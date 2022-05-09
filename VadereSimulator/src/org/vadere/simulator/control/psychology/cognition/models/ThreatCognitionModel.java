@@ -2,6 +2,7 @@ package org.vadere.simulator.control.psychology.cognition.models;
 
 import org.vadere.simulator.utils.topography.TopographyHelper;
 import org.vadere.state.attributes.Attributes;
+import org.vadere.state.attributes.models.psychology.AttributesThreatCognitionModel;
 import org.vadere.state.psychology.cognition.GroupMembership;
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.psychology.perception.types.ElapsedTime;
@@ -30,10 +31,12 @@ import java.util.stream.Collectors;
 public class ThreatCognitionModel implements ICognitionModel {
 
     private Topography topography;
+    private AttributesThreatCognitionModel attributes;
 
     @Override
     public void initialize(Topography topography, List<Attributes> attributes, Random random) {
         this.topography = topography;
+        this.attributes = new AttributesThreatCognitionModel();
     }
 
     @Override

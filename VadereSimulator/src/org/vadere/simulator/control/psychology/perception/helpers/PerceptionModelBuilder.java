@@ -41,8 +41,9 @@ public class PerceptionModelBuilder {
 			AttributesPerceptionModel attributes = Model.findAttributes(attributesList, perceptionModel.getAttributes().getClass());
 			perceptionModel.setAttributes(attributes);
 		} catch (AttributesNotFoundException e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
+
 
 
 		return perceptionModel;

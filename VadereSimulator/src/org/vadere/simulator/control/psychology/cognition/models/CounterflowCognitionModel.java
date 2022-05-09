@@ -2,6 +2,7 @@ package org.vadere.simulator.control.psychology.cognition.models;
 
 import org.vadere.simulator.utils.topography.TopographyHelper;
 import org.vadere.state.attributes.Attributes;
+import org.vadere.state.attributes.models.psychology.AttributesCounterflowCognitionModel;
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
@@ -21,10 +22,12 @@ import java.util.Random;
 public class CounterflowCognitionModel implements ICognitionModel {
 
     private Topography topography;
+    private AttributesCounterflowCognitionModel attributes;
 
     @Override
     public void initialize(Topography topography, List<Attributes> attributes, Random random) {
         this.topography = topography;
+        this.attributes = new AttributesCounterflowCognitionModel();
     }
 
     @Override

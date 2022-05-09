@@ -52,12 +52,23 @@ public class TargetVersionV2_2 extends SimpleJsonTransformation {
         ObjectNode psychologyLayer = (ObjectNode) node.at(psychologyLayerKey);
 
         if (path(psychologyLayer, keyMissing).isMissingNode()) {
-            psychologyLayer.put(keyMissing, mapper.createObjectNode()); // add empty node
+            ObjectNode attributesNode = mapper.createObjectNode();
+            attributesNode.put(extracted(psychologyLayer, "perception"), mapper.createObjectNode());
+            attributesNode.put(extracted(psychologyLayer, "cognition"), mapper.createObjectNode());
+
+            psychologyLayer.put(keyMissing, attributesNode); // add empty node
         } else {
             throw new MigrationException("Key " + keyMissing + " not allowed under " + psychologyLayerKey + ".");
         }
 
         return node;
+    }
+
+    private String extracted(ObjectNode psychologyLayer, String key) {
+
+        String path = "org.vadere.state.attributes.models.psychology.Attributes";
+
+        return path + psychologyLayer.get(key).toString().replace("\"", "");
     }
 
 

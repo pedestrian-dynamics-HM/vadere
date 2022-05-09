@@ -30,7 +30,7 @@ public class ProbabilisticCognitionModel extends AProbabilisticModel {
     @Override
     public void initialize(Topography topography, List<Attributes> attributes, Random random) {
         this.rng = new JDKRandomGenerator(random.nextInt());
-        this.attributesProbabilisticCognitionModel = Model.findAttributes(attributes, AttributesProbabilisticCognitionModel.class);
+        this.attributesProbabilisticCognitionModel = new AttributesProbabilisticCognitionModel();
         this.topography = topography;
 
         checkModelAttributes();

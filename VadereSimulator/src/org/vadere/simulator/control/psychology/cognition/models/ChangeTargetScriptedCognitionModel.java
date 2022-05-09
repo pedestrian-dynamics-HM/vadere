@@ -1,6 +1,7 @@
 package org.vadere.simulator.control.psychology.cognition.models;
 
 import org.vadere.state.attributes.Attributes;
+import org.vadere.state.attributes.models.psychology.AttributesChangeTargetScriptedCognitionModel;
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.psychology.perception.types.ChangeTargetScripted;
 import org.vadere.state.scenario.Pedestrian;
@@ -22,10 +23,12 @@ import java.util.stream.Collectors;
 public class ChangeTargetScriptedCognitionModel implements ICognitionModel {
 
     private Topography topography;
+    private AttributesChangeTargetScriptedCognitionModel attributes;
 
     @Override
     public void initialize(Topography topography, List<Attributes> attributes, Random random) {
         this.topography = topography;
+        this.attributes = new AttributesChangeTargetScriptedCognitionModel();
     }
 
     @Override

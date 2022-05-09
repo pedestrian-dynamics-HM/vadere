@@ -1,6 +1,7 @@
 package org.vadere.simulator.control.psychology.cognition.models;
 
 import org.vadere.state.attributes.Attributes;
+import org.vadere.state.attributes.models.psychology.AttributesCooperativeCognitionModel;
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
@@ -22,10 +23,12 @@ import java.util.Random;
 public class CooperativeCognitionModel implements ICognitionModel {
 
     private Topography topography;
+    private AttributesCooperativeCognitionModel attributes;
 
     @Override
     public void initialize(Topography topography, List<Attributes> attributes, Random random) {
         this.topography = topography;
+        this.attributes = new AttributesCooperativeCognitionModel();
     }
 
     @Override

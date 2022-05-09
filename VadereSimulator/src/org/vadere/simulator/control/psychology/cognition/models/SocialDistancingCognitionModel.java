@@ -1,6 +1,7 @@
 package org.vadere.simulator.control.psychology.cognition.models;
 
 import org.vadere.state.attributes.Attributes;
+import org.vadere.state.attributes.models.psychology.AttributesSocialDistancingCognitionModel;
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.psychology.perception.types.DistanceRecommendation;
 import org.vadere.state.psychology.perception.types.ElapsedTime;
@@ -27,9 +28,11 @@ import java.util.Random;
 public class SocialDistancingCognitionModel implements ICognitionModel {
 
     private HashMap<Pedestrian, Double> cloggingStartTimes = new HashMap<>();
+    private AttributesSocialDistancingCognitionModel attributes;
 
     @Override
     public void initialize(Topography topography, List<Attributes> attributes, Random random) {
+        this.attributes = new AttributesSocialDistancingCognitionModel();
     }
 
     @Override
