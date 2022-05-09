@@ -1,7 +1,7 @@
 {
-  "name" : "s2",
+  "name" : "aaa",
   "description" : "",
-  "release" : "2.2",
+  "release" : "2.1",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -107,24 +107,7 @@
     "attributesPsychology" : {
       "usePsychologyLayer" : true,
       "psychologyLayer" : {
-        "attributesModel" : {
-          "org.vadere.state.attributes.models.psychology.AttributesSimplePerceptionModel" : {
-            "priority" : {
-              "11" : "InformationStimulus",
-              "21" : "ChangeTargetScripted",
-              "31" : "ChangeTarget",
-              "41" : "Threat"
-            }
-          },
-          "org.vadere.state.attributes.models.psychology.AttributesProbabilisticCognitionModel" : {
-            "routeChoices" : [ {
-              "instruction" : "use target [1]",
-              "targetIds" : [ 1, 2 ],
-              "targetProbabilities" : [ 0.0, 1.0 ]
-            } ]
-          }
-        },
-        "perception" : "SimplePerceptionModel",
+        "perception" : "MultiPerceptionModel",
         "cognition" : "ProbabilisticCognitionModel"
       }
     },

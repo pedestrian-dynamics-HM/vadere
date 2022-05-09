@@ -1,6 +1,8 @@
 package org.vadere.simulator.control.psychology.perception.models;
 
 import org.vadere.state.attributes.Attributes;
+import org.vadere.state.attributes.models.psychology.AttributesMultiPerceptionModel;
+import org.vadere.state.attributes.models.psychology.AttributesPerceptionModel;
 import org.vadere.state.psychology.perception.types.*;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
@@ -16,11 +18,14 @@ import java.util.stream.Collectors;
 public class MultiPerceptionModel extends PerceptionModel {
 
     private Topography topography;
+    private AttributesMultiPerceptionModel attributes;
 
 
     @Override
     public void initialize(Topography topography, final double simTimeStepLengh, List<Attributes> attributesList) {
         this.topography = topography;
+        this.attributes = new AttributesMultiPerceptionModel();
+
     }
 
     @Override
@@ -33,6 +38,17 @@ public class MultiPerceptionModel extends PerceptionModel {
             ped.setNextPerceivedStimuli(stimuli);
         }
 
+    }
+
+    @Override
+    public void setAttributes(AttributesPerceptionModel attributes) {
+        this.attributes = (AttributesMultiPerceptionModel) attributes;
+
+    }
+
+    @Override
+    public AttributesMultiPerceptionModel getAttributes() {
+        return this.attributes;
     }
 
 

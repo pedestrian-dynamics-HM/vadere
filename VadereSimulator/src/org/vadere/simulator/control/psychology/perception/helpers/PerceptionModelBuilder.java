@@ -1,8 +1,12 @@
 package org.vadere.simulator.control.psychology.perception.helpers;
 
 import org.vadere.simulator.control.psychology.perception.models.IPerceptionModel;
+import org.vadere.simulator.models.Model;
 import org.vadere.simulator.projects.ScenarioStore;
 import org.vadere.state.attributes.Attributes;
+import org.vadere.state.attributes.exceptions.AttributesNotFoundException;
+import org.vadere.state.attributes.models.psychology.AttributesPerceptionModel;
+import org.vadere.state.attributes.models.psychology.AttributesSimplePerceptionModel;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.reflection.DynamicClassInstantiator;
 
@@ -32,6 +36,15 @@ public class PerceptionModelBuilder {
 		List<Attributes> attributesList = scenarioStore.getAttributesPsychology().getPsychologyLayer().getAttributesModel();
 
 		perceptionModel.initialize(topography, simTimeStepLength, attributesList);
+
+		try {
+			AttributesPerceptionModel attributes = Model.findAttributes(attributesList, perceptionModel.getAttributes().getClass());
+			perceptionModel.setAttributes(attributes);
+		} catch (AttributesNotFoundException e) {
+			e.printStackTrace();
+		}
+
+
 		return perceptionModel;
 	}
 

@@ -1,7 +1,7 @@
 package org.vadere.simulator.control.psychology.perception.models;
 
-import org.vadere.simulator.models.Model;
 import org.vadere.state.attributes.Attributes;
+import org.vadere.state.attributes.models.psychology.AttributesPerceptionModel;
 import org.vadere.state.attributes.models.psychology.AttributesSimplePerceptionModel;
 import org.vadere.state.psychology.perception.types.*;
 import org.vadere.state.scenario.Pedestrian;
@@ -17,13 +17,13 @@ import java.util.stream.Collectors;
  */
 public class SimplePerceptionModel extends PerceptionModel {
 
-    private AttributesSimplePerceptionModel attributesSimplePerceptionModel;
+    private AttributesSimplePerceptionModel attributes;
     private Topography topography;
 
     @Override
     public void initialize(Topography topography, final double simTimeStepLengh, List<Attributes> attributesList) {
         this.topography = topography;
-        this.attributesSimplePerceptionModel = Model.findAttributes(attributesList, AttributesSimplePerceptionModel.class);
+        this.attributes = new AttributesSimplePerceptionModel();
     }
 
 
@@ -33,6 +33,16 @@ public class SimplePerceptionModel extends PerceptionModel {
             Stimulus mostImportantStimulus = rankChangeTargetAndThreatHigherThanWait(pedSpecificStimuli.get(pedestrian), pedestrian);
             pedestrian.setMostImportantStimulus(mostImportantStimulus);
         }
+    }
+
+    @Override
+    public void setAttributes(AttributesPerceptionModel attributes) {
+        this.attributes = (AttributesSimplePerceptionModel) attributes;
+    }
+
+    @Override
+    public AttributesSimplePerceptionModel getAttributes() {
+        return this.attributes;
     }
 
 
@@ -49,7 +59,7 @@ public class SimplePerceptionModel extends PerceptionModel {
 
         // first element in stimuliSorted is the most important stimulus
 
-        List<String> attr = attributesSimplePerceptionModel.getSortedPriorityQueue().values().stream().collect(Collectors.toList());
+        List<String> attr = attributes.getSortedPriorityQueue().values().stream().collect(Collectors.toList());
         Collections.reverse(attr);
         for (String typeName : attr){
             Stimulus stimulus = StimulusFactory.stringToStimulus(typeName);
