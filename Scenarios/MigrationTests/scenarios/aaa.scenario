@@ -2,7 +2,6 @@
   "name" : "aaa",
   "description" : "",
   "release" : "2.2",
-  "commithash" : "f1e0e42791848a7b13d749ca06536b3d9a29fb42",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -108,12 +107,25 @@
     "attributesPsychology" : {
       "usePsychologyLayer" : true,
       "psychologyLayer" : {
-        "perception" : "MultiPerceptionModel",
-        "cognition" : "ProbabilisticCognitionModel",
+        "perception" : "SimplePerceptionModel",
+        "cognition" : "SocialDistancingCognitionModel",
         "attributesModel" : {
-          "org.vadere.state.attributes.models.psychology.perception.AttributesMultiPerceptionModel" : { },
-          "org.vadere.state.attributes.models.psychology.cognition.AttributesProbabilisticCognitionModel" : {
-            "routeChoices" : [ ]
+          "org.vadere.state.attributes.models.psychology.perception.AttributesSimplePerceptionModel" : {
+            "priority" : {
+              "1" : "InformationStimulus",
+              "2" : "ChangeTargetScripted",
+              "3" : "ChangeTarget",
+              "4" : "Threat",
+              "5" : "Wait",
+              "6" : "WaitInArea",
+              "7" : "DistanceRecommendation"
+            }
+          },
+          "org.vadere.state.attributes.models.psychology.cognition.AttributesSocialDistancingCognitionModel" : {
+            "repulsionFactor" : 1.2345,
+            "repulsionIntercept" : 0.5555,
+            "minDistance" : 1.25,
+            "maxDistance" : 2.0
           }
         }
       }
@@ -252,19 +264,20 @@
     },
     "stimulusInfos" : [ {
       "timeframe" : {
-        "startTime" : 0.0,
+        "startTime" : 1.0,
         "endTime" : 10.0,
         "repeat" : false,
         "waitTimeBetweenRepetition" : 0.0
       },
       "stimuli" : [ {
-        "type" : "InformationStimulus",
-        "id" : -1,
-        "information" : "use target [1]"
+        "type" : "DistanceRecommendation",
+        "id" : 1,
+        "socialDistance" : 1.5,
+        "cloggingTimeAllowedInSecs" : 5.0
       } ]
     } ],
     "reactionProbabilities" : [ {
-      "stimulusId" : -1,
+      "stimulusId" : 1,
       "reactionProbability" : 1.0
     } ]
   }

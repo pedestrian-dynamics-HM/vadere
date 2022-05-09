@@ -1,18 +1,18 @@
-package org.vadere.state.attributes.models.psychology.cognition;
+package org.vadere.state.attributes.models;
 
-public class AttributesSocialDistancingCognitionModel extends AttributesCognitionModel {
+public class AttributesPedestrianRepulsionPotentialStrategy extends AttributesCombinedPotentialStrategy {
 
     private double repulsionFactor = 1.6444;
     private double repulsionIntercept  = 0.4845;
     private double minDistance = 1.25;
     private double maxDistance = 2.0;
 
-    public double getRepulsionFactor() {
-        return repulsionFactor;
+    public double getMaxDistance() {
+        return maxDistance;
     }
 
-    public void setRepulsionFactor(double repulsionFactor) {
-        this.repulsionFactor = repulsionFactor;
+    public void setMaxDistance(double maxDistance) {
+        this.maxDistance = maxDistance;
     }
 
     public double getRepulsionIntercept() {
@@ -31,11 +31,11 @@ public class AttributesSocialDistancingCognitionModel extends AttributesCognitio
         this.minDistance = minDistance;
     }
 
-    public double getMaxDistance() {
-        return maxDistance;
+    public double getRepulsionFactor() {
+        return repulsionFactor;
     }
 
-    public void setMaxDistance(double maxDistance) {
-        this.maxDistance = maxDistance;
+    public void setRepulsionFactor(double repulsionFactor) {
+        this.repulsionFactor = repulsionFactor;
     }
 }

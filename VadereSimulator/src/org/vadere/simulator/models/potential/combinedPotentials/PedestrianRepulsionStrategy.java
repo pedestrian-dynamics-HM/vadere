@@ -5,6 +5,7 @@ import org.vadere.simulator.models.potential.PotentialFieldPedestrianCompactSoft
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
 import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
+import org.vadere.state.attributes.models.AttributesPedestrianRepulsionPotentialStrategy;
 import org.vadere.state.psychology.perception.types.DistanceRecommendation;
 import org.vadere.state.psychology.perception.types.Stimulus;
 import org.vadere.state.scenario.Agent;
@@ -25,11 +26,17 @@ public class PedestrianRepulsionStrategy implements ICombinedPotentialStrategy {
     private IPotentialFieldTarget potentialFieldTarget;
     private PotentialFieldObstacle potentialFieldObstacle;
     private PotentialFieldAgent potentialFieldAgent;
+    private AttributesPedestrianRepulsionPotentialStrategy attributes;
 
-    public PedestrianRepulsionStrategy(IPotentialFieldTarget potentialFieldTarget, PotentialFieldObstacle potentialFieldObstacle, PotentialFieldAgent potentialFieldAgent) {
+    public PedestrianRepulsionStrategy(IPotentialFieldTarget potentialFieldTarget, PotentialFieldObstacle potentialFieldObstacle, PotentialFieldAgent potentialFieldAgent, AttributesPedestrianRepulsionPotentialStrategy attributes) {
         this.potentialFieldTarget = potentialFieldTarget;
         this.potentialFieldObstacle = potentialFieldObstacle;
         this.potentialFieldAgent = potentialFieldAgent;
+        this.attributes = attributes;
+     }
+
+    public void setAttributes(AttributesPedestrianRepulsionPotentialStrategy attributes) {
+        this.attributes = attributes;
     }
 
     @Override
@@ -70,6 +77,7 @@ public class PedestrianRepulsionStrategy implements ICombinedPotentialStrategy {
         return socialDistance;
     }
 
+
     /**
      * Compute the personal space width depending on the social distance for the realistic use case.
      * Original equation:
@@ -78,8 +86,8 @@ public class PedestrianRepulsionStrategy implements ICombinedPotentialStrategy {
      * We use a fixed corridor width c=2 in this implementation.
      * **/
     private double getPersonalSpaceFromSocialDistance(double socialDistance) {
-
-        return 1.6444*socialDistance-0.4845;
+        //TODO repulsion
+        return getAttributes().getRepulsionFactor() *socialDistance - getAttributes().getRepulsionIntercept();
     }
 
     /**
@@ -92,10 +100,10 @@ public class PedestrianRepulsionStrategy implements ICombinedPotentialStrategy {
 
     private boolean isSocialDistanceInRange(double socialDistance) {
         // additional check (already checked in ScenarioChecker!)
-        return (socialDistance >= 1.25 && socialDistance <= 2.0);
+        return (socialDistance >= getAttributes().getMinDistance() && socialDistance <= getAttributes().getMaxDistance());
     }
 
-
-
-
+    public AttributesPedestrianRepulsionPotentialStrategy getAttributes() {
+        return attributes;
+    }
 }

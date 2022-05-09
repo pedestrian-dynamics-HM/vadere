@@ -4,8 +4,9 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.models.StepSizeAdjuster;
 import org.vadere.simulator.models.osm.optimization.OptimizationMetric;
-import org.vadere.simulator.models.potential.PotentialFieldPedestrianCompactSoftshell;
+import org.vadere.state.attributes.models.AttributesCombinedPotentialStrategy;
 import org.vadere.simulator.models.potential.combinedPotentials.*;
+import org.vadere.state.attributes.models.AttributesPedestrianRepulsionPotentialStrategy;
 import org.vadere.util.geometry.shapes.*;
 import org.vadere.simulator.models.SpeedAdjuster;
 import org.vadere.simulator.models.osm.optimization.StepCircleOptimizer;
@@ -38,6 +39,7 @@ public class PedestrianOSM extends Pedestrian {
 
 	private transient IPotentialFieldTarget potentialFieldTarget;
 	private transient PotentialFieldObstacle potentialFieldObstacle;
+	private AttributesCombinedPotentialStrategy attributesCombinedPotentialStrategy;
 
 	public PotentialFieldAgent getPotentialFieldPedestrian() {
 		return potentialFieldPedestrian;
@@ -380,7 +382,8 @@ public class PedestrianOSM extends Pedestrian {
 		} else if (newStrategy == CombinedPotentialStrategy.PEDESTRIAN_REPULSION_STRATEGY){
 			this.combinedPotentialStrategy = new PedestrianRepulsionStrategy(this.potentialFieldTarget,
 					this.potentialFieldObstacle,
-					this.potentialFieldPedestrian);
+					this.potentialFieldPedestrian,
+					(AttributesPedestrianRepulsionPotentialStrategy) this.attributesCombinedPotentialStrategy);
 		} else {
 			throw new UnsupportedOperationException();
 		}
@@ -448,5 +451,13 @@ public class PedestrianOSM extends Pedestrian {
 			}
 		}
 		return peds;
+	}
+
+	public void setCombinedPotentialStrategyAttributes(AttributesCombinedPotentialStrategy attributes) {
+		this.attributesCombinedPotentialStrategy = attributes;
+	}
+
+	public AttributesCombinedPotentialStrategy getAttributesCombinedPotentialStrategy(){
+		return this.attributesCombinedPotentialStrategy;
 	}
 }
