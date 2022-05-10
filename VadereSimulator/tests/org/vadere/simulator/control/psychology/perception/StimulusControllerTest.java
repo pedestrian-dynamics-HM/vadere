@@ -60,7 +60,6 @@ public class StimulusControllerTest {
 
         StimulusInfoStore stimulusInfoStore = new StimulusInfoStore();
         stimulusInfoStore.setStimulusInfos(stimulusInfos);
-        stimulusInfoStore.setReactionProbabilities(Collections.singletonList(new ReactionProbability()));
 
         return stimulusInfoStore;
     }
@@ -68,7 +67,6 @@ public class StimulusControllerTest {
     private StimulusInfoStore getStimulusInfoStore(List<StimulusInfo> stimulusList){
         StimulusInfoStore store = new StimulusInfoStore();
         store.setStimulusInfos(stimulusList);
-        store.setReactionProbabilities(Collections.singletonList(new ReactionProbability()));
         return store;
     }
 
@@ -477,7 +475,6 @@ public class StimulusControllerTest {
 
         // setup stimuluscontroller
         StimulusController stimulusController = new StimulusController(getScenarioStore(getStimulusInfoStore(Collections.singletonList(waitInfo))));
-        stimulusController.setReactionProbabilites(reactionProbabilities);
 
         List<Stimulus> stimuli = stimulusController.getStimuliForTime(0.4);
         double isProbWait = stimuli.stream().filter(stimulus -> stimulus instanceof Wait).findFirst().orElseThrow().getPerceptionProbability();
@@ -511,7 +508,6 @@ public class StimulusControllerTest {
 
         // setup stimuluscontroller
         StimulusController stimulusController = new StimulusController(getScenarioStore(getStimulusInfoStore(Collections.singletonList(waitInfo))));
-        stimulusController.setReactionProbabilites(reactionProbabilities);
         stimulusController.setPedSpecificDynamicStimulusEnduring(ped, changeTargetOriginal);
 
         // check if probability is set in mixed setting (general + pedestrian specific stimuli)
@@ -640,7 +636,6 @@ public class StimulusControllerTest {
         );
 
         StimulusInfoStore store = getStimulusInfoStore(Collections.singletonList((stimulusInfo1)));
-        store.setReactionProbabilities(Collections.singletonList(new ReactionProbability(expectedProbVal)));
         StimulusController stimulusController = new StimulusController(getScenarioStore(store));
 
         List<Stimulus> stimuli = stimulusController.getStimuliForTime(time);

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.json.JSONArray;
 import org.vadere.annotation.factories.migrationassistant.MigrationTransformation;
 import org.vadere.simulator.projects.migration.MigrationException;
 import org.vadere.simulator.projects.migration.jsontranformation.SimpleJsonTransformation;
@@ -24,6 +25,9 @@ import static org.vadere.state.util.StateJsonConverter.serializeStimuliToNode;
 @MigrationTransformation(targetVersionLabel = "1.16")
 public class TargetVersionV1_16 extends SimpleJsonTransformation {
 
+	JacksonObjectMapper mapper = new JacksonObjectMapper();
+
+
 	public TargetVersionV1_16(){
 		super(Version.V1_16);
 	}
@@ -43,23 +47,21 @@ public class TargetVersionV1_16 extends SimpleJsonTransformation {
 
 	}
 
-	private void addNewFieldToScenarioNode(final JsonNode node) {
+	private JsonNode addNewFieldToScenarioNode(final JsonNode node) {
+
+		String key = "reactionProbabilities";
 		JsonNode scenarioNode = node.get("scenario");
-		StimulusInfoStore stimulusInfoStore = StateJsonConverter.deserializeStimuliFromArrayNode(scenarioNode);
 
-		if (stimulusInfoStore.getReactionProbabilities().isEmpty() && !stimulusInfoStore.getStimulusInfos().isEmpty()){
-			stimulusInfoStore.setReactionProbabilities(Collections.singletonList(new ReactionProbability()));
+		if (path(scenarioNode, key).isMissingNode()) {
+			((ObjectNode) scenarioNode).put(key, mapper.createArrayNode());
 		}
 
-		ObjectNode node1 = serializeStimuliToNode(stimulusInfoStore);
-		Iterator<String> iter = node1.fieldNames();
-		while (iter.hasNext()) {
-			String fieldName = iter.next();
-			((ObjectNode)scenarioNode).put(fieldName, node1.get(fieldName));
-		}
+		return node;
+
+
 	}
 
-	private void removeRedudanteAttribute(final JsonNode node) {
+	private JsonNode removeRedudanteAttribute(final JsonNode node) {
 		String perceptionProbabilityKey = "perceptionProbability";
 		JsonNode stimulusInfosNode = path(node, "scenario/stimulusInfos");
 
@@ -76,6 +78,8 @@ public class TargetVersionV1_16 extends SimpleJsonTransformation {
 				}
 			}
 		}
+
+		return node;
 	}
 
 }

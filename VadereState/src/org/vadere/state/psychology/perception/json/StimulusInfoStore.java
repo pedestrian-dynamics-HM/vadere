@@ -76,7 +76,7 @@ public class StimulusInfoStore {
 
         StimulusInfoStore stimulusInfoStore = new StimulusInfoStore();
         stimulusInfoStore.setStimulusInfos(stimulusInfos);
-        
+
         // Use annotations at stimulus classes to specify how JSON <-> Java mapping should look like.
         // "VShape" are mapped by "JacksonObjectMapper" implementation.
         ObjectMapper mapper = new JacksonObjectMapper();

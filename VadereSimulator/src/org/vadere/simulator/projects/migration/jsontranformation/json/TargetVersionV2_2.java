@@ -38,7 +38,7 @@ public class TargetVersionV2_2 extends SimpleJsonTransformation {
         if (!path(scenarioNode, key).isMissingNode()) {
             ((ObjectNode) scenarioNode).remove(key);
         }
-
+        
         return node;
     }
 

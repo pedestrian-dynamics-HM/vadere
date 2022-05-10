@@ -28,8 +28,6 @@ public class StimulusController {
     private List<StimulusInfo> recurringStimuli;
 
 
-
-    private HashMap<Integer, Double> reactionProbabilities;
     private HashMap<Pedestrian, List<StimulusInfo>> pedSpecificStimuli;
 
 
@@ -44,7 +42,6 @@ public class StimulusController {
         oneTimeStimuli.stream().forEach(stimulusInfo -> throwExceptionIfTimeframeIsInvalid(stimulusInfo.getTimeframe(), false));
         recurringStimuli.stream().forEach(stimulusInfo -> throwExceptionIfTimeframeIsInvalid(stimulusInfo.getTimeframe(), true));
 
-        setReactionProbabilites(scenarioStore.getStimulusInfoStore().getReactionProbabilities());
         pedSpecificStimuli = new HashMap<>();
     }
 
@@ -57,7 +54,6 @@ public class StimulusController {
     }
     public List<StimulusInfo> getOneTimeStimuli() { return oneTimeStimuli; }
     public List<StimulusInfo> getRecurringStimuli() { return recurringStimuli; }
-    public HashMap<Integer, Double> getReactionProbabilities() { return reactionProbabilities; }
 
 
     // Setters
@@ -66,10 +62,6 @@ public class StimulusController {
     }
     public void setOneTimeStimuli(List<StimulusInfo> oneTimeStimuli) { this.oneTimeStimuli = oneTimeStimuli; }
     public void setRecurringStimuli(List<StimulusInfo> recurringStimuli) { this.recurringStimuli = recurringStimuli; }
-    protected void setReactionProbabilites(List<ReactionProbability> reactionProbabilities) {
-        reactionProbabilities.forEach(reactionProbability -> throwExceptionIfReactionProbabilityIsInvalid(reactionProbability));
-        this.reactionProbabilities = (HashMap<Integer, Double>) reactionProbabilities.stream().collect(Collectors.toMap(ReactionProbability::getStimulusId,ReactionProbability::getReactionProbability));
-    }
 
     // Methods
     public List<Stimulus> getStimuliForTime(double simulationTime) {
@@ -88,23 +80,10 @@ public class StimulusController {
         stimuli.addAll(activeOneTimeStimuli);
         stimuli.addAll(activeRecurringStimuli);
 
-        setReactionProbability(stimuli);
-
         return stimuli;
     }
 
-    private void setReactionProbability(final List<Stimulus> stimuli) {
-        /*for (Stimulus stimulus : stimuli){
-            if (!(stimulus instanceof ElapsedTime)){
-                if (reactionProbabilities.containsKey(stimulus.getId())){
-                    stimulus.setPerceptionProbability(reactionProbabilities.get(stimulus.getId()));
-                }
-                else{
-                    throw new RuntimeException("Stimulus id = "+ stimulus.getId() + " is not defined in perceptionLayer/reactionProbabilities." );
-                }
-            }
-        }*/
-    }
+
 
 
     public void setPedSpecificStimuli(final HashMap<Pedestrian, List<StimulusInfo>> pedSpecificStimuli) {
@@ -225,7 +204,6 @@ public class StimulusController {
 
     public void setPedSpecificDynamicStimulus(Pedestrian ped, StimulusInfo stimulusInfo){
 
-        setReactionProbability(stimulusInfo.getStimuli());
         List<StimulusInfo> stimulusInfos = new ArrayList<>();
 
         if (pedSpecificStimuli.containsKey(ped)) {
@@ -354,15 +332,6 @@ public class StimulusController {
         }
     }
 
-    /**
-     * Throw {@link IllegalArgumentException} if probability is not in 0..1
-     */
-    private static void throwExceptionIfReactionProbabilityIsInvalid(ReactionProbability reactionProbability) {
-        double probability = reactionProbability.getReactionProbability();
-        if ( probability > 1.0 || probability < 0.0) {
-            throw new IllegalArgumentException("ReactionProbability: probability must be in [0,1]. Got " + probability);
-        }
-    }
 
 
 }

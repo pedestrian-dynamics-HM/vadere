@@ -137,8 +137,6 @@ public class VadereCommandHandler extends CommandHandler<VadereVar> {
 			StimulusInfoStore sis = new StimulusInfoStore();
 			sis.setStimulusInfos(lsi);
 
-			List<ReactionProbability> reactionProbabilities = sic.getScenarioStore().getStimulusInfoStore().getReactionProbabilities();
-			sis.setReactionProbabilities(reactionProbabilities);
 
 			TraCIGetResponse res;
 			String data;

@@ -50,7 +50,6 @@ public class StimulusPresettings {
 
             StimulusInfoStore stimulusInfoStore = new StimulusInfoStore();
             stimulusInfoStore.setStimulusInfos(stimulusInfos);
-            stimulusInfoStore.setReactionProbabilities(Collections.singletonList(new ReactionProbability()));
 
 
             try {

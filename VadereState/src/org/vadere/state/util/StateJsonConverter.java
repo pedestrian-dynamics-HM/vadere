@@ -221,14 +221,6 @@ public abstract class StateJsonConverter {
 				node.forEach(stimulusInfoNode -> stimulusInfoList.add(mapper.convertValue(stimulusInfoNode, StimulusInfo.class)));
 				stimulusInfoStore.setStimulusInfos(stimulusInfoList);
 			}
-
-			key = "reactionProbabilities";
-			if (nodef.has(key)) {
-				node = nodef.get(key);
-				List<ReactionProbability> reactionProbabilities = new ArrayList<>();
-				node.forEach(reactionProbabilityNode -> reactionProbabilities.add(mapper.convertValue(reactionProbabilityNode, ReactionProbability.class)));
-				stimulusInfoStore.setReactionProbabilities(reactionProbabilities);
-			}
 		}
 
 		return stimulusInfoStore;
