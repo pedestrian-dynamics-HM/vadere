@@ -142,6 +142,11 @@ public class MigrationUtil {
 			public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
 
 				boolean hasTreeMarker = treeMarker.stream().anyMatch(m -> dir.resolve(m).toFile().exists());
+
+				if (dir.toString().contains(IOUtils.LEGACY_DIR)){
+					throw new RuntimeException("Skip directory: " + dir);
+				}
+
 				if (ignoreDirs.contains(dir.getFileName().toString())) { // skip ignored directories-trees.
 					return FileVisitResult.SKIP_SUBTREE;
 				} else if (hasTreeMarker) { // skip directory tree if treeMarker is present.
