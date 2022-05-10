@@ -44,7 +44,7 @@ public class CooperativeCognitionModelTest {
             privateTopographyField.setAccessible(true);
 
             assertNull(privateTopographyField.get(modelUnderTest));
-            modelUnderTest.initialize(new Topography(), attributes, new Random(0));
+            modelUnderTest.initialize(new Topography(), new Random(0));
             assertNotNull(privateTopographyField.get(modelUnderTest));
 
         } catch (IllegalAccessException ex) {

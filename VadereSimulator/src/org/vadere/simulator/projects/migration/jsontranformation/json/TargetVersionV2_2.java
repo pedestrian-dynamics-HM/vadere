@@ -44,15 +44,20 @@ public class TargetVersionV2_2 extends SimpleJsonTransformation {
 
     private JsonNode removeStimulusIds(JsonNode node) {
 
-        String stimulusInfos = "/scenario/stimulusInfos";
+        String key = "stimulusInfos";
+        JsonNode scenarioNode = node.get("scenario");
 
-        ArrayNode psychologyLayer = (ArrayNode) node.at(stimulusInfos);
+        if (!path(scenarioNode, "stimulusInfos").isMissingNode()) {
 
-        for (JsonNode entry : psychologyLayer){
-            ArrayNode stimuli = (ArrayNode) entry.get("stimuli");
-            for (JsonNode stimulus : stimuli){
-                ((ObjectNode) stimulus).remove("id");
+            ArrayNode psychologyLayer = (ArrayNode) scenarioNode.get(key);
+
+            for (JsonNode entry : psychologyLayer){
+                ArrayNode stimuli = (ArrayNode) entry.get("stimuli");
+                for (JsonNode stimulus : stimuli){
+                    ((ObjectNode) stimulus).remove("id");
+                }
             }
+
         }
 
         return node;

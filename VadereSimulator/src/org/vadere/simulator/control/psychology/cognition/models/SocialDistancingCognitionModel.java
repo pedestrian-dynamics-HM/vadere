@@ -1,8 +1,6 @@
 package org.vadere.simulator.control.psychology.cognition.models;
 
 import org.vadere.simulator.models.osm.PedestrianOSM;
-import org.vadere.simulator.models.potential.combinedPotentials.PedestrianRepulsionStrategy;
-import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesPedestrianRepulsionPotentialStrategy;
 import org.vadere.state.attributes.models.psychology.cognition.AttributesCognitionModel;
 import org.vadere.state.attributes.models.psychology.cognition.AttributesSocialDistancingCognitionModel;
@@ -17,7 +15,6 @@ import org.vadere.state.simulation.FootstepHistory;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Random;
 
 /**
@@ -35,7 +32,7 @@ public class SocialDistancingCognitionModel implements ICognitionModel {
     private AttributesSocialDistancingCognitionModel attributes;
 
     @Override
-    public void initialize(Topography topography, List<Attributes> attributes, Random random) {
+    public void initialize(Topography topography, Random random) {
         this.attributes = new AttributesSocialDistancingCognitionModel();
     }
 
@@ -52,10 +49,10 @@ public class SocialDistancingCognitionModel implements ICognitionModel {
                 PedestrianOSM ped = (PedestrianOSM) pedestrian;
 
                 AttributesPedestrianRepulsionPotentialStrategy attr = new AttributesPedestrianRepulsionPotentialStrategy();
-                attr.setMaxDistance(this.attributes.getMaxDistance());
-                attr.setMinDistance(this.attributes.getMinDistance());
-                attr.setRepulsionIntercept(this.attributes.getRepulsionIntercept());
-                attr.setRepulsionFactor(this.attributes.getRepulsionFactor());
+                attr.setSocialDistanceUpperBound(this.attributes.getMaxDistance());
+                attr.setSocialDistanceLowerBound(this.attributes.getMinDistance());
+                attr.setPersonalSpaceWidthIntercept(this.attributes.getRepulsionIntercept());
+                attr.setPersonalSpaceWidthFactor(this.attributes.getRepulsionFactor());
                 ped.setCombinedPotentialStrategyAttributes(attr);
             }
         }

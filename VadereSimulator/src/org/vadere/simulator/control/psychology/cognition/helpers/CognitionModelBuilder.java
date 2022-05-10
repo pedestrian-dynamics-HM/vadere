@@ -5,7 +5,6 @@ import org.vadere.simulator.models.Model;
 import org.vadere.simulator.projects.ScenarioStore;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.psychology.cognition.AttributesCognitionModel;
-import org.vadere.state.attributes.models.psychology.perception.AttributesPerceptionModel;
 import org.vadere.util.reflection.DynamicClassInstantiator;
 
 import java.util.List;
@@ -33,7 +32,7 @@ public class CognitionModelBuilder {
 		List<Attributes> attributes = scenarioStore.getAttributesPsychology().getPsychologyLayer().getAttributesModel();
 
 		Random random = new Random(scenarioStore.getAttributesSimulation().getSimulationSeed());
-		cognitionModel.initialize(scenarioStore.getTopography(), attributes, random);
+		cognitionModel.initialize(scenarioStore.getTopography(), random);
 
 		List<Attributes> attributesList = scenarioStore.getAttributesPsychology().getPsychologyLayer().getAttributesModel();
 

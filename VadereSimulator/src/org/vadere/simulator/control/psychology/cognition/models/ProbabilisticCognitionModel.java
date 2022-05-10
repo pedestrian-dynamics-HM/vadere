@@ -4,7 +4,6 @@ import org.apache.commons.math3.distribution.EnumeratedIntegerDistribution;
 import org.apache.commons.math3.random.JDKRandomGenerator;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.util.Precision;
-import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.psychology.cognition.AttributesCognitionModel;
 import org.vadere.state.attributes.models.psychology.cognition.AttributesProbabilisticCognitionModel;
 import org.vadere.state.attributes.models.psychology.cognition.AttributesRouteChoiceDefinition;
@@ -35,7 +34,7 @@ public class ProbabilisticCognitionModel extends AProbabilisticModel {
     private Topography topography;
 
     @Override
-    public void initialize(Topography topography, List<Attributes> attributes, Random random) {
+    public void initialize(Topography topography, Random random) {
         this.rng = new JDKRandomGenerator(random.nextInt());
         this.attributesProbabilisticCognitionModel = new AttributesProbabilisticCognitionModel();
         this.topography = topography;
@@ -79,7 +78,6 @@ public class ProbabilisticCognitionModel extends AProbabilisticModel {
         }
     }
 
-
     public AttributesRouteChoiceDefinition getFilteredAttributes(String information) {
 
         List<AttributesRouteChoiceDefinition> routeChoices = attributesProbabilisticCognitionModel.getRouteChoices();
@@ -98,7 +96,7 @@ public class ProbabilisticCognitionModel extends AProbabilisticModel {
 
     }
 
-    private LinkedList<Integer> getNewTarget(LinkedList<Integer> targetIdList, LinkedList<Double> targetProbabilityList) {
+    public LinkedList<Integer> getNewTarget(LinkedList<Integer> targetIdList, LinkedList<Double> targetProbabilityList) {
 
         int[] targetIds = targetIdList.stream().mapToInt(i -> i).toArray();
         double[] targetProbabilities = targetProbabilityList.stream().mapToDouble(i -> i).toArray();

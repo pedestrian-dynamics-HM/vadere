@@ -1,7 +1,6 @@
 package org.vadere.simulator.control.psychology.perception.models;
 
 import org.vadere.simulator.models.Model;
-import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.psychology.perception.AttributesPerceptionModel;
 import org.vadere.state.psychology.perception.types.ElapsedTime;
 import org.vadere.state.psychology.perception.types.Stimulus;
@@ -33,7 +32,7 @@ public interface IPerceptionModel {
 	 * a model can acquire additional information about a pedestrian's surrounding
 	 * when evaluating pedestrian's perception.
 	 */
-	void initialize(Topography topography, final double simTimeStepLengh, List<Attributes> attributesList);
+	void initialize(Topography topography, final double simTimeStepLengh);
 
 
 	/**

@@ -11,7 +11,6 @@ import org.vadere.state.psychology.perception.types.Stimulus;
 import org.vadere.state.scenario.Agent;
 import org.vadere.util.geometry.shapes.IPoint;
 
-import javax.management.RuntimeErrorException;
 import java.util.Collection;
 
 /**
@@ -86,8 +85,7 @@ public class PedestrianRepulsionStrategy implements ICombinedPotentialStrategy {
      * We use a fixed corridor width c=2 in this implementation.
      * **/
     private double getPersonalSpaceFromSocialDistance(double socialDistance) {
-        //TODO repulsion
-        return getAttributes().getRepulsionFactor() *socialDistance - getAttributes().getRepulsionIntercept();
+        return getAttributes().getPersonalSpaceWidthFactor() *socialDistance - getAttributes().getPersonalSpaceWidthIntercept();
     }
 
     /**
@@ -95,12 +93,12 @@ public class PedestrianRepulsionStrategy implements ICombinedPotentialStrategy {
      * the height must be set to 850.
      * */
     private double getHeightFromSocialDistance(double socialDistance) {
-        return 850.0;
+        return attributes.getPersonalSpaceStrength();
     }
 
     private boolean isSocialDistanceInRange(double socialDistance) {
         // additional check (already checked in ScenarioChecker!)
-        return (socialDistance >= getAttributes().getMinDistance() && socialDistance <= getAttributes().getMaxDistance());
+        return (socialDistance >= getAttributes().getSocialDistanceLowerBound() && socialDistance <= getAttributes().getSocialDistanceUpperBound());
     }
 
     public AttributesPedestrianRepulsionPotentialStrategy getAttributes() {

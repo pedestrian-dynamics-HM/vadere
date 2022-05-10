@@ -70,7 +70,7 @@ public class ThreatCognitionModelTest {
             privateTopographyField.setAccessible(true);
 
             assertNull(privateTopographyField.get(modelUnderTest));
-            modelUnderTest.initialize(new Topography(), attributes, new Random(0));
+            modelUnderTest.initialize(new Topography(), new Random(0));
             assertNotNull(privateTopographyField.get(modelUnderTest));
 
         } catch (IllegalAccessException ex) {
@@ -95,7 +95,7 @@ public class ThreatCognitionModelTest {
         initializeTopography();
 
         ThreatCognitionModel modelUnderTest = new ThreatCognitionModel();
-        modelUnderTest.initialize(topography, attributes, new Random(0));
+        modelUnderTest.initialize(topography, new Random(0));
 
         Threat threatStimulus = new Threat();
         pedestrian.setMostImportantStimulus(threatStimulus);
@@ -111,7 +111,7 @@ public class ThreatCognitionModelTest {
         initializeTopography();
 
         ThreatCognitionModel modelUnderTest = new ThreatCognitionModel();
-        modelUnderTest.initialize(topography, attributes, new Random(0));
+        modelUnderTest.initialize(topography, new Random(0));
 
         Threat threatStimulus = new Threat();
         pedestrian.setMostImportantStimulus(threatStimulus);
@@ -129,7 +129,7 @@ public class ThreatCognitionModelTest {
         initializeTopography();
 
         ThreatCognitionModel modelUnderTest = new ThreatCognitionModel();
-        modelUnderTest.initialize(topography, attributes, new Random(0));
+        modelUnderTest.initialize(topography, new Random(0));
 
         Threat threatStimulus = new Threat();
         pedestrian.setMostImportantStimulus(threatStimulus);
@@ -151,7 +151,7 @@ public class ThreatCognitionModelTest {
         initializeTopography();
 
         ThreatCognitionModel modelUnderTest = new ThreatCognitionModel();
-        modelUnderTest.initialize(topography, attributes, new Random(0));
+        modelUnderTest.initialize(topography, new Random(0));
 
         Threat threatStimulus = new Threat();
         pedestrian.setMostImportantStimulus(threatStimulus);
@@ -179,7 +179,7 @@ public class ThreatCognitionModelTest {
         topography.addElement(pedestrian);
 
         ThreatCognitionModel modelUnderTest = new ThreatCognitionModel();
-        modelUnderTest.initialize(topography, attributes, new Random(0));
+        modelUnderTest.initialize(topography, new Random(0));
 
         modelUnderTest.update(pedestrians);
 
@@ -205,7 +205,7 @@ public class ThreatCognitionModelTest {
         topography.addElement(pedestrian);
 
         ThreatCognitionModel modelUnderTest = new ThreatCognitionModel();
-        modelUnderTest.initialize(topography, attributes, new Random(0));
+        modelUnderTest.initialize(topography, new Random(0));
 
         // The "Threat" stimulus is processed for the first time.
         // Subsequent stimuli will be "ElapsedTime".
@@ -233,7 +233,7 @@ public class ThreatCognitionModelTest {
         topography.addElement(pedestrian);
 
         ThreatCognitionModel modelUnderTest = new ThreatCognitionModel();
-        modelUnderTest.initialize(topography, attributes, new Random(0));
+        modelUnderTest.initialize(topography, new Random(0));
 
         pedestrian.setSelfCategory(SelfCategory.WAIT);
         modelUnderTest.update(pedestrians);
@@ -276,7 +276,7 @@ public class ThreatCognitionModelTest {
         topography.addElement(pedestrian);
 
         ThreatCognitionModel modelUnderTest = new ThreatCognitionModel();
-        modelUnderTest.initialize(topography, attributes, new Random(0));
+        modelUnderTest.initialize(topography, new Random(0));
 
         modelUnderTest.update(pedestrians);
 

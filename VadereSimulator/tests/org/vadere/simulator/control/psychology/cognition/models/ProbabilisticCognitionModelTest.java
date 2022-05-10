@@ -125,7 +125,8 @@ public class ProbabilisticCognitionModelTest {
         pedestrians.stream().forEach(ped -> ped.setMostImportantStimulus(new InformationStimulus("A")));
 
         ProbabilisticCognitionModel probabilisticPerceptionModel = new ProbabilisticCognitionModel();
-        probabilisticPerceptionModel.initialize(topography, attributes, new Random(0));
+        probabilisticPerceptionModel.initialize(topography, new Random(0));
+        probabilisticPerceptionModel.setAttributes(attr);
 
 
 
@@ -149,7 +150,8 @@ public class ProbabilisticCognitionModelTest {
         List<Pedestrian> pedestrians = createPedestrians(1);
 
         ProbabilisticCognitionModel probabilisticPerceptionModel = new ProbabilisticCognitionModel();
-        probabilisticPerceptionModel.initialize(topography, attributes, new Random(0));
+        probabilisticPerceptionModel.initialize(topography, new Random(0));
+        probabilisticPerceptionModel.setAttributes(this.attributesProbabilisticCognitionModel);
 
         pedestrians.stream().forEach(ped -> ped.setMostImportantStimulus(new InformationStimulus("A")));
 

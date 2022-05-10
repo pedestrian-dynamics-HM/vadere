@@ -1,6 +1,5 @@
 package org.vadere.simulator.control.psychology.cognition.models;
 
-import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.psychology.cognition.AttributesChangeTargetScriptedCognitionModel;
 import org.vadere.state.attributes.models.psychology.cognition.AttributesCognitionModel;
 import org.vadere.state.psychology.cognition.SelfCategory;
@@ -27,7 +26,7 @@ public class ChangeTargetScriptedCognitionModel implements ICognitionModel {
     private AttributesChangeTargetScriptedCognitionModel attributes;
 
     @Override
-    public void initialize(Topography topography, List<Attributes> attributes, Random random) {
+    public void initialize(Topography topography, Random random) {
         this.topography = topography;
         this.attributes = new AttributesChangeTargetScriptedCognitionModel();
     }

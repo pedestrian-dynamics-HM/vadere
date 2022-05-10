@@ -2,40 +2,51 @@ package org.vadere.state.attributes.models;
 
 public class AttributesPedestrianRepulsionPotentialStrategy extends AttributesCombinedPotentialStrategy {
 
-    private double repulsionFactor = 1.6444;
-    private double repulsionIntercept  = 0.4845;
-    private double minDistance = 1.25;
-    private double maxDistance = 2.0;
+    /* Parameter values, see Mayr, Koester: Social distancing with the Optimal Steps Model*/
 
-    public double getMaxDistance() {
-        return maxDistance;
+    private double personalSpaceWidthFactor = 1.6444;
+    private double personalSpaceWidthIntercept = 0.4845;
+    private double socialDistanceLowerBound = 1.25;
+    private double socialDistanceUpperBound = 2.0;
+    private double personalSpaceStrength = 850.0;
+
+    public double getSocialDistanceUpperBound() {
+        return socialDistanceUpperBound;
     }
 
-    public void setMaxDistance(double maxDistance) {
-        this.maxDistance = maxDistance;
+    public void setSocialDistanceUpperBound(double socialDistanceUpperBound) {
+        this.socialDistanceUpperBound = socialDistanceUpperBound;
     }
 
-    public double getRepulsionIntercept() {
-        return repulsionIntercept;
+    public double getPersonalSpaceWidthIntercept() {
+        return personalSpaceWidthIntercept;
     }
 
-    public void setRepulsionIntercept(double repulsionIntercept) {
-        this.repulsionIntercept = repulsionIntercept;
+    public void setPersonalSpaceWidthIntercept(double personalSpaceWidthIntercept) {
+        this.personalSpaceWidthIntercept = personalSpaceWidthIntercept;
     }
 
-    public double getMinDistance() {
-        return minDistance;
+    public double getSocialDistanceLowerBound() {
+        return socialDistanceLowerBound;
     }
 
-    public void setMinDistance(double minDistance) {
-        this.minDistance = minDistance;
+    public void setSocialDistanceLowerBound(double socialDistanceLowerBound) {
+        this.socialDistanceLowerBound = socialDistanceLowerBound;
     }
 
-    public double getRepulsionFactor() {
-        return repulsionFactor;
+    public double getPersonalSpaceWidthFactor() {
+        return personalSpaceWidthFactor;
     }
 
-    public void setRepulsionFactor(double repulsionFactor) {
-        this.repulsionFactor = repulsionFactor;
+    public void setPersonalSpaceWidthFactor(double personalSpaceWidthFactor) {
+        this.personalSpaceWidthFactor = personalSpaceWidthFactor;
+    }
+
+    public double getPersonalSpaceStrength() {
+        return personalSpaceStrength;
+    }
+
+    public void setPersonalSpaceStrength(double personalSpaceStrength) {
+        this.personalSpaceStrength = personalSpaceStrength;
     }
 }

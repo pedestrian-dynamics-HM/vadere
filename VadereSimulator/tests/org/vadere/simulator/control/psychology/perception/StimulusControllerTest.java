@@ -457,70 +457,6 @@ public class StimulusControllerTest {
         assertEquals(2, pedSpecificStimuli.size());
     }
 
-    @Test
-    public void checkProbabilityMappingGeneralStimuliOnly(){
-
-        int commandIdWait = -33;
-        double probWait = 0.11;
-
-        // define stimuli and store them in stimulusInfo object
-        Stimulus wait = new Wait();
-        wait.setId(commandIdWait);
-        Timeframe timeframe = new Timeframe(0, 1, false,0);
-        StimulusInfo waitInfo = new StimulusInfo(timeframe, Collections.singletonList(wait));
-
-        // define probababilites for stimuli
-        LinkedList<ReactionProbability> reactionProbabilities = new LinkedList<>();
-        reactionProbabilities.add(new ReactionProbability(commandIdWait, probWait));
-
-        // setup stimuluscontroller
-        StimulusController stimulusController = new StimulusController(getScenarioStore(getStimulusInfoStore(Collections.singletonList(waitInfo))));
-
-        List<Stimulus> stimuli = stimulusController.getStimuliForTime(0.4);
-        double isProbWait = stimuli.stream().filter(stimulus -> stimulus instanceof Wait).findFirst().orElseThrow().getPerceptionProbability();
-        assert isProbWait == probWait;
-    }
-
-
-    @Test
-    public void checkProbabilityMappingMixedSetting(){
-
-        int commandIdWait = -33;
-        int commandIdChangeTarget = 55;
-        double probWait = 0.5;
-        double probChangeTarget = 0.75;
-
-        Pedestrian ped = new Pedestrian(new AttributesAgent(), new Random());
-
-        // define stimuli and store them in stimulusInfo object
-        Stimulus wait = new Wait();
-        wait.setId(commandIdWait);
-        Stimulus changeTargetOriginal = new ChangeTarget();
-        changeTargetOriginal.setId(commandIdChangeTarget);
-        Timeframe timeframe = new Timeframe(0, 1, false,0);
-        StimulusInfo waitInfo = new StimulusInfo(timeframe, Collections.singletonList(wait));
-
-        // define probababilites for stimuli
-        LinkedList<ReactionProbability> reactionProbabilities = new LinkedList<>();
-        reactionProbabilities.add(new ReactionProbability(commandIdWait, probWait));
-        reactionProbabilities.add(new ReactionProbability(commandIdChangeTarget, probChangeTarget));
-
-
-        // setup stimuluscontroller
-        StimulusController stimulusController = new StimulusController(getScenarioStore(getStimulusInfoStore(Collections.singletonList(waitInfo))));
-        stimulusController.setPedSpecificDynamicStimulusEnduring(ped, changeTargetOriginal);
-
-        // check if probability is set in mixed setting (general + pedestrian specific stimuli)
-        List<Stimulus> stimuli = stimulusController.getStimuliForTime(0.0, ped);
-        double isProbWait = stimuli.stream().filter(stimulus -> stimulus instanceof Wait).findFirst().orElseThrow().getPerceptionProbability();
-        double isProbChangeTarget = stimuli.stream().filter(stimulus -> stimulus instanceof ChangeTarget).findFirst().orElseThrow().getPerceptionProbability();
-
-        assert isProbWait == probWait;
-        assert isProbChangeTarget == probChangeTarget;
-    }
-
-
-
 
     @Test
     public void getDynamicStimuli(){
@@ -625,27 +561,6 @@ public class StimulusControllerTest {
 
     }
 
-    @Test
-    public void assignReactionProbabilites() {
-        double expectedProbVal = 0.77;
-        double time = 1.2;
-
-        StimulusInfo stimulusInfo1 = getStimulusInfo(
-                new Timeframe(time, 7, false,0),
-                new Wait(time)
-        );
-
-        StimulusInfoStore store = getStimulusInfoStore(Collections.singletonList((stimulusInfo1)));
-        StimulusController stimulusController = new StimulusController(getScenarioStore(store));
-
-        List<Stimulus> stimuli = stimulusController.getStimuliForTime(time);
-        Stimulus waitStimulus = stimuli.stream().filter(stimulus -> stimulus instanceof Wait).collect(Collectors.toList()).get(0);
-        Stimulus elapsedTimeStimulus = stimuli.stream().filter(stimulus -> stimulus instanceof ElapsedTime).collect(Collectors.toList()).get(0);
-
-        assertEquals(expectedProbVal, waitStimulus.getPerceptionProbability(), Double.MIN_VALUE);
-        assertEquals(1.0, elapsedTimeStimulus.getPerceptionProbability(), Double.MIN_VALUE);
-
-    }
 
 
 

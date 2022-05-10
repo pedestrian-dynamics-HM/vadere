@@ -1,6 +1,5 @@
 package org.vadere.simulator.control.psychology.perception.models;
 
-import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.psychology.perception.AttributesPerceptionModel;
 import org.vadere.state.attributes.models.psychology.perception.AttributesSimplePerceptionModel;
 import org.vadere.state.psychology.perception.types.*;
@@ -21,7 +20,7 @@ public class SimplePerceptionModel extends PerceptionModel {
     private Topography topography;
 
     @Override
-    public void initialize(Topography topography, final double simTimeStepLengh, List<Attributes> attributesList) {
+    public void initialize(Topography topography, final double simTimeStepLengh) {
         this.topography = topography;
         this.attributes = new AttributesSimplePerceptionModel();
     }

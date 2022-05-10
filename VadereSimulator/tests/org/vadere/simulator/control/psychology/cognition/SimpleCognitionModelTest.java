@@ -51,7 +51,7 @@ public class SimpleCognitionModelTest {
         }
 
         SimpleCognitionModel simpleCognitionModel = new SimpleCognitionModel();
-        simpleCognitionModel.initialize(createTopography(), attributes, new Random(0));
+        simpleCognitionModel.initialize(createTopography(), new Random(0));
 
         simpleCognitionModel.update(pedestrians);
 
