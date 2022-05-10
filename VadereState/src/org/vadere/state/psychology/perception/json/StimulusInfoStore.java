@@ -39,29 +39,20 @@ public class StimulusInfoStore {
 
     // Member Variables
     private List<StimulusInfo> stimulusInfos;
-    private List<ReactionProbability> reactionProbabilities;
 
     // Constructors
     public StimulusInfoStore() {
         this.stimulusInfos = new ArrayList<>();
-        this.reactionProbabilities = new ArrayList<>();
     }
 
     // Getter
     public List<StimulusInfo> getStimulusInfos() {
         return stimulusInfos;
     }
-    public List<ReactionProbability> getReactionProbabilities() {
-        return reactionProbabilities;
-    }
 
     // Setter
     public void setStimulusInfos(List<StimulusInfo> stimulusInfos) {
         this.stimulusInfos = stimulusInfos;
-    }
-
-    public void setReactionProbabilities(final List<ReactionProbability> reactionProbabilities) {
-        this.reactionProbabilities = reactionProbabilities;
     }
 
     public static void main(String... args) {
@@ -85,9 +76,7 @@ public class StimulusInfoStore {
 
         StimulusInfoStore stimulusInfoStore = new StimulusInfoStore();
         stimulusInfoStore.setStimulusInfos(stimulusInfos);
-        stimulusInfoStore.setReactionProbabilities(reactionProbabilities);
-
-
+        
         // Use annotations at stimulus classes to specify how JSON <-> Java mapping should look like.
         // "VShape" are mapped by "JacksonObjectMapper" implementation.
         ObjectMapper mapper = new JacksonObjectMapper();

@@ -1,6 +1,7 @@
 package org.vadere.simulator.projects.migration.jsontranformation.json;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.vadere.annotation.factories.migrationassistant.MigrationTransformation;
 import org.vadere.simulator.control.psychology.perception.models.PerceptionModel;
@@ -24,8 +25,39 @@ public class TargetVersionV2_2 extends SimpleJsonTransformation {
     protected void initDefaultHooks() {
         addPostHookFirst(this::addPsychologyLayerNodeIfMissing);
         addPostHookLast(this::addNestedModelAttributesKeyInPsychologyLayer);
+        addPostHookLast(this::removeReactionProbabilities);
+        addPostHookLast(this::removeStimulusIds);
         addPostHookLast(this::sort);
     }
+
+
+    private JsonNode removeReactionProbabilities(JsonNode node) {
+        String key = "reactionProbabilities";
+        JsonNode scenarioNode = node.get("scenario");
+
+        if (!path(scenarioNode, key).isMissingNode()) {
+            ((ObjectNode) scenarioNode).remove(key);
+        }
+
+        return node;
+    }
+
+    private JsonNode removeStimulusIds(JsonNode node) {
+
+        String stimulusInfos = "/scenario/stimulusInfos";
+
+        ArrayNode psychologyLayer = (ArrayNode) node.at(stimulusInfos);
+
+        for (JsonNode entry : psychologyLayer){
+            ArrayNode stimuli = (ArrayNode) entry.get("stimuli");
+            for (JsonNode stimulus : stimuli){
+                ((ObjectNode) stimulus).remove("id");
+            }
+        }
+
+        return node;
+    }
+
 
     private JsonNode addPsychologyLayerNodeIfMissing(JsonNode node) {
 
@@ -71,6 +103,7 @@ public class TargetVersionV2_2 extends SimpleJsonTransformation {
 
         return path + psychologyLayer.get(key).toString().replace("\"", "");
     }
+
 
 
 }
