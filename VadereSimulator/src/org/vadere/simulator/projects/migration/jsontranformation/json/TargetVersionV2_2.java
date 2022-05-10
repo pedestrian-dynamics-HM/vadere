@@ -38,7 +38,7 @@ public class TargetVersionV2_2 extends SimpleJsonTransformation {
         if (!path(scenarioNode, key).isMissingNode()) {
             ((ObjectNode) scenarioNode).remove(key);
         }
-        
+
         return node;
     }
 
@@ -100,7 +100,6 @@ public class TargetVersionV2_2 extends SimpleJsonTransformation {
     private String extracted(ObjectNode psychologyLayer, String key) {
 
         String path = "org.vadere.state.attributes.models.psychology."+ key +".Attributes";
-
         return path + psychologyLayer.get(key).toString().replace("\"", "");
     }
 
