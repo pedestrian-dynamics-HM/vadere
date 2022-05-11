@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import org.apache.commons.math3.util.Precision;
 
 import java.util.List;
 
@@ -48,7 +47,6 @@ public abstract class Stimulus implements Cloneable {
 
     // Member Variables
     protected double time;
-    protected double perceptionProbability;
 
 
     protected int id;
@@ -58,29 +56,24 @@ public abstract class Stimulus implements Cloneable {
     protected Stimulus() {
 
         this.time = 0;
-        this.perceptionProbability = 1.0;
         this.id = -1;
     }
 
     protected Stimulus(double time) {
         this.time = time;
-        this.perceptionProbability = 1.0;
         this.id = -1;
     }
 
     protected Stimulus(double time, int id) {
         this.time = time;
         this.id = id;
-        this.perceptionProbability = 1.0;
     }
 
     protected Stimulus(double time, double perceptionProbability) {
         this.time = time;
-        this.perceptionProbability = perceptionProbability;
     }
     protected Stimulus(double time, double perceptionProbability, int id) {
         this.time = time;
-        this.perceptionProbability = perceptionProbability;
         this.id = id;
     }
 
@@ -92,14 +85,12 @@ public abstract class Stimulus implements Cloneable {
     public double getTime() {
         return time;
     }
-    public double getPerceptionProbability() {return perceptionProbability; }
+
     public int getId() { return id; }
 
     // Setter
     public void setTime(double time) { this.time = time; }
-    public void setPerceptionProbability(double perceptionProbability){
-        this.perceptionProbability = perceptionProbability;
-    }
+
     public void setId(int id) {
         this.id = id;
     }

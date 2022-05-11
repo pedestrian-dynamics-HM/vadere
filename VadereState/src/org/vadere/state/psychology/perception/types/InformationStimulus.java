@@ -50,8 +50,7 @@ public class InformationStimulus extends Stimulus {
 		if(this == that) return true;
 		if(!(that instanceof InformationStimulus)) return false;
 		InformationStimulus informationStimulus = (InformationStimulus) that;
-		boolean isProb = Precision.equals(this.perceptionProbability, informationStimulus.getPerceptionProbability(), Double.MIN_VALUE);
 		boolean isInformation = this.information.equals(informationStimulus.getInformation());
-		return isProb && isInformation;
+		return isInformation;
 	}
 }

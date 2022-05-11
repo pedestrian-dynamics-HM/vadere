@@ -5,6 +5,7 @@ import org.vadere.state.psychology.perception.json.StimulusInfo;
 import org.vadere.state.psychology.perception.types.*;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VShape;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -105,6 +106,7 @@ public class StimulusController {
         List<Stimulus> stimuli = new ArrayList<>();
         stimuli = getStimuliForTime(simulationTime);
 
+
         List<Stimulus> waitInAreaStimuli = stimuli.stream().filter(stimulus -> stimulus instanceof WaitInArea).collect(Collectors.toList());
         List<Stimulus> threatStimuli = stimuli.stream().filter(stimulus -> stimulus instanceof Threat).collect(Collectors.toList());
 
@@ -156,6 +158,8 @@ public class StimulusController {
             Threat currentThreat = (Threat) stimulus;
 
             VPoint threatOrigin = this.scenarioStore.getTopography().getTarget(currentThreat.getOriginAsTargetId()).getShape().getCentroid();
+
+
             double distanceToThreat = threatOrigin.distance(pedestrian.getPosition());
 
             if (distanceToThreat <= currentThreat.getRadius()) {
@@ -220,7 +224,7 @@ public class StimulusController {
     public void setPedSpecificDynamicStimulus(Pedestrian ped, Stimulus stimulus, double stimulusEndTime){
 
         Timeframe timeframe = new Timeframe(0, stimulusEndTime, false, 0);
-        StimulusInfo stimulusInfo = new StimulusInfo(timeframe, Collections.singletonList(stimulus));
+        StimulusInfo stimulusInfo = new StimulusInfo(timeframe, Collections.singletonList(stimulus), new Location());
         setPedSpecificDynamicStimulus(ped, stimulusInfo);
 
     }

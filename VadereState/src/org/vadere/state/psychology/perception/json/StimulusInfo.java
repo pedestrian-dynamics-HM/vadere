@@ -1,5 +1,6 @@
 package org.vadere.state.psychology.perception.json;
 
+import org.vadere.state.psychology.perception.types.Location;
 import org.vadere.state.psychology.perception.types.Stimulus;
 import org.vadere.state.psychology.perception.types.Timeframe;
 
@@ -30,14 +31,16 @@ public class StimulusInfo {
 
     // Member Variables
     private Timeframe timeframe;
+    private Location location;
     private List<Stimulus> stimuli;
 
     public StimulusInfo() {
     }
 
-    public StimulusInfo(Timeframe timeframe, List<Stimulus> stimuli) {
+    public StimulusInfo(Timeframe timeframe, List<Stimulus> stimuli, Location location) {
         this.timeframe = timeframe;
         this.stimuli = stimuli;
+        this.location = location;
     }
 
     // Getter
@@ -47,6 +50,8 @@ public class StimulusInfo {
     public List<Stimulus> getStimuli() {
         return stimuli;
     }
+    public Location getLocation() {return location;}
+
 
     // Setter
     public void setTimeframe(Timeframe timeframe) {
@@ -55,5 +60,7 @@ public class StimulusInfo {
     public void setStimuli(List<Stimulus> stimuli) {
         this.stimuli = stimuli;
     }
+    public void setLocation(Location location) {this.location = location;}
+
 
 }

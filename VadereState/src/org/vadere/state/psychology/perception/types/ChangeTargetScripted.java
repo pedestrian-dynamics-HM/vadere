@@ -144,8 +144,7 @@ public class ChangeTargetScripted extends Stimulus {
         if(this == that) return true;
         if(!(that instanceof ChangeTargetScripted)) return false;
         ChangeTargetScripted thatChangeTarget = (ChangeTargetScripted) that;
-        boolean isProb = Precision.equals(this.perceptionProbability, thatChangeTarget.getPerceptionProbability(), Double.MIN_VALUE);
-        return isProb && this.newTargetIds.equals(thatChangeTarget.getNewTargetIds());
+        return this.newTargetIds.equals(thatChangeTarget.getNewTargetIds());
     }
 
 }
