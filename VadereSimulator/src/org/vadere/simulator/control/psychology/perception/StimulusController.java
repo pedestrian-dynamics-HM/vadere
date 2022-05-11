@@ -1,7 +1,6 @@
 package org.vadere.simulator.control.psychology.perception;
 
 import org.vadere.simulator.projects.ScenarioStore;
-import org.vadere.state.psychology.perception.json.ReactionProbability;
 import org.vadere.state.psychology.perception.json.StimulusInfo;
 import org.vadere.state.psychology.perception.types.*;
 import org.vadere.state.scenario.Pedestrian;

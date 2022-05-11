@@ -13,7 +13,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.vadere.state.attributes.*;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.scenario.*;
-import org.vadere.state.psychology.perception.json.ReactionProbability;
 import org.vadere.state.psychology.perception.json.StimulusInfo;
 import org.vadere.state.psychology.perception.json.StimulusInfoStore;
 import org.vadere.state.scenario.*;

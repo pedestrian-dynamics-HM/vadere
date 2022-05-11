@@ -1,23 +1,12 @@
 package org.vadere.simulator.projects.migration.jsontranformation.json;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.json.JSONArray;
 import org.vadere.annotation.factories.migrationassistant.MigrationTransformation;
 import org.vadere.simulator.projects.migration.MigrationException;
 import org.vadere.simulator.projects.migration.jsontranformation.SimpleJsonTransformation;
-import org.vadere.state.psychology.perception.json.ReactionProbability;
-import org.vadere.state.psychology.perception.json.StimulusInfoStore;
 import org.vadere.state.util.JacksonObjectMapper;
-import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.version.Version;
-
-import java.util.Collections;
-import java.util.Iterator;
-
-import static org.vadere.state.util.StateJsonConverter.serializeStimuliToNode;
 
 /**
  * Remove node "threatMemory" under "scenario.topography.dynamicElements.psychologyStatus"
