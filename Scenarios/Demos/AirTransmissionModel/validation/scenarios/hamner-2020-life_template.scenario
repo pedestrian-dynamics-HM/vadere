@@ -1,8 +1,8 @@
 {
   "name" : "hamner-2020-life_template",
   "description" : "Superspreading event during a choir rehearsal following hamner-2020-life;\n\nL. Hamner, P. Dubbel, I. Capron, A. Ross, A. Jordan,\nJ. Lee, J. Lynn, A. Ball, S. Narwal, S. Russell, et al.\nHigh SARS-CoV-2 attack rate following exposure at a\nchoir practice — skagit county, washington, march 2020.\nMMWR. Morbidity and Mortality Weekly Report, 69\n(19):606–610, 2020. doi:10.15585/mmwr.mm6919e6.",
-  "release" : "2.1",
-  "commithash" : "4f8202a8bd2a52cd623cfe8d28b5f0627a11d309",
+  "release" : "2.2",
+  "commithash" : "af7a3ef52d293a808945bd11357de59e4afce058",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ ],
@@ -110,7 +110,21 @@
       "usePsychologyLayer" : false,
       "psychologyLayer" : {
         "perception" : "SimplePerceptionModel",
-        "cognition" : "SimpleCognitionModel"
+        "cognition" : "SimpleCognitionModel",
+        "attributesModel" : {
+          "org.vadere.state.attributes.models.psychology.perception.AttributesSimplePerceptionModel" : {
+            "priority" : {
+              "1" : "InformationStimulus",
+              "2" : "ChangeTargetScripted",
+              "3" : "ChangeTarget",
+              "4" : "Threat",
+              "5" : "Wait",
+              "6" : "WaitInArea",
+              "7" : "DistanceRecommendation"
+            }
+          },
+          "org.vadere.state.attributes.models.psychology.cognition.AttributesSimpleCognitionModel" : { }
+        }
       }
     },
     "topography" : {
@@ -170,7 +184,6 @@
         }
       }
     },
-    "stimulusInfos" : [ ],
-    "reactionProbabilities" : [ ]
+    "stimulusInfos" : [ ]
   }
 }

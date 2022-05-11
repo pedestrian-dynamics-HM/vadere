@@ -1,8 +1,8 @@
 {
   "name" : "17-Threat-ImitatingBehavior-SelfCatThreatModel",
   "description" : "",
-  "release" : "2.1",
-  "commithash" : "4f8202a8bd2a52cd623cfe8d28b5f0627a11d309",
+  "release" : "2.2",
+  "commithash" : "af7a3ef52d293a808945bd11357de59e4afce058",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -115,7 +115,21 @@
       "usePsychologyLayer" : true,
       "psychologyLayer" : {
         "perception" : "SimplePerceptionModel",
-        "cognition" : "ThreatCognitionModel"
+        "cognition" : "ThreatCognitionModel",
+        "attributesModel" : {
+          "org.vadere.state.attributes.models.psychology.perception.AttributesSimplePerceptionModel" : {
+            "priority" : {
+              "1" : "InformationStimulus",
+              "2" : "ChangeTargetScripted",
+              "3" : "ChangeTarget",
+              "4" : "Threat",
+              "5" : "Wait",
+              "6" : "WaitInArea",
+              "7" : "DistanceRecommendation"
+            }
+          },
+          "org.vadere.state.attributes.models.psychology.cognition.AttributesThreatCognitionModel" : { }
+        }
       }
     },
     "topography" : {
@@ -483,15 +497,10 @@
       },
       "stimuli" : [ {
         "type" : "Threat",
-        "id" : -1,
         "originAsTargetId" : 0,
         "loudness" : 1.0,
         "radius" : 10.0
       } ]
-    } ],
-    "reactionProbabilities" : [ {
-      "stimulusId" : -1,
-      "reactionProbability" : 1.0
     } ]
   }
 }

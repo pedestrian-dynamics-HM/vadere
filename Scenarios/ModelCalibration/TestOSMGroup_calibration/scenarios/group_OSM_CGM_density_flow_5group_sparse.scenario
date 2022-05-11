@@ -1,8 +1,8 @@
 {
   "name" : "group_OSM_CGM_density_flow_5group_sparse.scenario",
   "description" : "",
-  "release" : "2.1",
-  "commithash" : "4f8202a8bd2a52cd623cfe8d28b5f0627a11d309",
+  "release" : "2.2",
+  "commithash" : "af7a3ef52d293a808945bd11357de59e4afce058",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -123,7 +123,21 @@
       "usePsychologyLayer" : false,
       "psychologyLayer" : {
         "perception" : "SimplePerceptionModel",
-        "cognition" : "CooperativeCognitionModel"
+        "cognition" : "CooperativeCognitionModel",
+        "attributesModel" : {
+          "org.vadere.state.attributes.models.psychology.perception.AttributesSimplePerceptionModel" : {
+            "priority" : {
+              "1" : "InformationStimulus",
+              "2" : "ChangeTargetScripted",
+              "3" : "ChangeTarget",
+              "4" : "Threat",
+              "5" : "Wait",
+              "6" : "WaitInArea",
+              "7" : "DistanceRecommendation"
+            }
+          },
+          "org.vadere.state.attributes.models.psychology.cognition.AttributesCooperativeCognitionModel" : { }
+        }
       }
     },
     "topography" : {
@@ -253,7 +267,6 @@
       "teleporter" : null,
       "attributesCar" : null
     },
-    "stimulusInfos" : [ ],
-    "reactionProbabilities" : [ ]
+    "stimulusInfos" : [ ]
   }
 }

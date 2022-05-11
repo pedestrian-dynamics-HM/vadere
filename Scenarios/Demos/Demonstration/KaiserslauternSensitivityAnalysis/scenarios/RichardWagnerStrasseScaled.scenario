@@ -1,8 +1,8 @@
 {
   "name" : "RichardWagnerStrasseScaled",
   "description" : "",
-  "release" : "2.0",
-  "commithash" : "a45e488c23340a40f8809fb9abb820a7037f1d56",
+  "release" : "2.2",
+  "commithash" : "af7a3ef52d293a808945bd11357de59e4afce058",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.NoDataKeyOutputFile",
@@ -132,7 +132,21 @@
       "usePsychologyLayer" : false,
       "psychologyLayer" : {
         "perception" : "SimplePerceptionModel",
-        "cognition" : "CooperativeCognitionModel"
+        "cognition" : "CooperativeCognitionModel",
+        "attributesModel" : {
+          "org.vadere.state.attributes.models.psychology.perception.AttributesSimplePerceptionModel" : {
+            "priority" : {
+              "1" : "InformationStimulus",
+              "2" : "ChangeTargetScripted",
+              "3" : "ChangeTarget",
+              "4" : "Threat",
+              "5" : "Wait",
+              "6" : "WaitInArea",
+              "7" : "DistanceRecommendation"
+            }
+          },
+          "org.vadere.state.attributes.models.psychology.cognition.AttributesCooperativeCognitionModel" : { }
+        }
       }
     },
     "topography" : {
@@ -1218,7 +1232,6 @@
       "teleporter" : null,
       "attributesCar" : null
     },
-    "stimulusInfos" : [ ],
-    "reactionProbabilities" : [ ]
+    "stimulusInfos" : [ ]
   }
 }
