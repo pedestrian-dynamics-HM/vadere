@@ -57,8 +57,10 @@ public class AreaGroupMetaDataProcessor extends DataProcessor<TimestepGroupIdKey
         // compute the id of groups represented in the measurement area
         Set<Integer> groupIdsInArea = new HashSet<>();
         for (Pedestrian p : pedInArea) {
-            LinkedList<Integer> groupIds = p.getGroupIds();
-            groupIdsInArea.addAll(groupIds);
+            if (p.isGroupMember() != null) {
+                LinkedList<Integer> groupIds = p.isGroupMember().getGroupIds();
+                groupIdsInArea.addAll(groupIds);
+            }
         }
 
         try {

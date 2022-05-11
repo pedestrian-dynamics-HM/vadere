@@ -63,6 +63,7 @@ public class CentroidGroupModel extends AbstractGroupModel<CentroidGroup> {
 		this.sourceGroupSizeDeterminator = new HashMap<>();
 
 		this.nextFreeGroupId = new AtomicInteger(0);
+		this.pedestrianGroupSizes = new HashMap<>();
 	}
 
 	@Override
@@ -115,21 +116,18 @@ public class CentroidGroupModel extends AbstractGroupModel<CentroidGroup> {
 	@Override
 	public CentroidGroup getGroup(final Pedestrian pedestrian) {
 
-		/*Optional<CentroidGroup> group = groupsById.values().stream()
+		Optional<CentroidGroup> group = groupsById.values().stream()
 				.filter(g -> g.members.contains(pedestrian))
 				.findFirst();
 		assert group.isPresent() : "No group found for pedestrian";
-		return group.get();*/
-
-		CentroidGroup group = groupsById.get(pedestrian.getGroupIds().getFirst());
-		assert group != null : "No group found for pedestrian";
-		return group;
+		return group.get();
 	}
 
 	@Override
 	protected void registerMember(final Pedestrian ped, final CentroidGroup group) {
-		//TODO does not register the pedestrian but the group. and only the first group of the pedestrian
-		groupsById.putIfAbsent(ped.getGroupIds().getFirst(), group);
+		//TODO does not register the pedestrian but the group. and only the first group of the pedestrian??
+		//groupsById.putIfAbsent(ped.getGroupIds().getFirst(), group);
+		groupsById.putIfAbsent(group.getID(), group);
 	}
 
 	protected void registerGroup(final CentroidGroup group) {
@@ -153,13 +151,14 @@ public class CentroidGroupModel extends AbstractGroupModel<CentroidGroup> {
 
 	private void initializeGroupsOfInitialPedestrians() {
 		// get all pedestrians already in topography
-		DynamicElementContainer<Pedestrian> c = topography.getPedestrianDynamicElements();
+		/*DynamicElementContainer<Pedestrian> c = topography.getPedestrianDynamicElements();
 
 		if (c.getElements().size() > 0) {
 			Map<Integer, List<Pedestrian>> groups = new HashMap<>();
 
 			// aggregate group data
 			c.getElements().forEach(p -> {
+				//TODO requires different attributes or method to signal (in json) that pedestrian is in a group
 				for (Integer id : p.getGroupIds()) {
 					List<Pedestrian> peds = groups.computeIfAbsent(id, k -> new ArrayList<>());
 					// empty group id and size values, will be set later on
@@ -188,7 +187,7 @@ public class CentroidGroupModel extends AbstractGroupModel<CentroidGroup> {
 			if (max.isPresent()) {
 				nextFreeGroupId = new AtomicInteger(max.get() + 1);
 			}
-		}
+		}*/
 	}
 
 
@@ -221,9 +220,13 @@ public class CentroidGroupModel extends AbstractGroupModel<CentroidGroup> {
 
 	@Override
 	public void elementRemoved(Pedestrian pedestrian) {
-		Group group = groupsById.get(pedestrian.getGroupIds().getFirst());
-		if (group.removeMember(pedestrian)) { // if true pedestrian was last member.
-			groupsById.remove(group.getID());
+		if (pedestrian.isGroupMember() != null) {
+			for (Integer groupId: pedestrian.isGroupMember().getGroupIds()) {
+				Group group = groupsById.get(groupId);
+				if (group.removeMember(pedestrian)) { // if true pedestrian was last member.
+					groupsById.remove(group.getID());
+				}
+			}
 		}
 	}
 
@@ -278,6 +281,26 @@ public class CentroidGroupModel extends AbstractGroupModel<CentroidGroup> {
 		}
 	}
 
+	@Override
+	public void addGroupId(int groupId, Pedestrian ped) {
+		CentroidGroup groupToInsert = groupsById.get(groupId);
+		if (groupToInsert == null) {
+			groupToInsert = getNewGroup(groupId, (int) getAverageGroupSize());
+			registerGroup(groupToInsert);
+		}
+		if (!groupToInsert.isMember(ped)) {
+			groupToInsert.addMemberInAnyCase(ped);
+		}
+		//If group is full remove it from the sourceNextGroups list in case it is in there
+		if (groupToInsert.getOpenPersons() == 0) {
+			CentroidGroup finalGroupToInsert = groupToInsert;
+			sourceNextGroups.values()
+					.forEach((groupList) -> {
+						groupList.remove(finalGroupToInsert);});
+		}
+		addGroupSize(ped.getId(), groupToInsert.getSize());
+	}
+
 	private double getAverageGroupSize() {
 		return groupsById.values().stream()
 				.map(group -> group.getSize())
@@ -296,7 +319,7 @@ public class CentroidGroupModel extends AbstractGroupModel<CentroidGroup> {
 	}
 
 	@Override
-	public List<Integer> getGroupSizes(Pedestrian ped) {
+	public LinkedList<Integer> getGroupSizes(Pedestrian ped) {
 		return pedestrianGroupSizes.get(ped.getId());
 	}
 

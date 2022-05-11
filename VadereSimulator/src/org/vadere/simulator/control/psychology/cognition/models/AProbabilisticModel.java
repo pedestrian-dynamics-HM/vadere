@@ -32,7 +32,9 @@ public abstract class AProbabilisticModel implements ICognitionModel {
         // Assume that an agent is informed and reacts to information a..
         setInformationState(pedestrian);
         // handle group members separately
-        setInformationStateGroupMember(pedestrian.getPedGroupMembers());
+        if (pedestrian.isGroupMember() != null) {
+            setInformationStateGroupMember(pedestrian.isGroupMember().getPedGroupMembers());
+        }
     }
 
 }

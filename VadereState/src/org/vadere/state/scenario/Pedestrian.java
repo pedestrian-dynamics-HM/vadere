@@ -36,15 +36,7 @@ public class Pedestrian extends Agent {
     private ExposureModelHealthStatus healthStatus;
     private DoseResponseModelInfectionStatus infectionStatus;
 
-    private GroupMember groupMember;
-
-    //TODO
-	private LinkedList<Integer> groupIds; // TODO should actually be an attribute or a member of a subclass
-	//TODO
-    private LinkedList<Integer> groupSizes;
-
-    //TODO
-    private LinkedList<Pedestrian> agentsInGroup = new LinkedList<>();
+    private transient GroupMember groupMember;
 
 
     /**
@@ -170,16 +162,6 @@ public class Pedestrian extends Agent {
         return psychologyStatus.getKnowledgeBase();
     }
 
-    //TODO
-    public LinkedList<Integer> getGroupIds() {
-        return groupIds;
-    }
-
-    //TODO
-    public LinkedList<Integer> getGroupSizes() {
-        return groupSizes;
-    }
-
     public <T extends ModelPedestrian> T getModelPedestrian(Class<? extends T> modelType) {
         return (T) modelPedestrianMap.get(modelType);
     }
@@ -240,6 +222,10 @@ public class Pedestrian extends Agent {
     }
 
     // Setter
+    public void setGroupMember(GroupMember groupMember) {
+        this.groupMember = groupMember;
+    }
+
     public void registerGroupAccess(GroupAccess groupAccess) {
         this.groupMember = new GroupMember(this, groupAccess);
     }
@@ -275,16 +261,6 @@ public class Pedestrian extends Agent {
 
     public void setGroupMembership(GroupMembership groupMembership) {
         psychologyStatus.setGroupMembership(groupMembership);
-    }
-
-    //TODO
-    public void setGroupIds(LinkedList<Integer> groupIds) {
-        this.groupIds = groupIds;
-    }
-
-    //TODO
-    public void setGroupSizes(LinkedList<Integer> groupSizes) {
-        this.groupSizes = groupSizes;
     }
 
     public <T extends ModelPedestrian> ModelPedestrian setModelPedestrian(T modelPedestrian) {
@@ -340,23 +316,6 @@ public class Pedestrian extends Agent {
     @Override
     public Pedestrian clone() {
         return new Pedestrian(this);
-    }
-
-
-    //TODO
-    public LinkedList<Pedestrian> getPedGroupMembers() {
-        this.agentsInGroup = agentsInGroup;
-        return agentsInGroup;
-    }
-
-    //TODO
-    public boolean isAgentsInGroup() {
-        return getPedGroupMembers().size() > 0;
-    }
-
-    //TODO
-    public void setAgentsInGroup(final LinkedList<Pedestrian> agentsInGroup) {
-        this.agentsInGroup = agentsInGroup;
     }
 
     @Override

@@ -170,7 +170,7 @@ public class TargetController extends ScenarioElementController implements Model
 			if (agent instanceof Pedestrian) {
 				Pedestrian p = (Pedestrian) agent;
 				//TODO better GroupTargetController like GroupSourceController or make CentroidGroup a DynamicElement
-				if (p.isAgentsInGroup()) {
+				if (p.isGroupMember() != null && p.isGroupMember().getPedGroupMembers().size() > 0) {
 					getModel(state, CentroidGroupModel.class).ifPresentOrElse(
 							(model)
 									-> {

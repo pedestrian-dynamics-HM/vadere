@@ -5,6 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.vadere.simulator.control.scenarioelements.TargetChangerController;
 import org.vadere.simulator.control.scenarioelements.targetchanger.TargetChangerAlgorithm;
+import org.vadere.simulator.models.groups.cgm.CentroidGroupModel;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesTarget;
 import org.vadere.state.attributes.scenario.AttributesTargetChanger;
@@ -47,6 +48,7 @@ public class TargetChangerControllerTest {
     private Topography topography;
     private List<Pedestrian> pedestrians;
     private List<Target> targets;
+    private CentroidGroupModel cgm;
     double simTimeInSec = 0;
     // The "TargetChanger" is added by each test individually
     // to meet the requirements of the test.
@@ -57,6 +59,7 @@ public class TargetChangerControllerTest {
         pedestrians = createTwoPedestrianWithTargetT1(1);
         targets = createTwoTargets();
         simTimeInSec = 0;
+        cgm = new CentroidGroupModel();
 
         for (Pedestrian pedestrian : pedestrians) {
             topography.addElement(pedestrian);
@@ -111,14 +114,16 @@ public class TargetChangerControllerTest {
         groupId.add(42);
 
         Pedestrian pedestrian1 = new Pedestrian(new AttributesAgent(startId), random);
+        pedestrian1.registerGroupAccess(cgm);
         pedestrian1.setPosition(new VPoint(5, 1));
         pedestrian1.setTargets(target);
-        pedestrian1.setGroupIds(groupId);
+        pedestrian1.isGroupMember().setGroupIds(groupId);
 
         Pedestrian pedestrian2 = new Pedestrian(new AttributesAgent(startId +  1), random);
+        pedestrian2.registerGroupAccess(cgm);
         pedestrian2.setPosition(new VPoint(1, 1));
         pedestrian2.setTargets(target);
-        pedestrian2.setGroupIds(groupId);
+        pedestrian2.isGroupMember().setGroupIds(groupId);
 
         LinkedList<Pedestrian> list1 = new LinkedList<>();
         list1.add(pedestrian1);
@@ -126,8 +131,8 @@ public class TargetChangerControllerTest {
         LinkedList<Pedestrian> list2 = new LinkedList<>();
         list2.add(pedestrian2);
 
-        pedestrian1.setAgentsInGroup(list2);
-        pedestrian2.setAgentsInGroup(list1);
+        pedestrian1.isGroupMember().setAgentsInGroup(list2);
+        pedestrian2.isGroupMember().setAgentsInGroup(list1);
 
         // Watch out: Use an "ArrayList" to keep order and
         // index 0 refers to pedestrian p1!

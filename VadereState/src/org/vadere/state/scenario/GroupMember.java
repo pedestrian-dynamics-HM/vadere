@@ -13,24 +13,27 @@ public class GroupMember {
         this.groupAccess = groupAccess;
     }
 
-    void setGroupIds(LinkedList<Integer> groupIds) {
+    public void setGroupIds(LinkedList<Integer> groupIds) {
         groupAccess.setGroupIds(groupIds, member);
-    };
-    List<Integer> getGroupIds() {
+    }
+    public LinkedList<Integer> getGroupIds() {
         return groupAccess.getGroupIds(member);
-    };
-    List<Integer> getGroupSizes() {
+    }
+    public LinkedList<Integer> getGroupSizes() {
         return groupAccess.getGroupSizes(member);
-    };
-    void setGroupSizes(LinkedList<Integer> sizes) {
+    }
+    public void setGroupSizes(LinkedList<Integer> sizes) {
         groupAccess.setGroupSizes(sizes, member);
     }
-    List<Pedestrian> getPedGroupMembers() {
+    public List<Pedestrian> getPedGroupMembers() {
         return groupAccess.getPedGroupMembers(member);
-    };
-    void setAgentsInGroup(final LinkedList<Pedestrian> agentsInGroup) {
+    }
+    public void setAgentsInGroup(final LinkedList<Pedestrian> agentsInGroup) {
         groupAccess.setAgentsInGroup(agentsInGroup, member);
-    };
+    }
 
+    public void addGroupId(int groupId) {
+        groupAccess.addGroupId(groupId, member);
+    }
 
 }

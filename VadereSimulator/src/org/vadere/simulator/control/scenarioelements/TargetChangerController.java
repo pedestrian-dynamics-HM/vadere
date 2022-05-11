@@ -51,7 +51,7 @@ public class TargetChangerController extends ScenarioElementController implement
     private TargetChangerAlgorithm changerAlgorithm;
 
     // Constructors
- 
+
 
     public TargetChangerController(Topography topography, TargetChanger targetChanger, Random random, GroupIterator groupIterator) {
         this.changerAlgorithm = TargetChangerAlgorithm.create(targetChanger, topography);
@@ -69,7 +69,7 @@ public class TargetChangerController extends ScenarioElementController implement
         this(topography, targetChanger, random, null);
     }
 
-        // Getters
+    // Getters
     public Map<Integer, Agent> getProcessedAgents() {
         return processedAgents;
     }
@@ -91,18 +91,15 @@ public class TargetChangerController extends ScenarioElementController implement
                 logEnteringTimeOfAgent(agent, simTimeInSec);
                 notifyListenersTargetChangerAreaReached(agent);
 
+                changerAlgorithm.setAgentTargetList(agent);
+
                 if (agent instanceof Pedestrian) {
                     Pedestrian p = (Pedestrian) agent;
-                    if (p.isAgentsInGroup()) {
-                        changerAlgorithm.setAgentTargetList(p);
-                        for (Pedestrian ped : p.getPedGroupMembers()) {
+                    if (p.isGroupMember() != null) {
+                        for (Pedestrian ped : p.isGroupMember().getPedGroupMembers()) {
                             processedAgents.put(ped.getId(), ped);
                         }
-                    } else {
-                        changerAlgorithm.setAgentTargetList(p);
                     }
-                } else {
-                    changerAlgorithm.setAgentTargetList(agent);
                 }
                 processedAgents.put(agent.getId(), agent);
             }
@@ -128,24 +125,30 @@ public class TargetChangerController extends ScenarioElementController implement
                 if (agent instanceof Pedestrian) {
                     Pedestrian p = (Pedestrian) agent;
                     //TODO tmp better GroupTargetChangerController like GroupSourceController or CentroidGroup to DynamicElement
-                    if (p.isAgentsInGroup()) {
-                        getModel(state, CentroidGroupModel.class).ifPresentOrElse(
-                                (model)
-                                        -> {
-                                    CentroidGroupModel cgm = (CentroidGroupModel) model;
-                                    CentroidGroup group = cgm.getGroup(p);
-                                    group.setGroupTargetList(this.targetChanger.getAttributes().getNextTarget());
-                                },
-                                ()
-                                        -> {
-                                    log.error("no group Model found but Agent in Group");
-                                });
-                        for (Pedestrian ped : p.getPedGroupMembers()) {
-                            processedAgents.put(ped.getId(), ped);
+
+                    if (p.isGroupMember() != null) {
+
+                        if (p.isGroupMember().getPedGroupMembers().size() > 0) {
+                            getModel(state, CentroidGroupModel.class).ifPresentOrElse(
+                                    (model)
+                                            -> {
+                                        CentroidGroupModel cgm = (CentroidGroupModel) model;
+                                        CentroidGroup group = cgm.getGroup(p);
+                                        group.setGroupTargetList(this.targetChanger.getAttributes().getNextTarget());
+                                    },
+                                    ()
+                                            -> {
+                                        log.error("no group Model found but Agent in Group");
+                                    });
+                            for (Pedestrian ped : p.isGroupMember().getPedGroupMembers()) {
+                                processedAgents.put(ped.getId(), ped);
+                            }
+                        } else {
+                            changerAlgorithm.setAgentTargetList(p);
                         }
-                    } else {
-                        changerAlgorithm.setAgentTargetList(p);
+
                     }
+
                 } else {
                     changerAlgorithm.setAgentTargetList(agent);
                 }

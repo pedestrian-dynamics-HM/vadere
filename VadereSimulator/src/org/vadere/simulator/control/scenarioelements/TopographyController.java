@@ -90,8 +90,9 @@ public class TopographyController extends OfflineTopographyController implements
 		newPedestrian.setSelfCategory(agentWrapper.getSelfCategory());
 		newPedestrian.setGroupMembership(agentWrapper.getGroupMembership());
 
-		newPedestrian.setGroupIds(agentWrapper.getGroupIds());
-		newPedestrian.setGroupSizes(agentWrapper.getGroupSizes());
+		//newPedestrian.setGroupIds(agentWrapper.getGroupIds());
+		//newPedestrian.setGroupSizes(agentWrapper.getGroupSizes());
+		newPedestrian.setGroupMember(agentWrapper.isGroupMember());
 
 		agentWrapper.getTrajectory().getFootSteps().forEach(footStep -> newPedestrian.addFootStepToTrajectory(footStep));
 

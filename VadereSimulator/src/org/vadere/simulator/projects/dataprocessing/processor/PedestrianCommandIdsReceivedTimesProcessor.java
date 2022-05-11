@@ -34,16 +34,18 @@ public class PedestrianCommandIdsReceivedTimesProcessor extends DataProcessor<Ti
 		for (Pedestrian ped : peds){
 
 			if (!getProcessedAgentIds().contains(ped.getId())) {
-				LinkedList<Pedestrian> groupMembers = ped.getPedGroupMembers();
 				int commandId = ped.getMostImportantStimulus().getId();
 
 				//if (commandId > 0) {
 					this.putValue(new TimestepPedestrianIdKey(timeStep, ped.getId()), commandId);
+					this.getProcessedAgentIds().add(ped.getId());
 
-					for (Pedestrian groupMember : groupMembers) {
-						// assign command id = 0 to pedestrian that follow other pedestrians (group member decisions)
-						this.putValue(new TimestepPedestrianIdKey(timeStep, groupMember.getId()), 0);
-						this.getProcessedAgentIds().add(groupMember.getId());
+					if (ped.isGroupMember() != null) {
+						for (Pedestrian groupMember : ped.isGroupMember().getPedGroupMembers()) {
+							// assign command id = 0 to pedestrian that follow other pedestrians (group member decisions)
+							this.putValue(new TimestepPedestrianIdKey(timeStep, groupMember.getId()), 0);
+							this.getProcessedAgentIds().add(groupMember.getId());
+						}
 					}
 				//}
 			}

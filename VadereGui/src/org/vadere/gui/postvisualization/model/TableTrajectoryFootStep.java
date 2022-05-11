@@ -138,12 +138,16 @@ public class TableTrajectoryFootStep {
 
 		if(groupIdCol != ColumnNames.NOT_SET_COLUMN_INDEX_IDENTIFIER) {
 			int groupId = row.getInt(groupIdCol);
-			pedestrian.getGroupIds().add(groupId);
+			if (pedestrian.isGroupMember() != null) {
+				pedestrian.isGroupMember().addGroupId(groupId);
+			}
 		}
 
 		if(groupSizeCol != ColumnNames.NOT_SET_COLUMN_INDEX_IDENTIFIER) {
 			int groupSize = row.getInt(groupSizeCol);
-			pedestrian.getGroupSizes().add(groupSize);
+			if (pedestrian.isGroupMember() != null) {
+				pedestrian.isGroupMember().getGroupSizes().add(groupSize);
+			}
 		}
 
 		if(mostImportantStimulusCol != ColumnNames.NOT_SET_COLUMN_INDEX_IDENTIFIER) {

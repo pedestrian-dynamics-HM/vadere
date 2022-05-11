@@ -4,6 +4,7 @@ package org.vadere.gui.renderer.agent;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.components.model.SimulationModel;
 import org.vadere.gui.components.view.DefaultRenderer;
+import org.vadere.state.scenario.GroupMember;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -85,12 +86,17 @@ public class AgentRender implements Renderer {
 			shape = shape.translate(pos.subtract(ped.getPosition()));
 		}
 
-		if (ped.getGroupIds().isEmpty() || (!ped.getGroupSizes().isEmpty() && ped.getGroupSizes().getFirst() == 1)) {
-			return shape;
-		} else if (ped.getGroupIds().getFirst() == 1) {
-			return shape;
+		if (ped.isGroupMember() != null) {
+			GroupMember groupMember = ped.isGroupMember();
+			if (groupMember.getGroupIds().isEmpty() || (!groupMember.getGroupSizes().isEmpty() && groupMember.getGroupSizes().getFirst() == 1)) {
+				return shape;
+			} else if (groupMember.getGroupIds().getFirst() == 1) {
+				return shape;
+			} else {
+				return FormHelper.getShape(groupMember.getGroupIds().getFirst(), pos, ped.getRadius());
+			}
 		} else {
-			return FormHelper.getShape(ped.getGroupIds().getFirst(), pos, ped.getRadius());
+			return shape;
 		}
 	}
 }

@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.gen.PMesh;
 import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.state.scenario.Agent;
+import org.vadere.state.scenario.GroupMember;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
@@ -100,17 +101,23 @@ public abstract class SimulationModel<T extends DefaultSimulationConfig> extends
     public abstract boolean isAlive(int pedId);
 
 	public Color getGroupColor(@NotNull final  Pedestrian ped) {
-		if (ped.getGroupIds().isEmpty() || (!ped.getGroupSizes().isEmpty() && ped.getGroupSizes().getFirst() == 1)) {
+		if (ped.isGroupMember() != null) {
+			GroupMember groupMember = ped.isGroupMember();
+			if (groupMember.getGroupIds().isEmpty() || (!groupMember.getGroupSizes().isEmpty() &&
+					groupMember.getGroupSizes().getFirst() == 1)) {
+				return config.getPedestrianDefaultColor();
+			}
+
+			int groupId = groupMember.getGroupIds().getFirst();
+			Color c = colorMap.get(groupId);
+			if (c == null) {
+				c = new Color(Color.HSBtoRGB(random.nextFloat(), 1f, 0.75f));
+				colorMap.put(groupId, c);
+			}
+			return c;
+		} else {
 			return config.getPedestrianDefaultColor();
 		}
-
-		int groupId = ped.getGroupIds().getFirst();
-		Color c = colorMap.get(groupId);
-		if (c == null) {
-			c = new Color(Color.HSBtoRGB(random.nextFloat(), 1f, 0.75f));
-			colorMap.put(groupId, c);
-		}
-		return c;
 	}
 
 	@Override

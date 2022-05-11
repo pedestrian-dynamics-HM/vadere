@@ -300,9 +300,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -357,9 +357,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -414,9 +414,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -471,9 +471,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -528,9 +528,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -585,9 +585,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -642,9 +642,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -699,9 +699,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -756,9 +756,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -813,9 +813,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -870,9 +870,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -927,9 +927,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -984,9 +984,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -1041,9 +1041,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -1098,9 +1098,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -1155,9 +1155,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -1212,9 +1212,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -1269,9 +1269,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -1326,9 +1326,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -1383,9 +1383,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -1440,9 +1440,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -1497,9 +1497,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -1554,9 +1554,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -1611,9 +1611,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -1668,9 +1668,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -1725,9 +1725,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -1782,9 +1782,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -1839,9 +1839,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -1896,9 +1896,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -1953,9 +1953,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -2010,9 +2010,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -2067,9 +2067,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -2124,9 +2124,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -2181,9 +2181,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -2238,9 +2238,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -2295,9 +2295,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -2352,9 +2352,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -2409,9 +2409,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -2466,9 +2466,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -2523,9 +2523,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -2580,9 +2580,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -2637,9 +2637,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -2694,9 +2694,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -2751,9 +2751,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -2808,9 +2808,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -2865,9 +2865,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -2922,9 +2922,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -2979,9 +2979,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -3036,9 +3036,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -3093,9 +3093,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -3150,9 +3150,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -3207,9 +3207,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -3264,9 +3264,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -3321,9 +3321,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -3378,9 +3378,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -3435,9 +3435,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -3492,9 +3492,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -3549,9 +3549,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -3606,9 +3606,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -3663,9 +3663,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -3720,9 +3720,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -3777,9 +3777,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -3834,9 +3834,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -3891,9 +3891,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -3948,9 +3948,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -4005,9 +4005,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -4062,9 +4062,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -4119,9 +4119,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -4176,9 +4176,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -4233,9 +4233,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -4290,9 +4290,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -4347,9 +4347,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -4404,9 +4404,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -4461,9 +4461,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -4518,9 +4518,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -4575,9 +4575,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -4632,9 +4632,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -4689,9 +4689,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -4746,9 +4746,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -4803,9 +4803,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -4860,9 +4860,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -4917,9 +4917,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -4974,9 +4974,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -5031,9 +5031,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -5088,9 +5088,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -5145,9 +5145,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -5202,9 +5202,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -5259,9 +5259,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -5316,9 +5316,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -5373,9 +5373,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -5430,9 +5430,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -5487,9 +5487,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -5544,9 +5544,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -5601,9 +5601,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -5658,9 +5658,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -5715,9 +5715,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -5772,9 +5772,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -5829,9 +5829,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -5886,9 +5886,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -5943,9 +5943,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -6000,9 +6000,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -6057,9 +6057,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -6114,9 +6114,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -6171,9 +6171,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -6228,9 +6228,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -6285,9 +6285,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -6342,9 +6342,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -6399,9 +6399,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -6456,9 +6456,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -6513,9 +6513,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -6570,9 +6570,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -6627,9 +6627,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -6684,9 +6684,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -6741,9 +6741,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -6798,9 +6798,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -6855,9 +6855,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -6912,9 +6912,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -6969,9 +6969,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -7026,9 +7026,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -7083,9 +7083,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -7140,9 +7140,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -7197,9 +7197,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -7254,9 +7254,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -7311,9 +7311,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -7368,9 +7368,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -7425,9 +7425,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -7482,9 +7482,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -7539,9 +7539,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -7596,9 +7596,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -7653,9 +7653,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -7710,9 +7710,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -7767,9 +7767,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -7824,9 +7824,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -7881,9 +7881,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -7938,9 +7938,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -7995,9 +7995,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -8052,9 +8052,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -8109,9 +8109,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -8166,9 +8166,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -8223,9 +8223,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -8280,9 +8280,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -8337,9 +8337,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -8394,9 +8394,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -8451,9 +8451,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -8508,9 +8508,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -8565,9 +8565,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -8622,9 +8622,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -8679,9 +8679,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -8736,9 +8736,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -8793,9 +8793,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -8850,9 +8850,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -8907,9 +8907,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -8964,9 +8964,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -9021,9 +9021,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -9078,9 +9078,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -9135,9 +9135,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -9192,9 +9192,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -9249,9 +9249,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -9306,9 +9306,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -9363,9 +9363,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -9420,9 +9420,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -9477,9 +9477,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -9534,9 +9534,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -9591,9 +9591,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -9648,9 +9648,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -9705,9 +9705,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -9762,9 +9762,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -9819,9 +9819,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -9876,9 +9876,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -9933,9 +9933,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -9990,9 +9990,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -10047,9 +10047,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -10104,9 +10104,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -10161,9 +10161,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -10218,9 +10218,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -10275,9 +10275,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -10332,9 +10332,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -10389,9 +10389,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -10446,9 +10446,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -10503,9 +10503,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -10560,9 +10560,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -10617,9 +10617,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -10674,9 +10674,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -10731,9 +10731,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -10788,9 +10788,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -10845,9 +10845,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -10902,9 +10902,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -10959,9 +10959,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -11016,9 +11016,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -11073,9 +11073,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -11130,9 +11130,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -11187,9 +11187,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -11244,9 +11244,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -11301,9 +11301,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -11358,9 +11358,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -11415,9 +11415,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -11472,9 +11472,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -11529,9 +11529,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -11586,9 +11586,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -11643,9 +11643,9 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
-        "groupIds" : [ ],
-        "groupSizes" : [ ],
-        "agentsInGroup" : [ ],
+        
+        
+        
         "trajectory" : {
           "footSteps" : [ ]
         },

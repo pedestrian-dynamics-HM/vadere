@@ -12,6 +12,7 @@ import rx.Subscription;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public abstract class ControlModel implements IControlModel {
@@ -55,10 +56,13 @@ public abstract class ControlModel implements IControlModel {
                 this.informationFilter.setPedProcessedCommandIds(ped, command.getCommandId());
 
                 // One stimulus per group is sufficient
-                for (Pedestrian groupMember : ped.getPedGroupMembers()){
-                    setPedSpecificStimuli(time, groupMember, stimulus);
-                    this.informationFilter.setPedProcessedCommandIds(groupMember, command.getCommandId());
+                if (ped.isGroupMember() != null) {
+                    for (Pedestrian groupMember : ped.isGroupMember().getPedGroupMembers()){
+                        setPedSpecificStimuli(time, groupMember, stimulus);
+                        this.informationFilter.setPedProcessedCommandIds(groupMember, command.getCommandId());
+                    }
                 }
+
             }
         }
     }

@@ -259,11 +259,15 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 		}
 
 		if(trajectories.groupIdCol != -1) {
-			pedestrian.getGroupIds().addLast(row.getInt(trajectories.groupIdCol));
+			if (pedestrian.isGroupMember() != null) {
+				pedestrian.isGroupMember().getGroupIds().addLast(row.getInt(trajectories.groupIdCol));
+			}
 		}
 
 		if(trajectories.groupSizeCol != -1) {
-			pedestrian.getGroupSizes().addLast(row.getInt(trajectories.groupSizeCol));
+			if (pedestrian.isGroupMember() != null) {
+				pedestrian.isGroupMember().getGroupSizes().addLast(row.getInt(trajectories.groupSizeCol));
+			}
 		}
 
 		if(trajectories.mostImportantStimulusCol != -1) {
