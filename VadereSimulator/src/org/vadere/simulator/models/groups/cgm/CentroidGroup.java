@@ -26,7 +26,7 @@ public class CentroidGroup implements Group {
 	public final static int MAX_NO_VISION_OF_LEADER = 25;
 
 	final private int id;
-	final private int size;
+	private int size;
 
 	final protected ArrayList<Pedestrian> members;
 
@@ -188,7 +188,13 @@ public class CentroidGroup implements Group {
 
 		members.add(ped);
 		initGroupVelocity(); // ensure same speed for all members.
+	}
 
+	public void addMemberInAnyCase(Pedestrian ped) {
+		if (isFull()) {
+			this.size++;
+		}
+		addMember(ped);
 	}
 
 	@Override

@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 /**
  * Implementation of group behavior model described in 'Pedestrian Group Behavior in a Cellular
@@ -45,6 +46,9 @@ public class CentroidGroupModel extends AbstractGroupModel<CentroidGroup> {
 	private LinkedHashMap<Integer, CentroidGroup> groupsById;
 	private Map<Integer, LinkedList<CentroidGroup>> sourceNextGroups;
 	private Map<Integer, GroupSizeDeterminator> sourceGroupSizeDeterminator;
+
+	//TODO currently as member because outside functions want to manipulate it without manipulating the group
+	private Map<Integer, LinkedList<Integer>> pedestrianGroupSizes;
 
 	private Topography topography;
 	private IPotentialFieldTarget potentialFieldTarget;
@@ -110,6 +114,13 @@ public class CentroidGroupModel extends AbstractGroupModel<CentroidGroup> {
 
 	@Override
 	public CentroidGroup getGroup(final Pedestrian pedestrian) {
+
+		/*Optional<CentroidGroup> group = groupsById.values().stream()
+				.filter(g -> g.members.contains(pedestrian))
+				.findFirst();
+		assert group.isPresent() : "No group found for pedestrian";
+		return group.get();*/
+
 		CentroidGroup group = groupsById.get(pedestrian.getGroupIds().getFirst());
 		assert group != null : "No group found for pedestrian";
 		return group;
@@ -117,7 +128,12 @@ public class CentroidGroupModel extends AbstractGroupModel<CentroidGroup> {
 
 	@Override
 	protected void registerMember(final Pedestrian ped, final CentroidGroup group) {
+		//TODO does not register the pedestrian but the group. and only the first group of the pedestrian
 		groupsById.putIfAbsent(ped.getGroupIds().getFirst(), group);
+	}
+
+	protected void registerGroup(final CentroidGroup group) {
+		groupsById.putIfAbsent(group.getID(), group);
 	}
 
 	@Override
@@ -183,16 +199,14 @@ public class CentroidGroupModel extends AbstractGroupModel<CentroidGroup> {
 		if (currentGroup == null) {
 			throw new IllegalStateException("No empty group exists to add Pedestrian: " + ped.getId());
 		}
-
-		// add ped to group. If group is full remove it from the sourceNextGroups list.
 		currentGroup.addMember(ped);
-		ped.addGroupId(currentGroup.getID(), currentGroup.getSize());
-		registerMember(ped, currentGroup);
+		addGroupSize(ped.getId(), currentGroup.getSize());
+		//If group is full remove it from the sourceNextGroups list.
 		if (currentGroup.getOpenPersons() == 0) {
 			groups.pollFirst(); // remove full group from list.
 		}
+		registerMember(ped, currentGroup);
 	}
-
 
 	public AttributesCGM getAttributesCGM() {
 		return attributesCGM;
@@ -233,5 +247,84 @@ public class CentroidGroupModel extends AbstractGroupModel<CentroidGroup> {
 
 	protected Topography getTopography() {
 		return topography;
+	}
+
+	@Override
+	public void setGroupIds(List<Integer> groupIds, Pedestrian ped) {
+		//remove existing group memberships
+		for (int groupId: getGroupIds(ped)) {
+			groupsById.get(groupId).removeMember(ped);
+		}
+
+		//set new group memberships
+		LinkedList<Integer> groupSizes = new LinkedList<>();
+		for (int groupId: groupIds) {
+			CentroidGroup groupToInsert = groupsById.get(groupId);
+			if (groupToInsert == null) {
+				groupToInsert = getNewGroup(groupId, (int) getAverageGroupSize());
+			}
+			groupToInsert.addMemberInAnyCase(ped);
+			groupSizes.add(groupToInsert.getSize());
+			//If group is full remove it from the sourceNextGroups list in case it is in there
+			if (groupToInsert.getOpenPersons() == 0) {
+				CentroidGroup finalGroupToInsert = groupToInsert;
+				sourceNextGroups.values()
+						.forEach((groupList) -> {
+							groupList.remove(finalGroupToInsert);});
+			}
+
+			setGroupSizes(groupSizes, ped);
+			registerGroup(groupToInsert);
+		}
+	}
+
+	private double getAverageGroupSize() {
+		return groupsById.values().stream()
+				.map(group -> group.getSize())
+				.mapToInt(Integer::intValue)
+				.average()
+				.orElse(0.0);
+	}
+
+	@Override
+	public LinkedList<Integer> getGroupIds(Pedestrian ped) {
+		return groupsById.values()
+				.stream()
+				.filter(group -> group.isMember(ped))
+				.map(CentroidGroup::getID)
+				.collect(Collectors.toCollection(LinkedList::new));
+	}
+
+	@Override
+	public List<Integer> getGroupSizes(Pedestrian ped) {
+		return pedestrianGroupSizes.get(ped.getId());
+	}
+
+	@Override
+	public void setGroupSizes(LinkedList<Integer> groupSizes, Pedestrian ped) {
+		pedestrianGroupSizes.put(ped.getId(), groupSizes);
+	}
+
+	public void addGroupSize(int pedestrianId, int groupSize) {
+		LinkedList<Integer> pedGroupSizes = pedestrianGroupSizes.getOrDefault(pedestrianId, new LinkedList<>());
+		pedGroupSizes.add(groupSize);
+		pedestrianGroupSizes.put(pedestrianId, pedGroupSizes);
+	}
+
+	@Override
+	public List<Pedestrian> getPedGroupMembers(Pedestrian ped) {
+		CentroidGroup group = groupsById.get(getGroupIds(ped).getFirst());
+		return group.members.stream()
+				.filter(p -> p.getId() != ped.getId())
+				.collect(Collectors.toList());
+	}
+
+	@Override
+	public void setAgentsInGroup(List<Pedestrian> agentsInGroup, Pedestrian ped) {
+		CentroidGroup group = groupsById.get(getGroupIds(ped).getFirst());
+		group.members.clear();
+		for (Pedestrian pedestrian: agentsInGroup) {
+			group.addMemberInAnyCase(pedestrian);
+		}
 	}
 }

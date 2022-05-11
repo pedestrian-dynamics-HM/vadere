@@ -92,8 +92,7 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 		this.potentialFieldPedestrian = PotentialFieldAgent.createPotentialField(
 				modelAttributesList, domain, attributesPedestrian, random, attributesOSM.getPedestrianPotentialModel());
 
-		Optional<CentroidGroupModel> opCentroidGroupModel = models.stream().
-				filter(ac -> ac instanceof CentroidGroupModel).map(ac -> (CentroidGroupModel) ac).findAny();
+		Optional<CentroidGroupModel> opCentroidGroupModel = getCentroidGroupSubmodel();
 
 		if (opCentroidGroupModel.isPresent()) {
 
@@ -262,9 +261,14 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 
 	private PedestrianOSM createElement(VPoint position, @NotNull final AttributesAgent attributesAgent) {
 		PedestrianOSM pedestrian = new PedestrianOSM(attributesOSM,
-				attributesAgent, domain.getTopography(), random, potentialFieldTarget,
-				potentialFieldObstacle.copy(), potentialFieldPedestrian,
-				speedAdjusters, stepCircleOptimizer.clone());
+					attributesAgent, domain.getTopography(), random, potentialFieldTarget,
+					potentialFieldObstacle.copy(), potentialFieldPedestrian,
+					speedAdjusters, stepCircleOptimizer.clone());
+
+		if (getCentroidGroupSubmodel().isPresent()) {
+			pedestrian.registerGroupAccess(getCentroidGroupSubmodel().get());
+		}
+
 		pedestrian.setPosition(position);
 		return pedestrian;
 	}
@@ -291,14 +295,18 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 
 	@Override
 	public SourceControllerFactory getSourceControllerFactory() {
-		Optional<CentroidGroupModel> opCentroidGroupModel = models.stream()
-				.filter(ac -> ac instanceof CentroidGroupModel)
-				.map(ac -> (CentroidGroupModel) ac).findAny();
+		Optional<CentroidGroupModel> opCentroidGroupModel = getCentroidGroupSubmodel();
 		if (opCentroidGroupModel.isPresent()) {
 			return new GroupSourceControllerFactory(opCentroidGroupModel.get());
 		}
 
 		return new SingleSourceControllerFactory();
+	}
+
+	private Optional<CentroidGroupModel> getCentroidGroupSubmodel() {
+		return  models.stream()
+				.filter(ac -> ac instanceof CentroidGroupModel)
+				.map(ac -> (CentroidGroupModel) ac).findAny();
 	}
 
 	/**

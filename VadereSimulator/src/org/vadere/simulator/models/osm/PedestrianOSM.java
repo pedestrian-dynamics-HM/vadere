@@ -6,6 +6,7 @@ import org.vadere.simulator.models.StepSizeAdjuster;
 import org.vadere.simulator.models.osm.optimization.OptimizationMetric;
 import org.vadere.simulator.models.potential.PotentialFieldPedestrianCompactSoftshell;
 import org.vadere.simulator.models.potential.combinedPotentials.*;
+import org.vadere.state.scenario.*;
 import org.vadere.util.geometry.shapes.*;
 import org.vadere.simulator.models.SpeedAdjuster;
 import org.vadere.simulator.models.osm.optimization.StepCircleOptimizer;
@@ -16,10 +17,6 @@ import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
 import org.vadere.simulator.models.potential.fields.PotentialFieldTargetRingExperiment;
 import org.vadere.state.attributes.models.AttributesOSM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.scenario.Agent;
-import org.vadere.state.scenario.Pedestrian;
-import org.vadere.state.scenario.Stairs;
-import org.vadere.state.scenario.Topography;
 ;
 
 import java.util.*;
@@ -64,14 +61,15 @@ public class PedestrianOSM extends Pedestrian {
 
 	@SuppressWarnings("unchecked")
 	public PedestrianOSM(AttributesOSM attributesOSM,
-				  AttributesAgent attributesPedestrian, Topography topography,
-				  Random random, IPotentialFieldTarget potentialFieldTarget,
-				  PotentialFieldObstacle potentialFieldObstacle,
-				  PotentialFieldAgent potentialFieldPedestrian,
-				  List<SpeedAdjuster> speedAdjusters,
-				  StepCircleOptimizer stepCircleOptimizer) {
+						 AttributesAgent attributesPedestrian, Topography topography,
+						 Random random, IPotentialFieldTarget potentialFieldTarget,
+						 PotentialFieldObstacle potentialFieldObstacle,
+						 PotentialFieldAgent potentialFieldPedestrian,
+						 List<SpeedAdjuster> speedAdjusters,
+						 StepCircleOptimizer stepCircleOptimizer,
+						 GroupMember groupMember) {
 
-		super(attributesPedestrian, random);
+		super(attributesPedestrian, random, groupMember);
 
 		this.random = random;
 
@@ -103,6 +101,17 @@ public class PedestrianOSM extends Pedestrian {
 		this.lastPosition = getPosition();
 		this.nextPosition = getPosition();
 		this.strides = new LinkedList<>();
+	}
+
+	public PedestrianOSM(AttributesOSM attributesOSM,
+						 AttributesAgent attributesPedestrian, Topography topography,
+						 Random random, IPotentialFieldTarget potentialFieldTarget,
+						 PotentialFieldObstacle potentialFieldObstacle,
+						 PotentialFieldAgent potentialFieldPedestrian,
+						 List<SpeedAdjuster> speedAdjusters,
+						 StepCircleOptimizer stepCircleOptimizer) {
+		this(attributesOSM, attributesPedestrian, topography, random, potentialFieldTarget,
+				potentialFieldObstacle, potentialFieldPedestrian, speedAdjusters, stepCircleOptimizer, null);
 	}
 
 	private PedestrianOSM(@NotNull final PedestrianOSM other) {
@@ -432,6 +441,7 @@ public class PedestrianOSM extends Pedestrian {
 		return "id = " + getId() + " memory " + super.toString();
 	}
 
+	//TODO
 	public LinkedList<Pedestrian> getPedGroupMembers(){
 
 		LinkedList<Pedestrian> peds = new LinkedList<>();

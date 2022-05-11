@@ -31,14 +31,19 @@ public class Pedestrian extends Agent {
     private boolean isChild; // TODO should actually be an attribute or a member of a subclass
     private boolean isLikelyInjured; // TODO should actually be an attribute or a member of a subclass
 
-    private PsychologyStatus psychologyStatus;
+    private final PsychologyStatus psychologyStatus;
 
     private ExposureModelHealthStatus healthStatus;
     private DoseResponseModelInfectionStatus infectionStatus;
 
-	private LinkedList<Integer> groupIds; // TODO should actually be an attribute or a member of a subclass
-	private LinkedList<Integer> groupSizes;
+    private GroupMember groupMember;
 
+    //TODO
+	private LinkedList<Integer> groupIds; // TODO should actually be an attribute or a member of a subclass
+	//TODO
+    private LinkedList<Integer> groupSizes;
+
+    //TODO
     private LinkedList<Pedestrian> agentsInGroup = new LinkedList<>();
 
 
@@ -64,24 +69,29 @@ public class Pedestrian extends Agent {
         this(new AttributesAgent());
     }
 
+
+
     private Pedestrian(AttributesAgent attributesPedestrian) {
         this(attributesPedestrian, new Random());
     }
 
-    public Pedestrian(AttributesAgent attributesAgent, Random random) {
+    public Pedestrian(AttributesAgent attributesAgent, Random random, GroupMember groupMember) {
         super(attributesAgent, random);
 
-		idAsTarget = -1;
-		isChild = false;
-		isLikelyInjured = false;
-		psychologyStatus = new PsychologyStatus(null, new ThreatMemory(), SelfCategory.TARGET_ORIENTED, GroupMembership.OUT_GROUP, new KnowledgeBase());
+        this.groupMember = groupMember;
+        idAsTarget = -1;
+        isChild = false;
+        isLikelyInjured = false;
+        psychologyStatus = new PsychologyStatus(null, new ThreatMemory(), SelfCategory.TARGET_ORIENTED, GroupMembership.OUT_GROUP, new KnowledgeBase());
         healthStatus = null;
         infectionStatus = null;
-		groupIds = new LinkedList<>();
-		groupSizes = new LinkedList<>();
-		modelPedestrianMap = new HashMap<>();
-		trajectory = new VTrajectory();
-		footstepHistory = new FootstepHistory(attributesAgent.getFootstepHistorySize());
+        modelPedestrianMap = new HashMap<>();
+        trajectory = new VTrajectory();
+        footstepHistory = new FootstepHistory(attributesAgent.getFootstepHistorySize());
+    }
+
+    public Pedestrian(AttributesAgent attributesAgent, Random random) {
+        this(attributesAgent, random, null);
 	}
 
     protected Pedestrian(Pedestrian other) {
@@ -105,12 +115,10 @@ public class Pedestrian extends Agent {
             infectionStatus = null;
         }
 
-        if (other.groupIds != null) {
-            groupIds = new LinkedList<>(other.groupIds);
-            groupSizes = new LinkedList<>(other.groupSizes);
+        if (other.groupMember != null) {
+            groupMember = other.groupMember;
         } else {
-            groupIds = new LinkedList<>();
-            groupSizes = new LinkedList<>();
+            groupMember = null;
         }
 
         trajectory = new VTrajectory();
@@ -119,6 +127,10 @@ public class Pedestrian extends Agent {
     }
 
     // Getter
+    public GroupMember isGroupMember() {
+        return groupMember;
+    }
+
     public int getIdAsTarget() {
         return this.idAsTarget;
     }
@@ -158,10 +170,12 @@ public class Pedestrian extends Agent {
         return psychologyStatus.getKnowledgeBase();
     }
 
+    //TODO
     public LinkedList<Integer> getGroupIds() {
         return groupIds;
     }
 
+    //TODO
     public LinkedList<Integer> getGroupSizes() {
         return groupSizes;
     }
@@ -226,6 +240,10 @@ public class Pedestrian extends Agent {
     }
 
     // Setter
+    public void registerGroupAccess(GroupAccess groupAccess) {
+        this.groupMember = new GroupMember(this, groupAccess);
+    }
+
     public void setIdAsTarget(int id) {
         this.idAsTarget = id;
     }
@@ -259,10 +277,12 @@ public class Pedestrian extends Agent {
         psychologyStatus.setGroupMembership(groupMembership);
     }
 
+    //TODO
     public void setGroupIds(LinkedList<Integer> groupIds) {
         this.groupIds = groupIds;
     }
 
+    //TODO
     public void setGroupSizes(LinkedList<Integer> groupSizes) {
         this.groupSizes = groupSizes;
     }
@@ -304,10 +324,6 @@ public class Pedestrian extends Agent {
         return this.idAsTarget != -1;
     }
 
-    public void addGroupId(int groupId, int size) {
-        groupIds.add(groupId);
-        groupSizes.add(size);
-    }
 
     public void addFootStepToTrajectory(FootStep footStep) {
         this.trajectory = this.trajectory.add(footStep);
@@ -327,14 +343,18 @@ public class Pedestrian extends Agent {
     }
 
 
+    //TODO
     public LinkedList<Pedestrian> getPedGroupMembers() {
+        this.agentsInGroup = agentsInGroup;
         return agentsInGroup;
     }
 
+    //TODO
     public boolean isAgentsInGroup() {
         return getPedGroupMembers().size() > 0;
     }
 
+    //TODO
     public void setAgentsInGroup(final LinkedList<Pedestrian> agentsInGroup) {
         this.agentsInGroup = agentsInGroup;
     }
