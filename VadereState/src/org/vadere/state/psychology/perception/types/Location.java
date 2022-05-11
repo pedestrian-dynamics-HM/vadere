@@ -31,5 +31,9 @@ public class Location {
         this.areas.add(area);
     }
 
+    public List<VShape> getAreas(){
+        return this.areas;
+    }
+
 
 }

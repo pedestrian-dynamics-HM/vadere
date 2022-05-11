@@ -2,6 +2,7 @@ package org.vadere.state.psychology.perception.json;
 
 import org.vadere.state.psychology.perception.types.Location;
 import org.vadere.state.psychology.perception.types.Stimulus;
+import org.vadere.state.psychology.perception.types.SubpopulationFilter;
 import org.vadere.state.psychology.perception.types.Timeframe;
 
 import java.util.List;
@@ -32,6 +33,7 @@ public class StimulusInfo {
     // Member Variables
     private Timeframe timeframe;
     private Location location;
+    private SubpopulationFilter subpopulationFilter;
     private List<Stimulus> stimuli;
 
     public StimulusInfo() {
@@ -63,4 +65,11 @@ public class StimulusInfo {
     public void setLocation(Location location) {this.location = location;}
 
 
+    public SubpopulationFilter getSubpopulationFilter() {
+        return subpopulationFilter;
+    }
+
+    public void setSubpopulationFilter(SubpopulationFilter subpopulationFilter) {
+        this.subpopulationFilter = subpopulationFilter;
+    }
 }

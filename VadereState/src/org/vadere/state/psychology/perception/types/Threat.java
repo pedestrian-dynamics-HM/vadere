@@ -1,6 +1,8 @@
 package org.vadere.state.psychology.perception.types;
 
 import org.apache.commons.math3.util.Precision;
+import org.vadere.util.geometry.shapes.VCircle;
+import org.vadere.util.geometry.shapes.VShape;
 
 /**
  * Class signals agents a threat. For instance that something exploded.

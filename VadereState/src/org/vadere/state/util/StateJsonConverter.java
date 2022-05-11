@@ -225,6 +225,10 @@ public abstract class StateJsonConverter {
 		return stimulusInfoStore;
 	}
 
+	public static StimulusInfo deserializeStimulusInfo(String json) throws IOException {
+		return mapper.readValue(json, StimulusInfo.class);
+	}
+
 
 
 

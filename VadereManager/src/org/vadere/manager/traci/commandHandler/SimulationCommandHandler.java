@@ -17,19 +17,20 @@ import org.vadere.manager.traci.compound.object.CoordRef;
 import org.vadere.manager.traci.compound.object.PointConverter;
 import org.vadere.manager.traci.compound.object.SimulationCfg;
 import org.vadere.manager.traci.response.TraCIGetResponse;
-import org.vadere.simulator.control.external.models.ControlModelBuilder;
-import org.vadere.simulator.control.external.models.IControlModel;
-import org.vadere.simulator.control.external.reaction.InformationFilterSettings;
 import org.vadere.simulator.control.psychology.perception.StimulusController;
 import org.vadere.simulator.entrypoints.ScenarioFactory;
 import org.vadere.simulator.projects.Scenario;
+import org.vadere.simulator.projects.ScenarioStore;
 import org.vadere.simulator.utils.cache.ScenarioCache;
+import org.vadere.state.psychology.perception.json.StimulusInfo;
+import org.vadere.state.psychology.perception.json.StimulusInfoStore;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.ReferenceCoordinateSystem;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.traci.*;
 import org.vadere.state.types.ScenarioElementType;
+import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;
@@ -40,9 +41,9 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.nio.file.Path;
 
 /**
  * Handel GET/SET/SUB {@link org.vadere.manager.traci.commands.TraCICommand}s for the Simulation
@@ -70,7 +71,6 @@ public class SimulationCommandHandler extends CommandHandler<SimulationVar> {
 	private Pair<Double, Set<Integer>> allPrevious; // time at witch the given ids were send over traci
 	private Pair<Double, List<String>> departedCache; // time at witch the given ids were send over traci
 	private Pair<Double, List<String>> arrivedCache; // time at witch the given ids were send over traci
-	private HashMap<String, IControlModel> iControlModelHashMap;
 
 	static {
 		instance = new SimulationCommandHandler();
@@ -82,7 +82,6 @@ public class SimulationCommandHandler extends CommandHandler<SimulationVar> {
 		allPrevious = Pair.create(-1.0, new HashSet<>()); // never called.
 		departedCache = Pair.create(-1.0, new ArrayList<>());
 		arrivedCache = Pair.create(-1.0, new ArrayList<>());
-		iControlModelHashMap = new HashMap<>();
 	}
 
 	@Override
@@ -203,18 +202,13 @@ public class SimulationCommandHandler extends CommandHandler<SimulationVar> {
 			controlModelType = (String) cfg.getData(1, TraCIDataType.STRING);
 			infoFilterConfig = (String) cfg.getData(2, TraCIDataType.STRING);
 
+
 			remoteManager.accessState((manager, state) -> {
 				StimulusController stimulusController = manager.getRemoteSimulationRun().getStimulusController();
 				Topography topography = state.getTopography();
 				boolean isUsePsychologyLayer = state.getScenarioStore().getAttributesPsychology().isUsePsychologyLayer();
 				if (!isUsePsychologyLayer){
 					cmd.setErr("Psychology layer must be active. Set isUsePsychologyLayer: true in *.scenario file.");
-				}
-
-				double simTimeStepLength = state.getScenarioStore().getAttributesSimulation().getSimTimeStepLength();
-				if (!iControlModelHashMap.containsKey(controlModelName)) {
-					IControlModel controlModel = ControlModelBuilder.getModel(controlModelType, topography, stimulusController, simTimeStepLength, new InformationFilterSettings(infoFilterConfig));
-					iControlModelHashMap.put(controlModelName, controlModel);
 				}
 
 			});
@@ -245,24 +239,29 @@ public class SimulationCommandHandler extends CommandHandler<SimulationVar> {
 			model_name = (String)  cfg.getData(1,TraCIDataType.STRING);
 			msg_content = (String) cfg.getData(2,TraCIDataType.STRING);
 
-			if (!iControlModelHashMap.containsKey(model_name)) {
-				logger.infof("Model" + model_name + " not found. Try to initialize from model name.");
-				remoteManager.accessState((manager, state) -> {
-					StimulusController stimulusController = manager.getRemoteSimulationRun().getStimulusController();
-					Topography topography = state.getTopography();
-					double simTimeStepLength = state.getScenarioStore().getAttributesSimulation().getSimTimeStepLength();
-
-					IControlModel controlModel = ControlModelBuilder.getModel(model_name, topography, stimulusController, simTimeStepLength, new InformationFilterSettings());
-					iControlModelHashMap.put(model_name, controlModel);
-				});
-			}
-
-
-			IControlModel controlModel = iControlModelHashMap.get(model_name);
-
 			remoteManager.accessState((manager, state) -> {
-				controlModel.update(msg_content, state.getSimTimeInSec(), specify_id);
+
+
+				try {
+					StimulusInfo info = StateJsonConverter.deserializeStimulusInfo(msg_content);
+
+					if (specify_id != -1) {
+						LinkedList<Integer> idList = new LinkedList<>();
+						idList.add(specify_id);
+						info.getSubpopulationFilter().setAffectedPedestrianIds(idList);
+					}
+
+					ScenarioStore ss = state.getScenarioStore();
+					StimulusInfoStore stimulusInfoStore = manager.getRemoteSimulationRun().getStimulusController().getScenarioStore().getStimulusInfoStore();
+					stimulusInfoStore.getStimulusInfos().add(info);
+
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+
+
 			});
+
 
 			logger.infof("Received ControlCommand:");
 			logger.infof(cfg.toString());
