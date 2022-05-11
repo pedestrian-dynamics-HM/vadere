@@ -49,7 +49,34 @@ public class StimulusController {
     public void setOneTimeStimuli(List<StimulusInfo> oneTimeStimuli) { this.oneTimeStimuli = oneTimeStimuli; }
     public void setRecurringStimuli(List<StimulusInfo> recurringStimuli) { this.recurringStimuli = recurringStimuli; }
 
+
+
+
+
     // Methods
+
+    public List<Stimulus> getStimuliForTime(double simulationTime) {
+        List<Stimulus> stimuli = new ArrayList<>();
+
+        // Always, create an "ElapsedTime".
+        stimuli.add(new ElapsedTime(simulationTime));
+
+        List<Stimulus> activeOneTimeStimuli = getOneTimeStimuliForSimulationTime(simulationTime);
+        List<Stimulus> activeRecurringStimuli = getRecurringStimuliForSimulationTime(simulationTime);
+
+        // Set timestamp for each active stimulus.
+        activeOneTimeStimuli.stream().forEach(stimulus -> stimulus.setTime(simulationTime));
+        activeRecurringStimuli.stream().forEach((stimulus -> stimulus.setTime(simulationTime)));
+
+        stimuli.addAll(activeOneTimeStimuli);
+        stimuli.addAll(activeRecurringStimuli);
+
+        return stimuli;
+    }
+
+
+
+
     public List<Stimulus> getStimuliForTime(double simulationTime, Pedestrian ped) {
         List<Stimulus> stimuli = new ArrayList<>();
 
@@ -106,6 +133,20 @@ public class StimulusController {
         return activeStimuli;
     }
 
+
+
+    private List<Stimulus> getOneTimeStimuliForSimulationTime(double simulationTime) {
+        List<Stimulus> activeStimuli = new ArrayList<>();
+        oneTimeStimuli.stream()
+                .filter(stimulusInfo -> oneTimeTimeframeIsActiveAtSimulationTime(stimulusInfo.getTimeframe(), simulationTime)
+                )
+                .forEach(stimulusInfo -> activeStimuli.addAll(stimulusInfo.getStimuli()));
+
+        return activeStimuli;
+
+    }
+
+
     private boolean pedIsAffected(int pedId, SubpopulationFilter filter) {
         List<Integer> ids = filter.getAffectedPedestrianIds();
         if (ids.size() > 0){
@@ -131,6 +172,18 @@ public class StimulusController {
                 .filter(stimulusInfo -> timeframeIsActiveAtSimulationTime(stimulusInfo.getTimeframe(), simulationTime) &&
                 pedIsInSpecifiedArea(stimulusInfo.getLocation(), ped.getPosition()) &&
                         pedIsAffected(ped.getId(), stimulusInfo.getSubpopulationFilter()))
+                .forEach(stimulusInfo -> activeStimuli.addAll(stimulusInfo.getStimuli()));
+
+        return activeStimuli;
+    }
+
+    private List<Stimulus> getRecurringStimuliForSimulationTime(double simulationTime) {
+
+        List<Stimulus> activeStimuli = new ArrayList<>();
+
+        recurringStimuli.stream()
+                .filter(stimulusInfo -> timeframeIsActiveAtSimulationTime(stimulusInfo.getTimeframe(), simulationTime)
+                       )
                 .forEach(stimulusInfo -> activeStimuli.addAll(stimulusInfo.getStimuli()));
 
         return activeStimuli;
