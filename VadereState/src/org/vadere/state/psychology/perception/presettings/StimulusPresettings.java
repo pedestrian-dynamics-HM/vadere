@@ -1,7 +1,6 @@
 package org.vadere.state.psychology.perception.presettings;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.vadere.state.psychology.perception.json.ReactionProbability;
 import org.vadere.state.psychology.perception.json.StimulusInfo;
 import org.vadere.state.psychology.perception.json.StimulusInfoStore;
 import org.vadere.state.psychology.perception.types.*;
@@ -9,7 +8,10 @@ import org.vadere.state.util.JacksonObjectMapper;
 import org.vadere.util.geometry.shapes.VRectangle;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Provide JSON presettings for commonly used stimuli.

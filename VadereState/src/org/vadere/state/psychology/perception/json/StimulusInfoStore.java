@@ -71,9 +71,6 @@ public class StimulusInfoStore {
         List<StimulusInfo> stimulusInfos = new ArrayList<>();
         stimulusInfos.add(stimulusInfo1);
 
-        List<ReactionProbability> reactionProbabilities = new ArrayList<>();
-        reactionProbabilities.add(new ReactionProbability());
-
         StimulusInfoStore stimulusInfoStore = new StimulusInfoStore();
         stimulusInfoStore.setStimulusInfos(stimulusInfos);
 
@@ -94,7 +91,6 @@ public class StimulusInfoStore {
             for (StimulusInfo stimulusInfo : deserializedStimulusInfoStore.getStimulusInfos()) {
                 System.out.print(stimulusInfo.getTimeframe());
                 System.out.print(stimulusInfo.getStimuli());
-                System.out.println(reactionProbabilities);
             }
             System.out.println();
         } catch (IOException e) {
