@@ -5,6 +5,7 @@ import org.vadere.state.psychology.perception.types.Stimulus;
 import org.vadere.state.psychology.perception.types.SubpopulationFilter;
 import org.vadere.state.psychology.perception.types.Timeframe;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -37,12 +38,14 @@ public class StimulusInfo {
     private List<Stimulus> stimuli;
 
     public StimulusInfo() {
+        this(new Timeframe(), new LinkedList<>(), new Location(), new SubpopulationFilter());
     }
 
-    public StimulusInfo(Timeframe timeframe, List<Stimulus> stimuli, Location location) {
+    public StimulusInfo(Timeframe timeframe, List<Stimulus> stimuli, Location location, SubpopulationFilter subpopulationFilter) {
         this.timeframe = timeframe;
         this.stimuli = stimuli;
         this.location = location;
+        this.subpopulationFilter = subpopulationFilter;
     }
 
     // Getter
@@ -53,6 +56,8 @@ public class StimulusInfo {
         return stimuli;
     }
     public Location getLocation() {return location;}
+    public SubpopulationFilter getSubpopulationFilter() {return subpopulationFilter;}
+
 
 
     // Setter
@@ -63,12 +68,6 @@ public class StimulusInfo {
         this.stimuli = stimuli;
     }
     public void setLocation(Location location) {this.location = location;}
-
-
-    public SubpopulationFilter getSubpopulationFilter() {
-        return subpopulationFilter;
-    }
-
     public void setSubpopulationFilter(SubpopulationFilter subpopulationFilter) {
         this.subpopulationFilter = subpopulationFilter;
     }

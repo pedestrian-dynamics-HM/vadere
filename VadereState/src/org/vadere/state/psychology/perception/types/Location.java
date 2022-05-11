@@ -16,6 +16,7 @@ public class Location {
     private List<VShape> areas;
 
     public Location(){
+        areas = new LinkedList<>();
     }
 
     public Location(List<VShape> areas){

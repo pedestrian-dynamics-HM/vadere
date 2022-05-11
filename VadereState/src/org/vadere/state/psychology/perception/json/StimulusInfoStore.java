@@ -64,8 +64,11 @@ public class StimulusInfoStore {
         stimuli.add(new WaitInArea(0, new VRectangle(12.5, 0, 5, 6)));
         // stimuli.add(new WaitInArea(0, new VCircle(5, 5, 5)));
 
+        Location location = new Location(new VRectangle(0,0,1000,1000));
+
         StimulusInfo stimulusInfo1 = new StimulusInfo();
         stimulusInfo1.setTimeframe(timeframe);
+        stimulusInfo1.setLocation(location);
         stimulusInfo1.setStimuli(stimuli);
 
         List<StimulusInfo> stimulusInfos = new ArrayList<>();
