@@ -235,6 +235,29 @@
           "type" : "RECTANGLE"
         }
       } ]
+    },
+    {
+      "timeframe" : {
+        "startTime" : 0.0,
+        "endTime" : 10.0,
+        "repeat" : false,
+        "waitTimeBetweenRepetition" : 0.0
+      },
+      "stimuli" : [ {
+        "type" : "WaitInArea",
+        "id" : -11,
+        "area" : {
+          "x" : 0.0,
+          "y" : 0.0,
+          "width" : 20.0,
+          "height" : 20.0,
+          "type" : "RECTANGLE"
+        }
+      }, { 
+      "type" : "Wait",
+      "id" : -22
+      }
+       ]
     } ],
     "reactionProbabilities" : [ {
       "stimulusId" : -1,
