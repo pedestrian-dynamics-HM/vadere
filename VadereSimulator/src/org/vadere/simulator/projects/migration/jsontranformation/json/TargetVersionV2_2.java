@@ -4,10 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.vadere.annotation.factories.migrationassistant.MigrationTransformation;
-import org.vadere.simulator.control.psychology.perception.models.PerceptionModel;
 import org.vadere.simulator.projects.migration.MigrationException;
 import org.vadere.simulator.projects.migration.jsontranformation.SimpleJsonTransformation;
-import org.vadere.state.attributes.AttributesPsychologyLayer;
 import org.vadere.state.util.JacksonObjectMapper;
 import org.vadere.util.version.Version;
 
@@ -27,7 +25,78 @@ public class TargetVersionV2_2 extends SimpleJsonTransformation {
         addPostHookLast(this::addNestedModelAttributesKeyInPsychologyLayer);
         addPostHookLast(this::removeReactionProbabilities);
         addPostHookLast(this::removeStimulusIds);
+        addPostHookLast(this::moveThreatWaitAreasToLocation);
         addPostHookLast(this::sort);
+    }
+
+    private JsonNode moveThreatWaitAreasToLocation(JsonNode node) {
+
+        String key = "stimulusInfos";
+        JsonNode scenarioNode = node.get("scenario");
+
+        ArrayNode newStimulusInfos = mapper.createArrayNode();
+
+        if (!path(scenarioNode, "stimulusInfos").isMissingNode()) {
+
+            ArrayNode psychologyLayer = (ArrayNode) scenarioNode.get(key);
+
+
+            for (JsonNode entry : psychologyLayer.deepCopy()) {
+                ArrayNode stimuli = (ArrayNode) entry.get("stimuli");
+
+
+                for (JsonNode stimusNode : stimuli) {
+
+                    ObjectNode stimulusInfo = (ObjectNode) entry;
+                    ObjectNode nodenew = stimulusInfo.deepCopy();
+
+                    ArrayNode sss = mapper.createArrayNode();
+                    ObjectNode aa = mapper.createObjectNode();
+
+
+                    ObjectNode stimulus = (ObjectNode) stimusNode;
+                    String stimulusType = stimulus.get("type").toString().replace("\"", "");
+
+                    ArrayNode ss = mapper.createArrayNode();
+                    ObjectNode aas = mapper.createObjectNode();
+
+                    if (stimulusType.equals("WaitInArea")) {
+                        ObjectNode node1 = (ObjectNode) stimulus.get("area").deepCopy();
+                        ss.add(node1);
+                        aa.put("type", "Wait");
+                        sss.add(aa);
+
+
+                    } else if (stimulusType.equals("Threat")){
+                        aa.put("type", "Threat");
+                        aa.put("loudness", stimulus.get("loudness") );
+                        sss.add(aa);
+
+                        
+
+
+                    } else {
+                        sss.add(stimulus);
+                    }
+
+                    aas.put("areas", ss);
+                    nodenew.put("location", aas);
+
+                    nodenew.remove("stimuli");
+                    nodenew.put("stimuli", sss);
+                    newStimulusInfos.add(nodenew);
+                }
+
+
+            }
+        }
+
+        ObjectNode node000 = (ObjectNode) scenarioNode;
+        node000.remove("stimulusInfos");
+        node000.put("stimulusInfos", newStimulusInfos);
+
+        return node;
+
     }
 
 
@@ -51,9 +120,9 @@ public class TargetVersionV2_2 extends SimpleJsonTransformation {
 
             ArrayNode psychologyLayer = (ArrayNode) scenarioNode.get(key);
 
-            for (JsonNode entry : psychologyLayer){
+            for (JsonNode entry : psychologyLayer) {
                 ArrayNode stimuli = (ArrayNode) entry.get("stimuli");
-                for (JsonNode stimulus : stimuli){
+                for (JsonNode stimulus : stimuli) {
                     ((ObjectNode) stimulus).remove("id");
                 }
             }
@@ -104,10 +173,9 @@ public class TargetVersionV2_2 extends SimpleJsonTransformation {
 
     private String extracted(ObjectNode psychologyLayer, String key) {
 
-        String path = "org.vadere.state.attributes.models.psychology."+ key +".Attributes";
+        String path = "org.vadere.state.attributes.models.psychology." + key + ".Attributes";
         return path + psychologyLayer.get(key).toString().replace("\"", "");
     }
-
 
 
 }
