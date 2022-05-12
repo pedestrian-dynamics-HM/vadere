@@ -7,11 +7,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.vadere.annotation.factories.migrationassistant.MigrationTransformation;
 import org.vadere.simulator.projects.migration.MigrationException;
 import org.vadere.simulator.projects.migration.jsontranformation.SimpleJsonTransformation;
-import org.vadere.state.psychology.perception.json.StimulusInfo;
 import org.vadere.state.util.JacksonObjectMapper;
-import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.geometry.shapes.VCircle;
-import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.version.Version;
 
@@ -39,114 +36,105 @@ public class TargetVersionV2_2 extends SimpleJsonTransformation {
 
     private JsonNode moveThreatWaitAreasToLocation(JsonNode node) {
 
+        // generates one stimulusInfo for each stimulus
+
+
         String key = "stimulusInfos";
         JsonNode scenarioNode = node.get("scenario");
-
         ArrayNode newStimulusInfos = mapper.createArrayNode();
 
         if (!path(scenarioNode, "stimulusInfos").isMissingNode()) {
 
             ArrayNode psychologyLayer = (ArrayNode) scenarioNode.get(key);
 
+            for (JsonNode stimulusInfoJson : psychologyLayer.deepCopy()) {
 
-            for (JsonNode entry : psychologyLayer.deepCopy()) {
-                ArrayNode stimuli = (ArrayNode) entry.get("stimuli");
+                ObjectNode stimulusInfo = stimulusInfoJson.deepCopy();
+                ArrayNode stimuli = (ArrayNode) stimulusInfo.get("stimuli");
+
+                for (JsonNode stimulusJson : stimuli) {
+
+                    ArrayNode stimuliList = mapper.createArrayNode();
+                    ObjectNode stimulusAdjusted = mapper.createObjectNode();
+
+                    ArrayNode areaList = mapper.createArrayNode();
+                    ObjectNode location = mapper.createObjectNode();
 
 
-                for (JsonNode stimusNode : stimuli) {
-
-                    ObjectNode stimulusInfo = (ObjectNode) entry;
-                    ObjectNode nodenew = stimulusInfo.deepCopy();
-
-                    ArrayNode sss = mapper.createArrayNode();
-                    ObjectNode aa = mapper.createObjectNode();
-
-
-                    ObjectNode stimulus = (ObjectNode) stimusNode;
+                    ObjectNode stimulus = (ObjectNode) stimulusJson;
                     String stimulusType = stimulus.get("type").toString().replace("\"", "");
 
-                    ArrayNode ss = mapper.createArrayNode();
-                    ObjectNode aas = mapper.createObjectNode();
-
                     if (stimulusType.equals("WaitInArea")) {
-                        ObjectNode node1 = (ObjectNode) stimulus.get("area").deepCopy();
-                        ss.add(node1);
 
-                        aa.put("type", "Wait");
-                        sss.add(aa);
+                        // Step 1: create perception area definition
+                        // move area definition to new location attribute.
+                        areaList.add(stimulus.get("area").deepCopy());
+
+                        // remove perception area definition from stimulus
+                        // replace WaitInArea by simple Wait.
+                        stimulusAdjusted.put("type", "Wait");
+                        stimuliList.add(stimulusAdjusted);
 
 
                     } else if (stimulusType.equals("Threat")){
+                        // separate perception area and threat origin.
+                        // After the migration: perception area can be of arbitrary shape.
+                        // Before the migration, the perception area has always been a disk with the following properties:
+                        //      center = target centroid (corresponding target is specified using "originAsTargetId" in Threat.class)
+                        //      radius = radius (old attribute in Threat.class)
+                        // In the migration, I add the corresponding perception area (disk) to the location attribute.
 
 
-                        double radius = stimulus.get("radius").asDouble();
-
+                        // Step 1: create perception area definition
+                        // generate new disk definition and place it under location
+                        JsonNode disk = null;
+                        boolean targetIdFound = false;
                         Iterator<JsonNode> iter = scenarioNode.get("topography").get("targets").iterator();
+                        while (!targetIdFound && iter.hasNext()){
 
-                        boolean isSearchingForTargetId = true;
-
-                        VShape shape = null;
-                        JsonNode area = null;
-
-                        while (isSearchingForTargetId && iter.hasNext()){
-
-                            JsonNode targetentry = iter.next();
-
-                            if (targetentry.get("id") == stimulus.get("originAsTargetId")){
-
-                                JsonNode shapeJ = targetentry.get("shape");
-
+                            JsonNode target = iter.next();
+                            if (target.get("id") == stimulus.get("originAsTargetId")){
                                 try {
-
-                                    shape = mapper.treeToValue(shapeJ, VShape.class);
-                                    VPoint center;
-                                    center = shape.getCentroid();
-                                    VCircle circle = new VCircle(center, radius);
-
-
-                                    area = mapper.convertValue(circle, JsonNode.class);
-
+                                    VShape shape = mapper.treeToValue(target.get("shape"), VShape.class);
+                                    double radius = stimulus.get("radius").asDouble();
+                                    VCircle circle = new VCircle(shape.getCentroid(), radius);
+                                    disk = mapper.convertValue(circle, JsonNode.class);
                                 } catch (JsonProcessingException e) {
                                     e.printStackTrace();
                                 }
-
-                                isSearchingForTargetId = false;
+                                targetIdFound = true;
                             }
                         }
-                        if (shape == null){
-                            throw new RuntimeException("target id not found.");
+                        if (disk == null){
+                            throw new RuntimeException("Threat with originAsTargetId="
+                                    + stimulus.get("originAsTargetId").asInt()
+                                    + ": target does not exist.");
                         }
+                        areaList.add(disk);
 
-
-                        ss.add(area);
-
-
-                        aa.put("type", "Threat");
-                        aa.put("loudness", stimulus.get("loudness") );
-                        aa.put("originAsTargetId", stimulus.get("originAsTargetId") );
-
-                        sss.add(aa);
+                        // remove perception area definition from stimulus
+                        stimulusAdjusted = stimulus.deepCopy();
+                        stimulusAdjusted.remove("radius"); // no longer necessary, see disk definition
+                        stimuliList.add(stimulusAdjusted);
 
 
                     } else {
-                        sss.add(stimulus);
+                        stimuliList.add(stimulus);
                     }
 
-                    aas.put("areas", ss);
-                    nodenew.put("location", aas);
+                    location.put("areas", areaList);
+                    stimulusInfo.put("location", location);
 
-                    nodenew.remove("stimuli");
-                    nodenew.put("stimuli", sss);
-                    newStimulusInfos.add(nodenew);
+                    stimulusInfo.remove("stimuli");
+                    stimulusInfo.put("stimuli", stimuliList);
+                    newStimulusInfos.add(stimulusInfo);
                 }
-
-
             }
         }
 
-        ObjectNode node000 = (ObjectNode) scenarioNode;
-        node000.remove("stimulusInfos");
-        node000.put("stimulusInfos", newStimulusInfos);
+
+        ((ObjectNode) scenarioNode).remove("stimulusInfos");
+        ((ObjectNode) scenarioNode).put("stimulusInfos", newStimulusInfos);
 
         return node;
 
