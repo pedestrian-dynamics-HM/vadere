@@ -123,6 +123,7 @@ public class TargetVersionV2_2 extends SimpleJsonTransformation {
 
                         aa.put("type", "Threat");
                         aa.put("loudness", stimulus.get("loudness") );
+                        aa.put("originAsTargetId", stimulus.get("originAsTargetId") );
 
                         sss.add(aa);
 

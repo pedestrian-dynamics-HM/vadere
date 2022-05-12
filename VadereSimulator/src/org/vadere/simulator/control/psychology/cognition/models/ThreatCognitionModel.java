@@ -114,7 +114,7 @@ public class ThreatCognitionModel implements ICognitionModel {
         VPoint threatOrigin = topography.getTarget(latestThreat.getOriginAsTargetId()).getShape().getCentroid();
         double distanceToThreat = threatOrigin.distance(pedestrian.getPosition());
 
-        boolean pedestrianIsInsideThreatArea = (distanceToThreat <= latestThreat.getRadius());
+        boolean pedestrianIsInsideThreatArea = true; // (distanceToThreat <= latestThreat.getRadius());
         boolean pedestrianIsBlockedByObstacle = TopographyHelper.pedestrianIsBlockedByObstacle(pedestrian, topography);
 
         // Gerta suggests to apply SelfCategory.COMMON_FATE

@@ -199,7 +199,9 @@ public class ThreatCognitionModelTest {
 
         Threat threatStimulus = new Threat();
         threatStimulus.setOriginAsTargetId(targetAsThreat.getId());
-        threatStimulus.setRadius(threatRadius);
+
+        //TODO: check test
+        //threatStimulus.setRadius(threatRadius);
         pedestrian.setMostImportantStimulus(threatStimulus);
         pedestrian.setPosition(new VPoint(0, 0));
         topography.addElement(pedestrian);
@@ -255,7 +257,10 @@ public class ThreatCognitionModelTest {
 
         Threat threatStimulus = new Threat();
         threatStimulus.setOriginAsTargetId(targetAsThreat.getId());
-        threatStimulus.setRadius(threatRadius);
+
+        //TODO: check test
+        //threatStimulus.setRad
+        //threatStimulus.setRadius(threatRadius);
 
         // Set up threatened neighbor.
         AttributesAgent attributesAgent = new AttributesAgent(pedestrian.getId() + 1);
