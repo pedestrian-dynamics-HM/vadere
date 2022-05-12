@@ -284,7 +284,7 @@ public class StimulusControllerTest {
 
         double expectedSimulationTime = 1.0;
 
-        List<Stimulus> activeStimuli = stimulusController.getStimuliForTime(expectedSimulationTime);
+        List<Stimulus> activeStimuli = stimulusController.getStimuliFilteredTimeOnly(expectedSimulationTime);
 
         if (activeStimuli.size() == 1) {
             Stimulus stimulus = activeStimuli.get(0);
@@ -313,7 +313,7 @@ public class StimulusControllerTest {
 
         double expectedSimulationTime = 5.0;
 
-        List<Stimulus> activeStimuli = stimulusController.getStimuliForTime(expectedSimulationTime);
+        List<Stimulus> activeStimuli = stimulusController.getStimuliFilteredTimeOnly(expectedSimulationTime);
 
         for (Stimulus stimulus : activeStimuli) {
             assertEquals(expectedSimulationTime, stimulus.getTime(), 10e-1);
@@ -340,7 +340,7 @@ public class StimulusControllerTest {
 
         double expectedSimulationTime = 5.0;
 
-        List<Stimulus> activeStimuli = stimulusController.getStimuliForTime(expectedSimulationTime);
+        List<Stimulus> activeStimuli = stimulusController.getStimuliFilteredTimeOnly(expectedSimulationTime);
 
         assertEquals(1, activeStimuli.size());
         assertEquals(0, wait.getTime(), 10e-1);
@@ -365,6 +365,8 @@ public class StimulusControllerTest {
 
     @Test
     public void getStimuliForTimeReturnsCorrectStimuli(){
+
+
         Stimulus stimulus1 = new Wait(2.0);
         Stimulus stimulus2 = new Wait(3.0);
         Stimulus stimulus3 = new WaitInArea(12, new VRectangle(1,1,100,10.0));
@@ -383,17 +385,17 @@ public class StimulusControllerTest {
 
         List<Stimulus> stimuli;
         //only default event
-        stimuli = stimulusController.getStimuliForTime(0.5);
+        stimuli = stimulusController.getStimuliFilteredTimeOnly(0.5);
         assertEquals(1, stimuli.size());
         assertTimeStamp(stimuli, 0.5);
 
         //only stimulusInfo1
-        stimuli = stimulusController.getStimuliForTime(2.5);
+        stimuli = stimulusController.getStimuliFilteredTimeOnly(2.5);
         assertEquals(3, stimuli.size());
         assertTimeStamp(stimuli, 2.5);
 
         //both stimulusInfo1 stimulusInfo2
-        stimuli = stimulusController.getStimuliForTime(3.5);
+        stimuli = stimulusController.getStimuliFilteredTimeOnly(3.5);
         assertEquals(4, stimuli.size());
         assertTrue(errorMessage, stimuli.contains(stimulus1));
         assertTrue(errorMessage, stimuli.contains(stimulus2));
@@ -401,21 +403,21 @@ public class StimulusControllerTest {
         assertTimeStamp(stimuli, 3.5);
 
         //only stimulusInfo1
-        stimuli = stimulusController.getStimuliForTime(4.5);
+        stimuli = stimulusController.getStimuliFilteredTimeOnly(4.5);
         assertEquals(3, stimuli.size());
         assertTrue(errorMessage, stimuli.contains(stimulus1));
         assertTrue(errorMessage, stimuli.contains(stimulus2));
         assertTimeStamp(stimuli, 4.5);
 
         //one time event is over only stimuli from stimulusInfo2
-        stimuli = stimulusController.getStimuliForTime(7.8);
+        stimuli = stimulusController.getStimuliFilteredTimeOnly(7.8);
         assertEquals(2, stimuli.size());
         assertTrue(errorMessage, stimuli.contains(stimulus3));
         assertTimeStamp(stimuli, 7.8);
 
         //no event (only the default time event)
         //one time event is over only stimuli from stimulusInfo2
-        stimuli = stimulusController.getStimuliForTime(8.3);
+        stimuli = stimulusController.getStimuliFilteredTimeOnly(8.3);
         assertEquals(1, stimuli.size());
         assertTimeStamp(stimuli, 8.3);
 
@@ -453,9 +455,9 @@ public class StimulusControllerTest {
         stimulusController.getScenarioStore().setTopography(topography);
 
 
-        List<Stimulus> stimuliFiltered1 = stimulusController.getStimuli(0, pedestrians.get(0));
+        List<Stimulus> stimuliFiltered1 = stimulusController.getStimuliFiltered(0, pedestrians.get(0).getPosition(), pedestrians.get(0).getId());
         Stimulus Threat1 = stimuliFiltered1.stream().filter(stimulus -> stimulus instanceof Threat).collect(Collectors.toList()).get(0);
-        List<Stimulus> stimuliFiltered2 = stimulusController.getStimuli(0, pedestrians.get(1));
+        List<Stimulus> stimuliFiltered2 = stimulusController.getStimuliFiltered(0, pedestrians.get(1).getPosition(), pedestrians.get(1).getId());
         Stimulus Threat2 = stimuliFiltered2.stream().filter(stimulus -> stimulus instanceof Threat).collect(Collectors.toList()).get(0);
 
         assertEquals(Threat1, expectedStimulusPed1);
@@ -474,7 +476,9 @@ public class StimulusControllerTest {
 
         double expectedTime = 0.1;
         VShape waitingArea = new VCircle(new VPoint(0, 0), 2);
-        Stimulus expectedWaitInArea = new WaitInArea(expectedTime, waitingArea);
+
+        Location location = new Location(waitingArea);
+        Stimulus expectedWaitInArea = new Wait(expectedTime);
         Stimulus expectedElapsedTime = new ElapsedTime(0.2);
 
         stimuli.add(expectedElapsedTime);
@@ -484,18 +488,18 @@ public class StimulusControllerTest {
         Timeframe timeFrame = new Timeframe(0, 7, false,0);
         stimulusInfo1.setStimuli(stimuli);
         stimulusInfo1.setTimeframe(timeFrame);
+        stimulusInfo1.setLocation(location);
 
         StimulusInfoStore store = getStimulusInfoStore(Collections.singletonList(stimulusInfo1));
         StimulusController stimulusController = new StimulusController(getScenarioStore(store));
         stimulusController.getScenarioStore().setTopography(topography);
 
+        List<Stimulus> stimuliFiltered1 = stimulusController.getStimuliFiltered(0, pedestrians.get(0).getPosition(), pedestrians.get(0).getId());
+        Stimulus Wait = stimuliFiltered1.stream().filter(stimulus -> stimulus instanceof Wait).collect(Collectors.toList()).get(0);
+        List<Stimulus> stimuliFiltered2 = stimulusController.getStimuliFiltered(0, pedestrians.get(1).getPosition(), pedestrians.get(1).getId());
 
-        List<Stimulus> stimuliFiltered1 = stimulusController.getStimuli(0, pedestrians.get(0));
-        Stimulus WaitInArea = stimuliFiltered1.stream().filter(stimulus -> stimulus instanceof WaitInArea).collect(Collectors.toList()).get(0);
-        List<Stimulus> stimuliFiltered2 = stimulusController.getStimuli(0, pedestrians.get(1));
-
-        assertEquals(WaitInArea, expectedWaitInArea);
-        assertFalse(stimuliFiltered2.stream().anyMatch( stimulus -> stimulus instanceof WaitInArea));
+        assertEquals(Wait, expectedWaitInArea);
+        assertFalse(stimuliFiltered2.stream().anyMatch( stimulus -> stimulus instanceof Wait));
 
     }
 

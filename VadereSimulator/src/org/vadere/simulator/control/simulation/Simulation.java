@@ -455,7 +455,11 @@ public class Simulation implements ControllerProvider{
 		Collection<Pedestrian> pedestrians = topography.getElements(Pedestrian.class);
 
 		if (scenarioStore.getAttributesPsychology().isUsePsychologyLayer()) {
+
+
 			HashMap<Pedestrian, List<Stimulus>> pedSpecificStimuli = stimulusController.getStimuli(simTimeInSec, pedestrians);
+
+
 			perceptionModel.update(pedSpecificStimuli);
 			cognitionModel.update(pedestrians);
 		} else {

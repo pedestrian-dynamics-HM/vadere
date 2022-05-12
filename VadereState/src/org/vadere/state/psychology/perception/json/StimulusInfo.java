@@ -68,7 +68,8 @@ public class StimulusInfo {
         this.stimuli = stimuli;
     }
     public void setLocation(Location location) {this.location = location;}
-    public void setSubpopulationFilter(SubpopulationFilter subpopulationFilter) {
-        this.subpopulationFilter = subpopulationFilter;
-    }
+    public void setSubpopulationFilter(SubpopulationFilter subpopulationFilter) {this.subpopulationFilter = subpopulationFilter;}
+
+
+
 }
