@@ -10,6 +10,7 @@ import org.vadere.manager.traci.commandHandler.variables.PersonVar;
 import org.vadere.manager.traci.commands.TraCISetCommand;
 import org.vadere.manager.traci.commands.get.TraCIGetCompoundPayload;
 import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.psychology.perception.json.StimulusInfoStore;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.traci.CompoundObject;
@@ -36,6 +37,7 @@ import static org.mockito.Mockito.when;
 public class SimulationCommandHandlerTest extends CommandHandlerTest {
 
 	private SimulationCommandHandler simCmdHandler = SimulationCommandHandler.instance;
+
 
 	// Get
 
@@ -115,6 +117,14 @@ public class SimulationCommandHandlerTest extends CommandHandlerTest {
 	@Test
 	public void process_apply_control() {
 
+			String basePath = "testResources";
+			String scenario = "stimulusInfoData2.json";
+			String json = null;
+			try {
+				json = IOUtils.readTextFile(Paths.get(basePath, scenario).toString());
+			} catch (IOException e) {
+				fail();
+			}
 
 			SimulationVar var = SimulationVar.EXTERNAL_INPUT;
 			int varID = var.id;
@@ -126,7 +136,7 @@ public class SimulationCommandHandlerTest extends CommandHandlerTest {
 					.add(TraCIDataType.STRING) // sending node
 					.add(TraCIDataType.STRING) // model name
 					.add(TraCIDataType.STRING) // command
-					.build("10", "RouteChoice" , "{'time': 8.0}");
+					.build("10", "RouteChoice" , json);
 
 			TraCISetCommand cmd = (TraCISetCommand) getFirstCommand(TraCISetCommand.build(
 					TraCICmd.SET_SIMULATION_STATE, elementID, varID, varType, data));
@@ -142,12 +152,14 @@ public class SimulationCommandHandlerTest extends CommandHandlerTest {
 					pedEl1.setTargets(t);
 					when(topo.getPedestrianDynamicElements().getElement(0)).thenReturn(pedEl1);
 					when(simState.getSimTimeInSec()).thenReturn(4.0);
+
+					StimulusInfoStore infoStore = new StimulusInfoStore();
+					when(remoteManager.getRemoteSimulationRun().getStimulusController().getScenarioStore().getStimulusInfoStore()).thenReturn(infoStore);
 				}
 			};
 
 			try {
 				TraCICommand ret = simCmdHandler.process_apply_control(cmd, rm);
-				fail();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

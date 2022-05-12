@@ -1,5 +1,4 @@
 {
-  "stimulusInfos" : [ {
     "timeframe" : {
       "startTime": 1.0,
       "endTime": 49.0,
@@ -15,5 +14,4 @@
     "stimuli" : [ {
       "type" : "Wait"
     } ]
-  } ]
 }
