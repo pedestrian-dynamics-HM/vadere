@@ -33,7 +33,6 @@ public class ThreatCognitionModelTest {
     private Pedestrian pedestrian;
     private List<Pedestrian> pedestrians;
     private Topography topography;
-    private List<Attributes> attributes = new LinkedList<>();
 
     @Before
     public void initializePedestrian() {
@@ -186,7 +185,13 @@ public class ThreatCognitionModelTest {
         assertEquals(SelfCategory.COMMON_FATE, pedestrian.getSelfCategory());
     }
 
-    @Test
+/* Deprecated test.
+For version < 2.2, the perception area was defined indirectly via the attributes of the Threat.
+For version >=2.2, the perception area is defined outside the stimulus.
+The StimulusController filters the stimuli by time, location, and people.
+In the ThreatCognitionModel only stimuli arrive that are within range.
+It is therefore no longer necessary to check whether the persons are within range.
+// no longer necessary
     public void updateSetsThreatenedOrCommonFateUponElapsedTimeStimulusIfPedestrianWasThreatenedBefore() {
         initializeTopography();
 
@@ -200,8 +205,7 @@ public class ThreatCognitionModelTest {
         Threat threatStimulus = new Threat();
         threatStimulus.setOriginAsTargetId(targetAsThreat.getId());
 
-        //TODO: check test
-        //threatStimulus.setRadius(threatRadius);
+        threatStimulus.setRadius(threatRadius);
         pedestrian.setMostImportantStimulus(threatStimulus);
         pedestrian.setPosition(new VPoint(0, 0));
         topography.addElement(pedestrian);
@@ -223,7 +227,7 @@ public class ThreatCognitionModelTest {
             SelfCategory expectedSelfCategory = (i <= threatRadius) ? SelfCategory.THREATENED : SelfCategory.COMMON_FATE;
             assertEquals(expectedSelfCategory, pedestrian.getSelfCategory());
         }
-    }
+    }*/
 
     @Test
     public void updateSetsOutGroupMembersToTargetOrientedUponElapsedTimeStimulusIfNoThreatOccurredBefore() {

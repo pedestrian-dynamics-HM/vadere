@@ -38,7 +38,6 @@ public class TargetVersionV2_2 extends SimpleJsonTransformation {
 
         // generates one stimulusInfo for each stimulus
 
-
         String key = "stimulusInfos";
         JsonNode scenarioNode = node.get("scenario");
         ArrayNode newStimulusInfos = mapper.createArrayNode();

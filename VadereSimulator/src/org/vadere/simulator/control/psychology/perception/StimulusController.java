@@ -32,8 +32,7 @@ public class StimulusController {
     public StimulusController(ScenarioStore scenarioStore) {
         this.scenarioStore = scenarioStore;
     }
-
-
+    
     // Getters
     public ScenarioStore getScenarioStore() {
         return scenarioStore;
@@ -49,20 +48,17 @@ public class StimulusController {
     public void setOneTimeStimuli(List<StimulusInfo> oneTimeStimuli) { this.oneTimeStimuli = oneTimeStimuli; }
     public void setRecurringStimuli(List<StimulusInfo> recurringStimuli) { this.recurringStimuli = recurringStimuli; }
 
-
-
-
-
+    
     // Methods
 
-    public List<Stimulus> getStimuliForTime(double simulationTime) {
+    public List<Stimulus> getStimuliFiltered(double simulationTime, VPoint position, int pedId) {
         List<Stimulus> stimuli = new ArrayList<>();
 
         // Always, create an "ElapsedTime".
         stimuli.add(new ElapsedTime(simulationTime));
 
-        List<Stimulus> activeOneTimeStimuli = getOneTimeStimuliForSimulationTime(simulationTime);
-        List<Stimulus> activeRecurringStimuli = getRecurringStimuliForSimulationTime(simulationTime);
+        List<Stimulus> activeOneTimeStimuli = getOneTimeStimuliForSimulationTime(simulationTime, position, pedId);
+        List<Stimulus> activeRecurringStimuli = getRecurringStimuliForSimulationTime(simulationTime, position, pedId);
 
         // Set timestamp for each active stimulus.
         activeOneTimeStimuli.stream().forEach(stimulus -> stimulus.setTime(simulationTime));
@@ -73,36 +69,8 @@ public class StimulusController {
 
         return stimuli;
     }
-
-
-
-
-    public List<Stimulus> getStimuliForTime(double simulationTime, Pedestrian ped) {
-        List<Stimulus> stimuli = new ArrayList<>();
-
-        // Always, create an "ElapsedTime".
-        stimuli.add(new ElapsedTime(simulationTime));
-
-        List<Stimulus> activeOneTimeStimuli = getOneTimeStimuliForSimulationTime(simulationTime, ped);
-        List<Stimulus> activeRecurringStimuli = getRecurringStimuliForSimulationTime(simulationTime, ped);
-
-        // Set timestamp for each active stimulus.
-        activeOneTimeStimuli.stream().forEach(stimulus -> stimulus.setTime(simulationTime));
-        activeRecurringStimuli.stream().forEach((stimulus -> stimulus.setTime(simulationTime)));
-
-        stimuli.addAll(activeOneTimeStimuli);
-        stimuli.addAll(activeRecurringStimuli);
-
-        return stimuli;
-    }
-
-    public void setPedSpecificStimulus(StimulusInfo stimulusInfo){
-        this.getScenarioStore().getStimulusInfoStore().getStimulusInfos().add(stimulusInfo);
-    }
-
-
-
-    public HashMap<Pedestrian,List<Stimulus>> getStimuliForTime(double simulationTime, Collection<Pedestrian> peds) {
+    
+    public HashMap<Pedestrian,List<Stimulus>> getStimuli(double simulationTime, Collection<Pedestrian> peds) {
 
         oneTimeStimuli = filterOneTimeStimuli(scenarioStore.getStimulusInfoStore().getStimulusInfos());
         recurringStimuli = filterRecurringStimuli(scenarioStore.getStimulusInfoStore().getStimulusInfos());
@@ -113,7 +81,7 @@ public class StimulusController {
 
         HashMap<Pedestrian, List<Stimulus>> pedSpecificStimuliForTime = new HashMap<>();
         for (Pedestrian ped : peds) {
-            pedSpecificStimuliForTime.put(ped, getStimuliForTime(simulationTime, ped));
+            pedSpecificStimuliForTime.put(ped, getStimuliFiltered(simulationTime, ped.getPosition(), ped.getId()));
         }
 
         return pedSpecificStimuliForTime;
@@ -121,73 +89,36 @@ public class StimulusController {
 
 
 
-    private List<Stimulus> getOneTimeStimuliForSimulationTime(double simulationTime, Pedestrian ped) {
+    private List<Stimulus> getOneTimeStimuliForSimulationTime(double simulationTime, VPoint position, int pedId) {
         List<Stimulus> activeStimuli = new ArrayList<>();
-        oneTimeStimuli.stream()
-                .filter(stimulusInfo -> oneTimeTimeframeIsActiveAtSimulationTime(stimulusInfo.getTimeframe(), simulationTime)
-                       && pedIsInSpecifiedArea(stimulusInfo.getLocation(), ped.getPosition())
-                        && pedIsAffected(ped.getId(), stimulusInfo.getSubpopulationFilter())
-                        )
-                .forEach(stimulusInfo -> activeStimuli.addAll(stimulusInfo.getStimuli()));
+        
+        oneTimeStimuli.stream().filter(stimulusInfo ->
+                            oneTimeTimeframeIsActiveAtSimulationTime(stimulusInfo.getTimeframe(), simulationTime)
+                                    && pedIsInSpecifiedArea(stimulusInfo.getLocation(), position)
+                                    && pedIsAffected(pedId, stimulusInfo.getSubpopulationFilter())
+                    )
+                    .forEach(stimulusInfo -> activeStimuli.addAll(stimulusInfo.getStimuli()));
+        
 
         return activeStimuli;
     }
 
+    
 
-
-    private List<Stimulus> getOneTimeStimuliForSimulationTime(double simulationTime) {
+    private List<Stimulus> getRecurringStimuliForSimulationTime(double simulationTime, VPoint position, int pedId) {
         List<Stimulus> activeStimuli = new ArrayList<>();
-        oneTimeStimuli.stream()
-                .filter(stimulusInfo -> oneTimeTimeframeIsActiveAtSimulationTime(stimulusInfo.getTimeframe(), simulationTime)
+
+        recurringStimuli.stream()
+                .filter(stimulusInfo -> 
+                        timeframeIsActiveAtSimulationTime(stimulusInfo.getTimeframe(), simulationTime) 
+                      && pedIsInSpecifiedArea(stimulusInfo.getLocation(), position) 
+                      && pedIsAffected(pedId, stimulusInfo.getSubpopulationFilter())
                 )
                 .forEach(stimulusInfo -> activeStimuli.addAll(stimulusInfo.getStimuli()));
 
         return activeStimuli;
-
     }
 
-
-    private boolean pedIsAffected(int pedId, SubpopulationFilter filter) {
-        List<Integer> ids = filter.getAffectedPedestrianIds();
-        if (ids.size() > 0){
-            return ids.contains(pedId);
-        }
-        // if there is no ped id defined, I assume that the StimulusInfo is valid for any agent
-        return true;
-    }
-
-    private boolean pedIsInSpecifiedArea(Location location, VPoint position) {
-        List<VShape> areas = location.getAreas();
-        if (areas.size() > 0){
-            return location.getAreas().stream().anyMatch(area -> area.contains(position));
-        }
-        // if there is no area defined, I assume that the StimulusInfo is valid for the whole topography
-        return true;
-    }
-
-    private List<Stimulus> getRecurringStimuliForSimulationTime(double simulationTime, Pedestrian ped) {
-        List<Stimulus> activeStimuli = new ArrayList<>();
-
-        recurringStimuli.stream()
-                .filter(stimulusInfo -> timeframeIsActiveAtSimulationTime(stimulusInfo.getTimeframe(), simulationTime) &&
-                pedIsInSpecifiedArea(stimulusInfo.getLocation(), ped.getPosition()) &&
-                        pedIsAffected(ped.getId(), stimulusInfo.getSubpopulationFilter()))
-                .forEach(stimulusInfo -> activeStimuli.addAll(stimulusInfo.getStimuli()));
-
-        return activeStimuli;
-    }
-
-    private List<Stimulus> getRecurringStimuliForSimulationTime(double simulationTime) {
-
-        List<Stimulus> activeStimuli = new ArrayList<>();
-
-        recurringStimuli.stream()
-                .filter(stimulusInfo -> timeframeIsActiveAtSimulationTime(stimulusInfo.getTimeframe(), simulationTime)
-                       )
-                .forEach(stimulusInfo -> activeStimuli.addAll(stimulusInfo.getStimuli()));
-
-        return activeStimuli;
-    }
 
     public static List<StimulusInfo> filterOneTimeStimuli(List<StimulusInfo> lsi){
         return lsi.stream()
@@ -275,6 +206,28 @@ public class StimulusController {
         }
     }
 
+    private boolean pedIsAffected(int pedId, SubpopulationFilter filter) {
 
+        boolean stimulusIsActive = true;
+
+        List<Integer> ids = filter.getAffectedPedestrianIds();
+        if (ids.size() > 0){
+            stimulusIsActive = ids.contains(pedId);
+        }
+        // if there is no ped id defined, I assume that the StimulusInfo is valid for any agent
+        return stimulusIsActive;
+    }
+
+    private boolean pedIsInSpecifiedArea(Location location, VPoint position) {
+
+        boolean stimulusIsActive = true;
+
+        List<VShape> areas = location.getAreas();
+        if (areas.size() > 0){
+            stimulusIsActive = location.getAreas().stream().anyMatch(area -> area.contains(position));
+        }
+        // if there is no area defined, I assume that the StimulusInfo is valid for the whole topography
+        return stimulusIsActive;
+    }
 
 }

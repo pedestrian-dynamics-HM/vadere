@@ -1,9 +1,7 @@
 package org.vadere.simulator.control.psychology.perception;
 
 import org.junit.Test;
-import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.simulator.projects.ScenarioStore;
-import org.vadere.state.attributes.models.AttributesOSM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesTarget;
 import org.vadere.state.psychology.perception.json.StimulusInfo;
@@ -455,9 +453,9 @@ public class StimulusControllerTest {
         stimulusController.getScenarioStore().setTopography(topography);
 
 
-        List<Stimulus> stimuliFiltered1 = stimulusController.getStimuliForTime(0, pedestrians.get(0));
+        List<Stimulus> stimuliFiltered1 = stimulusController.getStimuli(0, pedestrians.get(0));
         Stimulus Threat1 = stimuliFiltered1.stream().filter(stimulus -> stimulus instanceof Threat).collect(Collectors.toList()).get(0);
-        List<Stimulus> stimuliFiltered2 = stimulusController.getStimuliForTime(0, pedestrians.get(1));
+        List<Stimulus> stimuliFiltered2 = stimulusController.getStimuli(0, pedestrians.get(1));
         Stimulus Threat2 = stimuliFiltered2.stream().filter(stimulus -> stimulus instanceof Threat).collect(Collectors.toList()).get(0);
 
         assertEquals(Threat1, expectedStimulusPed1);
@@ -492,9 +490,9 @@ public class StimulusControllerTest {
         stimulusController.getScenarioStore().setTopography(topography);
 
 
-        List<Stimulus> stimuliFiltered1 = stimulusController.getStimuliForTime(0, pedestrians.get(0));
+        List<Stimulus> stimuliFiltered1 = stimulusController.getStimuli(0, pedestrians.get(0));
         Stimulus WaitInArea = stimuliFiltered1.stream().filter(stimulus -> stimulus instanceof WaitInArea).collect(Collectors.toList()).get(0);
-        List<Stimulus> stimuliFiltered2 = stimulusController.getStimuliForTime(0, pedestrians.get(1));
+        List<Stimulus> stimuliFiltered2 = stimulusController.getStimuli(0, pedestrians.get(1));
 
         assertEquals(WaitInArea, expectedWaitInArea);
         assertFalse(stimuliFiltered2.stream().anyMatch( stimulus -> stimulus instanceof WaitInArea));
