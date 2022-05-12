@@ -1,13 +1,21 @@
 package org.vadere.simulator.projects.migration.jsontranformation.json;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.vadere.annotation.factories.migrationassistant.MigrationTransformation;
 import org.vadere.simulator.projects.migration.MigrationException;
 import org.vadere.simulator.projects.migration.jsontranformation.SimpleJsonTransformation;
+import org.vadere.state.psychology.perception.json.StimulusInfo;
 import org.vadere.state.util.JacksonObjectMapper;
+import org.vadere.state.util.StateJsonConverter;
+import org.vadere.util.geometry.shapes.VCircle;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.version.Version;
+
+import java.util.Iterator;
 
 
 @MigrationTransformation(targetVersionLabel = "2.2")
@@ -63,16 +71,60 @@ public class TargetVersionV2_2 extends SimpleJsonTransformation {
                     if (stimulusType.equals("WaitInArea")) {
                         ObjectNode node1 = (ObjectNode) stimulus.get("area").deepCopy();
                         ss.add(node1);
+
                         aa.put("type", "Wait");
                         sss.add(aa);
 
 
                     } else if (stimulusType.equals("Threat")){
+
+
+                        double radius = stimulus.get("radius").asDouble();
+
+                        Iterator<JsonNode> iter = scenarioNode.get("topography").get("targets").iterator();
+
+                        boolean isSearchingForTargetId = true;
+
+                        VShape shape = null;
+                        JsonNode area = null;
+
+                        while (isSearchingForTargetId && iter.hasNext()){
+
+                            JsonNode targetentry = iter.next();
+
+                            if (targetentry.get("id") == stimulus.get("originAsTargetId")){
+
+                                JsonNode shapeJ = targetentry.get("shape");
+
+                                try {
+
+                                    shape = mapper.treeToValue(shapeJ, VShape.class);
+                                    VPoint center;
+                                    center = shape.getCentroid();
+                                    VCircle circle = new VCircle(center, radius);
+
+
+                                    area = mapper.convertValue(circle, JsonNode.class);
+
+                                } catch (JsonProcessingException e) {
+                                    e.printStackTrace();
+                                }
+
+                                isSearchingForTargetId = false;
+                            }
+                        }
+                        if (shape == null){
+                            throw new RuntimeException("target id not found.");
+                        }
+
+
+                        ss.add(area);
+
+
                         aa.put("type", "Threat");
                         aa.put("loudness", stimulus.get("loudness") );
-                        sss.add(aa);
 
-                        
+                        sss.add(aa);
 
 
                     } else {
