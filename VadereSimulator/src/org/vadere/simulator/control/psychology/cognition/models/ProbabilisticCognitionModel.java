@@ -11,6 +11,7 @@ import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.psychology.perception.types.*;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
+import org.vadere.state.simulation.FootstepHistory;
 import org.vadere.util.logging.Logger;
 
 import java.util.*;
@@ -68,13 +69,21 @@ public class ProbabilisticCognitionModel extends AProbabilisticModel {
                     pedestrian.getKnowledgeBase().addInformation(new KnowledgeItem(instruction));
                     pedestrian.setSelfCategory(SelfCategory.CHANGE_TARGET);
                 } else {
-                    pedestrian.setSelfCategory(SelfCategory.TARGET_ORIENTED);
+                    tryToReachTarget(pedestrian);
                 }
 
             } else {
-                pedestrian.setSelfCategory(SelfCategory.TARGET_ORIENTED);
+                tryToReachTarget(pedestrian);
             }
 
+        }
+    }
+
+    private void tryToReachTarget(Pedestrian pedestrian) {
+        if (pedestrianCannotMove(pedestrian)) {
+            pedestrian.setSelfCategory(SelfCategory.COOPERATIVE);
+        } else {
+            pedestrian.setSelfCategory(SelfCategory.TARGET_ORIENTED);
         }
     }
 
@@ -137,6 +146,21 @@ public class ProbabilisticCognitionModel extends AProbabilisticModel {
 
         }
     }
+
+    protected boolean pedestrianCannotMove(Pedestrian pedestrian) {
+        boolean cannotMove = false;
+
+        FootstepHistory footstepHistory = pedestrian.getFootstepHistory();
+        int requiredFootSteps = 2;
+
+        if (footstepHistory.size() >= requiredFootSteps
+                && footstepHistory.getAverageSpeedInMeterPerSecond() <= 0.05) {
+            cannotMove = true;
+        }
+
+        return cannotMove;
+    }
+
 
 
 }
