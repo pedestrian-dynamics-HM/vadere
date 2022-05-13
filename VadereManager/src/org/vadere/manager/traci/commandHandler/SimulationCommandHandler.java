@@ -192,20 +192,11 @@ public class SimulationCommandHandler extends CommandHandler<SimulationVar> {
 	@SimulationHandler(cmd = TraCICmd.SET_SIMULATION_STATE, var = SimulationVar.EXTERNAL_INPUT_INIT,
 			name = "init_control", ignoreElementId = true )
 	public TraCICommand process_init_control(TraCISetCommand cmd, RemoteManager remoteManager) {
-		String controlModelName, controlModelType;
-		String infoFilterConfig;
 
 		try {
 
 			CompoundObject cfg = (CompoundObject) cmd.getVariableValue();
-			controlModelName = (String) cfg.getData(0, TraCIDataType.STRING);
-			controlModelType = (String) cfg.getData(1, TraCIDataType.STRING);
-			infoFilterConfig = (String) cfg.getData(2, TraCIDataType.STRING);
-
-
 			remoteManager.accessState((manager, state) -> {
-				StimulusController stimulusController = manager.getRemoteSimulationRun().getStimulusController();
-				Topography topography = state.getTopography();
 				boolean isUsePsychologyLayer = state.getScenarioStore().getAttributesPsychology().isUsePsychologyLayer();
 				if (!isUsePsychologyLayer){
 					cmd.setErr("Psychology layer must be active. Set isUsePsychologyLayer: true in *.scenario file.");
@@ -251,7 +242,6 @@ public class SimulationCommandHandler extends CommandHandler<SimulationVar> {
 						info.getSubpopulationFilter().setAffectedPedestrianIds(idList);
 					}
 
-					ScenarioStore ss = state.getScenarioStore();
 					StimulusInfoStore stimulusInfoStore = manager.getRemoteSimulationRun().getStimulusController().getScenarioStore().getStimulusInfoStore();
 					stimulusInfoStore.getStimulusInfos().add(info);
 
