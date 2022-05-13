@@ -1,5 +1,5 @@
 {
-  "name" : "queueScenario_socialDistancing1.5_publication",
+  "name" : "queue_corridorDistance1.5",
   "description" : "",
   "release" : "1.16",
   "commithash" : "d0adaf2d4593d947ab58b8c6a515d5c001010d25",
@@ -7,43 +7,19 @@
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
       "filename" : "postvis.traj",
-      "processors" : [ 1, 2, 11 ]
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOverlapOutputFile",
-      "filename" : "overlaps.csv",
-      "processors" : [ 3 ]
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.NoDataKeyOutputFile",
-      "filename" : "overlapCount.txt",
-      "processors" : [ 4 ]
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
-      "filename" : "pathogenLoad.txt",
-      "processors" : [ 5 ]
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepOutputFile",
-      "filename" : "numberOfAerosolClouds.txt",
-      "processors" : [ 6 ]
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimeGridOutputFile",
-      "filename" : "pathogenConcentration.txt",
-      "processors" : [ 7 ]
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepOutputFile",
-      "filename" : "infectionStatusPerPedestrian.txt",
-      "processors" : [ 8 ]
+      "processors" : [ 1, 2, 3 ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
       "filename" : "pedestrianHealthStatus.txt",
-      "processors" : [ 10 ]
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.IdOutputFile",
-      "filename" : "aerosolCloudLifeTime.txt",
-      "processors" : [ 9 ]
+      "processors" : [ 4 ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepIdDataOutputFile",
       "filename" : "aerosolCloudShapes.txt",
-      "processors" : [ 12 ]
+      "processors" : [ 5 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile",
+      "filename" : "pathogenLoad.txt",
+      "processors" : [ 6 ]
     } ],
     "processors" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor",
@@ -52,48 +28,21 @@
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepTargetIDProcessor",
       "id" : 2
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianOverlapProcessor",
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepHealthStatusProcessor",
       "id" : 3
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.NumberOverlapsProcessor",
-      "id" : 4,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesNumberOverlapsProcessor",
-      "attributes" : {
-        "pedestrianOverlapProcessorId" : 3
-      }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianPathogenLoadProcessor",
-      "id" : 5
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.AerosolCloudCountingProcessor",
-      "id" : 6
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PathogenConcentrationProcessor",
-      "id" : 7,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesPathogenConcentrationProcessor",
-      "attributes" : {
-        "gridResolution" : 0.5,
-        "timeResolution" : 4.0
-      }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.NumberOfPedPerInfectionStatusProcessor",
-      "id" : 8
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.AerosolCloudLifeTimeProcessor",
-      "id" : 9
-    }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianHealthStatusProcessor",
-      "id" : 10
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepHealthStatusProcessor",
-      "id" : 11
+      "id" : 4
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.AerosolCloudShapeProcessor",
-      "id" : 12,
+      "id" : 5,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesAerosolCloudShapeProcessor",
       "attributes" : {
         "sampleEveryNthSimStep" : 1
       }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianPathogenLoadMaxProcessor",
+      "id" : 6
     } ],
     "isTimestamped" : false,
     "isWriteMetaData" : false
@@ -300,7 +249,7 @@
         "distributionParameters" : [ 1.0 ],
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : 1,
-        "startTime" : 7.0,
+        "startTime" : 10.5,
         "endTime" : 20.0,
         "spawnAtRandomPositions" : false,
         "spawnAtGridPositionsCA" : false,
@@ -319,7 +268,7 @@
           "type" : "RECTANGLE"
         },
         "interSpawnTimeDistribution" : "org.vadere.state.scenario.ConstantDistribution",
-        "distributionParameters" : [ 2.0 ],
+        "distributionParameters" : [ 3.0 ],
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : 9,
         "startTime" : 0.0,
