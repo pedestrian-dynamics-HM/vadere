@@ -446,7 +446,7 @@ public class CentroidGroup implements Group {
 
             //to avoid recursive calls, consider only first element encounter
             boolean eventPending = this.getMembers().stream()
-                    .filter(p -> p.getElementsEncountered().contains(element.getId()))
+                    .filter(p -> p.getElementsEncountered(TargetChanger.class).contains(element.getId()))
                     .count() == 1;
 
             if (eventPending) {
@@ -466,7 +466,7 @@ public class CentroidGroup implements Group {
 
                 for (Pedestrian p : this.getMembers()) {
                     if (p.getId() != agentId) {
-                        p.elementEncountered(element);
+                        p.elementEncountered(TargetChanger.class, (TargetChanger) element);
                     }
                 }
             }

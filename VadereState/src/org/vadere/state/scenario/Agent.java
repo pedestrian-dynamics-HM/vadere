@@ -18,7 +18,7 @@ public abstract class Agent extends DynamicElement {
     private AttributesAgent attributes;
 
 	private transient final List<AgentListener> listeners;
-	private transient final Set<Integer> encounteredScenarioElements;
+	private transient final HashMap<Class<? extends ScenarioElement>, LinkedList<Integer>> encounteredScenarioElements;
 
 	/**
 	 * Source where the agent was spawned. The SourceController should
@@ -50,7 +50,7 @@ public abstract class Agent extends DynamicElement {
 		isCurrentTargetAnAgent = false;
 
 		followers = new LinkedList<>();
-		encounteredScenarioElements = new HashSet<>();
+		encounteredScenarioElements = new HashMap<>();
 		listeners = new LinkedList<>();
 	}
 
@@ -319,15 +319,16 @@ public abstract class Agent extends DynamicElement {
 		}
 	}
 
-	public void elementEncountered(ScenarioElement elem) {
-		encounteredScenarioElements.add(elem.getId());
+	public <T extends ScenarioElement> void elementEncountered(Class<T> clazz, T elem) {
+		encounteredScenarioElements.computeIfAbsent(clazz, k -> new LinkedList<>())
+						.add(elem.getId());
 		for (AgentListener listener: listeners) {
 			listener.agentElementEncountered(elem, this.getId());
 		}
 	}
 
-	public Set<Integer> getElementsEncountered() {
-		return new HashSet<>(encounteredScenarioElements);
+	public <T extends ScenarioElement> LinkedList<Integer> getElementsEncountered(Class<T> clazz) {
+		return encounteredScenarioElements.getOrDefault(clazz, new LinkedList<>());
 	}
 
 	public void clearListeners() {

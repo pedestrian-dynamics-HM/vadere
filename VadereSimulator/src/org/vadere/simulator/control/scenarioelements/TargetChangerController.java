@@ -1,7 +1,6 @@
 package org.vadere.simulator.control.scenarioelements;
 
 import org.vadere.simulator.control.scenarioelements.targetchanger.TargetChangerAlgorithm;
-import org.vadere.simulator.models.groups.GroupIterator;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.Pedestrian;
@@ -39,34 +38,19 @@ public class TargetChangerController extends ScenarioElementController {
 
     // Member Variables
     public final TargetChanger targetChanger;
-    private final GroupIterator groupIterator;
     private Topography topography;
-    private Map<Integer, Agent> processedAgents;
     private Random random;
     private TargetChangerAlgorithm changerAlgorithm;
 
     // Constructors
-
-
-    public TargetChangerController(Topography topography, TargetChanger targetChanger, Random random, GroupIterator groupIterator) {
+    public TargetChangerController(Topography topography, TargetChanger targetChanger, Random random) {
         this.changerAlgorithm = TargetChangerAlgorithm.create(targetChanger, topography);
         this.changerAlgorithm.throwExceptionOnInvalidInput(targetChanger);
         this.changerAlgorithm.init(random);
 
         this.targetChanger = targetChanger;
         this.topography = topography;
-        this.processedAgents = new HashMap<>();
         this.random = random;
-        this.groupIterator = groupIterator;
-    }
-
-    public TargetChangerController(Topography topography, TargetChanger targetChanger, Random random) {
-        this(topography, targetChanger, random, null);
-    }
-
-    // Getters
-    public Map<Integer, Agent> getProcessedAgents() {
-        return processedAgents;
     }
 
     public void update(double simTimeInSec) {
@@ -80,16 +64,12 @@ public class TargetChangerController extends ScenarioElementController {
                 continue;
             }
 
-            if (agent.getElementsEncountered().contains(targetChanger.getId()) && !processedAgents.containsKey(agent.getId())) {
-                processedAgents.put(agent.getId(), agent);
-            }
-
-            if (hasAgentReachedTargetChangerArea(agent) && !processedAgents.containsKey(agent.getId())) {
+            if (hasAgentReachedTargetChangerArea(agent) &&
+                    !agent.getElementsEncountered(TargetChanger.class).contains(targetChanger.getId())) {
                 logEnteringTimeOfAgent(agent, simTimeInSec);
                 notifyListenersTargetChangerAreaReached(agent);
                 changerAlgorithm.setAgentTargetList(agent);
-                processedAgents.put(agent.getId(), agent);
-                agent.elementEncountered(targetChanger);
+                agent.elementEncountered(TargetChanger.class, targetChanger);
             }
         }
     }
@@ -119,7 +99,7 @@ public class TargetChangerController extends ScenarioElementController {
         Map<Integer, Double> enteringTimes = targetChanger.getEnteringTimes();
         Integer agentId = agent.getId();
 
-        if (enteringTimes.containsKey(agentId) == false) {
+        if (!enteringTimes.containsKey(agentId)) {
             enteringTimes.put(agentId, simTimeInSec);
         }
     }
