@@ -5,6 +5,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.vadere.simulator.control.scenarioelements.TargetChangerController;
 import org.vadere.simulator.control.scenarioelements.targetchanger.TargetChangerAlgorithm;
+import org.vadere.simulator.models.groups.cgm.CentroidGroup;
+import org.vadere.simulator.models.groups.cgm.CentroidGroupModel;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesTarget;
 import org.vadere.state.attributes.scenario.AttributesTargetChanger;
@@ -103,6 +105,8 @@ public class TargetChangerControllerTest {
     private List<Pedestrian> createGroupOfPedestriansTargetT1(int startId) {
         int seed = 0;
         Random random = new Random(seed);
+        CentroidGroup cg = new CentroidGroup(1, 2, new CentroidGroupModel());
+
 
         LinkedList<Integer> target = new LinkedList<>();
         target.add(1);
@@ -113,11 +117,15 @@ public class TargetChangerControllerTest {
         Pedestrian pedestrian1 = new Pedestrian(new AttributesAgent(startId), random);
         pedestrian1.setPosition(new VPoint(5, 1));
         pedestrian1.setTargets(target);
+        cg.addMember(pedestrian1);
+        pedestrian1.addAgentListener(cg);
         pedestrian1.setGroupIds(groupId);
 
         Pedestrian pedestrian2 = new Pedestrian(new AttributesAgent(startId + 1), random);
         pedestrian2.setPosition(new VPoint(1, 1));
         pedestrian2.setTargets(target);
+        cg.addMember(pedestrian2);
+        pedestrian2.addAgentListener(cg);
         pedestrian2.setGroupIds(groupId);
 
         LinkedList<Pedestrian> list1 = new LinkedList<>();
@@ -707,13 +715,14 @@ public class TargetChangerControllerTest {
         TargetChanger targetChanger = new TargetChanger(attributesTargetChanger);
         TargetChangerController controllerUnderTest = new TargetChangerController(topography, targetChanger, new Random(0));
 
-        assertEquals(peds.get(0).getNextTargetId(), 1);
-        assertEquals(peds.get(1).getNextTargetId(), 1);
+
+        assertEquals(1, peds.get(0).getNextTargetId());
+        assertEquals(1, peds.get(1).getNextTargetId());
 
         controllerUnderTest.update(simTimeInSec);
 
-        assertEquals(peds.get(0).getNextTargetId(), 2);
-        assertEquals(peds.get(1).getNextTargetId(), 2);
+        assertEquals(2, peds.get(0).getNextTargetId());
+        assertEquals(2, peds.get(1).getNextTargetId());
 
     }
 
