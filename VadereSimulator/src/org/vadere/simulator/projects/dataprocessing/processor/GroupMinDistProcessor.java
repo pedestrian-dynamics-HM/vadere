@@ -1,11 +1,9 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
 import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
-import org.vadere.simulator.models.groups.AreaGroupMetaData;
+import org.vadere.simulator.projects.dataprocessing.procesordata.AreaGroupMetaData;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
-import org.vadere.state.attributes.processor.AttributesGroupDistProcessor;
 import org.vadere.state.attributes.processor.AttributesGroupMinDistProcessor;
-import org.vadere.state.attributes.processor.AttributesPedestrianDensityGaussianProcessor;
 import org.vadere.state.attributes.processor.AttributesProcessor;
 import org.vadere.util.geometry.shapes.VPoint;
 

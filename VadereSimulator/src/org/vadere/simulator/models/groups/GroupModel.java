@@ -2,10 +2,7 @@ package org.vadere.simulator.models.groups;
 
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
-import org.vadere.state.scenario.DynamicElementAddListener;
-import org.vadere.state.scenario.DynamicElementRemoveListener;
-import org.vadere.state.scenario.Pedestrian;
-import org.vadere.state.scenario.ScenarioElement;
+import org.vadere.state.scenario.*;
 
 import java.beans.PropertyEditor;
 import java.util.Iterator;

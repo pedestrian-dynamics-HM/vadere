@@ -438,11 +438,11 @@ public class Simulation implements ControllerProvider{
 		}
 
 		for (TargetController targetController : this.targetControllers) {
-			targetController.update(this.getSimulationState());
+			targetController.update(simTimeInSec);
 		}
 
 		for (TargetChangerController targetChangerController : this.targetChangerControllers) {
-			targetChangerController.update(this.getSimulationState());
+			targetChangerController.update(simTimeInSec);
 		}
 
 		for (AbsorbingAreaController absorbingAreaController : this.absorbingAreaControllers) {

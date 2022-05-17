@@ -2,7 +2,7 @@ package org.vadere.simulator.projects.dataprocessing.processor;
 
 import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
 import org.vadere.simulator.control.simulation.SimulationState;
-import org.vadere.simulator.models.groups.AreaGroupMetaData;
+import org.vadere.simulator.projects.dataprocessing.procesordata.AreaGroupMetaData;
 import org.vadere.simulator.models.groups.cgm.CentroidGroup;
 import org.vadere.simulator.models.groups.cgm.CentroidGroupModel;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
