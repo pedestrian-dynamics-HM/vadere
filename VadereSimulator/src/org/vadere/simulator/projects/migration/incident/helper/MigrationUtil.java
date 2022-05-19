@@ -142,9 +142,15 @@ public class MigrationUtil {
 			public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
 
 				boolean hasTreeMarker = treeMarker.stream().anyMatch(m -> dir.resolve(m).toFile().exists());
+
 				if (ignoreDirs.contains(dir.getFileName().toString())) { // skip ignored directories-trees.
 					return FileVisitResult.SKIP_SUBTREE;
 				} else if (hasTreeMarker) { // skip directory tree if treeMarker is present.
+
+					if (dir.resolve(IOUtils.LEGACY_DIR).toFile().exists()){
+						throw new RuntimeException("Cannot migrate directory " + dir + " due to a legacy folder. Delete the legacy folder and re-run the migration.");
+					}
+
 					return FileVisitResult.SKIP_SUBTREE;
 				}
 
