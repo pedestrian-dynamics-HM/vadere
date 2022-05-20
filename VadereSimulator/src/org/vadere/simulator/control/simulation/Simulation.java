@@ -336,7 +336,7 @@ public class Simulation implements ControllerProvider{
 					if (singleStepMode){
 						// check reached next simTime (-1 simulate one step)
 						// round to long to ensure correct trap.
-						boolean timeReached = Math.round(simTimeInSec) >= Math.round(simulateUntilInSec);
+						boolean timeReached = Math.round(simulateUntilInSec - simTimeInSec) <= 0;
 						if (timeReached && isRunSimulation){
 							logger.debugf("Synchronized reached at: %.4f. Wait for traci commands.", simTimeInSec);
 							waitForTraci();
