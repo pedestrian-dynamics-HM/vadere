@@ -6,13 +6,14 @@
       "repeat" : false,
       "waitTimeBetweenRepetition" : 0.0
     },
+    "location" : {
+      "areas" : [ ]
+    },
+    "subpopulationFilter" : {
+      "affectedPedestrianIds" : [ ]
+    },
     "stimuli" : [ {
-      "type" : "Wait",
-      "id" : -1
+      "type" : "Wait"
     } ]
-  } ],
-  "reactionProbabilities" : [ {
-    "stimulusId" : -1,
-    "reactionProbability" : 0.75
   } ]
 }

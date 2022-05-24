@@ -1,5 +1,9 @@
 package org.vadere.simulator.control.psychology.cognition.models;
 
+import org.vadere.simulator.models.osm.PedestrianOSM;
+import org.vadere.state.attributes.models.AttributesPedestrianRepulsionPotentialStrategy;
+import org.vadere.state.attributes.models.psychology.cognition.AttributesCognitionModel;
+import org.vadere.state.attributes.models.psychology.cognition.AttributesSocialDistancingCognitionModel;
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.psychology.perception.types.DistanceRecommendation;
 import org.vadere.state.psychology.perception.types.ElapsedTime;
@@ -11,6 +15,7 @@ import org.vadere.state.simulation.FootstepHistory;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Random;
 
 /**
  * Suppose a distance recommendation (a {@link DistanceRecommendation}) occurred (keyword: social distancing).
@@ -24,9 +29,11 @@ import java.util.HashMap;
 public class SocialDistancingCognitionModel implements ICognitionModel {
 
     private HashMap<Pedestrian, Double> cloggingStartTimes = new HashMap<>();
+    private AttributesSocialDistancingCognitionModel attributes;
 
     @Override
-    public void initialize(Topography topography) {
+    public void initialize(Topography topography, Random random) {
+        this.attributes = new AttributesSocialDistancingCognitionModel();
     }
 
     @Override
@@ -39,8 +46,27 @@ public class SocialDistancingCognitionModel implements ICognitionModel {
                 pedestrian.setSelfCategory(SelfCategory.TARGET_ORIENTED);
             } else if (stimulus instanceof DistanceRecommendation) {
                 pedestrian.setSelfCategory(SelfCategory.SOCIAL_DISTANCING);
+                PedestrianOSM ped = (PedestrianOSM) pedestrian;
+
+                AttributesPedestrianRepulsionPotentialStrategy attr = new AttributesPedestrianRepulsionPotentialStrategy();
+                attr.setSocialDistanceUpperBound(this.attributes.getMaxDistance());
+                attr.setSocialDistanceLowerBound(this.attributes.getMinDistance());
+                attr.setPersonalSpaceWidthIntercept(this.attributes.getRepulsionIntercept());
+                attr.setPersonalSpaceWidthFactor(this.attributes.getRepulsionFactor());
+                ped.setCombinedPotentialStrategyAttributes(attr);
             }
         }
+    }
+
+    @Override
+    public void setAttributes(AttributesCognitionModel attributes) {
+        this.attributes = (AttributesSocialDistancingCognitionModel) attributes;
+
+    }
+
+    @Override
+    public AttributesSocialDistancingCognitionModel getAttributes() {
+        return this.attributes;
     }
 
 

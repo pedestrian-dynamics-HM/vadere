@@ -122,8 +122,8 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 
 		JMenu mnPresetMenu = new JMenu(Messages.getString("Tab.Model.loadTemplateMenu.title"));
 		presetMenuBar.add(mnPresetMenu);
-		menusInTabs.add(mnPresetMenu);
 
+		menusInTabs.add(mnPresetMenu);
 		ModelPresets.getPresets().forEach(
 				modelDefinition -> mnPresetMenu.add(new JMenuItem(new AbstractAction(modelDefinition.getMainModel()) {
 					private static final long serialVersionUID = 1L;
@@ -211,7 +211,6 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 				new TextView("ProjectView.defaultDirectoryAttributes", AttributeType.PSYCHOLOGY);
 		attributesPsychologyView.setScenarioChecker(model); // use .isEditable(true); to save time (no check!)
 		tabbedPane.addTab(Messages.getString("Tab.Psychology.title"), attributesPsychologyView);
-
 
 		topographyFileView = new TextView("ProjectView.defaultDirectoryScenarios", AttributeType.TOPOGRAPHY);
 		topographyFileView.setScenarioChecker(model);

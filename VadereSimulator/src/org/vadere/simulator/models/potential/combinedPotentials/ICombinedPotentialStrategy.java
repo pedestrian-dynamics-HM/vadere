@@ -30,4 +30,5 @@ public interface ICombinedPotentialStrategy {
      * Get the combined potential at given position.
      */
     public double getValue(IPoint newPos, Agent thisAgent, Collection<? extends Agent> otherAgents);
+
 }

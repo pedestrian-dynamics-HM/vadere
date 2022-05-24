@@ -1,11 +1,14 @@
 package org.vadere.simulator.control.psychology.cognition.models;
 
+import org.vadere.state.attributes.models.psychology.cognition.AttributesCognitionModel;
+import org.vadere.state.attributes.models.psychology.cognition.AttributesSimpleCognitionModel;
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.psychology.perception.types.*;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 
 import java.util.Collection;
+import java.util.Random;
 
 /**
  * The {@link SimpleCognitionModel} just passes the perceived stimulus to the
@@ -14,10 +17,12 @@ import java.util.Collection;
 public class SimpleCognitionModel implements ICognitionModel {
 
     private Topography topography;
+    private AttributesSimpleCognitionModel attributes;
 
     @Override
-    public void initialize(Topography topography) {
+    public void initialize(Topography topography, Random random) {
         this.topography = topography;
+        this.attributes = new AttributesSimpleCognitionModel();
     }
 
     @Override
@@ -43,6 +48,16 @@ public class SimpleCognitionModel implements ICognitionModel {
 
             pedestrian.setSelfCategory(nextSelfCategory);
         }
+    }
+
+    @Override
+    public void setAttributes(AttributesCognitionModel attributes) {
+        this.attributes = (AttributesSimpleCognitionModel) attributes;
+    }
+
+    @Override
+    public AttributesSimpleCognitionModel getAttributes() {
+        return this.attributes;
     }
 
 }

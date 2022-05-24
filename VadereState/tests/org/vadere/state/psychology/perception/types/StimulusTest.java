@@ -22,10 +22,8 @@ public class StimulusTest {
 
         Threat threatClone = threatOriginal.clone();
         threatClone.setTime(3);
-        threatClone.setOriginAsTargetId(4);
 
         assertEquals(expectedTime, threatOriginal.getTime(), ALLOWED_DOUBLE_TOLERANCE);
-        assertEquals(expectedOriginAsTargetId, threatOriginal.getOriginAsTargetId());
         assertEquals(threatOriginal.getLoudness(), threatClone.getLoudness(), ALLOWED_DOUBLE_TOLERANCE);
     }
 

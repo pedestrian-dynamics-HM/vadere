@@ -2,6 +2,7 @@ package org.vadere.simulator.control.psychology.cognition;
 
 import org.junit.Test;
 import org.vadere.simulator.control.psychology.cognition.models.SimpleCognitionModel;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.psychology.perception.types.*;
@@ -10,12 +11,15 @@ import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.shapes.VPoint;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
 
 public class SimpleCognitionModelTest {
+
+    private List<Attributes> attributes = new LinkedList<>();
 
     private Topography createTopography() {
         return new Topography();
@@ -47,7 +51,7 @@ public class SimpleCognitionModelTest {
         }
 
         SimpleCognitionModel simpleCognitionModel = new SimpleCognitionModel();
-        simpleCognitionModel.initialize(createTopography());
+        simpleCognitionModel.initialize(createTopography(), new Random(0));
 
         simpleCognitionModel.update(pedestrians);
 

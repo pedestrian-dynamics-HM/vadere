@@ -8,14 +8,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.vadere.state.attributes.*;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.scenario.*;
-import org.vadere.state.psychology.perception.json.ReactionProbability;
 import org.vadere.state.psychology.perception.json.StimulusInfo;
 import org.vadere.state.psychology.perception.json.StimulusInfoStore;
 import org.vadere.state.scenario.*;
@@ -24,21 +21,19 @@ import org.vadere.util.logging.Logger;
 import org.vadere.util.reflection.DynamicClassInstantiator;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 public abstract class StateJsonConverter {
 
 	public static final String SCENARIO_KEY = "scenario";
 
 	public static final String MAIN_MODEL_KEY = "mainModel";
+
+	private static final String ATTRIBUTES_MODEL_KEY = "attributesModel";
+
+	private static final String PSYCHOLOGY_LAYER_KEY = "psychologyLayer";
+	
 
 	private static final TypeReference<Map<String, Object>> mapTypeReference =
 			new TypeReference<Map<String, Object>>() {};
@@ -126,13 +121,34 @@ public abstract class StateJsonConverter {
 	}
 
 	public static AttributesPsychology deserializeAttributesPsychology(String json) throws IOException  {
-		return deserializeObjectFromJson(json, AttributesPsychology.class);
+		return deserializeAttributesPsychologyFromNode(mapper.readTree(json));
 	}
 
-	public static AttributesPsychology deserializeAttributesPsychologyFromNode(JsonNode node)
+	public static AttributesPsychology deserializeAttributesPsychologyFromNode(JsonNode jsonNode)
 			throws JsonProcessingException {
-		return mapper.treeToValue(node, AttributesPsychology.class);
+
+		ObjectNode node = jsonNode.deepCopy();
+		JsonNode layer = node.get(PSYCHOLOGY_LAYER_KEY);
+		node.remove(PSYCHOLOGY_LAYER_KEY);
+
+		AttributesPsychology attributesPsychology = mapper.treeToValue(node, AttributesPsychology.class);
+		attributesPsychology.setPsychologyLayer(deseralizeAttributesPsychologyLayerFromNode(layer));
+
+		return attributesPsychology;
 	}
+
+	private static AttributesPsychologyLayer deseralizeAttributesPsychologyLayerFromNode(JsonNode jsonNode) throws JsonProcessingException {
+
+		ObjectNode node = jsonNode.deepCopy();
+		JsonNode attributesModel = node.get(ATTRIBUTES_MODEL_KEY);
+		node.remove(ATTRIBUTES_MODEL_KEY);
+
+		AttributesPsychologyLayer layer = mapper.treeToValue(node, AttributesPsychologyLayer.class);
+		layer.setAttributesModel(deserializeAttributesListFromNode(attributesModel));
+
+		return layer;
+	}
+
 
 	public static List<Attributes> deserializeAttributesListFromNode(JsonNode node) throws JsonProcessingException {
 		DynamicClassInstantiator<Attributes> instantiator = new DynamicClassInstantiator<>();
@@ -204,17 +220,13 @@ public abstract class StateJsonConverter {
 				node.forEach(stimulusInfoNode -> stimulusInfoList.add(mapper.convertValue(stimulusInfoNode, StimulusInfo.class)));
 				stimulusInfoStore.setStimulusInfos(stimulusInfoList);
 			}
-
-			key = "reactionProbabilities";
-			if (nodef.has(key)) {
-				node = nodef.get(key);
-				List<ReactionProbability> reactionProbabilities = new ArrayList<>();
-				node.forEach(reactionProbabilityNode -> reactionProbabilities.add(mapper.convertValue(reactionProbabilityNode, ReactionProbability.class)));
-				stimulusInfoStore.setReactionProbabilities(reactionProbabilities);
-			}
 		}
 
 		return stimulusInfoStore;
+	}
+
+	public static StimulusInfo deserializeStimulusInfo(String json) throws IOException {
+		return mapper.readValue(json, StimulusInfo.class);
 	}
 
 
@@ -274,7 +286,7 @@ public abstract class StateJsonConverter {
 
 		ObjectNode node = mapper.createObjectNode();
 		node.put(MAIN_MODEL_KEY, modelDefinition.getMainModel());
-		node.set("attributesModel", serializeAttributesModelToNode(modelDefinition.getAttributesList()));
+		node.set(ATTRIBUTES_MODEL_KEY, serializeAttributesModelToNode(modelDefinition.getAttributesList()));
 		return prettyWriter.writeValueAsString(node);
 	}
 
@@ -388,7 +400,17 @@ public abstract class StateJsonConverter {
 
 	public static String serializeAttributesPsychology(AttributesPsychology attributesPsychology)
 			throws JsonProcessingException {
-		return prettyWriter.writeValueAsString(mapper.convertValue(attributesPsychology, JsonNode.class));
+
+		ObjectNode node = serializeAttributesPsychologyToNode(attributesPsychology);
+		return prettyWriter.writeValueAsString(node);
+	}
+
+	public static ObjectNode serializeAttributesPsychologyToNode(AttributesPsychology attributesPsychology) {
+		ObjectNode node = mapper.valueToTree(attributesPsychology);
+		ObjectNode psychologyLayer = (ObjectNode) node.get(PSYCHOLOGY_LAYER_KEY);
+		ObjectNode attributesModel = serializeAttributesModelToNode(attributesPsychology.getPsychologyLayer().getAttributesModel());
+		psychologyLayer.put(ATTRIBUTES_MODEL_KEY, attributesModel);
+		return node;
 	}
 
 	public static String serializeAttributesStrategyModel(AttributesStrategyModel attributesStrategyModel)
@@ -404,7 +426,7 @@ public abstract class StateJsonConverter {
 			throws JsonProcessingException {
 		ObjectNode node = mapper.createObjectNode();
 		node.put(MAIN_MODEL_KEY, mainModel);
-		node.set("attributesModel", serializeAttributesModelToNode(attributesList));
+		node.set(ATTRIBUTES_MODEL_KEY, serializeAttributesModelToNode(attributesList));
 		return prettyWriter.writeValueAsString(node);
 	}
 
@@ -470,7 +492,7 @@ public abstract class StateJsonConverter {
 
 	public static String addAttributesModel(String attributesClassName, String json) throws IOException {
 		JsonNode node = mapper.readTree(json);
-		JsonNode attributesModelNode = node.get("attributesModel");
+		JsonNode attributesModelNode = node.get(ATTRIBUTES_MODEL_KEY);
 		DynamicClassInstantiator<Attributes> instantiator = new DynamicClassInstantiator<>();
 		((ObjectNode) attributesModelNode).set(
 				attributesClassName,
