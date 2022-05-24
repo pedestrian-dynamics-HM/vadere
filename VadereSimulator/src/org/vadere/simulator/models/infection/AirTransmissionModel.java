@@ -186,7 +186,7 @@ public class AirTransmissionModel extends AbstractExposureModel {
 		VPoint currentPosition = pedestrian.getPosition();
 		VPoint lastPosition = lastPedestrianPositions.get(pedestrianId);
 		if (lastPedestrianPositions.get(pedestrianId) == null) {
-			viewingDirection = new Vector2D(Math.random(), Math.random());
+			viewingDirection = new Vector2D(random.nextDouble(), random.nextDouble());
 		} else {
 			if (lastPosition.distance(currentPosition) < MIN_PED_STEP_LENGTH) {
 				viewingDirection = viewingDirections.get(pedestrianId);

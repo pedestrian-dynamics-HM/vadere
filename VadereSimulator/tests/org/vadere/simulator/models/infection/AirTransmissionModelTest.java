@@ -444,12 +444,10 @@ public class AirTransmissionModelTest {
         pedestrian.setPosition(position);
         topography.addElement(pedestrian);
 
-        //TODO: check seed
         Random random = new Random(0);
-        double xRandom = random.nextDouble();
-        double yRandom = random.nextDouble();
 
-        Vector2D walkingDirection = new Vector2D(xRandom, yRandom);
+        //TODO: could be tested for several walking directions not only one random walking direction
+        Vector2D walkingDirection = new Vector2D(random.nextDouble(), random.nextDouble());
         walkingDirection = walkingDirection.normalize(AirTransmissionModel.MIN_PED_STEP_LENGTH);
 
         for (double simTimeInSec = simStartTime; simTimeInSec < simEndTime; simTimeInSec += airTransmissionModel.simTimeStepLength) {
