@@ -2,6 +2,7 @@ package org.vadere.simulator.control.psychology.cognition.models;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.scenario.Pedestrian;
@@ -10,6 +11,7 @@ import org.vadere.state.simulation.FootStep;
 import org.vadere.util.geometry.shapes.VPoint;
 
 import java.lang.reflect.Field;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
@@ -19,6 +21,7 @@ public class CooperativeCognitionModelTest {
 
     private Pedestrian pedestrian;
     private List<Pedestrian> pedestrians;
+    private List<Attributes> attributes = new LinkedList<>();
 
     @Before
     public void initializePedestrian() {
@@ -28,6 +31,8 @@ public class CooperativeCognitionModelTest {
         this.pedestrian = new Pedestrian(attributesAgent, new Random());
         this.pedestrians = List.of(pedestrian);
     }
+
+
 
     @Test
     public void initializeSetsTopography() {
@@ -39,7 +44,7 @@ public class CooperativeCognitionModelTest {
             privateTopographyField.setAccessible(true);
 
             assertNull(privateTopographyField.get(modelUnderTest));
-            modelUnderTest.initialize(new Topography());
+            modelUnderTest.initialize(new Topography(), new Random(0));
             assertNotNull(privateTopographyField.get(modelUnderTest));
 
         } catch (IllegalAccessException ex) {

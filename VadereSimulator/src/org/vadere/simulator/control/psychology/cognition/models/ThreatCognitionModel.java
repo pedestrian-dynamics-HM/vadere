@@ -1,6 +1,8 @@
 package org.vadere.simulator.control.psychology.cognition.models;
 
 import org.vadere.simulator.utils.topography.TopographyHelper;
+import org.vadere.state.attributes.models.psychology.cognition.AttributesCognitionModel;
+import org.vadere.state.attributes.models.psychology.cognition.AttributesThreatCognitionModel;
 import org.vadere.state.psychology.cognition.GroupMembership;
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.psychology.perception.types.ElapsedTime;
@@ -12,6 +14,7 @@ import org.vadere.util.geometry.shapes.VPoint;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 /**
@@ -28,10 +31,12 @@ import java.util.stream.Collectors;
 public class ThreatCognitionModel implements ICognitionModel {
 
     private Topography topography;
+    private AttributesThreatCognitionModel attributes;
 
     @Override
-    public void initialize(Topography topography) {
+    public void initialize(Topography topography, Random random) {
         this.topography = topography;
+        this.attributes = new AttributesThreatCognitionModel();
     }
 
     @Override
@@ -46,6 +51,16 @@ public class ThreatCognitionModel implements ICognitionModel {
             }
 
         }
+    }
+
+    @Override
+    public void setAttributes(AttributesCognitionModel attributes) {
+        this.attributes = (AttributesThreatCognitionModel) attributes;
+    }
+
+    @Override
+    public AttributesThreatCognitionModel getAttributes() {
+        return this.attributes;
     }
 
     private void handleThreat(Pedestrian pedestrian, Stimulus stimulus) {
@@ -99,7 +114,7 @@ public class ThreatCognitionModel implements ICognitionModel {
         VPoint threatOrigin = topography.getTarget(latestThreat.getOriginAsTargetId()).getShape().getCentroid();
         double distanceToThreat = threatOrigin.distance(pedestrian.getPosition());
 
-        boolean pedestrianIsInsideThreatArea = (distanceToThreat <= latestThreat.getRadius());
+        boolean pedestrianIsInsideThreatArea = true; // (distanceToThreat <= latestThreat.getRadius());
         boolean pedestrianIsBlockedByObstacle = TopographyHelper.pedestrianIsBlockedByObstacle(pedestrian, topography);
 
         // Gerta suggests to apply SelfCategory.COMMON_FATE

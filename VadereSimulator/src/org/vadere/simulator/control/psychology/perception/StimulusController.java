@@ -1,11 +1,11 @@
 package org.vadere.simulator.control.psychology.perception;
 
 import org.vadere.simulator.projects.ScenarioStore;
-import org.vadere.state.psychology.perception.json.ReactionProbability;
 import org.vadere.state.psychology.perception.json.StimulusInfo;
 import org.vadere.state.psychology.perception.types.*;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VShape;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -13,10 +13,10 @@ import java.util.stream.Collectors;
 /**
  * The StimulusController encapsulates logic to inject stimuli
  * into the simulation loop.
- *
+ * <p>
  * The StimulusController uses the passed {@link ScenarioStore}
  * to extract the possible stimuli from the scenario description.
- *
+ * <p>
  * TODO: Clarify what shall happen if "simTimeSteps" is too coarse
  *   and defined stimuli cannot be triggered correctly here.
  */
@@ -28,58 +28,58 @@ public class StimulusController {
     private List<StimulusInfo> recurringStimuli;
 
 
-
-    private HashMap<Integer, Double> reactionProbabilities;
-    private HashMap<Pedestrian, List<StimulusInfo>> pedSpecificStimuli;
-
-
     // Constructors
     public StimulusController(ScenarioStore scenarioStore) {
         this.scenarioStore = scenarioStore;
-
-        oneTimeStimuli = filterOneTimeStimuli(scenarioStore.getStimulusInfoStore().getStimulusInfos());
-        recurringStimuli = filterRecurringStimuli(scenarioStore.getStimulusInfoStore().getStimulusInfos());
-
-
-        oneTimeStimuli.stream().forEach(stimulusInfo -> throwExceptionIfTimeframeIsInvalid(stimulusInfo.getTimeframe(), false));
-        recurringStimuli.stream().forEach(stimulusInfo -> throwExceptionIfTimeframeIsInvalid(stimulusInfo.getTimeframe(), true));
-
-        setReactionProbabilites(scenarioStore.getStimulusInfoStore().getReactionProbabilities());
-        pedSpecificStimuli = new HashMap<>();
+        setCheckStimuli();
     }
-
-
-
 
     // Getters
     public ScenarioStore getScenarioStore() {
         return scenarioStore;
     }
-    public List<StimulusInfo> getOneTimeStimuli() { return oneTimeStimuli; }
-    public List<StimulusInfo> getRecurringStimuli() { return recurringStimuli; }
-    public HashMap<Integer, Double> getReactionProbabilities() { return reactionProbabilities; }
+
+    public List<StimulusInfo> getOneTimeStimuli() {
+        return oneTimeStimuli;
+    }
+
+    public List<StimulusInfo> getRecurringStimuli() {
+        return recurringStimuli;
+    }
 
 
     // Setters
     public void setScenarioStore(ScenarioStore scenarioStore) {
         this.scenarioStore = scenarioStore;
     }
-    public void setOneTimeStimuli(List<StimulusInfo> oneTimeStimuli) { this.oneTimeStimuli = oneTimeStimuli; }
-    public void setRecurringStimuli(List<StimulusInfo> recurringStimuli) { this.recurringStimuli = recurringStimuli; }
-    protected void setReactionProbabilites(List<ReactionProbability> reactionProbabilities) {
-        reactionProbabilities.forEach(reactionProbability -> throwExceptionIfReactionProbabilityIsInvalid(reactionProbability));
-        this.reactionProbabilities = (HashMap<Integer, Double>) reactionProbabilities.stream().collect(Collectors.toMap(ReactionProbability::getStimulusId,ReactionProbability::getReactionProbability));
+
+    public void setOneTimeStimuli(List<StimulusInfo> oneTimeStimuli) {
+        this.oneTimeStimuli = oneTimeStimuli;
     }
 
+    public void setRecurringStimuli(List<StimulusInfo> recurringStimuli) {
+        this.recurringStimuli = recurringStimuli;
+    }
+
+
     // Methods
-    public List<Stimulus> getStimuliForTime(double simulationTime) {
+
+    public List<Stimulus> getStimuliFilteredTimeOnly(double simulationTime) {
+        return getStimuliFiltered(simulationTime, null, null);
+    }
+
+
+    public List<Stimulus> getStimuliFiltered(double simulationTime, VPoint position, Integer pedId) {
+
+        setCheckStimuli();
+
         List<Stimulus> stimuli = new ArrayList<>();
 
         // Always, create an "ElapsedTime".
         stimuli.add(new ElapsedTime(simulationTime));
 
-        List<Stimulus> activeOneTimeStimuli = getOneTimeStimuliForSimulationTime(simulationTime);
-        List<Stimulus> activeRecurringStimuli = getRecurringStimuliForSimulationTime(simulationTime);
+        List<Stimulus> activeOneTimeStimuli = getOneTimeStimuliForSimulationTime(simulationTime, position, pedId);
+        List<Stimulus> activeRecurringStimuli = getRecurringStimuliForSimulationTime(simulationTime, position, pedId);
 
         // Set timestamp for each active stimulus.
         activeOneTimeStimuli.stream().forEach(stimulus -> stimulus.setTime(simulationTime));
@@ -88,193 +88,67 @@ public class StimulusController {
         stimuli.addAll(activeOneTimeStimuli);
         stimuli.addAll(activeRecurringStimuli);
 
-        setReactionProbability(stimuli);
-
         return stimuli;
     }
 
-    private void setReactionProbability(final List<Stimulus> stimuli) {
-        for (Stimulus stimulus : stimuli){
-            if (!(stimulus instanceof ElapsedTime)){
-                if (reactionProbabilities.containsKey(stimulus.getId())){
-                    stimulus.setPerceptionProbability(reactionProbabilities.get(stimulus.getId()));
-                }
-                else{
-                    throw new RuntimeException("Stimulus id = "+ stimulus.getId() + " is not defined in perceptionLayer/reactionProbabilities." );
-                }
-            }
-        }
-    }
-
-
-    public void setPedSpecificStimuli(final HashMap<Pedestrian, List<StimulusInfo>> pedSpecificStimuli) {
-        this.pedSpecificStimuli = pedSpecificStimuli;
-    }
-
-    public HashMap<Pedestrian,List<Stimulus>> getStimuliForTime(double simulationTime, Collection<Pedestrian> peds) {
+    public HashMap<Pedestrian, List<Stimulus>> getStimuli(double simulationTime, Collection<Pedestrian> peds) {
 
         HashMap<Pedestrian, List<Stimulus>> pedSpecificStimuliForTime = new HashMap<>();
-
         for (Pedestrian ped : peds) {
-            pedSpecificStimuliForTime.put(ped, getStimuliForTime(simulationTime, ped));
+            pedSpecificStimuliForTime.put(ped, getStimuliFiltered(simulationTime, ped.getPosition(), ped.getId()));
         }
 
         return pedSpecificStimuliForTime;
     }
 
-    public List<Stimulus> getStimuliForTime(double simulationTime, Pedestrian ped) {
-
-        List<Stimulus> stimuli = new ArrayList<>();
-        stimuli = getStimuliForTime(simulationTime);
-
-        List<Stimulus> waitInAreaStimuli = stimuli.stream().filter(stimulus -> stimulus instanceof WaitInArea).collect(Collectors.toList());
-        List<Stimulus> threatStimuli = stimuli.stream().filter(stimulus -> stimulus instanceof Threat).collect(Collectors.toList());
-
-        Stimulus mostImportantWaitInArea = selectWaitInAreaContainingPedestrian(ped, waitInAreaStimuli);
-        Stimulus mostImportantThrea = selectClosestAndPerceptibleThreat(ped,threatStimuli);
-
-        stimuli.removeAll(waitInAreaStimuli);
-        stimuli.removeAll(threatStimuli);
-        if (mostImportantThrea!= null) stimuli.add(mostImportantThrea);
-        if (mostImportantWaitInArea != null)stimuli.add(mostImportantWaitInArea);
-
-
-        stimuli.addAll(getPedSpecificDynamicStimuli(ped, simulationTime, stimuli));
-
-        return stimuli.stream().distinct().collect(Collectors.toList());
-
-    }
-
-    private List<Stimulus> getPedSpecificDynamicStimuli(Pedestrian pedestrian, double simulationTime, List<Stimulus> stimuli){
-        List<Stimulus> activeStimuli = new ArrayList<>();
-        if (pedSpecificStimuli.containsKey(pedestrian)){
-            pedSpecificStimuli.get(pedestrian).stream()
-                    .filter(stimulusInfo -> oneTimeTimeframeIsActiveAtSimulationTime(stimulusInfo.getTimeframe(), simulationTime))
-                    .forEach(stimulusInfo -> activeStimuli.addAll(stimulusInfo.getStimuli()));
-        }
-
-        List<Stimulus> waitInAreaStimuli = activeStimuli.stream().filter(stimulus -> stimulus instanceof WaitInArea).collect(Collectors.toList());
-        List<Stimulus> threatStimuli = activeStimuli.stream().filter(stimulus -> stimulus instanceof Threat).collect(Collectors.toList());
-
-        Stimulus mostImportantWaitInArea = selectWaitInAreaContainingPedestrian(pedestrian, waitInAreaStimuli);
-        Stimulus mostImportantThrea = selectClosestAndPerceptibleThreat(pedestrian,threatStimuli);
-
-        activeStimuli.removeAll(waitInAreaStimuli);
-        activeStimuli.removeAll(threatStimuli);
-        if (mostImportantThrea!= null) activeStimuli.add(mostImportantThrea);
-        if (mostImportantWaitInArea != null) activeStimuli.add(mostImportantWaitInArea);
-
-        List<Stimulus> finalstimuli = stimuli;
-        List<Stimulus> sorted = activeStimuli.stream().filter(stimulus -> finalstimuli.contains(stimulus) == false).collect(Collectors.toList());
-
-        return sorted;
-    }
-
-    private Stimulus selectClosestAndPerceptibleThreat(Pedestrian pedestrian, List<Stimulus> threatStimuli) {
-        Threat closestAndPerceptibleThreat = null;
-        double distanceToClosestThreat = -1;
-
-        for (Stimulus stimulus : threatStimuli) {
-            Threat currentThreat = (Threat) stimulus;
-
-            VPoint threatOrigin = this.scenarioStore.getTopography().getTarget(currentThreat.getOriginAsTargetId()).getShape().getCentroid();
-            double distanceToThreat = threatOrigin.distance(pedestrian.getPosition());
-
-            if (distanceToThreat <= currentThreat.getRadius()) {
-                if (closestAndPerceptibleThreat == null) {
-                    closestAndPerceptibleThreat = currentThreat;
-                    distanceToClosestThreat = distanceToThreat;
-                } else {
-                    if (distanceToThreat < distanceToClosestThreat) {
-                        closestAndPerceptibleThreat = currentThreat;
-                        distanceToClosestThreat = distanceToThreat;
-                    }
-                }
-            }
-        }
-
-        return closestAndPerceptibleThreat;
-    }
-
-    private Stimulus selectWaitInAreaContainingPedestrian(Pedestrian pedestrian, List<Stimulus> waitInAreaStimuli) {
-        WaitInArea selectedWaitInArea = null;
-
-        for (Stimulus stimulus : waitInAreaStimuli) {
-            WaitInArea waitInArea = (WaitInArea) stimulus;
-            boolean pedInArea = waitInArea.getArea().contains(pedestrian.getPosition());
-
-            if (pedInArea) {
-                selectedWaitInArea = waitInArea;
-            }
-        }
-
-        return selectedWaitInArea;
+    private void setCheckStimuli() {
+        oneTimeStimuli = filterOneTimeStimuli(scenarioStore.getStimulusInfoStore().getStimulusInfos());
+        recurringStimuli = filterRecurringStimuli(scenarioStore.getStimulusInfoStore().getStimulusInfos());
+        oneTimeStimuli.stream().forEach(stimulusInfo -> throwExceptionIfTimeframeIsInvalid(stimulusInfo.getTimeframe(), false));
+        recurringStimuli.stream().forEach(stimulusInfo -> throwExceptionIfTimeframeIsInvalid(stimulusInfo.getTimeframe(), true));
     }
 
 
-    public void setDynamicStimulus(StimulusInfo stimulusInfo){
+   private List<Stimulus> getOneTimeStimuliForSimulationTime(double simulationTime, VPoint position, Integer pedId) {
+       List<Stimulus> activeStimuli = new ArrayList<>();
 
-        List<StimulusInfo> stimuliList = Collections.singletonList(stimulusInfo);
-        List<StimulusInfo> oneTimeDynamicStimuli = filterOneTimeStimuli(stimuliList);
-        List<StimulusInfo> recurringDynamicStimuli = filterRecurringStimuli(stimuliList);
+       oneTimeStimuli.stream().filter(stimulusInfo ->
+                       oneTimeTimeframeIsActiveAtSimulationTime(stimulusInfo.getTimeframe(), simulationTime)
+                               && pedIsInSpecifiedArea(position, stimulusInfo.getLocation())
+                               && pedIsAffected(pedId, stimulusInfo.getSubpopulationFilter())
+               )
+               .forEach(stimulusInfo -> activeStimuli.addAll(stimulusInfo.getStimuli()));
 
-        oneTimeStimuli.addAll(oneTimeDynamicStimuli);
-        recurringStimuli.addAll(recurringDynamicStimuli);
-    }
+
+       return activeStimuli;
+
+   }
 
 
-    public void setPedSpecificDynamicStimulus(Pedestrian ped, StimulusInfo stimulusInfo){
 
-        setReactionProbability(stimulusInfo.getStimuli());
-        List<StimulusInfo> stimulusInfos = new ArrayList<>();
 
-        if (pedSpecificStimuli.containsKey(ped)) {
-            stimulusInfos.addAll(pedSpecificStimuli.get(ped));
-        }
-        stimulusInfos.add(stimulusInfo);
-        pedSpecificStimuli.put(ped, stimulusInfos);
-
-    }
-
-    public void setPedSpecificDynamicStimulusEnduring(Pedestrian ped, Stimulus stimulus){
-        setPedSpecificDynamicStimulus(ped, stimulus, Double.MAX_VALUE);
-    }
-
-    public void setPedSpecificDynamicStimulus(Pedestrian ped, Stimulus stimulus, double stimulusEndTime){
-
-        Timeframe timeframe = new Timeframe(0, stimulusEndTime, false, 0);
-        StimulusInfo stimulusInfo = new StimulusInfo(timeframe, Collections.singletonList(stimulus));
-        setPedSpecificDynamicStimulus(ped, stimulusInfo);
-
-    }
-
-    private List<Stimulus> getOneTimeStimuliForSimulationTime(double simulationTime) {
-        List<Stimulus> activeStimuli = new ArrayList<>();
-
-        oneTimeStimuli.stream()
-                .filter(stimulusInfo -> oneTimeTimeframeIsActiveAtSimulationTime(stimulusInfo.getTimeframe(), simulationTime))
-                .forEach(stimulusInfo -> activeStimuli.addAll(stimulusInfo.getStimuli()));
-
-        return activeStimuli;
-    }
-
-    private List<Stimulus> getRecurringStimuliForSimulationTime(double simulationTime) {
+    private List<Stimulus> getRecurringStimuliForSimulationTime(double simulationTime, VPoint position, Integer pedId) {
         List<Stimulus> activeStimuli = new ArrayList<>();
 
         recurringStimuli.stream()
-                .filter(stimulusInfo -> timeframeIsActiveAtSimulationTime(stimulusInfo.getTimeframe(), simulationTime))
+                .filter(stimulusInfo ->
+                        timeframeIsActiveAtSimulationTime(stimulusInfo.getTimeframe(), simulationTime)
+                                && pedIsInSpecifiedArea(position, stimulusInfo.getLocation())
+                                && pedIsAffected(pedId, stimulusInfo.getSubpopulationFilter())
+                )
                 .forEach(stimulusInfo -> activeStimuli.addAll(stimulusInfo.getStimuli()));
 
         return activeStimuli;
     }
 
-    public static List<StimulusInfo> filterOneTimeStimuli(List<StimulusInfo> lsi){
+
+    public static List<StimulusInfo> filterOneTimeStimuli(List<StimulusInfo> lsi) {
         return lsi.stream()
                 .filter(stimulusInfo -> stimulusInfo.getTimeframe().isRepeat() == false)
                 .collect(Collectors.toList());
     }
 
-    public static List<StimulusInfo> filterRecurringStimuli(List<StimulusInfo> lsi){
+    public static List<StimulusInfo> filterRecurringStimuli(List<StimulusInfo> lsi) {
         return lsi.stream()
                 .filter(stimulusInfo -> stimulusInfo.getTimeframe().isRepeat() == true)
                 .collect(Collectors.toList());
@@ -296,28 +170,28 @@ public class StimulusController {
     /**
      * Given a (recurring) "timeframe" and a "simulationTime" return if the
      * timeframe is "active" at that specific "simulationTime" or not.
-     *
+     * <p>
      * An {@link Timeframe} contains "startTime", "endTime" and"waitTimeBetweenRepetition" for
      * an {@link Stimulus}. With "startTime", "endTime" and "waitTimeBetweenRepetition" you can calculate
      * the period length of an event:
-     *
-     *   period_length = (endTime - startTime) + waitTimeBetweenRepetition
-     *
+     * <p>
+     * period_length = (endTime - startTime) + waitTimeBetweenRepetition
+     * <p>
      * With this information, you can define intervals in which the timeframe is active. For instance:
-     *
-     *   startTime = 0.75
-     *   endTime = 1.25
-     *   waitTimeBetweenRepetition = 1.0
-     *   simulationTime = 0.8
-     *
+     * <p>
+     * startTime = 0.75
+     * endTime = 1.25
+     * waitTimeBetweenRepetition = 1.0
+     * simulationTime = 0.8
+     * <p>
      * That means, the timeframe is active in following intervals (end time is included!):
-     *
-     *   [0.75 -- 1.25]
-     *   [2.25 -- 2.75]
-     *   [3.75 -- 4.25]
-     *   [5.25 -- 5.75]
-     *   ...
-     *
+     * <p>
+     * [0.75 -- 1.25]
+     * [2.25 -- 2.75]
+     * [3.75 -- 4.25]
+     * [5.25 -- 5.75]
+     * ...
+     * <p>
      * Now, if this method gets "simulationTime = 0.8", the method should detect that the timeframe
      * is active in that given time.
      *
@@ -331,7 +205,7 @@ public class StimulusController {
 
         double normalizedSimulationTime = Math.max(0, (simulationTime - timeframe.getStartTime()));
         // Check with unit testing if cut-off is okay here or if we need rounding.
-        int currentPeriod = (int)(normalizedSimulationTime / stimulusPeriodLength);
+        int currentPeriod = (int) (normalizedSimulationTime / stimulusPeriodLength);
 
         double stimulusStartTimeCurrentPeriod = timeframe.getStartTime() + (currentPeriod * stimulusPeriodLength);
         double stimulusEndTimeCurrentPeriod = stimulusStartTimeCurrentPeriod + stimulusLength;
@@ -354,14 +228,28 @@ public class StimulusController {
         }
     }
 
-    /**
-     * Throw {@link IllegalArgumentException} if probability is not in 0..1
-     */
-    private static void throwExceptionIfReactionProbabilityIsInvalid(ReactionProbability reactionProbability) {
-        double probability = reactionProbability.getReactionProbability();
-        if ( probability > 1.0 || probability < 0.0) {
-            throw new IllegalArgumentException("ReactionProbability: probability must be in [0,1]. Got " + probability);
+    private boolean pedIsAffected(Integer pedId, SubpopulationFilter filter) {
+
+        boolean stimulusIsActive = true;
+
+        List<Integer> ids = filter.getAffectedPedestrianIds();
+        if (ids.size() > 0 && pedId != null) {
+            stimulusIsActive = ids.contains(pedId);
         }
+        // if there is no ped id defined, I assume that the StimulusInfo is valid for any agent
+        return stimulusIsActive;
+    }
+
+    private boolean pedIsInSpecifiedArea(VPoint position, Location location) {
+
+        boolean stimulusIsActive = true;
+
+        List<VShape> areas = location.getAreas();
+        if (areas.size() > 0 && position != null) {
+            stimulusIsActive = location.getAreas().stream().anyMatch(area -> area.contains(position));
+        }
+        // if there is no area defined, I assume that the StimulusInfo is valid for the whole topography
+        return stimulusIsActive;
     }
 
 

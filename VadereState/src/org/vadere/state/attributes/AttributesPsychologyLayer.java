@@ -1,7 +1,6 @@
 package org.vadere.state.attributes;
 
-import java.util.HashMap;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * This class beautifies the JSON content by mapping
@@ -14,6 +13,7 @@ public class AttributesPsychologyLayer {
     public static final String DEFAULT_PERCEPTION_MODEL = "SimplePerceptionModel";
     public static final String DEFAULT_COGNITION_MODEL = "SimpleCognitionModel";
 
+
     // Variables
     // Both should reference to concrete "IPerception" and "ICognition"
     // implementations! We do not reference them here to avoid cyclic
@@ -21,14 +21,17 @@ public class AttributesPsychologyLayer {
     private String perception;
     private String cognition;
 
+    public List<Attributes> attributesModel;
+
     // Constructors
     public AttributesPsychologyLayer() {
-        this(DEFAULT_PERCEPTION_MODEL, DEFAULT_COGNITION_MODEL);
+        this(DEFAULT_PERCEPTION_MODEL, DEFAULT_COGNITION_MODEL, new ArrayList<>());
     }
 
-    public AttributesPsychologyLayer(String perception, String cognition) {
+    public AttributesPsychologyLayer(String perception, String cognition, List<Attributes> attributesModel ) {
         this.perception = perception;
         this.cognition = cognition;
+        this.attributesModel = attributesModel;
     }
 
     // Getter
@@ -63,5 +66,16 @@ public class AttributesPsychologyLayer {
     public int hashCode() {
         return Objects.hash(perception, cognition);
     }
+
+
+    public List<Attributes> getAttributesModel() {
+        return attributesModel;
+    }
+
+    public void setAttributesModel(List<Attributes> attributesModel) {
+        this.attributesModel = attributesModel;
+    }
+
+
 
 }
