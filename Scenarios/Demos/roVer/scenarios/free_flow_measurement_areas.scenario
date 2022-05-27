@@ -52,6 +52,14 @@
       "attributes" : {
         "interpolate" : true
       }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.TargetFloorFieldGridProcessor",
+      "id" : 8,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesFloorFieldProcessor",
+      "attributes" : {
+        "targetId" : 1111,
+        "resolution" : 1.0
+      }
     } ],
     "isTimestamped" : true,
     "isWriteMetaData" : true
@@ -1436,7 +1444,7 @@
         },
         "reachDistance" : 0.0,
         "changeAlgorithmType" : "SELECT_LIST",
-        "nextTarget" : [ 102 ],
+        "nextTarget" : [ 692 ],
         "probabilityToChangeTarget" : [ 1.0 ]
       }, {
         "id" : 23,
