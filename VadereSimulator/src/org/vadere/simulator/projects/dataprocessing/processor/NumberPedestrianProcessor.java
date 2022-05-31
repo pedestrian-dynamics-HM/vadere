@@ -5,12 +5,16 @@ import org.vadere.simulator.control.simulation.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepKey;
 import org.vadere.state.scenario.Pedestrian;
 
+
+/**
+ * Processor returns number of pedestrians for each simulation time step. 
+ */
 @DataProcessorClass(label = "NumberPedestrianProcessor")
 public class NumberPedestrianProcessor extends DataProcessor<TimestepKey, Integer> {
 
 
     public NumberPedestrianProcessor(){
-        super("NumAgents");
+        super("NumPeds");
     }
 
     @Override
