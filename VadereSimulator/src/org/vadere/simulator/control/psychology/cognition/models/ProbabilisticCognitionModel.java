@@ -48,8 +48,6 @@ public class ProbabilisticCognitionModel extends AProbabilisticModel {
     @Override
     public void update(Collection<Pedestrian> pedestrians) {
 
-        //TODO how to consider groups?
-
         for (Pedestrian pedestrian : pedestrians) {
 
             Stimulus stimulus = pedestrian.getMostImportantStimulus();
@@ -63,11 +61,13 @@ public class ProbabilisticCognitionModel extends AProbabilisticModel {
 
                     AttributesRouteChoiceDefinition attr = getFilteredAttributes(instruction);
                     LinkedList<Integer> newTarget = getNewTarget(attr.getTargetIds(), attr.getTargetProbabilities());
-                    pedestrian.setTargets(newTarget);
-                    pedestrian.setNextTargetListIndex(0);
 
-                    pedestrian.getKnowledgeBase().addInformation(new KnowledgeItem(instruction));
-                    pedestrian.setSelfCategory(SelfCategory.CHANGE_TARGET);
+                    setNewTarget(pedestrian, instruction, newTarget, false);
+
+                    for (Pedestrian member : pedestrian.getPedGroupMembers()){
+                        setNewTarget(member, instruction, newTarget, true);
+                    }
+
                 } else {
                     tryToReachTarget(pedestrian);
                 }
@@ -77,6 +77,16 @@ public class ProbabilisticCognitionModel extends AProbabilisticModel {
             }
 
         }
+    }
+
+    private void setNewTarget(Pedestrian pedestrian, String instruction, LinkedList<Integer> newTarget, boolean isGroupMember) {
+        //System.out.println("Set target " + newTarget + "\t for pedestrian \t" + pedestrian.getId() + "\t with group id = " + pedestrian.getGroupIds().getFirst() + "\t set as group-member: " + isGroupMember);
+
+        pedestrian.setTargets(newTarget);
+        pedestrian.setNextTargetListIndex(0);
+
+        pedestrian.getKnowledgeBase().addInformation(new KnowledgeItem(instruction));
+        pedestrian.setSelfCategory(SelfCategory.CHANGE_TARGET);
     }
 
     private void tryToReachTarget(Pedestrian pedestrian) {
