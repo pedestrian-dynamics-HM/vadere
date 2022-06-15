@@ -3,6 +3,7 @@ package org.vadere.state.util;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
@@ -226,7 +227,15 @@ public abstract class StateJsonConverter {
 	}
 
 	public static Pedestrian deserializePedestrian(String json) throws IOException {
-		return mapper.readValue(json, Pedestrian.class);
+		/*mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+		JsonNode jsonNodeRoot = mapper.readTree(json);
+		JsonNode jsonNodeGroupId = jsonNodeRoot.get("groupId");*/
+		Pedestrian ped = mapper.readValue(json, Pedestrian.class);
+		/*if (jsonNodeGroupId != null) {
+			ped.registerGroupAccess();
+		}
+		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true);*/
+		return ped;
 	}
 
 	public static Car deserializeCar(String json) throws IOException {
