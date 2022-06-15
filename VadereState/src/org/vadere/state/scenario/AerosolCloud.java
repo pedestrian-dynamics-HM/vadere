@@ -7,23 +7,12 @@ import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.geometry.shapes.*;
 
 /**
- * This class models aerosolClouds. AerosolClouds represent one mode of transmission how pathogen can spread among
- * pedestrians. They are created, updated and deleted in the InfectionModel:
- *
- * <ul>
- *     <li>Creation: infectious pedestrians emit pathogen, i.e. an aerosolCloud is created. Its position
- *     depends on the pedestrian's trajectory and respiratory cycle. The shape is circular.</li>
- *     <li>Update: An aerosolCloud can change its extent and pathogenLoad. The corresponding methods are defined
- *     in this class. The pathogen concentration equals pathogenLoad / volume. </li>
- *     <li>Deletion: The TransmissionModel deletes an aerosolCloud once it has reached a minimum pathogen
- *     concentration</li>
- * </ul>
+ * AerosolCloud represents one medium of transmission how pathogen can spread among
+ * pedestrians.
  */
-public class AerosolCloud extends InfectiousParticleDispersion {
+public class AerosolCloud extends ParticleDispersion {
 
     private AttributesAerosolCloud attributes;
-
-    final static int numberOfNodesAlongShapeBound = 20;
 
     // ToDo: implement AerosolCloudListener (or remove commented code)
     // private final Collection<AerosolCloudListener> aerosolCloudListeners = new LinkedList<>();
@@ -83,16 +72,8 @@ public class AerosolCloud extends InfectiousParticleDispersion {
         return attributes.getCenter();
     }
 
-    public double getHalfLife() {
-        return attributes.getHalfLife();
-    }
-
     public double getCreationTime() {
         return attributes.getCreationTime();
-    }
-
-    public double getInitialPathogenLoad() {
-        return attributes.getInitialPathogenLoad();
     }
 
     public double getCurrentPathogenLoad() {
@@ -182,7 +163,7 @@ public class AerosolCloud extends InfectiousParticleDispersion {
             attributes.setRadius(newRadius);
 
             // define shape
-            VShape newShape = createAerosolCloudShape(center, newRadius);
+            VCircle newShape = createAerosolCloudShape(center, newRadius);
             attributes.setShape(newShape);
         }
     }

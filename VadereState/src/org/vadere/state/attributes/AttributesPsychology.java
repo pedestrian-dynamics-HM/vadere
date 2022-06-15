@@ -1,7 +1,6 @@
 package org.vadere.state.attributes;
 
 import java.util.Objects;
-import java.util.Random;
 
 /**
  * This class encapsulates psychology-related simulation attributes.
@@ -45,4 +44,5 @@ public class AttributesPsychology extends Attributes {
 	public int hashCode() {
 		return Objects.hash(usePsychologyLayer, psychologyLayer);
 	}
+
 }

@@ -45,7 +45,7 @@ public class DistanceRecommendation extends Stimulus {
         if(this == that) return true;
         if(!(that instanceof DistanceRecommendation)) return false;
         DistanceRecommendation thatStimulus = (DistanceRecommendation) that;
-        return Precision.equals(this.perceptionProbability, thatStimulus.getPerceptionProbability(), Double.MIN_VALUE);
+        return true;
     }
 
 }

@@ -1,12 +1,14 @@
 package org.vadere.simulator.control.psychology.cognition.models;
 
 import org.vadere.simulator.models.Model;
+import org.vadere.state.attributes.models.psychology.cognition.AttributesCognitionModel;
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.psychology.perception.types.Threat;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 
 import java.util.Collection;
+import java.util.Random;
 
 /**
  * Interface for a cognition model.
@@ -38,7 +40,7 @@ public interface ICognitionModel {
 	 * a model can acquire additional information about a pedestrian's surrounding
 	 * when evaluating pedestrian's cognition.
 	 */
-	void initialize(Topography topography);
+	void initialize(Topography topography, Random random);
 
 	/**
 	 * Usually, this method iterates over the pededestrians and calls
@@ -50,5 +52,9 @@ public interface ICognitionModel {
 	 * @param pedestrians The pedestrians to update
 	 */
 	void update(Collection<Pedestrian> pedestrians);
+
+	void setAttributes(AttributesCognitionModel attributes);
+
+	AttributesCognitionModel getAttributes();
 
 }

@@ -4,11 +4,9 @@ import org.junit.Test;
 import org.vadere.simulator.projects.ScenarioStore;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesTarget;
-import org.vadere.state.psychology.perception.json.ReactionProbability;
 import org.vadere.state.psychology.perception.json.StimulusInfo;
 import org.vadere.state.psychology.perception.json.StimulusInfoStore;
 import org.vadere.state.psychology.perception.types.*;
-import org.vadere.state.psychology.perception.types.Stimulus;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
@@ -60,7 +58,6 @@ public class StimulusControllerTest {
 
         StimulusInfoStore stimulusInfoStore = new StimulusInfoStore();
         stimulusInfoStore.setStimulusInfos(stimulusInfos);
-        stimulusInfoStore.setReactionProbabilities(Collections.singletonList(new ReactionProbability()));
 
         return stimulusInfoStore;
     }
@@ -68,7 +65,6 @@ public class StimulusControllerTest {
     private StimulusInfoStore getStimulusInfoStore(List<StimulusInfo> stimulusList){
         StimulusInfoStore store = new StimulusInfoStore();
         store.setStimulusInfos(stimulusList);
-        store.setReactionProbabilities(Collections.singletonList(new ReactionProbability()));
         return store;
     }
 
@@ -288,7 +284,7 @@ public class StimulusControllerTest {
 
         double expectedSimulationTime = 1.0;
 
-        List<Stimulus> activeStimuli = stimulusController.getStimuliForTime(expectedSimulationTime);
+        List<Stimulus> activeStimuli = stimulusController.getStimuliFilteredTimeOnly(expectedSimulationTime);
 
         if (activeStimuli.size() == 1) {
             Stimulus stimulus = activeStimuli.get(0);
@@ -317,7 +313,7 @@ public class StimulusControllerTest {
 
         double expectedSimulationTime = 5.0;
 
-        List<Stimulus> activeStimuli = stimulusController.getStimuliForTime(expectedSimulationTime);
+        List<Stimulus> activeStimuli = stimulusController.getStimuliFilteredTimeOnly(expectedSimulationTime);
 
         for (Stimulus stimulus : activeStimuli) {
             assertEquals(expectedSimulationTime, stimulus.getTime(), 10e-1);
@@ -344,7 +340,7 @@ public class StimulusControllerTest {
 
         double expectedSimulationTime = 5.0;
 
-        List<Stimulus> activeStimuli = stimulusController.getStimuliForTime(expectedSimulationTime);
+        List<Stimulus> activeStimuli = stimulusController.getStimuliFilteredTimeOnly(expectedSimulationTime);
 
         assertEquals(1, activeStimuli.size());
         assertEquals(0, wait.getTime(), 10e-1);
@@ -369,6 +365,8 @@ public class StimulusControllerTest {
 
     @Test
     public void getStimuliForTimeReturnsCorrectStimuli(){
+
+
         Stimulus stimulus1 = new Wait(2.0);
         Stimulus stimulus2 = new Wait(3.0);
         Stimulus stimulus3 = new WaitInArea(12, new VRectangle(1,1,100,10.0));
@@ -387,17 +385,17 @@ public class StimulusControllerTest {
 
         List<Stimulus> stimuli;
         //only default event
-        stimuli = stimulusController.getStimuliForTime(0.5);
+        stimuli = stimulusController.getStimuliFilteredTimeOnly(0.5);
         assertEquals(1, stimuli.size());
         assertTimeStamp(stimuli, 0.5);
 
         //only stimulusInfo1
-        stimuli = stimulusController.getStimuliForTime(2.5);
+        stimuli = stimulusController.getStimuliFilteredTimeOnly(2.5);
         assertEquals(3, stimuli.size());
         assertTimeStamp(stimuli, 2.5);
 
         //both stimulusInfo1 stimulusInfo2
-        stimuli = stimulusController.getStimuliForTime(3.5);
+        stimuli = stimulusController.getStimuliFilteredTimeOnly(3.5);
         assertEquals(4, stimuli.size());
         assertTrue(errorMessage, stimuli.contains(stimulus1));
         assertTrue(errorMessage, stimuli.contains(stimulus2));
@@ -405,149 +403,23 @@ public class StimulusControllerTest {
         assertTimeStamp(stimuli, 3.5);
 
         //only stimulusInfo1
-        stimuli = stimulusController.getStimuliForTime(4.5);
+        stimuli = stimulusController.getStimuliFilteredTimeOnly(4.5);
         assertEquals(3, stimuli.size());
         assertTrue(errorMessage, stimuli.contains(stimulus1));
         assertTrue(errorMessage, stimuli.contains(stimulus2));
         assertTimeStamp(stimuli, 4.5);
 
         //one time event is over only stimuli from stimulusInfo2
-        stimuli = stimulusController.getStimuliForTime(7.8);
+        stimuli = stimulusController.getStimuliFilteredTimeOnly(7.8);
         assertEquals(2, stimuli.size());
         assertTrue(errorMessage, stimuli.contains(stimulus3));
         assertTimeStamp(stimuli, 7.8);
 
         //no event (only the default time event)
         //one time event is over only stimuli from stimulusInfo2
-        stimuli = stimulusController.getStimuliForTime(8.3);
+        stimuli = stimulusController.getStimuliFilteredTimeOnly(8.3);
         assertEquals(1, stimuli.size());
         assertTimeStamp(stimuli, 8.3);
-
-    }
-
-    @Test
-    public void getStimuliForDynamicPedSpecificStimuli(){
-
-        Stimulus stimulus1 = new Wait(2.0);
-
-        Pedestrian ped = new Pedestrian(new AttributesAgent(), new Random());
-        LinkedList<Integer> expectedTargetIdList = new LinkedList<>();
-        expectedTargetIdList.add(1);
-        Stimulus changeTargetOriginal = new ChangeTarget(4.0, expectedTargetIdList);
-
-
-        StimulusInfo stimulusInfo1 = getStimulusInfo(new Timeframe(0, 7, false,0), stimulus1);
-
-        StimulusInfoStore store = getStimulusInfoStore(Collections.singletonList(stimulusInfo1));
-        StimulusController stimulusController = new StimulusController(getScenarioStore(store));
-
-        List<Stimulus> stimuli1, pedSpecificStimuli;
-
-        StimulusInfo stimulusInfo2 = getStimulusInfo(new Timeframe(0, 5.0, false,0), changeTargetOriginal);
-        stimulusController.setPedSpecificDynamicStimulus(ped, stimulusInfo2);
-
-        stimuli1 = stimulusController.getStimuliForTime(4.0);
-        assertEquals(2, stimuli1.size());
-
-        pedSpecificStimuli = stimulusController.getStimuliForTime(4.0, ped);
-        assertEquals(3, pedSpecificStimuli.size());
-
-        pedSpecificStimuli = stimulusController.getStimuliForTime(5.0, ped);
-        assertEquals(3, pedSpecificStimuli.size());
-
-        pedSpecificStimuli = stimulusController.getStimuliForTime(5.2, ped);
-        assertEquals(2, pedSpecificStimuli.size());
-    }
-
-    @Test
-    public void checkProbabilityMappingGeneralStimuliOnly(){
-
-        int commandIdWait = -33;
-        double probWait = 0.11;
-
-        // define stimuli and store them in stimulusInfo object
-        Stimulus wait = new Wait();
-        wait.setId(commandIdWait);
-        Timeframe timeframe = new Timeframe(0, 1, false,0);
-        StimulusInfo waitInfo = new StimulusInfo(timeframe, Collections.singletonList(wait));
-
-        // define probababilites for stimuli
-        LinkedList<ReactionProbability> reactionProbabilities = new LinkedList<>();
-        reactionProbabilities.add(new ReactionProbability(commandIdWait, probWait));
-
-        // setup stimuluscontroller
-        StimulusController stimulusController = new StimulusController(getScenarioStore(getStimulusInfoStore(Collections.singletonList(waitInfo))));
-        stimulusController.setReactionProbabilites(reactionProbabilities);
-
-        List<Stimulus> stimuli = stimulusController.getStimuliForTime(0.4);
-        double isProbWait = stimuli.stream().filter(stimulus -> stimulus instanceof Wait).findFirst().orElseThrow().getPerceptionProbability();
-        assert isProbWait == probWait;
-    }
-
-
-    @Test
-    public void checkProbabilityMappingMixedSetting(){
-
-        int commandIdWait = -33;
-        int commandIdChangeTarget = 55;
-        double probWait = 0.5;
-        double probChangeTarget = 0.75;
-
-        Pedestrian ped = new Pedestrian(new AttributesAgent(), new Random());
-
-        // define stimuli and store them in stimulusInfo object
-        Stimulus wait = new Wait();
-        wait.setId(commandIdWait);
-        Stimulus changeTargetOriginal = new ChangeTarget();
-        changeTargetOriginal.setId(commandIdChangeTarget);
-        Timeframe timeframe = new Timeframe(0, 1, false,0);
-        StimulusInfo waitInfo = new StimulusInfo(timeframe, Collections.singletonList(wait));
-
-        // define probababilites for stimuli
-        LinkedList<ReactionProbability> reactionProbabilities = new LinkedList<>();
-        reactionProbabilities.add(new ReactionProbability(commandIdWait, probWait));
-        reactionProbabilities.add(new ReactionProbability(commandIdChangeTarget, probChangeTarget));
-
-
-        // setup stimuluscontroller
-        StimulusController stimulusController = new StimulusController(getScenarioStore(getStimulusInfoStore(Collections.singletonList(waitInfo))));
-        stimulusController.setReactionProbabilites(reactionProbabilities);
-        stimulusController.setPedSpecificDynamicStimulusEnduring(ped, changeTargetOriginal);
-
-        // check if probability is set in mixed setting (general + pedestrian specific stimuli)
-        List<Stimulus> stimuli = stimulusController.getStimuliForTime(0.0, ped);
-        double isProbWait = stimuli.stream().filter(stimulus -> stimulus instanceof Wait).findFirst().orElseThrow().getPerceptionProbability();
-        double isProbChangeTarget = stimuli.stream().filter(stimulus -> stimulus instanceof ChangeTarget).findFirst().orElseThrow().getPerceptionProbability();
-
-        assert isProbWait == probWait;
-        assert isProbChangeTarget == probChangeTarget;
-    }
-
-
-
-
-    @Test
-    public void getDynamicStimuli(){
-
-        Stimulus stimulus1 = new Wait(2.0);
-
-        LinkedList<Integer> expectedTargetIdList = new LinkedList<>();
-        expectedTargetIdList.add(1);
-        Stimulus changeTargetOriginal = new ChangeTarget(4.0, expectedTargetIdList);
-
-
-        StimulusInfo stimulusInfo1 = getStimulusInfo(new Timeframe(0, 7, false,0), stimulus1);
-
-        StimulusInfoStore store = getStimulusInfoStore(Collections.singletonList(stimulusInfo1));
-        StimulusController stimulusController = new StimulusController(getScenarioStore(store));
-
-        List<Stimulus> stimuli1;
-
-        StimulusInfo stimulusInfo2 = getStimulusInfo(new Timeframe(0, 4.0, false,0), changeTargetOriginal);
-        stimulusController.setDynamicStimulus(stimulusInfo2);
-
-        stimuli1 = stimulusController.getStimuliForTime(4.0);
-        assertEquals(3, stimuli1.size());
 
     }
 
@@ -583,9 +455,9 @@ public class StimulusControllerTest {
         stimulusController.getScenarioStore().setTopography(topography);
 
 
-        List<Stimulus> stimuliFiltered1 = stimulusController.getStimuliForTime(0, pedestrians.get(0));
+        List<Stimulus> stimuliFiltered1 = stimulusController.getStimuliFiltered(0, pedestrians.get(0).getPosition(), pedestrians.get(0).getId());
         Stimulus Threat1 = stimuliFiltered1.stream().filter(stimulus -> stimulus instanceof Threat).collect(Collectors.toList()).get(0);
-        List<Stimulus> stimuliFiltered2 = stimulusController.getStimuliForTime(0, pedestrians.get(1));
+        List<Stimulus> stimuliFiltered2 = stimulusController.getStimuliFiltered(0, pedestrians.get(1).getPosition(), pedestrians.get(1).getId());
         Stimulus Threat2 = stimuliFiltered2.stream().filter(stimulus -> stimulus instanceof Threat).collect(Collectors.toList()).get(0);
 
         assertEquals(Threat1, expectedStimulusPed1);
@@ -604,7 +476,9 @@ public class StimulusControllerTest {
 
         double expectedTime = 0.1;
         VShape waitingArea = new VCircle(new VPoint(0, 0), 2);
-        Stimulus expectedWaitInArea = new WaitInArea(expectedTime, waitingArea);
+
+        Location location = new Location(waitingArea);
+        Stimulus expectedWaitInArea = new Wait(expectedTime);
         Stimulus expectedElapsedTime = new ElapsedTime(0.2);
 
         stimuli.add(expectedElapsedTime);
@@ -614,43 +488,21 @@ public class StimulusControllerTest {
         Timeframe timeFrame = new Timeframe(0, 7, false,0);
         stimulusInfo1.setStimuli(stimuli);
         stimulusInfo1.setTimeframe(timeFrame);
+        stimulusInfo1.setLocation(location);
 
         StimulusInfoStore store = getStimulusInfoStore(Collections.singletonList(stimulusInfo1));
         StimulusController stimulusController = new StimulusController(getScenarioStore(store));
         stimulusController.getScenarioStore().setTopography(topography);
 
+        List<Stimulus> stimuliFiltered1 = stimulusController.getStimuliFiltered(0, pedestrians.get(0).getPosition(), pedestrians.get(0).getId());
+        Stimulus Wait = stimuliFiltered1.stream().filter(stimulus -> stimulus instanceof Wait).collect(Collectors.toList()).get(0);
+        List<Stimulus> stimuliFiltered2 = stimulusController.getStimuliFiltered(0, pedestrians.get(1).getPosition(), pedestrians.get(1).getId());
 
-        List<Stimulus> stimuliFiltered1 = stimulusController.getStimuliForTime(0, pedestrians.get(0));
-        Stimulus WaitInArea = stimuliFiltered1.stream().filter(stimulus -> stimulus instanceof WaitInArea).collect(Collectors.toList()).get(0);
-        List<Stimulus> stimuliFiltered2 = stimulusController.getStimuliForTime(0, pedestrians.get(1));
-
-        assertEquals(WaitInArea, expectedWaitInArea);
-        assertFalse(stimuliFiltered2.stream().anyMatch( stimulus -> stimulus instanceof WaitInArea));
-
-    }
-
-    @Test
-    public void assignReactionProbabilites() {
-        double expectedProbVal = 0.77;
-        double time = 1.2;
-
-        StimulusInfo stimulusInfo1 = getStimulusInfo(
-                new Timeframe(time, 7, false,0),
-                new Wait(time)
-        );
-
-        StimulusInfoStore store = getStimulusInfoStore(Collections.singletonList((stimulusInfo1)));
-        store.setReactionProbabilities(Collections.singletonList(new ReactionProbability(expectedProbVal)));
-        StimulusController stimulusController = new StimulusController(getScenarioStore(store));
-
-        List<Stimulus> stimuli = stimulusController.getStimuliForTime(time);
-        Stimulus waitStimulus = stimuli.stream().filter(stimulus -> stimulus instanceof Wait).collect(Collectors.toList()).get(0);
-        Stimulus elapsedTimeStimulus = stimuli.stream().filter(stimulus -> stimulus instanceof ElapsedTime).collect(Collectors.toList()).get(0);
-
-        assertEquals(expectedProbVal, waitStimulus.getPerceptionProbability(), Double.MIN_VALUE);
-        assertEquals(1.0, elapsedTimeStimulus.getPerceptionProbability(), Double.MIN_VALUE);
+        assertEquals(Wait, expectedWaitInArea);
+        assertFalse(stimuliFiltered2.stream().anyMatch( stimulus -> stimulus instanceof Wait));
 
     }
+
 
 
 

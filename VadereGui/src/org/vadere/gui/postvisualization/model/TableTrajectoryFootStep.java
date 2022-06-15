@@ -59,9 +59,8 @@ public class TableTrajectoryFootStep {
 	public final int selfCategoryCol;
 	public final int groupMembershipCol;
 	public final int informationStateCol;
-	public final int infectionStatusCol;
-	public final int absorbedPathogenLoadCol;
-	public final int minInfectiousDoseCol;
+	public final int isInfectiousCol;
+	public final int degreeOfExposureCol;
 
 	public static final int agentDFPedIdCol = 0;
 	public static final int birthTimeCol = 1;
@@ -94,9 +93,8 @@ public class TableTrajectoryFootStep {
 		selfCategoryCol = columnNames.getSelfCategoryCol(dataFrame);
 		groupMembershipCol = columnNames.getGroupMembershipCol(dataFrame);
 		informationStateCol = columnNames.getInformationStateCol(dataFrame);
-		infectionStatusCol = columnNames.getInfectionStatusCol(dataFrame);
-		absorbedPathogenLoadCol = columnNames.getAbsorbedPathogenLoadCol(dataFrame);
-		minInfectiousDoseCol = columnNames.getMinInfectiousDoseCol(dataFrame);
+		isInfectiousCol = columnNames.getIsInfectiousCol(dataFrame);
+		degreeOfExposureCol = columnNames.getDegreeOfExposureCol(dataFrame);
 
 
 		this.trajectoryDataFrame = dataFrame;

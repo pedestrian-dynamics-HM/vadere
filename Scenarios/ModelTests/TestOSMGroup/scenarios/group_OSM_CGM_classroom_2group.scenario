@@ -1,7 +1,7 @@
 {
   "name" : "group_OSM_CGM_classroom_2group",
   "description" : "",
-  "release" : "2.0",
+  "release" : "2.2",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -139,7 +139,21 @@
       "usePsychologyLayer" : false,
       "psychologyLayer" : {
         "perception" : "SimplePerceptionModel",
-        "cognition" : "CooperativeCognitionModel"
+        "cognition" : "CooperativeCognitionModel",
+        "attributesModel" : {
+          "org.vadere.state.attributes.models.psychology.perception.AttributesSimplePerceptionModel" : {
+            "priority" : {
+              "1" : "InformationStimulus",
+              "2" : "ChangeTargetScripted",
+              "3" : "ChangeTarget",
+              "4" : "Threat",
+              "5" : "Wait",
+              "6" : "WaitInArea",
+              "7" : "DistanceRecommendation"
+            }
+          },
+          "org.vadere.state.attributes.models.psychology.cognition.AttributesCooperativeCognitionModel" : { }
+        }
       }
     },
     "topography" : {
@@ -267,6 +281,8 @@
       } ],
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],
+      "aerosolClouds" : [ ],
+      "droplets" : [ ],
       "sources" : [ ],
       "dynamicElements" : [ {
         "attributes" : {
@@ -309,11 +325,17 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ]
-          }
+            "knowledge" : [ ],
+            "informationState" : "NO_INFORMATION"
+          },
+          "perceivedStimuli" : [ ],
+          "nextPerceivedStimuli" : [ ]
         },
+        "healthStatus" : null,
+        "infectionStatus" : null,
         "groupIds" : [ 1 ],
         "groupSizes" : [ 2 ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -360,11 +382,17 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ]
-          }
+            "knowledge" : [ ],
+            "informationState" : "NO_INFORMATION"
+          },
+          "perceivedStimuli" : [ ],
+          "nextPerceivedStimuli" : [ ]
         },
+        "healthStatus" : null,
+        "infectionStatus" : null,
         "groupIds" : [ 1 ],
         "groupSizes" : [ 2 ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -411,11 +439,17 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ]
-          }
+            "knowledge" : [ ],
+            "informationState" : "NO_INFORMATION"
+          },
+          "perceivedStimuli" : [ ],
+          "nextPerceivedStimuli" : [ ]
         },
+        "healthStatus" : null,
+        "infectionStatus" : null,
         "groupIds" : [ 2 ],
         "groupSizes" : [ 2 ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -462,11 +496,17 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ]
-          }
+            "knowledge" : [ ],
+            "informationState" : "NO_INFORMATION"
+          },
+          "perceivedStimuli" : [ ],
+          "nextPerceivedStimuli" : [ ]
         },
+        "healthStatus" : null,
+        "infectionStatus" : null,
         "groupIds" : [ 2 ],
         "groupSizes" : [ 2 ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -513,11 +553,17 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ]
-          }
+            "knowledge" : [ ],
+            "informationState" : "NO_INFORMATION"
+          },
+          "perceivedStimuli" : [ ],
+          "nextPerceivedStimuli" : [ ]
         },
+        "healthStatus" : null,
+        "infectionStatus" : null,
         "groupIds" : [ 3 ],
         "groupSizes" : [ 2 ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -564,11 +610,17 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ]
-          }
+            "knowledge" : [ ],
+            "informationState" : "NO_INFORMATION"
+          },
+          "perceivedStimuli" : [ ],
+          "nextPerceivedStimuli" : [ ]
         },
+        "healthStatus" : null,
+        "infectionStatus" : null,
         "groupIds" : [ 3 ],
         "groupSizes" : [ 2 ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -615,11 +667,17 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ]
-          }
+            "knowledge" : [ ],
+            "informationState" : "NO_INFORMATION"
+          },
+          "perceivedStimuli" : [ ],
+          "nextPerceivedStimuli" : [ ]
         },
+        "healthStatus" : null,
+        "infectionStatus" : null,
         "groupIds" : [ 4 ],
         "groupSizes" : [ 2 ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -666,11 +724,17 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ]
-          }
+            "knowledge" : [ ],
+            "informationState" : "NO_INFORMATION"
+          },
+          "perceivedStimuli" : [ ],
+          "nextPerceivedStimuli" : [ ]
         },
+        "healthStatus" : null,
+        "infectionStatus" : null,
         "groupIds" : [ 4 ],
         "groupSizes" : [ 2 ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -717,11 +781,17 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ]
-          }
+            "knowledge" : [ ],
+            "informationState" : "NO_INFORMATION"
+          },
+          "perceivedStimuli" : [ ],
+          "nextPerceivedStimuli" : [ ]
         },
+        "healthStatus" : null,
+        "infectionStatus" : null,
         "groupIds" : [ 5 ],
         "groupSizes" : [ 2 ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -768,11 +838,17 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ]
-          }
+            "knowledge" : [ ],
+            "informationState" : "NO_INFORMATION"
+          },
+          "perceivedStimuli" : [ ],
+          "nextPerceivedStimuli" : [ ]
         },
+        "healthStatus" : null,
+        "infectionStatus" : null,
         "groupIds" : [ 5 ],
         "groupSizes" : [ 2 ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -819,11 +895,17 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ]
-          }
+            "knowledge" : [ ],
+            "informationState" : "NO_INFORMATION"
+          },
+          "perceivedStimuli" : [ ],
+          "nextPerceivedStimuli" : [ ]
         },
+        "healthStatus" : null,
+        "infectionStatus" : null,
         "groupIds" : [ 6 ],
         "groupSizes" : [ 2 ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -870,11 +952,17 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ]
-          }
+            "knowledge" : [ ],
+            "informationState" : "NO_INFORMATION"
+          },
+          "perceivedStimuli" : [ ],
+          "nextPerceivedStimuli" : [ ]
         },
+        "healthStatus" : null,
+        "infectionStatus" : null,
         "groupIds" : [ 6 ],
         "groupSizes" : [ 2 ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -921,11 +1009,17 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ]
-          }
+            "knowledge" : [ ],
+            "informationState" : "NO_INFORMATION"
+          },
+          "perceivedStimuli" : [ ],
+          "nextPerceivedStimuli" : [ ]
         },
+        "healthStatus" : null,
+        "infectionStatus" : null,
         "groupIds" : [ 7 ],
         "groupSizes" : [ 2 ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -972,11 +1066,17 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ]
-          }
+            "knowledge" : [ ],
+            "informationState" : "NO_INFORMATION"
+          },
+          "perceivedStimuli" : [ ],
+          "nextPerceivedStimuli" : [ ]
         },
+        "healthStatus" : null,
+        "infectionStatus" : null,
         "groupIds" : [ 7 ],
         "groupSizes" : [ 2 ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -1023,11 +1123,17 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ]
-          }
+            "knowledge" : [ ],
+            "informationState" : "NO_INFORMATION"
+          },
+          "perceivedStimuli" : [ ],
+          "nextPerceivedStimuli" : [ ]
         },
+        "healthStatus" : null,
+        "infectionStatus" : null,
         "groupIds" : [ 8 ],
         "groupSizes" : [ 2 ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -1074,11 +1180,17 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ]
-          }
+            "knowledge" : [ ],
+            "informationState" : "NO_INFORMATION"
+          },
+          "perceivedStimuli" : [ ],
+          "nextPerceivedStimuli" : [ ]
         },
+        "healthStatus" : null,
+        "infectionStatus" : null,
         "groupIds" : [ 8 ],
         "groupSizes" : [ 2 ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -1125,11 +1237,17 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ]
-          }
+            "knowledge" : [ ],
+            "informationState" : "NO_INFORMATION"
+          },
+          "perceivedStimuli" : [ ],
+          "nextPerceivedStimuli" : [ ]
         },
+        "healthStatus" : null,
+        "infectionStatus" : null,
         "groupIds" : [ 9 ],
         "groupSizes" : [ 2 ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -1176,11 +1294,17 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ]
-          }
+            "knowledge" : [ ],
+            "informationState" : "NO_INFORMATION"
+          },
+          "perceivedStimuli" : [ ],
+          "nextPerceivedStimuli" : [ ]
         },
+        "healthStatus" : null,
+        "infectionStatus" : null,
         "groupIds" : [ 9 ],
         "groupSizes" : [ 2 ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -1227,11 +1351,17 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ]
-          }
+            "knowledge" : [ ],
+            "informationState" : "NO_INFORMATION"
+          },
+          "perceivedStimuli" : [ ],
+          "nextPerceivedStimuli" : [ ]
         },
+        "healthStatus" : null,
+        "infectionStatus" : null,
         "groupIds" : [ 10 ],
         "groupSizes" : [ 2 ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -1278,11 +1408,17 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ]
-          }
+            "knowledge" : [ ],
+            "informationState" : "NO_INFORMATION"
+          },
+          "perceivedStimuli" : [ ],
+          "nextPerceivedStimuli" : [ ]
         },
+        "healthStatus" : null,
+        "infectionStatus" : null,
         "groupIds" : [ 10 ],
         "groupSizes" : [ 2 ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -1329,11 +1465,17 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ]
-          }
+            "knowledge" : [ ],
+            "informationState" : "NO_INFORMATION"
+          },
+          "perceivedStimuli" : [ ],
+          "nextPerceivedStimuli" : [ ]
         },
+        "healthStatus" : null,
+        "infectionStatus" : null,
         "groupIds" : [ 11 ],
         "groupSizes" : [ 2 ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -1380,11 +1522,17 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ]
-          }
+            "knowledge" : [ ],
+            "informationState" : "NO_INFORMATION"
+          },
+          "perceivedStimuli" : [ ],
+          "nextPerceivedStimuli" : [ ]
         },
+        "healthStatus" : null,
+        "infectionStatus" : null,
         "groupIds" : [ 11 ],
         "groupSizes" : [ 2 ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -1431,11 +1579,17 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ]
-          }
+            "knowledge" : [ ],
+            "informationState" : "NO_INFORMATION"
+          },
+          "perceivedStimuli" : [ ],
+          "nextPerceivedStimuli" : [ ]
         },
+        "healthStatus" : null,
+        "infectionStatus" : null,
         "groupIds" : [ 12 ],
         "groupSizes" : [ 2 ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -1482,11 +1636,17 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ]
-          }
+            "knowledge" : [ ],
+            "informationState" : "NO_INFORMATION"
+          },
+          "perceivedStimuli" : [ ],
+          "nextPerceivedStimuli" : [ ]
         },
+        "healthStatus" : null,
+        "infectionStatus" : null,
         "groupIds" : [ 12 ],
         "groupSizes" : [ 2 ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -1533,11 +1693,17 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ]
-          }
+            "knowledge" : [ ],
+            "informationState" : "NO_INFORMATION"
+          },
+          "perceivedStimuli" : [ ],
+          "nextPerceivedStimuli" : [ ]
         },
+        "healthStatus" : null,
+        "infectionStatus" : null,
         "groupIds" : [ 13 ],
         "groupSizes" : [ 2 ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -1584,11 +1750,17 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ]
-          }
+            "knowledge" : [ ],
+            "informationState" : "NO_INFORMATION"
+          },
+          "perceivedStimuli" : [ ],
+          "nextPerceivedStimuli" : [ ]
         },
+        "healthStatus" : null,
+        "infectionStatus" : null,
         "groupIds" : [ 13 ],
         "groupSizes" : [ 2 ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -1635,11 +1807,17 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ]
-          }
+            "knowledge" : [ ],
+            "informationState" : "NO_INFORMATION"
+          },
+          "perceivedStimuli" : [ ],
+          "nextPerceivedStimuli" : [ ]
         },
+        "healthStatus" : null,
+        "infectionStatus" : null,
         "groupIds" : [ 14 ],
         "groupSizes" : [ 2 ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -1686,11 +1864,17 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ]
-          }
+            "knowledge" : [ ],
+            "informationState" : "NO_INFORMATION"
+          },
+          "perceivedStimuli" : [ ],
+          "nextPerceivedStimuli" : [ ]
         },
+        "healthStatus" : null,
+        "infectionStatus" : null,
         "groupIds" : [ 14 ],
         "groupSizes" : [ 2 ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -1737,11 +1921,17 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ]
-          }
+            "knowledge" : [ ],
+            "informationState" : "NO_INFORMATION"
+          },
+          "perceivedStimuli" : [ ],
+          "nextPerceivedStimuli" : [ ]
         },
+        "healthStatus" : null,
+        "infectionStatus" : null,
         "groupIds" : [ 15 ],
         "groupSizes" : [ 2 ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -1788,11 +1978,17 @@
           "selfCategory" : "TARGET_ORIENTED",
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ]
-          }
+            "knowledge" : [ ],
+            "informationState" : "NO_INFORMATION"
+          },
+          "perceivedStimuli" : [ ],
+          "nextPerceivedStimuli" : [ ]
         },
+        "healthStatus" : null,
+        "infectionStatus" : null,
         "groupIds" : [ 15 ],
         "groupSizes" : [ 2 ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },

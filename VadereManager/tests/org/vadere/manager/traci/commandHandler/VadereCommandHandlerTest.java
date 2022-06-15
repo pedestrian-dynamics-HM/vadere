@@ -6,8 +6,6 @@ import org.vadere.manager.RemoteManager;
 import org.vadere.manager.RemoteScenarioRun;
 import org.vadere.manager.TestRemoteManager;
 import org.vadere.manager.traci.TraCICmd;
-import org.vadere.state.psychology.perception.json.ReactionProbability;
-import org.vadere.state.traci.TraCIDataType;
 import org.vadere.manager.traci.commandHandler.variables.VadereVar;
 import org.vadere.manager.traci.commands.TraCICommand;
 import org.vadere.manager.traci.commands.TraCIGetCommand;
@@ -18,19 +16,17 @@ import org.vadere.state.psychology.perception.json.StimulusInfo;
 import org.vadere.state.psychology.perception.json.StimulusInfoStore;
 import org.vadere.state.scenario.TargetChanger;
 import org.vadere.state.scenario.Topography;
+import org.vadere.state.traci.TraCIDataType;
 import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.io.IOUtils;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
 import static org.mockito.ArgumentMatchers.isA;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class VadereCommandHandlerTest extends CommandHandlerTest {
 
@@ -56,7 +52,6 @@ public class VadereCommandHandlerTest extends CommandHandlerTest {
 		List<StimulusInfo> stimuli = sis.getStimulusInfos();
 		List<StimulusInfo> oneTimeStimuli = StimulusController.filterOneTimeStimuli(stimuli);
 		List<StimulusInfo> recurringStimuli = StimulusController.filterRecurringStimuli(stimuli);
-		List<ReactionProbability> reactionProbabilities = sis.getReactionProbabilities();
 
 		TraCIGetCommand cmd = (TraCIGetCommand) getFirstCommand(TraCIGetCommand.build(
 				TraCICmd.GET_VADERE_VALUE, varID, elementID));
@@ -66,7 +61,6 @@ public class VadereCommandHandlerTest extends CommandHandlerTest {
 				StimulusController sc = mock(StimulusController.class, Mockito.RETURNS_DEEP_STUBS);
 				when(sc.getOneTimeStimuli()).thenReturn(oneTimeStimuli);
 				when(sc.getRecurringStimuli()).thenReturn(recurringStimuli);
-				when(sc.getScenarioStore().getStimulusInfoStore().getReactionProbabilities()).thenReturn(reactionProbabilities);
 				when(remoteManager.getRemoteSimulationRun().getStimulusController()).thenReturn(sc);
 			}
 		};

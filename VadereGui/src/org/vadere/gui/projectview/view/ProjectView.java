@@ -4,6 +4,8 @@ package org.vadere.gui.projectview.view;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.postvisualization.control.Player;
+import org.vadere.gui.postvisualization.model.ContactData;
+import org.vadere.gui.postvisualization.model.TableAerosolCloudData;
 import org.vadere.gui.projectview.control.*;
 import org.vadere.gui.projectview.model.ProjectViewModel;
 import org.vadere.gui.projectview.model.ProjectViewModel.OutputBundle;
@@ -30,11 +32,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.List;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -621,29 +620,23 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 				Scenario scenarioRM = bundle.getScenarioRM();
 				Optional<File> trajectoryFile = IOUtils
 						.getFirstFile(bundle.getDirectory(), IOUtils.TRAJECTORY_FILE_EXTENSION);
+				
 				File[] txtFiles = IOUtils.getFileList(bundle.getDirectory(), ".txt");
-				Optional<File> contactsTrajectoryFile = Optional.empty();
-				for (File f :txtFiles) {
-					if (f.getName().contains("contacts")) {
-						contactsTrajectoryFile = Optional.of(f);
-					}
-				}
-				Optional<File> aerosolCloudShapeFile = Optional.empty();
-				for (File f :txtFiles) {
-					if (f.getName().contains("aerosolCloudShapes")) {
-						aerosolCloudShapeFile = Optional.of(f);
+				List<String> tableNames = new ArrayList<>(Arrays.asList(ContactData.TABLE_NAME, TableAerosolCloudData.TABLE_NAME));
+				HashMap<String, File> optionalPostVisFiles = new HashMap<>();
+				for (String name : tableNames) {
+					for (File f : txtFiles) {
+						if (f.getName().contains(name)) {
+							optionalPostVisFiles.put(name, f);
+						}
 					}
 				}
 
 				if (trajectoryFile.isPresent()) {
-					if (contactsTrajectoryFile.isPresent() && aerosolCloudShapeFile.isPresent()) {
-						scenarioJPanel.loadOutputFileForPostVis(trajectoryFile.get(), contactsTrajectoryFile.get(), aerosolCloudShapeFile.get(), scenarioRM);
-					} else if (contactsTrajectoryFile.isPresent() && !aerosolCloudShapeFile.isPresent()) {
-						scenarioJPanel.loadOutputFileForPostVis(trajectoryFile.get(), contactsTrajectoryFile.get(), scenarioRM);
-					} else if (!contactsTrajectoryFile.isPresent() && aerosolCloudShapeFile.isPresent()) {
-						scenarioJPanel.loadOutputFileForPostVis(trajectoryFile.get(), null, aerosolCloudShapeFile.get(), scenarioRM);
+					if (optionalPostVisFiles.size() > 0) {
+						scenarioJPanel.loadOutputFileForPostVis(trajectoryFile.get(), optionalPostVisFiles, scenarioRM);
 					} else {
-							scenarioJPanel.loadOutputFileForPostVis(trajectoryFile.get(), scenarioRM);
+						scenarioJPanel.loadOutputFileForPostVis(trajectoryFile.get(), scenarioRM);
 					}
 				} else {
 					scenarioJPanel.loadOutputFileForPostVis(scenarioRM);

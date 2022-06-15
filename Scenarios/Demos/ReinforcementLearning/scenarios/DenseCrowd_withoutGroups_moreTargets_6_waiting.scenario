@@ -1,7 +1,8 @@
 {
   "name" : "DenseCrowd_withoutGroups_moreTargets_6_waiting",
   "description" : "",
-  "release" : "2.0",
+  "release" : "2.2",
+  "commithash" : "bef9b7bef5c5755b23c296217e1454e4af9b7d15",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -101,7 +102,21 @@
       "usePsychologyLayer" : false,
       "psychologyLayer" : {
         "perception" : "SimplePerceptionModel",
-        "cognition" : "CooperativeCognitionModel"
+        "cognition" : "CooperativeCognitionModel",
+        "attributesModel" : {
+          "org.vadere.state.attributes.models.psychology.perception.AttributesSimplePerceptionModel" : {
+            "priority" : {
+              "1" : "InformationStimulus",
+              "2" : "ChangeTargetScripted",
+              "3" : "ChangeTarget",
+              "4" : "Threat",
+              "5" : "Wait",
+              "6" : "WaitInArea",
+              "7" : "DistanceRecommendation"
+            }
+          },
+          "org.vadere.state.attributes.models.psychology.cognition.AttributesCooperativeCognitionModel" : { }
+        }
       }
     },
     "topography" : {
@@ -343,6 +358,8 @@
       } ],
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],
+      "aerosolClouds" : [ ],
+      "droplets" : [ ],
       "sources" : [ {
         "id" : 1,
         "shape" : {
@@ -409,11 +426,17 @@
           "selfCategory" : null,
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ]
-          }
+            "knowledge" : [ ],
+            "informationState" : "NO_INFORMATION"
+          },
+          "perceivedStimuli" : [ ],
+          "nextPerceivedStimuli" : [ ]
         },
+        "healthStatus" : null,
+        "infectionStatus" : null,
         "groupIds" : [ 2 ],
         "groupSizes" : [ ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -460,11 +483,17 @@
           "selfCategory" : null,
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ]
-          }
+            "knowledge" : [ ],
+            "informationState" : "NO_INFORMATION"
+          },
+          "perceivedStimuli" : [ ],
+          "nextPerceivedStimuli" : [ ]
         },
+        "healthStatus" : null,
+        "infectionStatus" : null,
         "groupIds" : [ 2 ],
         "groupSizes" : [ ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -511,11 +540,17 @@
           "selfCategory" : null,
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ]
-          }
+            "knowledge" : [ ],
+            "informationState" : "NO_INFORMATION"
+          },
+          "perceivedStimuli" : [ ],
+          "nextPerceivedStimuli" : [ ]
         },
+        "healthStatus" : null,
+        "infectionStatus" : null,
         "groupIds" : [ 2 ],
         "groupSizes" : [ ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -562,11 +597,17 @@
           "selfCategory" : null,
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ]
-          }
+            "knowledge" : [ ],
+            "informationState" : "NO_INFORMATION"
+          },
+          "perceivedStimuli" : [ ],
+          "nextPerceivedStimuli" : [ ]
         },
+        "healthStatus" : null,
+        "infectionStatus" : null,
         "groupIds" : [ 2 ],
         "groupSizes" : [ ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -613,11 +654,17 @@
           "selfCategory" : null,
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ]
-          }
+            "knowledge" : [ ],
+            "informationState" : "NO_INFORMATION"
+          },
+          "perceivedStimuli" : [ ],
+          "nextPerceivedStimuli" : [ ]
         },
+        "healthStatus" : null,
+        "infectionStatus" : null,
         "groupIds" : [ 2 ],
         "groupSizes" : [ ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },
@@ -664,11 +711,17 @@
           "selfCategory" : null,
           "groupMembership" : "OUT_GROUP",
           "knowledgeBase" : {
-            "knowledge" : [ ]
-          }
+            "knowledge" : [ ],
+            "informationState" : "NO_INFORMATION"
+          },
+          "perceivedStimuli" : [ ],
+          "nextPerceivedStimuli" : [ ]
         },
+        "healthStatus" : null,
+        "infectionStatus" : null,
         "groupIds" : [ 2 ],
         "groupSizes" : [ ],
+        "agentsInGroup" : [ ],
         "trajectory" : {
           "footSteps" : [ ]
         },

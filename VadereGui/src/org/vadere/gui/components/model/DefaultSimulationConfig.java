@@ -7,7 +7,6 @@ import java.util.Optional;
 import java.util.TreeMap;
 
 import org.apache.commons.configuration2.Configuration;
-import org.vadere.state.health.InfectionStatus;
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.psychology.information.InformationState;
 import org.vadere.util.config.VadereConfig;
@@ -52,7 +51,17 @@ public class DefaultSimulationConfig extends DefaultConfig {
 	private Map<Integer, Color> pedestrianColors = new TreeMap<>();
 	private Map<Integer, Color> randomColors = new HashMap<>();
 	private Map<Integer, Color> selfCategoryColors = new HashMap<>();
-	private Map<Integer, Color> infectionStatusColors = new HashMap<>();
+
+	/*
+	 * threshold above which pedestrian's color changes gradually depending on current degree of exposure
+	 */
+	private double lowerVisualizedExposure = 0;
+
+	/*
+	 * threshold below which pedestrian's color changes gradually depending on current degree of exposure
+	 */
+	private double upperVisualizedExposure = 1000;
+
 	private Map<Integer, Color> informationStateColors = new HashMap<>();
 	private double gridWidth = CONFIG.getDouble("ProjectView.cellWidth");
 	private final double MIN_CELL_WIDTH = CONFIG.getDouble("ProjectView.minCellWidth");
@@ -69,7 +78,8 @@ public class DefaultSimulationConfig extends DefaultConfig {
 		this.randomColors = new HashMap<>();
 		this.pedestrianColors = new HashMap<>();
 		this.selfCategoryColors = new HashMap<>();
-		this.infectionStatusColors = new HashMap<>();
+		this.lowerVisualizedExposure = config.lowerVisualizedExposure;
+		this.upperVisualizedExposure = config.upperVisualizedExposure;
 		this.informationStateColors = new HashMap<>();
 
 		for (Map.Entry<Integer, Color> entry : config.pedestrianColors.entrySet()) {
@@ -365,7 +375,6 @@ public class DefaultSimulationConfig extends DefaultConfig {
 		setChanged();
 	}
 
-
 	public Color getSelfCategoryColor(SelfCategory selfCategory) {
 		Color color = getPedestrianDefaultColor();
 
@@ -375,13 +384,53 @@ public class DefaultSimulationConfig extends DefaultConfig {
 
 		return color;
 	}
-	public Color getInfectionStatusColor(InfectionStatus infectionStatus) {
-		Color color = getPedestrianDefaultColor();
 
-		if (infectionStatusColors.containsKey(infectionStatus.ordinal())) {
-			color = infectionStatusColors.get(infectionStatus.ordinal());
+	public double getLowerVisualizedExposure() {
+		return lowerVisualizedExposure;
+	}
+
+	public void setLowerVisualizedExposure(double lowerVisualizedExposure) {
+		this.lowerVisualizedExposure = lowerVisualizedExposure;
+	}
+
+	public void setUpperVisualizedExposure(double upperVisualizedExposure) {
+		this.upperVisualizedExposure = upperVisualizedExposure;
+	}
+
+	public double getUpperVisualizedExposure() {
+		return this.upperVisualizedExposure;
+	}
+
+	public Color getHealthStatusColor(Boolean isInfectious, double degreeOfExposure) {
+		Color color;
+
+		if (isInfectious) {
+			color = getInfectiousColor();
+		} else {
+			color = getInterpolatedExposureColor(degreeOfExposure);
 		}
+		return color;
+	}
 
+	/*
+	 * defines a truncated color transition depending on an agent's degree of exposure.
+	 */
+	private Color getInterpolatedExposureColor(double degreeOfExposure) {
+		Color color;
+		float t = (float) ((degreeOfExposure - lowerVisualizedExposure) / upperVisualizedExposure);
+
+		Color susceptibleColor = getPedestrianDefaultColor();
+		Color exposedColor = getExposedColor();
+
+		if (degreeOfExposure <= lowerVisualizedExposure) {
+			color = susceptibleColor;
+		} else if (degreeOfExposure >= upperVisualizedExposure) {
+			color = exposedColor;
+		} else {
+			color = ColorHelper.improvedColorInterpolation(susceptibleColor, exposedColor, t);
+			// alternatively use:
+			// color = ColorHelper.standardColorInterpolation(susceptibleColor, exposedColor, t);
+		}
 		return color;
 	}
 
@@ -393,11 +442,6 @@ public class DefaultSimulationConfig extends DefaultConfig {
 		}
 
 		return color;
-	}
-
-	public void setInfectionStatusColor(InfectionStatus infectionStatus, final Color color) {
-		this.infectionStatusColors.put(infectionStatus.ordinal(), color);
-		setChanged();
 	}
 
 	public void setGridWidth(final double gridWidth) {

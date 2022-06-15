@@ -1,7 +1,8 @@
 {
   "name" : "rimea_06_corner",
   "description" : "",
-  "release" : "2.0",
+  "release" : "2.2",
+  "commithash" : "bef9b7bef5c5755b23c296217e1454e4af9b7d15",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile",
@@ -146,7 +147,21 @@
       "usePsychologyLayer" : false,
       "psychologyLayer" : {
         "perception" : "SimplePerceptionModel",
-        "cognition" : "CooperativeCognitionModel"
+        "cognition" : "CooperativeCognitionModel",
+        "attributesModel" : {
+          "org.vadere.state.attributes.models.psychology.perception.AttributesSimplePerceptionModel" : {
+            "priority" : {
+              "1" : "InformationStimulus",
+              "2" : "ChangeTargetScripted",
+              "3" : "ChangeTarget",
+              "4" : "Threat",
+              "5" : "Wait",
+              "6" : "WaitInArea",
+              "7" : "DistanceRecommendation"
+            }
+          },
+          "org.vadere.state.attributes.models.psychology.cognition.AttributesCooperativeCognitionModel" : { }
+        }
       }
     },
     "topography" : {
@@ -285,20 +300,8 @@
           "perceivedStimuli" : [ ],
           "nextPerceivedStimuli" : [ ]
         },
-        "healthStatus" : {
-          "infectionStatus" : "SUSCEPTIBLE",
-          "lastInfectionStatusUpdateTime" : -1.0,
-          "pathogenAbsorbedLoad" : 0.0,
-          "startBreatheOutPosition" : null,
-          "respiratoryTimeOffset" : 0.0,
-          "breathingIn" : false,
-          "pathogenEmissionCapacity" : 4.0,
-          "pathogenAbsorptionRate" : 5.0E-4,
-          "minInfectiousDose" : 3200.0,
-          "exposedPeriod" : 259000.0,
-          "infectiousPeriod" : 346000.0,
-          "recoveredPeriod" : 1.56E7
-        },
+        "healthStatus" : null,
+        "infectionStatus" : null,
         "groupIds" : [ ],
         "groupSizes" : [ ],
         "agentsInGroup" : [ ],
@@ -354,20 +357,8 @@
           "perceivedStimuli" : [ ],
           "nextPerceivedStimuli" : [ ]
         },
-        "healthStatus" : {
-          "infectionStatus" : "SUSCEPTIBLE",
-          "lastInfectionStatusUpdateTime" : -1.0,
-          "pathogenAbsorbedLoad" : 0.0,
-          "startBreatheOutPosition" : null,
-          "respiratoryTimeOffset" : 0.0,
-          "breathingIn" : false,
-          "pathogenEmissionCapacity" : 4.0,
-          "pathogenAbsorptionRate" : 5.0E-4,
-          "minInfectiousDose" : 3200.0,
-          "exposedPeriod" : 259000.0,
-          "infectiousPeriod" : 346000.0,
-          "recoveredPeriod" : 1.56E7
-        },
+        "healthStatus" : null,
+        "infectionStatus" : null,
         "groupIds" : [ ],
         "groupSizes" : [ ],
         "agentsInGroup" : [ ],
@@ -393,7 +384,6 @@
       "teleporter" : null,
       "attributesCar" : null
     },
-    "stimulusInfos" : [ ],
-    "reactionProbabilities" : [ ]
+    "stimulusInfos" : [ ]
   }
 }

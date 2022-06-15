@@ -4,19 +4,19 @@ import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
 import org.vadere.simulator.control.simulation.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.EventtimePedestrianIdKey;
-import org.vadere.state.health.HealthStatus;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.simulation.FootStep;
 
 import java.util.LinkedList;
+import java.util.Locale;
 
 /**
- * Log {@link Pedestrian}'s current {@link HealthStatus}
+ * Log {@link Pedestrian}'s current {@link org.vadere.state.health.ExposureModelHealthStatus}
  */
 
 @DataProcessorClass()
 public class FootStepHealthStatusProcessor extends DataProcessor<EventtimePedestrianIdKey, String> {
-    public static String[] HEADERS = {"infectionStatus", "absorbedPathogenLoad", "minInfectiousDose"};
+    public static String[] HEADERS = {"isInfectious", "degreeOfExposure"};
 
     public FootStepHealthStatusProcessor() {
         super(HEADERS);
@@ -37,10 +37,9 @@ public class FootStepHealthStatusProcessor extends DataProcessor<EventtimePedest
     }
 
     private String healthStatusToString(Pedestrian pedestrian) {
-        String statusAsString = String.format("%s %f %f",
-                pedestrian.getInfectionStatus().name(),
-                pedestrian.getPathogenAbsorbedLoad(),
-                pedestrian.getMinInfectiousDose()
+        String statusAsString = String.format(Locale.US, "%s %f",
+                pedestrian.isInfectious(),
+                pedestrian.getDegreeOfExposure()
         );
 
         return statusAsString;

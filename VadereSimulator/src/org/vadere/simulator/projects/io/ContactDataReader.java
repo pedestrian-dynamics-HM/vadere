@@ -1,7 +1,6 @@
 package org.vadere.simulator.projects.io;
 
 import org.vadere.simulator.projects.dataprocessing.outputfile.OutputFile;
-import org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor;
 import tech.tablesaw.api.Table;
 import tech.tablesaw.io.csv.CsvReadOptions;
 

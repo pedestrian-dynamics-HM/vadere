@@ -1,13 +1,12 @@
 package org.vadere.simulator.control.psychology.perception.models;
 
+import org.vadere.state.attributes.models.psychology.perception.AttributesPerceptionModel;
+import org.vadere.state.attributes.models.psychology.perception.AttributesSimplePerceptionModel;
 import org.vadere.state.psychology.perception.types.*;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
-import org.vadere.util.geometry.shapes.VPoint;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -17,12 +16,15 @@ import java.util.stream.Collectors;
  */
 public class SimplePerceptionModel extends PerceptionModel {
 
+    private AttributesSimplePerceptionModel attributes;
     private Topography topography;
 
     @Override
     public void initialize(Topography topography, final double simTimeStepLengh) {
         this.topography = topography;
+        this.attributes = new AttributesSimplePerceptionModel();
     }
+
 
     @Override
     public void update(HashMap<Pedestrian, List<Stimulus>> pedSpecificStimuli) {
@@ -30,6 +32,16 @@ public class SimplePerceptionModel extends PerceptionModel {
             Stimulus mostImportantStimulus = rankChangeTargetAndThreatHigherThanWait(pedSpecificStimuli.get(pedestrian), pedestrian);
             pedestrian.setMostImportantStimulus(mostImportantStimulus);
         }
+    }
+
+    @Override
+    public void setAttributes(AttributesPerceptionModel attributes) {
+        this.attributes = (AttributesSimplePerceptionModel) attributes;
+    }
+
+    @Override
+    public AttributesSimplePerceptionModel getAttributes() {
+        return this.attributes;
     }
 
 
@@ -41,12 +53,29 @@ public class SimplePerceptionModel extends PerceptionModel {
                 .collect(Collectors.toList())
                 .get(0);
 
+        LinkedList<Stimulus> stimuliSorted = new LinkedList<>();
+        stimuliSorted.add(mostImportantStimulus);
+
+        // first element in stimuliSorted is the most important stimulus
+
+        List<String> attr = attributes.getSortedPriorityQueue().values().stream().collect(Collectors.toList());
+        Collections.reverse(attr);
+        for (String typeName : attr){
+            Stimulus stimulus = StimulusFactory.stringToStimulus(typeName);
+            if (stimulus != null) {
+                stimuliSorted.addAll(stimuli.stream().filter(s -> s.getClass() == stimulus.getClass()).collect(Collectors.toList()));
+            }
+        }
+        // add ElapsedTime stimulus as last element, since any other stimulus is more important
+
+
+
+         /* depracted
         List<Stimulus> waitStimuli = stimuli.stream().filter(stimulus -> stimulus instanceof Wait).collect(Collectors.toList());
         List<Stimulus> waitInAreaStimuli = stimuli.stream().filter(stimulus -> stimulus instanceof WaitInArea).collect(Collectors.toList());
         List<Stimulus> threatStimuli = stimuli.stream().filter(stimulus -> stimulus instanceof Threat).collect(Collectors.toList());
         List<Stimulus> changeTargetStimuli = stimuli.stream().filter(stimulus -> stimulus instanceof ChangeTarget).collect(Collectors.toList());
         List<Stimulus> changeTargetScriptedStimuli = stimuli.stream().filter(stimulus -> stimulus instanceof ChangeTargetScripted).collect(Collectors.toList());
-        // place List changepersonalspace here
         List<Stimulus> distanceRecommendationStimuli = stimuli.stream().filter(stimulus -> stimulus instanceof DistanceRecommendation).collect(Collectors.toList());
 
 
@@ -63,9 +92,11 @@ public class SimplePerceptionModel extends PerceptionModel {
         }else if (distanceRecommendationStimuli.size() >= 1){
             mostImportantStimulus = distanceRecommendationStimuli.get(0);
         }
-        else if(true){} // place changepersonalspace here
+        else if(true){} */
 
-        return mostImportantStimulus;
+        return stimuliSorted.getLast();
+
+
     }
 
 

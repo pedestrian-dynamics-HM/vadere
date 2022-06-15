@@ -1,7 +1,8 @@
 {
   "name" : "g2_osm_calibration_minStepSize_0_11",
   "description" : "",
-  "release" : "2.0",
+  "release" : "2.2",
+  "commithash" : "bef9b7bef5c5755b23c296217e1454e4af9b7d15",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -227,7 +228,21 @@
       "usePsychologyLayer" : false,
       "psychologyLayer" : {
         "perception" : "SimplePerceptionModel",
-        "cognition" : "CooperativeCognitionModel"
+        "cognition" : "CooperativeCognitionModel",
+        "attributesModel" : {
+          "org.vadere.state.attributes.models.psychology.perception.AttributesSimplePerceptionModel" : {
+            "priority" : {
+              "1" : "InformationStimulus",
+              "2" : "ChangeTargetScripted",
+              "3" : "ChangeTarget",
+              "4" : "Threat",
+              "5" : "Wait",
+              "6" : "WaitInArea",
+              "7" : "DistanceRecommendation"
+            }
+          },
+          "org.vadere.state.attributes.models.psychology.cognition.AttributesCooperativeCognitionModel" : { }
+        }
       }
     },
     "topography" : {
@@ -292,6 +307,8 @@
       } ],
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],
+      "aerosolClouds" : [ ],
+      "droplets" : [ ],
       "sources" : [ {
         "id" : -1,
         "shape" : {
@@ -341,15 +358,20 @@
         "repeat" : false,
         "waitTimeBetweenRepetition" : 0.0
       },
-      "stimuli" : [ {
-        "type" : "WaitInArea",
-        "area" : {
+      "location" : {
+        "areas" : [ {
           "x" : 45.5,
           "y" : 0.0,
           "width" : 5.0,
           "height" : 10.0,
           "type" : "RECTANGLE"
-        }
+        } ]
+      },
+      "subpopulationFilter" : {
+        "affectedPedestrianIds" : [ ]
+      },
+      "stimuli" : [ {
+        "type" : "Wait"
       } ]
     } ]
   }
