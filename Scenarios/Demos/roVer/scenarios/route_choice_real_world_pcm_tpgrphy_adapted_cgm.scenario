@@ -882,7 +882,7 @@
         "id" : 2
       }, {
         "shape" : {
-          "x" : 178.3,
+          "x" : 178.5,
           "y" : 209.6,
           "width" : 5.2,
           "height" : 3.9,
@@ -893,7 +893,7 @@
         "shape" : {
           "x" : 178.4,
           "y" : 213.6,
-          "width" : 2.8,
+          "width" : 2.65,
           "height" : 39.8,
           "type" : "RECTANGLE"
         },
@@ -902,7 +902,7 @@
         "shape" : {
           "x" : 178.5,
           "y" : 280.7,
-          "width" : 2.7,
+          "width" : 2.65,
           "height" : 15.5,
           "type" : "RECTANGLE"
         },
@@ -1201,9 +1201,9 @@
         },
         "interSpawnTimeDistribution" : "constant",
         "distributionParameters" : {
-          "updateFrequency" : 3.0
+          "updateFrequency" : 4.0
         },
-        "spawnNumber" : 2,
+        "spawnNumber" : 3,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
         "endTime" : 20000.0,
