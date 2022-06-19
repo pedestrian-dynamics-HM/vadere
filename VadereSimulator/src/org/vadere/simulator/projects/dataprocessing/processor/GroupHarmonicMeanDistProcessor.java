@@ -48,7 +48,7 @@ public class GroupHarmonicMeanDistProcessor extends GroupDistProcessor {
                     .map(currGroupCenter::distance)
                     .collect(Collectors.toList());
             for (Double d : distances) {
-                weightedMeanDistance += 1 / d;
+                weightedMeanDistance += 1 / d; // TODO not correct and better use sth else than centroid
             }
             return Optional.of(weightedMeanDistance);
         } else {
