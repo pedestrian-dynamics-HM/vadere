@@ -16,9 +16,9 @@
       "filename" : "pos_out.txt",
       "processors" : [ 6, 7, 9, 15 ]
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile",
-      "filename" : "flow_out.txt",
-      "processors" : [ 10, 11, 12, 13, 14 ]
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepGroupIdOutputFile",
+      "filename" : "group_out.txt",
+      "processors" : [ 16 ]
     } ],
     "processors" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor",
@@ -31,7 +31,7 @@
       "id" : 3,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesAreaDensityCountingProcessor",
       "attributes" : {
-        "measurementAreaId" : 1
+        "measurementAreaId" : 5
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepGroupIDProcessor",
@@ -41,7 +41,7 @@
       "id" : 5,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesAreaSpeedProcessor",
       "attributes" : {
-        "measurementAreaId" : 1,
+        "measurementAreaId" : 5,
         "pedestrianPositionProcessorId" : 7,
         "pedestrianVelocityProcessorId" : 6
       }
@@ -78,78 +78,15 @@
         "type" : "TARGET"
       }
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianLineCrossProcessor",
-      "id" : 10,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianLineCrossProcessor",
-      "attributes" : {
-        "p1" : {
-          "x" : 185.8,
-          "y" : 190.1
-        },
-        "p2" : {
-          "x" : 193.0,
-          "y" : 192.1
-        }
-      }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianLineCrossProcessor",
-      "id" : 11,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianLineCrossProcessor",
-      "attributes" : {
-        "p1" : {
-          "x" : 190.0,
-          "y" : 184.7
-        },
-        "p2" : {
-          "x" : 193.4,
-          "y" : 185.2
-        }
-      }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianLineCrossProcessor",
-      "id" : 12,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianLineCrossProcessor",
-      "attributes" : {
-        "p1" : {
-          "x" : 191.2,
-          "y" : 174.1
-        },
-        "p2" : {
-          "x" : 194.3,
-          "y" : 174.1
-        }
-      }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianLineCrossProcessor",
-      "id" : 13,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianLineCrossProcessor",
-      "attributes" : {
-        "p1" : {
-          "x" : 191.9,
-          "y" : 166.7
-        },
-        "p2" : {
-          "x" : 194.2,
-          "y" : 166.7
-        }
-      }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianLineCrossProcessor",
-      "id" : 14,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianLineCrossProcessor",
-      "attributes" : {
-        "p1" : {
-          "x" : 188.2,
-          "y" : 158.6
-        },
-        "p2" : {
-          "x" : 191.3,
-          "y" : 158.2
-        }
-      }
-    }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianGroupIDProcessor",
       "id" : 15
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.AreaGroupMetaDataProcessor",
+      "id" : 16,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesGroupMetaDataProcessor",
+      "attributes" : {
+        "measurementAreaId" : -1
+      }
     } ],
     "isTimestamped" : true,
     "isWriteMetaData" : true
@@ -211,11 +148,12 @@
       },
       "org.vadere.state.attributes.models.AttributesCGM" : {
         "groupMemberRepulsionFactor" : 0.01,
-        "leaderAttractionFactor" : 0.003
+        "leaderAttractionFactor" : 0.003,
+        "lostMembers" : true
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 600.0,
+      "finishTime" : 300.0,
       "simTimeStepLength" : 0.4,
       "realTimeSimTimeRatio" : 0.1,
       "writeSimulationData" : true,
@@ -911,6 +849,24 @@
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
+            "x" : 223.5,
+            "y" : 237.9
+          }, {
+            "x" : 232.6,
+            "y" : 286.0
+          }, {
+            "x" : 243.3,
+            "y" : 284.0
+          }, {
+            "x" : 230.6,
+            "y" : 237.5
+          } ]
+        },
+        "id" : 33
+      }, {
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
             "x" : 177.87208846584548,
             "y" : 246.75720884658458
           }, {
@@ -1133,20 +1089,50 @@
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
-            "x" : 223.5,
-            "y" : 237.9
+            "x" : 177.63076923076923,
+            "y" : 218.0
           }, {
-            "x" : 232.6,
-            "y" : 286.0
+            "x" : 177.9825097357178,
+            "y" : 259.9157435063708
           }, {
-            "x" : 243.3,
-            "y" : 284.0
+            "x" : 177.98250973572038,
+            "y" : 259.9157435063708
           }, {
-            "x" : 230.6,
-            "y" : 237.5
+            "x" : 180.97097107622812,
+            "y" : 259.99651273178995
+          }, {
+            "x" : 180.97097107622784,
+            "y" : 259.99651273178995
+          }, {
+            "x" : 181.0435950977262,
+            "y" : 246.56832631863654
+          }, {
+            "x" : 181.1823475860292,
+            "y" : 220.9124037604779
+          }, {
+            "x" : 188.8090247575892,
+            "y" : 218.9980814261362
+          }, {
+            "x" : 188.86322943923525,
+            "y" : 219.23157273298986
+          }, {
+            "x" : 191.25854104713522,
+            "y" : 218.67818304246242
+          }, {
+            "x" : 191.25854104713528,
+            "y" : 218.67818304246242
+          }, {
+            "x" : 193.64830417411844,
+            "y" : 218.01435995163376
+          }, {
+            "x" : 193.6483041741184,
+            "y" : 218.01435995163376
+          }, {
+            "x" : 193.64501620324236,
+            "y" : 218.0
           } ]
         },
-        "id" : 33
+        "id" : 5
       } ],
       "stairs" : [ ],
       "targets" : [ {
@@ -1534,7 +1520,7 @@
         },
         "reachDistance" : 0.0,
         "changeAlgorithmType" : "SELECT_LIST",
-        "nextTarget" : [ 692 ],
+        "nextTarget" : [ 102 ],
         "probabilityToChangeTarget" : [ 1.0 ]
       }, {
         "id" : 23,

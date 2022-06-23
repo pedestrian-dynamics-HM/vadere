@@ -30,7 +30,7 @@ public class AreaGroupMetaDataProcessor extends DataProcessor<TimestepGroupIdKey
     private MeasurementArea measurementArea;
 
     public AreaGroupMetaDataProcessor() {
-        super("sim_time", "ped_total", "memb_in_area", "centroid_x", "centroid_y");
+        super("sim_time", "ped_total", "memb_in_area", "peds_lost", "centroid_x", "centroid_y");
         setAttributes(new AttributesGroupMetaDataProcessor());
     }
 
@@ -38,7 +38,9 @@ public class AreaGroupMetaDataProcessor extends DataProcessor<TimestepGroupIdKey
     public void init(final ProcessorManager manager) {
         super.init(manager);
         AttributesAreaProcessor att = (AttributesAreaProcessor) this.getAttributes();
-        this.measurementArea = manager.getMeasurementArea(att.getMeasurementAreaId(), false);
+        if (att.getMeasurementAreaId() != -1) {
+            this.measurementArea = manager.getMeasurementArea(att.getMeasurementAreaId(), false);
+        }
     }
 
     @Override
@@ -50,13 +52,15 @@ public class AreaGroupMetaDataProcessor extends DataProcessor<TimestepGroupIdKey
         Collection<Pedestrian> pedestrians = state.getTopography().getPedestrianDynamicElements().getElements();
 
         // the pedestrians in the measurement area
-        List<Pedestrian> pedInArea = pedestrians.stream()
-                .filter(p -> this.measurementArea.getShape().contains(p.getPosition()))
-                .collect(Collectors.toList());
+        if (measurementArea == null) {
+            pedestrians = pedestrians.stream()
+                    .filter(p -> this.measurementArea.getShape().contains(p.getPosition()))
+                    .collect(Collectors.toList());
+        }
 
         // compute the id of groups represented in the measurement area
         Set<Integer> groupIdsInArea = new HashSet<>();
-        for (Pedestrian p : pedInArea) {
+        for (Pedestrian p : pedestrians) {
             LinkedList<Integer> groupIds = p.getGroupIds();
             groupIdsInArea.addAll(groupIds);
         }
@@ -75,9 +79,13 @@ public class AreaGroupMetaDataProcessor extends DataProcessor<TimestepGroupIdKey
 
             for (CentroidGroup currentGroup: groupsInArea) {
                 List<Pedestrian> membersInArea = currentGroup.getMembers().stream()
-                        .filter(pedInArea::contains)
+                        .filter(pedestrians::contains)
                         .collect(Collectors.toList());
-                AreaGroupMetaData data = new AreaGroupMetaData(currentGroup, membersInArea.size(), membersInArea, pedInArea.size());
+                long pedsLostInArea = membersInArea.stream()
+                        .filter(ped -> currentGroup.getLostMembers().contains(ped))
+                        .count();
+                AreaGroupMetaData data = new AreaGroupMetaData(currentGroup, membersInArea.size(), membersInArea,
+                        pedestrians.size(), pedsLostInArea);
                 data.setSimTime(simTime);
                 try {
                     //compute the convex hull for all groups and the centroid of the resulting polygons -> problem might be that
@@ -98,15 +106,15 @@ public class AreaGroupMetaDataProcessor extends DataProcessor<TimestepGroupIdKey
     public String[] toStrings(TimestepGroupIdKey key) {
         AreaGroupMetaData groupInArea = this.getValue(key);
         if(groupInArea == null) {
-            return new String[]{"NA", "NA", "NA", "NA", "NA"};
+            return new String[]{"NA", "NA", "NA", "NA", "NA", "NA"};
         }
         else {
             if (groupInArea.getCentroid().isEmpty()) {
                 return new String[]{Double.toString(groupInArea.getSimTime()), Integer.toString(groupInArea.getTotalPedestriansInArea()),
-                        Integer.toString(groupInArea.getSizeInArea()), "NA", "NA"};
+                        Integer.toString(groupInArea.getSizeInArea()), Long.toString(groupInArea.getPedestriansLost()), "NA", "NA"};
             } else {
                 return new String[]{Double.toString(groupInArea.getSimTime()), Integer.toString(groupInArea.getTotalPedestriansInArea()),
-                        Integer.toString(groupInArea.getSizeInArea()),
+                        Integer.toString(groupInArea.getSizeInArea()), Long.toString(groupInArea.getPedestriansLost()),
                         Double.toString(groupInArea.getCentroid().get().x), Double.toString(groupInArea.getCentroid().get().y)};
             }
         }

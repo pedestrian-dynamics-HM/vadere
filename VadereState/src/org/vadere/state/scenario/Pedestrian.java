@@ -23,6 +23,19 @@ public class Pedestrian extends Agent {
     public static double PEDESTRIAN_MAX_SPEED_METER_PER_SECOND = 12.0;
     public static final double INVALID_NEXT_EVENT_TIME = -1.0;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Pedestrian that = (Pedestrian) o;
+        return this.getId() == that.getId();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId());
+    }
+
     // Variables
     // TODO: All these variables belong to Isabella's "social identity" branch
     //   which was never merged with "master". On "master", these variables should be unused.

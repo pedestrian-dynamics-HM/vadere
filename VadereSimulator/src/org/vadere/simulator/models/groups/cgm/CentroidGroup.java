@@ -1,10 +1,6 @@
 package org.vadere.simulator.models.groups.cgm;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -33,6 +29,7 @@ public class CentroidGroup implements Group {
     private double groupVelocity;
 
     private final LinkedList<Pedestrian> lostMembers;
+    private int lostMemberReevaluationCountdown;
     private Map<Pedestrian, Map<Pedestrian, VPoint>> lastVision;
     private final Map<Pedestrian, Integer> noVisionOfLeaderCount;
     private IPotentialFieldTarget potentialFieldTarget;
@@ -44,10 +41,11 @@ public class CentroidGroup implements Group {
         this.size = size;
         this.model = model;
         this.potentialFieldTarget = model.getPotentialFieldTarget();
-        members = new ArrayList<>();
+        this.members = new ArrayList<>();
 
         this.lastVision = new HashMap<>();
         this.lostMembers = new LinkedList<>();
+        this.lostMemberReevaluationCountdown = 0;
         this.noVisionOfLeaderCount = new HashMap<>();
     }
 
@@ -103,7 +101,7 @@ public class CentroidGroup implements Group {
     public boolean isFull() {
         boolean result = true;
 
-        if (members.size() < size) {
+        if ((members.size() + lostMembers.size()) < size) {
             result = false;
         }
 
@@ -176,7 +174,6 @@ public class CentroidGroup implements Group {
 
     @Override
     public void addMember(Pedestrian ped) {
-
         if (members.size() == 0) {
             this.groupVelocity = ped.getFreeFlowSpeed();
         } else if (isFull()) {
@@ -185,7 +182,6 @@ public class CentroidGroup implements Group {
 
         lastVision.put(ped, new HashMap<>());
         noVisionOfLeaderCount.put(ped, 0);
-
         members.add(ped);
         initGroupVelocity(); // ensure same speed for all members.
 
@@ -266,9 +262,75 @@ public class CentroidGroup implements Group {
             double potential2 = potentialFieldTarget.getPotential(p.getRightPosition(), p.getRight());
             double potentialDiff = Math.abs(potential1 - potential2);
             ret.add(Pair.of(p, potentialDiff));
-
         }
         return ret;
+    }
+
+    private Map<Pedestrian, Double> getAveragePotentialDiff() {
+        ArrayList<Pair<PedestrianPair, Double>> potentialDiffs = getPotentialDist();
+        HashMap<Pedestrian, Double> potentialDiffOthers = new HashMap<>();
+        for (Pedestrian member : members) {
+            double averageDiff = potentialDiffs.stream()
+                    .filter(pair -> pair.getKey().getLeftId() == member.getId())
+                    .map(pair -> pair.getRight())
+                    .mapToDouble(Double::doubleValue)
+                    .average().orElse(0.0);
+            potentialDiffOthers.put(member, averageDiff);
+        }
+        return potentialDiffOthers;
+    }
+
+    private Map<Pedestrian, Set<Pedestrian>> getClosePedestrians(double distance) {
+        ArrayList<Pair<PedestrianPair, Double>> potentialDiffs = getPotentialDist();
+        Map<Pedestrian, Set<Pedestrian>> result = new HashMap<>();
+        for (Pedestrian ped : members) {
+            Set<Pedestrian> closePeds = potentialDiffs.stream()
+                    .filter(pair -> pair.getKey().getLeftId() == ped.getId())
+                    .filter(pair -> Math.abs(pair.getRight()) < distance)
+                    .map(pair -> pair.getKey().getRight())
+                    .collect(Collectors.toSet());
+            result.put(ped, closePeds);
+        }
+        return result;
+    }
+
+    private List<Set<Pedestrian>> getPedClusters() {
+        Map<Pedestrian, Set<Pedestrian>> closePeds = getClosePedestrians(8.0);
+        List<Set<Pedestrian>> closeClusters = new ArrayList<>(closePeds.values());
+        boolean alldistinct = false;
+        while (!alldistinct) {
+            closeClusters = closeClusters.stream()
+                    .filter(setPeds -> !setPeds.isEmpty())
+                    .collect(Collectors.toList());
+            alldistinct = true;
+            for (Set<Pedestrian> cluster : closeClusters) {
+                for (Set<Pedestrian> cluster2 : closeClusters) {
+                    if (!cluster2.equals(cluster) && !Collections.disjoint(cluster, cluster2)) {
+                        cluster.addAll(cluster2);
+                        cluster2.clear();
+                        alldistinct = false;
+                    }
+                }
+            }
+        }
+        return closeClusters;
+    }
+
+    public void reevaluateLostMember(Pedestrian ped) {
+        if (Math.abs(getRelativeDistanceCentroid(ped)) < 8) {
+            wakeFromLostMember(ped);
+        }
+        lostMemberReevaluationCountdown--;
+
+        if (this.lostMembers.size() > this.members.size() / 2 + 1 && lostMemberReevaluationCountdown <= 0) {
+            Map<Boolean, List<Pedestrian>> partitions = members.stream()
+                    .collect(Collectors.partitioningBy(p -> Math.abs(getRelativeDistanceCentroid(p)) < 8));
+            if (partitions.get(true).size() > partitions.get(false).size()) {
+                lostMembers.clear();
+                lostMembers.addAll(partitions.get(false));
+            }
+            lostMemberReevaluationCountdown = (lostMembers.size()) * 10;
+        }
     }
 
     /**
@@ -295,6 +357,9 @@ public class CentroidGroup implements Group {
 
     }
 
+    public LinkedList<Pedestrian> getLostMembers() {
+        return lostMembers;
+    }
 
     void setLastVision(Pedestrian ped, Pedestrian p) {
         lastVision.get(ped).put(p, p.getPosition());
@@ -305,6 +370,10 @@ public class CentroidGroup implements Group {
     }
 
     boolean isLostMember(Pedestrian p) {
+        if (!lostMembers.isEmpty()) {
+            List<Pedestrian> l = lostMembers;
+            System.out.println("Test33333333333333333333333333333 - Lost Members");
+        }
         return lostMembers.contains(p);
     }
 

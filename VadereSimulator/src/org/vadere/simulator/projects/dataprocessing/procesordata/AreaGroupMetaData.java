@@ -16,13 +16,16 @@ public class AreaGroupMetaData {
     private boolean centroidInArea;
     private int totalPedestriansInArea;
     private double simTime;
+    private long pedestriansLost;
 
-    public AreaGroupMetaData(Group group, int sizeInArea, List<Pedestrian> membersInArea, int totalPedestriansInArea) {
+    public AreaGroupMetaData(Group group, int sizeInArea, List<Pedestrian> membersInArea, int totalPedestriansInArea,
+                             long pedestriansLost) {
         this.group = group;
         this.sizeInArea = sizeInArea;
         this.membersInArea = membersInArea;
         this.totalPedestriansInArea = totalPedestriansInArea;
         this.simTime = 0;
+        this.pedestriansLost = pedestriansLost;
     }
 
     public double getSimTime() {
@@ -72,5 +75,13 @@ public class AreaGroupMetaData {
 
     public void setCentroidInArea(boolean centroidInArea) {
         this.centroidInArea = centroidInArea;
+    }
+
+    public long getPedestriansLost() {
+        return pedestriansLost;
+    }
+
+    public void setPedestriansLost(int pedestriansLost) {
+        this.pedestriansLost = pedestriansLost;
     }
 }

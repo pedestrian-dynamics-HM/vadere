@@ -11,6 +11,7 @@ public class AttributesCGM extends Attributes {
 
 	private double groupMemberRepulsionFactor = 0.01;
 	private double leaderAttractionFactor = 0.003;
+	private boolean lostMembers = true;
 
 	/**
 	 *  moved to org.vadere.state.attributes.scenario.AttributeSource class to allow
@@ -26,5 +27,7 @@ public class AttributesCGM extends Attributes {
 	public double getLeaderAttractionFactor() {
 		return leaderAttractionFactor;
 	}
+
+	public boolean isLostMembers(){ return lostMembers; }
 
 }
