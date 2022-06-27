@@ -24,7 +24,7 @@ public class CentroidGroupStepSizeAdjuster implements StepSizeAdjuster {
 
         if (group != null) {
             if (!group.isLostMember(ped)) {
-                aheadDistance = group.getRelativeDistanceCentroid(ped);
+                aheadDistance = group.getRelativeDistanceCentroid(ped, false);
 
                 // TODO [priority=low] [task=refactoring] move Parameters to AttributesCGM
                 if (aheadDistance > 8) {

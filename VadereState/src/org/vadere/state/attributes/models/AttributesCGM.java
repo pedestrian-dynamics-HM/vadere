@@ -13,6 +13,8 @@ public class AttributesCGM extends Attributes {
 	private double leaderAttractionFactor = 0.003;
 	private boolean lostMembers = true;
 
+	private int waitBehaviourRelevantAgentsFactor = -1;
+
 	/**
 	 *  moved to org.vadere.state.attributes.scenario.AttributeSource class to allow
 	 *  different groupDistributions for each source
@@ -30,4 +32,11 @@ public class AttributesCGM extends Attributes {
 
 	public boolean isLostMembers(){ return lostMembers; }
 
+	public int getWaitBehaviourRelevantAgentsFactor() {
+		return waitBehaviourRelevantAgentsFactor;
+	}
+
+	public void setWaitBehaviourRelevantAgentsFactor(int waitBehaviourRelevantAgentsFactor) {
+		this.waitBehaviourRelevantAgentsFactor = waitBehaviourRelevantAgentsFactor;
+	}
 }

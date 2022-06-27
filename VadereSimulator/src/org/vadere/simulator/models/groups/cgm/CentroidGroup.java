@@ -29,7 +29,8 @@ public class CentroidGroup implements Group {
     private double groupVelocity;
 
     private final LinkedList<Pedestrian> lostMembers;
-    private int lostMemberReevaluationCountdown;
+    private int reevaluateAllMembersCountdown;
+
     private Map<Pedestrian, Map<Pedestrian, VPoint>> lastVision;
     private final Map<Pedestrian, Integer> noVisionOfLeaderCount;
     private IPotentialFieldTarget potentialFieldTarget;
@@ -45,7 +46,7 @@ public class CentroidGroup implements Group {
 
         this.lastVision = new HashMap<>();
         this.lostMembers = new LinkedList<>();
-        this.lostMemberReevaluationCountdown = 0;
+        this.reevaluateAllMembersCountdown = 0;
         this.noVisionOfLeaderCount = new HashMap<>();
     }
 
@@ -97,6 +98,12 @@ public class CentroidGroup implements Group {
         return members.contains(ped);
     }
 
+    public Optional<Pedestrian> getMember(int pedId) {
+        return members.stream()
+                .filter(ped -> ped.getId() == pedId)
+                .findAny();
+    }
+
     @Override
     public boolean isFull() {
         boolean result = true;
@@ -113,7 +120,7 @@ public class CentroidGroup implements Group {
         return size - members.size();
     }
 
-    public VPoint getCentroid() {
+    public VPoint getCentroid(boolean with_lost) {
 
 		/*double sumx = 0.0;
 		double sumy = 0.0;
@@ -129,15 +136,18 @@ public class CentroidGroup implements Group {
 
 		return new VPoint(result[0], result[1]);*/
 
-        if (members.size() >= 3) {
-            List<VPoint> pointsOfGroup = members.stream()
-                    .map(Agent::getPosition)
-                    .collect(Collectors.toList());
+        if (members.size() >= 3 && (with_lost || members.size() - lostMembers.size() >= 3)) {
+            List<VPoint> pointsOfGroup = new ArrayList<>();
+            for (Pedestrian ped : members) {
+                if (!isLostMember(ped) || with_lost) {
+                    pointsOfGroup.add(ped.getPosition());
+                }
+            }
             VPolygon convexPolygon = new GrahamScan(pointsOfGroup).getPolytope();
             VPoint centroid = convexPolygon.getCentroid();
             return centroid;
         } else {
-            throw new IllegalArgumentException("group too small");
+            throw new IllegalArgumentException("cannot compute centroid with <= 2 points");
         }
     }
 
@@ -233,10 +243,19 @@ public class CentroidGroup implements Group {
     }
 
     public boolean isCentroidWithinObstacle() {
-        // alternative: compute the centroid, loop through obstacles and check if shape.contains(centroid)
-        return getPairIntersectObstacle()
-                .stream().map(pedestrianPairBooleanPair -> pedestrianPairBooleanPair.getValue())
-                .anyMatch(val -> val);
+        if (members.size() - lostMembers.size() <= 2) {
+            return getPairIntersectObstacle()
+                    .stream()
+                    .filter(pair -> !isLostMember(pair.getKey().getLeft()) && !isLostMember(pair.getKey().getRight()))
+                    .map(pedestrianPairBooleanPair -> pedestrianPairBooleanPair.getValue())
+                    .anyMatch(val -> val);
+        } else {
+            VPoint centroid = getCentroid(false);
+            return model.getTopography().getObstacles()
+                    .stream()
+                    .map(Obstacle::getShape)
+                    .anyMatch(s -> s.contains(centroid));
+        }
     }
 
 
@@ -317,20 +336,58 @@ public class CentroidGroup implements Group {
     }
 
     public void reevaluateLostMember(Pedestrian ped) {
-        if (Math.abs(getRelativeDistanceCentroid(ped)) < 8) {
+        if (isGroupTarget(ped.getNextTargetId())) {
             wakeFromLostMember(ped);
-        }
-        lostMemberReevaluationCountdown--;
-
-        if (this.lostMembers.size() > this.members.size() / 2 + 1 && lostMemberReevaluationCountdown <= 0) {
-            Map<Boolean, List<Pedestrian>> partitions = members.stream()
-                    .collect(Collectors.partitioningBy(p -> Math.abs(getRelativeDistanceCentroid(p)) < 8));
-            if (partitions.get(true).size() > partitions.get(false).size()) {
-                lostMembers.clear();
-                lostMembers.addAll(partitions.get(false));
+            // take 7 (instead of 8) to reinsert lost member in members to avoid fluctuations
+            if (Math.abs(getRelativeDistanceCentroid(ped, false)) > 7) {
+                setLostMember(ped);
             }
-            lostMemberReevaluationCountdown = (lostMembers.size()) * 10;
         }
+        reevaluateAllMembersCountdown--;
+        if (reevaluateAllMembersCountdown <= 0) {
+            reevaluateAll();
+        }
+    }
+
+    private void reevaluateAll() {
+        if (this.lostMembers.size() > this.members.size() / 2) {
+            List<Pedestrian> membersMostCommonTarget = getMembersMostCommonTarget();
+            if (membersMostCommonTarget.size() > this.members.size() / 2) {
+
+                Map<Boolean, List<Pedestrian>> partitions = membersMostCommonTarget.stream()
+                        .collect(Collectors.partitioningBy(p -> Math.abs(getRelativeDistanceCentroid(p,
+                                true)) < 8));
+                if (partitions.get(true).size() > lostMembers.size()) {
+                    lostMembers.clear();
+                    lostMembers.addAll(partitions.get(false));
+                    lostMembers.addAll(members.stream()
+                            .filter(m -> !membersMostCommonTarget.contains(m)).collect(Collectors.toList()));
+                }
+            }
+            reevaluateAllMembersCountdown = (lostMembers.size()) * 10;
+        }
+    }
+
+    private List<Pedestrian> getMembersMostCommonTarget() {
+        List<Integer> targetIds = members.stream().map(m -> m.getNextTargetId()).collect(Collectors.toList());
+        int mostCommonTarget = -1;
+        for (int id : new HashSet<>(targetIds)) {
+            int frequencyTarget = Collections.frequency(targetIds, id);
+            if (frequencyTarget > mostCommonTarget) {
+                mostCommonTarget = frequencyTarget;
+            }
+        }
+        int finalMostCommonTarget = mostCommonTarget;
+        return members.stream()
+                .filter(member -> member.getNextTargetId() == finalMostCommonTarget)
+                .collect(Collectors.toList());
+    }
+
+    public boolean isGroupTarget(int targetId) {
+        Optional<Pedestrian> ped = members.stream()
+                .filter(memb -> !isLostMember(memb))
+                .findAny();
+        return ped.map(pedestrian -> pedestrian.getNextTargetId() == targetId).orElse(true);
     }
 
     /**
@@ -372,7 +429,6 @@ public class CentroidGroup implements Group {
     boolean isLostMember(Pedestrian p) {
         if (!lostMembers.isEmpty()) {
             List<Pedestrian> l = lostMembers;
-            System.out.println("Test33333333333333333333333333333 - Lost Members");
         }
         return lostMembers.contains(p);
     }
@@ -405,16 +461,21 @@ public class CentroidGroup implements Group {
      * @param ped Pedestrian
      * @return Distance to group centroid
      */
-    public double getRelativeDistanceCentroid(Pedestrian ped) {
+    public double getRelativeDistanceCentroid(Pedestrian ped, boolean includeLostMembers) {
         double result = 0.0;
         VPoint pedLocation = ped.getPosition();
 
         double potentialSum = 0.0;
         int size = 0;
-        for (Pedestrian p : members) {
-            if (!ped.equals(p) && !isLostMember(p)) {
-                potentialSum += potentialFieldTarget.getPotential(p.getPosition(), p);
-                size++;
+        List<Pedestrian> membersSameTarget = members.stream()
+                .filter(member -> member.getNextTargetId() == ped.getNextTargetId())
+                .collect(Collectors.toList());
+        for (Pedestrian p : membersSameTarget) {
+            if (!ped.equals(p)) {
+                if (!isLostMember(p) || includeLostMembers) {
+                    potentialSum += potentialFieldTarget.getPotential(p.getPosition(), p);
+                    size++;
+                }
             }
         }
 
@@ -462,15 +523,9 @@ public class CentroidGroup implements Group {
         return potentialFieldTarget;
     }
 
-    public void setNextTarget(int nextTargetListIndex) {
-        for (Pedestrian p : this.getMembers()) {
-            p.setNextTargetListIndex(nextTargetListIndex);
-        }
-    }
-
     public void setGroupTargetList(LinkedList<Integer> targetIds, int agentId) {
         for (Pedestrian p : this.getMembers()) {
-            if (p.getId() != agentId) {
+            if (p.getId() != agentId && !isLostMember(p)) {
                 p.setTargets(targetIds);
                 p.setIsCurrentTargetAnAgent(false);
                 p.setNextTargetListIndex(0);
@@ -485,6 +540,11 @@ public class CentroidGroup implements Group {
      */
     @Override
     public void agentTargetsChanged(LinkedList<Integer> targetIds, int agentId) {
+//        for (Pedestrian member: members) {  // TODO Unit Tests need to be adjusted
+//            if (member.getId() != agentId && !member.getTargets().equals(targetIds)) {
+//                member.setTargets(targetIds);
+//            }
+//        }
     }
 
     /**
@@ -495,13 +555,18 @@ public class CentroidGroup implements Group {
      */
     @Override
     public void agentNextTargetSet(double nextSpeed, int agentId) {
-        for (Pedestrian p : this.getMembers()) {
-            if (p.getId() != agentId) {
-                if (p.getNextTargetListIndex() < (p.getTargets().size() - 1)) {
-                    p.incrementNextTargetListIndex();
-                }
-                if (nextSpeed >= 0) {
-                    p.setFreeFlowSpeed(nextSpeed);
+        Optional<Pedestrian> current = getMember(agentId);
+        if (current.isPresent()) {
+            if (!isLostMember(current.get())) {
+                for (Pedestrian p : this.getMembers()) {
+                    if (p.getId() != agentId && !isLostMember(p)) {
+                        if (p.getNextTargetListIndex() < (p.getTargets().size() - 1)) {
+                            p.incrementNextTargetListIndex();
+                        }
+                        if (nextSpeed >= 0) {
+                            p.setFreeFlowSpeed(nextSpeed);
+                        }
+                    }
                 }
             }
         }
@@ -519,23 +584,16 @@ public class CentroidGroup implements Group {
                     .count() == 1;
 
             if (eventPending) {
-                this.members.stream()
-                        .filter(p -> p.getId() == agentId)
-                        .findAny()
-                        .ifPresentOrElse(
-                                (p)
-                                        -> {
-                                    setGroupTargetList(p.getTargets(), agentId);
-                                },
-                                ()
-                                        -> {
-                                    log.error("group does not contain agent, but listener of agent is registered" +
-                                            "to this group");
-                                });
-
-                for (Pedestrian p : this.getMembers()) {
-                    if (p.getId() != agentId) {
-                        p.elementEncountered(TargetChanger.class, (TargetChanger) element);
+                Optional<Pedestrian> optCurrent = getMember(agentId);
+                if (optCurrent.isPresent()) {
+                    Pedestrian current = optCurrent.get();
+                    if (!isLostMember(current)) {
+                        setGroupTargetList(current.getTargets(), agentId);
+                        for (Pedestrian p : this.getMembers()) {
+                            if (p.getId() != agentId && !isLostMember(p)) {
+                                p.elementEncountered(TargetChanger.class, (TargetChanger) element);
+                            }
+                        }
                     }
                 }
             }

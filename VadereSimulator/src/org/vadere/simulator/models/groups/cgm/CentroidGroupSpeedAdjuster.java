@@ -26,16 +26,21 @@ public class CentroidGroupSpeedAdjuster implements SpeedAdjuster {
 
             if (group.isLostMember(ped)) {
                 group.reevaluateLostMember(ped);
+                // wait behaviour
                 if (ped instanceof PedestrianOSM) {
-                    if (((PedestrianOSM) ped).getRelevantPedestrians().size() < 4) {
-                        if (group.getRelativeDistanceCentroid(ped) > 8) {
+                    if (((PedestrianOSM) ped).getRelevantPedestrians().size()
+                            < groupCollection.getAttributesCGM().getWaitBehaviourRelevantAgentsFactor()) {
+                        group.wakeFromLostMember(ped);
+                        if (group.isGroupTarget(ped.getNextTargetId()) &&
+                                group.getRelativeDistanceCentroid(ped, false) > 7) {
                             result = Double.MIN_VALUE;
                         }
+                        group.setLostMember(ped);
                     }
                 }
             }
             if (!group.isLostMember(ped)) {
-                aheadDistance = group.getRelativeDistanceCentroid(ped);
+                aheadDistance = group.getRelativeDistanceCentroid(ped, false);
 
                 // TODO [priority=low] [task=refactoring] move Parameters to AttributesCGM
                 // equations taken from 'Pedestrian Group Behavior in a Cellular Automaton'
