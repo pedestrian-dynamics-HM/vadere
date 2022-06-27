@@ -52,7 +52,7 @@ public class AreaGroupMetaDataProcessor extends DataProcessor<TimestepGroupIdKey
         Collection<Pedestrian> pedestrians = state.getTopography().getPedestrianDynamicElements().getElements();
 
         // the pedestrians in the measurement area
-        if (measurementArea == null) {
+        if (measurementArea != null) {
             pedestrians = pedestrians.stream()
                     .filter(p -> this.measurementArea.getShape().contains(p.getPosition()))
                     .collect(Collectors.toList());
@@ -90,9 +90,11 @@ public class AreaGroupMetaDataProcessor extends DataProcessor<TimestepGroupIdKey
                 try {
                     //compute the convex hull for all groups and the centroid of the resulting polygons -> problem might be that
                     //convex hull is susceptible to statistical outliers
-                    VPoint centroid = currentGroup.getCentroid();
+                    VPoint centroid = currentGroup.getCentroid(true);
                     data.setCentroid(centroid);
-                    data.setCentroidInArea(this.measurementArea.getShape().contains(centroid));
+                    if (this.measurementArea != null) {
+                        data.setCentroidInArea(this.measurementArea.getShape().contains(centroid));
+                    }
                 } catch (IllegalArgumentException e) {
                 }
                 this.putValue(new TimestepGroupIdKey(state.getStep(), currentGroup.getID()), data);
