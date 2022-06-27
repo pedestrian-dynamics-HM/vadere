@@ -299,42 +299,6 @@ public class CentroidGroup implements Group {
         return potentialDiffOthers;
     }
 
-    private Map<Pedestrian, Set<Pedestrian>> getClosePedestrians(double distance) {
-        ArrayList<Pair<PedestrianPair, Double>> potentialDiffs = getPotentialDist();
-        Map<Pedestrian, Set<Pedestrian>> result = new HashMap<>();
-        for (Pedestrian ped : members) {
-            Set<Pedestrian> closePeds = potentialDiffs.stream()
-                    .filter(pair -> pair.getKey().getLeftId() == ped.getId())
-                    .filter(pair -> Math.abs(pair.getRight()) < distance)
-                    .map(pair -> pair.getKey().getRight())
-                    .collect(Collectors.toSet());
-            result.put(ped, closePeds);
-        }
-        return result;
-    }
-
-    private List<Set<Pedestrian>> getPedClusters() {
-        Map<Pedestrian, Set<Pedestrian>> closePeds = getClosePedestrians(8.0);
-        List<Set<Pedestrian>> closeClusters = new ArrayList<>(closePeds.values());
-        boolean alldistinct = false;
-        while (!alldistinct) {
-            closeClusters = closeClusters.stream()
-                    .filter(setPeds -> !setPeds.isEmpty())
-                    .collect(Collectors.toList());
-            alldistinct = true;
-            for (Set<Pedestrian> cluster : closeClusters) {
-                for (Set<Pedestrian> cluster2 : closeClusters) {
-                    if (!cluster2.equals(cluster) && !Collections.disjoint(cluster, cluster2)) {
-                        cluster.addAll(cluster2);
-                        cluster2.clear();
-                        alldistinct = false;
-                    }
-                }
-            }
-        }
-        return closeClusters;
-    }
-
     public void reevaluateLostMember(Pedestrian ped) {
         if (isGroupTarget(ped.getNextTargetId())) {
             wakeFromLostMember(ped);
