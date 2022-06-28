@@ -9,6 +9,7 @@ import org.vadere.simulator.projects.dataprocessing.datakey.BonnMotionKey;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPedestrianIdKey;
 import org.vadere.state.attributes.processor.AttributesBonnMotionTrajectoryProcessor;
 import org.vadere.state.attributes.processor.AttributesProcessor;
+import org.vadere.state.scenario.ReferenceCoordinateSystem;
 import org.vadere.util.geometry.shapes.VPoint;
 
 import java.util.ArrayList;
@@ -81,13 +82,26 @@ public class BonnMotionTrajectoryProcessor extends DataProcessor<BonnMotionKey, 
 		double simTimeStepLength =
 				state.getScenarioStore().getAttributesSimulation().getSimTimeStepLength();
 
+		double boundHeight = state.getScenarioStore().getTopography().getBounds().getHeight();
+		ReferenceCoordinateSystem coordRef = state.getScenarioStore().getTopography().getAttributes().getReferenceCoordinateSystem();
+
 		// retrieve trajectory data from pedestrianPositionProcessor and transform them to
 		// the BonnMotion trajectory.
 		Map<TimestepPedestrianIdKey, VPoint> trajectories = this.pedestrianPositionProcessor.getData();
 		trajectories.entrySet().forEach(e -> {
 			int pedId = e.getKey().getPedestrianId();
 			double time = e.getKey().getTimestep() * simTimeStepLength;
-			VPoint point = e.getValue().multiply(attr.getScale());
+			VPoint point = e.getValue();
+
+			if (attr.getOrigin().equals("upper left")){
+				point.y = boundHeight - point.y;
+			}
+
+			if(attr.isApplyOffset() && coordRef != null){
+				point  = point.add(coordRef.getTranslation());
+			}
+
+			point = point.multiply(attr.getScale());
 			point = point.add(attr.getTranslate());
 
 			Pair<Double, VPoint> wayPoint = Pair.of(time, point);
