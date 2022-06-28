@@ -303,7 +303,7 @@ public class CentroidGroup implements Group {
         if (isGroupTarget(ped.getNextTargetId())) {
             wakeFromLostMember(ped);
             // take 7 (instead of 8) to reinsert lost member in members to avoid fluctuations
-            if (Math.abs(getRelativeDistanceCentroid(ped, false)) > 7) {
+            if (Math.abs(getRelativeDistanceCentroid(ped, false, true)) > 7) {
                 setLostMember(ped);
             }
         }
@@ -320,7 +320,7 @@ public class CentroidGroup implements Group {
 
                 Map<Boolean, List<Pedestrian>> partitions = membersMostCommonTarget.stream()
                         .collect(Collectors.partitioningBy(p -> Math.abs(getRelativeDistanceCentroid(p,
-                                true)) < 8));
+                                true, false)) < 8));
                 if (partitions.get(true).size() > lostMembers.size()) {
                     lostMembers.clear();
                     lostMembers.addAll(partitions.get(false));
@@ -425,15 +425,31 @@ public class CentroidGroup implements Group {
      * @param ped Pedestrian
      * @return Distance to group centroid
      */
-    public double getRelativeDistanceCentroid(Pedestrian ped, boolean includeLostMembers) {
+    public double getRelativeDistanceCentroid(Pedestrian ped, boolean includeLostMembers, boolean useGroupTarget) {
         double result = 0.0;
         VPoint pedLocation = ped.getPosition();
 
         double potentialSum = 0.0;
         int size = 0;
-        List<Pedestrian> membersSameTarget = members.stream()
-                .filter(member -> member.getNextTargetId() == ped.getNextTargetId())
-                .collect(Collectors.toList());
+        List<Pedestrian> membersSameTarget;
+        if (lostMembers.size() == 0) {
+            membersSameTarget = members;
+        } else if (useGroupTarget) {
+            if (!isGroupTarget(ped.getNextTargetId())) {
+                // cannot compute relative of ped to others
+                log.error("cannot compute relative distance centroid with different targets");
+                return 0.0;
+            }
+            membersSameTarget = members.stream()
+                    .filter(member -> isGroupTarget(member.getNextTargetId()))
+                    .collect(Collectors.toList());
+        } else {
+            // include all members with same target as ped (used for reevaluation)
+            membersSameTarget = members.stream()
+                    .filter(member -> member.getNextTargetId() == ped.getNextTargetId())
+                    .collect(Collectors.toList());
+        }
+
         for (Pedestrian p : membersSameTarget) {
             if (!ped.equals(p)) {
                 if (!isLostMember(p) || includeLostMembers) {
