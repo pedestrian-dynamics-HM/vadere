@@ -11,7 +11,7 @@ public class AttributesCGM extends Attributes {
 
 	private double groupMemberRepulsionFactor = 0.01;
 	private double leaderAttractionFactor = 0.003;
-	private boolean lostMembers = true;
+	private boolean lostMembers = false;
 
 	private int waitBehaviourRelevantAgentsFactor = -1;
 
