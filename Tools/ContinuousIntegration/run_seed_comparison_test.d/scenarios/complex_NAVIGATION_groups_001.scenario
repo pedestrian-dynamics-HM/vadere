@@ -1,7 +1,8 @@
 {
   "name" : "complex_NAVIGATION_groups_001",
   "description" : "",
-  "release" : "2.1",
+  "release" : "2.2",
+  "commithash" : "d9d2b99fc786eb7cd6932d373880911fde7d8471",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -45,9 +46,7 @@
     "attributesModel" : {
       "org.vadere.state.attributes.models.AttributesCGM" : {
         "groupMemberRepulsionFactor" : 0.01,
-        "leaderAttractionFactor" : 0.003,
-        "lostMembers" : false,
-        "waitBehaviourRelevantAgentsFactor" : -1
+        "leaderAttractionFactor" : 0.003
       },
       "org.vadere.state.attributes.models.AttributesFloorField" : {
         "createMethod" : "HIGH_ACCURACY_FAST_MARCHING",
@@ -103,7 +102,7 @@
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 5.0,
+      "finishTime" : 45.0,
       "simTimeStepLength" : 0.4,
       "realTimeSimTimeRatio" : 0.0,
       "writeSimulationData" : true,
@@ -118,7 +117,21 @@
       "usePsychologyLayer" : false,
       "psychologyLayer" : {
         "perception" : "SimplePerceptionModel",
-        "cognition" : "CooperativeCognitionModel"
+        "cognition" : "CooperativeCognitionModel",
+        "attributesModel" : {
+          "org.vadere.state.attributes.models.psychology.perception.AttributesSimplePerceptionModel" : {
+            "priority" : {
+              "1" : "InformationStimulus",
+              "2" : "ChangeTargetScripted",
+              "3" : "ChangeTarget",
+              "4" : "Threat",
+              "5" : "Wait",
+              "6" : "WaitInArea",
+              "7" : "DistanceRecommendation"
+            }
+          },
+          "org.vadere.state.attributes.models.psychology.cognition.AttributesCooperativeCognitionModel" : { }
+        }
       }
     },
     "topography" : {
@@ -494,7 +507,6 @@
       "teleporter" : null,
       "attributesCar" : null
     },
-    "stimulusInfos" : [ ],
-    "reactionProbabilities" : [ ]
+    "stimulusInfos" : [ ]
   }
 }

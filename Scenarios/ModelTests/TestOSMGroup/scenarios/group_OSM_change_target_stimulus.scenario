@@ -1,23 +1,37 @@
 {
-  "name" : "09-Wait-Probabilistic-OSMEventDriven",
+  "name" : "group_OSM_change_target_stimulus",
   "description" : "",
-  "release" : "2.1",
-  "commithash" : "4f8202a8bd2a52cd623cfe8d28b5f0627a11d309",
+  "release" : "2.2",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
       "filename" : "postvis.traj",
-      "processors" : [ 1, 2, 3 ]
+      "processors" : [ 8, 9, 10, 11 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepRowOutputFile",
+      "filename" : "out.txt",
+      "processors" : [ 7 ]
     } ],
     "processors" : [ {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.TargetFloorFieldGridProcessor",
+      "id" : 7,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesFloorFieldProcessor",
+      "attributes" : {
+        "targetId" : 5,
+        "resolution" : 1.0
+      }
+    }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor",
-      "id" : 1
+      "id" : 8
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepTargetIDProcessor",
-      "id" : 2
+      "id" : 9
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepPsychologyStatusProcessor",
-      "id" : 3
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepGroupIDProcessor",
+      "id" : 10
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepGroupSizeProcessor",
+      "id" : 11
     } ],
     "isTimestamped" : true,
     "isWriteMetaData" : false
@@ -47,25 +61,25 @@
         }
       },
       "org.vadere.state.attributes.models.AttributesOSM" : {
-        "stepCircleResolution" : 18,
+        "stepCircleResolution" : 4,
         "numberOfCircles" : 1,
-        "optimizationType" : "DISCRETE",
-        "varyStepDirection" : false,
+        "optimizationType" : "NELDER_MEAD",
+        "varyStepDirection" : true,
         "movementType" : "ARBITRARY",
         "stepLengthIntercept" : 0.4625,
         "stepLengthSlopeSpeed" : 0.2345,
         "stepLengthSD" : 0.036,
         "movementThreshold" : 0.0,
-        "minStepLength" : 0.4625,
-        "minimumStepLength" : false,
-        "maxStepDuration" : 1.7976931348623157E308,
-        "dynamicStepLength" : false,
+        "minStepLength" : 0.17,
+        "minimumStepLength" : true,
+        "maxStepDuration" : 3.0,
+        "dynamicStepLength" : true,
         "updateType" : "EVENT_DRIVEN",
-        "seeSmallWalls" : false,
+        "seeSmallWalls" : true,
         "targetPotentialModel" : "org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid",
         "pedestrianPotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldPedestrianCompactSoftshell",
         "obstaclePotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldObstacleCompactSoftshell",
-        "submodels" : [ ]
+        "submodels" : [ "org.vadere.simulator.models.groups.cgm.CentroidGroupModel" ]
       },
       "org.vadere.state.attributes.models.AttributesPotentialCompactSoftshell" : {
         "pedPotentialIntimateSpaceWidth" : 0.45,
@@ -76,25 +90,51 @@
         "intimateSpaceFactor" : 1.2,
         "personalSpacePower" : 1,
         "intimateSpacePower" : 1
+      },
+      "org.vadere.state.attributes.models.AttributesCGM" : {
+        "groupMemberRepulsionFactor" : 0.01,
+        "leaderAttractionFactor" : 0.003
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 40.0,
+      "finishTime" : 50.0,
       "simTimeStepLength" : 0.4,
-      "realTimeSimTimeRatio" : 0.3,
+      "realTimeSimTimeRatio" : 0.5,
       "writeSimulationData" : true,
       "visualizationEnabled" : true,
       "printFPS" : false,
-      "digitsPerCoordinate" : 2,
+      "digitsPerCoordinate" : 4,
       "useFixedSeed" : true,
-      "fixedSeed" : 1,
-      "simulationSeed" : 1
+      "fixedSeed" : 8544059563994946213,
+      "simulationSeed" : 8544059563994946215
     },
     "attributesPsychology" : {
       "usePsychologyLayer" : true,
       "psychologyLayer" : {
-        "perception" : "MultiPerceptionModel",
-        "cognition" : "ProbabilisticCognitionModel"
+        "perception" : "SimplePerceptionModel",
+        "cognition" : "ProbabilisticCognitionModel",
+        "attributesModel" : {
+          "org.vadere.state.attributes.models.psychology.perception.AttributesSimplePerceptionModel" : {
+            "priority" : {
+              "1" : "InformationStimulus"
+            }
+          },
+          "org.vadere.state.attributes.models.psychology.cognition.AttributesProbabilisticCognitionModel" : {
+            "routeChoices" : [ {
+              "instruction" : "use target 11",
+              "targetIds" : [ 11, 21, 31 ],
+              "targetProbabilities" : [ 1.0, 0.0, 0.0 ]
+            }, {
+              "instruction" : "use target 21",
+              "targetIds" : [ 11, 21, 31 ],
+              "targetProbabilities" : [ 0.0, 1.0, 0.0 ]
+            }, {
+              "instruction" : "use target 31",
+              "targetIds" : [ 11, 21, 31 ],
+              "targetProbabilities" : [ 0.0, 0.5, 0.5 ]
+            } ]
+          }
+        }
       }
     },
     "topography" : {
@@ -103,7 +143,7 @@
           "x" : 0.0,
           "y" : 0.0,
           "width" : 40.0,
-          "height" : 16.0
+          "height" : 20.0
         },
         "boundingBoxWidth" : 0.5,
         "bounded" : true,
@@ -113,13 +153,47 @@
       "measurementAreas" : [ ],
       "stairs" : [ ],
       "targets" : [ {
-        "id" : 2,
+        "id" : 11,
         "absorbing" : true,
         "shape" : {
-          "x" : 36.2,
-          "y" : 1.1754385964912277,
-          "width" : 2.5,
-          "height" : 13.724561403508773,
+          "x" : 2.3,
+          "y" : 2.1,
+          "width" : 4.1,
+          "height" : 2.5,
+          "type" : "RECTANGLE"
+        },
+        "waitingTime" : 0.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : true,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
+      }, {
+        "id" : 21,
+        "absorbing" : true,
+        "shape" : {
+          "x" : 16.1,
+          "y" : 2.8,
+          "width" : 4.1,
+          "height" : 2.1,
+          "type" : "RECTANGLE"
+        },
+        "waitingTime" : 0.0,
+        "waitingTimeYellowPhase" : 0.0,
+        "parallelWaiters" : 0,
+        "individualWaiting" : true,
+        "deletionDistance" : 0.1,
+        "startingWithRedLight" : false,
+        "nextSpeed" : -1.0
+      }, {
+        "id" : 31,
+        "absorbing" : true,
+        "shape" : {
+          "x" : 30.7,
+          "y" : 2.8,
+          "width" : 3.5,
+          "height" : 2.3,
           "type" : "RECTANGLE"
         },
         "waitingTime" : 0.0,
@@ -135,27 +209,27 @@
       "aerosolClouds" : [ ],
       "droplets" : [ ],
       "sources" : [ {
-        "id" : 2,
+        "id" : 1,
         "shape" : {
-          "x" : 1.0,
-          "y" : 1.0,
-          "width" : 6.456140350877193,
-          "height" : 14.035087719298245,
+          "x" : 0.5,
+          "y" : 15.0,
+          "width" : 4.5,
+          "height" : 4.5,
           "type" : "RECTANGLE"
         },
         "interSpawnTimeDistribution" : "constant",
         "distributionParameters" : {
-          "updateFrequency" : 1.0
+          "updateFrequency" : 3.0
         },
-        "spawnNumber" : 2,
-        "maxSpawnNumberTotal" : -1,
+        "spawnNumber" : 10,
+        "maxSpawnNumberTotal" : 100,
         "startTime" : 0.0,
         "endTime" : 0.0,
         "spawnAtRandomPositions" : true,
         "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
-        "targetIds" : [ 2 ],
-        "groupSizeDistribution" : [ 1.0 ],
+        "targetIds" : [ 11 ],
+        "groupSizeDistribution" : [ 0.0, 0.0, 0.0, 1.0 ],
         "dynamicElementType" : "PEDESTRIAN",
         "attributesPedestrian" : null
       } ],
@@ -178,19 +252,21 @@
     },
     "stimulusInfos" : [ {
       "timeframe" : {
-        "startTime" : 5.2,
-        "endTime" : 10.0,
+        "startTime" : 8.0,
+        "endTime" : 15.4,
         "repeat" : false,
         "waitTimeBetweenRepetition" : 0.0
       },
+      "location" : {
+        "areas" : [ ]
+      },
+      "subpopulationFilter" : {
+        "affectedPedestrianIds" : [ ]
+      },
       "stimuli" : [ {
-        "type" : "Wait",
-        "id" : -1
+        "type" : "InformationStimulus",
+        "information" : "use target 31"
       } ]
-    } ],
-    "reactionProbabilities" : [ {
-      "stimulusId" : -1,
-      "reactionProbability" : 1.0
     } ]
   }
 }

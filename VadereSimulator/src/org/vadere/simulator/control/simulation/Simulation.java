@@ -30,8 +30,6 @@ import java.awt.geom.Rectangle2D;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.vadere.state.attributes.Attributes.ID_NOT_SET;
-
 public class Simulation implements ControllerProvider{
 
 	private static Logger logger = Logger.getLogger(Simulation.class);
@@ -336,7 +334,7 @@ public class Simulation implements ControllerProvider{
 					if (singleStepMode){
 						// check reached next simTime (-1 simulate one step)
 						// round to long to ensure correct trap.
-						boolean timeReached = Math.round(simTimeInSec) >= Math.round(simulateUntilInSec);
+						boolean timeReached = Math.round(simulateUntilInSec - simTimeInSec) <= 0;
 						if (timeReached && isRunSimulation){
 							logger.debugf("Synchronized reached at: %.4f. Wait for traci commands.", simTimeInSec);
 							waitForTraci();
@@ -457,7 +455,11 @@ public class Simulation implements ControllerProvider{
 		Collection<Pedestrian> pedestrians = topography.getElements(Pedestrian.class);
 
 		if (scenarioStore.getAttributesPsychology().isUsePsychologyLayer()) {
-			HashMap<Pedestrian, List<Stimulus>> pedSpecificStimuli = stimulusController.getStimuliForTime(simTimeInSec, pedestrians);
+
+
+			HashMap<Pedestrian, List<Stimulus>> pedSpecificStimuli = stimulusController.getStimuli(simTimeInSec, pedestrians);
+
+
 			perceptionModel.update(pedSpecificStimuli);
 			cognitionModel.update(pedestrians);
 		} else {

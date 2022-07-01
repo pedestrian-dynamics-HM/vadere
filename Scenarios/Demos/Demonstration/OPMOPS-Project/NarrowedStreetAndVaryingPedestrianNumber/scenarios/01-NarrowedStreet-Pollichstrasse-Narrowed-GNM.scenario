@@ -1,8 +1,8 @@
 {
   "name" : "01-NarrowedStreet-Pollichstrasse-Narrowed-GNM",
   "description" : "",
-  "release" : "2.1",
-  "commithash" : "4f8202a8bd2a52cd623cfe8d28b5f0627a11d309",
+  "release" : "2.2",
+  "commithash" : "bef9b7bef5c5755b23c296217e1454e4af9b7d15",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -131,7 +131,21 @@
       "usePsychologyLayer" : false,
       "psychologyLayer" : {
         "perception" : "SimplePerceptionModel",
-        "cognition" : "CooperativeCognitionModel"
+        "cognition" : "CooperativeCognitionModel",
+        "attributesModel" : {
+          "org.vadere.state.attributes.models.psychology.perception.AttributesSimplePerceptionModel" : {
+            "priority" : {
+              "1" : "InformationStimulus",
+              "2" : "ChangeTargetScripted",
+              "3" : "ChangeTarget",
+              "4" : "Threat",
+              "5" : "Wait",
+              "6" : "WaitInArea",
+              "7" : "DistanceRecommendation"
+            }
+          },
+          "org.vadere.state.attributes.models.psychology.cognition.AttributesCooperativeCognitionModel" : { }
+        }
       }
     },
     "topography" : {
@@ -952,17 +966,24 @@
         "repeat" : false,
         "waitTimeBetweenRepetition" : 0.0
       },
+      "location" : {
+        "areas" : [ {
+          "radius" : 5.0,
+          "center" : {
+            "x" : 37.57171314741019,
+            "y" : 117.88312654145285
+          },
+          "type" : "CIRCLE"
+        } ]
+      },
+      "subpopulationFilter" : {
+        "affectedPedestrianIds" : [ ]
+      },
       "stimuli" : [ {
         "type" : "Threat",
-        "id" : -1,
-        "originAsTargetId" : -1,
-        "loudness" : 1.0,
-        "radius" : 5.0
+        "originAsTargetId" : 1,
+        "loudness" : 1.0
       } ]
-    } ],
-    "reactionProbabilities" : [ {
-      "stimulusId" : -1,
-      "reactionProbability" : 1.0
     } ]
   }
 }

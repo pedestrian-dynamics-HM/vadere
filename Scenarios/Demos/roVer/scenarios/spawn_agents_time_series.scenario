@@ -1,7 +1,8 @@
 {
   "name" : "spawn_agents_time_series",
   "description" : "",
-  "release" : "2.1",
+  "release" : "2.2",
+  "commithash" : "bef9b7bef5c5755b23c296217e1454e4af9b7d15",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -58,7 +59,7 @@
         "targetPotentialModel" : "org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid",
         "pedestrianPotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldPedestrianCompactSoftshell",
         "obstaclePotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldObstacleCompactSoftshell",
-        "submodels" : [ "org.vadere.simulator.models.groups.cgm.CentroidGroupModel" ]
+        "submodels" : [ ]
       },
       "org.vadere.state.attributes.models.AttributesPotentialCompactSoftshell" : {
         "pedPotentialIntimateSpaceWidth" : 0.45,
@@ -90,10 +91,6 @@
           "width" : 0.2,
           "height" : 1.0
         }
-      },
-      "org.vadere.state.attributes.models.AttributesCGM" : {
-        "groupMemberRepulsionFactor" : 0.01,
-        "leaderAttractionFactor" : 0.003
       }
     },
     "attributesSimulation" : {
@@ -112,7 +109,21 @@
       "usePsychologyLayer" : false,
       "psychologyLayer" : {
         "perception" : "SimplePerceptionModel",
-        "cognition" : "SimpleCognitionModel"
+        "cognition" : "SimpleCognitionModel",
+        "attributesModel" : {
+          "org.vadere.state.attributes.models.psychology.perception.AttributesSimplePerceptionModel" : {
+            "priority" : {
+              "1" : "InformationStimulus",
+              "2" : "ChangeTargetScripted",
+              "3" : "ChangeTarget",
+              "4" : "Threat",
+              "5" : "Wait",
+              "6" : "WaitInArea",
+              "7" : "DistanceRecommendation"
+            }
+          },
+          "org.vadere.state.attributes.models.psychology.cognition.AttributesSimpleCognitionModel" : { }
+        }
       }
     },
     "topography" : {
@@ -156,23 +167,6 @@
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
         "nextSpeed" : -1.0
-      }, {
-        "id" : 22,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 0.5,
-          "y" : 0.5,
-          "width" : 3.5,
-          "height" : 1.9,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : false,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
       } ],
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],
@@ -187,19 +181,20 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "interSpawnTimeDistribution" : "constant",
+        "interSpawnTimeDistribution" : "timeSeries",
         "distributionParameters" : {
-          "updateFrequency" : 20.0
+          "intervalLength" : 5,
+          "spawnsPerInterval" : [ 5, 0, 5, 0 ]
         },
-        "spawnNumber" : 6,
+        "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
         "endTime" : 1000.0,
         "spawnAtRandomPositions" : false,
         "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
-        "targetIds" : [ 22, 11 ],
-        "groupSizeDistribution" : [ 0.0, 0.0, 1.0 ],
+        "targetIds" : [ 11 ],
+        "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN",
         "attributesPedestrian" : null
       } ],
@@ -239,7 +234,6 @@
         }
       }
     },
-    "stimulusInfos" : [ ],
-    "reactionProbabilities" : [ ]
+    "stimulusInfos" : [ ]
   }
 }

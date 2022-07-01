@@ -1,8 +1,8 @@
 {
   "name" : "21-Ped-SocialDistancing_1.5m",
   "description" : "",
-  "release" : "2.1",
-  "commithash" : "4f8202a8bd2a52cd623cfe8d28b5f0627a11d309",
+  "release" : "2.2",
+  "commithash" : "bef9b7bef5c5755b23c296217e1454e4af9b7d15",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -123,7 +123,26 @@
       "usePsychologyLayer" : true,
       "psychologyLayer" : {
         "perception" : "SimplePerceptionModel",
-        "cognition" : "SocialDistancingCognitionModel"
+        "cognition" : "SocialDistancingCognitionModel",
+        "attributesModel" : {
+          "org.vadere.state.attributes.models.psychology.perception.AttributesSimplePerceptionModel" : {
+            "priority" : {
+              "1" : "InformationStimulus",
+              "2" : "ChangeTargetScripted",
+              "3" : "ChangeTarget",
+              "4" : "Threat",
+              "5" : "Wait",
+              "6" : "WaitInArea",
+              "7" : "DistanceRecommendation"
+            }
+          },
+          "org.vadere.state.attributes.models.psychology.cognition.AttributesSocialDistancingCognitionModel" : {
+            "repulsionFactor" : 1.6444,
+            "repulsionIntercept" : 0.4845,
+            "minDistance" : 1.25,
+            "maxDistance" : 2.0
+          }
+        }
       }
     },
     "topography" : {
@@ -249,16 +268,17 @@
         "repeat" : false,
         "waitTimeBetweenRepetition" : 0.0
       },
+      "location" : {
+        "areas" : [ ]
+      },
+      "subpopulationFilter" : {
+        "affectedPedestrianIds" : [ ]
+      },
       "stimuli" : [ {
         "type" : "DistanceRecommendation",
-        "id" : 10,
         "socialDistance" : 1.5,
         "cloggingTimeAllowedInSecs" : 5.0
       } ]
-    } ],
-    "reactionProbabilities" : [ {
-      "stimulusId" : 10,
-      "reactionProbability" : 1.0
     } ]
   }
 }

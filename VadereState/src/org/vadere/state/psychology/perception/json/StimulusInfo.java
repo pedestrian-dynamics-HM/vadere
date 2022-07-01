@@ -1,8 +1,11 @@
 package org.vadere.state.psychology.perception.json;
 
+import org.vadere.state.psychology.perception.types.Location;
 import org.vadere.state.psychology.perception.types.Stimulus;
+import org.vadere.state.psychology.perception.types.SubpopulationFilter;
 import org.vadere.state.psychology.perception.types.Timeframe;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -30,14 +33,19 @@ public class StimulusInfo {
 
     // Member Variables
     private Timeframe timeframe;
+    private Location location;
+    private SubpopulationFilter subpopulationFilter;
     private List<Stimulus> stimuli;
 
     public StimulusInfo() {
+        this(new Timeframe(), new LinkedList<>(), new Location(), new SubpopulationFilter());
     }
 
-    public StimulusInfo(Timeframe timeframe, List<Stimulus> stimuli) {
+    public StimulusInfo(Timeframe timeframe, List<Stimulus> stimuli, Location location, SubpopulationFilter subpopulationFilter) {
         this.timeframe = timeframe;
         this.stimuli = stimuli;
+        this.location = location;
+        this.subpopulationFilter = subpopulationFilter;
     }
 
     // Getter
@@ -47,6 +55,10 @@ public class StimulusInfo {
     public List<Stimulus> getStimuli() {
         return stimuli;
     }
+    public Location getLocation() {return location;}
+    public SubpopulationFilter getSubpopulationFilter() {return subpopulationFilter;}
+
+
 
     // Setter
     public void setTimeframe(Timeframe timeframe) {
@@ -55,5 +67,9 @@ public class StimulusInfo {
     public void setStimuli(List<Stimulus> stimuli) {
         this.stimuli = stimuli;
     }
+    public void setLocation(Location location) {this.location = location;}
+    public void setSubpopulationFilter(SubpopulationFilter subpopulationFilter) {this.subpopulationFilter = subpopulationFilter;}
+
+
 
 }

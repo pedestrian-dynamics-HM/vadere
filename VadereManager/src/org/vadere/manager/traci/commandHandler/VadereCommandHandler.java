@@ -1,13 +1,10 @@
 package org.vadere.manager.traci.commandHandler;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-
 import org.apache.commons.collections.ListUtils;
 import org.vadere.annotation.traci.client.TraCIApi;
 import org.vadere.manager.RemoteManager;
 import org.vadere.manager.traci.TraCICmd;
-import org.vadere.state.psychology.perception.json.ReactionProbability;
-import org.vadere.state.traci.TraCIDataType;
 import org.vadere.manager.traci.commandHandler.annotation.VadereHandler;
 import org.vadere.manager.traci.commandHandler.annotation.VadereHandlers;
 import org.vadere.manager.traci.commandHandler.variables.VadereVar;
@@ -22,6 +19,7 @@ import org.vadere.state.attributes.scenario.AttributesTargetChanger;
 import org.vadere.state.psychology.perception.json.StimulusInfo;
 import org.vadere.state.psychology.perception.json.StimulusInfoStore;
 import org.vadere.state.scenario.TargetChanger;
+import org.vadere.state.traci.TraCIDataType;
 import org.vadere.state.types.ScenarioElementType;
 import org.vadere.state.util.StateJsonConverter;
 
@@ -137,8 +135,6 @@ public class VadereCommandHandler extends CommandHandler<VadereVar> {
 			StimulusInfoStore sis = new StimulusInfoStore();
 			sis.setStimulusInfos(lsi);
 
-			List<ReactionProbability> reactionProbabilities = sic.getScenarioStore().getStimulusInfoStore().getReactionProbabilities();
-			sis.setReactionProbabilities(reactionProbabilities);
 
 			TraCIGetResponse res;
 			String data;

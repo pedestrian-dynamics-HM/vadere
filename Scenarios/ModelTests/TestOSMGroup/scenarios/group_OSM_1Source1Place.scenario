@@ -1,7 +1,7 @@
 {
   "name" : "group_OSM_1Source1Place",
   "description" : "",
-  "release" : "2.1",
+  "release" : "2.2",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -79,8 +79,8 @@
         "stepLengthSlopeSpeed" : 0.2345,
         "stepLengthSD" : 0.036,
         "movementThreshold" : 0.0,
-        "minStepLength" : 0.01,
-        "minimumStepLength" : true,
+        "minStepLength" : 0.4625,
+        "minimumStepLength" : false,
         "maxStepDuration" : 1.7976931348623157E308,
         "dynamicStepLength" : false,
         "updateType" : "EVENT_DRIVEN",
@@ -121,7 +121,21 @@
       "usePsychologyLayer" : false,
       "psychologyLayer" : {
         "perception" : "SimplePerceptionModel",
-        "cognition" : "CooperativeCognitionModel"
+        "cognition" : "CooperativeCognitionModel",
+        "attributesModel" : {
+          "org.vadere.state.attributes.models.psychology.perception.AttributesSimplePerceptionModel" : {
+            "priority" : {
+              "1" : "InformationStimulus",
+              "2" : "ChangeTargetScripted",
+              "3" : "ChangeTarget",
+              "4" : "Threat",
+              "5" : "Wait",
+              "6" : "WaitInArea",
+              "7" : "DistanceRecommendation"
+            }
+          },
+          "org.vadere.state.attributes.models.psychology.cognition.AttributesCooperativeCognitionModel" : { }
+        }
       }
     },
     "topography" : {
@@ -156,23 +170,6 @@
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
         "nextSpeed" : -1.0
-      }, {
-        "id" : 22,
-        "absorbing" : false,
-        "shape" : {
-          "x" : 15.0,
-          "y" : 2.9,
-          "width" : 1.0,
-          "height" : 4.1,
-          "type" : "RECTANGLE"
-        },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : false,
-        "deletionDistance" : 0.1,
-        "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
       } ],
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],
@@ -198,7 +195,7 @@
         "spawnAtRandomPositions" : true,
         "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
-        "targetIds" : [ 22, 1 ],
+        "targetIds" : [ 1 ],
         "groupSizeDistribution" : [ 0.0, 0.0, 1.0 ],
         "dynamicElementType" : "PEDESTRIAN",
         "attributesPedestrian" : null
@@ -220,7 +217,6 @@
       "teleporter" : null,
       "attributesCar" : null
     },
-    "stimulusInfos" : [ ],
-    "reactionProbabilities" : [ ]
+    "stimulusInfos" : [ ]
   }
 }

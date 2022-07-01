@@ -856,9 +856,8 @@ public class Topography implements DynamicElementMover{
 		this.contextId = contextId;
 	}
 
-	// TODO
-	public LinkedList<Integer> getGroups() {
-			return new LinkedList<>();
+	public List<Integer> getTargetIds(){
+		return targets.stream().map(target -> target.getId()).collect(Collectors.toList());
 	}
 
 }

@@ -30,7 +30,7 @@ public class ElapsedTime extends Stimulus {
         if(this == that) return true;
         if(!(that instanceof ElapsedTime)) return false;
         ElapsedTime elapsedTime = (ElapsedTime) that;
-        return Precision.equals(this.perceptionProbability, elapsedTime.getPerceptionProbability(), Double.MIN_VALUE);
+        return true;
     }
 
 
