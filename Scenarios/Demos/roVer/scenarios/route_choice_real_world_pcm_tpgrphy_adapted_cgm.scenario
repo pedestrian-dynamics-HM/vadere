@@ -6,7 +6,7 @@
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
       "filename" : "postvis.traj",
-      "processors" : [ 1, 2, 20 ]
+      "processors" : [ 1, 2, 20, 122 ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOverlapOutputFile",
       "filename" : "overlaps.csv",
@@ -19,10 +19,6 @@
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile",
       "filename" : "routeLenghts.txt",
       "processors" : [ 5 ]
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepOutputFile",
-      "filename" : "counts.txt",
-      "processors" : [ 101, 102, 103 ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
       "filename" : "checkSources.txt",
@@ -37,8 +33,8 @@
       "processors" : [ 13 ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepOutputFile",
-      "filename" : "densities.txt",
-      "processors" : [ 101, 102, 103, 104, 105 ]
+      "filename" : "densities_counts.txt",
+      "processors" : [ 101, 102, 103, 104, 105, 108, 109, 110, 111 ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
       "filename" : "targetIds.txt",
@@ -54,7 +50,15 @@
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepOutputFile",
       "filename" : "fundamentalDiagramm.txt",
-      "processors" : [ 25, 106, 27, 107, 29 ]
+      "processors" : [ 116, 117, 118, 119, 120, 25, 121, 27, 29 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
+      "filename" : "ped_out.txt",
+      "processors" : [ 114, 115, 23, 24 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
+      "filename" : "densities_pedid.txt",
+      "processors" : [ 112 ]
     } ],
     "processors" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor",
@@ -165,31 +169,114 @@
       "id" : 104,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesAreaDensityCountingProcessor",
       "attributes" : {
-        "measurementAreaId" : 11
+        "measurementAreaId" : 4
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.AreaDensityCountingNormedProcessor",
       "id" : 105,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesAreaDensityCountingProcessor",
       "attributes" : {
-        "measurementAreaId" : 12
+        "measurementAreaId" : 5
       }
     }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.AreaDensityCountingNormedProcessor",
+      "id" : 108,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesAreaDensityCountingProcessor",
+      "attributes" : {
+        "measurementAreaId" : 6
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.AreaDensityCountingNormedProcessor",
+      "id" : 109,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesAreaDensityCountingProcessor",
+      "attributes" : {
+        "measurementAreaId" : 7
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.AreaDensityCountingNormedProcessor",
+      "id" : 110,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesAreaDensityCountingProcessor",
+      "attributes" : {
+        "measurementAreaId" : 8
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.AreaDensityCountingNormedProcessor",
+      "id" : 111,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesAreaDensityCountingProcessor",
+      "attributes" : {
+        "measurementAreaId" : 9
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianDensityCountingProcessor",
+      "id" : 112,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianDensityCountingProcessor",
+      "attributes" : {
+        "pedestrianPositionProcessorId" : 24,
+        "radius" : 1.0
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianPotentialProcessor",
+      "id" : 114,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianPotentialProcessor",
+      "attributes" : {
+        "pedestrianPositionProcessorId" : 24,
+        "targetId" : -1,
+        "type" : "TARGET"
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianGroupIDProcessor",
+      "id" : 115
+    }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FundamentalDiagramCProcessor",
-      "id" : 106,
+      "id" : 116,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesFundamentalDiagramCProcessor",
       "attributes" : {
-        "measurementAreaId" : 11,
+        "measurementAreaId" : 4,
         "pedestrianVelocityProcessorId" : 23
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FundamentalDiagramCProcessor",
-      "id" : 107,
+      "id" : 117,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesFundamentalDiagramCProcessor",
       "attributes" : {
-        "measurementAreaId" : 12,
+        "measurementAreaId" : 5,
         "pedestrianVelocityProcessorId" : 23
       }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FundamentalDiagramCProcessor",
+      "id" : 118,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesFundamentalDiagramCProcessor",
+      "attributes" : {
+        "measurementAreaId" : 6,
+        "pedestrianVelocityProcessorId" : 23
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FundamentalDiagramCProcessor",
+      "id" : 119,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesFundamentalDiagramCProcessor",
+      "attributes" : {
+        "measurementAreaId" : 7,
+        "pedestrianVelocityProcessorId" : 23
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FundamentalDiagramCProcessor",
+      "id" : 120,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesFundamentalDiagramCProcessor",
+      "attributes" : {
+        "measurementAreaId" : 8,
+        "pedestrianVelocityProcessorId" : 23
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FundamentalDiagramCProcessor",
+      "id" : 121,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesFundamentalDiagramCProcessor",
+      "attributes" : {
+        "measurementAreaId" : 9,
+        "pedestrianVelocityProcessorId" : 23
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepGroupIDProcessor",
+      "id" : 122
     } ],
     "isTimestamped" : true,
     "isWriteMetaData" : false
@@ -255,7 +342,7 @@
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 400.0,
+      "finishTime" : 600.0,
       "simTimeStepLength" : 0.4,
       "realTimeSimTimeRatio" : 0.0,
       "writeSimulationData" : true,
@@ -412,10 +499,10 @@
             "x" : 181.2,
             "y" : 296.25765941105783
           }, {
-            "x" : 181.0435950977262,
+            "x" : 181.2,
             "y" : 246.56832631863654
           }, {
-            "x" : 181.1823475860292,
+            "x" : 181.2,
             "y" : 221.30302009359002
           }, {
             "x" : 182.78023494328372,
@@ -772,7 +859,7 @@
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
-            "x" : 181.1823475860292,
+            "x" : 181.2,
             "y" : 221.30302009359002
           }, {
             "x" : 181.2,
@@ -870,7 +957,7 @@
           "height" : 10.7,
           "type" : "RECTANGLE"
         },
-        "id" : 1
+        "id" : 6
       }, {
         "shape" : {
           "x" : 199.1,
@@ -888,25 +975,25 @@
           "height" : 3.9,
           "type" : "RECTANGLE"
         },
-        "id" : 3
+        "id" : 1
       }, {
         "shape" : {
-          "x" : 178.4,
+          "x" : 178.5,
           "y" : 213.6,
-          "width" : 2.65,
+          "width" : 2.7,
           "height" : 39.8,
           "type" : "RECTANGLE"
         },
-        "id" : 11
+        "id" : 4
       }, {
         "shape" : {
           "x" : 178.5,
           "y" : 280.7,
-          "width" : 2.65,
+          "width" : 2.7,
           "height" : 15.5,
           "type" : "RECTANGLE"
         },
-        "id" : 12
+        "id" : 5
       }, {
         "shape" : {
           "x" : 183.0,
@@ -915,7 +1002,7 @@
           "height" : 5.9,
           "type" : "RECTANGLE"
         },
-        "id" : 25
+        "id" : 9
       }, {
         "shape" : {
           "x" : 187.5,
@@ -924,25 +1011,25 @@
           "height" : 4.2,
           "type" : "RECTANGLE"
         },
-        "id" : 26
+        "id" : 3
       }, {
         "shape" : {
-          "x" : 188.8,
+          "x" : 186.8,
           "y" : 182.5,
-          "width" : 2.0,
-          "height" : 2.9,
+          "width" : 4.0,
+          "height" : 3.0,
           "type" : "RECTANGLE"
         },
-        "id" : 27
+        "id" : 8
       }, {
         "shape" : {
           "x" : 190.8,
           "y" : 173.9,
           "width" : 1.5,
-          "height" : 11.5,
+          "height" : 11.6,
           "type" : "RECTANGLE"
         },
-        "id" : 28
+        "id" : 7
       } ],
       "stairs" : [ ],
       "targets" : [ {
@@ -1201,7 +1288,7 @@
         },
         "interSpawnTimeDistribution" : "constant",
         "distributionParameters" : {
-          "updateFrequency" : 4.0
+          "updateFrequency" : 6.0
         },
         "spawnNumber" : 3,
         "maxSpawnNumberTotal" : -1,
@@ -1253,7 +1340,7 @@
       },
       "stimuli" : [ {
         "type" : "InformationStimulus",
-        "information" : "use all targets"
+        "information" : "use target 11"
       } ]
     } ]
   }

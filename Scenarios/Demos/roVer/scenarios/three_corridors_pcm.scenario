@@ -20,10 +20,6 @@
       "filename" : "routeLenghts.txt",
       "processors" : [ 5 ]
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepOutputFile",
-      "filename" : "counts.txt",
-      "processors" : [ 101, 102, 103 ]
-    }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
       "filename" : "checkSources.txt",
       "processors" : [ 11 ]
@@ -37,7 +33,7 @@
       "processors" : [ 13 ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepOutputFile",
-      "filename" : "densities.txt",
+      "filename" : "densities_counts.txt",
       "processors" : [ 101, 102, 103 ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -55,6 +51,14 @@
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepOutputFile",
       "filename" : "fundamentalDiagramm.txt",
       "processors" : [ 25, 27, 29 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
+      "filename" : "ped_out.txt",
+      "processors" : [ 23, 24, 105, 11 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
+      "filename" : "densities_pedid.txt",
+      "processors" : [ 109 ]
     } ],
     "processors" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor",
@@ -160,6 +164,23 @@
         "measurementAreaId" : 3,
         "pedestrianVelocityProcessorId" : 23
       }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianPotentialProcessor",
+      "id" : 105,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianPotentialProcessor",
+      "attributes" : {
+        "pedestrianPositionProcessorId" : 24,
+        "targetId" : -1,
+        "type" : "TARGET"
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianDensityCountingProcessor",
+      "id" : 109,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianDensityCountingProcessor",
+      "attributes" : {
+        "pedestrianPositionProcessorId" : 24,
+        "radius" : 1.0
+      }
     } ],
     "isTimestamped" : true,
     "isWriteMetaData" : false
@@ -179,10 +200,10 @@
         "movementThreshold" : 0.0,
         "minStepLength" : 0.1,
         "minimumStepLength" : true,
-        "maxStepDuration" : 1.7976931348623157E308,
+        "maxStepDuration" : 10.0,
         "dynamicStepLength" : true,
         "updateType" : "EVENT_DRIVEN",
-        "seeSmallWalls" : false,
+        "seeSmallWalls" : true,
         "targetPotentialModel" : "org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid",
         "pedestrianPotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldPedestrianCompactSoftshell",
         "obstaclePotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldObstacleCompactSoftshell",
@@ -203,8 +224,8 @@
         "potentialFieldResolution" : 0.1,
         "obstacleGridPenalty" : 0.1,
         "targetAttractionStrength" : 1.0,
-        "cacheType" : "NO_CACHE",
-        "cacheDir" : "",
+        "cacheType" : "BIN_CACHE",
+        "cacheDir" : "my_cache",
         "timeCostAttributes" : {
           "standardDeviation" : 0.7,
           "type" : "UNIT",
@@ -221,7 +242,7 @@
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 400.0,
+      "finishTime" : 600.0,
       "simTimeStepLength" : 0.4,
       "realTimeSimTimeRatio" : 0.0,
       "writeSimulationData" : true,
@@ -259,7 +280,7 @@
             }, {
               "instruction" : "use all targets",
               "targetIds" : [ 11, 21, 31 ],
-              "targetProbabilities" : [ 0.4, 0.3, 0.3 ]
+              "targetProbabilities" : [ 0.3, 0.3, 0.4 ]
             } ]
           }
         }
@@ -537,7 +558,7 @@
         "spawnAtGridPositionsCA" : false,
         "useFreeSpaceOnly" : true,
         "targetIds" : [ 111 ],
-        "groupSizeDistribution" : [ 0.0 ],
+        "groupSizeDistribution" : [ 1.0 ],
         "dynamicElementType" : "PEDESTRIAN",
         "attributesPedestrian" : null
       } ],
