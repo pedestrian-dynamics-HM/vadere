@@ -2,11 +2,10 @@
   "name" : "bridge_timeCost_OBSTACLES",
   "description" : "",
   "release" : "2.2",
-  "commithash" : "d9d2b99fc786eb7cd6932d373880911fde7d8471",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
-      "filename" : "postvis.trajectories",
+      "filename" : "postvis.traj",
       "processors" : [ 1, 2 ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOverlapOutputFile",

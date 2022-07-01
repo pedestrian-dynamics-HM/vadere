@@ -2,11 +2,10 @@
   "name" : "complex_NAVIGATION_groups_001",
   "description" : "",
   "release" : "2.2",
-  "commithash" : "d9d2b99fc786eb7cd6932d373880911fde7d8471",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
-      "filename" : "postvis.trajectories",
+      "filename" : "postvis.traj",
       "processors" : [ 1, 2 ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOverlapOutputFile",
@@ -46,7 +45,9 @@
     "attributesModel" : {
       "org.vadere.state.attributes.models.AttributesCGM" : {
         "groupMemberRepulsionFactor" : 0.01,
-        "leaderAttractionFactor" : 0.003
+        "leaderAttractionFactor" : 0.003,
+        "lostMembers" : false,
+        "waitBehaviourRelevantAgentsFactor" : -1
       },
       "org.vadere.state.attributes.models.AttributesFloorField" : {
         "createMethod" : "HIGH_ACCURACY_FAST_MARCHING",
@@ -102,7 +103,7 @@
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 45.0,
+      "finishTime" : 4.0,
       "simTimeStepLength" : 0.4,
       "realTimeSimTimeRatio" : 0.0,
       "writeSimulationData" : true,
