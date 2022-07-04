@@ -14,6 +14,7 @@ public interface ModelFilter {
 	 * @param modelClass	Class of the searched SubModel
 	 * @return				Optional of the SubModel
 	 */
+	//TODO might lead to downcasting
 	default Optional<Model> getModel (final SimulationState state, Class modelClass){
 		Optional<MainModel> mainModel =  state.getMainModel();
 		return mainModel.flatMap(mainModel1 -> mainModel1

@@ -18,7 +18,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-public class TargetController extends ScenarioElementController  {
+public class TargetController extends ScenarioElementController {
 
 	private static final Logger log = Logger.getLogger(TargetController.class);
 
@@ -61,7 +61,7 @@ public class TargetController extends ScenarioElementController  {
 				if (target.getWaitingTime() <= 0) {
 					checkRemove(agent);
 				} else {
-					waitingBehavior(simTimeInSec, agent);
+					waitingBehavior(agent, simTimeInSec);
 				}
 			}
 		}
@@ -81,7 +81,7 @@ public class TargetController extends ScenarioElementController  {
 		return elementsInRange;
 	}
 
-	private void waitingBehavior(double simTimeInSec, final Agent agent) {
+	private void waitingBehavior(final Agent agent, double simTimeInSec) {
 		final int agentId = agent.getId();
 		// individual waiting behaviour, as opposed to waiting at a traffic light
 		if (target.getAttributes().isIndividualWaiting()) {
@@ -151,38 +151,19 @@ public class TargetController extends ScenarioElementController  {
 
 		if (agent.hasNextTarget()) {
 			if (agent.getNextTargetId() == target.getId()
-				&& agent.isCurrentTargetAnAgent() == false)
+				&& !agent.isCurrentTargetAnAgent())
 				isNextTargetForAgent = true;
 		}
 
 		return isNextTargetForAgent;
 	}
 
-	// TODO [priority=high] [task=deprecation] removing the target from the list is deprecated, but still very frequently used everywhere.
 	private void checkRemove(Agent agent) {
 		if (target.isAbsorbing()) {
 			changeTargetOfFollowers(agent);
 			topography.removeElement(agent);
 		} else {
-			final int nextTargetListIndex = agent.getNextTargetListIndex();
-
-			// Deprecated target list usage
-			if (nextTargetListIndex == -1 && !agent.getTargets().isEmpty()) {
-				agent.getTargets().removeFirst();
-			}
-
-			// The right way (later this first check should not be necessary anymore):
-			if (nextTargetListIndex != -1) {
-				if (nextTargetListIndex < agent.getTargets().size()) {
-					agent.incrementNextTargetListIndex();
-				}
-			}
-
-			// set a new desired speed, if possible. you can model street networks with differing
-			// maximal speeds with this.
-			if (target.getNextSpeed() >= 0) {
-				agent.setFreeFlowSpeed(target.getNextSpeed());
-			}
+			agent.checkNextTarget(target.getNextSpeed());
 		}
 	}
 

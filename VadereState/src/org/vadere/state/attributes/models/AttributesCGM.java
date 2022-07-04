@@ -11,6 +11,9 @@ public class AttributesCGM extends Attributes {
 
 	private double groupMemberRepulsionFactor = 0.01;
 	private double leaderAttractionFactor = 0.003;
+	private boolean lostMembers = false;
+
+	private int waitBehaviourRelevantAgentsFactor = -1;
 
 	/**
 	 *  moved to org.vadere.state.attributes.scenario.AttributeSource class to allow
@@ -27,4 +30,13 @@ public class AttributesCGM extends Attributes {
 		return leaderAttractionFactor;
 	}
 
+	public boolean isLostMembers(){ return lostMembers; }
+
+	public int getWaitBehaviourRelevantAgentsFactor() {
+		return waitBehaviourRelevantAgentsFactor;
+	}
+
+	public void setWaitBehaviourRelevantAgentsFactor(int waitBehaviourRelevantAgentsFactor) {
+		this.waitBehaviourRelevantAgentsFactor = waitBehaviourRelevantAgentsFactor;
+	}
 }

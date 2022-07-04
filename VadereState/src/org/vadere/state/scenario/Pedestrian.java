@@ -341,30 +341,6 @@ public class Pedestrian extends Agent {
 
     @Override
     public void setTargets(LinkedList<Integer> target) {
-
-        if (getGroupIds() != null) {
-            if (getGroupIds().size() == 1) {
-                Collection<Pedestrian> peds = getPedGroupMembers();
-                setGroupTarget(peds, target);
-            }
-            else if (getGroupIds().size() > 1) {
-                try {
-                    throw new Exception("More than 1 groupIds assigned to pedestrian.");
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }
         super.setTargets(target);
-    }
-
-    public static void setGroupTarget(Collection<Pedestrian> agents, LinkedList<Integer> targetIds) {
-        for (Pedestrian a : agents) {
-            a.setTargetsOther(targetIds);
-        }
-    }
-
-    protected void setTargetsOther(LinkedList<Integer> targetIds) {
-        super.setTargets(targetIds);
     }
 }
