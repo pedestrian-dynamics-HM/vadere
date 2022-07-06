@@ -54,11 +54,47 @@
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
       "filename" : "ped_out.txt",
-      "processors" : [ 114, 115, 23, 24 ]
+      "processors" : [ 114, 19, 115, 23, 24, 123, 124 ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
       "filename" : "densities_pedid.txt",
       "processors" : [ 112 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPositionOutputFile",
+      "filename" : "voronoi_diagr_ma1.txt",
+      "processors" : [ 126 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPositionOutputFile",
+      "filename" : "voronoi_diagr_ma2.txt",
+      "processors" : [ 127 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPositionOutputFile",
+      "filename" : "voronoi_diagr_ma3.txt",
+      "processors" : [ 128 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPositionOutputFile",
+      "filename" : "voronoi_diagr_ma4.txt",
+      "processors" : [ 129 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPositionOutputFile",
+      "filename" : "voronoi_diagr_ma5.txt",
+      "processors" : [ 130 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPositionOutputFile",
+      "filename" : "voronoi_diagr_ma6.txt",
+      "processors" : [ 131 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPositionOutputFile",
+      "filename" : "voronoi_diagr_ma7.txt",
+      "processors" : [ 132 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPositionOutputFile",
+      "filename" : "voronoi_diagr_ma8.txt",
+      "processors" : [ 133 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPositionOutputFile",
+      "filename" : "voronoi_diagr_ma9.txt",
+      "processors" : [ 134 ]
     } ],
     "processors" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor",
@@ -277,6 +313,79 @@
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepGroupIDProcessor",
       "id" : 122
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.RelevantPedestriansProcessor",
+      "id" : 123,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesRelevantPedestriansProcessor",
+      "attributes" : { }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.LostPedestrianProcessor",
+      "id" : 124,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesLostPedestrianProcessor",
+      "attributes" : { }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.VoronoiPolygonProcessor",
+      "id" : 126,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesVoronoiPolygonProcessor",
+      "attributes" : {
+        "voronoiMeasurementAreaId" : 1
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.VoronoiPolygonProcessor",
+      "id" : 127,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesVoronoiPolygonProcessor",
+      "attributes" : {
+        "voronoiMeasurementAreaId" : 2
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.VoronoiPolygonProcessor",
+      "id" : 128,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesVoronoiPolygonProcessor",
+      "attributes" : {
+        "voronoiMeasurementAreaId" : 3
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.VoronoiPolygonProcessor",
+      "id" : 129,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesVoronoiPolygonProcessor",
+      "attributes" : {
+        "voronoiMeasurementAreaId" : 4
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.VoronoiPolygonProcessor",
+      "id" : 130,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesVoronoiPolygonProcessor",
+      "attributes" : {
+        "voronoiMeasurementAreaId" : 5
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.VoronoiPolygonProcessor",
+      "id" : 131,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesVoronoiPolygonProcessor",
+      "attributes" : {
+        "voronoiMeasurementAreaId" : 6
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.VoronoiPolygonProcessor",
+      "id" : 132,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesVoronoiPolygonProcessor",
+      "attributes" : {
+        "voronoiMeasurementAreaId" : 7
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.VoronoiPolygonProcessor",
+      "id" : 133,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesVoronoiPolygonProcessor",
+      "attributes" : {
+        "voronoiMeasurementAreaId" : 8
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.VoronoiPolygonProcessor",
+      "id" : 134,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesVoronoiPolygonProcessor",
+      "attributes" : {
+        "voronoiMeasurementAreaId" : 9
+      }
     } ],
     "isTimestamped" : true,
     "isWriteMetaData" : false
@@ -338,7 +447,9 @@
       },
       "org.vadere.state.attributes.models.AttributesCGM" : {
         "groupMemberRepulsionFactor" : 0.01,
-        "leaderAttractionFactor" : 0.003
+        "leaderAttractionFactor" : 0.003,
+        "lostMembers" : true,
+        "waitBehaviourRelevantAgentsFactor" : 5
       }
     },
     "attributesSimulation" : {
@@ -863,10 +974,10 @@
             "y" : 221.30302009359002
           }, {
             "x" : 181.2,
-            "y" : 213.5
+            "y" : 213.0
           }, {
             "x" : 211.49907640600577,
-            "y" : 213.0648557599634
+            "y" : 213.0
           }, {
             "x" : 211.60176924872212,
             "y" : 213.5541962198913
@@ -951,9 +1062,9 @@
         "id" : 14
       }, {
         "shape" : {
-          "x" : 190.8,
+          "x" : 190.80001,
           "y" : 163.0,
-          "width" : 1.5,
+          "width" : 1.4999,
           "height" : 10.7,
           "type" : "RECTANGLE"
         },
@@ -963,33 +1074,33 @@
           "x" : 199.1,
           "y" : 204.8,
           "width" : 14.8,
-          "height" : 8.4,
+          "height" : 8.1999,
           "type" : "RECTANGLE"
         },
         "id" : 2
       }, {
         "shape" : {
-          "x" : 178.5,
-          "y" : 209.6,
+          "x" : 178.50001,
+          "y" : 209.1,
           "width" : 5.2,
-          "height" : 3.9,
+          "height" : 3.89,
           "type" : "RECTANGLE"
         },
         "id" : 1
       }, {
         "shape" : {
-          "x" : 178.5,
-          "y" : 213.6,
-          "width" : 2.7,
+          "x" : 178.50001,
+          "y" : 213.1,
+          "width" : 2.6999,
           "height" : 39.8,
           "type" : "RECTANGLE"
         },
         "id" : 4
       }, {
         "shape" : {
-          "x" : 178.5,
+          "x" : 178.50001,
           "y" : 280.7,
-          "width" : 2.7,
+          "width" : 2.6999,
           "height" : 15.5,
           "type" : "RECTANGLE"
         },
@@ -1006,7 +1117,7 @@
       }, {
         "shape" : {
           "x" : 187.5,
-          "y" : 190.5,
+          "y" : 190.50001,
           "width" : 6.2,
           "height" : 4.2,
           "type" : "RECTANGLE"
@@ -1015,17 +1126,17 @@
       }, {
         "shape" : {
           "x" : 186.8,
-          "y" : 182.5,
+          "y" : 182.50001,
           "width" : 4.0,
-          "height" : 3.0,
+          "height" : 2.999,
           "type" : "RECTANGLE"
         },
         "id" : 8
       }, {
         "shape" : {
-          "x" : 190.8,
+          "x" : 190.80001,
           "y" : 173.9,
-          "width" : 1.5,
+          "width" : 1.4999,
           "height" : 11.6,
           "type" : "RECTANGLE"
         },
@@ -1340,7 +1451,7 @@
       },
       "stimuli" : [ {
         "type" : "InformationStimulus",
-        "information" : "use target 11"
+        "information" : "use all targets"
       } ]
     } ]
   }
