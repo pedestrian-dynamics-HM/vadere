@@ -17,6 +17,9 @@ public abstract class Agent extends DynamicElement {
     // Member Variables
     private AttributesAgent attributes;
 
+	private transient final List<AgentListener> listeners;
+	private transient final HashMap<Class<? extends ScenarioElement>, Set<Integer>> encounteredScenarioElements;
+
 	/**
 	 * Source where the agent was spawned. The SourceController should
 	 * set this field. It may be <code>null</code> when the agent is created
@@ -47,6 +50,8 @@ public abstract class Agent extends DynamicElement {
 		isCurrentTargetAnAgent = false;
 
 		followers = new LinkedList<>();
+		encounteredScenarioElements = new HashMap<>();
+		listeners = new LinkedList<>();
 	}
 
 	public Agent(AttributesAgent attributesAgent, Random random) {
@@ -183,6 +188,10 @@ public abstract class Agent extends DynamicElement {
 
     public void setTargets(LinkedList<Integer> targetIds) {
         this.targetIds = targetIds;
+
+		for (AgentListener listener: listeners) {
+			listener.agentTargetsChanged(targetIds, this.getId());
+		}
     }
 
     /**
@@ -284,6 +293,50 @@ public abstract class Agent extends DynamicElement {
 
 	public void setFollowers(LinkedList<Agent> followers) {
 		this.followers = followers;
+	}
+
+	// TODO [priority=high] [task=deprecation] removing the target from the list is deprecated, but still very frequently used everywhere.
+	public void checkNextTarget(double nextSpeed) {
+		final int nextTargetListIndex = this.getNextTargetListIndex();
+
+		// Deprecated target list usage
+		if (nextTargetListIndex <= -1 && !this.getTargets().isEmpty()) {
+			this.getTargets().removeFirst();
+		}
+
+		// The right way (later this first check should not be necessary anymore):
+		if (this.hasNextTarget()) {
+			this.incrementNextTargetListIndex();
+			for (AgentListener listener: listeners) {
+				listener.agentNextTargetSet(nextSpeed, this.getId());
+			}
+		}
+
+		// set a new desired speed, if possible. you can model street networks with differing
+		// maximal speeds with this.
+		if (nextSpeed >= 0) {
+			this.setFreeFlowSpeed(nextSpeed);
+		}
+	}
+
+	public <T extends ScenarioElement> void elementEncountered(Class<T> clazz, T elem) {
+		encounteredScenarioElements.computeIfAbsent(clazz, k -> new HashSet<>())
+						.add(elem.getId());
+		for (AgentListener listener: listeners) {
+			listener.agentElementEncountered(elem, this.getId());
+		}
+	}
+
+	public <T extends ScenarioElement> Set<Integer> getElementsEncountered(Class<T> clazz) {
+		return encounteredScenarioElements.getOrDefault(clazz, new HashSet<>());
+	}
+
+	public void clearListeners() {
+		this.listeners.clear();
+	}
+
+	public void addAgentListener(AgentListener listener) {
+		this.listeners.add(listener);
 	}
 
 }
