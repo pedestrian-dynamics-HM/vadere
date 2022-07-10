@@ -4,13 +4,14 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
 import org.vadere.simulator.control.simulation.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
-import org.vadere.simulator.projects.dataprocessing.datakey.TimeGridKey;
+import org.vadere.simulator.projects.dataprocessing.datakey.PedestrianIdKey;
+import org.vadere.simulator.projects.dataprocessing.datakey.TimeRectangleGridKey;
 import org.vadere.simulator.projects.dataprocessing.procesordata.PedestrianIdDuration;
-import org.vadere.state.attributes.processor.AttributesAreaDensityGridCountingProcessor;
 import org.vadere.state.attributes.processor.AttributesAreaDensityGridSpatialTimeProcessor;
 import org.vadere.state.attributes.processor.AttributesProcessor;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.simulation.FootStep;
+import org.vadere.state.simulation.VTrajectory;
 import org.vadere.util.geometry.LinkedCellsGrid;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -20,7 +21,7 @@ import org.vadere.util.logging.Logger;
 import java.util.*;
 
 @DataProcessorClass(label = "AreaDensityGridSpatialTimeProcessor")
-public class AreaDensityGridSpatialTimeProcessor extends DataProcessor<TimeGridKey, Double> {
+public class AreaDensityGridSpatialTimeProcessor extends DataProcessor<TimeRectangleGridKey, Double> {
 
     private double nextTime;
 
@@ -28,7 +29,9 @@ public class AreaDensityGridSpatialTimeProcessor extends DataProcessor<TimeGridK
 
     private LinkedCellsGrid<PedestrianIdDuration> cellsElements;
 
-    AttributesAreaDensityGridSpatialTimeProcessor attr;
+    private AttributesAreaDensityGridSpatialTimeProcessor attr;
+
+    private PedestrianTrajectoryProcessor trajectoryProcessor;
 
     private static Logger logger = Logger.getLogger(AreaDensityGridSpatialTimeProcessor.class);
 
@@ -39,7 +42,8 @@ public class AreaDensityGridSpatialTimeProcessor extends DataProcessor<TimeGridK
 
     @Override
     protected void doUpdate(SimulationState state) {
-        if (state.getSimTimeInSec() <= nextTime + timeWindowSize) {
+        this.trajectoryProcessor.update(state);
+        if (state.getSimTimeInSec() >= nextTime + timeWindowSize) {
             cellsElements.clear();
             Collection<Pedestrian> peds = state.getTopography().getPedestrianDynamicElements().getElements();
             for (Pedestrian ped : peds) {
@@ -55,8 +59,11 @@ public class AreaDensityGridSpatialTimeProcessor extends DataProcessor<TimeGridK
                         .sum();
                 VRectangle gridCell = cellsElements.getGridCellAsRectangle(result.getKey()[0], result.getKey()[1]);
                 double cellDensity = totalPedTimeInCell / (gridCell.getArea() * timeWindowSize); // see duives 2015
-                int time = (int) Math.round(nextTime + (timeWindowSize / 2));
-                TimeGridKey key = new TimeGridKey(time,  gridCell.x, gridCell.y, attr.getCellSize());
+                double time = nextTime + (timeWindowSize / 2);
+                if (totalPedTimeInCell > 0.0) {
+                    logger.debug(time + ": total Time in cell " + Arrays.toString(result.getKey()) + ": " + totalPedTimeInCell);
+                }
+                TimeRectangleGridKey key = new TimeRectangleGridKey(time,  gridCell.x, gridCell.y, gridCell.width, gridCell.height);
                 this.putValue(key, cellDensity);
             }
             nextTime += timeWindowSize;
@@ -67,6 +74,7 @@ public class AreaDensityGridSpatialTimeProcessor extends DataProcessor<TimeGridK
         if (!stepsInWindow.isEmpty()) {
             // set start time of footstep to start of timewindow
             FootStep fs = stepsInWindow.get(0);
+            FootStep fsPrev= stepsInWindow.get(0);
             double startTime = Math.max(fs.getStartTime(), nextTime);
             VPoint startPoint;
             if (startTime != fs.getStartTime()) {
@@ -78,54 +86,25 @@ public class AreaDensityGridSpatialTimeProcessor extends DataProcessor<TimeGridK
             int[] gridIdx = cellsElements.gridPos(fs.getStart());
             VRectangle currentCell = cellsElements.getGridCellAsRectangle(gridIdx[0], gridIdx[1]);
             double timeInCell = 0.0;
-            for (int i = 1; i < stepsInWindow.size(); i++) {
-                if (!currentCell.contains(fs.getStart())) {
-                    logger.warn("next footstep did not start at end position of previous footstep.");
-                    break;
+            Pair<VRectangle, Double> fsResult;
+            for (int i = 0; i < stepsInWindow.size(); i++) {
+                if (fs.getStart() != fsPrev.getEnd() || fs.getStartTime() != fsPrev.getEndTime()) {
+                    logger.debug("next footstep did start at different position and/or time. fs: "
+                            + i + "/" + (stepsInWindow.size() - 1));
+                    FootStep intermediate = new FootStep(fsPrev.getEnd(), fs.getStart(), fsPrev.getEndTime(), fs.getStartTime());
+                    fsResult = computeCellForFootStep(intermediate, currentCell, timeInCell, gridIdx, ped);
+                    currentCell = fsResult.getLeft();
+                    timeInCell = fsResult.getRight();
                 }
-                Pair<VRectangle, Double> pair = computeCellForFootStep(fs, currentCell, timeInCell, gridIdx, ped);
-                currentCell = pair.getLeft();
-                timeInCell = pair.getRight();
-                fs = stepsInWindow.get(i);
+                fsResult = computeCellForFootStep(fs, currentCell, timeInCell, gridIdx, ped);
+                currentCell = fsResult.getLeft();
+                timeInCell = fsResult.getRight();
+                // next footstep of ped
+                if (i + 1 < stepsInWindow.size()) {
+                    fsPrev = fs;
+                    fs = stepsInWindow.get(i + 1);
+                }
             }
-
-//            if (stepsInWindow.size() > 1) {
-//                // end position of start step is in window
-//                int[] gridIdx = cellsElements.gridPos(fs.getEnd());
-//                VRectangle currentCell = cellsElements.getGridCellAsRectangle(gridIdx[0], gridIdx[1]);
-//                timeInCell = fs.getEndTime() - Math.max(fs.computeIntersectionTime(currentCell), nextTime);
-//                // following footsteps
-//                for (int i = 1; i < stepsInWindow.size(); i++) {
-//                    fs = stepsInWindow.get(i);
-//                    if (!currentCell.contains(fs.getStart())) {
-//                        logger.warn("next footstep did not start at end position of previous footstep.");
-//                        break;
-//                    }
-//                    if (currentCell.contains(fs.getEnd())) {
-//                        //still same cell
-//                        timeInCell += fs.duration();
-//                    } else {
-//                        //add rest time in cell
-//                        timeInCell += fs.computeIntersectionTime(currentCell) - fs.getStartTime();
-//                        //add pedestrian with total duration for cell
-//                        cellsElements.addObject(new PedestrianIdDuration(ped.getId(), timeInCell, currentCell));
-//                        // check for skipped cells during one footstep
-//                        List<VRectangle> skipped = computeSkippedCells(gridIdx, cellsElements.gridPos(fs.getEnd()), currentCell);
-//                        gridIdx = cellsElements.gridPos(fs.getEnd());
-//                        currentCell = cellsElements.getGridCellAsRectangle(gridIdx[0], gridIdx[1]);
-//                        if (!skipped.isEmpty()) {
-//                            double skippedDuration = fs.computeIntersectionTime(currentCell) - fs.getStartTime();
-//                            for (VRectangle intermediateCell : skipped) {
-//                                //add every cell in between with a shared amount of time
-//                                cellsElements.addObject(new PedestrianIdDuration(ped.getId(),
-//                                        skippedDuration / skipped.size(), intermediateCell));
-//                            }
-//                        }
-//                        //new cell duration of footstep entering
-//                        timeInCell = fs.getEndTime() - fs.computeIntersectionTime(currentCell);
-//                    }
-//                }
-//            }
         }
     }
 
@@ -134,6 +113,7 @@ public class AreaDensityGridSpatialTimeProcessor extends DataProcessor<TimeGridK
         if (cell.contains(fs.getEnd())) {
             // still same cell
             timeInCell += Math.min(fs.getEndTime(), nextTime + timeWindowSize) - fs.getStartTime();
+            timeInCell = timeInCell;
         } else {
 
             double exitingTime = fs.computeIntersectionTime(cell);
@@ -147,6 +127,9 @@ public class AreaDensityGridSpatialTimeProcessor extends DataProcessor<TimeGridK
                 List<VRectangle> skipped = computeSkippedCells(gridIdx, cellsElements.gridPos(fs.getEnd()), cell);
                 gridIdx = cellsElements.gridPos(fs.getEnd());
                 cell = cellsElements.getGridCellAsRectangle(gridIdx[0], gridIdx[1]); //next cell for ped
+                if (!cell.contains(fs.getEnd())) {
+                    logger.warn("computed cell " + cell + " for point " + fs.getEnd() + " did not contain it. ");
+                }
                 double newCellEnteringTime = fs.computeIntersectionTime(cell);
 
                 if (!skipped.isEmpty()) {
@@ -156,6 +139,7 @@ public class AreaDensityGridSpatialTimeProcessor extends DataProcessor<TimeGridK
                         //add every cell in between with a shared amount of time
                         cellsElements.addObject(new PedestrianIdDuration(ped.getId(),
                                 skippedDuration / skipped.size(), intermediateCell));
+                        logger.debug(ped + " skipped grid cells during one footstep: " + skippedDuration + " s");
                     }
                 }
 
@@ -179,8 +163,10 @@ public class AreaDensityGridSpatialTimeProcessor extends DataProcessor<TimeGridK
     }
 
     private LinkedList<FootStep> getFootstepsForTimeWindow(Pedestrian pedestrian) {
-        Iterator<FootStep> it = pedestrian.getTrajectory().getFootSteps()
+        VTrajectory pedTrajectory = this.trajectoryProcessor.getValue(new PedestrianIdKey(pedestrian.getId()));
+        Iterator<FootStep> it = pedTrajectory.getFootSteps()
                 .descendingIterator();
+
         LinkedList<FootStep> stepsInWindow = new LinkedList<>();
         while (it.hasNext()) {
             FootStep footStep = it.next();
@@ -235,6 +221,7 @@ public class AreaDensityGridSpatialTimeProcessor extends DataProcessor<TimeGridK
         this.nextTime = 0.0;
         attr = (AttributesAreaDensityGridSpatialTimeProcessor) getAttributes();
         this.timeWindowSize = attr.getT();
+        this.trajectoryProcessor = (PedestrianTrajectoryProcessor) manager.getProcessor(attr.getPedestrianTrajectoryProcessorId());
     }
 
     @Override

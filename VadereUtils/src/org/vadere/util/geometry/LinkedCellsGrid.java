@@ -202,11 +202,14 @@ public class LinkedCellsGrid<T extends PointPositioned> implements Iterable<T> {
 	}
 
 	public VRectangle getGridCellAsRectangle(int iX, int iY) {
-		double width = sideLength;
-		double height = sideLength;
-//		double lowerLeftX = left + iX * this.cellSize[0];
-		double lowerLeftX = left + iX * sideLength;
-		double lowerLeftY = top + iY * sideLength;
+//		double width = sideLength;
+//		double height = sideLength;
+		double width = this.cellSize[0];
+		double height = this.cellSize[1];
+		double lowerLeftX = left + iX * this.cellSize[0];
+		double lowerLeftY = top + iY * this.cellSize[1];
+//		double lowerLeftX = left + iX * sideLength;
+//		double lowerLeftY = top + iY * sideLength;
 		return new VRectangle(lowerLeftX, lowerLeftY, width, height);
 	}
 

@@ -6,6 +6,16 @@ public class AttributesAreaDensityGridSpatialTimeProcessor extends AttributesPro
 
     double T = 1;
 
+    private int pedestrianTrajectoryProcessorId;
+
+    public int getPedestrianTrajectoryProcessorId() {
+        return pedestrianTrajectoryProcessorId;
+    }
+
+    public void setPedestrianTrajectoryProcessorId(int pedestrianTrajectoryProcessorId) {
+        this.pedestrianTrajectoryProcessorId = pedestrianTrajectoryProcessorId;
+    }
+
     public double getT() {
         return T;
     }

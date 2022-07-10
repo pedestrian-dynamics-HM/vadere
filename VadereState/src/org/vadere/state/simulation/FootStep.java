@@ -7,6 +7,8 @@ import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 
+import java.util.Optional;
+
 /**
  * A foot step is a simple java bean which represents one pedestrian foot step which is defined by
  * <ol>
@@ -105,7 +107,13 @@ public final class FootStep {
 	public double computeIntersectionTime(@NotNull final VRectangle rectangle) {
 		VPoint start = getStart();
 		VPoint end = getEnd();
-		VPoint intersectionPoint = GeometryUtils.intersectionPoint(rectangle, start.getX(), start.getY(), end.getX(), end.getY()).get();
+		Optional<VPoint> intersectionPointOpt = GeometryUtils.intersectionPoint(rectangle, start.getX(), start.getY(), end.getX(), end.getY());
+		VPoint intersectionPoint;
+		if (intersectionPointOpt.isEmpty()) {
+			intersectionPoint = getStart();
+		} else {
+			intersectionPoint = intersectionPointOpt.get();
+		}
 		double dStart = intersectionPoint.distance(start);
 		double stepLength = start.distance(end);
 		double duration = getEndTime() - getStartTime();
