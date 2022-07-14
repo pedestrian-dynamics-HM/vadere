@@ -32,7 +32,7 @@ public class AreaDensityGridCountingProcessor<T, I> extends  DataProcessor<TimeG
         for (int r = 0; r < count.length; r++) {
             for (int c = 0; c < count[r].length; c++) {
                 pedCount = count[r][c];
-                this.putValue(new TimeGridKey(step,r*attr.getCellSize(),c*attr.getCellSize(), attr.getCellSize()), pedCount);
+                this.putValue(new TimeGridKey(step,r*attr.getCellSize(),c*attr.getCellSize(), attr.getCellSize()), pedCount);  //TODO actual cell size in LinkedCellsGrid probably different
             }
         }
     }
