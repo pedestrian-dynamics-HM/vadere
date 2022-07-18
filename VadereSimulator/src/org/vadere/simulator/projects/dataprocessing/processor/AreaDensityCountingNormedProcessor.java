@@ -10,7 +10,6 @@ import org.vadere.state.traci.CompoundObject;
 import org.vadere.state.traci.CompoundObjectBuilder;
 import org.vadere.state.traci.CompoundObjectProvider;
 import org.vadere.state.traci.TraCIDataType;
-
 import java.util.Collection;
 
 @DataProcessorClass(label = "AreaDensityCountingNormedProcessor")

@@ -90,7 +90,7 @@ public class AreaGroupMetaDataProcessor extends DataProcessor<TimestepGroupIdKey
                 try {
                     //compute the convex hull for all groups and the centroid of the resulting polygons -> problem might be that
                     //convex hull is susceptible to statistical outliers
-                    VPoint centroid = currentGroup.getCentroid(true);
+                    VPoint centroid = currentGroup.getCentroid(false);
                     data.setCentroid(centroid);
                     if (this.measurementArea != null) {
                         data.setCentroidInArea(this.measurementArea.getShape().contains(centroid));

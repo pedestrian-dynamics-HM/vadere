@@ -3,6 +3,7 @@ package org.vadere.simulator.projects.dataprocessing.processor;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
 import org.vadere.meshing.WeilerAtherton;
+import org.vadere.simulator.control.simulation.Simulation;
 import org.vadere.simulator.control.simulation.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPositionKey;
@@ -17,6 +18,7 @@ import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.voronoi.Face;
 import org.vadere.util.voronoi.VoronoiDiagram;
+import org.vadere.util.logging.Logger;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -28,6 +30,8 @@ import java.util.stream.Collectors;
 public class VoronoiPolygonProcessor extends DataProcessor<TimestepPositionKey, VPolygon> implements UsesMeasurementArea {
 	private MeasurementArea voronoiMeasurementArea;
 	private List<VPolygon> obstacles;
+
+	private static Logger logger = Logger.getLogger(VoronoiPolygonProcessor.class);
 
 	public VoronoiPolygonProcessor() {
 		super("polygon", "area");
@@ -45,6 +49,7 @@ public class VoronoiPolygonProcessor extends DataProcessor<TimestepPositionKey, 
 			VPolygon cell = face.toPolygon();
 			VPolygon capCell = computeObstacleIntersection(cell);
 			if (capCell == null) {
+				logger.info("no voronoidiagramm for timestep: " + state.getStep() + "and area: " + voronoiMeasurementArea.getId());
 				substractionSuccess = false;
 				break;
 			}
@@ -67,10 +72,14 @@ public class VoronoiPolygonProcessor extends DataProcessor<TimestepPositionKey, 
 
 	@Override
 	public String[] toStrings(TimestepPositionKey key) {
-		VPolygon p = this.getValue(key);
-		String points = StateJsonConverter.serializeObject(p.getPoints());
-		String area = StateJsonConverter.serializeObject(p.getArea());
-		return new String[]{points, area};
+		if (this.hasValue(key)) {
+			VPolygon p = this.getValue(key);
+			String points = StateJsonConverter.serializeObject(p.getPoints());
+			String area = StateJsonConverter.serializeObject(p.getArea());
+			return new String[]{points, area};
+		} else {
+			return new String[]{"NA", "NA"};
+		}
 	}
 
 	@Override
@@ -100,13 +109,13 @@ public class VoronoiPolygonProcessor extends DataProcessor<TimestepPositionKey, 
 			if (!intersectedObstacles.isEmpty()) {
 				intersectedObstacles.addFirst(cell);
 				WeilerAtherton weilerAtherton = new WeilerAtherton(intersectedObstacles);
-				VPolygon capPolygon = weilerAtherton.subtraction().get();
-				return capPolygon;
+				Optional<VPolygon> capPolygon = weilerAtherton.subtraction();
+				return capPolygon.orElse(null);
 			} else {
 				return cell;
 			}
 		} catch (Exception e) {
-			System.out.println(e.getMessage());
+			logger.info(e.getMessage());
 		}
 		return null;
 	}

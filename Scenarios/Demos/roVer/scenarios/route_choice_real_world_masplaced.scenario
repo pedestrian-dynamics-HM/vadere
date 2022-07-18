@@ -2,7 +2,6 @@
   "name" : "route_choice_real_world_masplaced",
   "description" : "",
   "release" : "2.2",
-  "commithash" : "dc9936bd7960937f6d4c931052229ec9c5b1f2f0",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -209,7 +208,7 @@
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 600.0,
+      "finishTime" : 20.0,
       "simTimeStepLength" : 0.4,
       "realTimeSimTimeRatio" : 0.1,
       "writeSimulationData" : true,

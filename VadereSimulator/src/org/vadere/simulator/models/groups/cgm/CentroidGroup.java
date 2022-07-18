@@ -511,6 +511,9 @@ public class CentroidGroup implements Group {
                 p.setNextTargetListIndex(0);
             }
         }
+        if (this.members.stream().filter(ped -> !isLostMember(ped)).map(ped -> ped.getNextTargetId()).collect(Collectors.toSet()).size() != 1) {
+            log.error("Group " + this.getID() + ": all groups members should have same target after targetchange but did not.");
+        }
     }
 
     /**
@@ -560,6 +563,7 @@ public class CentroidGroup implements Group {
 
             //to avoid recursive calls, consider only first element encounter
             boolean eventPending = this.getMembers().stream()
+                    .filter(p -> !isLostMember(p))
                     .filter(p -> p.getElementsEncountered(TargetChanger.class).contains(element.getId()))
                     .count() == 1;
 
