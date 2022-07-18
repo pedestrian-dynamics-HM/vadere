@@ -62,9 +62,9 @@ public class AreaDensityGridSpatialTimeProcessor extends DataProcessor<TimeRecta
                 double time = nextTime + (timeWindowSize / 2);
                 if (totalPedTimeInCell > 0.0) {
                     logger.debug(time + ": total Time in cell " + Arrays.toString(result.getKey()) + ": " + totalPedTimeInCell);
+                    TimeRectangleGridKey key = new TimeRectangleGridKey(time, gridCell.x, gridCell.y, gridCell.width, gridCell.height);
+                    this.putValue(key, cellDensity);
                 }
-                TimeRectangleGridKey key = new TimeRectangleGridKey(time,  gridCell.x, gridCell.y, gridCell.width, gridCell.height);
-                this.putValue(key, cellDensity);
             }
             nextTime += timeWindowSize;
         }

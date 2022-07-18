@@ -70,12 +70,12 @@
       "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianLineCrossProcessor",
       "attributes" : {
         "p1" : {
-          "x" : 178.5,
-          "y" : 213.2
+          "x" : 177.5,
+          "y" : 221.0
         },
         "p2" : {
-          "x" : 181.2,
-          "y" : 213.2
+          "x" : 181.3,
+          "y" : 221.0
         }
       }
     }, {
@@ -84,12 +84,12 @@
       "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianLineCrossProcessor",
       "attributes" : {
         "p1" : {
-          "x" : 178.5,
-          "y" : 296.1
+          "x" : 178.2,
+          "y" : 296.0
         },
         "p2" : {
-          "x" : 181.2,
-          "y" : 296.1
+          "x" : 180.9,
+          "y" : 296.0
         }
       }
     }, {
@@ -170,8 +170,8 @@
       "org.vadere.state.attributes.models.AttributesCGM" : {
         "groupMemberRepulsionFactor" : 0.01,
         "leaderAttractionFactor" : 0.003,
-        "lostMembers" : true,
-        "waitBehaviourRelevantAgentsFactor" : 7
+        "lostMembers" : false,
+        "waitBehaviourRelevantAgentsFactor" : -1
       }
     },
     "attributesSimulation" : {

@@ -59,6 +59,14 @@
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
       "filename" : "densities_pedid.txt",
       "processors" : [ 109 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPositionOutputFile",
+      "filename" : "voronoi_polygon.txt",
+      "processors" : [ 112, 113, 111 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimeRectangleGridOutputFile",
+      "filename" : "grid_spatial_time.txt",
+      "processors" : [ 114 ]
     } ],
     "processors" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor",
@@ -181,6 +189,39 @@
         "pedestrianPositionProcessorId" : 24,
         "radius" : 1.0
       }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.VoronoiPolygonProcessor",
+      "id" : 111,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesVoronoiPolygonProcessor",
+      "attributes" : {
+        "voronoiMeasurementAreaId" : 1
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.VoronoiPolygonProcessor",
+      "id" : 112,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesVoronoiPolygonProcessor",
+      "attributes" : {
+        "voronoiMeasurementAreaId" : 2
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.VoronoiPolygonProcessor",
+      "id" : 113,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesVoronoiPolygonProcessor",
+      "attributes" : {
+        "voronoiMeasurementAreaId" : 3
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.AreaDensityGridSpatialTimeProcessor",
+      "id" : 114,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesAreaDensityGridSpatialTimeProcessor",
+      "attributes" : {
+        "cellSize" : 2.0,
+        "T" : 5.0,
+        "pedestrianTrajectoryProcessorId" : 115
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianTrajectoryProcessor",
+      "id" : 115
     } ],
     "isTimestamped" : true,
     "isWriteMetaData" : false
