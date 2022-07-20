@@ -43,7 +43,11 @@ public class AreaDensityGridSpatialTimeProcessor extends DataProcessor<TimeRecta
     @Override
     protected void doUpdate(SimulationState state) {
         this.trajectoryProcessor.update(state);
-        if (state.getSimTimeInSec() >= nextTime + timeWindowSize) {
+        if (state.getSimTimeInSec() >= nextTime + timeWindowSize ||
+                (state.getSimTimeInSec() >= timeWindowSize && attr.isEveryStep())) {
+            if (attr.isEveryStep()) {
+                nextTime = state.getSimTimeInSec() - (timeWindowSize/2);
+            }
             cellsElements.clear();
             Collection<Pedestrian> peds = state.getTopography().getPedestrianDynamicElements().getElements();
             for (Pedestrian ped : peds) {
@@ -66,7 +70,9 @@ public class AreaDensityGridSpatialTimeProcessor extends DataProcessor<TimeRecta
                     this.putValue(key, cellDensity);
                 }
             }
-            nextTime += timeWindowSize;
+            if (!attr.isEveryStep()) {
+                nextTime += timeWindowSize;
+            }
         }
     }
 

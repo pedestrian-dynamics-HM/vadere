@@ -6,6 +6,8 @@ public class AttributesAreaDensityGridSpatialTimeProcessor extends AttributesPro
 
     double T = 1;
 
+    boolean everyStep = true;
+
     private int pedestrianTrajectoryProcessorId;
 
     public int getPedestrianTrajectoryProcessorId() {
@@ -14,6 +16,14 @@ public class AttributesAreaDensityGridSpatialTimeProcessor extends AttributesPro
 
     public void setPedestrianTrajectoryProcessorId(int pedestrianTrajectoryProcessorId) {
         this.pedestrianTrajectoryProcessorId = pedestrianTrajectoryProcessorId;
+    }
+
+    public boolean isEveryStep() {
+        return everyStep;
+    }
+
+    public void setEveryStep(boolean everyStep) {
+        this.everyStep = everyStep;
     }
 
     public double getT() {
