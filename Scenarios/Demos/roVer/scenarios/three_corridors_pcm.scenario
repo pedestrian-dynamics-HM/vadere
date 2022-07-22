@@ -61,12 +61,20 @@
       "processors" : [ 109 ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPositionOutputFile",
-      "filename" : "voronoi_polygon.txt",
-      "processors" : [ 112, 113, 111 ]
+      "filename" : "voronoi_diagr_ma1.txt",
+      "processors" : [ 111 ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimeRectangleGridOutputFile",
       "filename" : "grid_spatial_time.txt",
       "processors" : [ 114 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPositionOutputFile",
+      "filename" : "voronoi_diagr_ma2.txt",
+      "processors" : [ 112 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPositionOutputFile",
+      "filename" : "voronoi_diagr_ma3.txt",
+      "processors" : [ 113 ]
     } ],
     "processors" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor",
@@ -217,6 +225,7 @@
       "attributes" : {
         "cellSize" : 2.0,
         "T" : 5.0,
+        "everyStep" : true,
         "pedestrianTrajectoryProcessorId" : 115
       }
     }, {
@@ -469,28 +478,28 @@
       } ],
       "measurementAreas" : [ {
         "shape" : {
-          "x" : 4.0,
+          "x" : 4.00001,
           "y" : 25.0,
-          "width" : 2.5,
-          "height" : 27.0,
+          "width" : 2.499,
+          "height" : 26.9999,
           "type" : "RECTANGLE"
         },
         "id" : 1
       }, {
         "shape" : {
-          "x" : 19.0,
+          "x" : 19.00001,
           "y" : 25.0,
-          "width" : 2.5,
-          "height" : 118.0,
+          "width" : 2.4999,
+          "height" : 117.9999,
           "type" : "RECTANGLE"
         },
         "id" : 3
       }, {
         "shape" : {
-          "x" : 11.5,
+          "x" : 11.50001,
           "y" : 25.0,
-          "width" : 2.5,
-          "height" : 86.0,
+          "width" : 2.4999,
+          "height" : 85.999,
           "type" : "RECTANGLE"
         },
         "id" : 2
@@ -654,7 +663,7 @@
       },
       "stimuli" : [ {
         "type" : "InformationStimulus",
-        "information" : "use target 11"
+        "information" : "use all targets"
       } ]
     } ]
   }

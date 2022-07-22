@@ -381,6 +381,7 @@
       "attributes" : {
         "cellSize" : 5.0,
         "T" : 5.0,
+        "everyStep" : true,
         "pedestrianTrajectoryProcessorId" : 136
       }
     }, {

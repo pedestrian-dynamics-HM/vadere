@@ -1,5 +1,5 @@
 {
-  "name" : "route_choice_real_world_pcm_tpgrphy_adapted_cgm",
+  "name" : "route_choice_real_world_pcm_tpgrphy_adapted_cgm_cut",
   "description" : "",
   "release" : "2.2",
   "processWriters" : {
@@ -244,7 +244,7 @@
       "id" : 111,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesAreaDensityCountingProcessor",
       "attributes" : {
-        "measurementAreaId" : 9
+        "measurementAreaId" : 954
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianDensityCountingProcessor",
@@ -470,7 +470,7 @@
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 600.0,
+      "finishTime" : 1000.0,
       "simTimeStepLength" : 0.4,
       "realTimeSimTimeRatio" : 0.0,
       "writeSimulationData" : true,
@@ -517,10 +517,10 @@
     "topography" : {
       "attributes" : {
         "bounds" : {
-          "x" : 121.8,
-          "y" : 118.9,
-          "width" : 164.1,
-          "height" : 215.1
+          "x" : 174.0,
+          "y" : 156.0,
+          "width" : 70.0,
+          "height" : 149.0
         },
         "boundingBoxWidth" : 0.5,
         "bounded" : true,
@@ -976,7 +976,7 @@
         "id" : 8
       }, {
         "shape" : {
-          "x" : 192.3,
+          "x" : 192.5,
           "y" : 159.5,
           "width" : 1.5,
           "height" : 31.0,
@@ -1081,7 +1081,7 @@
         "shape" : {
           "x" : 190.80001,
           "y" : 163.0,
-          "width" : 1.4999,
+          "width" : 1.6999,
           "height" : 10.7,
           "type" : "RECTANGLE"
         },
@@ -1130,7 +1130,7 @@
           "height" : 5.9,
           "type" : "RECTANGLE"
         },
-        "id" : 9
+        "id" : 954
       }, {
         "shape" : {
           "x" : 187.5,
@@ -1153,7 +1153,7 @@
         "shape" : {
           "x" : 190.80001,
           "y" : 173.9,
-          "width" : 1.4999,
+          "width" : 1.6999,
           "height" : 11.6,
           "type" : "RECTANGLE"
         },
@@ -1235,7 +1235,7 @@
         "shape" : {
           "x" : 190.8,
           "y" : 162.0,
-          "width" : 1.5,
+          "width" : 1.7,
           "height" : 2.0,
           "type" : "RECTANGLE"
         },
@@ -1386,15 +1386,15 @@
         "shape" : {
           "x" : 190.8,
           "y" : 160.0,
-          "width" : 1.5,
+          "width" : 1.7,
           "height" : 2.0,
           "type" : "RECTANGLE"
         },
         "interSpawnTimeDistribution" : "constant",
         "distributionParameters" : {
-          "updateFrequency" : 15
+          "updateFrequency" : 25
         },
-        "spawnNumber" : 2,
+        "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 60.0,
         "endTime" : 20000.0,
@@ -1416,7 +1416,7 @@
         },
         "interSpawnTimeDistribution" : "constant",
         "distributionParameters" : {
-          "updateFrequency" : 4.0
+          "updateFrequency" : 6.0
         },
         "spawnNumber" : 3,
         "maxSpawnNumberTotal" : -1,
@@ -1468,7 +1468,7 @@
       },
       "stimuli" : [ {
         "type" : "InformationStimulus",
-        "information" : "use all targets"
+        "information" : "use target 11"
       } ]
     } ]
   }
