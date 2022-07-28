@@ -58,7 +58,7 @@ public class ProbabilisticCognitionModel extends AProbabilisticModel {
                 InformationStimulus information = (InformationStimulus) pedestrian.getMostImportantStimulus();
                 String instruction = information.getInformation();
 
-                if (pedestrian.getKnowledgeBase().getInformationState().equals(InformationState.NO_INFORMATION)) {
+                if (pedestrian.getKnowledgeBase().getKnowledge().size() == 0) {
 
                     AttributesRouteChoiceDefinition attr = getFilteredAttributes(instruction);
                     LinkedList<Integer> newTarget = getNewTarget(attr.getTargetIds(), attr.getTargetProbabilities());
@@ -88,7 +88,6 @@ public class ProbabilisticCognitionModel extends AProbabilisticModel {
 
         pedestrian.getKnowledgeBase().addInformation(new KnowledgeItem(instruction));
         pedestrian.setSelfCategory(SelfCategory.CHANGE_TARGET);
-        pedestrian.getKnowledgeBase().setInformationState(InformationState.INFORMATION_RECEIVED);
     }
 
     private void tryToReachTarget(Pedestrian pedestrian) {
