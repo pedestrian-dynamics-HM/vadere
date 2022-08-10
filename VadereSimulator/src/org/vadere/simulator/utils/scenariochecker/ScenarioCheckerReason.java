@@ -37,6 +37,7 @@ public enum ScenarioCheckerReason {
 
 	TARGET_UNUSED("ScenarioChecker.target.unused"),
 	TARGET_OVERLAP("ScenarioChecker.target.overlap"),
+	TARGET_NO_ABSORBER("ScenarioChecker.target.noAbsorber"),
 	PEDESTRIAN_SPEED_SETUP("ScenarioChecker.pedestrian.speedsetup"),
 	PEDESTRIAN_SPEED_NOT_LOGICAL("ScenarioChecker.pedestrian.speedNotLogical"),
 	PEDESTRIAN_SPEED_NEGATIVE("ScenarioChecker.pedestrian.speedIsNegative"),

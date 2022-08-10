@@ -70,6 +70,7 @@ public class ScenarioChecker {
 		ret.addAll(checkSimulationAttribues());
 		ret.addAll(checkSourceSpawnSetting());
 		ret.addAll(checkMinSourceRadius());
+		ret.addAll(checkTargetNoAbsorber());
 		ret.addAll(runCheck(new TopographyOffsetCheck()));
 		ret.addAll(runCheck(new DataProcessorsLinkedToMeasurementArea()));
 		ret.addAll(runCheck(new CheckAreasInAreaDensityVoronoiProcessor()));
@@ -78,6 +79,7 @@ public class ScenarioChecker {
 		ret.addAll(runCheck(new StimulusCheck()));
 		return ret;
 	}
+	public PriorityQueue<ScenarioCheckerMessage> checkTargetNoAbsorber(){return runCheck(new ExistingAbsorberCheck());}
 
 	public PriorityQueue<ScenarioCheckerMessage> checkMinSourceRadius() {
 		return runCheck(new SourceMinRadiusCheck());
