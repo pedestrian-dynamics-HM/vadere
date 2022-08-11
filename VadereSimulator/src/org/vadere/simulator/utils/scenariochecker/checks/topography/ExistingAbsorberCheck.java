@@ -11,6 +11,9 @@ import java.util.List;
 import java.util.PriorityQueue;
 import java.util.stream.Collectors;
 
+/**
+ * Test if there are targets with 'absorb' set to 'true'
+ */
 public class ExistingAbsorberCheck extends AbstractScenarioCheck implements TopographyCheckerTest {
     @Override
     public PriorityQueue<ScenarioCheckerMessage> runScenarioCheckerTest(Topography topography) {

@@ -11,7 +11,10 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.stream.Collectors;
-
+/**
+ * Test if there are any targets with 'absorb' set to 'false' with higher index,
+ * than existing targets with 'absorb' set to 'true'
+ */
 public class LastIsAbsorberCheck extends AbstractScenarioCheck implements TopographyCheckerTest {
     @Override
     public PriorityQueue<ScenarioCheckerMessage> runScenarioCheckerTest(Topography topography) {
