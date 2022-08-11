@@ -2,7 +2,6 @@
   "name" : "Reynolds_test",
   "description" : "",
   "release" : "2.2",
-  "commithash" : "bef9b7bef5c5755b23c296217e1454e4af9b7d15",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -112,7 +111,22 @@
         "bounded" : true,
         "referenceCoordinateSystem" : null
       },
-      "obstacles" : [ ],
+      "obstacles" : [ {
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 30.0,
+            "y" : 8.8
+          }, {
+            "x" : 30.0,
+            "y" : 8.8
+          }, {
+            "x" : 30.0,
+            "y" : 8.8
+          } ]
+        },
+        "id" : 3
+      } ],
       "measurementAreas" : [ {
         "shape" : {
           "x" : 10.0,
