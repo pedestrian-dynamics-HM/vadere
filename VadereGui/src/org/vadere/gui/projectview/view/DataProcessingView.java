@@ -6,6 +6,7 @@ import info.clearthought.layout.TableLayout;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rsyntaxtextarea.Theme;
+import org.vadere.gui.components.control.JSearchComboBox;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.components.view.JComboCheckBox;
 import org.vadere.gui.projectview.model.IScenarioChecker;
@@ -21,7 +22,6 @@ import org.vadere.simulator.projects.dataprocessing.store.DataProcessorStore;
 import org.vadere.simulator.projects.dataprocessing.store.OutputFileStore;
 import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.config.VadereConfig;
-import org.vadere.util.io.IOUtils;
 import org.vadere.util.logging.Logger;
 
 import javax.swing.*;
@@ -273,7 +273,7 @@ class DataProcessingView extends JPanel implements IJsonView {
 					// map label of processors to class string
 					Map<String, String> processorLableToClass = factory.getLabelMap();
 					String[] processors = processorLableToClass.keySet().stream().sorted().toArray(String[]::new);
-					JComboBox processorOptions = new JComboBox<>(processors);
+					JSearchComboBox processorOptions = new JSearchComboBox(processors);
 
 					if (JOptionPane.showConfirmDialog(ProjectView.getMainWindow(), processorOptions,
 							Messages.getString("DataProcessingView.dialogChoseProcessor.label"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
