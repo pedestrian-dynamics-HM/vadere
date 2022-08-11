@@ -127,7 +127,7 @@ public class AdjustPanel extends JPanel implements Observer {
 		ActionSetTimeStep setTimeStepAction = new ActionSetTimeStep("setTimeStep", model);
 		slider.addChangeListener(setTimeStepAction);
 		slider.addChangeListener(e -> {
-			if ( slider.getValue() == slider.getMaximum() -1 ) {
+			if ( slider.getValue() == slider.getMaximum()) {
 				this.onEndListener.accept(e);
 			}
 		});
