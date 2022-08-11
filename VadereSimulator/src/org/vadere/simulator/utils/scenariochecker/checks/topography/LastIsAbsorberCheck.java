@@ -7,6 +7,7 @@ import org.vadere.simulator.utils.scenariochecker.checks.TopographyCheckerTest;
 import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Topography;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.stream.Collectors;
@@ -17,11 +18,14 @@ public class LastIsAbsorberCheck extends AbstractScenarioCheck implements Topogr
         int maxID = topography.getTargetIds()
                 .stream()
                 .max(Integer::compareTo)
-                .get();
+                .orElse(-1);
+        if (maxID == -1) {
+            return messages;
+        }
         List<Target> targetList = topography.getTargets()
                 .stream().
-                filter(t -> t.isAbsorbing())
-                .sorted((o1, o2) -> Integer.compare(o1.getId(),o2.getId()))
+                filter(Target::isAbsorbing)
+                .sorted(Comparator.comparingInt(Target::getId))
                 .collect(Collectors.toList());
         if (targetList.isEmpty()){
             return  messages;
