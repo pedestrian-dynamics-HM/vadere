@@ -16,10 +16,10 @@ public class ExistingAbsorberCheck extends AbstractScenarioCheck implements Topo
     public PriorityQueue<ScenarioCheckerMessage> runScenarioCheckerTest(Topography topography) {
         List<Target> targetList = topography.getTargets()
                 .stream()
-                .filter(t -> t.isAbsorbing())
+                .filter(Target::isAbsorbing)
                 .collect(Collectors.toList());
         if ( targetList.isEmpty()) {
-            messages.add(msgBuilder.topographyError().reason(ScenarioCheckerReason.TARGET_NO_ABSORBER,"").build());
+            messages.add(msgBuilder.topographyWarning().reason(ScenarioCheckerReason.TARGET_NO_ABSORBER,"").build());
         }
         return messages;
     }
