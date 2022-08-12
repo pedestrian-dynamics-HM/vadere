@@ -5,15 +5,15 @@ import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.event.ListDataListener;
 import javax.swing.text.JTextComponent;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class JSearchComboBox extends JComboBox<String> {
     final private List<String> comboboxModel;
     private String searchString = "";
-
     private JTextComponent textComponentProxy;
-    private JComboBox comboBoxProxy;
+    private JSearchComboBox comboBoxProxy;
 
     private class SearchModel<T> implements ComboBoxModel<T> {
         List<T> items;
@@ -30,7 +30,8 @@ public class JSearchComboBox extends JComboBox<String> {
         @Override
         public void setSelectedItem(Object anItem) {
             // model needs to be replaced to only show the one item searched for
-            comboBoxProxy.setModel(new SearchModel<>(List.of(anItem), anItem));
+            JComboBox box = (JComboBox) comboBoxProxy;
+            box.setModel(new SearchModel<>(List.of(anItem), anItem));
         }
         // this method will be called everytime there is a CaretEvent
         @Override
@@ -58,7 +59,6 @@ public class JSearchComboBox extends JComboBox<String> {
 
         }
     }
-
     // CaretListener is used as a method of detecting a change in the
     // ComboBox JTextComponent. Why? because at the time of implementation
     // CaretListener seemed to be the only Listener for JTextComponent which
@@ -68,28 +68,11 @@ public class JSearchComboBox extends JComboBox<String> {
         public void caretUpdate(CaretEvent e) {
             if (!(textComponentProxy.getText().equals(searchString))) {
                 searchString = textComponentProxy.getText();
-
-                Runnable doAssist = () -> {
+                SwingUtilities.invokeLater(() -> {
                     updateModel(searchString);
                     comboBoxProxy.showPopup();
-                };
-                SwingUtilities.invokeLater(doAssist);
+                });
             }
-        }
-
-        private void updateModel(String searchString) {
-            // replace with better search algorith if needed
-            List<String> array = comboboxModel
-                    .stream()
-                    .filter(entry -> {
-                        String questioned = entry.toLowerCase();
-                        String searchpatt = searchString.toLowerCase();
-                        return questioned.contains(searchpatt);
-
-                    }).collect(Collectors.toList());
-            ComboBoxModel<String> newModel = new SearchModel<>(array, searchString);
-            comboBoxProxy.setModel(newModel);
-
         }
 
     }
@@ -100,7 +83,6 @@ public class JSearchComboBox extends JComboBox<String> {
         initChangeListener();
         clearTextField();
     }
-
     private void initChangeListener() {
         textComponentProxy.addCaretListener(new CustomCaretListener());
     }
@@ -110,8 +92,21 @@ public class JSearchComboBox extends JComboBox<String> {
         this.textComponentProxy = (JTextComponent) this.getEditor().getEditorComponent();
         this.comboBoxProxy = this;
     }
-
     private void clearTextField() {
         textComponentProxy.setText("");
+    }
+    private void updateModel(String searchString) {
+        // replace with better search algorith if needed
+        List<String> array = comboboxModel
+                .stream()
+                .filter(entry -> {
+                    String questioned = entry.toLowerCase();
+                    String searchpatt = searchString.toLowerCase();
+                    return questioned.contains(searchpatt);
+
+                }).collect(Collectors.toList());
+        ComboBoxModel<String> newModel = new SearchModel<>(array, searchString);
+        this.setModel(newModel);
+
     }
 }
