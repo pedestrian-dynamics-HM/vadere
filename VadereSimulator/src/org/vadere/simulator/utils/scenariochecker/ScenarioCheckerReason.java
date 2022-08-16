@@ -19,6 +19,7 @@ public enum ScenarioCheckerReason {
 	STAIRS_TREAD_DIM_WRONG("ScenarioChecker.stairs.wrongTreadDim"),
 	TOPOGRAPHY_OFFSET("ScenarioChecker.topography.offset"),
 
+	OBSTACLE_NO_AREA("ScenarioChecker.obstacle.noArea"),
 	OVERLAP_STAIR_STAIR("ScenarioChecker.overlap.stair.stair"),
 	OVERLAP_TARGET_TARGET("ScenarioChecker.overlap.target.target"),
 	OVERLAP_TARGET_STAIR("ScenarioChecker.overlap.target.stair"),
