@@ -2,8 +2,11 @@ package org.vadere.state.attributes.scenario;
 
 import com.fasterxml.jackson.annotation.JsonView;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.vadere.state.attributes.AttributesEmbedShape;
 import org.vadere.state.scenario.Pedestrian;
+import org.vadere.state.scenario.Target;
+import org.vadere.state.util.StateJsonConverter;
 import org.vadere.state.util.Views;
 import org.vadere.util.geometry.shapes.VShape;
 
@@ -12,6 +15,9 @@ import org.vadere.util.geometry.shapes.VShape;
  * 
  */
 public class AttributesTarget extends AttributesEmbedShape {
+
+	public static final String CONSTANT_DISTRIBUTION = "constant";
+	public static final JsonNode CONSTANT_DISTRIBUTION_PAR = StateJsonConverter.createObjectNode().put("updateFrequency", 1.0);
 
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
 	private int id = ID_NOT_SET;
@@ -54,6 +60,14 @@ public class AttributesTarget extends AttributesEmbedShape {
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
 	private boolean individualWaiting = true;
 
+	/**
+	 *  Modes :
+	 *  "individual",
+	 *  "trafficLight"
+	 */
+	@JsonView(Views.CacheViewExclude.class)
+	private String waitingMode = "individual";
+
 	// TODO should be "reachedDistance"; agents do not necessarily get deleted/absorbed
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
 	private double deletionDistance = 0.1;
@@ -72,6 +86,37 @@ public class AttributesTarget extends AttributesEmbedShape {
 	 */
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
 	private double nextSpeed = -1.0;
+
+	/**
+	 *  Distribution types:
+	 *  "binomial",
+	 *  "constant",
+	 *  "empirical",
+	 *  "linearInterpolation",
+	 *  "mixed",
+	 *  "negativeExponential",
+	 *  "normal",
+	 *  "poisson",
+	 *  "singleSpawn",
+	 *  "timeSeries"
+	 */
+	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
+	private String waitingTimeDistribution = CONSTANT_DISTRIBUTION;
+
+	/**
+	 *  Distribution parameter examples:
+	 *  "binomial" -> "trials": 1 , "p": 0.5
+	 *  "constant" -> "updateFrequency": 1.0
+	 *  "empirical" -> "values" : [0.2,0.5,1.4]
+	 *  "linearInterpolation", "spawnFrequency": 1.0, "xValues": [1.4, 2.4], "yValues": [5,9]
+	 *  "mixed",
+	 *  "negativeExponential" -> "mean": 2.4
+	 *  "normal" -> "mean":1.3, "sd":0.2
+	 *  "poisson" -> "numberPedsPerSecond" : 5.4
+	 *  "singleSpawn", "spawnTime" : 3.0
+	 *  "timeSeries" -> "intervalLength":1.2, "spawnsPerInterval" : [2,0,0,2,0,0]
+	 */
+	private JsonNode distributionParameters = CONSTANT_DISTRIBUTION_PAR;
 
 	public AttributesTarget() {}
 
@@ -198,5 +243,32 @@ public class AttributesTarget extends AttributesEmbedShape {
 	public void setNextSpeed(double nextSpeed) {
 		checkSealed();
 		this.nextSpeed = nextSpeed;
+	}
+
+	public JsonNode getDistributionParameters() {
+		return distributionParameters;
+	}
+
+	public void setDistributionParameters(JsonNode distributionParameters) {
+		checkSealed();
+		this.distributionParameters = distributionParameters;
+	}
+
+	public String getWaitingTimeDistribution() {
+		return waitingTimeDistribution;
+	}
+
+	public void setWaitingTimeDistribution(String waitingTimeDistribution) {
+		checkSealed();
+		this.waitingTimeDistribution = waitingTimeDistribution;
+	}
+
+	public Target.WaitingBehaviour getWaitingBehaviour() {
+		if ("individual".equals(waitingMode)) {
+			return Target.WaitingBehaviour.Individual;
+		} else if ("trafficLight".equals(waitingMode)) {
+			return Target.WaitingBehaviour.TrafficLight;
+		}
+		throw new IllegalArgumentException("expected a waiting mode in AttributesTarget");
 	}
 }

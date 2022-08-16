@@ -15,6 +15,7 @@ public class Target extends ScenarioElement implements Comparable<Target> {
 
 	private AttributesTarget attributes;
 	private final Map<Integer, Double> enteringTimes;
+	private final Map<Integer, Double> leavingTimes;
 	
 	/**
 	 * Collection of listeners - unordered because it's order is not predictable
@@ -22,14 +23,23 @@ public class Target extends ScenarioElement implements Comparable<Target> {
 	 */
 	private final Collection<TargetListener> targetListeners = new LinkedList<>();
 
+	public enum WaitingBehaviour {
+		Individual,TrafficLight
+	}
 	public Target(AttributesTarget attributes) {
-		this(attributes, new HashMap<>());
+		this(attributes, new HashMap<>(),new HashMap<>());
 	}
 
 	public Target(AttributesTarget attributes, Map<Integer, Double> enteringTimes) {
+		this(attributes,enteringTimes,new HashMap<>());
+	}
+
+	public Target(AttributesTarget attributes, Map<Integer, Double> enteringTimes, Map<Integer, Double> leavingTimes) {
 		this.attributes = attributes;
 		this.enteringTimes = enteringTimes;
+		this.leavingTimes = leavingTimes;
 	}
+
 
 	public boolean isAbsorbing() {
 		return attributes.isAbsorbing();
@@ -51,12 +61,20 @@ public class Target extends ScenarioElement implements Comparable<Target> {
 		return attributes.isStartingWithRedLight();
 	}
 
+	public WaitingBehaviour getWaitingBehaviour(){
+		return attributes.getWaitingBehaviour();
+	}
+
 	public double getNextSpeed() {
 		return attributes.getNextSpeed();
 	}
 
 	public Map<Integer, Double> getEnteringTimes() {
 		return enteringTimes;
+	}
+
+	public Map<Integer, Double> getLeavingTimes(){
+		return leavingTimes;
 	}
 
 	@Override
