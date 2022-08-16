@@ -41,6 +41,7 @@ public class Simulation implements ControllerProvider{
 	private final Collection<TargetController> targetControllers;
 	private final Collection<TargetChangerController> targetChangerControllers;
 	private final Collection<AbsorbingAreaController> absorbingAreaControllers;
+	private final Random random;
 	private TeleporterController teleporterController;
 	private TopographyController topographyController;
 	private DynamicElementFactory dynamicElementFactory;
@@ -129,7 +130,7 @@ public class Simulation implements ControllerProvider{
 
 		// "stimulusController" is final. Therefore, create object here and not in helper method.
 		this.stimulusController = new StimulusController(scenarioStore);
-
+		this.random = random;
 		createControllers(domain, mainModel, random);
 
 		// this code is to visualize the potential fields. It may be refactored later.
@@ -157,7 +158,7 @@ public class Simulation implements ControllerProvider{
 		}
 
 		for (Target target : topography.getTargets()) {
-			targetControllers.add(new TargetController(topography, target));
+			targetControllers.add(new TargetController(topography, target,random));
 		}
 
 		for (TargetChanger targetChanger : topography.getTargetChangers()) {
@@ -428,7 +429,7 @@ public class Simulation implements ControllerProvider{
 		// new targets.
 		this.targetControllers.clear();
 		for (Target target : this.topographyController.getTopography().getTargets()) {
-			targetControllers.add(new TargetController(this.topographyController.getTopography(), target));
+			targetControllers.add(new TargetController(this.topographyController.getTopography(), target,random));
 		}
 
 		for (SourceController sourceController : this.sourceControllers) {
