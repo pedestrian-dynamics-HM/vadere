@@ -74,9 +74,11 @@ public class PostvisualizationWindow extends JPanel implements Observer, DropTar
 	private JMenuBar menuBar;
 	private static Resources resources = Resources.getInstance("postvisualization");
 	private final ScenarioElementView textView;
-	private JButton playButton;
-	private JButton pauseButton;
-	private JButton stopButton;
+
+	private ButtonGroup playControlGroup;
+	private JToggleButton playButton;
+	private JToggleButton pauseButton;
+	private JToggleButton stopButton;
 
 	public PostvisualizationWindow(final String projectPath) {
 		this(false, projectPath);
@@ -165,19 +167,33 @@ public class PostvisualizationWindow extends JPanel implements Observer, DropTar
 		int iconWidth = VadereConfig.getConfig().getInt("ProjectView.icon.width.value");
 
 		// Player controls
-		playButton = addActionToToolbar(toolbar,
+		playControlGroup = new ButtonGroup();
+		playButton = addToggleActionToToolbar(toolbar,
 				new ActionPlay("play", resources.getIcon("play.png", iconWidth, iconHeight), model),
 				"PostVis.btnPlay.tooltip");
-		pauseButton = addActionToToolbar(toolbar,
+
+		pauseButton = addToggleActionToToolbar(toolbar,
 				new ActionPause("pause", resources.getIcon("pause.png", iconWidth, iconHeight), model),
 				"PostVis.btnPause.tooltip");
-		stopButton = addActionToToolbar(toolbar,
+		stopButton = addToggleActionToToolbar(toolbar,
 				new ActionStop("stop", resources.getIcon("stop.png", iconWidth, iconHeight), model),
 				"PostVis.btnStop.tooltip");
+
+
+		playControlGroup.add(playButton);
+		playControlGroup.add(pauseButton);
+		playControlGroup.add(stopButton);
+
+		stopButton.setSelected(true);
+
+		adjustPanel.addOnEndReachedListener(e -> {
+			Player.getInstance(model).stop();
+			stopButton.setSelected(true);
+		});
 		toolbar.addSeparator(new Dimension(5, 50));
 
 		// Pedestrian-related options
-		addActionToToolbar(toolbar,
+		addToggleActionToToolbar(toolbar,
 				new ActionVisualization("show_pedestrian", resources.getIcon("pedestrian.png", iconWidth, iconHeight),
 						model) {
 					@Override
@@ -186,7 +202,7 @@ public class PostvisualizationWindow extends JPanel implements Observer, DropTar
 						model.notifyObservers();
 					}
 				}, "ProjectView.btnShowPedestrian.tooltip");
-		addActionToToolbar(toolbar,
+		addToggleActionToToolbar(toolbar,
 				new ActionVisualization("show_trajectory",
 						resources.getIcon("trajectories.png", iconWidth, iconHeight), model) {
 					@Override
@@ -195,7 +211,7 @@ public class PostvisualizationWindow extends JPanel implements Observer, DropTar
 						model.notifyObservers();
 					}
 				}, "ProjectView.btnShowTrajectories.tooltip");
-		addActionToToolbar(toolbar,
+		addToggleActionToToolbar(toolbar,
 				new ActionVisualization("show_direction",
 						resources.getIcon("walking_direction.png", iconWidth, iconHeight), model) {
 					@Override
@@ -204,7 +220,7 @@ public class PostvisualizationWindow extends JPanel implements Observer, DropTar
 						model.notifyObservers();
 					}
 				}, "ProjectView.btnShowWalkingDirection.tooltip");
-		addActionToToolbar(toolbar,
+		addToggleActionToToolbar(toolbar,
 				new ActionVisualization("show_groups",
 						resources.getIcon("group.png", iconWidth, iconHeight), model) {
 					@Override
@@ -213,7 +229,7 @@ public class PostvisualizationWindow extends JPanel implements Observer, DropTar
 						model.notifyObservers();
 					}
 				}, "ProjectView.btnShowGroupInformation.tooltip");
-		addActionToToolbar(toolbar,
+		addToggleActionToToolbar(toolbar,
 				new ActionVisualization("show_contacts", resources.getIcon("contacts.png", iconWidth, iconHeight),
 						model) {
 					@Override
@@ -230,7 +246,7 @@ public class PostvisualizationWindow extends JPanel implements Observer, DropTar
 		toolbar.addSeparator(new Dimension(5, 50));
 
 		// Other information (neither related to pedestrians nor to measuring tools)
-		addActionToToolbar(
+		addToggleActionToToolbar(
 				toolbar,
 				new ActionVisualization(
 						"show_aerosolClouds",
@@ -250,11 +266,11 @@ public class PostvisualizationWindow extends JPanel implements Observer, DropTar
 		toolbar.addSeparator(new Dimension(5, 50));
 
 		// "Measuring" tools
-		addActionToToolbar(toolbar,
+		addToggleActionToToolbar(toolbar,
 				new ActionSwapSelectionMode("draw_voronoi_diagram",
 						resources.getIcon("voronoi.png", iconWidth, iconHeight), model),
 				"ProjectView.btnDrawVoronoiDiagram.tooltip");
-		addActionToToolbar(toolbar,
+		addToggleActionToToolbar(toolbar,
 				new ActionVisualization("show_grid", resources.getIcon("grid.png", iconWidth, iconHeight), model) {
 					@Override
 					public void actionPerformed(ActionEvent e) {
@@ -262,7 +278,7 @@ public class PostvisualizationWindow extends JPanel implements Observer, DropTar
 						model.notifyObservers();
 					}
 				}, "ProjectView.btnShowGrid.tooltip");
-		addActionToToolbar(
+		addToggleActionToToolbar(
 				toolbar,
 				new ActionVisualization("show_density", resources.getIcon("density.png", iconWidth, iconHeight),
 						model) {
@@ -272,7 +288,7 @@ public class PostvisualizationWindow extends JPanel implements Observer, DropTar
 						model.notifyObservers();
 					}
 				}, "ProjectView.btnShowDensity.tooltip");
-		addActionToToolbar(
+		addToggleActionToToolbar(
 				toolbar,
 				new ActionShowPotentialField("show_potentialField", resources.getIcon("potentialField.png", iconWidth,
 						iconHeight), model),
@@ -437,6 +453,11 @@ public class PostvisualizationWindow extends JPanel implements Observer, DropTar
 	private static JButton addActionToToolbar(final JToolBar toolbar, final Action action,
 			final String toolTipProperty) {
 		return SwingUtils.addActionToToolbar(toolbar, action, Messages.getString(toolTipProperty));
+	}
+
+	private static JToggleButton addToggleActionToToolbar(final JToolBar toolbar, final Action action,
+											  final String toolTipProperty) {
+		return SwingUtils.addToggleActionToToolbar(toolbar, action, Messages.getString(toolTipProperty));
 	}
 
 	private static JButton addActionMenuToToolbar(final JToolBar toolbar, final ActionVisualizationMenu menuAction,

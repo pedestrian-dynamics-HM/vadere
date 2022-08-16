@@ -5,12 +5,17 @@ import com.jgoodies.forms.layout.FormLayout;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.postvisualization.control.ActionSetTimeStep;
 import org.vadere.gui.postvisualization.control.EJSliderAction;
+import org.vadere.gui.postvisualization.control.Player;
 import org.vadere.gui.postvisualization.model.PostvisualizationModel;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
+import java.awt.event.ActionListener;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.function.Consumer;
 
 public class AdjustPanel extends JPanel implements Observer {
 
@@ -35,6 +40,8 @@ public class AdjustPanel extends JPanel implements Observer {
 	private final JLabel lblTimeResolution;
 
 	private final PostvisualizationModel model;
+
+	private Consumer<ChangeEvent> onEndListener;
 
 	// Constructtors
 	public AdjustPanel(final PostvisualizationModel model) {
@@ -119,7 +126,11 @@ public class AdjustPanel extends JPanel implements Observer {
 
 		ActionSetTimeStep setTimeStepAction = new ActionSetTimeStep("setTimeStep", model);
 		slider.addChangeListener(setTimeStepAction);
-
+		slider.addChangeListener(e -> {
+			if ( slider.getValue() == slider.getMaximum()) {
+				this.onEndListener.accept(e);
+			}
+		});
 		setToolTips();
 	}
 
@@ -148,7 +159,9 @@ public class AdjustPanel extends JPanel implements Observer {
 		lblStep.setToolTipText(unitSimStepText);
 		sStep.setToolTipText(unitSimStepText);
 	}
-
+	public void addOnEndReachedListener(Consumer<ChangeEvent> listener) {
+		this.onEndListener = listener;
+	}
 	@Override
 	public void update(Observable o, Object arg) {
 		SwingUtilities.invokeLater(() -> {

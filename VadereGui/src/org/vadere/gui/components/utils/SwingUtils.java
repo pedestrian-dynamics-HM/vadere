@@ -15,6 +15,16 @@ public class SwingUtils {
 		return button;
 	}
 
+	public static JToggleButton addToggleActionToToolbar(final JToolBar toolbar, final Action action, final String tooltip) {
+		JToggleButton button = new JToggleButton();
+		button.setAction(action);
+		button.setText("");
+		button.setFocusable(false);
+		button.setToolTipText(tooltip);
+		toolbar.add(button);
+		return button;
+	}
+
 	public static void centerComponent(final Component component) {
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		component.setLocation(screenSize.width / 2 - component.getSize().width / 2,
