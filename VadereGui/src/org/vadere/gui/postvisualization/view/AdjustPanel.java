@@ -41,8 +41,6 @@ public class AdjustPanel extends JPanel implements Observer {
 
 	private final PostvisualizationModel model;
 
-	private Consumer<ChangeEvent> onEndListener;
-
 	// Constructtors
 	public AdjustPanel(final PostvisualizationModel model) {
 		this.model = model;
@@ -51,7 +49,7 @@ public class AdjustPanel extends JPanel implements Observer {
 			slider = new JSlider(SwingConstants.HORIZONTAL, model.getFirstStep(),
 					model.getLastStep(), model.getFirstStep());
 		} else {
-			slider = new JSlider(SwingConstants.HORIZONTAL, 1, 1, 1);
+			slider = new JSlider(SwingConstants.HORIZONTAL, 0, 0, 0);
 		}
 
 		slider.addMouseListener(new EJSliderAction(slider));
@@ -108,8 +106,13 @@ public class AdjustPanel extends JPanel implements Observer {
 		sStep.addChangeListener(e -> {
 			if ((int) sStep.getValue() <= model.getStepCount()) {
 				model.setStep((int) sStep.getValue());
-				model.notifyObservers();
 			}
+			model.addObserver(new Observer() {
+				@Override
+				public void update(Observable o, Object arg) {
+
+				}
+			});
 		});
 
 		sTimeResolution.addChangeListener(e -> {
@@ -123,14 +126,8 @@ public class AdjustPanel extends JPanel implements Observer {
 			sTime.setModel(sModelTime);
 		});
 
-
 		ActionSetTimeStep setTimeStepAction = new ActionSetTimeStep("setTimeStep", model);
 		slider.addChangeListener(setTimeStepAction);
-		slider.addChangeListener(e -> {
-			if ( slider.getValue() == slider.getMaximum()) {
-				this.onEndListener.accept(e);
-			}
-		});
 		setToolTips();
 	}
 
@@ -159,9 +156,7 @@ public class AdjustPanel extends JPanel implements Observer {
 		lblStep.setToolTipText(unitSimStepText);
 		sStep.setToolTipText(unitSimStepText);
 	}
-	public void addOnEndReachedListener(Consumer<ChangeEvent> listener) {
-		this.onEndListener = listener;
-	}
+
 	@Override
 	public void update(Observable o, Object arg) {
 		SwingUtilities.invokeLater(() -> {
