@@ -48,7 +48,7 @@ public class SimulationCommandHandlerTest extends CommandHandlerTest {
 		int varID = var.id;
 		TraCIDataType varType = var.type;
 		String elementID = "-1";
-		String retValWin = "7cbf8c42d1b4cfa035f613c30236227d51062db8";
+		String retValWin = "d604cc32d8b7c386e6d92eef2e7f33d03b6278a8";
 		String retValLin = "01ab5b90c5ddbac50e6250e5515867665935fe35";
 
 		// response ok //
