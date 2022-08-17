@@ -36,6 +36,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.text.*;
 
 /**
  * Shows text like the JSON formatted attributes.
@@ -151,7 +152,60 @@ public class TextView extends JPanel implements IJsonView {
 		add(sp, BorderLayout.CENTER);
 
 		textfileTextarea.setText(Messages.getString("TextFileView.txtrTextfiletextarea.text"));
+		AbstractDocument document = (AbstractDocument)textfileTextarea.getDocument();
+		document.setDocumentFilter(new DocumentFilter(){
+			@Override
+			public void remove(FilterBypass fb, int offset, int length) throws BadLocationException {
+				Document document = fb.getDocument();
+				String removedString = document.getText(offset,length);
+				switch (removedString){
+					case "\"":{
+						checkRemoveEmptyQuotations(fb, offset, length);
+						break;
+					}
+					case "[":{
+						checkRemoveEmptySquareBrackets(fb, offset, length);
+						break;
+					}
+					case "{":{
+						checkRemoveEmptySwirlyBrackets(fb, offset, length);
+						break;
+					}
+					default: {
+						super.remove(fb, offset, length);
+					}
+				}
 
+
+			}
+			private void checkRemoveEmptyQuotations(FilterBypass fb, int offset, int length) throws BadLocationException {
+				String postChar = document.getText(offset +1, length);
+				if (postChar.equals("\"")){
+					super.remove(fb, offset, length +1);
+				}else {
+					super.remove(fb, offset, length);
+				}
+			}
+
+			private void checkRemoveEmptySquareBrackets(FilterBypass fb, int offset, int length) throws BadLocationException {
+				String postChar = document.getText(offset +1, length);
+				if (postChar.equals("]")){
+					super.remove(fb, offset, length +1);
+				}else {
+					super.remove(fb, offset, length);
+				}
+			}
+
+			private void checkRemoveEmptySwirlyBrackets(FilterBypass fb, int offset, int length) throws BadLocationException {
+				String postChar = document.getText(offset +1, length);
+				if (postChar.equals("}")){
+					super.remove(fb, offset, length +1);
+				}else {
+					super.remove(fb, offset, length);
+				}
+			}
+
+		});
 		documentListener = new DocumentListener() {
 			@Override
 			public void changedUpdate(DocumentEvent e) {
@@ -165,6 +219,21 @@ public class TextView extends JPanel implements IJsonView {
 
 			@Override
 			public void insertUpdate(DocumentEvent e) {
+				String insertedText = getInsertedText(e);
+				switch (insertedText){
+					case "\"": {
+						checkInsert2ndQuotationMark(e);
+						break;
+					}
+					case "{": {
+						checkInsert2ndSwirlyBracket(e);
+						break;
+					}
+					case "[": {
+						checkInsert2ndSquareBracket(e);
+						break;
+					}
+				}
 				setScenarioContent();
 			}
 
@@ -220,6 +289,62 @@ public class TextView extends JPanel implements IJsonView {
 
 		this.attributeType = attributeType;
 		jsonValidIndicator.setValid();
+	}
+
+	private void checkInsert2ndQuotationMark(DocumentEvent e) {
+		Document document = e.getDocument();
+		String prevChar;
+		String postChar;
+		try {
+			prevChar = document.getText(e.getOffset()-1,1);
+			postChar = document.getText(e.getOffset()+1,1);
+
+			if (!prevChar.equals("\"") && !postChar.equals("\"")) {
+				SwingUtilities.invokeLater(() -> {
+					try {
+						document.insertString(e.getOffset() + 1, "\"", null);
+					} catch (BadLocationException ex) {
+						throw new RuntimeException(ex);
+					}
+					textfileTextarea.setCaretPosition(e.getOffset()+1);
+				});
+			}
+		} catch (BadLocationException ex) {
+			throw new RuntimeException(ex);
+		}
+	}
+
+	private void checkInsert2ndSwirlyBracket(DocumentEvent e){
+		Document document = e.getDocument();
+		SwingUtilities.invokeLater(() -> {
+			try {
+				document.insertString(e.getOffset() + 1, "}", null);
+			} catch (BadLocationException ex) {
+				throw new RuntimeException(ex);
+			}
+			textfileTextarea.setCaretPosition(e.getOffset()+1);
+		});
+	}
+	private void checkInsert2ndSquareBracket(DocumentEvent e){
+		Document document = e.getDocument();
+		SwingUtilities.invokeLater(() -> {
+			try {
+				document.insertString(e.getOffset() + 1, "]", null);
+			} catch (BadLocationException ex) {
+				throw new RuntimeException(ex);
+			}
+			textfileTextarea.setCaretPosition(e.getOffset()+1);
+		});
+	}
+	private static String getInsertedText(DocumentEvent e) {
+		Document document = e.getDocument();
+		String insertedText;
+		try {
+			insertedText = document.getText(e.getOffset(), e.getLength());
+		} catch (BadLocationException ex) {
+			throw new RuntimeException(ex);
+		}
+		return insertedText;
 	}
 
 	private void generatePresettingsMenu(final AttributeType attributeType) {
