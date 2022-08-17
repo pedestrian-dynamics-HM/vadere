@@ -132,10 +132,10 @@ public class StateJsonConverterTest {
         // changes must NOT change the floor field hash
         attrTarget.setId(33);
         attrTarget.setAbsorbing(false);
-        attrTarget.setWaitingTime(3);
+        attrTarget.setWaitingBehaviour(Target.WaitingBehaviour.TrafficLight);
         attrTarget.setWaitingTimeYellowPhase(2);
         attrTarget.setParallelWaiters(1);
-        attrTarget.setIndividualWaiting(false);
+        attrTarget.setWaitingTimeDistribution("binomial");
         attrTarget.setDeletionDistance(0.4);
         attrTarget.setStartingWithRedLight(true);
         attrTarget.setNextSpeed(1);

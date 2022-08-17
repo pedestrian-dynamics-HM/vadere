@@ -45,9 +45,6 @@ public class Target extends ScenarioElement implements Comparable<Target> {
 		return attributes.isAbsorbing();
 	}
 
-	public double getWaitingTime() {
-		return attributes.getWaitingTime();
-	}
 
 	public double getWaitingTimeYellowPhase() {
 		return attributes.getWaitingTimeYellowPhase();

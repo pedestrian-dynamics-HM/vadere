@@ -27,6 +27,8 @@ public class TargetController extends ScenarioElementController {
 	private final VadereDistribution distribution;
 	private final AttributesTarget targetAttributes;
 
+	private final double phaseLength;
+
 	public final Target target;
 	private Topography topography;
 
@@ -55,6 +57,7 @@ public class TargetController extends ScenarioElementController {
 			throw new IllegalArgumentException("Problem with scenario parameters for source: "
 					+ "interSpawnTimeDistribution and/or distributionParameters. See causing Excepion herefafter.", e);
 		}
+		this.phaseLength = this.distribution.getNextSpawnTime(0);
 		this.waitingBehaviour = target.getWaitingBehaviour();
 	}
 
@@ -65,20 +68,24 @@ public class TargetController extends ScenarioElementController {
 
 		for (DynamicElement element : getPrefilteredDynamicElements()) {
 			final Agent agent = castCheckAgent(element);
+			final int agentID = agent.getId();
 			if(agent == null) continue;
 
 			final boolean agentHasReachedThisTarget =
 					isNextTargetForAgent(agent)
 					&& hasAgentReachedThisTarget(agent);
-			final boolean isModeInstantAbsorbing = target.getWaitingTime() <= 0;
+
+			final boolean agentWaitingPeriodEnds =
+					target.getLeavingTimes().containsKey(agentID) &&
+					target.getLeavingTimes().get(agentID) <= simTimeInSec;
 
 			if (agentHasReachedThisTarget){
 				notifyListenersTargetReached(agent);
 			}
-			if (agentHasReachedThisTarget && isModeInstantAbsorbing){
+			if (agentHasReachedThisTarget && agentWaitingPeriodEnds){
 				checkRemove(agent);
 			}
-			if (agentHasReachedThisTarget && !isModeInstantAbsorbing){
+			if (agentHasReachedThisTarget && !agentWaitingPeriodEnds){
 				waitingBehavior(agent, simTimeInSec);
 			}
 		}
@@ -179,27 +186,26 @@ public class TargetController extends ScenarioElementController {
 	}
 
 	private TrafficLightPhase getCurrentTrafficLightPhase(double simTimeInSec) {
-		double phaseSecond = simTimeInSec % (target.getWaitingTime() * 2 + target.getWaitingTimeYellowPhase() * 2);
+		double phaseSecond = simTimeInSec % (this.phaseLength * 2 + target.getWaitingTimeYellowPhase() * 2);
 
 		if (target.isStartingWithRedLight()) {
-			if (phaseSecond < target.getWaitingTime())
+			if (phaseSecond < this.phaseLength)
 				return TrafficLightPhase.RED;
-			if (phaseSecond < target.getWaitingTime() + target.getWaitingTimeYellowPhase())
+			if (phaseSecond < this.phaseLength + target.getWaitingTimeYellowPhase())
 				return TrafficLightPhase.YELLOW;
-			if (phaseSecond < target.getWaitingTime() * 2 + target.getWaitingTimeYellowPhase())
+			if (phaseSecond < this.phaseLength * 2 + target.getWaitingTimeYellowPhase())
 				return TrafficLightPhase.GREEN;
 
-			return TrafficLightPhase.YELLOW;
 		} else {
-			if (phaseSecond < target.getWaitingTime())
+			if (phaseSecond < this.phaseLength)
 				return TrafficLightPhase.GREEN;
-			if (phaseSecond < target.getWaitingTime() + target.getWaitingTimeYellowPhase())
+			if (phaseSecond < this.phaseLength + target.getWaitingTimeYellowPhase())
 				return TrafficLightPhase.YELLOW;
-			if (phaseSecond < target.getWaitingTime() * 2 + target.getWaitingTimeYellowPhase())
+			if (phaseSecond < this.phaseLength * 2 + target.getWaitingTimeYellowPhase())
 				return TrafficLightPhase.RED;
 
-			return TrafficLightPhase.YELLOW;
 		}
+		return TrafficLightPhase.YELLOW;
 	}
 
 	private boolean isNextTargetForAgent(Agent agent) {

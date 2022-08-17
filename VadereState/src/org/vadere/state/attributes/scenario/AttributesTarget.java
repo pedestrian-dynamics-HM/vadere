@@ -30,15 +30,6 @@ public class AttributesTarget extends AttributesEmbedShape {
 	/** Shape and position. */
 	private VShape shape;
 	/**
-	 * Waiting time in seconds on this area.
-	 * If "individualWaiting" is true, then each element waits the given time on this area before
-	 * "absorbing" takes place.
-	 * If it is false, then the element waits this exact time before switching in "no waiting" mode
-	 * and back. This way, a traffic light can be simulated.
-	 */
-	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
-	private double waitingTime = 0;
-	/**
 	 * Waiting time on the target in the yellow phase (before red and green).
 	 * This can be used to cycle traffic lights in red, green or yellow phase, so that (Y -> R -> Y
 	 * -> G) cycles.
@@ -52,13 +43,6 @@ public class AttributesTarget extends AttributesEmbedShape {
 	 */
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
 	private int parallelWaiters = 0;
-	/**
-	 * True: each element on the target area is treated individually.
-	 * False: the target waits for "waitingTime" and then enters "no waiting mode" for the same time
-	 * (and then goes back to waiting mode). See "waitingTime".
-	 */
-	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
-	private boolean individualWaiting = true;
 
 	/**
 	 *  Modes :
@@ -66,7 +50,7 @@ public class AttributesTarget extends AttributesEmbedShape {
 	 *  "trafficLight"
 	 */
 	@JsonView(Views.CacheViewExclude.class)
-	private String waitingMode = "individual";
+	private String waitingBehaviour = "individual";
 
 	// TODO should be "reachedDistance"; agents do not necessarily get deleted/absorbed
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
@@ -134,19 +118,14 @@ public class AttributesTarget extends AttributesEmbedShape {
 		this.shape = pedestrian.getShape();
 		this.absorbing = true;
 		this.id = pedestrian.getIdAsTarget();
-		this.waitingTime = 0;
 		this.waitingTimeYellowPhase = 0;
 		this.parallelWaiters = 0;
-		this.individualWaiting = true;
+		this.waitingBehaviour = "individual";
 		this.startingWithRedLight = false;
 		this.nextSpeed = -1;
 	}
 
 	// Getters...
-
-	public boolean isIndividualWaiting() {
-		return individualWaiting;
-	}
 
 	public boolean isAbsorbing() {
 		return absorbing;
@@ -164,10 +143,6 @@ public class AttributesTarget extends AttributesEmbedShape {
 	@Override
 	public VShape getShape() {
 		return shape;
-	}
-
-	public double getWaitingTime() {
-		return waitingTime;
 	}
 
 	public double getWaitingTimeYellowPhase() {
@@ -210,11 +185,6 @@ public class AttributesTarget extends AttributesEmbedShape {
 		this.absorbing = absorbing;
 	}
 
-	public void setWaitingTime(double waitingTime) {
-		checkSealed();
-		this.waitingTime = waitingTime;
-	}
-
 	public void setWaitingTimeYellowPhase(double waitingTimeYellowPhase) {
 		checkSealed();
 		this.waitingTimeYellowPhase = waitingTimeYellowPhase;
@@ -223,11 +193,6 @@ public class AttributesTarget extends AttributesEmbedShape {
 	public void setParallelWaiters(int parallelWaiters) {
 		checkSealed();
 		this.parallelWaiters = parallelWaiters;
-	}
-
-	public void setIndividualWaiting(boolean individualWaiting) {
-		checkSealed();
-		this.individualWaiting = individualWaiting;
 	}
 
 	public void setDeletionDistance(double deletionDistance) {
@@ -264,11 +229,20 @@ public class AttributesTarget extends AttributesEmbedShape {
 	}
 
 	public Target.WaitingBehaviour getWaitingBehaviour() {
-		if ("individual".equals(waitingMode)) {
+		if ("individual".equals(waitingBehaviour)) {
 			return Target.WaitingBehaviour.Individual;
-		} else if ("trafficLight".equals(waitingMode)) {
+		} else if ("trafficLight".equals(waitingBehaviour)) {
 			return Target.WaitingBehaviour.TrafficLight;
 		}
 		throw new IllegalArgumentException("expected a waiting mode in AttributesTarget");
+	}
+
+	public void setWaitingBehaviour(Target.WaitingBehaviour behaviour){
+		checkSealed();
+		if (behaviour == Target.WaitingBehaviour.Individual){
+			waitingBehaviour = "individual";
+		} else {
+			waitingBehaviour = "trafficLight";
+		}
 	}
 }

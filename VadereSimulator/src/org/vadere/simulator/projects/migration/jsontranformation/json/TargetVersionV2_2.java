@@ -34,6 +34,8 @@ public class TargetVersionV2_2 extends SimpleJsonTransformation {
         addPostHookLast(this::sort);
     }
 
+
+
     private JsonNode moveThreatWaitAreasToLocation(JsonNode node) {
 
         // generates one stimulusInfo for each stimulus
