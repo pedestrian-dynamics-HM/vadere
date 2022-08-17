@@ -1,8 +1,8 @@
 {
   "name" : "bridge_coordinates_kai_random_pos",
   "description" : "",
-  "release" : "2.2",
-  "commithash" : "d9d2b99fc786eb7cd6932d373880911fde7d8471",
+  "release" : "2.3",
+  "commithash" : "b8f1461237f175183dddeb7716251c6b8d7d23b9",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -227,13 +227,16 @@
             "y" : 5933411.2
           } ]
         },
-        "waitingTime" : 0.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 0.0
+        }
       }, {
         "id" : 1,
         "absorbing" : true,
@@ -253,13 +256,16 @@
             "y" : 5933395.9
           } ]
         },
-        "waitingTime" : 0.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 0.0
+        }
       } ],
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],

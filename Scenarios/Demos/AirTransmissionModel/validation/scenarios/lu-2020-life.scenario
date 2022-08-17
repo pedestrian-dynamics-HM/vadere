@@ -1,8 +1,8 @@
 {
   "name" : "lu-2020-life",
   "description" : "Superspreading event in a restaurant following lu-2021-life;\n\nJ. Lu, J. Gu, K. Li, C. Xu, W. Su, Z. Lai, D. Zhou,\nC. Yu, B. Xu, and Z. Yang. COVID-19 outbreak associated\nwith air conditioning in restaurant, guangzhou,\nchina, 2020. Emerging Infectious Diseases, 26(7):1628–\n1631, 2020. doi:10.3201/eid2607.200764.",
-  "release" : "2.2",
-  "commithash" : "bef9b7bef5c5755b23c296217e1454e4af9b7d15",
+  "release" : "2.3",
+  "commithash" : "b8f1461237f175183dddeb7716251c6b8d7d23b9",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -345,13 +345,16 @@
           "height" : 0.1,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4380.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 1,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4380.0
+        }
       }, {
         "id" : 6,
         "absorbing" : true,
@@ -362,13 +365,16 @@
           "height" : 0.1,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4380.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 1,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4380.0
+        }
       }, {
         "id" : 8,
         "absorbing" : true,
@@ -379,13 +385,16 @@
           "height" : 0.1,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4380.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 1,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4380.0
+        }
       }, {
         "id" : 4,
         "absorbing" : true,
@@ -396,13 +405,16 @@
           "height" : 0.1,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4500.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 1,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4500.0
+        }
       }, {
         "id" : 1,
         "absorbing" : true,
@@ -413,13 +425,16 @@
           "height" : 0.1,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4500.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 1,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4500.0
+        }
       }, {
         "id" : 3,
         "absorbing" : true,
@@ -430,13 +445,16 @@
           "height" : 0.1,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4500.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 1,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4500.0
+        }
       }, {
         "id" : 5,
         "absorbing" : true,
@@ -447,13 +465,16 @@
           "height" : 0.1,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4500.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 1,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4500.0
+        }
       }, {
         "id" : 2,
         "absorbing" : true,
@@ -464,13 +485,16 @@
           "height" : 0.1,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4500.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 1,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4500.0
+        }
       }, {
         "id" : 9,
         "absorbing" : true,
@@ -481,13 +505,16 @@
           "height" : 0.1,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 3180.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 1,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 3180.0
+        }
       }, {
         "id" : 10,
         "absorbing" : true,
@@ -498,13 +525,16 @@
           "height" : 0.1,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 3180.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 1,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 3180.0
+        }
       } ],
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],

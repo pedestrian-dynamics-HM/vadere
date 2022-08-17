@@ -1,8 +1,8 @@
 {
   "name" : "supermarket_basic",
   "description" : "",
-  "release" : "2.2",
-  "commithash" : "bef9b7bef5c5755b23c296217e1454e4af9b7d15",
+  "release" : "2.3",
+  "commithash" : "b8f1461237f175183dddeb7716251c6b8d7d23b9",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -791,13 +791,16 @@
           "height" : 1.5,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 0.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 0.0
+        }
       }, {
         "id" : 100,
         "absorbing" : false,
@@ -808,13 +811,16 @@
           "height" : 1.489826513082832,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 102,
         "absorbing" : false,
@@ -825,13 +831,16 @@
           "height" : 0.8,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 104,
         "absorbing" : false,
@@ -842,13 +851,16 @@
           "height" : 1.5,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 5.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 5.0
+        }
       }, {
         "id" : 101,
         "absorbing" : false,
@@ -859,13 +871,16 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 2.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 2.0
+        }
       }, {
         "id" : 103,
         "absorbing" : false,
@@ -876,13 +891,16 @@
           "height" : 1.296355235298165,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 105,
         "absorbing" : false,
@@ -893,13 +911,16 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 2.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 2.0
+        }
       }, {
         "id" : 106,
         "absorbing" : false,
@@ -910,13 +931,16 @@
           "height" : 0.8,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 107,
         "absorbing" : false,
@@ -927,13 +951,16 @@
           "height" : 1.3672689453061455,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 5.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 5.0
+        }
       }, {
         "id" : 108,
         "absorbing" : false,
@@ -944,13 +971,16 @@
           "height" : 1.5,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 5.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 5.0
+        }
       }, {
         "id" : 109,
         "absorbing" : false,
@@ -961,13 +991,16 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 2.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 2.0
+        }
       }, {
         "id" : 111,
         "absorbing" : false,
@@ -978,13 +1011,16 @@
           "height" : 1.2473905238919745,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 5.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 5.0
+        }
       }, {
         "id" : 110,
         "absorbing" : false,
@@ -995,13 +1031,16 @@
           "height" : 0.8,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 98,
         "absorbing" : false,
@@ -1012,13 +1051,16 @@
           "height" : 0.6695980553662082,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 0.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 0.0
+        }
       }, {
         "id" : 99,
         "absorbing" : false,
@@ -1029,13 +1071,16 @@
           "height" : 0.6695980553662082,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 0.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 0.0
+        }
       }, {
         "id" : 114,
         "absorbing" : false,
@@ -1046,13 +1091,16 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 2.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 2.0
+        }
       }, {
         "id" : 112,
         "absorbing" : false,
@@ -1063,13 +1111,16 @@
           "height" : 0.8,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 115,
         "absorbing" : false,
@@ -1080,13 +1131,16 @@
           "height" : 2.5,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 3.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 3.0
+        }
       }, {
         "id" : 113,
         "absorbing" : false,
@@ -1097,13 +1151,16 @@
           "height" : 0.8,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 300,
         "absorbing" : false,
@@ -1114,13 +1171,16 @@
           "height" : 0.8626795768379729,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 0.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 0.0
+        }
       }, {
         "id" : 301,
         "absorbing" : false,
@@ -1131,13 +1191,16 @@
           "height" : 1.4,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 0.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 0.0
+        }
       }, {
         "id" : 302,
         "absorbing" : false,
@@ -1148,13 +1211,16 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 0.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 0.0
+        }
       }, {
         "id" : 303,
         "absorbing" : true,
@@ -1165,13 +1231,16 @@
           "height" : 1.9,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 0.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 0.0
+        }
       }, {
         "id" : 304,
         "absorbing" : false,
@@ -1182,13 +1251,16 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 0.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 0.0
+        }
       }, {
         "id" : 305,
         "absorbing" : false,
@@ -1199,13 +1271,16 @@
           "height" : 2.5,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 0.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 0.0
+        }
       }, {
         "id" : 303,
         "absorbing" : false,
@@ -1216,13 +1291,16 @@
           "height" : 1.3,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 0.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 0.0
+        }
       }, {
         "id" : 800,
         "absorbing" : false,
@@ -1233,13 +1311,16 @@
           "height" : 0.8,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 0.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 0.0
+        }
       }, {
         "id" : 202,
         "absorbing" : false,
@@ -1250,13 +1331,16 @@
           "height" : 1.1000000000000014,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 201,
         "absorbing" : false,
@@ -1267,13 +1351,16 @@
           "height" : 1.7833233822358707,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 0.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 0.0
+        }
       }, {
         "id" : 400,
         "absorbing" : false,
@@ -1284,13 +1371,16 @@
           "height" : 0.6999999999999993,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 402,
         "absorbing" : false,
@@ -1301,13 +1391,16 @@
           "height" : 1.961222474977415,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 404,
         "absorbing" : false,
@@ -1318,13 +1411,16 @@
           "height" : 1.961222474977415,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 406,
         "absorbing" : false,
@@ -1335,13 +1431,16 @@
           "height" : 1.961222474977415,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 408,
         "absorbing" : false,
@@ -1352,13 +1451,16 @@
           "height" : 1.961222474977415,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 410,
         "absorbing" : false,
@@ -1369,13 +1471,16 @@
           "height" : 1.961222474977415,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 412,
         "absorbing" : false,
@@ -1386,13 +1491,16 @@
           "height" : 1.961222474977415,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 414,
         "absorbing" : false,
@@ -1403,13 +1511,16 @@
           "height" : 1.961222474977415,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 602,
         "absorbing" : false,
@@ -1420,13 +1531,16 @@
           "height" : 0.8,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 601,
         "absorbing" : false,
@@ -1437,13 +1551,16 @@
           "height" : 0.8,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 603,
         "absorbing" : false,
@@ -1454,13 +1571,16 @@
           "height" : 0.8,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 604,
         "absorbing" : false,
@@ -1471,13 +1591,16 @@
           "height" : 1.961222474977415,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 415,
         "absorbing" : false,
@@ -1488,13 +1611,16 @@
           "height" : 1.961222474977415,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 413,
         "absorbing" : false,
@@ -1505,13 +1631,16 @@
           "height" : 1.961222474977415,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 411,
         "absorbing" : false,
@@ -1522,13 +1651,16 @@
           "height" : 1.961222474977415,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 407,
         "absorbing" : false,
@@ -1539,13 +1671,16 @@
           "height" : 1.961222474977415,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 409,
         "absorbing" : false,
@@ -1556,13 +1691,16 @@
           "height" : 1.961222474977415,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 405,
         "absorbing" : false,
@@ -1573,13 +1711,16 @@
           "height" : 1.961222474977415,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 505,
         "absorbing" : false,
@@ -1590,13 +1731,16 @@
           "height" : 0.9152862336388026,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 509,
         "absorbing" : false,
@@ -1607,13 +1751,16 @@
           "height" : 0.8779296773288863,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 513,
         "absorbing" : false,
@@ -1624,13 +1771,16 @@
           "height" : 0.8779296773288863,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 900,
         "absorbing" : true,
@@ -1641,13 +1791,16 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 0.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 0.0
+        }
       }, {
         "id" : 19,
         "absorbing" : true,
@@ -1658,13 +1811,16 @@
           "height" : 0.2,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 0.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 0.0
+        }
       }, {
         "id" : 901,
         "absorbing" : false,
@@ -1675,13 +1831,16 @@
           "height" : 2.5,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 10.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 10.0
+        }
       }, {
         "id" : 902,
         "absorbing" : false,
@@ -1692,13 +1851,16 @@
           "height" : 2.5,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 10.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 10.0
+        }
       }, {
         "id" : 903,
         "absorbing" : false,
@@ -1709,13 +1871,16 @@
           "height" : 2.5,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 10.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 10.0
+        }
       }, {
         "id" : 905,
         "absorbing" : false,
@@ -1726,13 +1891,16 @@
           "height" : 2.5,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 10.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 10.0
+        }
       }, {
         "id" : 906,
         "absorbing" : false,
@@ -1743,13 +1911,16 @@
           "height" : 2.5,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 10.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 10.0
+        }
       }, {
         "id" : 908,
         "absorbing" : false,
@@ -1760,13 +1931,16 @@
           "height" : 2.5,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 10.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 10.0
+        }
       }, {
         "id" : 907,
         "absorbing" : false,
@@ -1777,13 +1951,16 @@
           "height" : 2.3000000000000007,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 10.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 10.0
+        }
       }, {
         "id" : 909,
         "absorbing" : false,
@@ -1794,13 +1971,16 @@
           "height" : 2.5,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 10.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 10.0
+        }
       }, {
         "id" : 910,
         "absorbing" : false,
@@ -1811,13 +1991,16 @@
           "height" : 2.5,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 10.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 10.0
+        }
       }, {
         "id" : 911,
         "absorbing" : false,
@@ -1828,13 +2011,16 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 10.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 10.0
+        }
       }, {
         "id" : 904,
         "absorbing" : false,
@@ -1845,13 +2031,16 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 10.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 10.0
+        }
       }, {
         "id" : 1101,
         "absorbing" : false,
@@ -1862,13 +2051,16 @@
           "height" : 2.5,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 5.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 5.0
+        }
       }, {
         "id" : 1100,
         "absorbing" : false,
@@ -1879,13 +2071,16 @@
           "height" : 2.5,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 5.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 5.0
+        }
       }, {
         "id" : 811,
         "absorbing" : false,
@@ -1896,13 +2091,16 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 60.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 1,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 60.0
+        }
       }, {
         "id" : 812,
         "absorbing" : false,
@@ -1913,13 +2111,16 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 60.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 1,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 60.0
+        }
       }, {
         "id" : 813,
         "absorbing" : false,
@@ -1930,13 +2131,16 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 60.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 1,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 60.0
+        }
       }, {
         "id" : 814,
         "absorbing" : false,
@@ -1947,13 +2151,16 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 60.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 1,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 60.0
+        }
       }, {
         "id" : 815,
         "absorbing" : false,
@@ -1964,13 +2171,16 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 60.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 1,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 60.0
+        }
       }, {
         "id" : 805,
         "absorbing" : false,
@@ -1981,13 +2191,16 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 60.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 1,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 60.0
+        }
       }, {
         "id" : 804,
         "absorbing" : false,
@@ -1998,13 +2211,16 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 60.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 1,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 60.0
+        }
       }, {
         "id" : 803,
         "absorbing" : false,
@@ -2015,13 +2231,16 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 60.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 1,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 60.0
+        }
       }, {
         "id" : 802,
         "absorbing" : false,
@@ -2032,13 +2251,16 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 60.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 1,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 60.0
+        }
       }, {
         "id" : 801,
         "absorbing" : false,
@@ -2049,13 +2271,16 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 60.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 1,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 60.0
+        }
       }, {
         "id" : 9999,
         "absorbing" : true,
@@ -2066,13 +2291,16 @@
           "height" : 0.5,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 0.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 0.0
+        }
       }, {
         "id" : 101,
         "absorbing" : false,
@@ -2083,13 +2311,16 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 2.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 2.0
+        }
       }, {
         "id" : 101,
         "absorbing" : false,
@@ -2100,13 +2331,16 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 2.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 2.0
+        }
       }, {
         "id" : 101,
         "absorbing" : false,
@@ -2117,13 +2351,16 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 2.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 2.0
+        }
       }, {
         "id" : 104,
         "absorbing" : false,
@@ -2134,13 +2371,16 @@
           "height" : 1.5,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 5.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 5.0
+        }
       }, {
         "id" : 104,
         "absorbing" : false,
@@ -2151,13 +2391,16 @@
           "height" : 1.5,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 5.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 5.0
+        }
       }, {
         "id" : 104,
         "absorbing" : false,
@@ -2168,13 +2411,16 @@
           "height" : 1.5,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 5.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 5.0
+        }
       }, {
         "id" : 104,
         "absorbing" : false,
@@ -2185,13 +2431,16 @@
           "height" : 1.5,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 5.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 5.0
+        }
       }, {
         "id" : 103,
         "absorbing" : false,
@@ -2202,13 +2451,16 @@
           "height" : 1.296355235298165,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 103,
         "absorbing" : false,
@@ -2219,13 +2471,16 @@
           "height" : 1.296355235298165,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 103,
         "absorbing" : false,
@@ -2236,13 +2491,16 @@
           "height" : 1.296355235298165,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 103,
         "absorbing" : false,
@@ -2253,13 +2511,16 @@
           "height" : 1.296355235298165,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 103,
         "absorbing" : false,
@@ -2270,13 +2531,16 @@
           "height" : 1.296355235298165,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 103,
         "absorbing" : false,
@@ -2287,13 +2551,16 @@
           "height" : 1.296355235298165,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 103,
         "absorbing" : false,
@@ -2304,13 +2571,16 @@
           "height" : 1.296355235298165,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 103,
         "absorbing" : false,
@@ -2321,13 +2591,16 @@
           "height" : 1.296355235298165,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 103,
         "absorbing" : false,
@@ -2338,13 +2611,16 @@
           "height" : 1.296355235298165,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 103,
         "absorbing" : false,
@@ -2355,13 +2631,16 @@
           "height" : 1.296355235298165,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 103,
         "absorbing" : false,
@@ -2372,13 +2651,16 @@
           "height" : 1.296355235298165,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 103,
         "absorbing" : false,
@@ -2389,13 +2671,16 @@
           "height" : 1.296355235298165,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 103,
         "absorbing" : false,
@@ -2406,13 +2691,16 @@
           "height" : 1.296355235298165,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 103,
         "absorbing" : false,
@@ -2423,13 +2711,16 @@
           "height" : 1.296355235298165,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 102,
         "absorbing" : false,
@@ -2440,13 +2731,16 @@
           "height" : 0.8,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 102,
         "absorbing" : false,
@@ -2457,13 +2751,16 @@
           "height" : 0.8,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 102,
         "absorbing" : false,
@@ -2474,13 +2771,16 @@
           "height" : 0.8,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 102,
         "absorbing" : false,
@@ -2491,13 +2791,16 @@
           "height" : 0.8,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 102,
         "absorbing" : false,
@@ -2508,13 +2811,16 @@
           "height" : 0.8,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 102,
         "absorbing" : false,
@@ -2525,13 +2831,16 @@
           "height" : 0.8,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 102,
         "absorbing" : false,
@@ -2542,13 +2851,16 @@
           "height" : 0.8,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 102,
         "absorbing" : false,
@@ -2559,13 +2871,16 @@
           "height" : 0.8,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 102,
         "absorbing" : false,
@@ -2576,13 +2891,16 @@
           "height" : 0.8,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 102,
         "absorbing" : false,
@@ -2593,13 +2911,16 @@
           "height" : 0.8,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 102,
         "absorbing" : false,
@@ -2610,13 +2931,16 @@
           "height" : 0.8,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 115,
         "absorbing" : false,
@@ -2627,13 +2951,16 @@
           "height" : 2.5,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 3.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 3.0
+        }
       }, {
         "id" : 115,
         "absorbing" : false,
@@ -2644,13 +2971,16 @@
           "height" : 2.5,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 3.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 3.0
+        }
       }, {
         "id" : 115,
         "absorbing" : false,
@@ -2661,13 +2991,16 @@
           "height" : 2.5,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 3.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 3.0
+        }
       }, {
         "id" : 115,
         "absorbing" : false,
@@ -2678,13 +3011,16 @@
           "height" : 2.5,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 3.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 3.0
+        }
       }, {
         "id" : 202,
         "absorbing" : false,
@@ -2695,13 +3031,16 @@
           "height" : 1.1000000000000014,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 202,
         "absorbing" : false,
@@ -2712,13 +3051,16 @@
           "height" : 1.1000000000000014,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 202,
         "absorbing" : false,
@@ -2729,13 +3071,16 @@
           "height" : 1.1000000000000014,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 202,
         "absorbing" : false,
@@ -2746,13 +3091,16 @@
           "height" : 1.1000000000000014,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 202,
         "absorbing" : false,
@@ -2763,13 +3111,16 @@
           "height" : 1.1000000000000014,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 202,
         "absorbing" : false,
@@ -2780,13 +3131,16 @@
           "height" : 1.1000000000000014,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 202,
         "absorbing" : false,
@@ -2797,13 +3151,16 @@
           "height" : 1.1000000000000014,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 202,
         "absorbing" : false,
@@ -2814,13 +3171,16 @@
           "height" : 1.1000000000000014,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 202,
         "absorbing" : false,
@@ -2831,13 +3191,16 @@
           "height" : 1.1000000000000014,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 202,
         "absorbing" : false,
@@ -2848,13 +3211,16 @@
           "height" : 1.1000000000000014,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 202,
         "absorbing" : false,
@@ -2865,13 +3231,16 @@
           "height" : 1.1000000000000014,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 202,
         "absorbing" : false,
@@ -2882,13 +3251,16 @@
           "height" : 1.1000000000000014,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 202,
         "absorbing" : false,
@@ -2899,13 +3271,16 @@
           "height" : 1.1000000000000014,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 202,
         "absorbing" : false,
@@ -2916,13 +3291,16 @@
           "height" : 1.1000000000000014,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 202,
         "absorbing" : false,
@@ -2933,13 +3311,16 @@
           "height" : 1.1000000000000014,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 202,
         "absorbing" : false,
@@ -2950,13 +3331,16 @@
           "height" : 1.1000000000000014,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 202,
         "absorbing" : false,
@@ -2967,13 +3351,16 @@
           "height" : 1.1000000000000014,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 202,
         "absorbing" : false,
@@ -2984,13 +3371,16 @@
           "height" : 1.1000000000000014,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 202,
         "absorbing" : false,
@@ -3001,13 +3391,16 @@
           "height" : 1.1000000000000014,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 202,
         "absorbing" : false,
@@ -3018,13 +3411,16 @@
           "height" : 1.1000000000000014,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 202,
         "absorbing" : false,
@@ -3035,13 +3431,16 @@
           "height" : 1.1000000000000014,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 202,
         "absorbing" : false,
@@ -3052,13 +3451,16 @@
           "height" : 1.1000000000000014,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 202,
         "absorbing" : false,
@@ -3069,13 +3471,16 @@
           "height" : 1.1000000000000014,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 202,
         "absorbing" : false,
@@ -3086,13 +3491,16 @@
           "height" : 1.1000000000000014,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 202,
         "absorbing" : false,
@@ -3103,13 +3511,16 @@
           "height" : 1.1000000000000014,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 202,
         "absorbing" : false,
@@ -3120,13 +3531,16 @@
           "height" : 1.1000000000000014,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 202,
         "absorbing" : false,
@@ -3137,13 +3551,16 @@
           "height" : 1.1000000000000014,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 202,
         "absorbing" : false,
@@ -3154,13 +3571,16 @@
           "height" : 1.1000000000000014,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 202,
         "absorbing" : false,
@@ -3171,13 +3591,16 @@
           "height" : 1.1000000000000014,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 202,
         "absorbing" : false,
@@ -3188,13 +3611,16 @@
           "height" : 1.1000000000000014,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 202,
         "absorbing" : false,
@@ -3205,13 +3631,16 @@
           "height" : 1.1000000000000014,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 407,
         "absorbing" : false,
@@ -3222,13 +3651,16 @@
           "height" : 1.961222474977415,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 407,
         "absorbing" : false,
@@ -3239,13 +3671,16 @@
           "height" : 1.961222474977415,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 407,
         "absorbing" : false,
@@ -3256,13 +3691,16 @@
           "height" : 1.961222474977415,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 407,
         "absorbing" : false,
@@ -3273,13 +3711,16 @@
           "height" : 1.961222474977415,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 407,
         "absorbing" : false,
@@ -3290,13 +3731,16 @@
           "height" : 1.961222474977415,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 407,
         "absorbing" : false,
@@ -3307,13 +3751,16 @@
           "height" : 1.961222474977415,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 407,
         "absorbing" : false,
@@ -3324,13 +3771,16 @@
           "height" : 1.961222474977415,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 407,
         "absorbing" : false,
@@ -3341,13 +3791,16 @@
           "height" : 1.961222474977415,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 407,
         "absorbing" : false,
@@ -3358,13 +3811,16 @@
           "height" : 1.961222474977415,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 407,
         "absorbing" : false,
@@ -3375,13 +3831,16 @@
           "height" : 1.961222474977415,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 407,
         "absorbing" : false,
@@ -3392,13 +3851,16 @@
           "height" : 1.961222474977415,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 407,
         "absorbing" : false,
@@ -3409,13 +3871,16 @@
           "height" : 1.961222474977415,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 407,
         "absorbing" : false,
@@ -3426,13 +3891,16 @@
           "height" : 1.961222474977415,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 407,
         "absorbing" : false,
@@ -3443,13 +3911,16 @@
           "height" : 1.961222474977415,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 407,
         "absorbing" : false,
@@ -3460,13 +3931,16 @@
           "height" : 1.961222474977415,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 407,
         "absorbing" : false,
@@ -3477,13 +3951,16 @@
           "height" : 1.961222474977415,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 407,
         "absorbing" : false,
@@ -3494,13 +3971,16 @@
           "height" : 1.961222474977415,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 407,
         "absorbing" : false,
@@ -3511,13 +3991,16 @@
           "height" : 1.961222474977415,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 407,
         "absorbing" : false,
@@ -3528,13 +4011,16 @@
           "height" : 1.961222474977415,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 407,
         "absorbing" : false,
@@ -3545,13 +4031,16 @@
           "height" : 1.961222474977415,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 407,
         "absorbing" : false,
@@ -3562,13 +4051,16 @@
           "height" : 1.961222474977415,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 407,
         "absorbing" : false,
@@ -3579,13 +4071,16 @@
           "height" : 1.961222474977415,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 407,
         "absorbing" : false,
@@ -3596,13 +4091,16 @@
           "height" : 1.961222474977415,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 407,
         "absorbing" : false,
@@ -3613,13 +4111,16 @@
           "height" : 1.961222474977415,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 407,
         "absorbing" : false,
@@ -3630,13 +4131,16 @@
           "height" : 1.961222474977415,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 407,
         "absorbing" : false,
@@ -3647,13 +4151,16 @@
           "height" : 1.961222474977415,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 407,
         "absorbing" : false,
@@ -3664,13 +4171,16 @@
           "height" : 1.961222474977415,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 413,
         "absorbing" : false,
@@ -3681,13 +4191,16 @@
           "height" : 1.961222474977415,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 413,
         "absorbing" : false,
@@ -3698,13 +4211,16 @@
           "height" : 1.961222474977415,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 413,
         "absorbing" : false,
@@ -3715,13 +4231,16 @@
           "height" : 1.961222474977415,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 413,
         "absorbing" : false,
@@ -3732,13 +4251,16 @@
           "height" : 1.961222474977415,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 413,
         "absorbing" : false,
@@ -3749,13 +4271,16 @@
           "height" : 1.961222474977415,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 413,
         "absorbing" : false,
@@ -3766,13 +4291,16 @@
           "height" : 1.961222474977415,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 413,
         "absorbing" : false,
@@ -3783,13 +4311,16 @@
           "height" : 1.961222474977415,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 413,
         "absorbing" : false,
@@ -3800,13 +4331,16 @@
           "height" : 1.961222474977415,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 901,
         "absorbing" : false,
@@ -3817,13 +4351,16 @@
           "height" : 2.5,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 10.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 10.0
+        }
       }, {
         "id" : 901,
         "absorbing" : false,
@@ -3834,13 +4371,16 @@
           "height" : 2.5,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 10.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 10.0
+        }
       }, {
         "id" : 901,
         "absorbing" : false,
@@ -3851,13 +4391,16 @@
           "height" : 2.5,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 10.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 10.0
+        }
       }, {
         "id" : 901,
         "absorbing" : false,
@@ -3868,13 +4411,16 @@
           "height" : 2.5,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 10.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 10.0
+        }
       }, {
         "id" : 901,
         "absorbing" : false,
@@ -3885,13 +4431,16 @@
           "height" : 2.5,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 10.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 10.0
+        }
       }, {
         "id" : 901,
         "absorbing" : false,
@@ -3902,13 +4451,16 @@
           "height" : 2.5,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 10.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 10.0
+        }
       }, {
         "id" : 901,
         "absorbing" : false,
@@ -3919,13 +4471,16 @@
           "height" : 2.5,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 10.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 10.0
+        }
       }, {
         "id" : 901,
         "absorbing" : false,
@@ -3936,13 +4491,16 @@
           "height" : 2.5,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 10.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 10.0
+        }
       }, {
         "id" : 901,
         "absorbing" : false,
@@ -3953,13 +4511,16 @@
           "height" : 2.5,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 10.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 10.0
+        }
       }, {
         "id" : 901,
         "absorbing" : false,
@@ -3970,13 +4531,16 @@
           "height" : 2.5,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 10.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 10.0
+        }
       }, {
         "id" : 901,
         "absorbing" : false,
@@ -3987,13 +4551,16 @@
           "height" : 2.5,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 10.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 10.0
+        }
       }, {
         "id" : 901,
         "absorbing" : false,
@@ -4004,13 +4571,16 @@
           "height" : 2.5,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 10.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 10.0
+        }
       }, {
         "id" : 901,
         "absorbing" : false,
@@ -4021,13 +4591,16 @@
           "height" : 2.5,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 10.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 10.0
+        }
       }, {
         "id" : 901,
         "absorbing" : false,
@@ -4038,13 +4611,16 @@
           "height" : 2.5,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 10.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 10.0
+        }
       }, {
         "id" : 901,
         "absorbing" : false,
@@ -4055,13 +4631,16 @@
           "height" : 2.5,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 10.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 10.0
+        }
       }, {
         "id" : 901,
         "absorbing" : false,
@@ -4072,13 +4651,16 @@
           "height" : 2.5,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 10.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 10.0
+        }
       }, {
         "id" : 901,
         "absorbing" : false,
@@ -4089,13 +4671,16 @@
           "height" : 2.5,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 10.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 10.0
+        }
       }, {
         "id" : 901,
         "absorbing" : false,
@@ -4106,13 +4691,16 @@
           "height" : 2.5,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 10.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 10.0
+        }
       }, {
         "id" : 901,
         "absorbing" : false,
@@ -4123,13 +4711,16 @@
           "height" : 2.5,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 10.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 10.0
+        }
       }, {
         "id" : 901,
         "absorbing" : false,
@@ -4140,13 +4731,16 @@
           "height" : 2.5,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 10.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 10.0
+        }
       }, {
         "id" : 901,
         "absorbing" : false,
@@ -4157,13 +4751,16 @@
           "height" : 2.5,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 10.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 10.0
+        }
       }, {
         "id" : 901,
         "absorbing" : false,
@@ -4174,13 +4771,16 @@
           "height" : 2.5,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 10.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 10.0
+        }
       }, {
         "id" : 901,
         "absorbing" : false,
@@ -4191,13 +4791,16 @@
           "height" : 2.5,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 10.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 10.0
+        }
       }, {
         "id" : 604,
         "absorbing" : false,
@@ -4208,13 +4811,16 @@
           "height" : 1.961222474977415,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 604,
         "absorbing" : false,
@@ -4225,13 +4831,16 @@
           "height" : 1.961222474977415,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 604,
         "absorbing" : false,
@@ -4242,13 +4851,16 @@
           "height" : 1.961222474977415,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 604,
         "absorbing" : false,
@@ -4259,13 +4871,16 @@
           "height" : 1.961222474977415,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 604,
         "absorbing" : false,
@@ -4276,13 +4891,16 @@
           "height" : 1.961222474977415,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 604,
         "absorbing" : false,
@@ -4293,13 +4911,16 @@
           "height" : 1.961222474977415,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 604,
         "absorbing" : false,
@@ -4310,13 +4931,16 @@
           "height" : 1.961222474977415,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 604,
         "absorbing" : false,
@@ -4327,13 +4951,16 @@
           "height" : 1.961222474977415,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 604,
         "absorbing" : false,
@@ -4344,13 +4971,16 @@
           "height" : 1.961222474977415,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4.0
+        }
       }, {
         "id" : 304,
         "absorbing" : false,
@@ -4361,13 +4991,16 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 0.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 0.0
+        }
       }, {
         "id" : 304,
         "absorbing" : false,
@@ -4378,13 +5011,16 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 0.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 0.0
+        }
       }, {
         "id" : 304,
         "absorbing" : false,
@@ -4395,13 +5031,16 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 0.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 0.0
+        }
       }, {
         "id" : 304,
         "absorbing" : false,
@@ -4412,13 +5051,16 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 0.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 0.0
+        }
       }, {
         "id" : 304,
         "absorbing" : false,
@@ -4429,13 +5071,16 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 0.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 0.0
+        }
       }, {
         "id" : 999,
         "absorbing" : true,
@@ -4446,13 +5091,16 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 40.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 40.0
+        }
       } ],
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],

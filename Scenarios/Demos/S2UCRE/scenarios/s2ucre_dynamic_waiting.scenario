@@ -1,8 +1,8 @@
 {
   "name" : "s2ucre_dynamic_waiting",
   "description" : "",
-  "release" : "2.2",
-  "commithash" : "bef9b7bef5c5755b23c296217e1454e4af9b7d15",
+  "release" : "2.3",
+  "commithash" : "b8f1461237f175183dddeb7716251c6b8d7d23b9",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -76,7 +76,9 @@
       },
       "org.vadere.state.attributes.models.AttributesCGM" : {
         "groupMemberRepulsionFactor" : 0.01,
-        "leaderAttractionFactor" : 0.003
+        "leaderAttractionFactor" : 0.003,
+        "lostMembers" : false,
+        "waitBehaviourRelevantAgentsFactor" : -1
       }
     },
     "attributesSimulation" : {
@@ -340,13 +342,16 @@
             "y" : 20.1
           } ]
         },
-        "waitingTime" : 0.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 0.0
+        }
       }, {
         "id" : 1,
         "absorbing" : true,
@@ -366,13 +371,16 @@
             "y" : 5.900000000372529
           } ]
         },
-        "waitingTime" : 0.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 0.0
+        }
       }, {
         "id" : 100,
         "absorbing" : false,
@@ -392,13 +400,16 @@
             "y" : 5.8
           } ]
         },
-        "waitingTime" : 60.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 60.0
+        }
       }, {
         "id" : 4,
         "absorbing" : false,
@@ -418,13 +429,16 @@
             "y" : 38.28645960401878
           } ]
         },
-        "waitingTime" : 30.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 30.0
+        }
       }, {
         "id" : 4,
         "absorbing" : false,
@@ -444,13 +458,16 @@
             "y" : 36.3
           } ]
         },
-        "waitingTime" : 30.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 30.0
+        }
       }, {
         "id" : 5,
         "absorbing" : true,
@@ -470,13 +487,16 @@
             "y" : 34.85863946661181
           } ]
         },
-        "waitingTime" : 30.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 30.0
+        }
       }, {
         "id" : 6,
         "absorbing" : false,
@@ -496,13 +516,16 @@
             "y" : 31.1
           } ]
         },
-        "waitingTime" : 30.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 30.0
+        }
       }, {
         "id" : 7,
         "absorbing" : false,
@@ -522,13 +545,16 @@
             "y" : 26.25
           } ]
         },
-        "waitingTime" : 30.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 30.0
+        }
       }, {
         "id" : 7,
         "absorbing" : false,
@@ -548,13 +574,16 @@
             "y" : 24.432947295064636
           } ]
         },
-        "waitingTime" : 30.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 30.0
+        }
       }, {
         "id" : 5,
         "absorbing" : false,
@@ -574,13 +603,16 @@
             "y" : 36.100006879285445
           } ]
         },
-        "waitingTime" : 30.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 30.0
+        }
       }, {
         "id" : 6,
         "absorbing" : true,
@@ -600,13 +632,16 @@
             "y" : 32.152625383454954
           } ]
         },
-        "waitingTime" : 30.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 30.0
+        }
       }, {
         "id" : 8,
         "absorbing" : false,
@@ -626,13 +661,16 @@
             "y" : 24.305218599968924
           } ]
         },
-        "waitingTime" : 30.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 30.0
+        }
       }, {
         "id" : 8,
         "absorbing" : false,
@@ -652,13 +690,16 @@
             "y" : 26.0
           } ]
         },
-        "waitingTime" : 30.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 30.0
+        }
       }, {
         "id" : 9,
         "absorbing" : false,
@@ -678,13 +719,16 @@
             "y" : 19.0
           } ]
         },
-        "waitingTime" : 30.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 30.0
+        }
       }, {
         "id" : 9,
         "absorbing" : false,
@@ -704,13 +748,16 @@
             "y" : 20.287771540463076
           } ]
         },
-        "waitingTime" : 30.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 30.0
+        }
       }, {
         "id" : 10,
         "absorbing" : false,
@@ -730,13 +777,16 @@
             "y" : 14.6
           } ]
         },
-        "waitingTime" : 30.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 30.0
+        }
       }, {
         "id" : 10,
         "absorbing" : false,
@@ -756,13 +806,16 @@
             "y" : 16.561222177899726
           } ]
         },
-        "waitingTime" : 30.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 30.0
+        }
       } ],
       "targetChangers" : [ {
         "id" : 8,
