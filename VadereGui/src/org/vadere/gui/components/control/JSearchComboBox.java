@@ -4,7 +4,7 @@ import javax.swing.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.event.ListDataListener;
-import javax.swing.text.JTextComponent;
+import javax.swing.text.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -84,7 +84,18 @@ public class JSearchComboBox extends JComboBox<String> {
         clearTextField();
     }
     private void initChangeListener() {
+
         textComponentProxy.addCaretListener(new CustomCaretListener());
+        ((PlainDocument)textComponentProxy.getDocument()).setDocumentFilter(new DocumentFilter(){
+            @Override
+            public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
+                // fix for windows
+                textComponentProxy.setSelectionStart(0);
+                textComponentProxy.setSelectionEnd(0);
+                // end fix
+                super.replace(fb, offset, length, text, attrs);
+            }
+        });
     }
     private void initComponents() {
         this.setEditable(true);
