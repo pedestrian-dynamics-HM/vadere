@@ -5,17 +5,12 @@ import com.jgoodies.forms.layout.FormLayout;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.postvisualization.control.ActionSetTimeStep;
 import org.vadere.gui.postvisualization.control.EJSliderAction;
-import org.vadere.gui.postvisualization.control.Player;
 import org.vadere.gui.postvisualization.model.PostvisualizationModel;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.awt.event.ActionListener;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.function.Consumer;
 
 public class AdjustPanel extends JPanel implements Observer {
 
@@ -106,13 +101,8 @@ public class AdjustPanel extends JPanel implements Observer {
 		sStep.addChangeListener(e -> {
 			if ((int) sStep.getValue() <= model.getStepCount()) {
 				model.setStep((int) sStep.getValue());
+				model.notifyObservers();
 			}
-			model.addObserver(new Observer() {
-				@Override
-				public void update(Observable o, Object arg) {
-
-				}
-			});
 		});
 
 		sTimeResolution.addChangeListener(e -> {
@@ -125,6 +115,7 @@ public class AdjustPanel extends JPanel implements Observer {
 			sModelTime = new SpinnerNumberModel(currentTimeValue, 0.0, Double.MAX_VALUE, newStepSize);
 			sTime.setModel(sModelTime);
 		});
+
 
 		ActionSetTimeStep setTimeStepAction = new ActionSetTimeStep("setTimeStep", model);
 		slider.addChangeListener(setTimeStepAction);

@@ -26,8 +26,10 @@ public class PedestrianMaxDegreeOfExposureProcessor extends DataProcessor<Pedest
     protected void doUpdate(final SimulationState state) {
         state.getTopography().getElements(Pedestrian.class).stream()
                 .forEach(pedestrian -> {
-                    PedestrianIdKey pedId = new PedestrianIdKey(pedestrian.getId());
-                    this.putValue(pedId, getDegreeOfExposure(pedestrian));
+                    if (!pedestrian.isInfectious()) {
+                        PedestrianIdKey pedId = new PedestrianIdKey(pedestrian.getId());
+                        this.putValue(pedId, getDegreeOfExposure(pedestrian));
+                    }
                 });
     }
 
@@ -35,8 +37,10 @@ public class PedestrianMaxDegreeOfExposureProcessor extends DataProcessor<Pedest
     public void postLoop(final SimulationState state) {
         state.getTopography().getElements(Pedestrian.class).stream()
                 .forEach(pedestrian -> {
-                    PedestrianIdKey pedId = new PedestrianIdKey(pedestrian.getId());
-                    this.putValue(pedId, getDegreeOfExposure(pedestrian));
+                    if(!pedestrian.isInfectious()) {
+                        PedestrianIdKey pedId = new PedestrianIdKey(pedestrian.getId());
+                        this.putValue(pedId, getDegreeOfExposure(pedestrian));
+                    }
                 });
     }
 

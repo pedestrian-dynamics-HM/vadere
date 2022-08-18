@@ -19,6 +19,7 @@ public enum ScenarioCheckerReason {
 	STAIRS_TREAD_DIM_WRONG("ScenarioChecker.stairs.wrongTreadDim"),
 	TOPOGRAPHY_OFFSET("ScenarioChecker.topography.offset"),
 
+	OBSTACLE_NO_AREA("ScenarioChecker.obstacle.noArea"),
 	OVERLAP_STAIR_STAIR("ScenarioChecker.overlap.stair.stair"),
 	OVERLAP_TARGET_TARGET("ScenarioChecker.overlap.target.target"),
 	OVERLAP_TARGET_STAIR("ScenarioChecker.overlap.target.stair"),
@@ -37,6 +38,8 @@ public enum ScenarioCheckerReason {
 
 	TARGET_UNUSED("ScenarioChecker.target.unused"),
 	TARGET_OVERLAP("ScenarioChecker.target.overlap"),
+	TARGET_NO_ABSORBER("ScenarioChecker.target.noAbsorber"),
+	TARGET_NOT_LAST_ABSORBER("ScenarioChecker.target.notLastAbsorber"),
 	PEDESTRIAN_SPEED_SETUP("ScenarioChecker.pedestrian.speedsetup"),
 	PEDESTRIAN_SPEED_NOT_LOGICAL("ScenarioChecker.pedestrian.speedNotLogical"),
 	PEDESTRIAN_SPEED_NEGATIVE("ScenarioChecker.pedestrian.speedIsNegative"),
