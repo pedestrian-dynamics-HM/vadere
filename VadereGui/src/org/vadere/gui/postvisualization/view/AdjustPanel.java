@@ -51,7 +51,7 @@ public class AdjustPanel extends JPanel implements Observer {
 
 		sModelVelocity = new SpinnerNumberModel(model.config.getFps(), 1, 200, 1);
 		sModelTime = new SpinnerNumberModel(0.0, 0.0, Double.MAX_VALUE, model.getTimeResolution());
-		sModelTimeStep = new SpinnerNumberModel(1, 1, Integer.MAX_VALUE, 1);
+		sModelTimeStep = new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1);
 		sModelTimeResolution = new SpinnerNumberModel(model.config.getTimeResolution(), 0.01, Double.MAX_VALUE, 0.01);
 		model.setTimeResolution(model.config.getTimeResolution());
 
