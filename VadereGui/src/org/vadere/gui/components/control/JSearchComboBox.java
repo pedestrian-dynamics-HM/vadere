@@ -92,6 +92,7 @@ public class JSearchComboBox extends JComboBox<String> {
                 // fix for windows
                 textComponentProxy.setSelectionStart(0);
                 textComponentProxy.setSelectionEnd(0);
+                textComponentProxy.setCaretPosition(textComponentProxy.getText().length());
                 // end fix
                 super.replace(fb, offset, length, text, attrs);
             }
