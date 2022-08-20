@@ -1,8 +1,7 @@
 {
   "name" : "Corridor-BHM-Defaults-WithFloorField-CounterflowCognitionModel",
   "description" : "",
-  "release" : "2.2",
-  "commithash" : "bef9b7bef5c5755b23c296217e1454e4af9b7d15",
+  "release" : "2.3",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -122,10 +121,10 @@
         "bounds" : {
           "x" : 0.0,
           "y" : 0.0,
-          "width" : 20.0,
-          "height" : 2.0
+          "width" : 21.0,
+          "height" : 3.0
         },
-        "boundingBoxWidth" : 0.5,
+        "boundingBoxWidth" : 1.0,
         "bounded" : true,
         "referenceCoordinateSystem" : null
       },
@@ -136,36 +135,42 @@
         "id" : 1,
         "absorbing" : true,
         "shape" : {
-          "x" : 18.5,
-          "y" : 0.5,
+          "x" : 19.0,
+          "y" : 1.0,
           "width" : 1.0,
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 0.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 0.0
+        }
       }, {
         "id" : 2,
         "absorbing" : true,
         "shape" : {
-          "x" : 0.5,
-          "y" : 0.5,
+          "x" : 1.0,
+          "y" : 1.0,
           "width" : 1.0,
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 0.0,
         "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "waitingBehaviour" : "individual",
         "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 0.0
+        }
       } ],
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],
@@ -174,8 +179,8 @@
       "sources" : [ {
         "id" : 3,
         "shape" : {
-          "x" : 1.6,
-          "y" : 0.5,
+          "x" : 2.1,
+          "y" : 1.0,
           "width" : 1.0,
           "height" : 1.0,
           "type" : "RECTANGLE"
@@ -198,8 +203,8 @@
       }, {
         "id" : 4,
         "shape" : {
-          "x" : 17.4,
-          "y" : 0.5,
+          "x" : 17.9,
+          "y" : 1.0,
           "width" : 1.0,
           "height" : 1.0,
           "type" : "RECTANGLE"
