@@ -2,7 +2,6 @@
   "name" : "Corridor-BHM-Defaults-WithFloorField-CounterflowCognitionModel",
   "description" : "",
   "release" : "2.3",
-  "commithash" : "b8f1461237f175183dddeb7716251c6b8d7d23b9",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -122,10 +121,10 @@
         "bounds" : {
           "x" : 0.0,
           "y" : 0.0,
-          "width" : 20.0,
-          "height" : 2.0
+          "width" : 21.0,
+          "height" : 3.0
         },
-        "boundingBoxWidth" : 0.5,
+        "boundingBoxWidth" : 1.0,
         "bounded" : true,
         "referenceCoordinateSystem" : null
       },
@@ -136,8 +135,8 @@
         "id" : 1,
         "absorbing" : true,
         "shape" : {
-          "x" : 18.5,
-          "y" : 0.5,
+          "x" : 19.0,
+          "y" : 1.0,
           "width" : 1.0,
           "height" : 1.0,
           "type" : "RECTANGLE"
@@ -156,8 +155,8 @@
         "id" : 2,
         "absorbing" : true,
         "shape" : {
-          "x" : 0.5,
-          "y" : 0.5,
+          "x" : 1.0,
+          "y" : 1.0,
           "width" : 1.0,
           "height" : 1.0,
           "type" : "RECTANGLE"
@@ -180,8 +179,8 @@
       "sources" : [ {
         "id" : 3,
         "shape" : {
-          "x" : 1.6,
-          "y" : 0.5,
+          "x" : 2.1,
+          "y" : 1.0,
           "width" : 1.0,
           "height" : 1.0,
           "type" : "RECTANGLE"
@@ -204,8 +203,8 @@
       }, {
         "id" : 4,
         "shape" : {
-          "x" : 17.4,
-          "y" : 0.5,
+          "x" : 17.9,
+          "y" : 1.0,
           "width" : 1.0,
           "height" : 1.0,
           "type" : "RECTANGLE"
