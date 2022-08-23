@@ -6,6 +6,7 @@ import org.apache.commons.math3.random.JDKRandomGenerator;
 import org.vadere.state.attributes.AttributesEmbedShape;
 import org.vadere.state.scenario.distribution.DistributionFactory;
 import org.vadere.state.scenario.distribution.VadereDistribution;
+import org.vadere.state.scenario.distribution.parameter.*;
 import org.vadere.state.types.DynamicElementType;
 import org.vadere.state.util.StateJsonConverter;
 import org.vadere.state.util.Views;
@@ -30,34 +31,38 @@ public class AttributesSource extends AttributesEmbedShape {
 	private VShape shape = null;
 
 	/**
-	 *  Distribution types:
-	 *  "binomial",
-	 *  "constant",
-	 *  "empirical",
-	 *  "linearInterpolation",
-	 *  "mixed",
-	 *  "negativeExponential",
-	 *  "normal",
-	 *  "poisson",
-	 *  "singleSpawn",
-	 *  "timeSeries"
+	 *  Distribution types:<br>
+	 *  <ul>
+	 *  <li>"binomial"
+	 *  <li>"constant"
+	 *  <li>"empirical"
+	 *  <li>"linearInterpolation"
+	 *  <li>"mixed"
+	 *  <li>"negativeExponential"
+	 *  <li>"normal"
+	 *  <li>"poisson"
+	 *  <li>"singleEvent"
+	 *  <li>"timeSeries"
+	 *  </ul>
 	 */
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
 	private String interSpawnTimeDistribution = CONSTANT_DISTRIBUTION;
 
 
 	/**
-	 *  Distribution parameter examples:
-	 *  "binomial" -> "trials": 1 , "p": 0.5
-	 *  "constant" -> "updateFrequency": 1.0
-	 *  "empirical" -> "values" : [0.2,0.5,1.4]
-	 *  "linearInterpolation", "spawnFrequency": 1.0, "xValues": [1.4, 2.4], "yValues": [5,9]
-	 *  "mixed",
-	 *  "negativeExponential" -> "mean": 2.4
-	 *  "normal" -> "mean":1.3, "sd":0.2
-	 *  "poisson" -> "numberPedsPerSecond" : 5.4
-	 *  "singleSpawn", "spawnTime" : 3.0
-	 *  "timeSeries" -> "intervalLength":1.2, "spawnsPerInterval" : [2,0,0,2,0,0]
+	 *  Distribution types:<br>
+	 *  <ul>
+	 *  <li>"BinomialParameter"				[{@link BinomialParameter}]</li>
+	 *  <li>"ConstantParameter"				[{@link ConstantParameter}]</li>
+	 *  <li>"EmpiricalParameter"			[{@link EmpiricalParameter}]</li>
+	 *  <li>"LinearInterpolationParameter"	[{@link LinearInterpolationParameter}]</li>
+	 *  <li>"MixedParameter"				[{@link MixedParameter}]</li>
+	 *  <li>"NegativeExponentialParameter"	[{@link NegativeExponentialParameter}]</li>
+	 *  <li>"NormalParameter"				[{@link NormalParameter}]</li>
+	 *  <li>"PoissonParameter"				[{@link PoissonParameter}]</li>
+	 *  <li>"SingleEventParameter"			[{@link SingleEventParameter}]</li>
+	 *  <li>"TimeSeriesParameter"			[{@link TimeSeriesParameter}]</li>
+	 *  </ul>
 	 */
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
 	private JsonNode distributionParameters = CONSTANT_DISTRIBUTION_PAR;

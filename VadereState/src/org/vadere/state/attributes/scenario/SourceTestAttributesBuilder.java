@@ -35,7 +35,7 @@ public class SourceTestAttributesBuilder {
 	private long randomSeed = 0;
 
 	public SourceTestAttributesBuilder(){
-		parameter.setUpdateFrequency(1);
+		parameter.setTimeInterval(1);
 	}
 
 	public AttributesSource getResult() throws IOException {
@@ -65,7 +65,7 @@ public class SourceTestAttributesBuilder {
 	}
 
 	public SourceTestAttributesBuilder setDistributionParams(double updateFruequency) {
-		this.parameter.setUpdateFrequency(updateFruequency);
+		this.parameter.setTimeInterval(updateFruequency);
 		return this;
 	}
 

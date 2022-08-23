@@ -49,7 +49,7 @@ public class NormalDistributionTest extends VadereDistributionTest {
 		double timeCurrentEvent = 1;
 
 		VadereDistribution<?> dist = getDistributionUnderTest();
-		double actual = dist.getNextSpawnTime(timeCurrentEvent);
+		double actual = dist.getNextSample(timeCurrentEvent);
 
 		assertEquals(sample + timeCurrentEvent, actual, 0);
 		Mockito.verify(distMock).sample();

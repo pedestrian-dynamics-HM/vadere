@@ -34,7 +34,7 @@ public class NegativeExponentialDistribution extends VadereDistribution<Negative
 	}
 
 	@Override
-	public double getNextSpawnTime(double timeCurrentEvent) {
+	public double getNextSample(double timeCurrentEvent) {
 		return timeCurrentEvent + distribution.sample();
 	}
 

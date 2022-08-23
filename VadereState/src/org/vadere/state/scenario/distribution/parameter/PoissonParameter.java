@@ -7,13 +7,13 @@ package org.vadere.state.scenario.distribution.parameter;
  */
 
 public class PoissonParameter {
-	public double getNumberPedsPerSecond() {
-		return numberPedsPerSecond;
+	public double getOccurrencesPerSecond() {
+		return occurrencesPerSecond;
 	}
 
-	public void setNumberPedsPerSecond(double numberPedsPerSecond) {
-		this.numberPedsPerSecond = numberPedsPerSecond;
+	public void setOccurrencesPerSecond(double occurrencesPerSecond) {
+		this.occurrencesPerSecond = occurrencesPerSecond;
 	}
 
-	double numberPedsPerSecond;
+	double occurrencesPerSecond;
 }

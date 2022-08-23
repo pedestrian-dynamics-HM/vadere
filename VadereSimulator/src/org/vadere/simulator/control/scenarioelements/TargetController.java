@@ -58,7 +58,7 @@ public class TargetController extends ScenarioElementController {
 						+ "waitingTimeDistribution and/or distributionParameters. See causing Excepion herefafter.", e);
 			}
 
-			this.phaseLength = this.distribution.getNextSpawnTime(0);
+			this.phaseLength = this.distribution.getNextSample(0);
 		}
 		this.waitingBehaviour = target.getWaitingBehaviour();
 	}
@@ -164,7 +164,7 @@ public class TargetController extends ScenarioElementController {
 				leavingTimes.size() < waitingSpots);
 		if (targetHasFreeWaitingSpots) {
 			// TODO: Refractor VadereDistributions method name
-			leavingTimes.put(agentId, this.distribution.getNextSpawnTime(simTimeInSec));
+			leavingTimes.put(agentId, this.distribution.getNextSample(simTimeInSec));
 		}
 	}
 

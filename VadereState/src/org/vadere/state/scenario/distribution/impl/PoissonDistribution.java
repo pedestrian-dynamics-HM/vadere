@@ -23,7 +23,7 @@ public class PoissonDistribution extends VadereDistribution<PoissonParameter> {
 	@Override
 	protected void setValues(PoissonParameter parameter, int spawnNumber, RandomGenerator randomGenerator)
 	        throws Exception {
-		distribution = new ExponentialDistribution(randomGenerator, 1 / parameter.getNumberPedsPerSecond());
+		distribution = new ExponentialDistribution(randomGenerator, 1 / parameter.getOccurrencesPerSecond());
 		this.spawnNumber = spawnNumber;
 	}
 
@@ -33,7 +33,7 @@ public class PoissonDistribution extends VadereDistribution<PoissonParameter> {
 	}
 
 	@Override
-	public double getNextSpawnTime(double timeCurrentEvent) {
+	public double getNextSample(double timeCurrentEvent) {
 		return timeCurrentEvent + distribution.sample();
 	}
 

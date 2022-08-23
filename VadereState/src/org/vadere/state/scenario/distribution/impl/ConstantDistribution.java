@@ -15,14 +15,14 @@ public class ConstantDistribution extends VadereDistribution<ConstantParameter> 
 		super(parameter, spawnNumber, unused);
 	}
 
-	private double updateFrequency;
+	private double timeInterval;
 	private int spawnNumber;
 	private int remainingSpawnAgents;
 
 	@Override
 	protected void setValues(ConstantParameter parameter, int spawnNumber, RandomGenerator unused) {
 		this.spawnNumber = spawnNumber;
-		this.updateFrequency = parameter.getUpdateFrequency();
+		this.timeInterval = parameter.getTimeInterval();
 
 	}
 
@@ -32,9 +32,9 @@ public class ConstantDistribution extends VadereDistribution<ConstantParameter> 
 	}
 
 	@Override
-	public double getNextSpawnTime(double timeCurrentEvent) {
+	public double getNextSample(double timeCurrentEvent) {
 		// always add a constant value to the 'value'
-		return timeCurrentEvent + this.updateFrequency;
+		return timeCurrentEvent + this.timeInterval;
 	}
 
 	@Override

@@ -4,17 +4,18 @@ package org.vadere.state.scenario.distribution.parameter;
  * This is the parameter structure used with a constant distribution.
  * @author Lukas Gradl (lgradl@hm.edu), Aleksandar Ivanov, Ludwig Jaeck
  */
+
 public class ConstantParameter {
 	/**
-	 * The attribute updateFrequency describes the time it takes for the next event to happen.
+	 * The attribute timeInterval describes the time it takes for the next event to happen.
 	 */
-	double updateFrequency;
+	double timeInterval;
 
-	public void setUpdateFrequency(double updateFrequency){
-		this.updateFrequency = updateFrequency;
+	public void setTimeInterval(double timeInterval){
+		this.timeInterval = timeInterval;
 	}
 
-	public double getUpdateFrequency(){
-		return this.updateFrequency;
+	public double getTimeInterval(){
+		return this.timeInterval;
 	}
 }

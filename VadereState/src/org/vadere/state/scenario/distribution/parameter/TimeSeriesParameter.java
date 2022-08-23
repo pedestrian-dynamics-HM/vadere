@@ -7,7 +7,7 @@ package org.vadere.state.scenario.distribution.parameter;
 public class TimeSeriesParameter {
 
 	double intervalLength;
-	int[] spawnsPerInterval;
+	int[] eventsPerInterval;
 
 	public double getIntervalLength() {
 		return intervalLength;
@@ -17,12 +17,12 @@ public class TimeSeriesParameter {
 		this.intervalLength = intervalLength;
 	}
 
-	public int[] getSpawnsPerInterval() {
-		return spawnsPerInterval;
+	public int[] getEventsPerInterval() {
+		return eventsPerInterval;
 	}
 
-	public void setSpawnsPerInterval(int[] spawnsPerInterval) {
-		this.spawnsPerInterval = spawnsPerInterval;
+	public void setEventsPerInterval(int[] eventsPerInterval) {
+		this.eventsPerInterval = eventsPerInterval;
 	}
 
 }

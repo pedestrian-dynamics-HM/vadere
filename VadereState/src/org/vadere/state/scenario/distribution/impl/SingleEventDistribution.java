@@ -2,27 +2,26 @@ package org.vadere.state.scenario.distribution.impl;
 
 import org.apache.commons.math3.random.RandomGenerator;
 import org.vadere.state.scenario.distribution.VadereDistribution;
-import org.vadere.state.scenario.distribution.parameter.SingleSpawnParameter;
+import org.vadere.state.scenario.distribution.parameter.SingleEventParameter;
 import org.vadere.state.scenario.distribution.registry.RegisterDistribution;
 
 /**
  * @author Aleksandar Ivanov(ivanov0@hm.edu), Lukas Gradl (lgradl@hm.edu)
  */
-
-@RegisterDistribution(name = "singleSpawn", parameter = SingleSpawnParameter.class)
-public class SingleSpawnDistribution extends VadereDistribution<SingleSpawnParameter> {
+@RegisterDistribution(name = "singleEvent", parameter = SingleEventParameter.class)
+public class SingleEventDistribution extends VadereDistribution<SingleEventParameter> {
 	private int spawnNumber;
-	private double spawnTime;
+	private double eventTime;
 	private int remainingSpawnAgents;
 
-	public SingleSpawnDistribution(SingleSpawnParameter parameter, int spawnNumber, RandomGenerator unused)
+	public SingleEventDistribution(SingleEventParameter parameter, int spawnNumber, RandomGenerator unused)
 	        throws Exception {
 		super(parameter, spawnNumber, unused);
 	}
 
 	@Override
-	protected void setValues(SingleSpawnParameter parameter, int spawnNumber, RandomGenerator unused) throws Exception {
-		this.spawnTime = parameter.getSpawnTime();
+	protected void setValues(SingleEventParameter parameter, int spawnNumber, RandomGenerator unused) throws Exception {
+		this.eventTime = parameter.getEventTime();
 		this.spawnNumber = parameter.getSpawnNumber();
 	}
 
@@ -32,9 +31,10 @@ public class SingleSpawnDistribution extends VadereDistribution<SingleSpawnParam
 	}
 
 	@Override
-	public double getNextSpawnTime(double timeCurrentEvent) {
-		return spawnTime;
+	public double getNextSample(double timeCurrentEvent) {
+		return eventTime;
 	}
+
 
 	@Override
 	public int getRemainingSpawnAgents() {

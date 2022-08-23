@@ -15,7 +15,7 @@ import org.vadere.state.scenario.distribution.VadereDistributionTest;
 import org.vadere.state.scenario.distribution.parameter.ConstantParameter;
 import org.vadere.state.scenario.distribution.parameter.MixedParameter;
 import org.vadere.state.scenario.distribution.parameter.MixedParameterDistribution;
-import org.vadere.state.scenario.distribution.parameter.SingleSpawnParameter;
+import org.vadere.state.scenario.distribution.parameter.SingleEventParameter;
 import org.vadere.state.scenario.distribution.parameter.TimeSeriesParameter;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -37,7 +37,7 @@ public class TimeSeriesDistributionTest extends VadereDistributionTest {
 		int intervalLength = 4;
 		parameter.setIntervalLength(intervalLength);
 		int[] spawnsPerInterval = { 1, 0, 0 };
-		parameter.setSpawnsPerInterval(spawnsPerInterval);
+		parameter.setEventsPerInterval(spawnsPerInterval);
 
 		PowerMockito.whenNew(MixedDistribution.class).withAnyArguments().thenReturn(distMock);
 
@@ -56,28 +56,28 @@ public class TimeSeriesDistributionTest extends VadereDistributionTest {
 
 		MixedParameterDistribution first = new MixedParameterDistribution();
 		ConstantParameter constantP = new ConstantParameter();
-		constantP.setUpdateFrequency(intervalLength / spawnsPerInterval[0]);
+		constantP.setTimeInterval(intervalLength / spawnsPerInterval[0]);
 		JsonNode node = mapper.convertValue(constantP, JsonNode.class);
 		first.setInterSpawnTimeDistribution("constant");
 		first.setDistributionParameters(node);
 
 		MixedParameterDistribution second = new MixedParameterDistribution();
-		SingleSpawnParameter singleP1 = new SingleSpawnParameter();
+		SingleEventParameter singleP1 = new SingleEventParameter();
 		singleP1.setSpawnNumber(0);
-		singleP1.setSpawnTime(8);
+		singleP1.setEventTime(8);
 		JsonNode node2 = mapper.convertValue(singleP1, JsonNode.class);
 		second.setInterSpawnTimeDistribution("singleSpawn");
 		second.setDistributionParameters(node2);
 
 		MixedParameterDistribution third = new MixedParameterDistribution();
-		SingleSpawnParameter singleP2 = new SingleSpawnParameter();
+		SingleEventParameter singleP2 = new SingleEventParameter();
 		singleP2.setSpawnNumber(0);
-		singleP2.setSpawnTime(Double.MAX_VALUE);
+		singleP2.setEventTime(Double.MAX_VALUE);
 		JsonNode node3 = mapper.convertValue(singleP2, JsonNode.class);
 		third.setInterSpawnTimeDistribution("singleSpawn");
 		third.setDistributionParameters(node3);
 
-		ArrayList<MixedParameterDistribution> expectedDistributions = new ArrayList<MixedParameterDistribution>();
+		ArrayList<MixedParameterDistribution> expectedDistributions = new ArrayList<>();
 		expectedDistributions.add(first);
 		expectedDistributions.add(second);
 		expectedDistributions.add(third);
@@ -116,13 +116,13 @@ public class TimeSeriesDistributionTest extends VadereDistributionTest {
 	@Override
 	public void testGetNextSpawnTime() throws Exception {
 		double expected = 1;
-		Mockito.when(distMock.getNextSpawnTime(Mockito.anyDouble())).thenReturn(expected);
+		Mockito.when(distMock.getNextSample(Mockito.anyDouble())).thenReturn(expected);
 
 		VadereDistribution<?> dist = getDistributionUnderTest();
-		double actual = dist.getNextSpawnTime(1);
+		double actual = dist.getNextSample(1);
 
 		assertEquals(expected, actual, 0);
-		Mockito.verify(distMock).getNextSpawnTime(1d);
+		Mockito.verify(distMock).getNextSample(1d);
 
 	}
 

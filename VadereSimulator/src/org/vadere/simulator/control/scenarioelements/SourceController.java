@@ -1,7 +1,6 @@
 package org.vadere.simulator.control.scenarioelements;
 
 import org.apache.commons.math3.random.JDKRandomGenerator;
-import org.apache.commons.math3.distribution.RealDistribution;
 import org.vadere.simulator.control.scenarioelements.listener.ControllerEventListener;
 import org.vadere.simulator.control.scenarioelements.listener.ControllerEventProvider;
 import org.vadere.simulator.models.DynamicElementFactory;
@@ -30,6 +29,7 @@ public abstract class SourceController extends ScenarioElementController impleme
 	protected static Logger logger = Logger.getLogger(SourceController.class);
 
     protected final Source source;
+
     protected final DynamicElementFactory dynamicElementFactory;
     protected final Random random;
     protected final AttributesSource sourceAttributes;
@@ -137,7 +137,7 @@ public abstract class SourceController extends ScenarioElementController impleme
         }
 
         // Read: timeOfNextEvent == timeOfCurrentEvent for this call
-        double newTimeOfNextEvent = distribution.getNextSpawnTime(timeOfNextEvent);
+        double newTimeOfNextEvent = distribution.getNextSample(timeOfNextEvent);
 
         if (newTimeOfNextEvent < timeOfNextEvent) { //TODO mit Herr Lehmberg reden wg. < vs <=
             String distributionName;

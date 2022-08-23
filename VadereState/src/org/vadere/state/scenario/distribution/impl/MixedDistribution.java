@@ -54,8 +54,8 @@ public class MixedDistribution extends VadereDistribution<MixedParameter> {
 	}
 
 	@Override
-	public double getNextSpawnTime(double timeCurrentEvent) {
-		return getDistributionByTime(timeCurrentEvent).getNextSpawnTime(timeCurrentEvent);
+	public double getNextSample(double timeCurrentEvent) {
+		return getDistributionByTime(timeCurrentEvent).getNextSample(timeCurrentEvent);
 	}
 
 	@Override

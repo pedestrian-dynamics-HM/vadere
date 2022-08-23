@@ -21,7 +21,7 @@ public class ConstantDistributionTest extends VadereDistributionTest {
 	@Override
 	protected VadereDistribution<?> getDistributionUnderTest() throws Exception {
 		ConstantParameter parameter = new ConstantParameter();
-		parameter.setUpdateFrequency(updateFrequency);
+		parameter.setTimeInterval(updateFrequency);
 
 		ConstantDistribution dist = new ConstantDistribution(parameter, spawnNumber, null);
 
@@ -32,7 +32,7 @@ public class ConstantDistributionTest extends VadereDistributionTest {
 	public void testGetNextSpawnTime() throws Exception {
 		double timeCurrentEvent = 1;
 		VadereDistribution<?> dist = getDistributionUnderTest();
-		double actual = dist.getNextSpawnTime(timeCurrentEvent);
+		double actual = dist.getNextSample(timeCurrentEvent);
 		assertEquals(updateFrequency + timeCurrentEvent, actual, 0);
 	}
 

@@ -29,8 +29,8 @@ public class TimeSeriesDistribution extends VadereDistribution<TimeSeriesParamet
 	}
 
 	@Override
-	public double getNextSpawnTime(double timeCurrentEvent) {
-		return distribution.getNextSpawnTime(timeCurrentEvent);
+	public double getNextSample(double timeCurrentEvent) {
+		return distribution.getNextSample(timeCurrentEvent);
 	}
 
 	@Override
@@ -45,37 +45,37 @@ public class TimeSeriesDistribution extends VadereDistribution<TimeSeriesParamet
 
 	@Override
 	protected void setValues(TimeSeriesParameter parameter, int unused1, RandomGenerator unused2) throws Exception {
-		int[] spawnsPerIntveral = parameter.getSpawnsPerInterval();
+		int[] eventsPerInterval = parameter.getEventsPerInterval();
 		double intervalLength = parameter.getIntervalLength();
 
 		ObjectMapper mapper = new ObjectMapper();
 
-		double[] switchpoints = new double[spawnsPerIntveral.length - 1];
+		double[] switchpoints = new double[eventsPerInterval.length - 1];
 		ArrayList<MixedParameterDistribution> distributions = new ArrayList<>();
 		double currentTime = intervalLength;
-		for (int i = 0; i < spawnsPerIntveral.length; i++) {
-			if (i < spawnsPerIntveral.length - 1) {
+		for (int i = 0; i < eventsPerInterval.length; i++) {
+			if (i < eventsPerInterval.length - 1) {
 				switchpoints[i] = currentTime;
 				currentTime += intervalLength;
 			}
-			int spawns = spawnsPerIntveral[i];
+			int spawns = eventsPerInterval[i];
 			MixedParameterDistribution dist = new MixedParameterDistribution();
 			if (spawns > 0) {
 				ConstantParameter constantP = new ConstantParameter();
-				constantP.setUpdateFrequency(intervalLength / spawns);
+				constantP.setTimeInterval(intervalLength / spawns);
 				JsonNode node = mapper.convertValue(constantP, JsonNode.class);
 				dist.setInterSpawnTimeDistribution("constant");
 				dist.setDistributionParameters(node);
 			} else {
-				SingleSpawnParameter singleP = new SingleSpawnParameter();
-				if (i == spawnsPerIntveral.length - 1) {
-					singleP.setSpawnTime(Double.MAX_VALUE);
+				SingleEventParameter singleP = new SingleEventParameter();
+				if (i == eventsPerInterval.length - 1) {
+					singleP.setEventTime(Double.MAX_VALUE);
 				} else {
-					singleP.setSpawnTime(currentTime - intervalLength);
+					singleP.setEventTime(currentTime - intervalLength);
 				}
 				singleP.setSpawnNumber(0);
 				JsonNode node = mapper.convertValue(singleP, JsonNode.class);
-				dist.setInterSpawnTimeDistribution("singleSpawn");
+				dist.setInterSpawnTimeDistribution("singleEvent");
 				dist.setDistributionParameters(node);
 			}
 

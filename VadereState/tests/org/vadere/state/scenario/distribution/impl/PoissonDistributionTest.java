@@ -27,7 +27,7 @@ public class PoissonDistributionTest extends VadereDistributionTest {
 	@Override
 	protected VadereDistribution<?> getDistributionUnderTest() throws Exception {
 		PoissonParameter parameter = new PoissonParameter();
-		parameter.setNumberPedsPerSecond(0);
+		parameter.setOccurrencesPerSecond(0);
 
 		RandomGenerator randomGenerator = null;
 
@@ -36,7 +36,7 @@ public class PoissonDistributionTest extends VadereDistributionTest {
 		PoissonDistribution dist = new PoissonDistribution(parameter, spawnNumber, randomGenerator);
 
 		PowerMockito.verifyNew(ExponentialDistribution.class).withArguments(randomGenerator,
-		        1 / parameter.getNumberPedsPerSecond());
+		        1 / parameter.getOccurrencesPerSecond());
 
 		return dist;
 	}
@@ -48,7 +48,7 @@ public class PoissonDistributionTest extends VadereDistributionTest {
 		double timeCurrentEvent = 1;
 
 		VadereDistribution<?> dist = getDistributionUnderTest();
-		double actual = dist.getNextSpawnTime(timeCurrentEvent);
+		double actual = dist.getNextSample(timeCurrentEvent);
 
 		assertEquals(sample + timeCurrentEvent, actual, 0);
 		Mockito.verify(distMock).sample();

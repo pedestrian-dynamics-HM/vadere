@@ -34,7 +34,7 @@ public class EmpiricalDistribution extends VadereDistribution<EmpiricalParameter
 	}
 
 	@Override
-	public double getNextSpawnTime(double timeCurrentEvent) {
+	public double getNextSample(double timeCurrentEvent) {
 		return timeCurrentEvent + distribution.sample();
 	}
 

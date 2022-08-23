@@ -11,7 +11,7 @@ public class DistributionRegistryTest {
 	@Test
 	public void testExpectedDistributionsRegistered() {
 		Set<String> expected = ImmutableSet.of("negativeExponential", "normal", "linearInterpolation", "constant",
-		        "empirical", "poisson", "singleSpawn");
+		        "empirical", "poisson", "singleEvent");
 
 		Set<String> actual = DistributionRegistry.getRegisteredNames();
 

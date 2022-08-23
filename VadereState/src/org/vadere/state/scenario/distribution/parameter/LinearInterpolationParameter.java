@@ -7,17 +7,17 @@ package org.vadere.state.scenario.distribution.parameter;
 
 public class LinearInterpolationParameter {
 
-	double spawnFrequency;
+	double timeInterval;
 	double[] xValues;
 	double[] yValues;
 
 
-	public double getSpawnFrequency() {
-		return spawnFrequency;
+	public double getTimeInterval() {
+		return timeInterval;
 	}
 
-	public void setSpawnFrequency(double spawnFrequency) {
-		this.spawnFrequency = spawnFrequency;
+	public void setTimeInterval(double timeInterval) {
+		this.timeInterval = timeInterval;
 	}
 
 

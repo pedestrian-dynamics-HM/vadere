@@ -35,7 +35,7 @@ public class NormalDistribution extends VadereDistribution<NormalParameter> {
 	}
 
 	@Override
-	public double getNextSpawnTime(double timeCurrentEvent) {
+	public double getNextSample(double timeCurrentEvent) {
 		return timeCurrentEvent + distribution.sample();
 	}
 

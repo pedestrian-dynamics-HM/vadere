@@ -16,7 +16,7 @@ import org.vadere.util.math.TruncatedNormalDistribution;
 public class LinearInterpolationDistribution extends VadereDistribution<LinearInterpolationParameter> {
 
 	private PolynomialSplineFunction interpolator;
-	private double spawnFrequency;
+	private double timeInterval;
 	private TruncatedNormalDistribution truncNormalDist;
 
 	public LinearInterpolationDistribution(LinearInterpolationParameter parameter, int spawnNumber,
@@ -39,7 +39,7 @@ public class LinearInterpolationDistribution extends VadereDistribution<LinearIn
 			}
 		}
 
-		this.spawnFrequency = parameter.getSpawnFrequency();
+		this.timeInterval = parameter.getTimeInterval();
 		this.interpolator = new LinearInterpolator().interpolate(xValues, yValues);
 
 		// https://www.wolframalpha.com/input/?i=normal+distribution%2C+mean%3D0%2C+sd%3D3+from+-4+to+4
@@ -62,8 +62,8 @@ public class LinearInterpolationDistribution extends VadereDistribution<LinearIn
 	}
 
 	@Override
-	public double getNextSpawnTime(double timeCurrentEvent) {
-		return timeCurrentEvent + spawnFrequency;
+	public double getNextSample(double timeCurrentEvent) {
+		return timeCurrentEvent + timeInterval;
 	}
 
 	@Override

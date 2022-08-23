@@ -67,7 +67,7 @@ public class AttributesTarget extends AttributesEmbedShape {
 	 *  <li>"negativeExponential"
 	 *  <li>"normal"
 	 *  <li>"poisson"
-	 *  <li>"singleSpawn"
+	 *  <li>"singleEvent"
 	 *  <li>"timeSeries"
 	 *  </ul>
 	 */
@@ -85,7 +85,7 @@ public class AttributesTarget extends AttributesEmbedShape {
 	 *  <li>"NegativeExponentialParameter"	[{@link NegativeExponentialParameter}]</li>
 	 *  <li>"NormalParameter"				[{@link NormalParameter}]</li>
 	 *  <li>"PoissonParameter"				[{@link PoissonParameter}]</li>
-	 *  <li>"SingleSpawnParameter"			[{@link SingleSpawnParameter}]</li>
+	 *  <li>"SingleEventParameter"			[{@link SingleEventParameter}]</li>
 	 *  <li>"TimeSeriesParameter"			[{@link TimeSeriesParameter}]</li>
 	 *  </ul>
 	 */

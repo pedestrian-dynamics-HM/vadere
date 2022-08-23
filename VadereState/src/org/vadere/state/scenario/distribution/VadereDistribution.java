@@ -15,7 +15,7 @@ public abstract class VadereDistribution<T> {
 
 	abstract public int getSpawnNumber(double timeCurrentEvent);
 
-	abstract public double getNextSpawnTime(double timeCurrentEvent);
+	abstract public double getNextSample(double timeCurrentEvent);
 
 	abstract public int getRemainingSpawnAgents();
 

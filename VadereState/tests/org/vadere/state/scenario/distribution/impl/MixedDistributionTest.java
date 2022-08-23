@@ -76,8 +76,8 @@ public class MixedDistributionTest extends VadereDistributionTest {
 	@Override
 	public void testGetNextSpawnTime() throws Exception {
 		VadereDistribution<?> dist = getDistributionUnderTest();
-		double actual = dist.getNextSpawnTime(12);
-		assertEquals(distStub.getNextSpawnTime(12), actual, 0);
+		double actual = dist.getNextSample(12);
+		assertEquals(distStub.getNextSample(12), actual, 0);
 	}
 
 }

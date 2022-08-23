@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 
 import org.vadere.state.scenario.distribution.VadereDistribution;
 import org.vadere.state.scenario.distribution.VadereDistributionTest;
-import org.vadere.state.scenario.distribution.parameter.SingleSpawnParameter;
+import org.vadere.state.scenario.distribution.parameter.SingleEventParameter;
 
 /**
  * @author Aleksandar Ivanov(ivanov0@hm.edu)
@@ -15,11 +15,11 @@ public class SingleSpawnDistributionTest extends VadereDistributionTest {
 
 	@Override
 	protected VadereDistribution<?> getDistributionUnderTest() throws Exception {
-		SingleSpawnParameter parameter = new SingleSpawnParameter();
+		SingleEventParameter parameter = new SingleEventParameter();
 		parameter.setSpawnNumber(1);
-		parameter.setSpawnTime(spawnTime);
+		parameter.setEventTime(spawnTime);
 
-		SingleSpawnDistribution dist = new SingleSpawnDistribution(parameter, spawnNumber, null);
+		SingleEventDistribution dist = new SingleEventDistribution(parameter, spawnNumber, null);
 
 		return dist;
 	}
@@ -27,7 +27,7 @@ public class SingleSpawnDistributionTest extends VadereDistributionTest {
 	@Override
 	public void testGetNextSpawnTime() throws Exception {
 		VadereDistribution<?> dist = getDistributionUnderTest();
-		double actual = dist.getNextSpawnTime(12);
+		double actual = dist.getNextSample(12);
 		assertEquals(spawnTime, actual, 0);
 	}
 

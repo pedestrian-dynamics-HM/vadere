@@ -33,7 +33,7 @@ public class BinomialDistribution extends VadereDistribution<BinomialParameter> 
 	}
 
 	@Override
-	public double getNextSpawnTime(double timeCurrentEvent) {
+	public double getNextSample(double timeCurrentEvent) {
 		return timeCurrentEvent + distribution.sample();
 	}
 
