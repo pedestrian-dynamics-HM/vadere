@@ -29,7 +29,7 @@ variables:
 
 # Stage Definitions
 stages:
-    # - unit_test
+    - unit_test
     - integration_test
     - seed_test
     - deploy
@@ -146,10 +146,10 @@ stages:
 # Job Definitions
 
 ## Jobs for GNU/Linux runner (which is labeled with tag "linux")
-run_unit_tests_on_linux:
-    extends: .template_unit_tests
-    tags:
-        - linux
+#run_unit_tests_on_linux:
+#    extends: .template_unit_tests
+#    tags:
+#        - linux
 
 run_scenario_files_on_linux:
     extends: .template_scenario_files
@@ -186,10 +186,10 @@ deploy_branch_on_linux:
         url: ${VADERE_DEPLOYMENT_BASE_URL}/branches/vadere.${CI_COMMIT_REF_NAME}.${CI_RUNNER_TAGS}.zip
 
 ## Jobs for Windows runner (which is labeled with tag "windows")
-run_unit_tests_on_windows:
-    extends: .template_unit_tests
-    tags:
-        - windows
+#run_unit_tests_on_windows:
+#    extends: .template_unit_tests
+#    tags:
+#        - windows
 
 run_scenario_files_on_windows:
     extends: .template_scenario_files
