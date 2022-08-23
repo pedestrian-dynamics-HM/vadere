@@ -260,7 +260,7 @@ if __name__ == "__main__":
 
     if args.scenario is None:
 
-        passed_and_failed_scenarios_model = run_all_model_tests()
+        # passed_and_failed_scenarios_model = run_all_model_tests()
         passed_and_failed_scenarios_optimization = run_all_optimization_tests()
 
         # Make a summery of all scenario files

@@ -29,7 +29,7 @@ variables:
 
 # Stage Definitions
 stages:
-    - unit_test
+    # - unit_test
     - integration_test
     - seed_test
     - deploy
