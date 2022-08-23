@@ -159,7 +159,6 @@ def run_scenario_files_with_vadere_console(scenario_files, vadere_console="Vader
             # run per scenario given the scenario path and output directory
             subprocess_args += ["scenario-run", "-f", scenario_file, "-o", output_dir]
 
-            print(subprocess_args)
             # Use timout feature, check return value and capture stdout/stderr to a PIPE (use completed_process.stdout
             # to get it).
             completed_process = subprocess.run(args=subprocess_args,
@@ -260,7 +259,7 @@ if __name__ == "__main__":
 
     if args.scenario is None:
 
-        # passed_and_failed_scenarios_model = run_all_model_tests()
+        passed_and_failed_scenarios_model = run_all_model_tests()
         passed_and_failed_scenarios_optimization = run_all_optimization_tests()
 
         # Make a summery of all scenario files
