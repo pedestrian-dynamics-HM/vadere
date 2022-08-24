@@ -41,11 +41,6 @@ public class FootStepProcessor extends DataProcessor<EventtimePedestrianIdKey, F
 
             for (FootStep fs : footSteps) {
                 putValue(new EventtimePedestrianIdKey(fs.getStartTime(), pedestrian.getId()), fs);
-                if (state.getSimTimeInSec() > 128 && pedestrian.getId() == 104) {
-                    int i = 1;
-                    //System.out.println( "trajectory: processor \t\t " + pedestrian.getTrajectory());
-                }
-
             }
         }
     }
