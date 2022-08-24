@@ -88,15 +88,9 @@ public class BonnMotionTrajectoryProcessor extends DataProcessor<BonnMotionKey, 
 		// the BonnMotion trajectory.
 		Map<TimestepPedestrianIdKey, VPoint> trajectories = this.pedestrianPositionProcessor.getData();
 
-
 		for (TimestepPedestrianIdKey e : trajectories.keySet()) {
 			int pedId = e.getPedestrianId();
 			double time = e.getTimestep() * simTimeStepLength;
-
-			if (pedId == 104) {
-				System.out.println("footstep time " + time +" actual footstep: \t\t\t " + trajectories.get(e));
-			}
-
 			VPoint point = trajectories.get(e).clone();
 
 			if (attr.getOrigin().equals("upper left")){
@@ -111,17 +105,9 @@ public class BonnMotionTrajectoryProcessor extends DataProcessor<BonnMotionKey, 
 			point = point.add(attr.getTranslate());
 
 			Pair<Double, VPoint> wayPoint = Pair.of(time, point);
-			addWayPoint(pedId, wayPoint);
-
-			if (pedId == 104) {
-				System.out.println("footstep time " + time + " corrected by bonn motion: \t " + trajectories.get(e));
-				System.out.println("footstep time " + time + " NEW WAY Point           : \t " + point);
-			}
-
-		}
+			addWayPoint(pedId, wayPoint);}
 
 		sortWayPoints();
-
 
 	}
 
