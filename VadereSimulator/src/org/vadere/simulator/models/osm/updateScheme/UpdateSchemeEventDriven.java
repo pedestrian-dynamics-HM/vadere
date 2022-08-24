@@ -10,7 +10,9 @@ import org.vadere.state.scenario.Topography;
 import org.vadere.state.simulation.FootStep;
 
 import java.util.Comparator;
+import java.util.List;
 import java.util.PriorityQueue;
+import java.util.stream.Collectors;
 
 /**
  * @author Benedikt Zoennchen
@@ -35,8 +37,14 @@ public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 			// event driven update ignores time credits!
 			while (pedestrianEventsQueue.peek().getTimeOfNextStep() < currentTimeInSec) {
 				PedestrianOSM ped = pedestrianEventsQueue.poll();
+				//List<Integer> ev = pedestrianEventsQueue.stream().map(pedestrianOSM -> pedestrianOSM.getId()).collect(Collectors.toList());
 				update(ped, timeStepInSec, currentTimeInSec);
-				//System.out.println(ped.getId());
+
+				if (currentTimeInSec > 128 && ped.getId() == 104){
+					//System.out.println(currentTimeInSec + "s , id = " + ped.getId() + " " + ped.getPosition() + ", psycho status: " + ped.getSelfCategory() );
+				}
+
+
 				pedestrianEventsQueue.add(ped);
 			}
 		}
@@ -74,7 +82,13 @@ public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 		} else if (selfCategory == SelfCategory.WAIT) {
 			osmBehaviorController.wait(pedestrian, topography, timeStepInSec);
 			// needed for postvis to correctly reproduce state.
-			pedestrian.getTrajectory().add(new FootStep(pedestrian.getPosition(), pedestrian.getPosition(), currentTimeInSec, pedestrian.getTimeOfNextStep()));
+			FootStep ft = new FootStep(pedestrian.getPosition(), pedestrian.getPosition(), currentTimeInSec, pedestrian.getTimeOfNextStep());
+			pedestrian.getTrajectory().add(ft);
+
+			if (currentTimeInSec > 128 && pedestrian.getId() == 104){
+				System.out.println( "trajectory: update scheme \t\t" + pedestrian.getTrajectory());
+			}
+
 		} else if (selfCategory == SelfCategory.CHANGE_TARGET) {
 			osmBehaviorController.changeTarget(pedestrian, topography);
 			// needed for postvis to correctly reproduce state.

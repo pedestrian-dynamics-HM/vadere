@@ -1,17 +1,13 @@
 {
-  "name" : "one_way_lane_wait_0",
+  "name" : "one_way_lane_wait_without_bonnmotion",
   "description" : "",
   "release" : "2.2",
-  "commithash" : "d0c63453e44d7ffaca253c0fe79a06a4359b6327",
+  "commithash" : "608f42aad6fc51552d16d3e60ee2bcad32a462ec",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
       "filename" : "postvis.traj",
-      "processors" : [ 1, 2 ]
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.BonnMotionTrajectoryFile",
-      "filename" : "trace.bonnMotion",
-      "processors" : [ 5 ]
+      "processors" : [ 1, 2, 8 ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepOutputFile",
       "filename" : "numAgents.csv",
@@ -28,23 +24,6 @@
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepTargetIDProcessor",
       "id" : 2
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.BonnMotionTrajectoryProcessor",
-      "id" : 5,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesBonnMotionTrajectoryProcessor",
-      "attributes" : {
-        "pedestrianPositionProcessorId" : 7,
-        "scale" : {
-          "x" : 1.0,
-          "y" : 1.0
-        },
-        "translate" : {
-          "x" : 0.0,
-          "y" : 0.0
-        },
-        "applyOffset" : false,
-        "origin" : "upper left"
-      }
-    }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.NumberPedestrianProcessor",
       "id" : 6
     }, {
@@ -54,6 +33,9 @@
       "attributes" : {
         "interpolate" : true
       }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepPsychologyStatusProcessor",
+      "id" : 8
     } ],
     "isTimestamped" : true,
     "isWriteMetaData" : true

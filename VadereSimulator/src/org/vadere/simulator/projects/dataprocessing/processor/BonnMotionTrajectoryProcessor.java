@@ -2,6 +2,8 @@ package org.vadere.simulator.projects.dataprocessing.processor;
 
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
 import org.vadere.simulator.control.simulation.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
@@ -12,10 +14,7 @@ import org.vadere.state.attributes.processor.AttributesProcessor;
 import org.vadere.state.scenario.ReferenceCoordinateSystem;
 import org.vadere.util.geometry.shapes.VPoint;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -88,10 +87,17 @@ public class BonnMotionTrajectoryProcessor extends DataProcessor<BonnMotionKey, 
 		// retrieve trajectory data from pedestrianPositionProcessor and transform them to
 		// the BonnMotion trajectory.
 		Map<TimestepPedestrianIdKey, VPoint> trajectories = this.pedestrianPositionProcessor.getData();
-		trajectories.entrySet().forEach(e -> {
-			int pedId = e.getKey().getPedestrianId();
-			double time = e.getKey().getTimestep() * simTimeStepLength;
-			VPoint point = e.getValue();
+
+
+		for (TimestepPedestrianIdKey e : trajectories.keySet()) {
+			int pedId = e.getPedestrianId();
+			double time = e.getTimestep() * simTimeStepLength;
+
+			if (pedId == 104) {
+				System.out.println("footstep time " + time +" actual footstep: \t\t\t " + trajectories.get(e));
+			}
+
+			VPoint point = trajectories.get(e).clone();
 
 			if (attr.getOrigin().equals("upper left")){
 				point.y = boundHeight - point.y;
@@ -106,9 +112,16 @@ public class BonnMotionTrajectoryProcessor extends DataProcessor<BonnMotionKey, 
 
 			Pair<Double, VPoint> wayPoint = Pair.of(time, point);
 			addWayPoint(pedId, wayPoint);
-		});
+
+			if (pedId == 104) {
+				System.out.println("footstep time " + time + " corrected by bonn motion: \t " + trajectories.get(e));
+				System.out.println("footstep time " + time + " NEW WAY Point           : \t " + point);
+			}
+
+		}
 
 		sortWayPoints();
+
 
 	}
 
