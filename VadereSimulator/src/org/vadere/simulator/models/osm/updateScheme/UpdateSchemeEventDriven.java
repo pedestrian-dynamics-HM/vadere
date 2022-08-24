@@ -73,6 +73,7 @@ public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 		} else if (selfCategory == SelfCategory.WAIT) {
 			osmBehaviorController.wait(pedestrian, topography, timeStepInSec);
 			// needed for postvis to correctly reproduce state.
+			osmBehaviorController.makeStepToTarget(pedestrian, topography);
 		} else if (selfCategory == SelfCategory.CHANGE_TARGET) {
 			osmBehaviorController.changeTarget(pedestrian, topography);
 			// needed for postvis to correctly reproduce state.
