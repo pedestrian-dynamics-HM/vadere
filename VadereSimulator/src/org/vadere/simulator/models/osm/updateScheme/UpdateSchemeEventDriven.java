@@ -36,6 +36,7 @@ public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 			while (pedestrianEventsQueue.peek().getTimeOfNextStep() < currentTimeInSec) {
 				PedestrianOSM ped = pedestrianEventsQueue.poll();
 				update(ped, timeStepInSec, currentTimeInSec);
+				//System.out.println(ped.getId());
 				pedestrianEventsQueue.add(ped);
 			}
 		}
@@ -73,7 +74,7 @@ public class UpdateSchemeEventDriven implements UpdateSchemeOSM {
 		} else if (selfCategory == SelfCategory.WAIT) {
 			osmBehaviorController.wait(pedestrian, topography, timeStepInSec);
 			// needed for postvis to correctly reproduce state.
-			osmBehaviorController.makeStepToTarget(pedestrian, topography);
+			pedestrian.getTrajectory().add(new FootStep(pedestrian.getPosition(), pedestrian.getPosition(), currentTimeInSec, pedestrian.getTimeOfNextStep()));
 		} else if (selfCategory == SelfCategory.CHANGE_TARGET) {
 			osmBehaviorController.changeTarget(pedestrian, topography);
 			// needed for postvis to correctly reproduce state.
