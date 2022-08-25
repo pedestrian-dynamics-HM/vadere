@@ -91,7 +91,8 @@ public class BonnMotionTrajectoryProcessor extends DataProcessor<BonnMotionKey, 
 		for (TimestepPedestrianIdKey e : trajectories.keySet()) {
 			int pedId = e.getPedestrianId();
 			double time = e.getTimestep() * simTimeStepLength;
-			VPoint point = trajectories.get(e).clone();
+			// make copy to apply transformations
+			VPoint point = new VPoint(trajectories.get(e));
 
 			if (attr.getOrigin().equals("upper left")){
 				point.y = boundHeight - point.y;
