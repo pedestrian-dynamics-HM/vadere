@@ -1,5 +1,6 @@
 package org.vadere.simulator.projects.dataprocessing;
 
+import org.apache.tools.ant.BuildEvent;
 import org.vadere.simulator.control.simulation.SimulationState;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.projects.SimulationResult;
@@ -115,5 +116,9 @@ public class ProcessorManager {
 
 	public void sealAllAttributes() {
 		processorMap.values().forEach(p -> p.sealAttributes());
+	}
+
+	public Topography getTopography() {
+		return  this.topography;
 	}
 }
