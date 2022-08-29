@@ -185,10 +185,16 @@ public class PostvisualizationWindow extends JPanel implements Observer, DropTar
 		playControlGroup.add(stopButton);
 
 		stopButton.setSelected(true);
-
-		adjustPanel.addOnEndReachedListener(e -> {
-			Player.getInstance(model).stop();
-			stopButton.setSelected(true);
+		model.addObserver(new Observer() {
+			@Override
+			public void update(Observable o, Object arg) {
+				if(model.getStep() == model.getLastStep()){
+					// yes this is intended pause the player but visually show stop in the gui,
+					// because this way the slider will stay at the end position
+					Player.getInstance(model).pause();
+					stopButton.setSelected(true);
+				}
+			}
 		});
 		toolbar.addSeparator(new Dimension(5, 50));
 
