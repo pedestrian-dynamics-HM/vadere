@@ -46,7 +46,7 @@ public class Player implements Runnable {
 
 		synchronized (model) {
 			if (model.getStepCount() >= 1) {
-				model.setStep(1);
+				model.setStep(0);
 				model.notifyObservers();
 			}
 		}

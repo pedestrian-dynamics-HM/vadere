@@ -5,17 +5,12 @@ import com.jgoodies.forms.layout.FormLayout;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.postvisualization.control.ActionSetTimeStep;
 import org.vadere.gui.postvisualization.control.EJSliderAction;
-import org.vadere.gui.postvisualization.control.Player;
 import org.vadere.gui.postvisualization.model.PostvisualizationModel;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.awt.event.ActionListener;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.function.Consumer;
 
 public class AdjustPanel extends JPanel implements Observer {
 
@@ -41,8 +36,6 @@ public class AdjustPanel extends JPanel implements Observer {
 
 	private final PostvisualizationModel model;
 
-	private Consumer<ChangeEvent> onEndListener;
-
 	// Constructtors
 	public AdjustPanel(final PostvisualizationModel model) {
 		this.model = model;
@@ -51,14 +44,14 @@ public class AdjustPanel extends JPanel implements Observer {
 			slider = new JSlider(SwingConstants.HORIZONTAL, model.getFirstStep(),
 					model.getLastStep(), model.getFirstStep());
 		} else {
-			slider = new JSlider(SwingConstants.HORIZONTAL, 1, 1, 1);
+			slider = new JSlider(SwingConstants.HORIZONTAL, 0, 0, 0);
 		}
 
 		slider.addMouseListener(new EJSliderAction(slider));
 
 		sModelVelocity = new SpinnerNumberModel(model.config.getFps(), 1, 200, 1);
 		sModelTime = new SpinnerNumberModel(0.0, 0.0, Double.MAX_VALUE, model.getTimeResolution());
-		sModelTimeStep = new SpinnerNumberModel(1, 1, Integer.MAX_VALUE, 1);
+		sModelTimeStep = new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1);
 		sModelTimeResolution = new SpinnerNumberModel(model.config.getTimeResolution(), 0.01, Double.MAX_VALUE, 0.01);
 		model.setTimeResolution(model.config.getTimeResolution());
 
@@ -126,11 +119,6 @@ public class AdjustPanel extends JPanel implements Observer {
 
 		ActionSetTimeStep setTimeStepAction = new ActionSetTimeStep("setTimeStep", model);
 		slider.addChangeListener(setTimeStepAction);
-		slider.addChangeListener(e -> {
-			if ( slider.getValue() == slider.getMaximum()) {
-				this.onEndListener.accept(e);
-			}
-		});
 		setToolTips();
 	}
 
@@ -159,9 +147,7 @@ public class AdjustPanel extends JPanel implements Observer {
 		lblStep.setToolTipText(unitSimStepText);
 		sStep.setToolTipText(unitSimStepText);
 	}
-	public void addOnEndReachedListener(Consumer<ChangeEvent> listener) {
-		this.onEndListener = listener;
-	}
+
 	@Override
 	public void update(Observable o, Object arg) {
 		SwingUtilities.invokeLater(() -> {
