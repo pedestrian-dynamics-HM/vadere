@@ -1,7 +1,8 @@
 {
   "name" : "free_flow_measurement_areas",
   "description" : "",
-  "release" : "2.1",
+  "release" : "2.3",
+  "commithash" : "ff5b381ea8f959e7e0d65a1b13bcdde1e13782cf",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ ],
@@ -65,7 +66,9 @@
       },
       "org.vadere.state.attributes.models.AttributesCGM" : {
         "groupMemberRepulsionFactor" : 0.01,
-        "leaderAttractionFactor" : 0.003
+        "leaderAttractionFactor" : 0.003,
+        "lostMembers" : false,
+        "waitBehaviourRelevantAgentsFactor" : -1
       }
     },
     "attributesSimulation" : {
@@ -84,7 +87,21 @@
       "usePsychologyLayer" : true,
       "psychologyLayer" : {
         "perception" : "SimplePerceptionModel",
-        "cognition" : "SimpleCognitionModel"
+        "cognition" : "SimpleCognitionModel",
+        "attributesModel" : {
+          "org.vadere.state.attributes.models.psychology.perception.AttributesSimplePerceptionModel" : {
+            "priority" : {
+              "1" : "InformationStimulus",
+              "2" : "ChangeTargetScripted",
+              "3" : "ChangeTarget",
+              "4" : "Threat",
+              "5" : "Wait",
+              "6" : "WaitInArea",
+              "7" : "DistanceRecommendation"
+            }
+          },
+          "org.vadere.state.attributes.models.psychology.cognition.AttributesSimpleCognitionModel" : { }
+        }
       }
     },
     "topography" : {
@@ -1005,7 +1022,6 @@
       "stairs" : [ ],
       "targets" : [ {
         "id" : 2008,
-        "absorbing" : true,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -1022,16 +1038,17 @@
             "y" : 360.95191854797304
           } ]
         },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "absorbing" : true,
         "deletionDistance" : 0.1,
+        "waitingBehaviour" : "NO_WAITING",
+        "parallelWaiters" : 0,
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : null,
+        "distributionParameters" : null,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "waitingTimeYellowPhase" : 0.0
       }, {
         "id" : 2009,
-        "absorbing" : true,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -1048,16 +1065,17 @@
             "y" : 173.48516997043043
           } ]
         },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "absorbing" : true,
         "deletionDistance" : 0.1,
+        "waitingBehaviour" : "NO_WAITING",
+        "parallelWaiters" : 0,
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : null,
+        "distributionParameters" : null,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "waitingTimeYellowPhase" : 0.0
       }, {
         "id" : 11,
-        "absorbing" : true,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -1074,16 +1092,17 @@
             "y" : 147.4
           } ]
         },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "absorbing" : true,
         "deletionDistance" : 0.1,
+        "waitingBehaviour" : "NO_WAITING",
+        "parallelWaiters" : 0,
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : null,
+        "distributionParameters" : null,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "waitingTimeYellowPhase" : 0.0
       }, {
         "id" : 302,
-        "absorbing" : false,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -1100,16 +1119,17 @@
             "y" : 220.55
           } ]
         },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "absorbing" : false,
         "deletionDistance" : 0.1,
+        "waitingBehaviour" : "NO_WAITING",
+        "parallelWaiters" : 0,
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : null,
+        "distributionParameters" : null,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "waitingTimeYellowPhase" : 0.0
       }, {
         "id" : 1111,
-        "absorbing" : true,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -1126,16 +1146,17 @@
             "y" : 219.6
           } ]
         },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "absorbing" : true,
         "deletionDistance" : 0.1,
+        "waitingBehaviour" : "NO_WAITING",
+        "parallelWaiters" : 0,
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : null,
+        "distributionParameters" : null,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "waitingTimeYellowPhase" : 0.0
       }, {
         "id" : 41,
-        "absorbing" : false,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -1152,16 +1173,17 @@
             "y" : 265.6
           } ]
         },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "absorbing" : false,
         "deletionDistance" : 0.1,
+        "waitingBehaviour" : "NO_WAITING",
+        "parallelWaiters" : 0,
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : null,
+        "distributionParameters" : null,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "waitingTimeYellowPhase" : 0.0
       }, {
         "id" : 102,
-        "absorbing" : false,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -1178,16 +1200,17 @@
             "y" : 286.5
           } ]
         },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "absorbing" : false,
         "deletionDistance" : 0.1,
+        "waitingBehaviour" : "NO_WAITING",
+        "parallelWaiters" : 0,
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : null,
+        "distributionParameters" : null,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "waitingTimeYellowPhase" : 0.0
       }, {
         "id" : 51,
-        "absorbing" : false,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -1204,16 +1227,17 @@
             "y" : 279.3
           } ]
         },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "absorbing" : false,
         "deletionDistance" : 0.1,
+        "waitingBehaviour" : "NO_WAITING",
+        "parallelWaiters" : 0,
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : null,
+        "distributionParameters" : null,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "waitingTimeYellowPhase" : 0.0
       }, {
         "id" : 6,
-        "absorbing" : false,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -1230,16 +1254,17 @@
             "y" : 271.0
           } ]
         },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : false,
+        "absorbing" : false,
         "deletionDistance" : 0.1,
+        "waitingBehaviour" : "NO_WAITING",
+        "parallelWaiters" : 0,
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : null,
+        "distributionParameters" : null,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "waitingTimeYellowPhase" : 0.0
       }, {
         "id" : 31,
-        "absorbing" : false,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -1256,16 +1281,17 @@
             "y" : 244.0
           } ]
         },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "absorbing" : false,
         "deletionDistance" : 0.1,
+        "waitingBehaviour" : "NO_WAITING",
+        "parallelWaiters" : 0,
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : null,
+        "distributionParameters" : null,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "waitingTimeYellowPhase" : 0.0
       }, {
         "id" : 21,
-        "absorbing" : false,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -1282,16 +1308,17 @@
             "y" : 220.0
           } ]
         },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "absorbing" : false,
         "deletionDistance" : 0.1,
+        "waitingBehaviour" : "NO_WAITING",
+        "parallelWaiters" : 0,
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : null,
+        "distributionParameters" : null,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "waitingTimeYellowPhase" : 0.0
       }, {
         "id" : 111,
-        "absorbing" : true,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -1308,13 +1335,15 @@
             "y" : 147.4
           } ]
         },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "absorbing" : true,
         "deletionDistance" : 0.1,
+        "waitingBehaviour" : "NO_WAITING",
+        "parallelWaiters" : 0,
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : null,
+        "distributionParameters" : null,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "waitingTimeYellowPhase" : 0.0
       } ],
       "targetChangers" : [ {
         "id" : 7,
@@ -1441,10 +1470,6 @@
       "teleporter" : null,
       "attributesCar" : null
     },
-    "stimulusInfos" : [ ],
-    "reactionProbabilities" : [ {
-      "stimulusId" : -400,
-      "reactionProbability" : 1.0
-    } ]
+    "stimulusInfos" : [ ]
   }
 }

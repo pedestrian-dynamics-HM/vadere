@@ -1,8 +1,8 @@
 {
   "name" : "s2ucre_dynamic_waiting_less_targets_groups",
   "description" : "",
-  "release" : "2.2",
-  "commithash" : "bef9b7bef5c5755b23c296217e1454e4af9b7d15",
+  "release" : "2.3",
+  "commithash" : "ff5b381ea8f959e7e0d65a1b13bcdde1e13782cf",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -76,7 +76,9 @@
       },
       "org.vadere.state.attributes.models.AttributesCGM" : {
         "groupMemberRepulsionFactor" : 0.01,
-        "leaderAttractionFactor" : 0.003
+        "leaderAttractionFactor" : 0.003,
+        "lostMembers" : false,
+        "waitBehaviourRelevantAgentsFactor" : -1
       }
     },
     "attributesSimulation" : {
@@ -323,7 +325,6 @@
       } ],
       "targets" : [ {
         "id" : 1,
-        "absorbing" : true,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -340,16 +341,17 @@
             "y" : 20.1
           } ]
         },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "absorbing" : true,
         "deletionDistance" : 0.1,
+        "waitingBehaviour" : "NO_WAITING",
+        "parallelWaiters" : 0,
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : null,
+        "distributionParameters" : null,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "waitingTimeYellowPhase" : 0.0
       }, {
         "id" : 1,
-        "absorbing" : true,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -366,16 +368,17 @@
             "y" : 5.900000000372529
           } ]
         },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "absorbing" : true,
         "deletionDistance" : 0.1,
+        "waitingBehaviour" : "NO_WAITING",
+        "parallelWaiters" : 0,
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : null,
+        "distributionParameters" : null,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "waitingTimeYellowPhase" : 0.0
       }, {
         "id" : 100,
-        "absorbing" : false,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -392,16 +395,19 @@
             "y" : 5.8
           } ]
         },
-        "waitingTime" : 60.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "absorbing" : false,
         "deletionDistance" : 0.1,
+        "waitingBehaviour" : "INDIVIDUAL",
+        "parallelWaiters" : 0,
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 60.0
+        },
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "waitingTimeYellowPhase" : 0.0
       }, {
         "id" : 4,
-        "absorbing" : false,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -418,16 +424,19 @@
             "y" : 40.73207802292548
           } ]
         },
-        "waitingTime" : 30.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "absorbing" : false,
         "deletionDistance" : 0.1,
+        "waitingBehaviour" : "INDIVIDUAL",
+        "parallelWaiters" : 0,
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 30.0
+        },
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "waitingTimeYellowPhase" : 0.0
       }, {
         "id" : 4,
-        "absorbing" : false,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -444,13 +453,17 @@
             "y" : 42.1
           } ]
         },
-        "waitingTime" : 30.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "absorbing" : false,
         "deletionDistance" : 0.1,
+        "waitingBehaviour" : "INDIVIDUAL",
+        "parallelWaiters" : 0,
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 30.0
+        },
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "waitingTimeYellowPhase" : 0.0
       } ],
       "targetChangers" : [ {
         "id" : 8,

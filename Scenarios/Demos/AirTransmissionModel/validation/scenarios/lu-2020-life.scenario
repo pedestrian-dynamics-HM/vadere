@@ -1,8 +1,8 @@
 {
   "name" : "lu-2020-life",
   "description" : "Superspreading event in a restaurant following lu-2021-life;\n\nJ. Lu, J. Gu, K. Li, C. Xu, W. Su, Z. Lai, D. Zhou,\nC. Yu, B. Xu, and Z. Yang. COVID-19 outbreak associated\nwith air conditioning in restaurant, guangzhou,\nchina, 2020. Emerging Infectious Diseases, 26(7):1628–\n1631, 2020. doi:10.3201/eid2607.200764.",
-  "release" : "2.2",
-  "commithash" : "bef9b7bef5c5755b23c296217e1454e4af9b7d15",
+  "release" : "2.3",
+  "commithash" : "ff5b381ea8f959e7e0d65a1b13bcdde1e13782cf",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -337,7 +337,6 @@
       "stairs" : [ ],
       "targets" : [ {
         "id" : 7,
-        "absorbing" : true,
         "shape" : {
           "x" : 1.65,
           "y" : 11.8,
@@ -345,16 +344,19 @@
           "height" : 0.1,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4380.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 1,
-        "individualWaiting" : true,
+        "absorbing" : true,
         "deletionDistance" : 0.1,
+        "waitingBehaviour" : "INDIVIDUAL",
+        "parallelWaiters" : 1,
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4380.0
+        },
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "waitingTimeYellowPhase" : 0.0
       }, {
         "id" : 6,
-        "absorbing" : true,
         "shape" : {
           "x" : 0.95,
           "y" : 11.8,
@@ -362,16 +364,19 @@
           "height" : 0.1,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4380.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 1,
-        "individualWaiting" : true,
+        "absorbing" : true,
         "deletionDistance" : 0.1,
+        "waitingBehaviour" : "INDIVIDUAL",
+        "parallelWaiters" : 1,
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4380.0
+        },
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "waitingTimeYellowPhase" : 0.0
       }, {
         "id" : 8,
-        "absorbing" : true,
         "shape" : {
           "x" : 1.65,
           "y" : 10.6,
@@ -379,16 +384,19 @@
           "height" : 0.1,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4380.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 1,
-        "individualWaiting" : true,
+        "absorbing" : true,
         "deletionDistance" : 0.1,
+        "waitingBehaviour" : "INDIVIDUAL",
+        "parallelWaiters" : 1,
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4380.0
+        },
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "waitingTimeYellowPhase" : 0.0
       }, {
         "id" : 4,
-        "absorbing" : true,
         "shape" : {
           "x" : 4.05,
           "y" : 11.3,
@@ -396,16 +404,19 @@
           "height" : 0.1,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4500.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 1,
-        "individualWaiting" : true,
+        "absorbing" : true,
         "deletionDistance" : 0.1,
+        "waitingBehaviour" : "INDIVIDUAL",
+        "parallelWaiters" : 1,
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4500.0
+        },
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "waitingTimeYellowPhase" : 0.0
       }, {
         "id" : 1,
-        "absorbing" : true,
         "shape" : {
           "x" : 2.7,
           "y" : 11.5,
@@ -413,16 +424,19 @@
           "height" : 0.1,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4500.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 1,
-        "individualWaiting" : true,
+        "absorbing" : true,
         "deletionDistance" : 0.1,
+        "waitingBehaviour" : "INDIVIDUAL",
+        "parallelWaiters" : 1,
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4500.0
+        },
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "waitingTimeYellowPhase" : 0.0
       }, {
         "id" : 3,
-        "absorbing" : true,
         "shape" : {
           "x" : 2.5,
           "y" : 11.1,
@@ -430,16 +444,19 @@
           "height" : 0.1,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4500.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 1,
-        "individualWaiting" : true,
+        "absorbing" : true,
         "deletionDistance" : 0.1,
+        "waitingBehaviour" : "INDIVIDUAL",
+        "parallelWaiters" : 1,
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4500.0
+        },
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "waitingTimeYellowPhase" : 0.0
       }, {
         "id" : 5,
-        "absorbing" : true,
         "shape" : {
           "x" : 2.6,
           "y" : 10.6,
@@ -447,16 +464,19 @@
           "height" : 0.1,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4500.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 1,
-        "individualWaiting" : true,
+        "absorbing" : true,
         "deletionDistance" : 0.1,
+        "waitingBehaviour" : "INDIVIDUAL",
+        "parallelWaiters" : 1,
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4500.0
+        },
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "waitingTimeYellowPhase" : 0.0
       }, {
         "id" : 2,
-        "absorbing" : true,
         "shape" : {
           "x" : 3.95,
           "y" : 10.55,
@@ -464,16 +484,19 @@
           "height" : 0.1,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 4500.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 1,
-        "individualWaiting" : true,
+        "absorbing" : true,
         "deletionDistance" : 0.1,
+        "waitingBehaviour" : "INDIVIDUAL",
+        "parallelWaiters" : 1,
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 4500.0
+        },
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "waitingTimeYellowPhase" : 0.0
       }, {
         "id" : 9,
-        "absorbing" : true,
         "shape" : {
           "x" : 5.55,
           "y" : 11.7,
@@ -481,16 +504,19 @@
           "height" : 0.1,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 3180.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 1,
-        "individualWaiting" : true,
+        "absorbing" : true,
         "deletionDistance" : 0.1,
+        "waitingBehaviour" : "INDIVIDUAL",
+        "parallelWaiters" : 1,
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 3180.0
+        },
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "waitingTimeYellowPhase" : 0.0
       }, {
         "id" : 10,
-        "absorbing" : true,
         "shape" : {
           "x" : 5.8,
           "y" : 10.3,
@@ -498,13 +524,17 @@
           "height" : 0.1,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 3180.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 1,
-        "individualWaiting" : true,
+        "absorbing" : true,
         "deletionDistance" : 0.1,
+        "waitingBehaviour" : "INDIVIDUAL",
+        "parallelWaiters" : 1,
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 3180.0
+        },
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "waitingTimeYellowPhase" : 0.0
       } ],
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],
