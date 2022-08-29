@@ -6,6 +6,8 @@ import org.vadere.annotation.ImportScanner;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.regex.Matcher;
@@ -27,9 +29,10 @@ import javax.tools.StandardLocation;
 @SupportedSourceVersion(SourceVersion.RELEASE_11)
 @AutoService(Processor.class)
 public class HelpTextAnnotationProcessor extends AbstractProcessor {
-
 	ArrayList<Function<String, String>> pattern;
 	Set<String> importedTypes;
+
+	List<String> primitiveTypes = Arrays.asList(new String[]{"int","double","float","boolean"});
 
 	@Override
 	public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
@@ -46,7 +49,7 @@ public class HelpTextAnnotationProcessor extends AbstractProcessor {
 					String relname = buildHelpTextPath(e.asType().toString());
 					FileObject file = processingEnv.getFiler().createResource(StandardLocation.CLASS_OUTPUT, "", relname);
 					try (PrintWriter w = new PrintWriter(file.openWriter())) {
-						w.println("<h1> " + e.getSimpleName() + "</h1>");
+						w.println("<h1> " + e.getSimpleName()+"</h1>");
 						w.println();
 						printComment(w, comment);
 						w.println();
@@ -119,11 +122,30 @@ public class HelpTextAnnotationProcessor extends AbstractProcessor {
 				.collect(Collectors.toSet());
 		for(Element field : fields){
 			w.println("<hr>");
-			w.println("<h2> Field: " + field.getSimpleName() + "</h2>");
+			String typeString;
+			if(isPrimitiveType(field)) {
+				typeString = getTypeString(field);
+			}else{
+				typeString = String.format("<a href='%s' class='class_link'>%s</a>",findFullPath(getTypeString(field)),strippedTypeString(field));
+				//System.out.println(typeString);
+			}
+			w.println("<h2> Field: " + field.getSimpleName() + " [" + typeString + "]" + "</h2>");
 			String comment = processingEnv.getElementUtils().getDocComment(field);
 			printComment(w, comment);
 			w.println();
 		}
 
+	}
+	private boolean isPrimitiveType(Element field){
+		return primitiveTypes.contains(field.asType().toString());
+	}
+
+	private String getTypeString(Element field){
+		return field.asType().toString();
+	}
+
+	private String strippedTypeString(Element field){
+		var str = field.asType().toString();
+		return str.substring(str.lastIndexOf(".") + 1);
 	}
 }
