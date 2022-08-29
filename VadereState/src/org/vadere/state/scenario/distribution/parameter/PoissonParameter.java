@@ -2,7 +2,8 @@ package org.vadere.state.scenario.distribution.parameter;
 
 
 /**
- * @author Lukas Gradl (lgradl@hm.edu)
+ * This is the parameter structure used with a poisson distribution.
+ * @author Lukas Gradl (lgradl@hm.edu), Ludwig Jaeck
  */
 
 public class PoissonParameter {

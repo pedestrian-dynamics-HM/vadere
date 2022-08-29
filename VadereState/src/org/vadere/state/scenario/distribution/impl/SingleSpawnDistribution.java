@@ -8,6 +8,7 @@ import org.vadere.state.scenario.distribution.registry.RegisterDistribution;
 /**
  * @author Aleksandar Ivanov(ivanov0@hm.edu), Lukas Gradl (lgradl@hm.edu)
  */
+
 @RegisterDistribution(name = "singleSpawn", parameter = SingleSpawnParameter.class)
 public class SingleSpawnDistribution extends VadereDistribution<SingleSpawnParameter> {
 	private int spawnNumber;

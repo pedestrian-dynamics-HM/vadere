@@ -1,7 +1,8 @@
 package org.vadere.state.scenario.distribution.parameter;
 
 /**
- * @author Lukas Gradl (lgradl@hm.edu)
+ * This is the parameter structure used with an empirical distribution.
+ * @author Lukas Gradl (lgradl@hm.edu), Ludwig Jaeck
  */
 
 public class LinearInterpolationParameter {
