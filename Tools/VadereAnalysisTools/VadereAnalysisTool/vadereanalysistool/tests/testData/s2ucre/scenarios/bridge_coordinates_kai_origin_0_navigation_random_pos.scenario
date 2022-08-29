@@ -1,8 +1,8 @@
 {
   "name" : "bridge_coordinates_kai_origin_0_navigation_random_pos",
   "description" : "",
-  "release" : "2.2",
-  "commithash" : "d9d2b99fc786eb7cd6932d373880911fde7d8471",
+  "release" : "2.3",
+  "commithash" : "ff5b381ea8f959e7e0d65a1b13bcdde1e13782cf",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -210,7 +210,6 @@
       "stairs" : [ ],
       "targets" : [ {
         "id" : 1,
-        "absorbing" : true,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -227,16 +226,17 @@
             "y" : 20.200000000186265
           } ]
         },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "absorbing" : true,
         "deletionDistance" : 0.1,
+        "waitingBehaviour" : "NO_WAITING",
+        "parallelWaiters" : 0,
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : null,
+        "distributionParameters" : null,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "waitingTimeYellowPhase" : 0.0
       }, {
         "id" : 1,
-        "absorbing" : true,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -253,13 +253,15 @@
             "y" : 4.900000000372529
           } ]
         },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "absorbing" : true,
         "deletionDistance" : 0.1,
+        "waitingBehaviour" : "NO_WAITING",
+        "parallelWaiters" : 0,
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : null,
+        "distributionParameters" : null,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "waitingTimeYellowPhase" : 0.0
       } ],
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],

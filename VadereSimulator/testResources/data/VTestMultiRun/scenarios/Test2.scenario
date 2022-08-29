@@ -1,8 +1,8 @@
 {
   "name" : "Test2",
   "description" : "",
-  "release" : "2.2",
-  "commithash" : "d9d2b99fc786eb7cd6932d373880911fde7d8471",
+  "release" : "2.3",
+  "commithash" : "ff5b381ea8f959e7e0d65a1b13bcdde1e13782cf",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",

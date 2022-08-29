@@ -1,7 +1,8 @@
 {
   "name" : "roVerTest002",
   "description" : "",
-  "release" : "2.2",
+  "release" : "2.3",
+  "commithash" : "ff5b381ea8f959e7e0d65a1b13bcdde1e13782cf",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -169,7 +170,6 @@
       "stairs" : [ ],
       "targets" : [ {
         "id" : 6,
-        "absorbing" : true,
         "shape" : {
           "x" : 16.3,
           "y" : 202.2,
@@ -177,16 +177,17 @@
           "height" : 17.0,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "absorbing" : true,
         "deletionDistance" : 0.1,
+        "waitingBehaviour" : "NO_WAITING",
+        "parallelWaiters" : 0,
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : null,
+        "distributionParameters" : null,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "waitingTimeYellowPhase" : 0.0
       }, {
         "id" : 7,
-        "absorbing" : true,
         "shape" : {
           "x" : 223.2,
           "y" : 227.2,
@@ -194,16 +195,17 @@
           "height" : 12.3,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "absorbing" : true,
         "deletionDistance" : 0.1,
+        "waitingBehaviour" : "NO_WAITING",
+        "parallelWaiters" : 0,
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : null,
+        "distributionParameters" : null,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "waitingTimeYellowPhase" : 0.0
       }, {
         "id" : 8,
-        "absorbing" : true,
         "shape" : {
           "x" : 209.8,
           "y" : 16.7,
@@ -211,16 +213,17 @@
           "height" : 11.9,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "absorbing" : true,
         "deletionDistance" : 0.1,
+        "waitingBehaviour" : "NO_WAITING",
+        "parallelWaiters" : 0,
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : null,
+        "distributionParameters" : null,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "waitingTimeYellowPhase" : 0.0
       }, {
         "id" : 9,
-        "absorbing" : false,
         "shape" : {
           "x" : 44.6,
           "y" : 44.2,
@@ -228,16 +231,17 @@
           "height" : 15.9,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "absorbing" : false,
         "deletionDistance" : 0.1,
+        "waitingBehaviour" : "NO_WAITING",
+        "parallelWaiters" : 0,
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : null,
+        "distributionParameters" : null,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "waitingTimeYellowPhase" : 0.0
       }, {
         "id" : 10,
-        "absorbing" : false,
         "shape" : {
           "x" : 133.3,
           "y" : 140.2,
@@ -245,13 +249,15 @@
           "height" : 18.9,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "absorbing" : false,
         "deletionDistance" : 0.1,
+        "waitingBehaviour" : "NO_WAITING",
+        "parallelWaiters" : 0,
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : null,
+        "distributionParameters" : null,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "waitingTimeYellowPhase" : 0.0
       } ],
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],

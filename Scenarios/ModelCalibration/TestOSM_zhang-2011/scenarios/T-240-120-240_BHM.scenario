@@ -1,8 +1,8 @@
 {
   "name" : "T-240-120-240_BHM",
   "description" : "",
-  "release" : "2.2",
-  "commithash" : "bef9b7bef5c5755b23c296217e1454e4af9b7d15",
+  "release" : "2.3",
+  "commithash" : "ff5b381ea8f959e7e0d65a1b13bcdde1e13782cf",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -451,7 +451,6 @@
       "stairs" : [ ],
       "targets" : [ {
         "id" : 1,
-        "absorbing" : true,
         "shape" : {
           "x" : 16.3,
           "y" : 9.2,
@@ -459,13 +458,15 @@
           "height" : 2.3,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "absorbing" : true,
         "deletionDistance" : 0.1,
+        "waitingBehaviour" : "NO_WAITING",
+        "parallelWaiters" : 0,
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : null,
+        "distributionParameters" : null,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "waitingTimeYellowPhase" : 0.0
       } ],
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],
