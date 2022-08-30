@@ -1,8 +1,8 @@
 {
   "name" : "s2ucre_static_waiting_less_targets_groups",
   "description" : "",
-  "release" : "2.3",
-  "commithash" : "ff5b381ea8f959e7e0d65a1b13bcdde1e13782cf",
+  "release" : "2.4",
+  "commithash" : "ac0845607d39a6ae849df8bd3c2da8bac01f7f31",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -402,7 +402,7 @@
         "nextSpeed" : -1.0,
         "waitingTimeDistribution" : "constant",
         "distributionParameters" : {
-          "updateFrequency" : 60.0
+          "timeInterval" : 60.0
         },
         "startingWithRedLight" : false,
         "waitingTimeYellowPhase" : 0.0
@@ -431,7 +431,7 @@
         "nextSpeed" : -1.0,
         "waitingTimeDistribution" : "constant",
         "distributionParameters" : {
-          "updateFrequency" : 30.0
+          "timeInterval" : 30.0
         },
         "startingWithRedLight" : false,
         "waitingTimeYellowPhase" : 0.0
@@ -460,7 +460,7 @@
         "nextSpeed" : -1.0,
         "waitingTimeDistribution" : "constant",
         "distributionParameters" : {
-          "updateFrequency" : 30.0
+          "timeInterval" : 30.0
         },
         "startingWithRedLight" : false,
         "waitingTimeYellowPhase" : 0.0
@@ -665,7 +665,7 @@
         },
         "interSpawnTimeDistribution" : "constant",
         "distributionParameters" : {
-          "updateFrequency" : 5.0
+          "timeInterval" : 5.0
         },
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,

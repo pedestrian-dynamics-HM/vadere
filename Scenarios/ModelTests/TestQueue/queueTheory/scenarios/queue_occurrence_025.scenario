@@ -1,7 +1,8 @@
 {
   "name" : "queue_occurrence_025",
   "description" : "",
-  "release" : "2.3",
+  "release" : "2.4",
+  "commithash" : "ac0845607d39a6ae849df8bd3c2da8bac01f7f31",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -185,7 +186,7 @@
         },
         "interSpawnTimeDistribution" : "poisson",
         "distributionParameters" : {
-          "numberPedsPerSecond" : 0.25
+          "occurrencesPerSecond" : 0.25
         },
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,

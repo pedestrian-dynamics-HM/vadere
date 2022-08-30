@@ -1,8 +1,8 @@
 {
   "name" : "mf_underground",
   "description" : "",
-  "release" : "2.3",
-  "commithash" : "ff5b381ea8f959e7e0d65a1b13bcdde1e13782cf",
+  "release" : "2.4",
+  "commithash" : "ac0845607d39a6ae849df8bd3c2da8bac01f7f31",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -983,7 +983,7 @@
         },
         "interSpawnTimeDistribution" : "constant",
         "distributionParameters" : {
-          "updateFrequency" : 1.0
+          "timeInterval" : 1.0
         },
         "spawnNumber" : 15,
         "maxSpawnNumberTotal" : -1,
@@ -1016,7 +1016,7 @@
         },
         "interSpawnTimeDistribution" : "constant",
         "distributionParameters" : {
-          "updateFrequency" : 1.0
+          "timeInterval" : 1.0
         },
         "spawnNumber" : 15,
         "maxSpawnNumberTotal" : -1,
@@ -1052,7 +1052,7 @@
         },
         "interSpawnTimeDistribution" : "constant",
         "distributionParameters" : {
-          "updateFrequency" : 1.0
+          "timeInterval" : 1.0
         },
         "spawnNumber" : 15,
         "maxSpawnNumberTotal" : -1,
@@ -1088,7 +1088,7 @@
         },
         "interSpawnTimeDistribution" : "constant",
         "distributionParameters" : {
-          "updateFrequency" : 1.0
+          "timeInterval" : 1.0
         },
         "spawnNumber" : 15,
         "maxSpawnNumberTotal" : -1,
@@ -1124,7 +1124,7 @@
         },
         "interSpawnTimeDistribution" : "constant",
         "distributionParameters" : {
-          "updateFrequency" : 1.0
+          "timeInterval" : 1.0
         },
         "spawnNumber" : 15,
         "maxSpawnNumberTotal" : -1,
@@ -1157,7 +1157,7 @@
         },
         "interSpawnTimeDistribution" : "constant",
         "distributionParameters" : {
-          "updateFrequency" : 1.0
+          "timeInterval" : 1.0
         },
         "spawnNumber" : 15,
         "maxSpawnNumberTotal" : -1,
@@ -1193,7 +1193,7 @@
         },
         "interSpawnTimeDistribution" : "constant",
         "distributionParameters" : {
-          "updateFrequency" : 1.0
+          "timeInterval" : 1.0
         },
         "spawnNumber" : 15,
         "maxSpawnNumberTotal" : -1,
@@ -1226,7 +1226,7 @@
         },
         "interSpawnTimeDistribution" : "constant",
         "distributionParameters" : {
-          "updateFrequency" : 1.0
+          "timeInterval" : 1.0
         },
         "spawnNumber" : 15,
         "maxSpawnNumberTotal" : -1,
@@ -1262,7 +1262,7 @@
         },
         "interSpawnTimeDistribution" : "constant",
         "distributionParameters" : {
-          "updateFrequency" : 1.0
+          "timeInterval" : 1.0
         },
         "spawnNumber" : 15,
         "maxSpawnNumberTotal" : -1,

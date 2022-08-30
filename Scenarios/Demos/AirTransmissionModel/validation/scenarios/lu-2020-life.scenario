@@ -1,8 +1,8 @@
 {
   "name" : "lu-2020-life",
   "description" : "Superspreading event in a restaurant following lu-2021-life;\n\nJ. Lu, J. Gu, K. Li, C. Xu, W. Su, Z. Lai, D. Zhou,\nC. Yu, B. Xu, and Z. Yang. COVID-19 outbreak associated\nwith air conditioning in restaurant, guangzhou,\nchina, 2020. Emerging Infectious Diseases, 26(7):1628–\n1631, 2020. doi:10.3201/eid2607.200764.",
-  "release" : "2.3",
-  "commithash" : "ff5b381ea8f959e7e0d65a1b13bcdde1e13782cf",
+  "release" : "2.4",
+  "commithash" : "ac0845607d39a6ae849df8bd3c2da8bac01f7f31",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -351,7 +351,7 @@
         "nextSpeed" : -1.0,
         "waitingTimeDistribution" : "constant",
         "distributionParameters" : {
-          "updateFrequency" : 4380.0
+          "timeInterval" : 4380.0
         },
         "startingWithRedLight" : false,
         "waitingTimeYellowPhase" : 0.0
@@ -371,7 +371,7 @@
         "nextSpeed" : -1.0,
         "waitingTimeDistribution" : "constant",
         "distributionParameters" : {
-          "updateFrequency" : 4380.0
+          "timeInterval" : 4380.0
         },
         "startingWithRedLight" : false,
         "waitingTimeYellowPhase" : 0.0
@@ -391,7 +391,7 @@
         "nextSpeed" : -1.0,
         "waitingTimeDistribution" : "constant",
         "distributionParameters" : {
-          "updateFrequency" : 4380.0
+          "timeInterval" : 4380.0
         },
         "startingWithRedLight" : false,
         "waitingTimeYellowPhase" : 0.0
@@ -411,7 +411,7 @@
         "nextSpeed" : -1.0,
         "waitingTimeDistribution" : "constant",
         "distributionParameters" : {
-          "updateFrequency" : 4500.0
+          "timeInterval" : 4500.0
         },
         "startingWithRedLight" : false,
         "waitingTimeYellowPhase" : 0.0
@@ -431,7 +431,7 @@
         "nextSpeed" : -1.0,
         "waitingTimeDistribution" : "constant",
         "distributionParameters" : {
-          "updateFrequency" : 4500.0
+          "timeInterval" : 4500.0
         },
         "startingWithRedLight" : false,
         "waitingTimeYellowPhase" : 0.0
@@ -451,7 +451,7 @@
         "nextSpeed" : -1.0,
         "waitingTimeDistribution" : "constant",
         "distributionParameters" : {
-          "updateFrequency" : 4500.0
+          "timeInterval" : 4500.0
         },
         "startingWithRedLight" : false,
         "waitingTimeYellowPhase" : 0.0
@@ -471,7 +471,7 @@
         "nextSpeed" : -1.0,
         "waitingTimeDistribution" : "constant",
         "distributionParameters" : {
-          "updateFrequency" : 4500.0
+          "timeInterval" : 4500.0
         },
         "startingWithRedLight" : false,
         "waitingTimeYellowPhase" : 0.0
@@ -491,7 +491,7 @@
         "nextSpeed" : -1.0,
         "waitingTimeDistribution" : "constant",
         "distributionParameters" : {
-          "updateFrequency" : 4500.0
+          "timeInterval" : 4500.0
         },
         "startingWithRedLight" : false,
         "waitingTimeYellowPhase" : 0.0
@@ -511,7 +511,7 @@
         "nextSpeed" : -1.0,
         "waitingTimeDistribution" : "constant",
         "distributionParameters" : {
-          "updateFrequency" : 3180.0
+          "timeInterval" : 3180.0
         },
         "startingWithRedLight" : false,
         "waitingTimeYellowPhase" : 0.0
@@ -531,7 +531,7 @@
         "nextSpeed" : -1.0,
         "waitingTimeDistribution" : "constant",
         "distributionParameters" : {
-          "updateFrequency" : 3180.0
+          "timeInterval" : 3180.0
         },
         "startingWithRedLight" : false,
         "waitingTimeYellowPhase" : 0.0
@@ -551,7 +551,7 @@
         },
         "interSpawnTimeDistribution" : "constant",
         "distributionParameters" : {
-          "updateFrequency" : 1.0
+          "timeInterval" : 1.0
         },
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
@@ -575,7 +575,7 @@
         },
         "interSpawnTimeDistribution" : "constant",
         "distributionParameters" : {
-          "updateFrequency" : 1.0
+          "timeInterval" : 1.0
         },
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
@@ -599,7 +599,7 @@
         },
         "interSpawnTimeDistribution" : "constant",
         "distributionParameters" : {
-          "updateFrequency" : 1.0
+          "timeInterval" : 1.0
         },
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
@@ -623,7 +623,7 @@
         },
         "interSpawnTimeDistribution" : "constant",
         "distributionParameters" : {
-          "updateFrequency" : 1.0
+          "timeInterval" : 1.0
         },
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
@@ -647,7 +647,7 @@
         },
         "interSpawnTimeDistribution" : "constant",
         "distributionParameters" : {
-          "updateFrequency" : 1.0
+          "timeInterval" : 1.0
         },
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
@@ -671,7 +671,7 @@
         },
         "interSpawnTimeDistribution" : "constant",
         "distributionParameters" : {
-          "updateFrequency" : 1.0
+          "timeInterval" : 1.0
         },
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
@@ -695,7 +695,7 @@
         },
         "interSpawnTimeDistribution" : "constant",
         "distributionParameters" : {
-          "updateFrequency" : 1.0
+          "timeInterval" : 1.0
         },
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
@@ -719,7 +719,7 @@
         },
         "interSpawnTimeDistribution" : "constant",
         "distributionParameters" : {
-          "updateFrequency" : 1.0
+          "timeInterval" : 1.0
         },
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
@@ -743,7 +743,7 @@
         },
         "interSpawnTimeDistribution" : "constant",
         "distributionParameters" : {
-          "updateFrequency" : 1.0
+          "timeInterval" : 1.0
         },
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
@@ -767,7 +767,7 @@
         },
         "interSpawnTimeDistribution" : "constant",
         "distributionParameters" : {
-          "updateFrequency" : 1.0
+          "timeInterval" : 1.0
         },
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : -1,
