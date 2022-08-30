@@ -30,6 +30,8 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -298,8 +300,12 @@ public class TextView extends JPanel implements IJsonView {
 		try {
 			prevChar = document.getText(e.getOffset()-1,1);
 			postChar = document.getText(e.getOffset()+1,1);
-
-			if (!prevChar.equals("\"") && !postChar.equals("\"")) {
+			if(prevChar.equals("\"")) {
+			}
+			else if(postChar.equals("\"")) {
+			}
+			else if(isOpenString(document.getText(0,e.getOffset()))){}
+			else {
 				SwingUtilities.invokeLater(() -> {
 					try {
 						document.insertString(e.getOffset() + 1, "\"", null);
@@ -313,7 +319,12 @@ public class TextView extends JPanel implements IJsonView {
 			throw new RuntimeException(ex);
 		}
 	}
-
+	private boolean isOpenString(String text){
+		String pattern = "\"[^\" ]{1,}(?!.*\")(?!.*\\s)";
+		Pattern r = Pattern.compile(pattern);
+		Matcher m = r.matcher(text);
+		return m.find( );
+	}
 	private void checkInsert2ndSwirlyBracket(DocumentEvent e){
 		Document document = e.getDocument();
 		SwingUtilities.invokeLater(() -> {
