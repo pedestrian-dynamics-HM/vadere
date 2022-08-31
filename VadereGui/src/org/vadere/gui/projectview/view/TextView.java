@@ -304,7 +304,8 @@ public class TextView extends JPanel implements IJsonView {
 			}
 			else if(postChar.equals("\"")) {
 			}
-			else if(isOpenString(document.getText(0,e.getOffset()))){}
+			else if(isOpenString(document.getText(e.getOffset()-2,1).charAt(0))){}
+			else if(isOpenString(document.getText(e.getOffset()+1,1).charAt(0))){}
 			else {
 				SwingUtilities.invokeLater(() -> {
 					try {
@@ -319,12 +320,11 @@ public class TextView extends JPanel implements IJsonView {
 			throw new RuntimeException(ex);
 		}
 	}
-	private boolean isOpenString(String text){
-		String pattern = "\"[^\" ]{1,}(?!.*\")(?!.*\\s)";
-		Pattern r = Pattern.compile(pattern);
-		Matcher m = r.matcher(text);
-		return m.find( );
+
+	private boolean isOpenString(char character) {
+		return Character.isDigit(character) || Character.isAlphabetic(character);
 	}
+
 	private void checkInsert2ndSwirlyBracket(DocumentEvent e){
 		Document document = e.getDocument();
 		SwingUtilities.invokeLater(() -> {
