@@ -1,9 +1,9 @@
 package org.vadere.state.scenario.distribution.parameter;
 
 /**
- * @author Lukas Gradl (lgradl@hm.edu)
+ * This is the parameter structure used with a time series distribution.
+ * @author Lukas Gradl (lgradl@hm.edu), Ludwig Jaeck
  */
-
 public class TimeSeriesParameter {
 
 	double intervalLength;

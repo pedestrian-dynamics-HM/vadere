@@ -1,6 +1,7 @@
 package org.vadere.state.scenario.distribution.parameter;
 
 /**
+ * This is the parameter structure used with an empirical distribution.
  * @author Lukas Gradl (lgradl@hm.edu)
  */
 

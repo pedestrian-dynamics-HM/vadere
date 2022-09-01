@@ -1,8 +1,8 @@
 {
   "name" : "warteschlange_ein_ziel",
   "description" : "",
-  "release" : "2.2",
-  "commithash" : "d9d2b99fc786eb7cd6932d373880911fde7d8471",
+  "release" : "2.3",
+  "commithash" : "ff5b381ea8f959e7e0d65a1b13bcdde1e13782cf",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -175,7 +175,6 @@
       "stairs" : [ ],
       "targets" : [ {
         "id" : 1,
-        "absorbing" : true,
         "shape" : {
           "x" : 37.0,
           "y" : 8.0,
@@ -183,13 +182,17 @@
           "height" : 2.0,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 5.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "absorbing" : true,
         "deletionDistance" : 0.1,
+        "waitingBehaviour" : "INDIVIDUAL",
+        "parallelWaiters" : 0,
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 5.0
+        },
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "waitingTimeYellowPhase" : 0.0
       } ],
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],

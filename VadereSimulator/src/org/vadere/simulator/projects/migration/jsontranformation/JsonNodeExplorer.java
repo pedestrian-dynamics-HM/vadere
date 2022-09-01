@@ -85,6 +85,11 @@ public interface JsonNodeExplorer {
 		parent.put(keyName, value);
 	}
 
+	default  void addStringField(JsonNode root, String keyName, String value){
+		ObjectNode parent = (ObjectNode) root;
+		parent.put(keyName, value);
+	}
+
 	default JsonNode pathMustExist(JsonNode root, String path) throws MigrationException {
 		JsonNode ret = path(root, path);
 		if (ret.isMissingNode()) {
@@ -123,6 +128,10 @@ public interface JsonNodeExplorer {
 
 	default boolean nodeIsNumber(JsonNode node){
 		return nodeNotEmptyAnd(node, n -> n.getNodeType() == JsonNodeType.NUMBER);
+	}
+
+	default boolean nodeIsBoolean(JsonNode node){
+		return nodeNotEmptyAnd(node, n -> n.getNodeType() == JsonNodeType.BOOLEAN);
 	}
 
 
@@ -172,6 +181,10 @@ public interface JsonNodeExplorer {
 
 	default Iterator<JsonNode> iteratorSources(JsonNode node) throws MigrationException{
 		JsonNode tChanger = pathMustExist(node, "scenario/sources");
+		return new JsonFilterIterator(tChanger, n->true);
+	}
+	default Iterator<JsonNode> iteratorTargets(JsonNode node) throws MigrationException{
+		JsonNode tChanger = pathMustExist(node, "scenario/topography/targets");
 		return new JsonFilterIterator(tChanger, n->true);
 	}
 

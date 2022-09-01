@@ -3,7 +3,8 @@ package org.vadere.state.scenario.distribution.parameter;
 import java.util.ArrayList;
 
 /**
- * @author Lukas Gradl (lgradl@hm.edu)
+ * This is the parameter structure used with a mixed distribution.
+ * @author Lukas Gradl (lgradl@hm.edu), Ludwig Jaeck
  */
 
 public class MixedParameter {
