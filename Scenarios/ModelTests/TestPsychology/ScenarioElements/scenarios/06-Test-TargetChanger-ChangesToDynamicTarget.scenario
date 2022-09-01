@@ -1,8 +1,8 @@
 {
   "name" : "06-Test-TargetChanger-ChangesToDynamicTarget",
   "description" : "",
-  "release" : "2.2",
-  "commithash" : "bef9b7bef5c5755b23c296217e1454e4af9b7d15",
+  "release" : "2.3",
+  "commithash" : "ff5b381ea8f959e7e0d65a1b13bcdde1e13782cf",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -152,7 +152,6 @@
       "stairs" : [ ],
       "targets" : [ {
         "id" : 1,
-        "absorbing" : false,
         "shape" : {
           "x" : 18.3,
           "y" : 17.0,
@@ -160,16 +159,17 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "absorbing" : false,
         "deletionDistance" : 0.1,
+        "waitingBehaviour" : "NO_WAITING",
+        "parallelWaiters" : 0,
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : null,
+        "distributionParameters" : null,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "waitingTimeYellowPhase" : 0.0
       }, {
         "id" : 2,
-        "absorbing" : true,
         "shape" : {
           "x" : 0.7,
           "y" : 11.1,
@@ -177,16 +177,17 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "absorbing" : true,
         "deletionDistance" : 0.1,
+        "waitingBehaviour" : "NO_WAITING",
+        "parallelWaiters" : 0,
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : null,
+        "distributionParameters" : null,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "waitingTimeYellowPhase" : 0.0
       }, {
         "id" : 3,
-        "absorbing" : true,
         "shape" : {
           "x" : 17.9,
           "y" : 0.9,
@@ -194,13 +195,15 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "absorbing" : true,
         "deletionDistance" : 0.1,
+        "waitingBehaviour" : "NO_WAITING",
+        "parallelWaiters" : 0,
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : null,
+        "distributionParameters" : null,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "waitingTimeYellowPhase" : 0.0
       } ],
       "targetChangers" : [ {
         "id" : 5,

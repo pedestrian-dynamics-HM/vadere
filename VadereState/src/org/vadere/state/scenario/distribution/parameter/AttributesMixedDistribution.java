@@ -5,7 +5,8 @@ import org.vadere.state.attributes.distributions.AttributesDistribution;
 import java.util.ArrayList;
 
 /**
- * @author Lukas Gradl (lgradl@hm.edu)
+ * This is the parameter structure used with a mixed distribution.
+ * @author Lukas Gradl (lgradl@hm.edu), Ludwig Jaeck
  */
 
 public class AttributesMixedDistribution extends AttributesDistribution {

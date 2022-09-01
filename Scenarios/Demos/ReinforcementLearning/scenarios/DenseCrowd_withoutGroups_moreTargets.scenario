@@ -1,8 +1,8 @@
 {
   "name" : "DenseCrowd_withoutGroups_moreTargets",
   "description" : "",
-  "release" : "2.2",
-  "commithash" : "bef9b7bef5c5755b23c296217e1454e4af9b7d15",
+  "release" : "2.3",
+  "commithash" : "ff5b381ea8f959e7e0d65a1b13bcdde1e13782cf",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -127,7 +127,6 @@
       "stairs" : [ ],
       "targets" : [ {
         "id" : 6,
-        "absorbing" : false,
         "shape" : {
           "x" : 0.6690997566909975,
           "y" : 8.832116788321168,
@@ -135,16 +134,17 @@
           "height" : 0.5178832116788321,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "absorbing" : false,
         "deletionDistance" : 0.1,
+        "waitingBehaviour" : "NO_WAITING",
+        "parallelWaiters" : 0,
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : null,
+        "distributionParameters" : null,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "waitingTimeYellowPhase" : 0.0
       }, {
         "id" : 15,
-        "absorbing" : false,
         "shape" : {
           "x" : 0.5,
           "y" : 7.40072202166065,
@@ -152,16 +152,17 @@
           "height" : 0.5992779783393498,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "absorbing" : false,
         "deletionDistance" : 0.1,
+        "waitingBehaviour" : "NO_WAITING",
+        "parallelWaiters" : 0,
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : null,
+        "distributionParameters" : null,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "waitingTimeYellowPhase" : 0.0
       }, {
         "id" : 16,
-        "absorbing" : false,
         "shape" : {
           "x" : 1.9494584837545128,
           "y" : 7.412755716004813,
@@ -169,16 +170,17 @@
           "height" : 0.5872442839951866,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "absorbing" : false,
         "deletionDistance" : 0.1,
+        "waitingBehaviour" : "NO_WAITING",
+        "parallelWaiters" : 0,
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : null,
+        "distributionParameters" : null,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "waitingTimeYellowPhase" : 0.0
       }, {
         "id" : 17,
-        "absorbing" : false,
         "shape" : {
           "x" : 1.9253910950661854,
           "y" : 6.587882628286499,
@@ -186,16 +188,17 @@
           "height" : 0.6148851214126587,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "absorbing" : false,
         "deletionDistance" : 0.1,
+        "waitingBehaviour" : "NO_WAITING",
+        "parallelWaiters" : 0,
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : null,
+        "distributionParameters" : null,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "waitingTimeYellowPhase" : 0.0
       }, {
         "id" : 18,
-        "absorbing" : false,
         "shape" : {
           "x" : 0.4804353801488554,
           "y" : 5.837004108904336,
@@ -203,16 +206,17 @@
           "height" : 0.6416962521064944,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "absorbing" : false,
         "deletionDistance" : 0.1,
+        "waitingBehaviour" : "NO_WAITING",
+        "parallelWaiters" : 0,
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : null,
+        "distributionParameters" : null,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "waitingTimeYellowPhase" : 0.0
       }, {
         "id" : 14,
-        "absorbing" : false,
         "shape" : {
           "x" : 0.5,
           "y" : 5.0,
@@ -220,16 +224,17 @@
           "height" : 0.5234657039711186,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "absorbing" : false,
         "deletionDistance" : 0.1,
+        "waitingBehaviour" : "NO_WAITING",
+        "parallelWaiters" : 0,
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : null,
+        "distributionParameters" : null,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "waitingTimeYellowPhase" : 0.0
       }, {
         "id" : 7,
-        "absorbing" : false,
         "shape" : {
           "x" : 1.9855595667870038,
           "y" : 5.0,
@@ -237,16 +242,17 @@
           "height" : 0.5475330926594459,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "absorbing" : false,
         "deletionDistance" : 0.1,
+        "waitingBehaviour" : "NO_WAITING",
+        "parallelWaiters" : 0,
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : null,
+        "distributionParameters" : null,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "waitingTimeYellowPhase" : 0.0
       }, {
         "id" : 8,
-        "absorbing" : false,
         "shape" : {
           "x" : 1.2,
           "y" : 7.40072202166065,
@@ -254,16 +260,17 @@
           "height" : 0.5992779783393498,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "absorbing" : false,
         "deletionDistance" : 0.1,
+        "waitingBehaviour" : "NO_WAITING",
+        "parallelWaiters" : 0,
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : null,
+        "distributionParameters" : null,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "waitingTimeYellowPhase" : 0.0
       }, {
         "id" : 9,
-        "absorbing" : false,
         "shape" : {
           "x" : 1.2010884503721384,
           "y" : 6.60072202166065,
@@ -271,16 +278,17 @@
           "height" : 0.5992779783393498,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "absorbing" : false,
         "deletionDistance" : 0.1,
+        "waitingBehaviour" : "NO_WAITING",
+        "parallelWaiters" : 0,
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : null,
+        "distributionParameters" : null,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "waitingTimeYellowPhase" : 0.0
       }, {
         "id" : 10,
-        "absorbing" : false,
         "shape" : {
           "x" : 1.2,
           "y" : 5.00072202166065,
@@ -288,16 +296,17 @@
           "height" : 0.5992779783393498,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "absorbing" : false,
         "deletionDistance" : 0.1,
+        "waitingBehaviour" : "NO_WAITING",
+        "parallelWaiters" : 0,
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : null,
+        "distributionParameters" : null,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "waitingTimeYellowPhase" : 0.0
       }, {
         "id" : 13,
-        "absorbing" : false,
         "shape" : {
           "x" : 1.9,
           "y" : 5.80072202166065,
@@ -305,16 +314,17 @@
           "height" : 0.5992779783393498,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "absorbing" : false,
         "deletionDistance" : 0.1,
+        "waitingBehaviour" : "NO_WAITING",
+        "parallelWaiters" : 0,
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : null,
+        "distributionParameters" : null,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "waitingTimeYellowPhase" : 0.0
       }, {
         "id" : 12,
-        "absorbing" : false,
         "shape" : {
           "x" : 1.2,
           "y" : 5.837,
@@ -322,16 +332,17 @@
           "height" : 0.6630000000000003,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "absorbing" : false,
         "deletionDistance" : 0.1,
+        "waitingBehaviour" : "NO_WAITING",
+        "parallelWaiters" : 0,
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : null,
+        "distributionParameters" : null,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "waitingTimeYellowPhase" : 0.0
       }, {
         "id" : 11,
-        "absorbing" : false,
         "shape" : {
           "x" : 0.5,
           "y" : 6.60072202166065,
@@ -339,13 +350,15 @@
           "height" : 0.5992779783393498,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "absorbing" : false,
         "deletionDistance" : 0.1,
+        "waitingBehaviour" : "NO_WAITING",
+        "parallelWaiters" : 0,
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : null,
+        "distributionParameters" : null,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "waitingTimeYellowPhase" : 0.0
       } ],
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],

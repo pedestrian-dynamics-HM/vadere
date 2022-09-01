@@ -1,7 +1,8 @@
 {
   "name" : "group_OSM_2Sources1Place",
   "description" : "",
-  "release" : "2.2",
+  "release" : "2.3",
+  "commithash" : "ff5b381ea8f959e7e0d65a1b13bcdde1e13782cf",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -78,7 +79,9 @@
       },
       "org.vadere.state.attributes.models.AttributesCGM" : {
         "groupMemberRepulsionFactor" : 0.01,
-        "leaderAttractionFactor" : 0.003
+        "leaderAttractionFactor" : 0.003,
+        "lostMembers" : false,
+        "waitBehaviourRelevantAgentsFactor" : -1
       }
     },
     "attributesSimulation" : {
@@ -149,7 +152,6 @@
       "stairs" : [ ],
       "targets" : [ {
         "id" : 1,
-        "absorbing" : true,
         "shape" : {
           "x" : 28.0,
           "y" : 3.0,
@@ -157,13 +159,15 @@
           "height" : 4.0,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 0.0,
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "individualWaiting" : true,
+        "absorbing" : true,
         "deletionDistance" : 0.1,
+        "waitingBehaviour" : "NO_WAITING",
+        "parallelWaiters" : 0,
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : null,
+        "distributionParameters" : null,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "waitingTimeYellowPhase" : 0.0
       } ],
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],

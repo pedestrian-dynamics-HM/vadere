@@ -860,4 +860,13 @@ public class Topography implements DynamicElementMover{
 		return targets.stream().map(target -> target.getId()).collect(Collectors.toList());
 	}
 
+    public Source getSource(int sourceId) {
+		for (Source source : this.sources) {
+			if (source.getId() == sourceId) {
+				return source;
+			}
+		}
+
+		return null;
+    }
 }

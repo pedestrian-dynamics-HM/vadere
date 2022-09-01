@@ -1,10 +1,9 @@
 package org.vadere.state.scenario.distribution.parameter;
 
 
-import org.vadere.state.attributes.distributions.AttributesDistribution;
-
 /**
- * @author Aleksandar Ivanov(ivanov0@hm.edu), Lukas Gradl (lgradl@hm.edu)
+ * This is the parameter structure used with a binomial distribution.
+ * @author Aleksandar Ivanov(ivanov0@hm.edu), Lukas Gradl (lgradl@hm.edu), Ludwig Jaeck
  */
 
 

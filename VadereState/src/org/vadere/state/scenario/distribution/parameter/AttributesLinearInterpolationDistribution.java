@@ -3,7 +3,8 @@ package org.vadere.state.scenario.distribution.parameter;
 import org.vadere.state.attributes.distributions.AttributesDistribution;
 
 /**
- * @author Lukas Gradl (lgradl@hm.edu)
+ * This is the parameter structure used with an empirical distribution.
+ * @author Lukas Gradl (lgradl@hm.edu), Ludwig Jaeck
  */
 
 public class AttributesLinearInterpolationDistribution extends AttributesDistribution {

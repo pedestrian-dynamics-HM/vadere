@@ -1,7 +1,8 @@
 {
   "name" : "bottleneckA",
   "description" : "",
-  "release" : "2.2",
+  "release" : "2.3",
+  "commithash" : "ff5b381ea8f959e7e0d65a1b13bcdde1e13782cf",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -221,7 +222,6 @@
       "stairs" : [ ],
       "targets" : [ {
         "id" : 4,
-        "absorbing" : true,
         "shape" : {
           "x" : 18.6,
           "y" : 10.0,
@@ -229,13 +229,15 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "waitingTime" : 100.0,
-        "waitingTimeYellowPhase" : 6.0,
-        "parallelWaiters" : 2,
-        "individualWaiting" : true,
+        "absorbing" : true,
         "deletionDistance" : 0.1,
+        "waitingBehaviour" : "NO_WAITING",
+        "parallelWaiters" : 0,
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : null,
+        "distributionParameters" : null,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "waitingTimeYellowPhase" : 0.0
       } ],
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],
@@ -292,8 +294,6 @@
       } ],
       "dynamicElements" : [ ],
       "attributesPedestrian" : {
-        "shape" : null,
-        "visible" : null,
         "radius" : 0.2,
         "densityDependentSpeed" : false,
         "speedDistributionMean" : 1.34,
@@ -309,8 +309,6 @@
       "teleporter" : null,
       "attributesCar" : {
         "id" : -1,
-        "shape" : null,
-        "visible" : null,
         "radius" : 0.2,
         "densityDependentSpeed" : false,
         "speedDistributionMean" : 0.9,

@@ -20,6 +20,29 @@
 
 ### Other
 
+## v2.3:
+
+### Added
+- Added new parameter `waitingTimeDistribution` to `AttributesTarget` describing a distribution used for the agents waiting time at a target.
+- Added new parameter `distributionParameters` to `AttributesTarget` describing the parameters of `waitingTimeDistribution`.
+- Added new parameter `waitingMode` to `AttributesTarget` used for differentiating between individual waiting and traffic light waiting. 
+  - can be set to `noWaiting` if agents should be absorbed immediately
+  - can be set to `individual` if agents should wait with individually assigned waiting times
+  - can be set to `trafficLight` if the target represents a traffic light
+### Removed
+- Removed parameter `waitingTime` from `AttributesTarget`, because this is now described by `distributionParameters`. 
+### Changed
+
+### Fixed
+
+### Performance
+
+### Security
+
+### Deprecated
+
+### Other
+
 
 ## v2.1 (2022-03-XX)
 

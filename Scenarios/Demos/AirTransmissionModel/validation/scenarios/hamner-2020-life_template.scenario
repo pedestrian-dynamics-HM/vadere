@@ -1,8 +1,8 @@
 {
   "name" : "hamner-2020-life_template",
   "description" : "Superspreading event during a choir rehearsal following hamner-2020-life;\n\nL. Hamner, P. Dubbel, I. Capron, A. Ross, A. Jordan,\nJ. Lee, J. Lynn, A. Ball, S. Narwal, S. Russell, et al.\nHigh SARS-CoV-2 attack rate following exposure at a\nchoir practice — skagit county, washington, march 2020.\nMMWR. Morbidity and Mortality Weekly Report, 69\n(19):606–610, 2020. doi:10.15585/mmwr.mm6919e6.",
-  "release" : "2.2",
-  "commithash" : "bef9b7bef5c5755b23c296217e1454e4af9b7d15",
+  "release" : "2.3",
+  "commithash" : "ff5b381ea8f959e7e0d65a1b13bcdde1e13782cf",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ ],

@@ -4,7 +4,8 @@ package org.vadere.state.scenario.distribution.parameter;
 import org.vadere.state.attributes.distributions.AttributesDistribution;
 
 /**
- * @author Lukas Gradl (lgradl@hm.edu)
+ * This is the parameter structure used with a single spawn distribution.
+ * @author Lukas Gradl (lgradl@hm.edu), Ludwig Jaeck
  */
 
 public class AttributesSingleSpawnDistribution extends AttributesDistribution {
@@ -16,6 +17,9 @@ public class AttributesSingleSpawnDistribution extends AttributesDistribution {
 		this.spawnTime = spawnTime;
 	}
 
+	/**
+	 * The attribute spawnTime describes the time the event occurs.
+	 */
 	Double spawnTime;
 
 	public int getSpawnNumber() {
