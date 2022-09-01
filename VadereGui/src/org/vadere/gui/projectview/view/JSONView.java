@@ -48,9 +48,9 @@ public class JSONView extends JPanel {
 		add(scrollPane, BorderLayout.CENTER);
 
 		lbljsoninvalid = new JLabel(Messages.getString("TextView.lbljsoninvalid.text"));
-		lbljsoninvalid.setIcon(new ImageIcon(Resources.class.getResource("/icons/Error.gif")));
+		lbljsoninvalid.setIcon(new ImageIcon(Resources.class.getResource("/icons/Error.png")));
 		lbljsonvalid = new JLabel(Messages.getString("TextView.lbljsonvalid.text"));
-		lbljsonvalid.setIcon(new ImageIcon(Resources.class.getResource("/icons/Inform.gif")));
+		lbljsonvalid.setIcon(new ImageIcon(Resources.class.getResource("/icons/Inform.png")));
 
 		panelTop.add(lbljsoninvalid);
 		panelTop.add(lbljsonvalid);

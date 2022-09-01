@@ -22,7 +22,7 @@ public class JsonValidIndicator extends JPanel {
 
 		labelJsonValid = new JLabel(Messages.getString("TextView.lbljsonvalid.text"));
 		add(labelJsonValid);
-		labelJsonValid.setIcon(new ImageIcon(Resources.class.getResource("/icons/Inform.gif")));
+		labelJsonValid.setIcon(new ImageIcon(Resources.class.getResource("/icons/Inform.png")));
 
 		// INVALID
 
@@ -30,7 +30,7 @@ public class JsonValidIndicator extends JPanel {
 				" <font color=gray size=-1><a href=#>" + Messages.getString("TextView.lbljsoninvalid.showErrorText")
 				+ "</a></font></html>");
 		add(labelJsonInvalid);
-		labelJsonInvalid.setIcon(new ImageIcon(Resources.class.getResource("/icons/Error.gif")));
+		labelJsonInvalid.setIcon(new ImageIcon(Resources.class.getResource("/icons/Error.png")));
 		labelJsonInvalid.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseReleased(MouseEvent e) {
