@@ -12,6 +12,7 @@ import org.vadere.simulator.projects.dataprocessing.processor.PedestrianLifetime
 
 import org.vadere.state.attributes.processor.AttributesTestServiceTimeProcessor;
 import org.vadere.state.scenario.Target;
+import org.vadere.state.scenario.distribution.parameter.AttributesPoissonDistribution;
 import org.vadere.util.logging.Logger;
 
 
@@ -52,7 +53,7 @@ public class TestPedestrianServiceTimeProcessor extends TestProcessor {
         var source = state.getTopography().getSource(1);
         var sourceAttrib = source.getAttributes();
         var distrbAttrib = sourceAttrib.getDistributionParameters();
-        var numberPedsPerSec = distrbAttrib.get("numberPedsPerSecond").asDouble();
+        var numberPedsPerSec = ((AttributesPoissonDistribution)distrbAttrib).getNumberPedsPerSecond();
 
         Map<EventTimeKey, Integer> countProcessorData =
                 this.elementCountingProcessor.getData();

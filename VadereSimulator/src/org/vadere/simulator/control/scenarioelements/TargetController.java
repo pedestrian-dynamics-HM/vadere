@@ -10,7 +10,8 @@ import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.TargetListener;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.scenario.distribution.DistributionFactory;
-import org.vadere.state.scenario.distribution.VadereDistribution;
+
+import org.vadere.state.scenario.distribution.VDistribution;
 import org.vadere.state.types.TrafficLightPhase;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
@@ -24,7 +25,7 @@ public class TargetController extends ScenarioElementController {
 
 	private final Target.WaitingBehaviour waitingBehaviour;
 	private static final Logger log = Logger.getLogger(TargetController.class);
-	private VadereDistribution distribution = null;
+	private VDistribution distribution = null;
 	private final AttributesTarget targetAttributes;
 
 	private double phaseLength = 0;

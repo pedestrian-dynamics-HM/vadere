@@ -170,7 +170,6 @@ public abstract class StateJsonConverter {
 
 	public static Topography deserializeTopographyFromNode(JsonNode node) throws IllegalArgumentException {
 		TopographyStore store = mapper.convertValue(node, TopographyStore.class);
-
 		Topography topography = new Topography(store.attributes, store.attributesPedestrian, store.attributesCar);
 		store.obstacles.forEach(obstacle -> topography.addObstacle(new Obstacle(obstacle)));
 		store.stairs.forEach(stairs -> topography.addStairs(new Stairs(stairs)));

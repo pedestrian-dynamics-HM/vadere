@@ -36,10 +36,9 @@ public class AttributesSource extends AttributesVisualElement {
 	 *  "singleSpawn",
 	 *  "timeSeries"
 	 */
-	//@VadereAttribute
+	@VadereAttribute
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
 	private VDistribution interSpawnTimeDistribution;
-
 
 	/**
 	 *  Distribution parameter examples:
