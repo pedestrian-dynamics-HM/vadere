@@ -707,7 +707,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		ActionDeleteScenarios deleteScenariosAction =
 				new ActionDeleteScenarios(Messages.getString("ProjectView.mntmDelete.text"), model, scenarioTable);
 		ActionRunSelectedScenarios runSelectedScenarios = new ActionRunSelectedScenarios(
-				Messages.getString("ProjectView.mntmRunSelectetTests.text"), model, scenarioTable);
+				Messages.getString("ProjectView.mntmRunSelectedTests.text"), model, scenarioTable);
 		ActionRunRepeatedlyScenarios runRepeatedlyScenarios = new ActionRunRepeatedlyScenarios(
 				Messages.getString("ProjectView.mntmRunRepeatedlyTests.text"), model, scenarioTable, n_repetitions);
 		ActionSeeDiscardChanges seeDiscardChangesAction = new ActionSeeDiscardChanges(
