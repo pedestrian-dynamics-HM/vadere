@@ -2,26 +2,28 @@ package org.vadere.state.scenario.distribution.impl;
 
 import org.apache.commons.math3.distribution.ExponentialDistribution;
 import org.apache.commons.math3.random.RandomGenerator;
-import org.vadere.state.scenario.distribution.VadereDistribution;
-import org.vadere.state.scenario.distribution.parameter.PoissonParameter;
+import org.vadere.state.attributes.Attributes;
+import org.vadere.state.scenario.distribution.VDistribution;
+import org.vadere.state.scenario.distribution.parameter.AttributesPoissonDistribution;
 import org.vadere.state.scenario.distribution.registry.RegisterDistribution;
 
 /**
  * @author Aleksandar Ivanov(ivanov0@hm.edu), Lukas Gradl (lgradl@hm.edu)
  */
-@RegisterDistribution(name = "poisson", parameter = PoissonParameter.class)
-public class PoissonDistribution extends VadereDistribution<PoissonParameter> {
+@RegisterDistribution(name = "poisson", parameter = AttributesPoissonDistribution.class)
+public class PoissonDistribution extends VDistribution<AttributesPoissonDistribution> {
 	private ExponentialDistribution distribution;
 	private int spawnNumber;
 	private int remainingSpawnAgents;
+	private Attributes poissonAttributes;
 
-	public PoissonDistribution(PoissonParameter parameter, int spawnNumber, RandomGenerator randomGenerator)
+	public PoissonDistribution(AttributesPoissonDistribution parameter, int spawnNumber, RandomGenerator randomGenerator)
 	        throws Exception {
 		super(parameter, spawnNumber, randomGenerator);
 	}
 
 	@Override
-	protected void setValues(PoissonParameter parameter, int spawnNumber, RandomGenerator randomGenerator)
+	protected void setValues(AttributesPoissonDistribution parameter, int spawnNumber, RandomGenerator randomGenerator)
 	        throws Exception {
 		distribution = new ExponentialDistribution(randomGenerator, 1 / parameter.getNumberPedsPerSecond());
 		this.spawnNumber = spawnNumber;
@@ -45,5 +47,18 @@ public class PoissonDistribution extends VadereDistribution<PoissonParameter> {
 	@Override
 	public void setRemainingSpawnAgents(int remainingSpawnAgents) {
 		this.remainingSpawnAgents = remainingSpawnAgents;
+	}
+
+	@Override
+	public Attributes getAttributes() {
+		return this.poissonAttributes;
+	}
+
+	@Override
+	public void setAttributes(Attributes attributes) {
+		if(attributes instanceof AttributesPoissonDistribution)
+			this.poissonAttributes = attributes;
+		else
+			throw new IllegalArgumentException();
 	}
 }

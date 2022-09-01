@@ -1,5 +1,6 @@
 package org.vadere.gui.topographycreator.control.celleditor;
 
+
 import javax.swing.*;
 import javax.swing.event.CellEditorListener;
 import javax.swing.table.TableCellEditor;
@@ -9,15 +10,14 @@ import java.util.EventObject;
 import java.util.HashMap;
 
 public class FieldValueEditor implements TableCellEditor {
-    private Object attached;
+
     private HashMap<String, JComponent> editorObjects;
 
     public FieldValueEditor(){
     }
 
-    public void set(HashMap<String, JComponent> editorObjects, Object attached) {
+    public void set(HashMap<String, JComponent> editorObjects) {
         this.editorObjects = editorObjects;
-        this.attached = attached;
     }
 
     JComponent comp;

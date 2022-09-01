@@ -1,7 +1,5 @@
 package org.vadere.simulator.control.scenarioelements;
 
-import org.apache.commons.math3.random.JDKRandomGenerator;
-import org.apache.commons.math3.distribution.RealDistribution;
 import org.vadere.simulator.control.scenarioelements.listener.ControllerEventListener;
 import org.vadere.simulator.control.scenarioelements.listener.ControllerEventProvider;
 import org.vadere.simulator.models.DynamicElementFactory;
@@ -9,8 +7,7 @@ import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesDynamicElement;
 import org.vadere.state.attributes.scenario.AttributesSource;
 import org.vadere.state.scenario.*;
-import org.vadere.state.scenario.distribution.DistributionFactory;
-import org.vadere.state.scenario.distribution.VadereDistribution;
+import org.vadere.state.scenario.distribution.VDistribution;
 import org.vadere.state.scenario.distribution.impl.MixedDistribution;
 import org.vadere.util.geometry.LinkedCellsGrid;
 import org.vadere.util.geometry.shapes.VCircle;
@@ -42,7 +39,7 @@ public abstract class SourceController extends ScenarioElementController impleme
 	 * <code>null</code>, if there is no next event.
 	 */
 	protected Double timeOfNextEvent;
-	protected VadereDistribution distribution;
+	protected VDistribution distribution;
 	protected int dynamicElementsCreatedTotal;
 
     public SourceController(Topography scenario, Source source,
@@ -59,12 +56,12 @@ public abstract class SourceController extends ScenarioElementController impleme
 
         timeOfNextEvent = sourceAttributes.getStartTime();
         try {
-            distribution = DistributionFactory.create(
+            distribution = sourceAttributes.getInterSpawnTimeDistribution();/*DistributionFactory.create(
                     sourceAttributes.getInterSpawnTimeDistribution(),
                     sourceAttributes.getDistributionParameters(),
                     sourceAttributes.getSpawnNumber(),
                     new JDKRandomGenerator(random.nextInt())
-            );
+            );*/
 
         } catch (Exception e) {
             throw new IllegalArgumentException("Problem with scenario parameters for source: "

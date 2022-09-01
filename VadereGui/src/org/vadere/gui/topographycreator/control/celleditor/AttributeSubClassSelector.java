@@ -3,6 +3,7 @@ package org.vadere.gui.topographycreator.control.celleditor;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
 import org.vadere.gui.topographycreator.view.AttributeView;
+import org.vadere.state.attributes.AttributesAttached;
 import org.vadere.state.scenario.ScenarioElement;
 
 import javax.swing.*;
@@ -27,12 +28,13 @@ public class AttributeSubClassSelector extends AttributeEditor {
     private GridBagConstraints gbc;
     private JPanel contentPanel;
 
-    public AttributeSubClassSelector(Object attached, Field field, TopographyCreatorModel model, ArrayList<Class> classesModel, JPanel contentReceiver) {
+    public AttributeSubClassSelector(AttributesAttached attached, Field field, TopographyCreatorModel model, ArrayList<Class> classesModel, JPanel contentReceiver) {
         super(attached, field, model);
         initializeGridBagConstraint();
         this.comboBox = new JComboBox();
         this.comboBox.setModel(initializeComboBoxModel(classesModel));
         this.contentPanel = contentReceiver;
+        this.add(comboBox);
         this.comboBox.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
@@ -44,7 +46,7 @@ public class AttributeSubClassSelector extends AttributeEditor {
                         refreshContentPanel();
                     } else {
                         try {
-                            Object newObject = constructNewObject(selected);
+                            AttributesAttached newObject = constructNewObject(selected);
                             setFieldValue(newObject);
                             clearContentPanel();
                             createInternalPropertyPane(newObject, model);
@@ -101,7 +103,7 @@ public class AttributeSubClassSelector extends AttributeEditor {
         this.comboBox.setSelectedItem(value);
     }
 
-    private void createInternalPropertyPane(Object newObject, TopographyCreatorModel model) {
+    private void createInternalPropertyPane(AttributesAttached newObject, TopographyCreatorModel model) {
         var proppane = AttributeView.buildPage(newObject, model);
         proppane.selectionChange((ScenarioElement) newObject);
         contentPanel.add(proppane, gbc);
@@ -116,9 +118,9 @@ public class AttributeSubClassSelector extends AttributeEditor {
         contentPanel.removeAll();
     }
 
-    private Object constructNewObject(String selected) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+    private AttributesAttached constructNewObject(String selected) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         Class clazz = classMap.get(selected);
-        Object newObject = clazz.getDeclaredConstructor(null).newInstance(null);
+        AttributesAttached newObject = (AttributesAttached) clazz.getDeclaredConstructor(null).newInstance(null);
         return newObject;
     }
 

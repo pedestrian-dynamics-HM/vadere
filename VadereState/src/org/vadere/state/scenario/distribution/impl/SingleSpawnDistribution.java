@@ -1,26 +1,28 @@
 package org.vadere.state.scenario.distribution.impl;
 
 import org.apache.commons.math3.random.RandomGenerator;
-import org.vadere.state.scenario.distribution.VadereDistribution;
-import org.vadere.state.scenario.distribution.parameter.SingleSpawnParameter;
+import org.vadere.state.attributes.Attributes;
+import org.vadere.state.scenario.distribution.VDistribution;
+import org.vadere.state.scenario.distribution.parameter.AttributesSingleSpawnDistribution;
 import org.vadere.state.scenario.distribution.registry.RegisterDistribution;
 
 /**
  * @author Aleksandar Ivanov(ivanov0@hm.edu), Lukas Gradl (lgradl@hm.edu)
  */
-@RegisterDistribution(name = "singleSpawn", parameter = SingleSpawnParameter.class)
-public class SingleSpawnDistribution extends VadereDistribution<SingleSpawnParameter> {
+@RegisterDistribution(name = "singleSpawn", parameter = AttributesSingleSpawnDistribution.class)
+public class SingleSpawnDistribution extends VDistribution<AttributesSingleSpawnDistribution> {
+	private Attributes singelspawnAttributes;
 	private int spawnNumber;
 	private double spawnTime;
 	private int remainingSpawnAgents;
 
-	public SingleSpawnDistribution(SingleSpawnParameter parameter, int spawnNumber, RandomGenerator unused)
+	public SingleSpawnDistribution(AttributesSingleSpawnDistribution parameter, int spawnNumber, RandomGenerator unused)
 	        throws Exception {
 		super(parameter, spawnNumber, unused);
 	}
 
 	@Override
-	protected void setValues(SingleSpawnParameter parameter, int spawnNumber, RandomGenerator unused) throws Exception {
+	protected void setValues(AttributesSingleSpawnDistribution parameter, int spawnNumber, RandomGenerator unused) throws Exception {
 		this.spawnTime = parameter.getSpawnTime();
 		this.spawnNumber = parameter.getSpawnNumber();
 	}
@@ -43,5 +45,18 @@ public class SingleSpawnDistribution extends VadereDistribution<SingleSpawnParam
 	@Override
 	public void setRemainingSpawnAgents(int remainingSpawnAgents) {
 		this.remainingSpawnAgents = remainingSpawnAgents;
+	}
+
+	@Override
+	public Attributes getAttributes() {
+		return this.singelspawnAttributes;
+	}
+
+	@Override
+	public void setAttributes(Attributes attributes) {
+		if(attributes instanceof AttributesSingleSpawnDistribution)
+			this.singelspawnAttributes = attributes;
+		else
+			throw new IllegalArgumentException();
 	}
 }

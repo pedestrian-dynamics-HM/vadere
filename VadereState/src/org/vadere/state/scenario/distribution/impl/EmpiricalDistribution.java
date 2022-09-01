@@ -1,29 +1,30 @@
 package org.vadere.state.scenario.distribution.impl;
 
 import org.apache.commons.math3.random.RandomGenerator;
-import org.vadere.state.scenario.distribution.VadereDistribution;
-import org.vadere.state.scenario.distribution.parameter.EmpiricalParameter;
+import org.vadere.state.attributes.Attributes;
+import org.vadere.state.scenario.distribution.VDistribution;
+import org.vadere.state.scenario.distribution.parameter.AttributesEmpiricalDistribution;
 import org.vadere.state.scenario.distribution.registry.RegisterDistribution;
 
 /**
  * @author Aleksandar Ivanov(ivanov0@hm.edu), Lukas Gradl (lgradl@hm.edu)
  */
-@RegisterDistribution(name = "empirical", parameter = EmpiricalParameter.class)
-public class EmpiricalDistribution extends VadereDistribution<EmpiricalParameter> {
-
+@RegisterDistribution(name = "empirical", parameter = AttributesEmpiricalDistribution.class)
+public class EmpiricalDistribution extends VDistribution<AttributesEmpiricalDistribution> {
+	private Attributes empiricalAttributes;
 	private org.apache.commons.math3.random.EmpiricalDistribution distribution;
 	private int spawnNumber;
 	private int remainingSpawnAgents;
 
-	public EmpiricalDistribution(EmpiricalParameter parameter, int spawnNumber, RandomGenerator randomGenerator)
+	public EmpiricalDistribution(AttributesEmpiricalDistribution parameter, int spawnNumber, RandomGenerator randomGenerator)
 	        throws Exception {
 		super(parameter, spawnNumber, randomGenerator);
 	}
 
 	@Override
-	protected void setValues(EmpiricalParameter parameter, int spawnNumber, RandomGenerator randomGenerator) {
+	protected void setValues(AttributesEmpiricalDistribution parameter, int spawnNumber, RandomGenerator randomGenerator) {
 		distribution = new org.apache.commons.math3.random.EmpiricalDistribution(randomGenerator);
-		distribution.load(parameter.getValues());
+		//distribution.load(parameter.getValues());
 		this.spawnNumber = spawnNumber;
 
 	}
@@ -46,5 +47,18 @@ public class EmpiricalDistribution extends VadereDistribution<EmpiricalParameter
 	@Override
 	public void setRemainingSpawnAgents(int remainingSpawnAgents) {
 		this.remainingSpawnAgents = remainingSpawnAgents;
+	}
+
+	@Override
+	public Attributes getAttributes() {
+		return this.empiricalAttributes;
+	}
+
+	@Override
+	public void setAttributes(Attributes attributes) {
+		if(attributes instanceof AttributesEmpiricalDistribution)
+			this.empiricalAttributes = attributes;
+		else
+			throw new IllegalArgumentException();
 	}
 }

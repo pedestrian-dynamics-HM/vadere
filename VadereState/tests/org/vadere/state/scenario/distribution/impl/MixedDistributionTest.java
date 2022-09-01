@@ -12,9 +12,9 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.vadere.state.scenario.distribution.DistributionFactory;
 import org.vadere.state.scenario.distribution.DistributionStub;
-import org.vadere.state.scenario.distribution.VadereDistribution;
-import org.vadere.state.scenario.distribution.VadereDistributionTest;
-import org.vadere.state.scenario.distribution.parameter.MixedParameter;
+import org.vadere.state.scenario.distribution.VDistribution;
+import org.vadere.state.scenario.distribution.VDistributionTest;
+import org.vadere.state.scenario.distribution.parameter.AttributesMixedDistribution;
 import org.vadere.state.scenario.distribution.parameter.MixedParameterDistribution;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -24,17 +24,17 @@ import com.fasterxml.jackson.databind.JsonNode;
  */
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ MixedDistribution.class, DistributionFactory.class })
-public class MixedDistributionTest extends VadereDistributionTest {
+public class MixedDistributionTest extends VDistributionTest {
 
 	RandomGenerator randomGenerator = null;
-	VadereDistribution<?> distStub;
+	VDistribution<?> distStub;
 
 	public MixedDistributionTest() throws Exception {
 		distStub = new DistributionStub(null, 0, randomGenerator);
 	}
 
 	@Override
-	protected VadereDistribution<?> getDistributionUnderTest() throws Exception {
+	protected VDistribution<?> getDistributionUnderTest() throws Exception {
 		MixedParameterDistribution parameterDist = new MixedParameterDistribution();
 		parameterDist.setInterSpawnTimeDistribution("");
 		parameterDist.setDistributionParameters(Mockito.mock(JsonNode.class));
@@ -42,7 +42,7 @@ public class MixedDistributionTest extends VadereDistributionTest {
 		ArrayList<MixedParameterDistribution> dists = new ArrayList<>();
 		dists.add(parameterDist);
 
-		MixedParameter parameter = new MixedParameter();
+		AttributesMixedDistribution parameter = new AttributesMixedDistribution();
 		parameter.setDistributions(dists);
 
 		double[] switchpoints = {};
@@ -60,14 +60,14 @@ public class MixedDistributionTest extends VadereDistributionTest {
 
 	@Override
 	public void testGetSpawnNumber() throws Exception {
-		VadereDistribution<?> dist = getDistributionUnderTest();
+		VDistribution<?> dist = getDistributionUnderTest();
 		int actual = dist.getSpawnNumber(1);
 		assertEquals(distStub.getSpawnNumber(1), actual);
 	}
 
 	@Override
 	public void testRemainingSpawnAgents() throws Exception {
-		VadereDistribution<?> dist = getDistributionUnderTest();
+		VDistribution<?> dist = getDistributionUnderTest();
 		dist.setRemainingSpawnAgents(1);
 		int actual = dist.getRemainingSpawnAgents();
 		assertEquals(distStub.getRemainingSpawnAgents(), actual);
@@ -75,7 +75,7 @@ public class MixedDistributionTest extends VadereDistributionTest {
 
 	@Override
 	public void testGetNextSpawnTime() throws Exception {
-		VadereDistribution<?> dist = getDistributionUnderTest();
+		VDistribution<?> dist = getDistributionUnderTest();
 		double actual = dist.getNextSpawnTime(12);
 		assertEquals(distStub.getNextSpawnTime(12), actual, 0);
 	}

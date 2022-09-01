@@ -2,6 +2,7 @@ package org.vadere.gui.topographycreator.control.celleditor;
 
 import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
 import org.vadere.gui.topographycreator.view.AttributeView;
+import org.vadere.state.attributes.AttributesAttached;
 import org.vadere.state.scenario.ScenarioElement;
 
 import javax.swing.*;
@@ -22,7 +23,7 @@ public class AttributeClassSelector extends AttributeEditor {
 
     private JPanel contentPanel;
 
-    public AttributeClassSelector(Object attached, Field field, TopographyCreatorModel model, Class clazz, JPanel contentReceiver) {
+    public AttributeClassSelector(AttributesAttached attached, Field field, TopographyCreatorModel model, Class clazz, JPanel contentReceiver) {
         super(attached, field, model);
         this.button = new JButton();
         this.button.setText("[null]");
@@ -34,7 +35,7 @@ public class AttributeClassSelector extends AttributeEditor {
                     String selected = button.getText();
                     if (isNoClass(selected)) {
                         try {
-                            Object newObject = constructNewObject();
+                            AttributesAttached newObject = constructNewObject();
                             setFieldValue(newObject);
                             clearContentPanel();
                             button.setText(clazz.getSimpleName());
@@ -88,7 +89,7 @@ public class AttributeClassSelector extends AttributeEditor {
         //this.setSelectedItem(value);
     }
 
-    private void createInternalPropertyPane(Object newObject, TopographyCreatorModel model) {
+    private void createInternalPropertyPane(AttributesAttached newObject, TopographyCreatorModel model) {
         var proppane = AttributeView.buildPage(newObject, model);
         proppane.selectionChange((ScenarioElement) newObject);
         contentPanel.add(proppane, gbc);
@@ -103,8 +104,8 @@ public class AttributeClassSelector extends AttributeEditor {
         contentPanel.removeAll();
     }
 
-    private Object constructNewObject() throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-        Object newObject = clazz.getDeclaredConstructor(null).newInstance(null);
+    private AttributesAttached constructNewObject() throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+        AttributesAttached newObject =(AttributesAttached) clazz.getDeclaredConstructor(null).newInstance(null);
         return newObject;
     }
 

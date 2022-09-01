@@ -1,11 +1,13 @@
 package org.vadere.state.scenario.distribution.parameter;
 
 
+import org.vadere.state.attributes.distributions.AttributesDistribution;
+
 /**
  * @author Lukas Gradl (lgradl@hm.edu)
  */
 
-public class SingleSpawnParameter {
+public class AttributesSingleSpawnDistribution extends AttributesDistribution {
 	public double getSpawnTime() {
 		return spawnTime;
 	}
@@ -14,7 +16,7 @@ public class SingleSpawnParameter {
 		this.spawnTime = spawnTime;
 	}
 
-	double spawnTime;
+	Double spawnTime;
 
 	public int getSpawnNumber() {
 		return spawnNumber;
@@ -24,7 +26,7 @@ public class SingleSpawnParameter {
 		this.spawnNumber = spawnNumber;
 	}
 
-	int spawnNumber;
+	Integer spawnNumber;
 
 
 }

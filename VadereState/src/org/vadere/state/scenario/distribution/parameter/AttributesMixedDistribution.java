@@ -1,20 +1,22 @@
 package org.vadere.state.scenario.distribution.parameter;
 
+import org.vadere.state.attributes.distributions.AttributesDistribution;
+
 import java.util.ArrayList;
 
 /**
  * @author Lukas Gradl (lgradl@hm.edu)
  */
 
-public class MixedParameter {
-	private double[] switchpoints;
+public class AttributesMixedDistribution extends AttributesDistribution {
+	private Double[] switchpoints;
 	private ArrayList<MixedParameterDistribution> distributions;
 
-	public double[] getSwitchpoints() {
+	public Double[] getSwitchpoints() {
 		return switchpoints;
 	}
 
-	public void setSwitchpoints(double[] switchpoints) {
+	public void setSwitchpoints(Double[] switchpoints) {
 		this.switchpoints = switchpoints;
 	}
 

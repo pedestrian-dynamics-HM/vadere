@@ -1,14 +1,16 @@
 package org.vadere.state.scenario.distribution.parameter;
 
+import org.vadere.state.attributes.distributions.AttributesDistribution;
+
 /**
  * @author Lukas Gradl (lgradl@hm.edu)
  */
 
-public class LinearInterpolationParameter {
+public class AttributesLinearInterpolationDistribution extends AttributesDistribution {
 
-	double spawnFrequency;
-	double[] xValues;
-	double[] yValues;
+	Double spawnFrequency;
+	Double[] xValues;
+	Double[] yValues;
 
 
 	public double getSpawnFrequency() {
@@ -20,20 +22,20 @@ public class LinearInterpolationParameter {
 	}
 
 
-	public double[] getxValues() {
+	public Double[] getxValues() {
 		return xValues;
 	}
 
-	public void setxValues(double[] xValues) {
+	public void setxValues(Double[] xValues) {
 		this.xValues = xValues;
 	}
 
 
-	public double[] getyValues() {
+	public Double[] getyValues() {
 		return yValues;
 	}
 
-	public void setyValues(double[] yValues) {
+	public void setyValues(Double[] yValues) {
 		this.yValues = yValues;
 	}
 

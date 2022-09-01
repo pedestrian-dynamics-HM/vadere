@@ -9,9 +9,9 @@ import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
-import org.vadere.state.scenario.distribution.VadereDistribution;
-import org.vadere.state.scenario.distribution.VadereDistributionTest;
-import org.vadere.state.scenario.distribution.parameter.NormalParameter;
+import org.vadere.state.scenario.distribution.VDistribution;
+import org.vadere.state.scenario.distribution.VDistributionTest;
+import org.vadere.state.scenario.distribution.parameter.AttributesNormalDistribution;
 import org.vadere.util.math.TruncatedNormalDistribution;
 
 /**
@@ -19,14 +19,14 @@ import org.vadere.util.math.TruncatedNormalDistribution;
  */
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ NormalDistribution.class })
-public class NormalDistributionTest extends VadereDistributionTest {
+public class NormalDistributionTest extends VDistributionTest {
 
 	@Mock
 	TruncatedNormalDistribution distMock;
 
 	@Override
-	protected VadereDistribution<?> getDistributionUnderTest() throws Exception {
-		NormalParameter parameter = new NormalParameter();
+	protected VDistribution<?> getDistributionUnderTest() throws Exception {
+		AttributesNormalDistribution parameter = new AttributesNormalDistribution();
 		parameter.setMean(1);
 		parameter.setSd(2);
 
@@ -48,7 +48,7 @@ public class NormalDistributionTest extends VadereDistributionTest {
 		Mockito.when(distMock.sample()).thenReturn(sample);
 		double timeCurrentEvent = 1;
 
-		VadereDistribution<?> dist = getDistributionUnderTest();
+		VDistribution<?> dist = getDistributionUnderTest();
 		double actual = dist.getNextSpawnTime(timeCurrentEvent);
 
 		assertEquals(sample + timeCurrentEvent, actual, 0);

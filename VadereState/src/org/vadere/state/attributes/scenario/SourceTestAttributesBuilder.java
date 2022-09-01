@@ -2,7 +2,7 @@ package org.vadere.state.attributes.scenario;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.vadere.state.scenario.distribution.parameter.ConstantParameter;
+import org.vadere.state.scenario.distribution.parameter.AttributesConstantDistribution;
 import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;
@@ -20,7 +20,7 @@ public class SourceTestAttributesBuilder {
 	private boolean useFreeSpaceOnly = false;
 	private boolean spawnAtRandomPositions = false;
 	private String distributionName= "constant";
-	private ConstantParameter parameter = new ConstantParameter();
+	private AttributesConstantDistribution parameter = new AttributesConstantDistribution();
 	private double[] groupSizeDistribution = new double[]{0.0, 0.0, 1.0};
 	private Integer[] groupSizeDistributionMock = new Integer[]{};
 	private int maxSpawnNumberTotal = AttributesSource.NO_MAX_SPAWN_NUMBER_TOTAL;

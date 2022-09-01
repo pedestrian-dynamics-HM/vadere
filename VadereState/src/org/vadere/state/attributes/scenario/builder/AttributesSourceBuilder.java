@@ -1,9 +1,11 @@
 package org.vadere.state.attributes.scenario.builder;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.vadere.state.attributes.Attributes;
+import org.vadere.state.attributes.distributions.AttributesDistribution;
 import org.vadere.state.attributes.scenario.AttributesSource;
+import org.vadere.state.scenario.distribution.VDistribution;
+import org.vadere.state.scenario.distribution.impl.ConstantDistribution;
+import org.vadere.state.scenario.distribution.parameter.AttributesConstantDistribution;
 import org.vadere.state.types.DynamicElementType;
 import org.vadere.util.geometry.shapes.VShape;
 
@@ -13,8 +15,8 @@ import java.util.List;
 
 public final class AttributesSourceBuilder {
 	private VShape shape = null;
-	private String interSpawnTimeDistribution = AttributesSource.CONSTANT_DISTRIBUTION;
-	private JsonNode distributionParameters = AttributesSource.CONSTANT_DISTRIBUTION_PAR; //TODO default parameter ?
+	private VDistribution interSpawnTimeDistribution;
+	private AttributesDistribution distributionParameters = new AttributesConstantDistribution(0.0);
 	private int spawnNumber = 1;
 	private int maxSpawnNumberTotal = AttributesSource.NO_MAX_SPAWN_NUMBER_TOTAL;
 	private double startTime = 0;
@@ -26,11 +28,16 @@ public final class AttributesSourceBuilder {
 	private DynamicElementType dynamicElementType = DynamicElementType.PEDESTRIAN;
 	private int id = Attributes.ID_NOT_SET;
 
-	private AttributesSourceBuilder() {
+	private AttributesSourceBuilder() throws Exception {
+		this.interSpawnTimeDistribution = new ConstantDistribution((AttributesConstantDistribution) distributionParameters,spawnNumber, null);
 	}
 
 	public static AttributesSourceBuilder anAttributesSource() {
-		return new AttributesSourceBuilder();
+		try {
+			return new AttributesSourceBuilder();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public AttributesSourceBuilder shape(VShape shape) {
@@ -38,12 +45,12 @@ public final class AttributesSourceBuilder {
 		return this;
 	}
 
-	public AttributesSourceBuilder interSpawnTimeDistribution(String interSpawnTimeDistribution) {
+	public AttributesSourceBuilder interSpawnTimeDistribution(VDistribution interSpawnTimeDistribution) {
 		this.interSpawnTimeDistribution = interSpawnTimeDistribution;
 		return this;
 	}
 
-	public AttributesSourceBuilder distributionParameters(JsonNode distributionParameters) {
+	public AttributesSourceBuilder distributionParameters(AttributesDistribution distributionParameters) {
 		this.distributionParameters = distributionParameters;
 		return this;
 	}

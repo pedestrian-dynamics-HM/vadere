@@ -10,23 +10,23 @@ import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
-import org.vadere.state.scenario.distribution.VadereDistribution;
-import org.vadere.state.scenario.distribution.VadereDistributionTest;
-import org.vadere.state.scenario.distribution.parameter.NegativeExponentialParameter;
+import org.vadere.state.scenario.distribution.VDistribution;
+import org.vadere.state.scenario.distribution.VDistributionTest;
+import org.vadere.state.scenario.distribution.parameter.AttributesNegativeExponentialDistribution;
 
 /**
  * @author Aleksandar Ivanov(ivanov0@hm.edu)
  */
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ NegativeExponentialDistribution.class })
-public class NegativeExponentialDistributionTest extends VadereDistributionTest {
+public class NegativeExponentialDistributionTest extends VDistributionTest {
 
 	@Mock
 	ExponentialDistribution distMock;
 
 	@Override
-	protected VadereDistribution<?> getDistributionUnderTest() throws Exception {
-		NegativeExponentialParameter parameter = new NegativeExponentialParameter();
+	protected VDistribution<?> getDistributionUnderTest() throws Exception {
+		AttributesNegativeExponentialDistribution parameter = new AttributesNegativeExponentialDistribution();
 		parameter.setMean(0);
 
 		RandomGenerator randomGenerator = null;
@@ -47,7 +47,7 @@ public class NegativeExponentialDistributionTest extends VadereDistributionTest 
 		Mockito.when(distMock.sample()).thenReturn(sample);
 		double timeCurrentEvent = 1;
 
-		VadereDistribution<?> dist = getDistributionUnderTest();
+		VDistribution<?> dist = getDistributionUnderTest();
 		double actual = dist.getNextSpawnTime(timeCurrentEvent);
 
 		assertEquals(sample + timeCurrentEvent, actual, 0);

@@ -1,13 +1,15 @@
 package org.vadere.state.scenario.distribution;
 
 import org.apache.commons.math3.random.RandomGenerator;
+import org.vadere.state.attributes.AttributesAttached;
+import org.vadere.state.attributes.distributions.AttributesDistribution;
 
 /**
  * @author Aleksandar Ivanov(ivanov0@hm.edu), Lukas Gradl (lgradl@hm.edu)
  */
-public abstract class VadereDistribution<T> {
+public abstract class VDistribution<T extends AttributesDistribution> implements AttributesAttached {
 
-	public VadereDistribution(T parameter, int spawnNumber, RandomGenerator randomGenerator) throws Exception {
+	public VDistribution(T parameter, int spawnNumber, RandomGenerator randomGenerator) throws Exception {
 		setValues(parameter, spawnNumber, randomGenerator);
 	}
 

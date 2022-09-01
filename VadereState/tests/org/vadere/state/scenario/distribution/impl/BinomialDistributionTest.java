@@ -9,23 +9,23 @@ import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
-import org.vadere.state.scenario.distribution.VadereDistribution;
-import org.vadere.state.scenario.distribution.VadereDistributionTest;
-import org.vadere.state.scenario.distribution.parameter.BinomialParameter;
+import org.vadere.state.scenario.distribution.VDistribution;
+import org.vadere.state.scenario.distribution.VDistributionTest;
+import org.vadere.state.scenario.distribution.parameter.AttributesBinomialDistribution;
 
 /**
  * @author Aleksandar Ivanov(ivanov0@hm.edu)
  */
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ BinomialDistribution.class })
-public class BinomialDistributionTest extends VadereDistributionTest {
+public class BinomialDistributionTest extends VDistributionTest {
 
 	@Mock
 	org.apache.commons.math3.distribution.BinomialDistribution distMock;
 
 	@Override
-	protected VadereDistribution<?> getDistributionUnderTest() throws Exception {
-		BinomialParameter parameter = new BinomialParameter();
+	protected VDistribution<?> getDistributionUnderTest() throws Exception {
+		AttributesBinomialDistribution parameter = new AttributesBinomialDistribution();
 		parameter.setP(1);
 		parameter.setTrials(2);
 
@@ -48,7 +48,7 @@ public class BinomialDistributionTest extends VadereDistributionTest {
 		Mockito.when(distMock.sample()).thenReturn(sample);
 		double timeCurrentEvent = 1;
 
-		VadereDistribution<?> dist = getDistributionUnderTest();
+		VDistribution<?> dist = getDistributionUnderTest();
 		double actual = dist.getNextSpawnTime(timeCurrentEvent);
 
 		assertEquals(sample + timeCurrentEvent, actual, 0);

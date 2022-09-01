@@ -1,9 +1,10 @@
 package org.vadere.state.scenario.distribution.impl;
 
 import org.apache.commons.math3.random.RandomGenerator;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.scenario.distribution.DistributionFactory;
-import org.vadere.state.scenario.distribution.VadereDistribution;
-import org.vadere.state.scenario.distribution.parameter.MixedParameter;
+import org.vadere.state.scenario.distribution.VDistribution;
+import org.vadere.state.scenario.distribution.parameter.AttributesMixedDistribution;
 import org.vadere.state.scenario.distribution.parameter.MixedParameterDistribution;
 import org.vadere.state.scenario.distribution.registry.RegisterDistribution;
 
@@ -12,20 +13,20 @@ import java.util.ArrayList;
 /**
  * @author Aleksandar Ivanov(ivanov0@hm.edu), Lukas Gradl (lgradl@hm.edu)
  */
-@RegisterDistribution(name = "mixed", parameter = MixedParameter.class)
-public class MixedDistribution extends VadereDistribution<MixedParameter> {
-
-	double[] switchpoints;
-	ArrayList<VadereDistribution<?>> distributions;
+@RegisterDistribution(name = "mixed", parameter = AttributesMixedDistribution.class)
+public class MixedDistribution extends VDistribution<AttributesMixedDistribution> {
+	private Attributes mixedAttributes;
+	Double[] switchpoints;
+	ArrayList<VDistribution<?>> distributions;
 	private int currentInterval = 0;
 
-	public MixedDistribution(MixedParameter parameter, int spawnNumber, RandomGenerator randomGenerator)
+	public MixedDistribution(AttributesMixedDistribution parameter, int spawnNumber, RandomGenerator randomGenerator)
 	        throws Exception {
 		super(parameter, spawnNumber, randomGenerator);
 	}
 
 	@Override
-	protected void setValues(MixedParameter parameter, int spawnNumber, RandomGenerator randomGenerator)
+	protected void setValues(AttributesMixedDistribution parameter, int spawnNumber, RandomGenerator randomGenerator)
 	        throws Exception {
 		if (parameter.getSwitchpoints().length != parameter.getDistributions().size() - 1) {
 			throw new Exception("There should be exactly one switchpoint for"
@@ -42,7 +43,7 @@ public class MixedDistribution extends VadereDistribution<MixedParameter> {
 		this.distributions = new ArrayList<>();
 
 		for (MixedParameterDistribution distribution : distributions) {
-			VadereDistribution<?> dist = DistributionFactory.create(distribution.getInterSpawnTimeDistribution(),
+			VDistribution<?> dist = DistributionFactory.create(distribution.getInterSpawnTimeDistribution(),
 			        distribution.getDistributionParameters(), spawnNumber, randomGenerator);
 			this.distributions.add(dist);
 		}
@@ -68,7 +69,7 @@ public class MixedDistribution extends VadereDistribution<MixedParameter> {
 		distributions.get(currentInterval).setRemainingSpawnAgents(remainingAgents);
 	}
 
-	private VadereDistribution<?> getDistributionByTime(double timeCurrentEvent) {
+	private VDistribution<?> getDistributionByTime(double timeCurrentEvent) {
 		while (!(currentInterval > switchpoints.length - 1) && timeCurrentEvent >= switchpoints[currentInterval]
 		        && !(timeCurrentEvent > switchpoints[switchpoints.length - 1])) {
 			currentInterval++;
@@ -77,8 +78,20 @@ public class MixedDistribution extends VadereDistribution<MixedParameter> {
 		return distributions.get(currentInterval);
 	}
 
-	public VadereDistribution<?> getCurrentDistribution() {
+	public VDistribution<?> getCurrentDistribution() {
 		return distributions.get(currentInterval);
 	}
 
+	@Override
+	public Attributes getAttributes() {
+		return this.mixedAttributes;
+	}
+
+	@Override
+	public void setAttributes(Attributes attributes) {
+		if(attributes instanceof AttributesMixedDistribution)
+			this.mixedAttributes = attributes;
+		else
+			throw new IllegalArgumentException();
+	}
 }

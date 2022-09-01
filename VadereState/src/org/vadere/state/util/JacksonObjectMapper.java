@@ -1,14 +1,17 @@
 package org.vadere.state.util;
 
 import java.io.IOException;
+import java.lang.reflect.ParameterizedType;
 import java.util.List;
 
-import com.fasterxml.jackson.core.TreeNode;
-import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.vadere.state.attributes.scenario.AttributesSource;
-import org.vadere.state.psychology.perception.json.StimulusInfoStore;
-import org.vadere.state.scenario.Source;
+import org.vadere.state.attributes.distributions.AttributesDistribution;
+import org.vadere.state.scenario.distribution.DistributionFactory;
+import org.vadere.state.scenario.distribution.VDistribution;
+import org.vadere.state.scenario.distribution.parameter.AttributesConstantDistribution;
+import org.vadere.state.scenario.distribution.registry.DistributionRegistry;
+import org.vadere.state.scenario.distribution.registry.RegisterDistribution;
 import org.vadere.util.geometry.shapes.ShapeType;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.state.scenario.DynamicElement;
@@ -136,8 +139,55 @@ public class JacksonObjectMapper extends ObjectMapper {
 			}
 		});
 
+		sm.addDeserializer(VDistribution.class, new JsonDeserializer<VDistribution>() {
+			@Override
+			public VDistribution deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JsonProcessingException {
+				JsonNode node = jsonParser.readValueAsTree();
+				String type = node.get("type").asText();
+				JsonNode param = node.get("parameters");
+
+				try {
+					return DistributionFactory.create(type,param,10,null);
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				}
+				//return deserializeVDistribution(jsonParser.readValueAsTree());
+			}
+		});
+		sm.addSerializer(VDistribution.class, new JsonSerializer<VDistribution>() {
+			@Override
+			public void serialize(VDistribution vDistribution, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
+				var mapper = new ObjectMapper();
+				var parentNode = mapper.createObjectNode();
+
+				parentNode.put("type",vDistribution.getClass().getAnnotation(RegisterDistribution.class).name());
+				parentNode.set("parameters",convertValue(vDistribution.getAttributes(),JsonNode.class));
+				jsonGenerator.writeTree(parentNode);
+
+			}
+		});
+
 		registerModule(sm);
 	}
+
+	private VDistribution deserializeVDistribution(JsonNode node){
+		return convertValue(node,VDistributionStore.class).newVDistribution();
+	}
+
+	private static class VDistributionStore{
+		public double distributionName;
+		public AttributesDistribution distributionAttributes;
+
+		public VDistributionStore(){}
+
+		public VDistributionStore(VDistributionStore store){
+			distributionName = store.distributionName;
+			distributionAttributes = store.distributionAttributes;
+		}
+
+		public VDistribution newVDistribution(){return null;}
+	}
+
 
 	private VRectangle deserializeVRectangle(JsonNode node) {
 		return convertValue(node, VRectangleStore.class).newVRectangle();
@@ -200,6 +250,16 @@ public class JacksonObjectMapper extends ObjectMapper {
 
 		public VCircle newVCircle() {
 			return new VCircle(center, radius);
+		}
+	}
+
+	private <T> T map(JsonNode source, Class<T> target) throws Exception {
+		try {
+			return readValue(source.toString(), target);
+		} catch (Exception e) {
+			String name = target.getName();
+			throw new Exception(
+					"An Error occured while parsing" + name + ". Scenario file is misconfigured. Error: " + e);
 		}
 	}
 

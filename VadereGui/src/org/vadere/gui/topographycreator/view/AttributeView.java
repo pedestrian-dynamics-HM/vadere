@@ -1,11 +1,11 @@
 package org.vadere.gui.topographycreator.view;
 
-import org.vadere.gui.components.model.IDefaultModel;
 import org.vadere.gui.components.view.ISelectScenarioElementListener;
 import org.vadere.gui.topographycreator.control.JAttributeTable;
 import org.vadere.gui.topographycreator.control.JCollapsablePanel;
 import org.vadere.gui.topographycreator.model.AttributeTableModel;
 import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
+import org.vadere.state.attributes.AttributesAttached;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.util.reflection.VadereAttribute;
 
@@ -50,13 +50,13 @@ public class AttributeView extends JPanel implements ISelectScenarioElementListe
     public void selectionChange(ScenarioElement scenarioElement) {
         if (scenarioElement != null){
             this.pageView.removeAll();
-            var attributePage = buildPage(scenarioElement.getAttributes(),panelModel);
+            var attributePage = buildPage(scenarioElement,panelModel);
             this.pageView.add(attributePage,BorderLayout.NORTH);
         }
     }
 
-    public static AttributePage buildPage(Object object,TopographyCreatorModel model){
-        var clazz = object.getClass();
+    public static AttributePage buildPage(AttributesAttached object, TopographyCreatorModel model){
+        var clazz = object.getAttributes().getClass();
         var panel = new JPanel(new GridBagLayout());
         var gbc = initGridBagConstraint(1.0);
         getSuperClassHierarchy(clazz)
@@ -65,7 +65,7 @@ public class AttributeView extends JPanel implements ISelectScenarioElementListe
         return new AttributePage(panel,object);
     }
 
-    private static JPanel createPanel(Class baseClass, Object attachedObject,TopographyCreatorModel model) {
+    private static JPanel createPanel(Class baseClass, AttributesAttached object, TopographyCreatorModel model) {
         var gbc = initGridBagConstraint(1.0);
         var fieldsGroupedBySuperClass = getFieldsGroupedBySuperClass(baseClass);
         if (!fieldsGroupedBySuperClass.isEmpty()) {
@@ -76,7 +76,7 @@ public class AttributeView extends JPanel implements ISelectScenarioElementListe
 
             for (var group : groups) {
                 var tableModel = new AttributeTableModel(semanticList.get(group));
-                var table = new JAttributeTable(tableModel,model,attachedObject);
+                var table = new JAttributeTable(tableModel,model,object);
                 /*table.addAttributeListener(new AttributeListener() {
                     @Override
                     public void attributeSelected(Field field) {

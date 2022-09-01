@@ -1,10 +1,10 @@
 package org.vadere.state.scenario;
 
-import org.vadere.state.attributes.Attributes;
+import org.vadere.state.attributes.AttributesAttached;
 import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.geometry.shapes.VShape;
 
-public abstract class ScenarioElement {
+public abstract class ScenarioElement implements AttributesAttached {
 
 	public abstract VShape getShape();
 
@@ -35,9 +35,9 @@ public abstract class ScenarioElement {
 	 */
 	@Override
 	public abstract ScenarioElement clone();
-
+/*
 	public abstract Attributes getAttributes();
 
 	public abstract void setAttributes(Attributes attributes);
-
+*/
 }

@@ -1,11 +1,13 @@
 package org.vadere.state.scenario.distribution.parameter;
 
 
+import org.vadere.state.attributes.distributions.AttributesDistribution;
+
 /**
  * @author Lukas Gradl (lgradl@hm.edu)
  */
 
-public class PoissonParameter {
+public class AttributesPoissonDistribution extends AttributesDistribution {
 	public double getNumberPedsPerSecond() {
 		return numberPedsPerSecond;
 	}
@@ -14,5 +16,5 @@ public class PoissonParameter {
 		this.numberPedsPerSecond = numberPedsPerSecond;
 	}
 
-	double numberPedsPerSecond;
+	Double numberPedsPerSecond;
 }

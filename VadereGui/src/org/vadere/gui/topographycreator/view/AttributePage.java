@@ -12,7 +12,7 @@ public class AttributePage extends JScrollPane implements ISelectScenarioElement
    private Observable observable;
     public AttributePage(JComponent component,Object object){
         super(component);
-        this.observable = new Observable();
+        /*this.observable = new Observable();
 
         var rootComponent = (JPanel)component.getComponent(0);
 
@@ -20,7 +20,7 @@ public class AttributePage extends JScrollPane implements ISelectScenarioElement
             if ( comp instanceof Observer){
                 observable.addObserver((Observer) comp);
             }
-        }
+        }*/
     }
     @Override
     public void selectionChange(ScenarioElement scenarioElement) {

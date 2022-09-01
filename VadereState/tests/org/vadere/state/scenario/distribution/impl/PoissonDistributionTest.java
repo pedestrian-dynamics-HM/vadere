@@ -10,23 +10,23 @@ import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
-import org.vadere.state.scenario.distribution.VadereDistribution;
-import org.vadere.state.scenario.distribution.VadereDistributionTest;
-import org.vadere.state.scenario.distribution.parameter.PoissonParameter;
+import org.vadere.state.scenario.distribution.VDistribution;
+import org.vadere.state.scenario.distribution.VDistributionTest;
+import org.vadere.state.scenario.distribution.parameter.AttributesPoissonDistribution;
 
 /**
  * @author Aleksandar Ivanov(ivanov0@hm.edu)
  */
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ PoissonDistribution.class })
-public class PoissonDistributionTest extends VadereDistributionTest {
+public class PoissonDistributionTest extends VDistributionTest {
 
 	@Mock
 	ExponentialDistribution distMock;
 
 	@Override
-	protected VadereDistribution<?> getDistributionUnderTest() throws Exception {
-		PoissonParameter parameter = new PoissonParameter();
+	protected VDistribution<?> getDistributionUnderTest() throws Exception {
+		AttributesPoissonDistribution parameter = new AttributesPoissonDistribution();
 		parameter.setNumberPedsPerSecond(0);
 
 		RandomGenerator randomGenerator = null;
@@ -47,7 +47,7 @@ public class PoissonDistributionTest extends VadereDistributionTest {
 		Mockito.when(distMock.sample()).thenReturn(sample);
 		double timeCurrentEvent = 1;
 
-		VadereDistribution<?> dist = getDistributionUnderTest();
+		VDistribution<?> dist = getDistributionUnderTest();
 		double actual = dist.getNextSpawnTime(timeCurrentEvent);
 
 		assertEquals(sample + timeCurrentEvent, actual, 0);

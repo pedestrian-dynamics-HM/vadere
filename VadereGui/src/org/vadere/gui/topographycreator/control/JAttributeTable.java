@@ -6,6 +6,8 @@ import org.vadere.gui.topographycreator.control.cellrenderer.FieldNameRenderer;
 import org.vadere.gui.topographycreator.control.cellrenderer.FieldValueRenderer;
 import org.vadere.gui.topographycreator.model.AttributeTableModel;
 import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
+import org.vadere.state.attributes.AttributesAttached;
+import org.vadere.util.observer.NotifyContext;
 
 import javax.swing.*;
 import java.awt.*;
@@ -20,7 +22,7 @@ public class JAttributeTable extends JPanel implements Observer {
     /**
      *
      */
-    private Object attached;
+    private AttributesAttached attached;
     private List<JComponent> tableComponents;
 
     /**
@@ -56,11 +58,13 @@ public class JAttributeTable extends JPanel implements Observer {
         this.setVisible(true);
     }
 
-    public JAttributeTable(AttributeTableModel attrmodel,TopographyCreatorModel topmodel, Object object){
+    public JAttributeTable(AttributeTableModel attrmodel, TopographyCreatorModel topmodel, AttributesAttached object){
         this();
         this.attached = object;
         setModel(attrmodel,topmodel);
-        updateView(object);
+        updateView();
+        this.fieldValueRendere.setEditors(this.editorObjects);
+        this.fieldValueEditor.set(this.editorObjects);
         this.attributeListeners = new ArrayList<>();
     }
     private void registerDefaultEditors() {
@@ -187,7 +191,7 @@ public class JAttributeTable extends JPanel implements Observer {
         this.tableComponents.add(panel);
         try {
             this.nameFields.put(field.getName(), field);
-            var component = (JComponent) constrClass.getDeclaredConstructor(Object.class,Field.class, TopographyCreatorModel.class,ArrayList.class,JPanel.class).newInstance(attached,field,model,subClass,panel);
+            var component = (JComponent) constrClass.getDeclaredConstructor(AttributesAttached.class,Field.class, TopographyCreatorModel.class,ArrayList.class,JPanel.class).newInstance(attached,field,model,subClass,panel);
             insertComponentIntoMap(field, component);
         } catch (InstantiationException e) {
             throw new RuntimeException(e);
@@ -243,8 +247,8 @@ public class JAttributeTable extends JPanel implements Observer {
         ((JComboBox)this.editorObjects.get(field.getName())).setModel(new DefaultComboBoxModel(values));
     }
 
-    private static AttributeEditor createNewInstanceOf(Class constrClass,Object attached,Field field, TopographyCreatorModel model) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-        AttributeEditor component = (AttributeEditor) constrClass.getDeclaredConstructor(Object.class,Field.class,TopographyCreatorModel.class).newInstance(attached,field,model);
+    private static AttributeEditor createNewInstanceOf(Class constrClass, AttributesAttached attached, Field field, TopographyCreatorModel model) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+        AttributeEditor component = (AttributeEditor) constrClass.getDeclaredConstructor(AttributesAttached.class,Field.class,TopographyCreatorModel.class).newInstance(attached,field,model);
         return component;
     }
 
@@ -259,17 +263,17 @@ public class JAttributeTable extends JPanel implements Observer {
         }
     }
 
-    public void updateView(Object attached){
-        this.attached = attached;
-        this.fieldValueRendere.setEditors(this.editorObjects);
-        this.fieldValueEditor.set(this.editorObjects,attached);
+    public void updateView(){
+        //this.attached = attached;
+        //this.fieldValueRendere.setEditors(this.editorObjects);
+        //this.fieldValueEditor.set(this.editorObjects,attached);
         for( var fielName : nameFields.keySet()) {
             var component = (AttributeEditor) editorObjects.get(fielName);
             var field = nameFields.get(fielName);
             field.setAccessible(true);
             try {
-                if(field.get(attached) != null) {
-                    component.updateValueFromModel(field.get(attached));
+                if(field.get(attached.getAttributes()) != null) {
+                    component.updateValueFromModel(field.get(attached.getAttributes()));
                 }
             } catch (IllegalAccessException e) {
             }
@@ -280,7 +284,13 @@ public class JAttributeTable extends JPanel implements Observer {
     @Override
     public void update(Observable o, Object arg) {
         var model = (TopographyCreatorModel)o;
-        updateView(model.getSelectedElement().getAttributes());
+        if(arg instanceof NotifyContext){
+            var ctx = (NotifyContext)arg;
+            if(!ctx.getNotifyContext().equals(AttributeEditor.class)){
+                updateView();
+            }
+        }
+
 
     }
 

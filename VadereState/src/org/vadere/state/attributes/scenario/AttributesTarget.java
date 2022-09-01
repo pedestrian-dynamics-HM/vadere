@@ -11,21 +11,12 @@ import org.vadere.util.reflection.VadereAttribute;
  * Attributes of a target area, used by TargetController in VadereSimulation.
  * 
  */
-public class AttributesTarget extends AttributesEmbedShape {
+public class AttributesTarget extends AttributesVisualElement {
 
 	@VadereAttribute
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
-	private Integer id = ID_NOT_SET;
-	/**
-	 * True: elements are removed from the simulation after entering.
-	 * False: the target id is removed from the target id list, but the element remains.
-	 */
-	@VadereAttribute
-	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
 	private Boolean absorbing = true;
-	/** Shape and position. */
-	@VadereAttribute
-	private VShape shape;
+
 	/**
 	 * Waiting time in seconds on this area.
 	 * If "individualWaiting" is true, then each element waits the given time on this area before
@@ -117,20 +108,6 @@ public class AttributesTarget extends AttributesEmbedShape {
 		return absorbing;
 	}
 
-	public int getId() {
-		return id;
-	}
-
-	@Override
-	public void setShape(VShape shape) {
-		this.shape = shape;
-	}
-
-	@Override
-	public VShape getShape() {
-		return shape;
-	}
-
 	public double getWaitingTime() {
 		return waitingTime;
 	}
@@ -163,11 +140,6 @@ public class AttributesTarget extends AttributesEmbedShape {
 	public void setReachedDistance(double reachedDistance) {
 		checkSealed();
 		this.deletionDistance = reachedDistance;
-	}
-
-	public void setId(int id) {
-		checkSealed();
-		this.id = id;
 	}
 
 	public void setAbsorbing(boolean absorbing) {

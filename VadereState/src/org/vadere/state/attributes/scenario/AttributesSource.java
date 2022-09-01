@@ -1,33 +1,27 @@
 package org.vadere.state.attributes.scenario;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.JsonNode;
-import org.apache.commons.math3.random.JDKRandomGenerator;
-import org.vadere.state.attributes.AttributesEmbedShape;
-import org.vadere.state.scenario.distribution.DistributionFactory;
-import org.vadere.state.scenario.distribution.VadereDistribution;
+import org.vadere.state.attributes.distributions.AttributesDistribution;
+import org.vadere.state.scenario.distribution.VDistribution;
+import org.vadere.state.scenario.distribution.parameter.AttributesConstantDistribution;
 import org.vadere.state.types.DynamicElementType;
 import org.vadere.state.util.StateJsonConverter;
 import org.vadere.state.util.Views;
 import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.util.reflection.VadereAttribute;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-public class AttributesSource extends AttributesEmbedShape {
+public class AttributesSource extends AttributesVisualElement {
 
 	public static final String CONSTANT_DISTRIBUTION = "constant";
 	public static final int NO_MAX_SPAWN_NUMBER_TOTAL = -1;
 	public static final JsonNode CONSTANT_DISTRIBUTION_PAR = StateJsonConverter.createObjectNode().put("updateFrequency", 1.0);
-
-	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
-	private int id = ID_NOT_SET;
-
-	/** Shape and position. */
-	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
-	private VShape shape = null;
 
 	/**
 	 *  Distribution types:
@@ -42,8 +36,9 @@ public class AttributesSource extends AttributesEmbedShape {
 	 *  "singleSpawn",
 	 *  "timeSeries"
 	 */
+	//@VadereAttribute
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
-	private String interSpawnTimeDistribution = CONSTANT_DISTRIBUTION;
+	private VDistribution interSpawnTimeDistribution;
 
 
 	/**
@@ -59,36 +54,44 @@ public class AttributesSource extends AttributesEmbedShape {
 	 *  "singleSpawn", "spawnTime" : 3.0
 	 *  "timeSeries" -> "intervalLength":1.2, "spawnsPerInterval" : [2,0,0,2,0,0]
 	 */
+	@VadereAttribute
+	@JsonIgnore
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
-	private JsonNode distributionParameters = CONSTANT_DISTRIBUTION_PAR;
+	private AttributesDistribution distributionParameters = new AttributesConstantDistribution(0.0);
 
+	@VadereAttribute
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
-	private int spawnNumber = 1;
+	private Integer spawnNumber = 1;
 
+	@VadereAttribute
 	/** Maximum number of spawned elements. {@link #NO_MAX_SPAWN_NUMBER_TOTAL} -> no maximum number. */
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
-	private int maxSpawnNumberTotal = NO_MAX_SPAWN_NUMBER_TOTAL;
+	private Integer maxSpawnNumberTotal = NO_MAX_SPAWN_NUMBER_TOTAL;
 
+	@VadereAttribute
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
-	private double startTime = 0;
+	private Double startTime = 0.0;
 	/** endTime == startTime means one single spawn event. */
+	@VadereAttribute
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
-	private double endTime = 0;
+	private Double endTime = 0.0;
 	
 	/**
 	 * The pedestrians are spawned at random positions rather than from the top
 	 * left corner downwards.
 	 */
+	@VadereAttribute
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
-	private boolean spawnAtRandomPositions;
+	private Boolean spawnAtRandomPositions;
 
 
 	/**
 	 * If set to true, the pedestrians are spawned on a rectangular grid for the cellular automaton. Different to the
 	 * regular spawnArray, they will touch if the cells are 0.4m and the radius is set to 0.2m.
 	 */
+	@VadereAttribute
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
-	private boolean spawnAtGridPositionsCA;
+	private Boolean spawnAtGridPositionsCA;
 
 	/**
 	 * If set to true, only free space is used to create pedestrians at each
@@ -99,8 +102,10 @@ public class AttributesSource extends AttributesEmbedShape {
 	 * useFreeSpaceOnly = false can cause errors if tow pedestrians arw spawned at
 	 * exactly the same place. Maybe Deprecate this switch.
 	 */
+	@VadereAttribute
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
-	private boolean useFreeSpaceOnly = true;
+	private Boolean useFreeSpaceOnly = true;
+	@VadereAttribute
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
 	private List<Integer> targetIds = new LinkedList<>();
 
@@ -152,11 +157,11 @@ public class AttributesSource extends AttributesEmbedShape {
 	 * @see Class#getName()
 	 *  https://commons.apache.org/proper/commons-math/apidocs/org/apache/commons/math3/distribution/package-summary.html
 	 */
-	public String getInterSpawnTimeDistribution() {
+	public VDistribution getInterSpawnTimeDistribution() {
 		return interSpawnTimeDistribution;
 	}
 
-	public JsonNode getDistributionParameters() {
+	public AttributesDistribution getDistributionParameters() {
 		return distributionParameters;
 	}
 
@@ -236,12 +241,12 @@ public class AttributesSource extends AttributesEmbedShape {
 		endTime = time;
 	}
 
-	public void setDistributionParameters(JsonNode distributionParameters) {
+	public void setDistributionParameters(AttributesDistribution distributionParameters) {
 		checkSealed();
 		this.distributionParameters = distributionParameters;
 	}
 
-	public void setInterSpawnTimeDistribution(String interSpawnTimeDistribution) {
+	public void setInterSpawnTimeDistribution(VDistribution interSpawnTimeDistribution) {
 		checkSealed();
 		this.interSpawnTimeDistribution = interSpawnTimeDistribution;
 	}
@@ -293,12 +298,12 @@ public class AttributesSource extends AttributesEmbedShape {
 	@Override
 	public void check() throws IOException {
 		try {
-			VadereDistribution<?> distribution = DistributionFactory.create(
+			/*VadereDistribution<?> distribution = DistributionFactory.create(
 					this.getInterSpawnTimeDistribution(),
 					this.getDistributionParameters(),
 					this.getSpawnNumber(),
 					new JDKRandomGenerator(42)
-			);
+			);*/
 		} catch (Exception e) {
 			throw new IOException("Cannot build " + this.getInterSpawnTimeDistribution());
 		}

@@ -11,6 +11,7 @@ import org.vadere.gui.components.model.IDefaultModel;
 import org.vadere.gui.projectview.view.JsonValidIndicator;
 import org.vadere.gui.projectview.view.ProjectView;
 import org.vadere.gui.projectview.view.ScenarioPanel;
+import org.vadere.gui.topographycreator.control.celleditor.AttributeEditor;
 import org.vadere.gui.topographycreator.model.AgentWrapper;
 import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
 import org.vadere.state.attributes.Attributes;
@@ -197,9 +198,9 @@ public class ScenarioElementView extends JPanel implements ISelectScenarioElemen
 	public void update(Observable o, Object arg) {
 		if (arg instanceof NotifyContext) {
 			var ctx = (NotifyContext) arg;
-			if (ctx.getNotifyContext().equals(this.getClass())) return;
-		}else{
-			selectionChange(panelModel.getSelectedElement());
+			if (ctx.getNotifyContext().equals(AttributeEditor.class)) {
+				SwingUtilities.invokeLater(()->selectionChange(panelModel.getSelectedElement()));
+			}
 		}
 	}
 }

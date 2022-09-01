@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Set;
 
 import org.reflections.Reflections;
-import org.vadere.state.scenario.distribution.VadereDistribution;
+import org.vadere.state.scenario.distribution.VDistribution;
 
 /**
  * @author Aleksandar Ivanov(ivanov0@hm.edu)
@@ -35,9 +35,9 @@ public class DistributionRegistry {
 		distributions.forEach(clazz -> {
 			RegisterDistribution annotation = clazz.getAnnotation(RegisterDistribution.class);
 
-			if (VadereDistribution.class.isAssignableFrom(clazz)) {
+			if (VDistribution.class.isAssignableFrom(clazz)) {
 				@SuppressWarnings("unchecked") // safe to cast because clazz extends VadereDistribution
-				Class<? extends VadereDistribution<?>> vadereDistributionclazz = (Class<? extends VadereDistribution<?>>) clazz;
+				Class<? extends VDistribution<?>> vadereDistributionclazz = (Class<? extends VDistribution<?>>) clazz;
 				RegisteredDistribution a = new RegisteredDistribution(annotation.parameter(), vadereDistributionclazz);
 				registry.put(annotation.name(), a);
 			}

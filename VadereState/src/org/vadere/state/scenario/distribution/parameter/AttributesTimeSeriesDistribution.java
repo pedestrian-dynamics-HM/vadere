@@ -1,13 +1,15 @@
 package org.vadere.state.scenario.distribution.parameter;
 
+import org.vadere.state.attributes.distributions.AttributesDistribution;
+
 /**
  * @author Lukas Gradl (lgradl@hm.edu)
  */
 
-public class TimeSeriesParameter {
+public class AttributesTimeSeriesDistribution extends AttributesDistribution {
 
-	double intervalLength;
-	int[] spawnsPerInterval;
+	Double intervalLength;
+	Integer[] spawnsPerInterval;
 
 	public double getIntervalLength() {
 		return intervalLength;
@@ -17,11 +19,11 @@ public class TimeSeriesParameter {
 		this.intervalLength = intervalLength;
 	}
 
-	public int[] getSpawnsPerInterval() {
+	public Integer[] getSpawnsPerInterval() {
 		return spawnsPerInterval;
 	}
 
-	public void setSpawnsPerInterval(int[] spawnsPerInterval) {
+	public void setSpawnsPerInterval(Integer[] spawnsPerInterval) {
 		this.spawnsPerInterval = spawnsPerInterval;
 	}
 

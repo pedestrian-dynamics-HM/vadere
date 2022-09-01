@@ -38,7 +38,7 @@ public class DistributionFactoryTest {
 		JsonNode parametersMock = Mockito.mock(JsonNode.class);
 
 		// Call
-		VadereDistribution<?> actual = DistributionFactory.create(name, parametersMock, 1, null);
+		VDistribution<?> actual = DistributionFactory.create(name, parametersMock, 1, null);
 
 		// Verify
 		PowerMockito.verifyNew(ObjectMapper.class).withNoArguments();

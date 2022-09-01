@@ -5,7 +5,7 @@ import org.apache.commons.math3.random.RandomGenerator;
 /**
  * @author Aleksandar Ivanov(ivanov0@hm.edu)
  */
-public class DistributionStub extends VadereDistribution<Object> {
+public class DistributionStub extends VDistribution<Object> {
 
 	public DistributionStub(Object parameter, int spawnNumber, RandomGenerator randomGenerator) throws Exception {
 		super(parameter, spawnNumber, randomGenerator);

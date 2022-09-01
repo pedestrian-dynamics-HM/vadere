@@ -3,8 +3,9 @@ package org.vadere.state.scenario.distribution.impl;
 import org.apache.commons.math3.analysis.interpolation.LinearInterpolator;
 import org.apache.commons.math3.analysis.polynomials.PolynomialSplineFunction;
 import org.apache.commons.math3.random.RandomGenerator;
-import org.vadere.state.scenario.distribution.VadereDistribution;
-import org.vadere.state.scenario.distribution.parameter.LinearInterpolationParameter;
+import org.vadere.state.attributes.Attributes;
+import org.vadere.state.scenario.distribution.VDistribution;
+import org.vadere.state.scenario.distribution.parameter.AttributesLinearInterpolationDistribution;
 import org.vadere.state.scenario.distribution.registry.RegisterDistribution;
 import org.vadere.util.math.TruncatedNormalDistribution;
 
@@ -12,20 +13,20 @@ import org.vadere.util.math.TruncatedNormalDistribution;
  * @author Aleksandar Ivanov(ivanov0@hm.edu), Lukas Gradl (lgradl@hm.edu),
  *         Daniel Lehmberg
  */
-@RegisterDistribution(name = "linearInterpolation", parameter = LinearInterpolationParameter.class)
-public class LinearInterpolationDistribution extends VadereDistribution<LinearInterpolationParameter> {
-
+@RegisterDistribution(name = "linearInterpolation", parameter = AttributesLinearInterpolationDistribution.class)
+public class LinearInterpolationDistribution extends VDistribution<AttributesLinearInterpolationDistribution> {
+	private Attributes lerpAttributes;
 	private PolynomialSplineFunction interpolator;
 	private double spawnFrequency;
 	private TruncatedNormalDistribution truncNormalDist;
 
-	public LinearInterpolationDistribution(LinearInterpolationParameter parameter, int spawnNumber,
-	        RandomGenerator randomGenerator) throws Exception {
+	public LinearInterpolationDistribution(AttributesLinearInterpolationDistribution parameter, int spawnNumber,
+										   RandomGenerator randomGenerator) throws Exception {
 		super(parameter, spawnNumber, randomGenerator);
 	}
 
 	@Override
-	protected void setValues(LinearInterpolationParameter parameter, int unused, RandomGenerator randomGenerator) {
+	protected void setValues(AttributesLinearInterpolationDistribution parameter, int unused, RandomGenerator randomGenerator) {
 		// Most correctness is checked in LinearInterpolator
 		// double[] xValues = {0., 200., 400, 600, 700, 800};
 		// double[] yValues = {3., 8., 2., 10, 0, 0};
@@ -71,4 +72,16 @@ public class LinearInterpolationDistribution extends VadereDistribution<LinearIn
 		// do nothing
 	}
 
+	@Override
+	public Attributes getAttributes() {
+		return this.lerpAttributes;
+	}
+
+	@Override
+	public void setAttributes(Attributes attributes) {
+		if(attributes instanceof AttributesLinearInterpolationDistribution)
+			this.lerpAttributes = attributes;
+		else
+			throw new IllegalArgumentException();
+	}
 }
