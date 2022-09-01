@@ -1,5 +1,6 @@
 package org.vadere.state.attributes.scenario;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -81,6 +82,7 @@ public class AttributesTarget extends AttributesVisualElement {
 	 *  <li>"TimeSeriesParameter"			[{@link TimeSeriesParameter}]</li>
 	 *  </ul>
 	 */
+	@JsonIgnore
 	private JsonNode distributionParameters ;
 
 	private Double deletionDistance = 0.1;

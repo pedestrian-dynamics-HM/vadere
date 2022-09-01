@@ -1,6 +1,7 @@
 package org.vadere.gui.projectview.view;
 
 
+import com.formdev.flatlaf.FlatLightLaf;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.postvisualization.control.Player;
@@ -70,13 +71,13 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 	 * different methods, maybe only store these as members?
 	 */
 	private JPanel contentPane = new JPanel();
-	private JPanel controlPanel = new JPanel();
+	private JPanel controlPanel = new JPanel(new GridBagLayout());
 	private JSplitPane mainSplitPanel = new JSplitPane();
 	private VTable scenarioTable;
 	private VTable outputTable;
-	private JButton btnRunSelectedScenario;
-	private JButton btnRunRepeatedlyScenario;
-	private JButton btnRunAllScenarios;
+	private JToggleButton btnRunSelectedScenario;
+	private JToggleButton btnRunRepeatedlyScenario;
+	private JToggleButton btnRunAllScenarios;
 	private JButton btnStopRunningScenarios;
 	private JButton btnPauseRunningScenarios;
 	private JButton btnNextSimulationStep;
@@ -238,6 +239,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 					| IllegalAccessException e) {
 				IOUtils.errorBox("The system look and feel could not be loaded.", "Error setLookAndFeel");
 			}
+			FlatLightLaf.setup();
 			// show GUI
 			ProjectViewModel model = new ProjectViewModel();
 			ProjectView frame = new ProjectView(model);
@@ -521,7 +523,6 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		panel_1.setLayout(new BorderLayout(0, 0));
 
 		panel_1.add(progressPanel, BorderLayout.SOUTH);
-		progressPanel.setLayout(new GridLayout(1, 0, 0, 0));
 
 		progressPanel.setData(Messages.getString("ProgressPanelDone.text"), 100);
 
@@ -531,11 +532,12 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		buildScenarioTable(outputTableRenderer);
 
 		buildOutputTable(outputTableRenderer);
-
 		JSplitPane splitPane = new JSplitPane();
+		JPanel panelContainer = new JPanel(new BorderLayout());
+		panelContainer.add(splitPane);
 		splitPane.setResizeWeight(0.6);
 		splitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
-		panel_1.add(splitPane, BorderLayout.WEST);
+		panel_1.add(splitPane, BorderLayout.CENTER);
 
 		JScrollPane scrollPanel = new JScrollPane(scenarioTable);
 		splitPane.setLeftComponent(scrollPanel);
@@ -546,8 +548,8 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		scrollPanel_output.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
 		panel_1.add(controlPanel, BorderLayout.NORTH);
-		FlowLayout fl_controlPanel = (FlowLayout) controlPanel.getLayout();
-		fl_controlPanel.setAlignment(FlowLayout.LEFT);
+		//FlowLayout fl_controlPanel = (FlowLayout) controlPanel.getLayout();
+		//fl_controlPanel.setAlignment(FlowLayout.LEFT);
 
 		JPanel panel_2 = buildRightSidePanel();
 
@@ -560,13 +562,13 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 				}
 			}
 		});
-		mainSplitPanel.setResizeWeight(0.4);
+		mainSplitPanel.setResizeWeight(0.5);
 		mainSplitPanel.setOrientation(JSplitPane.HORIZONTAL_SPLIT);
-		JScrollPane panel_1_scroll = new JScrollPane(panel_1);
-		panel_1_scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+		//JScrollPane panel_1_scroll = new JScrollPane(panel_1);
+		//panel_1_scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
 		panel_1.setMinimumSize(new Dimension(1, 1));
 		panel_2.setMinimumSize(new Dimension(1, 1));
-		mainSplitPanel.setLeftComponent(panel_1_scroll);
+		mainSplitPanel.setLeftComponent(panel_1);
 		mainSplitPanel.setRightComponent(panel_2);
 		mainSplitPanel.resetToPreferredSizes();
 		contentPane.add(mainSplitPanel, BorderLayout.CENTER);
@@ -736,37 +738,39 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 
 	private void buildToolBar() {
 		JToolBar toolBar = new JToolBar();
-		controlPanel.add(toolBar);
+		toolBar.setLayout(new FlowLayout(FlowLayout.CENTER));
+		controlPanel.add(toolBar,initializeConstraints());
 
 		ButtonGroup mainButtonsGroup = new ButtonGroup();
 
 		Action runAllScenariosAction =
-				new ActionRunAllScenarios(Messages.getString("ProjectView.btnRunAllTests.text"), model);
+				new ActionRunAllScenarios(null, model);
+		runAllScenariosAction.putValue(Action.SHORT_DESCRIPTION,Messages.getString("ProjectView.btnRunAllTests.text"));
 		runAllScenariosAction.putValue(Action.LARGE_ICON_KEY,
 				new ImageIcon(ProjectView.class.getResource("/icons/greenarrows_right_small.png")));
-		btnRunAllScenarios = new JButton(runAllScenariosAction);
+		btnRunAllScenarios = new JToggleButton(runAllScenariosAction);
 		toolBar.add(btnRunAllScenarios);
 		addToProjectSpecificActions(runAllScenariosAction);
 		mainButtonsGroup.add(btnRunAllScenarios);
 
 		ActionRunSelectedScenarios runSelectedScenarios = new ActionRunSelectedScenarios(
-				Messages.getString("ProjectView.mntmRunSelectedTests.text"), model, scenarioTable);
+				null, model, scenarioTable);
 		runSelectedScenarios.putValue(Action.SHORT_DESCRIPTION,
 				Messages.getString("ProjectView.btnRunSelectedTest.toolTipText"));
 		runSelectedScenarios.putValue(Action.LARGE_ICON_KEY,
 				new ImageIcon(ProjectView.class.getResource("/icons/greenarrow_right_small.png")));
-		btnRunSelectedScenario = new JButton(runSelectedScenarios);
+		btnRunSelectedScenario = new JToggleButton(runSelectedScenarios);
 		toolBar.add(btnRunSelectedScenario);
 		addToProjectSpecificActions(runSelectedScenarios);
 		mainButtonsGroup.add(btnRunSelectedScenario);
 
 		ActionRunRepeatedlyScenarios runRepeatedlyScenarios = new ActionRunRepeatedlyScenarios(
-				Messages.getString("ProjectView.mntmRunRepeatedlyTests.text"), model, scenarioTable, n_repetitions);
+				"x10", model, scenarioTable, n_repetitions);
 		runRepeatedlyScenarios.putValue(Action.SHORT_DESCRIPTION,
 				Messages.getString("ProjectView.btnRunRepeatedlyTest.toolTipText"));
 		runRepeatedlyScenarios.putValue(Action.LARGE_ICON_KEY,
 				new ImageIcon(ProjectView.class.getResource("/icons/greenarrow_right_small.png")));
-		btnRunRepeatedlyScenario = new JButton(runRepeatedlyScenarios);
+		btnRunRepeatedlyScenario = new JToggleButton(runRepeatedlyScenarios);
 		toolBar.add(btnRunRepeatedlyScenario);
 		addToProjectSpecificActions(runRepeatedlyScenarios);
 		mainButtonsGroup.add(btnRunRepeatedlyScenario);
@@ -875,5 +879,15 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		if (mainSplitPanel.getDividerLocation() > max_div) {
 			mainSplitPanel.setDividerLocation(max_div);
 		}
+	}
+
+	private static GridBagConstraints initializeConstraints() {
+		var gbc = new GridBagConstraints();
+		gbc.gridwidth = GridBagConstraints.REMAINDER;
+		gbc.gridheight = GridBagConstraints.REMAINDER;
+		gbc.anchor = GridBagConstraints.PAGE_START;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.weightx = 1;
+		return gbc;
 	}
 }
