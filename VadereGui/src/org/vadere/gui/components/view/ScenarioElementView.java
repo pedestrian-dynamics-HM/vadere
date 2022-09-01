@@ -18,10 +18,13 @@ import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.logging.Logger;
+import org.vadere.util.observer.NotifyContext;
 
 import java.awt.*;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Observable;
+import java.util.Observer;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -30,7 +33,7 @@ import javax.swing.event.DocumentListener;
 /**
  * The ScenarioElementView display's a ScenarioElement in JSON-Format.
  */
-public class ScenarioElementView extends JPanel implements ISelectScenarioElementListener {
+public class ScenarioElementView extends JPanel implements ISelectScenarioElementListener,Observer {
 
 	private static final long serialVersionUID = -1567362675580536991L;
 	private static Logger logger = Logger.getLogger(ScenarioElementView.class);
@@ -39,6 +42,7 @@ public class ScenarioElementView extends JPanel implements ISelectScenarioElemen
 	private DocumentListener documentListener;
 
 	private JsonValidIndicator jsonValidIndicator;
+
 
 	public ScenarioElementView(final IDefaultModel defaultModel) {
 		this(defaultModel,null, null);
@@ -152,7 +156,7 @@ public class ScenarioElementView extends JPanel implements ISelectScenarioElemen
 				}
 			}
 			panelModel.setElementHasChanged(element);
-			panelModel.notifyObservers();
+			panelModel.notifyObservers(new NotifyContext(this.getClass()));
 		}
 	}
 
@@ -186,6 +190,16 @@ public class ScenarioElementView extends JPanel implements ISelectScenarioElemen
 							.serializeObjectPretty(scenarioElement.getAttributes()));
 				}
 			}
+		}
+	}
+
+	@Override
+	public void update(Observable o, Object arg) {
+		if (arg instanceof NotifyContext) {
+			var ctx = (NotifyContext) arg;
+			if (ctx.getNotifyContext().equals(this.getClass())) return;
+		}else{
+			selectionChange(panelModel.getSelectedElement());
 		}
 	}
 }

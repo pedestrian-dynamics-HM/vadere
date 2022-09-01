@@ -133,17 +133,20 @@ public class TopographyWindow extends JPanel {
 
 		JsonValidIndicator jsonValidIndicator = new JsonValidIndicator();
 		ScenarioElementView scenarioElementView = new ScenarioElementView(panelModel, jsonValidIndicator, selectedElementLabel);
+		AttributeView attributeView = new AttributeView(panelModel);
 		TopographyTreeView topographyTreeView = new TopographyTreeView(panelModel);
 
+		panelModel.addObserver(scenarioElementView);
 		final JPanel thisPanel = this;
 
 		// TabbedPane
 		tabbedInfoPanel = new JTabbedPane(SwingConstants.TOP);
-		tabbedInfoPanel.addTab("SelectedElment", scenarioElementView);
+		tabbedInfoPanel.addTab("SelectedElement", scenarioElementView);
+		tabbedInfoPanel.addTab("Attribute Table", attributeView);
 		tabbedInfoPanel.addTab("ElementTree", topographyTreeView);
 		tabbedInfoPanel.addChangeListener(e ->{
 			int index = tabbedInfoPanel.getSelectedIndex();
-			if (index == 1){
+			if (index == tabbedInfoPanel.indexOfComponent(scenarioElementView)){
 				topographyTreeView.update(null, null);
 			}
 
@@ -211,6 +214,7 @@ public class TopographyWindow extends JPanel {
 		panelModel.addScaleChangeListener(mainPanel);
 		panelModel.addObserver(mainPanel);
 		scrollPane.setViewportView(mainPanel);
+
 
 		selectedElementLabel.setPanelModel(panelModel);
 

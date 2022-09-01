@@ -6,22 +6,25 @@ import org.vadere.state.attributes.AttributesEmbedShape;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.util.Views;
 import org.vadere.util.geometry.shapes.VShape;
-
+import org.vadere.util.reflection.VadereAttribute;
 /**
  * Attributes of a target area, used by TargetController in VadereSimulation.
  * 
  */
 public class AttributesTarget extends AttributesEmbedShape {
 
+	@VadereAttribute
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
-	private int id = ID_NOT_SET;
+	private Integer id = ID_NOT_SET;
 	/**
 	 * True: elements are removed from the simulation after entering.
 	 * False: the target id is removed from the target id list, but the element remains.
 	 */
+	@VadereAttribute
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
-	private boolean absorbing = true;
+	private Boolean absorbing = true;
 	/** Shape and position. */
+	@VadereAttribute
 	private VShape shape;
 	/**
 	 * Waiting time in seconds on this area.
@@ -30,48 +33,55 @@ public class AttributesTarget extends AttributesEmbedShape {
 	 * If it is false, then the element waits this exact time before switching in "no waiting" mode
 	 * and back. This way, a traffic light can be simulated.
 	 */
+	@VadereAttribute
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
-	private double waitingTime = 0;
+	private Double waitingTime = 0.0;
 	/**
 	 * Waiting time on the target in the yellow phase (before red and green).
 	 * This can be used to cycle traffic lights in red, green or yellow phase, so that (Y -> R -> Y
 	 * -> G) cycles.
 	 * Needed on crossings, otherwise cars bump into each other.
 	 */
+	@VadereAttribute
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
-	private double waitingTimeYellowPhase = 0;
+	private Double waitingTimeYellowPhase = 0.0;
 	/**
 	 * Number of elements that can wait or be absorbed at one time in parallel on this area.
 	 * If zero, an infinite amount can wait or be absorbed.
 	 */
+	@VadereAttribute
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
-	private int parallelWaiters = 0;
+	private Integer parallelWaiters = 0;
 	/**
 	 * True: each element on the target area is treated individually.
 	 * False: the target waits for "waitingTime" and then enters "no waiting mode" for the same time
 	 * (and then goes back to waiting mode). See "waitingTime".
 	 */
+	@VadereAttribute
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
-	private boolean individualWaiting = true;
+	private Boolean individualWaiting = true;
 
 	// TODO should be "reachedDistance"; agents do not necessarily get deleted/absorbed
+	@VadereAttribute
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
-	private double deletionDistance = 0.1;
+	private Double deletionDistance = 0.1;
 
 	/**
 	 * If set to false, starts with green phase (nonblocking), otherwise blocks the path (red
 	 * phase).
 	 */
+	@VadereAttribute
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
-	private boolean startingWithRedLight = false;
+	private Boolean startingWithRedLight = false;
 
 	/**
 	 * If non-negative, determines the desired speed the particle (pedestrian, car) is assigned
 	 * after passing this target.
 	 * Can be used to model street networks with differing maximal speeds on roads.
 	 */
+	@VadereAttribute
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
-	private double nextSpeed = -1.0;
+	private Double nextSpeed = -1.0;
 
 	public AttributesTarget() {}
 
@@ -89,12 +99,12 @@ public class AttributesTarget extends AttributesEmbedShape {
 		this.shape = pedestrian.getShape();
 		this.absorbing = true;
 		this.id = pedestrian.getIdAsTarget();
-		this.waitingTime = 0;
-		this.waitingTimeYellowPhase = 0;
+		this.waitingTime = 0.0;
+		this.waitingTimeYellowPhase = 0.0;
 		this.parallelWaiters = 0;
 		this.individualWaiting = true;
 		this.startingWithRedLight = false;
-		this.nextSpeed = -1;
+		this.nextSpeed = -1.0;
 	}
 
 	// Getters...
