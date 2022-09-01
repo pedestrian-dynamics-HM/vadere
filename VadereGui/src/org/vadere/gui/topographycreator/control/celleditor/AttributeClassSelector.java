@@ -91,7 +91,7 @@ public class AttributeClassSelector extends AttributeEditor {
 
     private void createInternalPropertyPane(AttributesAttached newObject, TopographyCreatorModel model) {
         var proppane = AttributeView.buildPage(newObject, model);
-        proppane.selectionChange((ScenarioElement) newObject);
+        //proppane.selectionChange((ScenarioElement) newObject);
         contentPanel.add(proppane, gbc);
     }
 

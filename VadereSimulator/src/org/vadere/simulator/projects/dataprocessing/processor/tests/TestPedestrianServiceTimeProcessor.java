@@ -12,7 +12,7 @@ import org.vadere.simulator.projects.dataprocessing.processor.PedestrianLifetime
 
 import org.vadere.state.attributes.processor.AttributesTestServiceTimeProcessor;
 import org.vadere.state.scenario.Target;
-import org.vadere.state.scenario.distribution.parameter.AttributesPoissonDistribution;
+import org.vadere.state.attributes.distributions.AttributesPoissonDistribution;
 import org.vadere.util.logging.Logger;
 
 

@@ -12,7 +12,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.vadere.state.scenario.distribution.VDistribution;
 import org.vadere.state.scenario.distribution.VDistributionTest;
-import org.vadere.state.scenario.distribution.parameter.AttributesNegativeExponentialDistribution;
+import org.vadere.state.attributes.distributions.AttributesNegativeExponentialDistribution;
 
 /**
  * @author Aleksandar Ivanov(ivanov0@hm.edu)

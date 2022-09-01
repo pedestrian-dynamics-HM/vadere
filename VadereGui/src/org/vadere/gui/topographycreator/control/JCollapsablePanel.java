@@ -111,7 +111,6 @@ public class JCollapsablePanel extends JPanel implements Observer {
         @Override
         public void mouseClicked(MouseEvent e) {
 
-
             if (hidden) {
                 contentPanel.setVisible(true);
                 hidden = false;

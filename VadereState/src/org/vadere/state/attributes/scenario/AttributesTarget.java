@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.vadere.state.attributes.AttributesEmbedShape;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Target;
+import org.vadere.state.scenario.distribution.VDistribution;
 import org.vadere.state.util.Views;
 import org.vadere.state.scenario.distribution.parameter.*;
 import org.vadere.util.geometry.shapes.VShape;
@@ -32,7 +33,7 @@ public class AttributesTarget extends AttributesVisualElement {
 	 *  </ul>
 	 */
 	@JsonView(Views.CacheViewExclude.class)
-	private String waitingBehaviour;
+	private String waitingBehaviour = Target.WaitingBehaviour.NO_WAITING.toString();
 
 	private Double waitingTimeYellowPhase = 0.0;
 	/**
@@ -63,7 +64,7 @@ public class AttributesTarget extends AttributesVisualElement {
 	 *  </ul>
 	 */
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
-	private String waitingTimeDistribution;
+	private VDistribution waitingTimeDistribution;
 
 	/**
 	 *  Distribution types:<br>
@@ -201,11 +202,11 @@ public class AttributesTarget extends AttributesVisualElement {
 		this.distributionParameters = distributionParameters;
 	}
 
-	public String getWaitingTimeDistribution() {
+	public VDistribution getWaitingTimeDistribution() {
 		return waitingTimeDistribution;
 	}
 
-	public void setWaitingTimeDistribution(String waitingTimeDistribution) {
+	public void setWaitingTimeDistribution(VDistribution waitingTimeDistribution) {
 		checkSealed();
 		this.waitingTimeDistribution = waitingTimeDistribution;
 	}

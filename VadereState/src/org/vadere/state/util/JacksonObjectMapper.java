@@ -1,16 +1,12 @@
 package org.vadere.state.util;
 
 import java.io.IOException;
-import java.lang.reflect.ParameterizedType;
 import java.util.List;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.vadere.state.attributes.distributions.AttributesDistribution;
 import org.vadere.state.scenario.distribution.DistributionFactory;
 import org.vadere.state.scenario.distribution.VDistribution;
-import org.vadere.state.scenario.distribution.parameter.AttributesConstantDistribution;
-import org.vadere.state.scenario.distribution.registry.DistributionRegistry;
 import org.vadere.state.scenario.distribution.registry.RegisterDistribution;
 import org.vadere.util.geometry.shapes.ShapeType;
 import org.vadere.util.geometry.GeometryUtils;
@@ -145,7 +141,9 @@ public class JacksonObjectMapper extends ObjectMapper {
 				JsonNode node = jsonParser.readValueAsTree();
 				String type = node.get("type").asText();
 				JsonNode param = node.get("parameters");
-
+				if(type.equals("null")){
+					return null;
+				}
 				try {
 					return DistributionFactory.create(type,param,10,null);
 				} catch (Exception e) {

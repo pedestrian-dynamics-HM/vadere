@@ -5,7 +5,7 @@ import org.vadere.state.attributes.distributions.AttributesDistribution;
 import org.vadere.state.attributes.scenario.AttributesSource;
 import org.vadere.state.scenario.distribution.VDistribution;
 import org.vadere.state.scenario.distribution.impl.ConstantDistribution;
-import org.vadere.state.scenario.distribution.parameter.AttributesConstantDistribution;
+import org.vadere.state.attributes.distributions.AttributesConstantDistribution;
 import org.vadere.state.types.DynamicElementType;
 import org.vadere.util.geometry.shapes.VShape;
 

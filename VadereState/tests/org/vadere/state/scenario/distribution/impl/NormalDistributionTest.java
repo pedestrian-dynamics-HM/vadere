@@ -11,7 +11,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.vadere.state.scenario.distribution.VDistribution;
 import org.vadere.state.scenario.distribution.VDistributionTest;
-import org.vadere.state.scenario.distribution.parameter.AttributesNormalDistribution;
+import org.vadere.state.attributes.distributions.AttributesNormalDistribution;
 import org.vadere.util.math.TruncatedNormalDistribution;
 
 /**

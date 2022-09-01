@@ -47,12 +47,12 @@ public class TargetController extends ScenarioElementController {
 		}
 		if (!targetAttributes.getWaitingBehaviour().equals(Target.WaitingBehaviour.NO_WAITING)) {
 			try {
-				distribution = DistributionFactory.create(
+				distribution = targetAttributes.getWaitingTimeDistribution();/*DistributionFactory.create(
 						targetAttributes.getWaitingTimeDistribution(),
 						targetAttributes.getDistributionParameters(),
 						0,
 						new JDKRandomGenerator(random.nextInt())
-				);
+				);*/
 
 			} catch (Exception e) {
 				throw new IllegalArgumentException("Problem with scenario parameters for target: "

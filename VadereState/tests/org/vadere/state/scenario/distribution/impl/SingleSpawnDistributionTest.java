@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 
 import org.vadere.state.scenario.distribution.VDistribution;
 import org.vadere.state.scenario.distribution.VDistributionTest;
-import org.vadere.state.scenario.distribution.parameter.AttributesSingleSpawnDistribution;
+import org.vadere.state.attributes.distributions.AttributesSingleSpawnDistribution;
 
 /**
  * @author Aleksandar Ivanov(ivanov0@hm.edu)

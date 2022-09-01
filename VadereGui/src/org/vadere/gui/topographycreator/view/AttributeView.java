@@ -55,14 +55,19 @@ public class AttributeView extends JPanel implements ISelectScenarioElementListe
         }
     }
 
-    public static AttributePage buildPage(AttributesAttached object, TopographyCreatorModel model){
+    public static JScrollPane buildPage(AttributesAttached object, TopographyCreatorModel model){
         var clazz = object.getAttributes().getClass();
         var panel = new JPanel(new GridBagLayout());
         var gbc = initGridBagConstraint(1.0);
         getSuperClassHierarchy(clazz)
                 .stream()
-                .forEach(c ->panel.add(createPanel(c,object,model),gbc));
-        return new AttributePage(panel,object);
+                .forEach(c ->{
+                    var pnl = createPanel(c,object,model);
+                    if(pnl != null) {
+                        panel.add(pnl, gbc);
+                    }
+                });
+        return new JScrollPane(panel);
     }
 
     private static JPanel createPanel(Class baseClass, AttributesAttached object, TopographyCreatorModel model) {
@@ -96,7 +101,7 @@ public class AttributeView extends JPanel implements ISelectScenarioElementListe
             }
             return classPanel;
         }
-        return new JPanel();
+        return null;
     }
 
     private static boolean groupIsUnNamed(String group) {

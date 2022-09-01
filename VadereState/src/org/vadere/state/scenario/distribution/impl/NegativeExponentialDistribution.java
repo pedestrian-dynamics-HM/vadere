@@ -4,7 +4,7 @@ import org.apache.commons.math3.distribution.ExponentialDistribution;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.scenario.distribution.VDistribution;
-import org.vadere.state.scenario.distribution.parameter.AttributesNegativeExponentialDistribution;
+import org.vadere.state.attributes.distributions.AttributesNegativeExponentialDistribution;
 import org.vadere.state.scenario.distribution.registry.RegisterDistribution;
 
 /**

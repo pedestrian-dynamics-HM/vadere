@@ -11,7 +11,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.vadere.state.scenario.distribution.VDistribution;
 import org.vadere.state.scenario.distribution.VDistributionTest;
-import org.vadere.state.scenario.distribution.parameter.AttributesEmpiricalDistribution;
+import org.vadere.state.attributes.distributions.AttributesEmpiricalDistribution;
 
 /**
  * @author Aleksandar Ivanov(ivanov0@hm.edu)

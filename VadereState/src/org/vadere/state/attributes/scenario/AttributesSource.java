@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.vadere.state.attributes.distributions.AttributesDistribution;
 import org.vadere.state.scenario.distribution.VDistribution;
-import org.vadere.state.scenario.distribution.parameter.AttributesConstantDistribution;
+import org.vadere.state.attributes.distributions.AttributesConstantDistribution;
 import org.vadere.state.types.DynamicElementType;
 import org.vadere.state.util.StateJsonConverter;
 import org.vadere.state.util.Views;
@@ -53,7 +53,6 @@ public class AttributesSource extends AttributesVisualElement {
 	 *  "singleSpawn", "spawnTime" : 3.0
 	 *  "timeSeries" -> "intervalLength":1.2, "spawnsPerInterval" : [2,0,0,2,0,0]
 	 */
-	@VadereAttribute
 	@JsonIgnore
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
 	private AttributesDistribution distributionParameters = new AttributesConstantDistribution(0.0);
@@ -81,7 +80,7 @@ public class AttributesSource extends AttributesVisualElement {
 	 */
 	@VadereAttribute
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
-	private Boolean spawnAtRandomPositions;
+	private Boolean spawnAtRandomPositions = false;
 
 
 	/**
@@ -90,7 +89,7 @@ public class AttributesSource extends AttributesVisualElement {
 	 */
 	@VadereAttribute
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
-	private Boolean spawnAtGridPositionsCA;
+	private Boolean spawnAtGridPositionsCA = false;
 
 	/**
 	 * If set to true, only free space is used to create pedestrians at each
@@ -122,6 +121,7 @@ public class AttributesSource extends AttributesVisualElement {
   	 *  GroupSize   [  1    2    3     4     5         ] ------------------------------------------
 	 *  uniform distribution of groups of the size from 3 to 5 ------------------------------------
 	 */
+
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
 	private List<Double> groupSizeDistribution = Arrays.asList(1.0);
 
@@ -212,20 +212,6 @@ public class AttributesSource extends AttributesVisualElement {
 		return targetIds;
 	}
 
-	public int getId() {
-		return id;
-	}
-
-	@Override
-	public void setShape(VShape shape) {
-		this.shape = shape;
-	}
-
-	@Override
-	public VShape getShape() {
-		return shape;
-	}
-
 	public DynamicElementType getDynamicElementType() {
 		return dynamicElementType;
 	}
@@ -287,11 +273,6 @@ public class AttributesSource extends AttributesVisualElement {
 	public void setDynamicElementType(DynamicElementType dynamicElementType) {
 		checkSealed();
 		this.dynamicElementType = dynamicElementType;
-	}
-
-	public void setId(int id) {
-		checkSealed();
-		this.id = id;
 	}
 
 	@Override

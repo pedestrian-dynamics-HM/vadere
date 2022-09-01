@@ -1,6 +1,7 @@
-package org.vadere.state.scenario.distribution.parameter;
+package org.vadere.state.attributes.distributions;
 
 import org.vadere.state.attributes.distributions.AttributesDistribution;
+import org.vadere.state.scenario.distribution.parameter.MixedParameterDistribution;
 
 import java.util.ArrayList;
 

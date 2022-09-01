@@ -3,7 +3,7 @@ package org.vadere.state.scenario.distribution.impl;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.scenario.distribution.VDistribution;
-import org.vadere.state.scenario.distribution.parameter.AttributesNormalDistribution;
+import org.vadere.state.attributes.distributions.AttributesNormalDistribution;
 import org.vadere.state.scenario.distribution.registry.RegisterDistribution;
 import org.vadere.util.math.TruncatedNormalDistribution;
 

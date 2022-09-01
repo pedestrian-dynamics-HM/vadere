@@ -3,7 +3,7 @@ package org.vadere.state.scenario.distribution.impl;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.scenario.distribution.VDistribution;
-import org.vadere.state.scenario.distribution.parameter.AttributesConstantDistribution;
+import org.vadere.state.attributes.distributions.AttributesConstantDistribution;
 import org.vadere.state.scenario.distribution.registry.RegisterDistribution;
 
 /**
@@ -16,6 +16,10 @@ public class ConstantDistribution extends VDistribution<AttributesConstantDistri
 
 	public ConstantDistribution(AttributesConstantDistribution parameter, int spawnNumber, RandomGenerator unused) throws Exception {
 		super(parameter,spawnNumber,unused);
+	}
+	public ConstantDistribution(){
+		super();
+		this.constantAttributes = new AttributesConstantDistribution();
 	}
 
 	private double updateFrequency;

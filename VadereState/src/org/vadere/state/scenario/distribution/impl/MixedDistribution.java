@@ -4,7 +4,7 @@ import org.apache.commons.math3.random.RandomGenerator;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.scenario.distribution.DistributionFactory;
 import org.vadere.state.scenario.distribution.VDistribution;
-import org.vadere.state.scenario.distribution.parameter.AttributesMixedDistribution;
+import org.vadere.state.attributes.distributions.AttributesMixedDistribution;
 import org.vadere.state.scenario.distribution.parameter.MixedParameterDistribution;
 import org.vadere.state.scenario.distribution.registry.RegisterDistribution;
 

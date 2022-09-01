@@ -2,6 +2,10 @@ package org.vadere.state.scenario.distribution.impl;
 
 import org.apache.commons.math3.random.RandomGenerator;
 import org.vadere.state.attributes.Attributes;
+import org.vadere.state.attributes.distributions.AttributesConstantDistribution;
+import org.vadere.state.attributes.distributions.AttributesMixedDistribution;
+import org.vadere.state.attributes.distributions.AttributesSingleSpawnDistribution;
+import org.vadere.state.attributes.distributions.AttributesTimeSeriesDistribution;
 import org.vadere.state.scenario.distribution.VDistribution;
 import org.vadere.state.scenario.distribution.parameter.*;
 import org.vadere.state.scenario.distribution.registry.RegisterDistribution;

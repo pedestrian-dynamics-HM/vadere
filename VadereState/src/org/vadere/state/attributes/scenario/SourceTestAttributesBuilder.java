@@ -2,7 +2,7 @@ package org.vadere.state.attributes.scenario;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.vadere.state.scenario.distribution.parameter.AttributesConstantDistribution;
+import org.vadere.state.attributes.distributions.AttributesConstantDistribution;
 import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;

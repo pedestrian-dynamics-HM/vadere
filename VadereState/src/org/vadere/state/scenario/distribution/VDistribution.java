@@ -13,7 +13,10 @@ public abstract class VDistribution<T extends AttributesDistribution> implements
 		setValues(parameter, spawnNumber, randomGenerator);
 	}
 
-	abstract protected void setValues(T parameter, int spawnNumber, RandomGenerator randomGenerator) throws Exception;
+    public VDistribution() {
+    }
+
+    abstract protected void setValues(T parameter, int spawnNumber, RandomGenerator randomGenerator) throws Exception;
 
 	abstract public int getSpawnNumber(double timeCurrentEvent);
 
