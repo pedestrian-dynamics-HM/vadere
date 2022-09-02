@@ -8,7 +8,7 @@ import org.vadere.simulator.control.scenarioelements.TopographyController;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.osm.OptimalStepsModel;
 import org.vadere.simulator.projects.Domain;
-import org.vadere.state.attributes.Attributes;
+import org.vadere.util.Attributes;
 import org.vadere.state.attributes.models.infection.AttributesProximityExposureModel;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.health.BasicExposureModelHealthStatus;

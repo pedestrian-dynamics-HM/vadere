@@ -9,7 +9,7 @@ import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.ode.IntegratorFactory;
 import org.vadere.simulator.models.ode.ODEModel;
 import org.vadere.simulator.projects.Domain;
-import org.vadere.state.attributes.Attributes;
+import org.vadere.util.Attributes;
 import org.vadere.state.attributes.models.AttributesOVM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesCar;
@@ -19,7 +19,6 @@ import org.vadere.state.scenario.DynamicElement;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.parallel.ParallelWorkerUtil;
-import org.w3c.dom.Attr;
 
 import java.util.Collection;
 import java.util.Collections;

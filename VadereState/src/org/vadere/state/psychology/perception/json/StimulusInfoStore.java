@@ -79,7 +79,7 @@ public class StimulusInfoStore {
 
         // Use annotations at stimulus classes to specify how JSON <-> Java mapping should look like.
         // "VShape" are mapped by "JacksonObjectMapper" implementation.
-        ObjectMapper mapper = new JacksonObjectMapper();
+        ObjectMapper mapper = new JacksonObjectMapper(new Random());
 
         // De/-Serialize an "StimulusInfoStore":
         try {

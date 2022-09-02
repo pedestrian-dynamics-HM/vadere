@@ -44,7 +44,7 @@ public class SingleSourceController extends SourceController {
 
 	@Override
 	public void update(double simTimeInSec) {
-		if (!isSourceFinished(simTimeInSec)) {
+		if (!this.spawner.isSpawnerFinished(simTimeInSec)) {
 			determineNumberOfSpawnsAndNextEvent(simTimeInSec);
 
 			if (numberToSpawn > 0) {
@@ -100,10 +100,10 @@ public class SingleSourceController extends SourceController {
 				// wants to try to spawn the agents in the next update.
 				int remainingAgents = numberToSpawn - spawnPoints.size();
 				assert (remainingAgents >= 0);
-				this.distribution.setRemainingSpawnAgents(remainingAgents);
+				this.spawner.setRemainingSpawnAgents(remainingAgents);
 
 				for (VPoint spawnPoint : spawnPoints) {
-					if (!isMaximumNumberOfSpawnedElementsReached()) {
+					if (!spawner.isMaximumNumberOfSpawnedElementsReached()) {
 						addNewAgentToScenario(spawnPoint, simTimeInSec);
 						dynamicElementsCreatedTotal++;
 					}
@@ -224,10 +224,10 @@ public class SingleSourceController extends SourceController {
 
 		// The concrete distribution implements how to proceed with agents that could not all be spawned
 		// e.g. because the source is too small
-		numberToSpawn = this.distribution.getRemainingSpawnAgents();
+		numberToSpawn = this.spawner.getRemainingSpawnAgents();
 
 		while (timeOfNextEvent <= simTimeInSec) {
-			numberToSpawn += distribution.getSpawnNumber(timeOfNextEvent);
+			numberToSpawn += spawner.getSpawnNumber(timeOfNextEvent);
 			createNextEvent();
 		}
 	}

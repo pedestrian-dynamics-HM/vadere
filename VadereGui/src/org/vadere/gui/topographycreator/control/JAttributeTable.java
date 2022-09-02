@@ -6,7 +6,7 @@ import org.vadere.gui.topographycreator.control.cellrenderer.FieldNameRenderer;
 import org.vadere.gui.topographycreator.control.cellrenderer.FieldValueRenderer;
 import org.vadere.gui.topographycreator.model.AttributeTableModel;
 import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
-import org.vadere.state.attributes.AttributesAttached;
+import org.vadere.util.AttributesAttached;
 import org.vadere.util.observer.NotifyContext;
 
 import javax.swing.*;

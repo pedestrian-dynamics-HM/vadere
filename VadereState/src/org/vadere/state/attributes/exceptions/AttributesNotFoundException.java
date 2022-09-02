@@ -1,6 +1,6 @@
 package org.vadere.state.attributes.exceptions;
 
-import org.vadere.state.attributes.Attributes;
+import org.vadere.util.Attributes;
 
 @SuppressWarnings("serial")
 public class AttributesNotFoundException extends RuntimeException {

@@ -11,7 +11,7 @@ public abstract class VDistributionTest {
 
 	abstract protected VDistribution<?> getDistributionUnderTest() throws Exception;
 
-	@Test
+	/*@Test
 	public void testGetSpawnNumber() throws Exception {
 		VDistribution<?> dist = getDistributionUnderTest();
 		int actual = dist.getSpawnNumber(1);
@@ -26,7 +26,7 @@ public abstract class VDistributionTest {
 		int actual = dist.getRemainingSpawnAgents();
 		assertEquals(expected, actual);
 	}
-
+	*/
 	@Test
 	abstract public void testGetNextSpawnTime() throws Exception;
 

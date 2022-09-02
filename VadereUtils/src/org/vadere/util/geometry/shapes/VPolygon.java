@@ -15,6 +15,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.vadere.util.Attributes;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.GrahamScan;
 
@@ -700,4 +701,13 @@ public class VPolygon extends Path2D.Double implements VShape {
 		return builder.toString();
 	}
 
+	@Override
+	public Attributes getAttributes() {
+		return null;
+	}
+
+	@Override
+	public void setAttributes(Attributes attributes) {
+
+	}
 }

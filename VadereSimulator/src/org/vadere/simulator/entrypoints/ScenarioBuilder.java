@@ -3,7 +3,7 @@ package org.vadere.simulator.entrypoints;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.ScenarioStore;
-import org.vadere.state.attributes.Attributes;
+import org.vadere.util.Attributes;
 import org.vadere.state.attributes.AttributesBuilder;
 import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.scenario.AttributesAgent;

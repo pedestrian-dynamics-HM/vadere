@@ -3,11 +3,10 @@ package org.vadere.simulator.models.potential;
 import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
 import org.vadere.simulator.projects.Domain;
-import org.vadere.state.attributes.Attributes;
+import org.vadere.util.Attributes;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Obstacle;
-import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.shapes.IPoint;
 
 import java.util.ArrayList;

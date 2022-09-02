@@ -2,7 +2,6 @@ package org.vadere.simulator.control.psychology.cognition.models;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesObstacle;
 import org.vadere.state.attributes.scenario.AttributesTarget;
@@ -22,7 +21,6 @@ import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 
 import java.lang.reflect.Field;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 

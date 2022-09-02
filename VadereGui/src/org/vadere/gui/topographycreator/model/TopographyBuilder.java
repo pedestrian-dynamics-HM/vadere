@@ -2,7 +2,7 @@ package org.vadere.gui.topographycreator.model;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.topographycreator.control.AttributeModifier;
-import org.vadere.state.attributes.Attributes;
+import org.vadere.util.Attributes;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesCar;
 import org.vadere.state.attributes.scenario.AttributesTopography;

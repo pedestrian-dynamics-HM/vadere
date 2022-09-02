@@ -3,8 +3,7 @@ package org.vadere.gui.topographycreator.control.celleditor;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
 import org.vadere.gui.topographycreator.view.AttributeView;
-import org.vadere.state.attributes.AttributesAttached;
-import org.vadere.state.scenario.ScenarioElement;
+import org.vadere.util.AttributesAttached;
 
 import javax.swing.*;
 import java.awt.*;
@@ -28,6 +27,8 @@ public class AttributeSubClassSelector extends AttributeEditor {
     private GridBagConstraints gbc;
     private JPanel contentPanel;
 
+    private AttributeEditor self;
+
     public AttributeSubClassSelector(AttributesAttached attached, Field field, TopographyCreatorModel model, ArrayList<Class> classesModel, JPanel contentReceiver) {
         super(attached, field, model);
         initializeGridBagConstraint();
@@ -35,6 +36,7 @@ public class AttributeSubClassSelector extends AttributeEditor {
         this.comboBox.setModel(initializeComboBoxModel(classesModel));
         this.contentPanel = contentReceiver;
         this.add(comboBox);
+        this.self = this;
         this.comboBox.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
@@ -49,6 +51,7 @@ public class AttributeSubClassSelector extends AttributeEditor {
                             AttributesAttached newObject = constructNewObject(selected);
                             setFieldValue(newObject);
                             clearContentPanel();
+                            self.setAttached(newObject);
                             createInternalPropertyPane(newObject, model);
                             refreshContentPanel();
                         } catch (Exception exp) {
@@ -60,20 +63,24 @@ public class AttributeSubClassSelector extends AttributeEditor {
 
             }
 
-            private void setFieldValue(Object newObject) {
-                updateModelFromValue(newObject);
-            }
 
-            private boolean isNoClass(String selected) {
-                return selected.equals("[null]");
-            }
-
-            private void clearFieldValue() {
-                setFieldValue(null);
-            }
         });
 
+
+
         //this.setBorder(new FlatTextBorder());
+    }
+
+    private void setFieldValue(Object newObject) {
+        updateModelFromValue(newObject);
+    }
+
+    private boolean isNoClass(String selected) {
+        return selected.equals("[null]");
+    }
+
+    private void clearFieldValue() {
+        setFieldValue(null);
     }
 
     @NotNull
@@ -101,6 +108,14 @@ public class AttributeSubClassSelector extends AttributeEditor {
     public void updateValueFromModel(Object value) {
         super.updateValueFromModel(value);
         this.comboBox.setSelectedItem(value);
+        /*clearFieldValue();
+        clearContentPanel();
+        refreshContentPanel();
+        AttributesAttached newObject = (AttributesAttached) value;
+        setFieldValue(newObject);
+        clearContentPanel();
+        createInternalPropertyPane(newObject, model);
+        refreshContentPanel();*/
     }
 
     private void createInternalPropertyPane(AttributesAttached newObject, TopographyCreatorModel model) {

@@ -1,7 +1,5 @@
 package org.vadere.state.attributes.distributions;
 
-import org.vadere.state.attributes.Attributes;
-import org.vadere.state.attributes.distributions.AttributesDistribution;
 import org.vadere.util.reflection.VadereAttribute;
 
 /**

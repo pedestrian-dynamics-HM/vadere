@@ -1,7 +1,7 @@
 package org.vadere.simulator.models;
 
 import org.jetbrains.annotations.NotNull;
-import org.vadere.state.attributes.Attributes;
+import org.vadere.util.Attributes;
 import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.shapes.VPoint;

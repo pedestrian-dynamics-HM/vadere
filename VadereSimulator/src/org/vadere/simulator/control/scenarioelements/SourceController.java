@@ -8,6 +8,7 @@ import org.vadere.state.attributes.scenario.AttributesDynamicElement;
 import org.vadere.state.attributes.scenario.AttributesSource;
 import org.vadere.state.scenario.*;
 import org.vadere.state.scenario.distribution.VDistribution;
+import org.vadere.state.scenario.spawner.VSpawner;
 import org.vadere.state.scenario.distribution.impl.MixedDistribution;
 import org.vadere.util.geometry.LinkedCellsGrid;
 import org.vadere.util.geometry.shapes.VCircle;
@@ -40,6 +41,7 @@ public abstract class SourceController extends ScenarioElementController impleme
 	 */
 	protected Double timeOfNextEvent;
 	protected VDistribution distribution;
+    protected VSpawner spawner;
 	protected int dynamicElementsCreatedTotal;
 
     public SourceController(Topography scenario, Source source,
@@ -227,4 +229,5 @@ public abstract class SourceController extends ScenarioElementController impleme
 	}
 
 	public int getSourceId() { return source.getId(); }
+
 }

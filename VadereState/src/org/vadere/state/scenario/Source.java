@@ -1,6 +1,6 @@
 package org.vadere.state.scenario;
 
-import org.vadere.state.attributes.Attributes;
+import org.vadere.util.Attributes;
 import org.vadere.state.attributes.scenario.AttributesSource;
 import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.geometry.shapes.VShape;

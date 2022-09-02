@@ -6,7 +6,7 @@ import org.vadere.simulator.control.factory.SingleSourceControllerFactory;
 import org.vadere.simulator.control.factory.SourceControllerFactory;
 import org.vadere.simulator.control.scenarioelements.SourceController;
 import org.vadere.simulator.models.DynamicElementFactory;
-import org.vadere.state.attributes.Attributes;
+import org.vadere.util.Attributes;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesSource;
 import org.vadere.state.attributes.scenario.SourceTestAttributesBuilder;

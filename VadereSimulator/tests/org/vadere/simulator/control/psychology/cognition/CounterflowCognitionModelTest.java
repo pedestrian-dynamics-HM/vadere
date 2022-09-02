@@ -2,7 +2,7 @@ package org.vadere.simulator.control.psychology.cognition;
 
 import org.junit.Test;
 import org.vadere.simulator.control.psychology.cognition.models.CounterflowCognitionModel;
-import org.vadere.state.attributes.Attributes;
+import org.vadere.util.Attributes;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesTarget;
 import org.vadere.state.psychology.cognition.SelfCategory;

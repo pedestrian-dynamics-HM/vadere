@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.vadere.state.attributes.Attributes;
+import org.vadere.util.Attributes;
 import org.vadere.state.attributes.models.psychology.cognition.AttributesProbabilisticCognitionModel;
 import org.vadere.state.attributes.models.psychology.cognition.AttributesRouteChoiceDefinition;
 import org.vadere.state.attributes.scenario.AttributesAgent;

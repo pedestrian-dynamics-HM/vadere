@@ -11,14 +11,14 @@ import java.util.ArrayList;
  */
 
 public class AttributesMixedDistribution extends AttributesDistribution {
-	private Double[] switchpoints;
+	private ArrayList<Double> switchpoints;
 	private ArrayList<MixedParameterDistribution> distributions;
 
-	public Double[] getSwitchpoints() {
+	public ArrayList<Double> getSwitchpoints() {
 		return switchpoints;
 	}
 
-	public void setSwitchpoints(Double[] switchpoints) {
+	public void setSwitchpoints(ArrayList<Double> switchpoints) {
 		this.switchpoints = switchpoints;
 	}
 

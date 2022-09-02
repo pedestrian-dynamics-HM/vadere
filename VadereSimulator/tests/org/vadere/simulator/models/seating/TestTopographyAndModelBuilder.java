@@ -8,7 +8,7 @@ import java.util.Scanner;
 
 import org.vadere.simulator.models.seating.trainmodel.TrainModel;
 import org.vadere.simulator.projects.Domain;
-import org.vadere.state.attributes.Attributes;
+import org.vadere.util.Attributes;
 import org.vadere.state.attributes.models.AttributesSeating;
 import org.vadere.state.scenario.Et423Geometry;
 import org.vadere.state.scenario.Topography;

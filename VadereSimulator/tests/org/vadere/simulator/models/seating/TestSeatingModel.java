@@ -9,7 +9,7 @@ import java.util.Random;
 import org.junit.Before;
 import org.junit.Test;
 import org.vadere.simulator.projects.Domain;
-import org.vadere.state.attributes.Attributes;
+import org.vadere.util.Attributes;
 import org.vadere.state.attributes.exceptions.AttributesNotFoundException;
 import org.vadere.state.attributes.models.AttributesSeating;
 import org.vadere.state.attributes.scenario.AttributesAgent;

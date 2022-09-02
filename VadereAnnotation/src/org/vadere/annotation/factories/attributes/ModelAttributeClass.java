@@ -16,7 +16,7 @@ import java.lang.annotation.Target;
 		extendedClassName = "AttributeBaseFactory",
 		genericFactoryTypes = "Attributes",
 		factoryImports = {
-				"org.vadere.state.attributes.Attributes",
+				"org.vadere.util.Attributes",
 				"org.vadere.util.factory.attributes.AttributeBaseFactory"
 		},
 		factoryPackage = "org.vadere.state.attributes"

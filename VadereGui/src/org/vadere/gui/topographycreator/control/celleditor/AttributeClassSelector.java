@@ -2,8 +2,7 @@ package org.vadere.gui.topographycreator.control.celleditor;
 
 import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
 import org.vadere.gui.topographycreator.view.AttributeView;
-import org.vadere.state.attributes.AttributesAttached;
-import org.vadere.state.scenario.ScenarioElement;
+import org.vadere.util.AttributesAttached;
 
 import javax.swing.*;
 import javax.swing.event.MouseInputAdapter;

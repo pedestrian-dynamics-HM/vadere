@@ -9,10 +9,7 @@ import org.vadere.state.util.JacksonObjectMapper;
 import org.vadere.util.geometry.shapes.VRectangle;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Provide JSON presettings for commonly used stimuli.
@@ -59,7 +56,7 @@ public class StimulusPresettings {
 
 
             try {
-                ObjectMapper mapper = new JacksonObjectMapper();
+                ObjectMapper mapper = new JacksonObjectMapper(new Random());
                 // String jsonDataString = mapper.writeValueAsString(stimulusInfoStore);
                 String jsonDataString = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(stimulusInfoStore);
 

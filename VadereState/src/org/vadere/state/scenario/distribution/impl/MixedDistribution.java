@@ -1,7 +1,7 @@
 package org.vadere.state.scenario.distribution.impl;
 
 import org.apache.commons.math3.random.RandomGenerator;
-import org.vadere.state.attributes.Attributes;
+import org.vadere.util.Attributes;
 import org.vadere.state.scenario.distribution.DistributionFactory;
 import org.vadere.state.scenario.distribution.VDistribution;
 import org.vadere.state.attributes.distributions.AttributesMixedDistribution;
@@ -16,10 +16,15 @@ import java.util.ArrayList;
 @RegisterDistribution(name = "mixed", parameter = AttributesMixedDistribution.class)
 public class MixedDistribution extends VDistribution<AttributesMixedDistribution> {
 	private Attributes mixedAttributes;
-	Double[] switchpoints;
+	ArrayList<Double> switchPoints;
 	ArrayList<VDistribution<?>> distributions;
 	private int currentInterval = 0;
 
+	public  MixedDistribution(){
+		// Do not remove this constructor. It is us used through reflection.
+		super();
+		this.mixedAttributes = new AttributesMixedDistribution();
+	}
 	public MixedDistribution(AttributesMixedDistribution parameter, int spawnNumber, RandomGenerator randomGenerator)
 	        throws Exception {
 		super(parameter, spawnNumber, randomGenerator);
@@ -28,13 +33,15 @@ public class MixedDistribution extends VDistribution<AttributesMixedDistribution
 	@Override
 	protected void setValues(AttributesMixedDistribution parameter, int spawnNumber, RandomGenerator randomGenerator)
 	        throws Exception {
-		if (parameter.getSwitchpoints().length != parameter.getDistributions().size() - 1) {
+
+		final boolean tooManyFewSwitchPoints = parameter.getSwitchpoints().size() != parameter.getDistributions().size() - 1;
+		if (tooManyFewSwitchPoints) {
 			throw new Exception("There should be exactly one switchpoint for"
 			        + "every given distribution minus 1. However there are not.");
 		}
 
 		setDistributions(parameter.getDistributions(), spawnNumber, randomGenerator);
-		this.switchpoints = parameter.getSwitchpoints();
+		this.switchPoints = parameter.getSwitchpoints();
 
 	}
 
@@ -43,39 +50,45 @@ public class MixedDistribution extends VDistribution<AttributesMixedDistribution
 		this.distributions = new ArrayList<>();
 
 		for (MixedParameterDistribution distribution : distributions) {
-			VDistribution<?> dist = DistributionFactory.create(distribution.getInterSpawnTimeDistribution(),
-			        distribution.getDistributionParameters(), spawnNumber, randomGenerator);
+			VDistribution<?> dist = DistributionFactory
+					.create(
+							distribution.getInterSpawnTimeDistribution(),
+							distribution.getDistributionParameters(),
+							spawnNumber,
+							randomGenerator
+					);
 			this.distributions.add(dist);
 		}
 	}
 
 	@Override
-	public int getSpawnNumber(double timeCurrentEvent) {
-		return getDistributionByTime(timeCurrentEvent).getSpawnNumber(timeCurrentEvent);
-	}
-
-	@Override
 	public double getNextSpawnTime(double timeCurrentEvent) {
-		return getDistributionByTime(timeCurrentEvent).getNextSpawnTime(timeCurrentEvent);
-	}
-
-	@Override
-	public int getRemainingSpawnAgents() {
-		return distributions.get(currentInterval).getRemainingSpawnAgents();
-	}
-
-	@Override
-	public void setRemainingSpawnAgents(int remainingAgents) {
-		distributions.get(currentInterval).setRemainingSpawnAgents(remainingAgents);
+		return getDistributionByTime(timeCurrentEvent)
+				.getNextSpawnTime(timeCurrentEvent);
 	}
 
 	private VDistribution<?> getDistributionByTime(double timeCurrentEvent) {
-		while (!(currentInterval > switchpoints.length - 1) && timeCurrentEvent >= switchpoints[currentInterval]
-		        && !(timeCurrentEvent > switchpoints[switchpoints.length - 1])) {
+		while (intervallAndTimeIsValidAt(timeCurrentEvent)) {
 			currentInterval++;
 		}
-
 		return distributions.get(currentInterval);
+	}
+
+	private boolean intervallAndTimeIsValidAt(double timeCurrentEvent) {
+		return iscCurrentIntervalInBound() && isEventInCurrentInterval(timeCurrentEvent)
+				&& isTimeInBound(timeCurrentEvent);
+	}
+
+	private boolean isTimeInBound(double timeCurrentEvent) {
+		return !(timeCurrentEvent > switchPoints.get(switchPoints.size() - 1));
+	}
+
+	private boolean isEventInCurrentInterval(double timeCurrentEvent) {
+		return timeCurrentEvent >= switchPoints.get(currentInterval);
+	}
+
+	private boolean iscCurrentIntervalInBound() {
+		return !(currentInterval > switchPoints.size() - 1);
 	}
 
 	public VDistribution<?> getCurrentDistribution() {

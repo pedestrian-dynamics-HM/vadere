@@ -6,12 +6,8 @@ import org.junit.Test;
 import org.vadere.state.attributes.scenario.AttributesAerosolCloud;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VShape;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
-import static org.vadere.state.attributes.Attributes.ID_NOT_SET;
+import static org.vadere.util.Attributes.ID_NOT_SET;
 
 
 public class AerosolCloudTest {

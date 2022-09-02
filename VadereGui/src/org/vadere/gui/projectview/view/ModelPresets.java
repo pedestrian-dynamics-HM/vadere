@@ -14,7 +14,7 @@ import org.vadere.simulator.models.ovm.OptimalVelocityModel;
 import org.vadere.simulator.models.psychology.selfcategorization.SelfCatThreatModel;
 import org.vadere.simulator.models.reynolds.ReynoldsSteeringModel;
 import org.vadere.simulator.models.sfm.SocialForceModel;
-import org.vadere.state.attributes.Attributes;
+import org.vadere.util.Attributes;
 import org.vadere.state.attributes.ModelDefinition;
 import org.vadere.state.attributes.models.*;
 

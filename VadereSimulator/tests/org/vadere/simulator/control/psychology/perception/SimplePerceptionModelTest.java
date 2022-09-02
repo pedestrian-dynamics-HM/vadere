@@ -2,7 +2,7 @@ package org.vadere.simulator.control.psychology.perception;
 
 import org.junit.Test;
 import org.vadere.simulator.control.psychology.perception.models.SimplePerceptionModel;
-import org.vadere.state.attributes.Attributes;
+import org.vadere.util.Attributes;
 import org.vadere.state.attributes.models.psychology.perception.AttributesSimplePerceptionModel;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesTarget;

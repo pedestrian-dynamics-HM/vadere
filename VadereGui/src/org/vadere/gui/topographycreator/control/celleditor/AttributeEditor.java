@@ -1,7 +1,7 @@
 package org.vadere.gui.topographycreator.control.celleditor;
 
 import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
-import org.vadere.state.attributes.AttributesAttached;
+import org.vadere.util.AttributesAttached;
 import org.vadere.util.observer.NotifyContext;
 
 import javax.swing.*;
@@ -27,7 +27,9 @@ public abstract class AttributeEditor extends JPanel {
         this.externUpdate  = true;
         this.oldValue = value;
     }
-
+    protected void setAttached(AttributesAttached attached){
+        this.attached = attached;
+    }
     protected void updateModelFromValue(Object newValue){
         /*if (externUpdate){
             this.externUpdate = false;
@@ -40,7 +42,7 @@ public abstract class AttributeEditor extends JPanel {
             field.setAccessible(true);
             this.field.set(this.attached.getAttributes(), newValue);
             field.setAccessible(false);
-            model.getSelectedElement().setAttributes(this.attached.getAttributes());
+            this.attached.setAttributes(this.attached.getAttributes());
             model.getScenario().updateCurrentStateSerialized();
             model.notifyObservers(new NotifyContext(this.getClass().getSuperclass()));
         } catch (IllegalAccessException e) {

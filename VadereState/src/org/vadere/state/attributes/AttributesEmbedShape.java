@@ -1,5 +1,6 @@
 package org.vadere.state.attributes;
 
+import org.vadere.util.Attributes;
 import org.vadere.util.geometry.shapes.VShape;
 
 

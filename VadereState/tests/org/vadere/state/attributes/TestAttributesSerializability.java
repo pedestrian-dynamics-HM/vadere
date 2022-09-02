@@ -2,7 +2,7 @@ package org.vadere.state.attributes;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.vadere.state.attributes.Attributes;
+import org.vadere.util.Attributes;
 
 import java.io.File;
 import java.io.IOException;

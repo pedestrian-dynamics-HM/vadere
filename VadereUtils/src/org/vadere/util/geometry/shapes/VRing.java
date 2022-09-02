@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.vadere.util.Attributes;
 import org.vadere.util.geometry.shapes.ShapeType;
 
 /**
@@ -254,5 +255,15 @@ public class VRing implements VShape {
 	@Override
 	public List<VLine> lines() {
 		throw new UnsupportedOperationException("not yet implemented.");
+	}
+
+	@Override
+	public Attributes getAttributes() {
+		return null;
+	}
+
+	@Override
+	public void setAttributes(Attributes attributes) {
+
 	}
 }

@@ -3,7 +3,6 @@ package org.vadere.state.util;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
@@ -18,6 +17,7 @@ import org.vadere.state.psychology.perception.json.StimulusInfo;
 import org.vadere.state.psychology.perception.json.StimulusInfoStore;
 import org.vadere.state.scenario.*;
 import org.vadere.state.types.ScenarioElementType;
+import org.vadere.util.Attributes;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.reflection.DynamicClassInstantiator;
 
@@ -42,7 +42,7 @@ public abstract class StateJsonConverter {
 	private static Logger logger = Logger.getLogger(StateJsonConverter.class);
 
 	/** Connection to jackson library. */
-	private static ObjectMapper mapper = new JacksonObjectMapper();
+	private static ObjectMapper mapper = new JacksonObjectMapper(new Random());
 
 	/** Connection to jackson library. */
 	private static ObjectWriter prettyWriter = mapper.writerWithDefaultPrettyPrinter();

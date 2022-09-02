@@ -5,7 +5,7 @@ import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.simulator.projects.Domain;
-import org.vadere.state.attributes.Attributes;
+import org.vadere.util.Attributes;
 import org.vadere.state.attributes.models.AttributesPotentialRingExperiment;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;

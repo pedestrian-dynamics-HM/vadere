@@ -2,7 +2,7 @@ package org.vadere.state.types;
 
 import java.awt.*;
 
-import org.vadere.state.attributes.Attributes;
+import org.vadere.util.Attributes;
 import org.vadere.state.attributes.scenario.*;
 
 public enum ScenarioElementType {

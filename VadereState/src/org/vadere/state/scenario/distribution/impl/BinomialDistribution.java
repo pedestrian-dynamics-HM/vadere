@@ -1,7 +1,7 @@
 package org.vadere.state.scenario.distribution.impl;
 
 import org.apache.commons.math3.random.RandomGenerator;
-import org.vadere.state.attributes.Attributes;
+import org.vadere.util.Attributes;
 import org.vadere.state.scenario.distribution.VDistribution;
 import org.vadere.state.attributes.distributions.AttributesBinomialDistribution;
 import org.vadere.state.scenario.distribution.registry.RegisterDistribution;
@@ -12,40 +12,24 @@ import org.vadere.state.scenario.distribution.registry.RegisterDistribution;
 @RegisterDistribution(name = "binomial", parameter = AttributesBinomialDistribution.class)
 public class BinomialDistribution extends VDistribution<AttributesBinomialDistribution> {
 	private Attributes binomialAttributes;
+	private org.apache.commons.math3.distribution.BinomialDistribution distribution;
+	public BinomialDistribution(){
+		// Do not remove this constructor. It is us used through reflection.
+		super();
+		this.binomialAttributes = new AttributesBinomialDistribution();
+	}
 	public BinomialDistribution(AttributesBinomialDistribution parameter, int spawnNumber, RandomGenerator randomGenerator)
-	        throws Exception {
+			throws Exception {
 		super(parameter, spawnNumber, randomGenerator);
 	}
-
-	private org.apache.commons.math3.distribution.BinomialDistribution distribution;
-	private int remainingSpawnAgents;
-	private int spawnNumber;
-
 	@Override
 	protected void setValues(AttributesBinomialDistribution parameter, int spawnNumber, RandomGenerator randomGenerator) {
 		this.distribution = new org.apache.commons.math3.distribution.BinomialDistribution(randomGenerator,
-		        parameter.getTrials(), parameter.getP());
-		this.spawnNumber = spawnNumber;
+				parameter.getTrials(), parameter.getP());
 	}
-
-	@Override
-	public int getSpawnNumber(double timeCurrentEvent) {
-		return spawnNumber;
-	}
-
 	@Override
 	public double getNextSpawnTime(double timeCurrentEvent) {
 		return timeCurrentEvent + distribution.sample();
-	}
-
-	@Override
-	public int getRemainingSpawnAgents() {
-		return remainingSpawnAgents;
-	}
-
-	@Override
-	public void setRemainingSpawnAgents(int remainingSpawnAgents) {
-		this.remainingSpawnAgents = remainingSpawnAgents;
 	}
 
 	@Override

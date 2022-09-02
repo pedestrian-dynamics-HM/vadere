@@ -1,7 +1,6 @@
 package org.vadere.state.attributes.models;
 
 import org.vadere.annotation.factories.attributes.ModelAttributeClass;
-import org.vadere.state.attributes.Attributes;
 import org.vadere.state.types.MovementType;
 import org.vadere.state.types.OptimizationType;
 import org.vadere.state.types.UpdateType;

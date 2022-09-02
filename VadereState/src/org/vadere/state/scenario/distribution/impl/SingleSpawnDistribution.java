@@ -1,7 +1,7 @@
 package org.vadere.state.scenario.distribution.impl;
 
 import org.apache.commons.math3.random.RandomGenerator;
-import org.vadere.state.attributes.Attributes;
+import org.vadere.util.Attributes;
 import org.vadere.state.scenario.distribution.VDistribution;
 import org.vadere.state.attributes.distributions.AttributesSingleSpawnDistribution;
 import org.vadere.state.scenario.distribution.registry.RegisterDistribution;
@@ -12,10 +12,14 @@ import org.vadere.state.scenario.distribution.registry.RegisterDistribution;
 @RegisterDistribution(name = "singleSpawn", parameter = AttributesSingleSpawnDistribution.class)
 public class SingleSpawnDistribution extends VDistribution<AttributesSingleSpawnDistribution> {
 	private Attributes singelspawnAttributes;
-	private int spawnNumber;
-	private double spawnTime;
-	private int remainingSpawnAgents;
 
+	private double spawnTime;
+
+	public SingleSpawnDistribution(){
+		// Do not remove this constructor. It is us used through reflection.
+		super();
+		this.singelspawnAttributes = new AttributesSingleSpawnDistribution();
+	}
 	public SingleSpawnDistribution(AttributesSingleSpawnDistribution parameter, int spawnNumber, RandomGenerator unused)
 	        throws Exception {
 		super(parameter, spawnNumber, unused);
@@ -24,27 +28,11 @@ public class SingleSpawnDistribution extends VDistribution<AttributesSingleSpawn
 	@Override
 	protected void setValues(AttributesSingleSpawnDistribution parameter, int spawnNumber, RandomGenerator unused) throws Exception {
 		this.spawnTime = parameter.getSpawnTime();
-		this.spawnNumber = parameter.getSpawnNumber();
-	}
-
-	@Override
-	public int getSpawnNumber(double timeCurrentEvent) {
-		return this.spawnNumber;
 	}
 
 	@Override
 	public double getNextSpawnTime(double timeCurrentEvent) {
 		return spawnTime;
-	}
-
-	@Override
-	public int getRemainingSpawnAgents() {
-		return remainingSpawnAgents;
-	}
-
-	@Override
-	public void setRemainingSpawnAgents(int remainingSpawnAgents) {
-		this.remainingSpawnAgents = remainingSpawnAgents;
 	}
 
 	@Override

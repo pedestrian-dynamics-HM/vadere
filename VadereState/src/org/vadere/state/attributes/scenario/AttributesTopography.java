@@ -1,6 +1,6 @@
 package org.vadere.state.attributes.scenario;
 
-import org.vadere.state.attributes.Attributes;
+import org.vadere.util.Attributes;
 import org.vadere.state.scenario.ReferenceCoordinateSystem;
 import org.vadere.util.geometry.shapes.VRectangle;
 

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 
 import org.vadere.state.attributes.*;
+import org.vadere.util.Attributes;
 import org.vadere.util.version.Version;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.projects.Scenario;

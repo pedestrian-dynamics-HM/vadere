@@ -1,4 +1,4 @@
-package org.vadere.state.scenario.distribution.impl;
+/*package org.vadere.state.scenario.distribution.impl;
 
 import static org.junit.Assert.*;
 
@@ -24,6 +24,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 /**
  * @author Aleksandar Ivanov(ivanov0@hm.edu)
  */
+/*
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ TimeSeriesDistribution.class })
 public class TimeSeriesDistributionTest extends VDistributionTest {
@@ -87,7 +88,9 @@ public class TimeSeriesDistributionTest extends VDistributionTest {
 
 		return dist;
 	}
+	*/
 
+/*
 	@Override
 	public void testGetSpawnNumber() throws Exception {
 		Mockito.when(distMock.getSpawnNumber(Mockito.anyDouble())).thenReturn(1);
@@ -99,6 +102,8 @@ public class TimeSeriesDistributionTest extends VDistributionTest {
 		Mockito.verify(distMock).getSpawnNumber(1d);
 	}
 
+ */
+/*
 	@Override
 	public void testRemainingSpawnAgents() throws Exception {
 		int expected = 1;
@@ -127,3 +132,4 @@ public class TimeSeriesDistributionTest extends VDistributionTest {
 	}
 
 }
+*/

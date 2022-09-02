@@ -1,7 +1,7 @@
 package org.vadere.gui.topographycreator.control.celleditor;
 
 import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
-import org.vadere.state.attributes.AttributesAttached;
+import org.vadere.util.AttributesAttached;
 
 import javax.swing.*;
 import javax.swing.text.AttributeSet;

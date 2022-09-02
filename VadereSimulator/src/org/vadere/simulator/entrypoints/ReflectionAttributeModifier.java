@@ -3,7 +3,7 @@ package org.vadere.simulator.entrypoints;
 
 import java.lang.reflect.Field;
 
-import org.vadere.state.attributes.Attributes;
+import org.vadere.util.Attributes;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.scenario.Topography;
 

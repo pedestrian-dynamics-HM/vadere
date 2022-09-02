@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.vadere.annotation.factories.migrationassistant.MigrationTransformation;
 import org.vadere.simulator.projects.migration.MigrationException;
 import org.vadere.simulator.projects.migration.jsontranformation.SimpleJsonTransformation;
-import org.vadere.state.attributes.Attributes;
+import org.vadere.util.Attributes;
 import org.vadere.state.attributes.models.infection.AttributesAirTransmissionModelAerosolCloud;
 import org.vadere.state.attributes.models.infection.AttributesAirTransmissionModelDroplets;
 import org.vadere.state.attributes.models.infection.AttributesThresholdResponseModel;

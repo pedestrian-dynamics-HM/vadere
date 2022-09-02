@@ -1,7 +1,7 @@
 package org.vadere.state.scenario.distribution.impl;
 
 import org.apache.commons.math3.random.RandomGenerator;
-import org.vadere.state.attributes.Attributes;
+import org.vadere.util.Attributes;
 import org.vadere.state.scenario.distribution.VDistribution;
 import org.vadere.state.attributes.distributions.AttributesConstantDistribution;
 import org.vadere.state.scenario.distribution.registry.RegisterDistribution;
@@ -14,37 +14,42 @@ public class ConstantDistribution extends VDistribution<AttributesConstantDistri
 
 	private Attributes constantAttributes;
 
-	public ConstantDistribution(AttributesConstantDistribution parameter, int spawnNumber, RandomGenerator unused) throws Exception {
-		super(parameter,spawnNumber,unused);
-	}
+	private double updateFrequency;
+	/*
+	private int spawnNumber;
+	private int remainingSpawnAgents;
+	 */
 	public ConstantDistribution(){
+		// Do not remove this constructor. It is us used through reflection.
 		super();
 		this.constantAttributes = new AttributesConstantDistribution();
 	}
+	public ConstantDistribution(AttributesConstantDistribution parameter, int spawnNumber, RandomGenerator unused) throws Exception {
+		super(parameter,spawnNumber,unused);
+	}
 
-	private double updateFrequency;
-	private int spawnNumber;
-	private int remainingSpawnAgents;
 
 	@Override
 	protected void setValues(AttributesConstantDistribution attributes, int spawnNumber, RandomGenerator unused) {
 		this.constantAttributes = attributes;
+		/*
 		this.spawnNumber = spawnNumber;
 		this.updateFrequency = attributes.getUpdateFrequency();
+		 */
 
 	}
-
-	@Override
-	public int getSpawnNumber(double timeCurrentEvent) {
-		return spawnNumber;
-	}
-
 	@Override
 	public double getNextSpawnTime(double timeCurrentEvent) {
 		// always add a constant value to the 'value'
 		return timeCurrentEvent + this.updateFrequency;
 	}
-
+	/*
+        @Override
+        public int getSpawnNumber(double timeCurrentEvent) {
+            return spawnNumber;
+        }
+    */
+/*
 	@Override
 	public int getRemainingSpawnAgents() {
 		return remainingSpawnAgents;
@@ -54,7 +59,7 @@ public class ConstantDistribution extends VDistribution<AttributesConstantDistri
 	public void setRemainingSpawnAgents(int remainingSpawnAgents) {
 		this.remainingSpawnAgents = remainingSpawnAgents;
 	}
-
+*/
 	@Override
 	public Attributes getAttributes() {
 		return this.constantAttributes;

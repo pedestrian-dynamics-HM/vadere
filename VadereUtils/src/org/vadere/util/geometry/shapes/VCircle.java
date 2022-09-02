@@ -14,6 +14,7 @@ import java.util.Comparator;
 import java.util.Optional;
 
 import org.jetbrains.annotations.NotNull;
+import org.vadere.util.Attributes;
 
 public class VCircle implements VShape, ICircleSector {
 
@@ -344,4 +345,13 @@ public class VCircle implements VShape, ICircleSector {
 				'}';
 	}
 
+	@Override
+	public Attributes getAttributes() {
+		return null;
+	}
+
+	@Override
+	public void setAttributes(Attributes attributes) {
+
+	}
 }

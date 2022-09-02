@@ -5,7 +5,7 @@ import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.projects.Domain;
-import org.vadere.state.attributes.Attributes;
+import org.vadere.util.Attributes;
 import org.vadere.state.attributes.models.AttributesBHM;
 import org.vadere.state.attributes.models.AttributesBMM;
 import org.vadere.state.attributes.scenario.AttributesAgent;

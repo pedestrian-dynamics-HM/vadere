@@ -1,7 +1,8 @@
 package org.vadere.util.geometry.shapes;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.jetbrains.annotations.NotNull;
-
+@JsonSerialize(as= VShape.class)
 public class VDisc extends VCircle {
 
 	public VDisc(final VPoint center, double radius) {

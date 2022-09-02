@@ -3,6 +3,7 @@ package org.vadere.state.attributes;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.vadere.util.Attributes;
 import org.vadere.util.reflection.DynamicClassInstantiator;
 
 /**

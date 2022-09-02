@@ -5,7 +5,7 @@ import org.vadere.simulator.control.scenarioelements.listener.ControllerEventPro
 import org.vadere.simulator.models.DynamicElementFactory;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.projects.Domain;
-import org.vadere.state.attributes.Attributes;
+import org.vadere.util.Attributes;
 import org.vadere.state.attributes.exceptions.AttributesNotFoundException;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.scenario.Agent;

@@ -1,7 +1,7 @@
 package org.vadere.state.scenario.distribution.impl;
 
 import org.apache.commons.math3.random.RandomGenerator;
-import org.vadere.state.attributes.Attributes;
+import org.vadere.util.Attributes;
 import org.vadere.state.scenario.distribution.VDistribution;
 import org.vadere.state.attributes.distributions.AttributesEmpiricalDistribution;
 import org.vadere.state.scenario.distribution.registry.RegisterDistribution;
@@ -13,9 +13,16 @@ import org.vadere.state.scenario.distribution.registry.RegisterDistribution;
 public class EmpiricalDistribution extends VDistribution<AttributesEmpiricalDistribution> {
 	private Attributes empiricalAttributes;
 	private org.apache.commons.math3.random.EmpiricalDistribution distribution;
+	/*
 	private int spawnNumber;
 	private int remainingSpawnAgents;
+	 */
 
+	public EmpiricalDistribution(){
+		// Do not remove this constructor. It is us used through reflection.
+		super();
+		this.empiricalAttributes = new AttributesEmpiricalDistribution();
+	}
 	public EmpiricalDistribution(AttributesEmpiricalDistribution parameter, int spawnNumber, RandomGenerator randomGenerator)
 	        throws Exception {
 		super(parameter, spawnNumber, randomGenerator);
@@ -25,20 +32,20 @@ public class EmpiricalDistribution extends VDistribution<AttributesEmpiricalDist
 	protected void setValues(AttributesEmpiricalDistribution parameter, int spawnNumber, RandomGenerator randomGenerator) {
 		distribution = new org.apache.commons.math3.random.EmpiricalDistribution(randomGenerator);
 		//distribution.load(parameter.getValues());
-		this.spawnNumber = spawnNumber;
+		//this.spawnNumber = spawnNumber;
 
 	}
-
-	@Override
-	public int getSpawnNumber(double timeCurrentEvent) {
-		return spawnNumber;
-	}
-
 	@Override
 	public double getNextSpawnTime(double timeCurrentEvent) {
 		return timeCurrentEvent + distribution.sample();
 	}
-
+	/*
+        @Override
+        public int getSpawnNumber(double timeCurrentEvent) {
+            return spawnNumber;
+        }
+    */
+/*
 	@Override
 	public int getRemainingSpawnAgents() {
 		return remainingSpawnAgents;
@@ -48,7 +55,7 @@ public class EmpiricalDistribution extends VDistribution<AttributesEmpiricalDist
 	public void setRemainingSpawnAgents(int remainingSpawnAgents) {
 		this.remainingSpawnAgents = remainingSpawnAgents;
 	}
-
+*/
 	@Override
 	public Attributes getAttributes() {
 		return this.empiricalAttributes;

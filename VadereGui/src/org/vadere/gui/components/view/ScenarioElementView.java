@@ -14,7 +14,7 @@ import org.vadere.gui.projectview.view.ScenarioPanel;
 import org.vadere.gui.topographycreator.control.celleditor.AttributeEditor;
 import org.vadere.gui.topographycreator.model.AgentWrapper;
 import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
-import org.vadere.state.attributes.Attributes;
+import org.vadere.util.Attributes;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.util.StateJsonConverter;

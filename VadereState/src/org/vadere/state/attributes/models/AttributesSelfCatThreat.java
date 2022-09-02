@@ -1,6 +1,6 @@
 package org.vadere.state.attributes.models;
 
-import org.vadere.state.attributes.Attributes;
+import org.vadere.util.Attributes;
 
 public class AttributesSelfCatThreat extends Attributes {
 

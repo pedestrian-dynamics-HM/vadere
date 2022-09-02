@@ -2,8 +2,7 @@ package org.vadere.simulator.control.scenarioelements.targetchanger;
 
 
 import org.apache.commons.math3.distribution.BinomialDistribution;
-import org.apache.commons.math3.random.JDKRandomGenerator;
-import org.vadere.state.attributes.Attributes;
+import org.vadere.util.Attributes;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.TargetChanger;
@@ -12,7 +11,6 @@ import org.vadere.state.scenario.TargetPedestrian;
 import org.vadere.state.scenario.Topography;
 
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;

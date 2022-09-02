@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.math3.util.Pair;
 import org.vadere.annotation.factories.attributes.ModelAttributeClass;
-import org.vadere.state.attributes.Attributes;
+import org.vadere.util.Attributes;
 import org.vadere.state.attributes.models.seating.SeatRelativePosition;
 import org.vadere.state.attributes.models.seating.ValueWithProbabilityFraction;
 import org.vadere.state.attributes.models.seating.model.SeatPosition;

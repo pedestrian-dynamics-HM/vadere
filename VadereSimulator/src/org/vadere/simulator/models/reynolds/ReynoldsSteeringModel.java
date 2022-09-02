@@ -11,7 +11,7 @@ import org.vadere.simulator.models.reynolds.behaviour.Separation;
 import org.vadere.simulator.models.reynolds.behaviour.WallAvoidance;
 import org.vadere.simulator.models.reynolds.behaviour.Wander;
 import org.vadere.simulator.projects.Domain;
-import org.vadere.state.attributes.Attributes;
+import org.vadere.util.Attributes;
 import org.vadere.state.attributes.models.AttributesReynolds;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.psychology.cognition.UnsupportedSelfCategoryException;

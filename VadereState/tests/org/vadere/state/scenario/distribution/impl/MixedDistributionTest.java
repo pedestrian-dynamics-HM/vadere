@@ -1,4 +1,4 @@
-package org.vadere.state.scenario.distribution.impl;
+/*package org.vadere.state.scenario.distribution.impl;
 
 import static org.junit.Assert.*;
 
@@ -21,7 +21,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * @author Aleksandar Ivanov(ivanov0@hm.edu)
- */
+*/
+/*
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ MixedDistribution.class, DistributionFactory.class })
 public class MixedDistributionTest extends VDistributionTest {
@@ -58,6 +59,8 @@ public class MixedDistributionTest extends VDistributionTest {
 		return dist;
 	}
 
+ */
+	/*
 	@Override
 	public void testGetSpawnNumber() throws Exception {
 		VDistribution<?> dist = getDistributionUnderTest();
@@ -81,3 +84,5 @@ public class MixedDistributionTest extends VDistributionTest {
 	}
 
 }
+	*/
+

@@ -3,7 +3,7 @@ package org.vadere.state.scenario;
 import java.util.Random;
 
 import org.vadere.util.geometry.shapes.Vector2D;
-import org.vadere.state.attributes.Attributes;
+import org.vadere.util.Attributes;
 import org.vadere.state.attributes.scenario.AttributesCar;
 import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.geometry.shapes.VPoint;

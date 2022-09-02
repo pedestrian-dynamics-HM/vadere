@@ -1,16 +1,12 @@
 package org.vadere.state.scenario;
 
 import org.jetbrains.annotations.NotNull;
-import org.vadere.state.attributes.Attributes;
+import org.vadere.util.Attributes;
 import org.vadere.state.attributes.scenario.AttributesMeasurementArea;
 import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
-
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Objects;
 
 public class MeasurementArea extends ScenarioElement {
 

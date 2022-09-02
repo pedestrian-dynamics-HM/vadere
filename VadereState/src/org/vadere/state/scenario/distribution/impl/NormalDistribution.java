@@ -1,7 +1,7 @@
 package org.vadere.state.scenario.distribution.impl;
 
 import org.apache.commons.math3.random.RandomGenerator;
-import org.vadere.state.attributes.Attributes;
+import org.vadere.util.Attributes;
 import org.vadere.state.scenario.distribution.VDistribution;
 import org.vadere.state.attributes.distributions.AttributesNormalDistribution;
 import org.vadere.state.scenario.distribution.registry.RegisterDistribution;
@@ -14,9 +14,12 @@ import org.vadere.util.math.TruncatedNormalDistribution;
 public class NormalDistribution extends VDistribution<AttributesNormalDistribution> {
 	private Attributes normalAttributes;
 	private TruncatedNormalDistribution distribution; // we should't really go back in time -> cut the dist at 0
-	private int spawnNumber;
-	private int remainingSpawnAgents;
 
+	public NormalDistribution(){
+		// Do not remove this constructor. It is us used through reflection.
+		super();
+		this.normalAttributes = new AttributesNormalDistribution();
+	}
 	public NormalDistribution(AttributesNormalDistribution parameter, int spawnNumber, RandomGenerator randomGenerator)
 	        throws Exception {
 		super(parameter, spawnNumber, randomGenerator);
@@ -27,20 +30,20 @@ public class NormalDistribution extends VDistribution<AttributesNormalDistributi
 	        throws Exception {
 		distribution = new TruncatedNormalDistribution(randomGenerator, parameter.getMean(), parameter.getSd(), 0,
 		        Double.MAX_VALUE, 1000);
-		this.spawnNumber = spawnNumber;
+		//this.spawnNumber = spawnNumber;
 
 	}
-
+/*
 	@Override
 	public int getSpawnNumber(double timeCurrentEvent) {
 		return spawnNumber;
 	}
-
+*/
 	@Override
 	public double getNextSpawnTime(double timeCurrentEvent) {
 		return timeCurrentEvent + distribution.sample();
 	}
-
+/*
 	@Override
 	public int getRemainingSpawnAgents() {
 		return remainingSpawnAgents;
@@ -50,7 +53,7 @@ public class NormalDistribution extends VDistribution<AttributesNormalDistributi
 	public void setRemainingSpawnAgents(int remainingSpawnAgents) {
 		this.remainingSpawnAgents = remainingSpawnAgents;
 	}
-
+*/
 	@Override
 	public Attributes getAttributes() {
 		return this.normalAttributes;

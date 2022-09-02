@@ -5,7 +5,7 @@ import org.vadere.gui.topographycreator.control.JAttributeTable;
 import org.vadere.gui.topographycreator.control.JCollapsablePanel;
 import org.vadere.gui.topographycreator.model.AttributeTableModel;
 import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
-import org.vadere.state.attributes.AttributesAttached;
+import org.vadere.util.AttributesAttached;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.util.reflection.VadereAttribute;
 

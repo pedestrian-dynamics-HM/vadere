@@ -1,4 +1,4 @@
-package org.vadere.state.attributes;
+package org.vadere.util;
 
 import org.apache.commons.attributes.Sealable;
 

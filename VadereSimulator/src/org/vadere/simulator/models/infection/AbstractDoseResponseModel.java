@@ -5,7 +5,7 @@ import org.vadere.simulator.control.scenarioelements.TopographyController;
 import org.vadere.simulator.control.simulation.ControllerProvider;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.projects.Domain;
-import org.vadere.state.attributes.Attributes;
+import org.vadere.util.Attributes;
 import org.vadere.state.attributes.exceptions.AttributesNotFoundException;
 import org.vadere.state.attributes.models.infection.AttributesDoseResponseModel;
 import org.vadere.state.attributes.models.infection.AttributesExposureModel;

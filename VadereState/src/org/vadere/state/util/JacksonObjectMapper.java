@@ -2,8 +2,10 @@ package org.vadere.state.util;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Random;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import org.apache.commons.math3.random.JDKRandomGenerator;
 import org.vadere.state.attributes.distributions.AttributesDistribution;
 import org.vadere.state.scenario.distribution.DistributionFactory;
 import org.vadere.state.scenario.distribution.VDistribution;
@@ -37,8 +39,13 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 public class JacksonObjectMapper extends ObjectMapper {
 
 	private static final long serialVersionUID = 1L;
-
+	private Random random;
+	public JacksonObjectMapper(Random random){
+		this();
+		this.random = random;
+	}
 	public JacksonObjectMapper() {
+		this.random = random;
 		configure(DeserializationFeature.ACCEPT_FLOAT_AS_INT, true); // otherwise 4.7 will automatically be casted to 4 for integers, with this it throws an error
 		enable(JsonParser.Feature.STRICT_DUPLICATE_DETECTION); // forbids duplicate keys
 		disable(SerializationFeature.FAIL_ON_EMPTY_BEANS); // to allow empty attributes like "attributes.SeatingAttr": {}, useful while in dev
@@ -145,7 +152,7 @@ public class JacksonObjectMapper extends ObjectMapper {
 					return null;
 				}
 				try {
-					return DistributionFactory.create(type,param,10,null);
+					return DistributionFactory.create(type,param,10,new JDKRandomGenerator(random.nextInt()));
 				} catch (Exception e) {
 					throw new RuntimeException(e);
 				}
