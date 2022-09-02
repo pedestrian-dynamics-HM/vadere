@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="64"
+   height="64"
+   viewBox="0 0 16.933333 16.933333"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.2.1 (9c6d41e410, 2022-07-14)"
+   sodipodi:docname="drawing.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     showgrid="true"
+     inkscape:zoom="11.28125"
+     inkscape:cx="31.955678"
+     inkscape:cy="31.999999"
+     inkscape:window-width="1620"
+     inkscape:window-height="988"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1">
+    <inkscape:grid
+       type="xygrid"
+       id="grid69"
+       originx="0"
+       originy="0.025770159" />
+    <inkscape:page
+       x="0"
+       y="0"
+       width="16.933332"
+       height="16.933332"
+       id="page2846"
+       inkscape:export-filename="Inform.png"
+       inkscape:export-xdpi="48.000004"
+       inkscape:export-ydpi="48.000004" />
+    <inkscape:page
+       x="19.84375"
+       y="0.025770158"
+       width="16.933334"
+       height="16.933332"
+       id="page2848"
+       inkscape:export-filename="Error.png"
+       inkscape:export-xdpi="48"
+       inkscape:export-ydpi="48" />
+  </sodipodi:namedview>
+  <defs
+     id="defs2" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,0.02577016)">
+    <circle
+       style="fill:#008cec;fill-opacity:1;stroke-width:0.169308"
+       id="path173"
+       cx="8.598958"
+       cy="8.5731878"
+       r="4.6559787" />
+    <text
+       xml:space="preserve"
+       style="font-size:7.22383px;fill:#008cec;fill-opacity:1;stroke-width:0.169308"
+       x="7.3608894"
+       y="11.317396"
+       id="text1771"><tspan
+         sodipodi:role="line"
+         id="tspan1769"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:7.22383px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#94e4fc;stroke-width:0.169308"
+         x="7.3608894"
+         y="11.317396">i</tspan></text>
+    <path
+       sodipodi:type="star"
+       style="fill:#fc5050;fill-opacity:1;stroke-width:0.264583"
+       id="path2912"
+       inkscape:flatsided="true"
+       sodipodi:sides="8"
+       sodipodi:cx="107"
+       sodipodi:cy="32.097397"
+       sodipodi:r1="30.140099"
+       sodipodi:r2="27.845819"
+       sodipodi:arg1="1.1830497"
+       sodipodi:arg2="1.5757488"
+       inkscape:rounded="0"
+       inkscape:randomized="0"
+       d="M 118.39607,59.999998 95.32812,59.885754 79.097399,43.493467 79.211643,20.425517 95.60393,4.1947962 118.67188,4.3090401 134.9026,20.701327 134.78836,43.769276 Z"
+       transform="matrix(0.17555871,0,0,0.17555871,9.5256346,2.8316885)" />
+    <text
+       xml:space="preserve"
+       style="font-size:7.49051px;fill:#fca0a0;fill-opacity:1;stroke-width:0.175558"
+       x="25.426497"
+       y="11.196973"
+       id="text1771-3"><tspan
+         sodipodi:role="line"
+         id="tspan1769-6"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:7.49051px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#fca0a0;stroke-width:0.175558"
+         x="25.426497"
+         y="11.196973">X</tspan></text>
+  </g>
+</svg>
