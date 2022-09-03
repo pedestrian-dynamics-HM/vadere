@@ -45,25 +45,12 @@ public class Target extends ScenarioElement implements Comparable<Target> {
 		return attributes.isAbsorbing();
 	}
 
-
-	public double getWaitingTimeYellowPhase() {
-		return attributes.getWaitingTimeYellowPhase();
-	}
-
 	public int getParallelWaiters() {
 		return attributes.getParallelWaiters();
 	}
 
-	public boolean isStartingWithRedLight() {
-		return attributes.isStartingWithRedLight();
-	}
-
 	public WaitingBehaviour getWaitingBehaviour(){
 		return attributes.getWaitingBehaviour();
-	}
-
-	public double getNextSpeed() {
-		return attributes.getNextSpeed();
 	}
 
 	public Map<Integer, Double> getEnteringTimes() {

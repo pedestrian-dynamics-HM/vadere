@@ -1,7 +1,8 @@
 {
   "name" : "queue",
   "description" : "",
-  "release" : "2.5",
+  "release" : "2.3",
+  "commithash" : "ff5b381ea8f959e7e0d65a1b13bcdde1e13782cf",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -221,7 +222,6 @@
         "referenceCoordinateSystem" : null
       },
       "obstacles" : [ {
-        "id" : 2,
         "shape" : {
           "x" : 0.5,
           "y" : 7.0,
@@ -229,9 +229,8 @@
           "height" : 0.5,
           "type" : "RECTANGLE"
         },
-        "visible" : null
+        "id" : 2
       }, {
-        "id" : 3,
         "shape" : {
           "x" : 4.8,
           "y" : 1.0,
@@ -239,9 +238,8 @@
           "height" : 6.0,
           "type" : "RECTANGLE"
         },
-        "visible" : null
+        "id" : 3
       }, {
-        "id" : 4,
         "shape" : {
           "x" : 0.5,
           "y" : 0.5,
@@ -249,9 +247,8 @@
           "height" : 0.5,
           "type" : "RECTANGLE"
         },
-        "visible" : null
+        "id" : 4
       }, {
-        "id" : 5,
         "shape" : {
           "x" : 1.8,
           "y" : 1.8,
@@ -259,9 +256,8 @@
           "height" : 5.2,
           "type" : "RECTANGLE"
         },
-        "visible" : null
+        "id" : 5
       }, {
-        "id" : 8,
         "shape" : {
           "x" : 3.8,
           "y" : 1.8,
@@ -269,9 +265,8 @@
           "height" : 5.2,
           "type" : "RECTANGLE"
         },
-        "visible" : null
+        "id" : 8
       }, {
-        "id" : 15,
         "shape" : {
           "x" : 2.8,
           "y" : 1.0,
@@ -279,9 +274,8 @@
           "height" : 5.2,
           "type" : "RECTANGLE"
         },
-        "visible" : null
+        "id" : 15
       }, {
-        "id" : 7,
         "shape" : {
           "x" : 0.5,
           "y" : 1.0,
@@ -289,7 +283,7 @@
           "height" : 6.0,
           "type" : "RECTANGLE"
         },
-        "visible" : null
+        "id" : 7
       } ],
       "measurementAreas" : [ ],
       "stairs" : [ ],
@@ -302,21 +296,17 @@
           "height" : 0.5,
           "type" : "RECTANGLE"
         },
-        "visible" : null,
         "absorbing" : true,
-        "waitingBehaviour" : "INDIVIDUAL",
-        "waitingTimeYellowPhase" : 0.0,
-        "parallelWaiters" : 0,
-        "waitingTimeDistribution" : {
-          "type" : "constant",
-          "parameters" : {
-            "updateFrequency" : 120.0
-          }
-        },
-        "distributionParameters" : null,
         "deletionDistance" : 0.1,
+        "waitingBehaviour" : "INDIVIDUAL",
+        "parallelWaiters" : 0,
+        "nextSpeed" : -1.0,
+        "waitingTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 120.0
+        },
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "waitingTimeYellowPhase" : 0.0
       } ],
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],
@@ -331,12 +321,9 @@
           "height" : 0.5,
           "type" : "RECTANGLE"
         },
-        "visible" : null,
-        "interSpawnTimeDistribution" : {
-          "type" : "constant",
-          "parameters" : {
-            "updateFrequency" : 2.0
-          }
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 2.0
         },
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : 9,
@@ -358,12 +345,9 @@
           "height" : 0.5,
           "type" : "RECTANGLE"
         },
-        "visible" : null,
-        "interSpawnTimeDistribution" : {
-          "type" : "constant",
-          "parameters" : {
-            "updateFrequency" : 1.0
-          }
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 1.0
         },
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : 1,
@@ -379,8 +363,6 @@
       } ],
       "dynamicElements" : [ ],
       "attributesPedestrian" : {
-        "shape" : null,
-        "visible" : null,
         "radius" : 0.2,
         "densityDependentSpeed" : false,
         "speedDistributionMean" : 1.34,
@@ -396,8 +378,6 @@
       "teleporter" : null,
       "attributesCar" : {
         "id" : -1,
-        "shape" : null,
-        "visible" : null,
         "radius" : 0.2,
         "densityDependentSpeed" : false,
         "speedDistributionMean" : 1.34,

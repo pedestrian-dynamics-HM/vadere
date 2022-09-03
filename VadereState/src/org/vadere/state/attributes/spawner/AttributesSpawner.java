@@ -24,7 +24,7 @@ public abstract class AttributesSpawner extends Attributes {
     protected Boolean eventPositionRandom;
     @VadereAttribute
     @JsonView(Views.CacheViewExclude.class)
-    protected Boolean eventPositonGridCA;
+    protected Boolean eventPositionGridCA;
     @VadereAttribute
     @JsonView(Views.CacheViewExclude.class)
     protected Boolean eventPositionFreeSpace;
@@ -72,12 +72,12 @@ public abstract class AttributesSpawner extends Attributes {
     }
 
     public Boolean isEventPositionGridCA() {
-        return eventPositonGridCA;
+        return eventPositionGridCA;
     }
 
     public void setEventPositionGridCA(Boolean eventPositionGridCA) {
         checkSealed();
-        this.eventPositonGridCA = eventPositionGridCA;
+        this.eventPositionGridCA = eventPositionGridCA;
     }
 
     public Boolean isEventPositionFreeSpace() {

@@ -8,7 +8,6 @@ import org.vadere.simulator.projects.migration.jsontranformation.SimpleJsonTrans
 import org.vadere.util.version.Version;
 
 import java.util.Iterator;
-import java.util.function.Function;
 
 
 @MigrationTransformation(targetVersionLabel = "2.5")
@@ -44,8 +43,23 @@ public class TargetVersionV2_5 extends SimpleJsonTransformation {
         addPostHookLast(this::sort);
     }
 
-    private JsonNode moveAndRenameSourceFields(JsonNode node) {
-        moveField(node,"scenario/topography/sources/spawnNumber",PATH_SRC +"/"+SPAWNER_FIELD);
+    private JsonNode moveAndRenameSourceFields(JsonNode node) throws MigrationException{
+        if (!path(node, PATH_SRC).isMissingNode()) {
+            Iterator<JsonNode> iter = iteratorSources(node);
+            while (iter.hasNext()) {
+                var nd = (ObjectNode) iter.next();
+                moveRenameField(nd,"eventElementCount","spawnNumber",SPAWNER_FIELD);
+                moveRenameField(nd,"constraintsTimeStart","startTime",SPAWNER_FIELD);
+                moveRenameField(nd,"constraintsTimeEnd","endTime",SPAWNER_FIELD);
+                moveRenameField(nd,"constraintsElementsMax","maxSpawnNumberTotal",SPAWNER_FIELD);
+                moveRenameField(nd,"eventPositionRandom","spawnAtRandomPositions",SPAWNER_FIELD);
+                moveRenameField(nd,"eventPositionGridCA","spawnAtGridPositionsCA",SPAWNER_FIELD);
+                moveRenameField(nd,"eventPositionFreeSpace","useFreeSpaceOnly",SPAWNER_FIELD);
+                moveRenameField(nd,"eventElement","attributesPedestrian",SPAWNER_FIELD);
+                moveRenameField(nd,"type","dynamicElementType",SPAWNER_FIELD+"eventElement");
+                moveRenameField(nd,"distribution",DIST_FIELD_SRC,SPAWNER_FIELD);
+            }
+        }
         return node;
     }
 
@@ -80,17 +94,17 @@ public class TargetVersionV2_5 extends SimpleJsonTransformation {
                 var newNode = getMapper().createObjectNode();
                 newNode.put(TYPE_STRING,distrName);
                 newNode.set(PARAM_STRING,paramNode);
-                nd.set(DIST_FIELD_NEW,newNode);
+                nd.set(nodeName,newNode);
             }
         }
     }
 
-    private void moveField(JsonNode node,String fieldPath,String newParent){
-        var ndSrc = path(node, fieldPath);
-        var ndTrg = path(node, newParent);
-        if(!ndSrc.isMissingNode()){
-            ((ObjectNode)ndTrg).put(ndSrc.asText(),"");
+    private void moveRenameField(JsonNode node,String newName, String fieldName, String newParent)throws MigrationException{
+        var ndSrc = node.path(fieldName);
+        var ndTrg = node.path(newParent);
+        if(!ndSrc.isMissingNode() && !ndTrg.isMissingNode()){
+            ((ObjectNode)ndTrg).put(newName,ndSrc.deepCopy());
         }
-
+        remove(node,fieldName);
     }
 }

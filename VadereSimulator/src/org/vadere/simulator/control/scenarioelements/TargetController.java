@@ -28,38 +28,27 @@ public class TargetController extends ScenarioElementController {
 	private VDistribution distribution = null;
 	private final AttributesTarget targetAttributes;
 
-	private double phaseLength = 0;
-
 	public final Target target;
 	private Topography topography;
 
-	public TrafficLightPhase phase;
 
 	public TargetController(Topography topography, Target target,Random random) {
 		this.target = target;
 		this.targetAttributes = target.getAttributes();
 		this.topography = topography;
 
-		if (this.target.isStartingWithRedLight()) {
-			phase = TrafficLightPhase.RED;
-		} else {
-			phase = TrafficLightPhase.GREEN;
-		}
 		if (!targetAttributes.getWaitingBehaviour().equals(Target.WaitingBehaviour.NO_WAITING)) {
 			try {
-				distribution = targetAttributes.getWaitingTimeDistribution();/*DistributionFactory.create(
-						targetAttributes.getWaitingTimeDistribution(),
-						targetAttributes.getDistributionParameters(),
-						0,
+				distribution = DistributionFactory.create(
+						targetAttributes.getWaitingAreaAttributes().getDistribution(),
 						new JDKRandomGenerator(random.nextInt())
-				);*/
+				);
 
 			} catch (Exception e) {
 				throw new IllegalArgumentException("Problem with scenario parameters for target: "
 						+ "waitingTimeDistribution and/or distributionParameters. See causing Excepion herefafter.", e);
 			}
 
-			this.phaseLength = this.distribution.getNextSpawnTime(0);
 		}
 		this.waitingBehaviour = target.getWaitingBehaviour();
 	}
@@ -106,7 +95,7 @@ public class TargetController extends ScenarioElementController {
 	}
 
 	private Collection<DynamicElement> getPrefilteredDynamicElements() {
-		final double reachedDistance = target.getAttributes().getDeletionDistance();
+		final double reachedDistance = target.getAttributes().getAbsorbingAreaAttributes().getDeletionDistance();
 
 		final Rectangle2D bounds = target.getShape().getBounds2D();
 		final VPoint center = new VPoint(bounds.getCenterX(), bounds.getCenterY());
@@ -120,27 +109,9 @@ public class TargetController extends ScenarioElementController {
 	}
 
 	private void waitingBehavior(final Agent agent, double simTimeInSec) {
-		// individual waiting behaviour, as opposed to waiting at a traffic light
-		switch (waitingBehaviour){
-			case INDIVIDUAL: {
-				waitIndividually(agent, simTimeInSec);
-				break;
-			}
-			case TRAFFIC_LIGHT: {
-				waitTrafficLight(agent,simTimeInSec);
-				break;
-			}
-			case NO_WAITING:{
-				checkRemove(agent);
-				break;
-			}
-		}
-	}
-
-	private void waitTrafficLight(Agent agent, double simTimeInSec) {
-		// traffic light switching based on waiting time. Light starts green.
-		phase = getCurrentTrafficLightPhase(simTimeInSec);
-		if (phase == TrafficLightPhase.GREEN) {
+		if(targetAttributes.isWaiting()){
+			waitIndividually(agent, simTimeInSec);
+		}else if (target.isAbsorbing()){
 			checkRemove(agent);
 		}
 	}
@@ -184,35 +155,12 @@ public class TargetController extends ScenarioElementController {
 	}
 
 	private boolean hasAgentReachedThisTarget(Agent agent) {
-		final double reachedDistance = target.getAttributes().getDeletionDistance();
+		final double reachedDistance = target.getAttributes().getAbsorbingAreaAttributes().getDeletionDistance();
 		final VPoint agentPosition = agent.getPosition();
 		final VShape targetShape = target.getShape();
 
 		return targetShape.contains(agentPosition)
 				|| targetShape.distance(agentPosition) < reachedDistance;
-	}
-
-	private TrafficLightPhase getCurrentTrafficLightPhase(double simTimeInSec) {
-		double phaseSecond = simTimeInSec % (this.phaseLength * 2 + target.getWaitingTimeYellowPhase() * 2);
-
-		if (target.isStartingWithRedLight()) {
-			if (phaseSecond < this.phaseLength)
-				return TrafficLightPhase.RED;
-			if (phaseSecond < this.phaseLength + target.getWaitingTimeYellowPhase())
-				return TrafficLightPhase.YELLOW;
-			if (phaseSecond < this.phaseLength * 2 + target.getWaitingTimeYellowPhase())
-				return TrafficLightPhase.GREEN;
-
-		} else {
-			if (phaseSecond < this.phaseLength)
-				return TrafficLightPhase.GREEN;
-			if (phaseSecond < this.phaseLength + target.getWaitingTimeYellowPhase())
-				return TrafficLightPhase.YELLOW;
-			if (phaseSecond < this.phaseLength * 2 + target.getWaitingTimeYellowPhase())
-				return TrafficLightPhase.RED;
-
-		}
-		return TrafficLightPhase.YELLOW;
 	}
 
 	private boolean isNextTargetForAgent(Agent agent) {

@@ -1,7 +1,8 @@
 {
   "name" : "bottleneckA",
   "description" : "",
-  "release" : "2.5",
+  "release" : "2.3",
+  "commithash" : "ff5b381ea8f959e7e0d65a1b13bcdde1e13782cf",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -181,7 +182,6 @@
         "referenceCoordinateSystem" : null
       },
       "obstacles" : [ {
-        "id" : 1,
         "shape" : {
           "x" : 16.0,
           "y" : 10.806257521058965,
@@ -189,9 +189,8 @@
           "height" : 9.193742478941035,
           "type" : "RECTANGLE"
         },
-        "visible" : null
+        "id" : 1
       }, {
-        "id" : 2,
         "shape" : {
           "x" : 16.0,
           "y" : 0.0,
@@ -199,9 +198,8 @@
           "height" : 10.204572803850782,
           "type" : "RECTANGLE"
         },
-        "visible" : null
+        "id" : 2
       }, {
-        "id" : 6,
         "shape" : {
           "x" : 6.0,
           "y" : 14.0,
@@ -209,9 +207,8 @@
           "height" : 6.0,
           "type" : "RECTANGLE"
         },
-        "visible" : null
+        "id" : 6
       }, {
-        "id" : 7,
         "shape" : {
           "x" : 6.0,
           "y" : 0.1,
@@ -219,7 +216,7 @@
           "height" : 6.9,
           "type" : "RECTANGLE"
         },
-        "visible" : null
+        "id" : 7
       } ],
       "measurementAreas" : [ ],
       "stairs" : [ ],
@@ -232,16 +229,15 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "visible" : null,
         "absorbing" : true,
+        "deletionDistance" : 0.1,
         "waitingBehaviour" : "NO_WAITING",
-        "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
+        "nextSpeed" : -1.0,
         "waitingTimeDistribution" : null,
         "distributionParameters" : null,
-        "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "waitingTimeYellowPhase" : 0.0
       } ],
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],
@@ -256,12 +252,9 @@
           "height" : 18.0,
           "type" : "RECTANGLE"
         },
-        "visible" : null,
-        "interSpawnTimeDistribution" : {
-          "type" : "constant",
-          "parameters" : {
-            "updateFrequency" : 1.0
-          }
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 1.0
         },
         "spawnNumber" : 5,
         "maxSpawnNumberTotal" : 200,
@@ -283,12 +276,9 @@
           "height" : 18.0,
           "type" : "RECTANGLE"
         },
-        "visible" : null,
-        "interSpawnTimeDistribution" : {
-          "type" : "constant",
-          "parameters" : {
-            "updateFrequency" : 1.0
-          }
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 1.0
         },
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : 1,
@@ -304,8 +294,6 @@
       } ],
       "dynamicElements" : [ ],
       "attributesPedestrian" : {
-        "shape" : null,
-        "visible" : null,
         "radius" : 0.2,
         "densityDependentSpeed" : false,
         "speedDistributionMean" : 1.34,
@@ -321,8 +309,6 @@
       "teleporter" : null,
       "attributesCar" : {
         "id" : -1,
-        "shape" : null,
-        "visible" : null,
         "radius" : 0.2,
         "densityDependentSpeed" : false,
         "speedDistributionMean" : 0.9,

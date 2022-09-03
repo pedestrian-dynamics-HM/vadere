@@ -1,15 +1,10 @@
 package org.vadere.state.attributes.scenario;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import org.vadere.state.attributes.AttributesEmbedShape;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Target;
-import org.vadere.state.scenario.distribution.VDistribution;
 import org.vadere.state.util.Views;
-import org.vadere.state.scenario.distribution.parameter.*;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.reflection.VadereAttribute;
 /**
@@ -17,11 +12,12 @@ import org.vadere.util.reflection.VadereAttribute;
  * @author Ludwig Jaeck
  */
 public class AttributesTarget extends AttributesVisualElement {
+	private Boolean absorbing;
+	private AttributesAbsorbingArea absorbingArea;
+	private Boolean waiting;
+	private AttributesWaitingArea waitingArea;
 
-	@VadereAttribute
-	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
-	private Boolean absorbing = true;
-
+	private Double leavingSpeed;
 	/**
 	 *  Modes: <br>
 	 *  <ul>
@@ -35,7 +31,7 @@ public class AttributesTarget extends AttributesVisualElement {
 	 */
 	@JsonView(Views.CacheViewExclude.class)
 	private String waitingBehaviour = Target.WaitingBehaviour.NO_WAITING.toString();
-
+/*
 	private Double waitingTimeYellowPhase = 0.0;
 	/**
 	 * Number of elements that can wait or be absorbed at one time in parallel on this area.
@@ -47,7 +43,7 @@ public class AttributesTarget extends AttributesVisualElement {
 
 
 	// TODO should be "reachedDistance"; agents do not necessarily get deleted/absorbed
-	@VadereAttribute
+
 
 	/**
 	 *  Distribution types:<br>
@@ -63,34 +59,21 @@ public class AttributesTarget extends AttributesVisualElement {
 	 *  <li>"singleSpawn"
 	 *  <li>"timeSeries"
 	 *  </ul>
-	 */
+	 *//*
+	 @VadereAttribute
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
 	private VDistribution waitingTimeDistribution;
+*/
 
-	/**
-	 *  Distribution types:<br>
-	 *  <ul>
-	 *  <li>"BinomialParameter"				[{@link BinomialParameter}]</li>
-	 *  <li>"ConstantParameter"				[{@link ConstantParameter}]</li>
-	 *  <li>"EmpiricalParameter"			[{@link EmpiricalParameter}]</li>
-	 *  <li>"LinearInterpolationParameter"	[{@link LinearInterpolationParameter}]</li>
-	 *  <li>"MixedParameter"				[{@link MixedParameter}]</li>
-	 *  <li>"NegativeExponentialParameter"	[{@link NegativeExponentialParameter}]</li>
-	 *  <li>"NormalParameter"				[{@link NormalParameter}]</li>
-	 *  <li>"PoissonParameter"				[{@link PoissonParameter}]</li>
-	 *  <li>"SingleSpawnParameter"			[{@link SingleSpawnParameter}]</li>
-	 *  <li>"TimeSeriesParameter"			[{@link TimeSeriesParameter}]</li>
-	 *  </ul>
-	 */
+	/*
 	@JsonIgnore
 	private JsonNode distributionParameters ;
-
-	private Double deletionDistance = 0.1;
 
 	/**
 	 * If set to false, starts with green phase (nonblocking), otherwise blocks the path (red
 	 * phase).
 	 */
+			/*
 	@VadereAttribute
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
 	private Boolean startingWithRedLight = false;
@@ -100,11 +83,12 @@ public class AttributesTarget extends AttributesVisualElement {
 	 * after passing this target.
 	 * Can be used to model street networks with differing maximal speeds on roads.
 	 */
+			/*
 	@VadereAttribute
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
 	private Double nextSpeed = -1.0;
 
-
+*/
 
 	public AttributesTarget() {}
 
@@ -122,11 +106,9 @@ public class AttributesTarget extends AttributesVisualElement {
 		this.shape = pedestrian.getShape();
 		this.absorbing = true;
 		this.id = pedestrian.getIdAsTarget();
-		this.waitingTimeYellowPhase = 0.0;
 		this.parallelWaiters = 0;
 		this.waitingBehaviour = Target.WaitingBehaviour.NO_WAITING.toString();
-		this.startingWithRedLight = false;
-		this.nextSpeed = -1.0;
+
 	}
 
 	// Getters...
@@ -135,82 +117,18 @@ public class AttributesTarget extends AttributesVisualElement {
 		return absorbing;
 	}
 
-	public double getWaitingTimeYellowPhase() {
-		return waitingTimeYellowPhase;
+	public void setAbsorbing(boolean absorbing) {
+		checkSealed();
+		this.absorbing = absorbing;
 	}
 
 	public int getParallelWaiters() {
 		return parallelWaiters;
 	}
 
-	/**
-	 * Within this distance, pedestrians have reached the target. It is actually not a "deletion"
-	 * distance but a "reached" distance. Pedestrians do not necessarily get deleted. They can have
-	 * further targets.
-	 */
-	public double getDeletionDistance() {
-		return deletionDistance;
-	}
-
-	public boolean isStartingWithRedLight() {
-		return startingWithRedLight;
-	}
-
-	public double getNextSpeed() {
-		return nextSpeed;
-	}
-
-	public void setReachedDistance(double reachedDistance) {
-		checkSealed();
-		this.deletionDistance = reachedDistance;
-	}
-
-	public void setAbsorbing(boolean absorbing) {
-		checkSealed();
-		this.absorbing = absorbing;
-	}
-
-	public void setWaitingTimeYellowPhase(double waitingTimeYellowPhase) {
-		checkSealed();
-		this.waitingTimeYellowPhase = waitingTimeYellowPhase;
-	}
-
 	public void setParallelWaiters(int parallelWaiters) {
 		checkSealed();
 		this.parallelWaiters = parallelWaiters;
-	}
-
-	public void setDeletionDistance(double deletionDistance) {
-		checkSealed();
-		this.deletionDistance = deletionDistance;
-	}
-
-	public void setStartingWithRedLight(boolean startingWithRedLight) {
-		checkSealed();
-		this.startingWithRedLight = startingWithRedLight;
-	}
-
-	public void setNextSpeed(double nextSpeed) {
-		checkSealed();
-		this.nextSpeed = nextSpeed;
-	}
-
-	public JsonNode getDistributionParameters() {
-		return distributionParameters;
-	}
-
-	public void setDistributionParameters(JsonNode distributionParameters) {
-		checkSealed();
-		this.distributionParameters = distributionParameters;
-	}
-
-	public VDistribution getWaitingTimeDistribution() {
-		return waitingTimeDistribution;
-	}
-
-	public void setWaitingTimeDistribution(VDistribution waitingTimeDistribution) {
-		checkSealed();
-		this.waitingTimeDistribution = waitingTimeDistribution;
 	}
 
 	public Target.WaitingBehaviour getWaitingBehaviour() {
@@ -228,5 +146,37 @@ public class AttributesTarget extends AttributesVisualElement {
 	public void setWaitingBehaviour(Target.WaitingBehaviour behaviour){
 		checkSealed();
 		this.waitingBehaviour = behaviour.toString();
+	}
+
+	public AttributesAbsorbingArea getAbsorbingAreaAttributes() {
+		return absorbingArea;
+	}
+
+	public void setAbsorbingAreaAttributes(AttributesAbsorbingArea absorbingArea) {
+		this.absorbingArea = absorbingArea;
+	}
+
+	public Boolean isWaiting() {
+		return waiting;
+	}
+
+	public void setWaiting(Boolean waiting) {
+		this.waiting = waiting;
+	}
+
+	public AttributesWaitingArea getWaitingAreaAttributes() {
+		return waitingArea;
+	}
+
+	public void setWaitingAreaAttributes(AttributesWaitingArea waitingArea) {
+		this.waitingArea = waitingArea;
+	}
+
+	public Double getLeavingSpeed() {
+		return leavingSpeed;
+	}
+
+	public void setLeavingSpeed(Double leavingSpeed) {
+		this.leavingSpeed = leavingSpeed;
 	}
 }

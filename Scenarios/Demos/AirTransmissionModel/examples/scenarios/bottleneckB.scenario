@@ -1,7 +1,8 @@
 {
   "name" : "bottleneckB",
   "description" : "",
-  "release" : "2.5",
+  "release" : "2.3",
+  "commithash" : "ff5b381ea8f959e7e0d65a1b13bcdde1e13782cf",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -206,7 +207,6 @@
         "referenceCoordinateSystem" : null
       },
       "obstacles" : [ {
-        "id" : 6,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -319,7 +319,7 @@
             "y" : 9.7
           } ]
         },
-        "visible" : null
+        "id" : 6
       } ],
       "measurementAreas" : [ ],
       "stairs" : [ ],
@@ -332,16 +332,15 @@
           "height" : 1.0,
           "type" : "RECTANGLE"
         },
-        "visible" : null,
         "absorbing" : true,
+        "deletionDistance" : 0.1,
         "waitingBehaviour" : "NO_WAITING",
-        "waitingTimeYellowPhase" : 0.0,
         "parallelWaiters" : 0,
+        "nextSpeed" : -1.0,
         "waitingTimeDistribution" : null,
         "distributionParameters" : null,
-        "deletionDistance" : 0.1,
         "startingWithRedLight" : false,
-        "nextSpeed" : -1.0
+        "waitingTimeYellowPhase" : 0.0
       } ],
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],
@@ -356,12 +355,9 @@
           "height" : 15.8,
           "type" : "RECTANGLE"
         },
-        "visible" : null,
-        "interSpawnTimeDistribution" : {
-          "type" : "constant",
-          "parameters" : {
-            "updateFrequency" : 1.0
-          }
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 1.0
         },
         "spawnNumber" : 3,
         "maxSpawnNumberTotal" : -1,
@@ -383,12 +379,9 @@
           "height" : 0.8,
           "type" : "RECTANGLE"
         },
-        "visible" : null,
-        "interSpawnTimeDistribution" : {
-          "type" : "constant",
-          "parameters" : {
-            "updateFrequency" : 1.0
-          }
+        "interSpawnTimeDistribution" : "constant",
+        "distributionParameters" : {
+          "updateFrequency" : 1.0
         },
         "spawnNumber" : 1,
         "maxSpawnNumberTotal" : 1,
@@ -404,8 +397,6 @@
       } ],
       "dynamicElements" : [ ],
       "attributesPedestrian" : {
-        "shape" : null,
-        "visible" : null,
         "radius" : 0.2,
         "densityDependentSpeed" : false,
         "speedDistributionMean" : 1.34,
@@ -421,8 +412,6 @@
       "teleporter" : null,
       "attributesCar" : {
         "id" : -1,
-        "shape" : null,
-        "visible" : null,
         "radius" : 0.2,
         "densityDependentSpeed" : false,
         "speedDistributionMean" : 1.34,
