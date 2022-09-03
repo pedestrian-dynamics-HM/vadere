@@ -9,11 +9,11 @@ import org.vadere.state.attributes.distributions.AttributesDistribution;
  */
 public abstract class VDistribution<T extends AttributesDistribution> implements AttributesAttached{
 
-	public VDistribution(T parameter, int spawnNumber, RandomGenerator randomGenerator) throws Exception {
-		setValues(parameter, spawnNumber, randomGenerator);
+	public VDistribution(T parameter,RandomGenerator randomGenerator) throws Exception {
+		setValues(parameter, randomGenerator);
 	}
     public VDistribution() {}
-    abstract protected void setValues(T parameter, int spawnNumber, RandomGenerator randomGenerator) throws Exception;
+    abstract protected void setValues(T parameter,RandomGenerator randomGenerator) throws Exception;
 
 	abstract public double getNextSpawnTime(double timeCurrentEvent);
 

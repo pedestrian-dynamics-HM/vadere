@@ -35,23 +35,23 @@ public abstract class VSpawner  implements AttributesAttached {
             return true;
         }
         if (isSpawnerWithOneSingleSpawnEvent()) {
-            return dynamicElementsCreatedTotal == spawnerAttributes.getSpawnNumber();
+            return dynamicElementsCreatedTotal == spawnerAttributes.getEventElementCount();
         }
         return isAfterSourceEndTime(simTimeInSec) && isQueueEmpty();
     }
 
     public boolean isMaximumNumberOfSpawnedElementsReached() {
-        final int maxNumber = spawnerAttributes.getMaxSpawnNumberTotal();
-        return maxNumber != AttributesSource.NO_MAX_SPAWN_NUMBER_TOTAL
+        final int maxNumber = spawnerAttributes.getConstraintsElementsMax();
+        return maxNumber != AttributesSpawner.NO_MAX_SPAWN_NUMBER_TOTAL
                 && dynamicElementsCreatedTotal >= maxNumber;
     }
 
     protected boolean isAfterSourceEndTime(double simTimeInSec) {
-        return simTimeInSec > spawnerAttributes.getEndTime();
+        return simTimeInSec > spawnerAttributes.getConstraintsTimeStart();
     }
 
     protected boolean isSpawnerWithOneSingleSpawnEvent() {
-        return spawnerAttributes.getStartTime() == spawnerAttributes.getEndTime();
+        return spawnerAttributes.getConstraintsTimeEnd() == spawnerAttributes.getConstraintsTimeStart();
     }
 
     abstract protected boolean isQueueEmpty();

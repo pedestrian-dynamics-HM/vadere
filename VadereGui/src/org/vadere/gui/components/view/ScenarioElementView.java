@@ -44,6 +44,8 @@ public class ScenarioElementView extends JPanel implements ISelectScenarioElemen
 
 	private JsonValidIndicator jsonValidIndicator;
 
+	private boolean externUpdate = false;
+
 
 	public ScenarioElementView(final IDefaultModel defaultModel) {
 		this(defaultModel,null, null);

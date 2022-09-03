@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.control.util.SingleSpawnArray;
 import org.vadere.simulator.models.DynamicElementFactory;
 import org.vadere.state.attributes.scenario.AttributesDynamicElement;
+import org.vadere.state.attributes.scenario.AttributesSource;
 import org.vadere.state.scenario.Source;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.PointPositioned;
@@ -39,7 +40,7 @@ public class SingleSourceController extends SourceController {
 				new VRectangle(0, 0, elementBound.getWidth(), elementBound.getHeight()),
 				this.dynamicElementFactory::getDynamicElementRequiredPlace,
 				this::testFreeSpace,
-				source.getAttributes());
+				sourceAttributes.getSpawnerAttributes());
 	}
 
 	@Override
@@ -50,9 +51,9 @@ public class SingleSourceController extends SourceController {
 			if (numberToSpawn > 0) {
 				List<VPoint> spawnPoints;
 
-				if (sourceAttributes.isSpawnAtRandomPositions()) {
+				if (spawnerAttributes.isEventPositionRandom()) {
 
-					if(!sourceAttributes.isSpawnAtGridPositionsCA()) {
+					if(!spawnerAttributes.isEventPositionGridCA()) {
 
 						spawnPoints = getRealRandomPositions(
 								numberToSpawn,
@@ -78,7 +79,7 @@ public class SingleSourceController extends SourceController {
 
 				} else {
 
-					if (sourceAttributes.isUseFreeSpaceOnly()) {
+					if (spawnerAttributes.isEventPositionFreeSpace()) {
 						spawnPoints = getRealPositions(
 								numberToSpawn,
 								getDynElementsAtSource().stream()
@@ -206,7 +207,7 @@ public class SingleSourceController extends SourceController {
 
 			// no intersection with other free spaces (obstacles & other pedestrians)
 
-			if (!sourceAttributes.isUseFreeSpaceOnly() || testFreeSpace(freeSpaceRequired, blockPedestrianShapes)) {
+			if (!spawnerAttributes.isEventPositionFreeSpace() || testFreeSpace(freeSpaceRequired, blockPedestrianShapes)) {
 				return Optional.of(randomPoint);
 			}
 		}

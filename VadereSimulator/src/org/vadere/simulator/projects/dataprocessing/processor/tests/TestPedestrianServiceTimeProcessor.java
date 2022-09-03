@@ -52,7 +52,7 @@ public class TestPedestrianServiceTimeProcessor extends TestProcessor {
 
         var source = state.getTopography().getSource(1);
         var sourceAttrib = source.getAttributes();
-        var distrbAttrib = sourceAttrib.getDistributionParameters();
+        var distrbAttrib = sourceAttrib.getSpawnerAttributes().getDistributionAttributes();
         var numberPedsPerSec = ((AttributesPoissonDistribution)distrbAttrib).getNumberPedsPerSecond();
 
         Map<EventTimeKey, Integer> countProcessorData =

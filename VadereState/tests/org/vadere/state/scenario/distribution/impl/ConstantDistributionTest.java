@@ -23,7 +23,7 @@ public class ConstantDistributionTest extends VDistributionTest {
 		AttributesConstantDistribution parameter = new AttributesConstantDistribution();
 		parameter.setUpdateFrequency(updateFrequency);
 
-		ConstantDistribution dist = new ConstantDistribution(parameter, spawnNumber, null);
+		ConstantDistribution dist = new ConstantDistribution(parameter,null);
 
 		return dist;
 	}

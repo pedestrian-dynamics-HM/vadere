@@ -13,13 +13,13 @@ public class RegularSpawner extends VSpawner {
 
     protected VDistribution distribution;
 
-    protected RegularSpawner(AttributesSpawner attributes,Topography topography, VDistribution distribution) {
+    public RegularSpawner(AttributesSpawner attributes, Topography topography, VDistribution distribution) {
         super(attributes,topography,distribution);
     }
 
     @Override
     public int getSpawnNumber(double timeCurrentEvent) {
-        return ((AttributesRegularSpawner)this.spawnerAttributes).getSpawnNumber();
+        return ((AttributesRegularSpawner)this.spawnerAttributes).getEventElementCount();
     }
 
     @Override

@@ -1,6 +1,7 @@
 package org.vadere.gui.topographycreator.control.celleditor;
 
 import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
+import org.vadere.util.Attributes;
 import org.vadere.util.AttributesAttached;
 
 import javax.swing.*;
@@ -9,7 +10,7 @@ import java.lang.reflect.Field;
 public class AttributeDoubleSpinner extends AttributeEditor {
     private JSpinner spinner;
 
-    public AttributeDoubleSpinner(AttributesAttached attached, Field field, TopographyCreatorModel model) {
+    public AttributeDoubleSpinner(Attributes attached, Field field, TopographyCreatorModel model) {
         super(attached, field, model);
         this.spinner = new JSpinner();
         this.spinner.setModel(new SpinnerNumberModel(0.0, -1000.0, 1000.0, 0.1));

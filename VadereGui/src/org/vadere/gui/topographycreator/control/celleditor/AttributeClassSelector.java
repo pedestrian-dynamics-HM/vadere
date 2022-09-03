@@ -2,74 +2,52 @@ package org.vadere.gui.topographycreator.control.celleditor;
 
 import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
 import org.vadere.gui.topographycreator.view.AttributeView;
-import org.vadere.util.AttributesAttached;
+import org.vadere.util.Attributes;
 
 import javax.swing.*;
-import javax.swing.event.MouseInputAdapter;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 
 public class AttributeClassSelector extends AttributeEditor {
 
-    private JButton button;
+    private final JButton button;
     private GridBagConstraints gbc;
 
-    private Class clazz;
+    private final Class clazz;
 
     private TopographyCreatorModel model;
 
-    private JPanel contentPanel;
+    private boolean contentPaneVisible = true;
 
-    public AttributeClassSelector(AttributesAttached attached, Field field, TopographyCreatorModel model, Class clazz, JPanel contentReceiver) {
+    private final JPanel contentPanel;
+
+    public AttributeClassSelector(Attributes attached, Field field, TopographyCreatorModel model, Class clazz, JPanel contentReceiver) {
         super(attached, field, model);
-        this.button = new JButton();
-        this.button.setText("[null]");
-        this.add(button);
-        this.button.addMouseListener(new MouseInputAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                SwingUtilities.invokeLater(() -> {
-                    String selected = button.getText();
-                    if (isNoClass(selected)) {
-                        try {
-                            AttributesAttached newObject = constructNewObject();
-                            setFieldValue(newObject);
-                            clearContentPanel();
-                            button.setText(clazz.getSimpleName());
-                            createInternalPropertyPane(newObject, model);
-                            refreshContentPanel();
-                        } catch (Exception exp) {
-
-                        }
-                    } else {
-                        clearFieldValue();
-                        button.setText("[null]");
-                        clearContentPanel();
-                        refreshContentPanel();
-                    }
-
-                });
-
-            }
-
-            private void setFieldValue(Object newObject) {
-                updateModelFromValue(newObject);
-            }
-
-            private boolean isNoClass(String selected) {
-                return selected.equals("[null]");
-            }
-
-            private void clearFieldValue() {
-                setFieldValue(null);
-            }
-
-        });
         this.contentPanel = contentReceiver;
         this.clazz = clazz;
+        this.button = new JButton();
+        this.add(button);
+        Attributes attrs = null;
+        try {
+            attrs = this.constructNewObject();
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
+        this.createInternalPropertyPane(attrs,model);
 
+        this.button.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                SwingUtilities.invokeLater(() -> {
+                    contentPaneVisible = !contentPaneVisible;
+                    contentPanel.setVisible(contentPaneVisible);
+                });
+            }
+        });
         initializeGridBagConstraint();
     }
 
@@ -85,28 +63,16 @@ public class AttributeClassSelector extends AttributeEditor {
 
     public void updateValueFromModel(Object value) {
         super.updateValueFromModel(value);
-        //this.setSelectedItem(value);
     }
 
-    private void createInternalPropertyPane(AttributesAttached newObject, TopographyCreatorModel model) {
+    private void createInternalPropertyPane(Attributes newObject, TopographyCreatorModel model) {
         var proppane = AttributeView.buildPage(newObject, model);
-        //proppane.selectionChange((ScenarioElement) newObject);
         contentPanel.add(proppane, gbc);
     }
 
-    private void refreshContentPanel() {
-        contentPanel.revalidate();
-        contentPanel.repaint();
-    }
-
-    private void clearContentPanel() {
-        contentPanel.removeAll();
-    }
-
-    private AttributesAttached constructNewObject() throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-        AttributesAttached newObject =(AttributesAttached) clazz.getDeclaredConstructor(null).newInstance(null);
+    private Attributes constructNewObject() throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+        Attributes newObject =(Attributes) clazz.getDeclaredConstructor(null).newInstance(null);
         return newObject;
     }
-
 
 }

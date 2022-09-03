@@ -73,7 +73,7 @@ public class ProjectWriter {
 		for (Scenario scenario : project.getScenarios()) {
 			IOUtils.writeTextFile(
 					getScenarioPath(scenarioPath, scenario).toString(),
-					JsonConverter.serializeScenarioRunManager(scenario, includeCommitHash));
+					JsonConverter.serializeScenario(scenario, includeCommitHash));
 		}
 	}
 
@@ -82,7 +82,7 @@ public class ProjectWriter {
 		Path scenariosDir = Files.createDirectories(Paths.get(projectFolderPath, IOUtils.SCENARIO_DIR));
 		IOUtils.writeTextFile(
 				getScenarioPath(scenariosDir, scenario).toString(),
-				JsonConverter.serializeScenarioRunManager(scenario, true));
+				JsonConverter.serializeScenario(scenario, true));
 	}
 
 	public static Path getScenarioPath(Path scenariosDir, Scenario scenario) {

@@ -344,14 +344,4 @@ public class VCircle implements VShape, ICircleSector {
 				", radius=" + radius +
 				'}';
 	}
-
-	@Override
-	public Attributes getAttributes() {
-		return null;
-	}
-
-	@Override
-	public void setAttributes(Attributes attributes) {
-
-	}
 }

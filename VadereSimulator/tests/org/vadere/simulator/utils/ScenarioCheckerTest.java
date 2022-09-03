@@ -8,11 +8,9 @@ import org.vadere.simulator.utils.scenariochecker.ScenarioChecker;
 import org.vadere.simulator.utils.scenariochecker.ScenarioCheckerMessage;
 import org.vadere.simulator.utils.scenariochecker.ScenarioCheckerMessageType;
 import org.vadere.simulator.utils.scenariochecker.ScenarioCheckerReason;
-import org.vadere.state.attributes.scenario.builder.AttributesAgentBuilder;
-import org.vadere.state.attributes.scenario.builder.AttributesObstacleBuilder;
-import org.vadere.state.attributes.scenario.builder.AttributesSourceBuilder;
-import org.vadere.state.attributes.scenario.builder.AttributesStairsBuilder;
-import org.vadere.state.attributes.scenario.builder.AttributesTargetBuilder;
+import org.vadere.state.attributes.scenario.AttributesSource;
+import org.vadere.state.attributes.scenario.builder.*;
+import org.vadere.state.attributes.spawner.AttributesRegularSpawner;
 import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Source;
@@ -97,11 +95,13 @@ public class ScenarioCheckerTest implements TestResourceHandlerScenario {
 
 	@Test
 	public void TestCheckValidTargetsInSourceNoIdNoSpawn() {
-		AttributesSourceBuilder attrBuilder = AttributesSourceBuilder.anAttributesSource();
-		builder.addSource(attrBuilder
-				.spawnNumber(0)
-				.targetIds(new ArrayList<>())
-				.build()
+		AttributesSourceBuilder srcBuilder = AttributesSourceBuilder.anAttributesSource();
+		AttributesSpawnerBuilder spnBuilder = AttributesSpawnerBuilder.anAttributesSpawner();
+		spnBuilder.setEventElementCount(0);
+		builder.addSource(srcBuilder
+				.setSpawnerBuilder(spnBuilder)
+				.setTargetIds(new ArrayList<>())
+				.build(new AttributesSource(),new AttributesRegularSpawner())
 		);
 		Topography topography = builder.build();
 
@@ -116,7 +116,7 @@ public class ScenarioCheckerTest implements TestResourceHandlerScenario {
 	public void TestCheckValidTargetsInSourceNoId() {
 		AttributesSourceBuilder attrBuilder = AttributesSourceBuilder.anAttributesSource();
 		builder.addSource(attrBuilder
-				.targetIds(new ArrayList<>())
+				.setTargetIds(new ArrayList<>())
 				.build()
 		);
 		Topography topography = builder.build();
@@ -135,7 +135,7 @@ public class ScenarioCheckerTest implements TestResourceHandlerScenario {
 		AttributesSourceBuilder attrSourceB = AttributesSourceBuilder.anAttributesSource();
 		AttributesTargetBuilder attrTargetB = AttributesTargetBuilder.anAttributesTarget();
 		builder.addSource(attrSourceB
-				.targetIds(Collections.singletonList(4)) // id not found !
+				.setTargetIds(Collections.singletonList(4)) // id not found !
 				.build()
 		);
 		builder.addTarget(attrTargetB
@@ -157,7 +157,7 @@ public class ScenarioCheckerTest implements TestResourceHandlerScenario {
 		AttributesSourceBuilder attrSourceB = AttributesSourceBuilder.anAttributesSource();
 		AttributesTargetBuilder attrTargetB = AttributesTargetBuilder.anAttributesTarget();
 		builder.addSource(attrSourceB
-				.targetIds(Arrays.asList(1, 2, 3)) // id 3 not found !
+				.setTargetIds(Arrays.asList(1, 2, 3)) // id 3 not found !
 				.build()
 		);
 		builder.addTarget(attrTargetB
@@ -184,7 +184,7 @@ public class ScenarioCheckerTest implements TestResourceHandlerScenario {
 		AttributesSourceBuilder attrSourceB = AttributesSourceBuilder.anAttributesSource();
 		AttributesTargetBuilder attrTargetB = AttributesTargetBuilder.anAttributesTarget();
 		builder.addSource(attrSourceB
-				.targetIds(Collections.singletonList(1))
+				.setTargetIds(Collections.singletonList(1))
 				.build()
 		);
 		builder.addTarget(attrTargetB
@@ -205,9 +205,9 @@ public class ScenarioCheckerTest implements TestResourceHandlerScenario {
 	public void testCheckSourceObstacleOverlapWithNoOverlap(){
 		AttributesObstacleBuilder attrObstacleB = AttributesObstacleBuilder.anAttributesObstacle();
 		AttributesSourceBuilder attrSourceB = AttributesSourceBuilder.anAttributesSource();
-
+		AttributesVisualElementBuilder attrVisual = AttributesVisualElementBuilder.anVisualElement();
 		builder.addSource(attrSourceB
-				.shape(new VRectangle(0,0,10,10))
+				.setVisualBuilder(attrVisual.setShape(new VRectangle(0,0,10,10)))
 				.build());
 
 		builder.addObstacle(attrObstacleB
@@ -227,14 +227,14 @@ public class ScenarioCheckerTest implements TestResourceHandlerScenario {
 	public void testCheckSourceObstacleOverlapWithOverlap(){
 		AttributesObstacleBuilder attrObstacleB = AttributesObstacleBuilder.anAttributesObstacle();
 		AttributesSourceBuilder attrSourceB = AttributesSourceBuilder.anAttributesSource();
-
+		AttributesVisualElementBuilder attrVisual = AttributesVisualElementBuilder.anVisualElement();
 		builder.addSource(attrSourceB
-				.shape(new VRectangle(0,0,10,10))
+				.setVisualBuilder(attrVisual.setShape(new VRectangle(0,0,10,10)))
 				.build());
 		Source testSource = (Source)builder.getLastAddedElement();
 
 		builder.addSource(attrSourceB
-				.shape(new VRectangle(100,100,10,10))
+				.setVisualBuilder(attrVisual.setShape(new VRectangle(100,100,10,10)))
 				.build());
 
 
@@ -266,8 +266,8 @@ public class ScenarioCheckerTest implements TestResourceHandlerScenario {
 	public void testCheckUnusedTargetsWithNoError(){
 		AttributesSourceBuilder attrSourceB = AttributesSourceBuilder.anAttributesSource();
 
-		builder.addSource(attrSourceB.targetIds(1,2).build());
-		builder.addSource(attrSourceB.targetIds(3).build());
+		builder.addSource(attrSourceB.setTargetIds(1,2).build());
+		builder.addSource(attrSourceB.setTargetIds(3).build());
 
 		builder.addTarget(1);
 		builder.addTarget(2);
@@ -285,7 +285,7 @@ public class ScenarioCheckerTest implements TestResourceHandlerScenario {
 	public void testCheckUnusedTargetsWithError(){
 		AttributesSourceBuilder attrSourceB = AttributesSourceBuilder.anAttributesSource();
 
-		builder.addSource(attrSourceB.targetIds(1,2).build());
+		builder.addSource(attrSourceB.setTargetIds(1,2).build());
 
 		builder.addTarget(1);
 		builder.addTarget(2);

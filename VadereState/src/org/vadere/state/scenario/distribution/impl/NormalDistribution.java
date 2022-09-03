@@ -22,11 +22,11 @@ public class NormalDistribution extends VDistribution<AttributesNormalDistributi
 	}
 	public NormalDistribution(AttributesNormalDistribution parameter, int spawnNumber, RandomGenerator randomGenerator)
 	        throws Exception {
-		super(parameter, spawnNumber, randomGenerator);
+		super(parameter, randomGenerator);
 	}
 
 	@Override
-	protected void setValues(AttributesNormalDistribution parameter, int spawnNumber, RandomGenerator randomGenerator)
+	protected void setValues(AttributesNormalDistribution parameter, RandomGenerator randomGenerator)
 	        throws Exception {
 		distribution = new TruncatedNormalDistribution(randomGenerator, parameter.getMean(), parameter.getSd(), 0,
 		        Double.MAX_VALUE, 1000);

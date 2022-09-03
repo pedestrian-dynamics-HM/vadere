@@ -6,6 +6,7 @@ import org.vadere.simulator.projects.migration.incident.Tree;
 import org.vadere.simulator.projects.migration.MigrationException;
 import org.vadere.simulator.projects.migration.incident.incidents.Incident;
 import org.vadere.state.attributes.scenario.AttributesSource;
+import org.vadere.state.attributes.spawner.AttributesSpawner;
 import org.vadere.state.util.StateJsonConverter;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -30,13 +31,13 @@ public class MoveSpawnDelayIntoDistributionParametersIncident extends Incident {
 
 					final double spawnDelay = source.get("spawnDelay").asDouble();
 					final ObjectNode s = (ObjectNode) source;
-					final JsonNode distribution = source.get("interSpawnTimeDistribution");
+					final JsonNode distribution = source.get("spawner").get("distribution").get("type");
 
 					// If spawn delay is set AND constant spawn rate algorithm is used:
 					// copy spawn delay to distribution parameters
 					if (spawnDelay != -1.0 &&
 							(distribution == null
-							|| distribution.asText().equals(AttributesSource.CONSTANT_DISTRIBUTION))) {
+							|| distribution.asText().equals(AttributesSpawner.CONSTANT_DISTRIBUTION))) {
 
 						s.set("distributionParameters", StateJsonConverter.toJsonNode(new Double[] {spawnDelay}));
 					}

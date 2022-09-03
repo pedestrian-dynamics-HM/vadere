@@ -17,16 +17,16 @@ public class TestVadereTestProject {
 	@Test
 	public void testToJson() throws IOException {
 		final String scenarioJson = loadTestScenarioJson();
-		final Scenario srm = JsonConverter.deserializeScenarioRunManager(scenarioJson);
+		final Scenario srm = JsonConverter.deserializeScenario(scenarioJson);
 		
-		final String serializedJson = JsonConverter.serializeScenarioRunManager(srm);
+		final String serializedJson = JsonConverter.serializeScenario(srm);
 		// TODO implement json test
 	}
 
 	@Test
 	public void testFromJson() throws IOException {
 		final String scenarioJson = loadTestScenarioJson();
-		final Scenario srm = JsonConverter.deserializeScenarioRunManager(scenarioJson);
+		final Scenario srm = JsonConverter.deserializeScenario(scenarioJson);
 
 		assertEquals("Neues_Szenario", srm.getName());
 		assertEquals(3, srm.getModelAttributes().size());

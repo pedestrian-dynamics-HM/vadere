@@ -257,13 +257,4 @@ public class VRing implements VShape {
 		throw new UnsupportedOperationException("not yet implemented.");
 	}
 
-	@Override
-	public Attributes getAttributes() {
-		return null;
-	}
-
-	@Override
-	public void setAttributes(Attributes attributes) {
-
-	}
 }

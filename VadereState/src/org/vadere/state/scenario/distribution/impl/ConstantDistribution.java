@@ -24,42 +24,21 @@ public class ConstantDistribution extends VDistribution<AttributesConstantDistri
 		super();
 		this.constantAttributes = new AttributesConstantDistribution();
 	}
-	public ConstantDistribution(AttributesConstantDistribution parameter, int spawnNumber, RandomGenerator unused) throws Exception {
-		super(parameter,spawnNumber,unused);
-	}
-
 
 	@Override
-	protected void setValues(AttributesConstantDistribution attributes, int spawnNumber, RandomGenerator unused) {
-		this.constantAttributes = attributes;
-		/*
-		this.spawnNumber = spawnNumber;
-		this.updateFrequency = attributes.getUpdateFrequency();
-		 */
-
+	protected void setValues(AttributesConstantDistribution parameter, RandomGenerator unused) throws Exception {
+		this.constantAttributes = parameter;
 	}
+
+	public ConstantDistribution(AttributesConstantDistribution parameter,RandomGenerator unused) throws Exception {
+		super(parameter,unused);
+	}
+
 	@Override
 	public double getNextSpawnTime(double timeCurrentEvent) {
 		// always add a constant value to the 'value'
 		return timeCurrentEvent + this.updateFrequency;
 	}
-	/*
-        @Override
-        public int getSpawnNumber(double timeCurrentEvent) {
-            return spawnNumber;
-        }
-    */
-/*
-	@Override
-	public int getRemainingSpawnAgents() {
-		return remainingSpawnAgents;
-	}
-
-	@Override
-	public void setRemainingSpawnAgents(int remainingSpawnAgents) {
-		this.remainingSpawnAgents = remainingSpawnAgents;
-	}
-*/
 	@Override
 	public Attributes getAttributes() {
 		return this.constantAttributes;

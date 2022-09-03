@@ -9,6 +9,7 @@ import org.apache.commons.math3.random.JDKRandomGenerator;
 import org.vadere.state.attributes.distributions.AttributesDistribution;
 import org.vadere.state.scenario.distribution.DistributionFactory;
 import org.vadere.state.scenario.distribution.VDistribution;
+import org.vadere.state.scenario.distribution.registry.DistributionRegistry;
 import org.vadere.state.scenario.distribution.registry.RegisterDistribution;
 import org.vadere.util.geometry.shapes.ShapeType;
 import org.vadere.util.geometry.GeometryUtils;
@@ -35,6 +36,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import org.vadere.util.geometry.shapes.attributes.AttributesVRectangle;
 
 public class JacksonObjectMapper extends ObjectMapper {
 
@@ -148,11 +150,17 @@ public class JacksonObjectMapper extends ObjectMapper {
 				JsonNode node = jsonParser.readValueAsTree();
 				String type = node.get("type").asText();
 				JsonNode param = node.get("parameters");
+				AttributesDistribution attrib;
+				try {
+					attrib = (AttributesDistribution) convertValue(param, DistributionRegistry.get(type).getParameter());
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				}
 				if(type.equals("null")){
 					return null;
 				}
 				try {
-					return DistributionFactory.create(type,param,10,new JDKRandomGenerator(random.nextInt()));
+					return DistributionFactory.create(attrib,new JDKRandomGenerator(random.nextInt()));
 				} catch (Exception e) {
 					throw new RuntimeException(e);
 				}
@@ -213,10 +221,10 @@ public class JacksonObjectMapper extends ObjectMapper {
 		public VRectangleStore() {}
 
 		public VRectangleStore(VRectangle vRect) {
-			x = vRect.x;
-			y = vRect.y;
-			height = vRect.height;
-			width = vRect.width;
+			x = vRect.getX();
+			y = vRect.getY();
+			height = vRect.getHeight();
+			width = vRect.getWidth();
 		}
 
 		public VRectangle newVRectangle() {
@@ -255,16 +263,6 @@ public class JacksonObjectMapper extends ObjectMapper {
 
 		public VCircle newVCircle() {
 			return new VCircle(center, radius);
-		}
-	}
-
-	private <T> T map(JsonNode source, Class<T> target) throws Exception {
-		try {
-			return readValue(source.toString(), target);
-		} catch (Exception e) {
-			String name = target.getName();
-			throw new Exception(
-					"An Error occured while parsing" + name + ". Scenario file is misconfigured. Error: " + e);
 		}
 	}
 

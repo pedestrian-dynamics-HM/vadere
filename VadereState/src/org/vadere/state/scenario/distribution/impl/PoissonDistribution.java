@@ -26,11 +26,11 @@ public class PoissonDistribution extends VDistribution<AttributesPoissonDistribu
 	}
 	public PoissonDistribution(AttributesPoissonDistribution parameter, int spawnNumber, RandomGenerator randomGenerator)
 	        throws Exception {
-		super(parameter, spawnNumber, randomGenerator);
+		super(parameter, randomGenerator);
 	}
 
 	@Override
-	protected void setValues(AttributesPoissonDistribution parameter, int spawnNumber, RandomGenerator randomGenerator)
+	protected void setValues(AttributesPoissonDistribution parameter, RandomGenerator randomGenerator)
 	        throws Exception {
 		distribution = new ExponentialDistribution(randomGenerator, 1 / parameter.getNumberPedsPerSecond());
 		//this.spawnNumber = spawnNumber;

@@ -701,13 +701,4 @@ public class VPolygon extends Path2D.Double implements VShape {
 		return builder.toString();
 	}
 
-	@Override
-	public Attributes getAttributes() {
-		return null;
-	}
-
-	@Override
-	public void setAttributes(Attributes attributes) {
-
-	}
 }

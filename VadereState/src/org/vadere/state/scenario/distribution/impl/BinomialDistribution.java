@@ -20,10 +20,10 @@ public class BinomialDistribution extends VDistribution<AttributesBinomialDistri
 	}
 	public BinomialDistribution(AttributesBinomialDistribution parameter, int spawnNumber, RandomGenerator randomGenerator)
 			throws Exception {
-		super(parameter, spawnNumber, randomGenerator);
+		super(parameter,randomGenerator);
 	}
 	@Override
-	protected void setValues(AttributesBinomialDistribution parameter, int spawnNumber, RandomGenerator randomGenerator) {
+	protected void setValues(AttributesBinomialDistribution parameter, RandomGenerator randomGenerator) {
 		this.distribution = new org.apache.commons.math3.distribution.BinomialDistribution(randomGenerator,
 				parameter.getTrials(), parameter.getP());
 	}

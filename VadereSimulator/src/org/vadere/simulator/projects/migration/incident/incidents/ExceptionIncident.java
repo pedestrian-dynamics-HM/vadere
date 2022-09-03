@@ -26,7 +26,7 @@ public class ExceptionIncident extends Incident {
 	public void resolve(Tree tree, StringBuilder log) throws MigrationException {
 		while (true) {
 			try {
-				JsonConverter.deserializeScenarioRunManagerFromNode(node);
+				JsonConverter.deserializeScenarioFromNode(node);
 				break;
 			} catch (IOException e) {
 				String errMsg = e.getMessage();

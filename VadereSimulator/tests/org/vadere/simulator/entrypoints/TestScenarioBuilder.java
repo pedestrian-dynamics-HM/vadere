@@ -54,7 +54,7 @@ public class TestScenarioBuilder {
         // 5. change sourceAttributes
         builder.setSourceField("spawnNumber", 1, 400);
         scenario = builder.build();
-        assertTrue(scenario.getTopography().getSources().get(0).getAttributes().getSpawnNumber() == 400);
+        assertTrue(scenario.getTopography().getSources().get(0).getAttributes().getSpawnerAttributes().getEventElementCount() == 400);
     }
 
 }

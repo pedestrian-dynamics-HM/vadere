@@ -25,11 +25,11 @@ public class EmpiricalDistribution extends VDistribution<AttributesEmpiricalDist
 	}
 	public EmpiricalDistribution(AttributesEmpiricalDistribution parameter, int spawnNumber, RandomGenerator randomGenerator)
 	        throws Exception {
-		super(parameter, spawnNumber, randomGenerator);
+		super(parameter, randomGenerator);
 	}
 
 	@Override
-	protected void setValues(AttributesEmpiricalDistribution parameter, int spawnNumber, RandomGenerator randomGenerator) {
+	protected void setValues(AttributesEmpiricalDistribution parameter, RandomGenerator randomGenerator) {
 		distribution = new org.apache.commons.math3.random.EmpiricalDistribution(randomGenerator);
 		//distribution.load(parameter.getValues());
 		//this.spawnNumber = spawnNumber;

@@ -17,16 +17,16 @@ public class DistributionFactory {
 
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-	public static VDistribution<?> create(String name, JsonNode parameters, int spawnNumber,
+	public static VDistribution<?> create(AttributesDistribution parameters,
                                           RandomGenerator randomGenerator) throws Exception {
-		RegisteredDistribution registeredDistribution = DistributionRegistry.get(name);
+		RegisteredDistribution registeredDistribution = DistributionRegistry.get(parameters);
 		Class<?> pClazz = registeredDistribution.getParameter();
 
 		Constructor<? extends VDistribution<?>> distributionConstructor = registeredDistribution.getDistribution()
 		        .getConstructor(pClazz, int.class, RandomGenerator.class);
 
-		Object p = map(parameters, pClazz);
-		return distributionConstructor.newInstance(p, spawnNumber, randomGenerator);
+		//Object p = map(parameters, pClazz);
+		return distributionConstructor.newInstance(parameters,randomGenerator);
 	}
 
 	private static <T> T map(JsonNode source, Class<T> target) throws Exception {

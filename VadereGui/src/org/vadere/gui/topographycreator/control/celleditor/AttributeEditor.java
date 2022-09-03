@@ -1,6 +1,7 @@
 package org.vadere.gui.topographycreator.control.celleditor;
 
 import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
+import org.vadere.util.Attributes;
 import org.vadere.util.AttributesAttached;
 import org.vadere.util.observer.NotifyContext;
 
@@ -9,47 +10,36 @@ import java.awt.*;
 import java.lang.reflect.Field;
 
 public abstract class AttributeEditor extends JPanel {
-    private boolean externUpdate = false;
-    private Object oldValue = null;
+    private final Field field;
+    private Attributes fieldOwner;
+    private final TopographyCreatorModel model;
 
-    private Field field;
-    protected TopographyCreatorModel model;
 
-    private AttributesAttached attached;
+    protected final NotifyContext ctx = new NotifyContext(this.getClass());
 
-    public  AttributeEditor(AttributesAttached attached, Field field, TopographyCreatorModel model){
+    public  AttributeEditor(Attributes fieldOwner, Field field, TopographyCreatorModel model){
         super(new BorderLayout());
-        this.attached = attached;
+        this.fieldOwner = fieldOwner;
         this.field = field;
         this.model = model;
     }
     public void updateValueFromModel(Object value){
-        this.externUpdate  = true;
-        this.oldValue = value;
-    }
-    protected void setAttached(AttributesAttached attached){
-        this.attached = attached;
     }
     protected void updateModelFromValue(Object newValue){
-        /*if (externUpdate){
-            this.externUpdate = false;
-            return;
-        }*/
-        /*if (oldValue == newValue){
-            return;
-        }*/
         try {
             field.setAccessible(true);
-            this.field.set(this.attached.getAttributes(), newValue);
+            this.field.set(this.fieldOwner, newValue);
             field.setAccessible(false);
-            this.attached.setAttributes(this.attached.getAttributes());
+
             model.getScenario().updateCurrentStateSerialized();
-            model.notifyObservers(new NotifyContext(this.getClass().getSuperclass()));
+            model.notifyObservers(ctx);
+
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
-        externUpdate = false;
-        oldValue = newValue;
     }
 
+    protected TopographyCreatorModel getModel(){
+        return this.model;
+    }
 }

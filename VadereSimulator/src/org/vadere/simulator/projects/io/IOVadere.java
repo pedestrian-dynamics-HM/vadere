@@ -1,7 +1,5 @@
 package org.vadere.simulator.projects.io;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.vadere.simulator.projects.ProjectOutput;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.VadereProject;
@@ -44,7 +42,7 @@ public class IOVadere {
 			throw e;
 		}
 
-		return JsonConverter.deserializeScenarioRunManager(json);
+		return JsonConverter.deserializeScenario(json);
 
 	}
 
@@ -84,7 +82,7 @@ public class IOVadere {
 			for (File file : IOUtils.getFilesInScenarioDirectory(p)) {
 				try {
 					Scenario scenario =
-							JsonConverter.deserializeScenarioRunManager(IOUtils.readTextFile(file.getAbsolutePath()));
+							JsonConverter.deserializeScenario(IOUtils.readTextFile(file.getAbsolutePath()));
 					if (!scenarioNames.add(scenario.getName())) {
 						String errorMessage = String.format("There are two scenarios with the same name: %s\nConflicting file: %s",
 								scenario.getName(), file.getAbsolutePath());

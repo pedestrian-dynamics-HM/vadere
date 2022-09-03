@@ -6,6 +6,7 @@ import org.vadere.gui.topographycreator.control.cellrenderer.FieldNameRenderer;
 import org.vadere.gui.topographycreator.control.cellrenderer.FieldValueRenderer;
 import org.vadere.gui.topographycreator.model.AttributeTableModel;
 import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
+import org.vadere.util.Attributes;
 import org.vadere.util.AttributesAttached;
 import org.vadere.util.observer.NotifyContext;
 
@@ -22,7 +23,7 @@ public class JAttributeTable extends JPanel implements Observer {
     /**
      *
      */
-    private AttributesAttached attached;
+    private Attributes attached;
     private List<JComponent> tableComponents;
 
     /**
@@ -58,7 +59,7 @@ public class JAttributeTable extends JPanel implements Observer {
         this.setVisible(true);
     }
 
-    public JAttributeTable(AttributeTableModel attrmodel, TopographyCreatorModel topmodel, AttributesAttached object){
+    public JAttributeTable(AttributeTableModel attrmodel, TopographyCreatorModel topmodel, Attributes object){
         this();
         this.attached = object;
         setModel(attrmodel,topmodel);
@@ -191,7 +192,7 @@ public class JAttributeTable extends JPanel implements Observer {
         this.tableComponents.add(panel);
         try {
             this.nameFields.put(field.getName(), field);
-            var component = (JComponent) constrClass.getDeclaredConstructor(AttributesAttached.class,Field.class, TopographyCreatorModel.class,ArrayList.class,JPanel.class).newInstance(attached,field,model,subClass,panel);
+            var component = (JComponent) constrClass.getDeclaredConstructor(Attributes.class,Field.class, TopographyCreatorModel.class,ArrayList.class,JPanel.class).newInstance(attached,field,model,subClass,panel);
             insertComponentIntoMap(field, component);
         } catch (InstantiationException e) {
             throw new RuntimeException(e);
@@ -247,8 +248,8 @@ public class JAttributeTable extends JPanel implements Observer {
         ((JComboBox)this.editorObjects.get(field.getName())).setModel(new DefaultComboBoxModel(values));
     }
 
-    private static AttributeEditor createNewInstanceOf(Class constrClass, AttributesAttached attached, Field field, TopographyCreatorModel model) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-        AttributeEditor component = (AttributeEditor) constrClass.getDeclaredConstructor(AttributesAttached.class,Field.class,TopographyCreatorModel.class).newInstance(attached,field,model);
+    private static AttributeEditor createNewInstanceOf(Class constrClass, Attributes attached, Field field, TopographyCreatorModel model) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+        AttributeEditor component = (AttributeEditor) constrClass.getDeclaredConstructor(Attributes.class,Field.class,TopographyCreatorModel.class).newInstance(attached,field,model);
         return component;
     }
 
@@ -264,16 +265,13 @@ public class JAttributeTable extends JPanel implements Observer {
     }
 
     public void updateView(){
-        //this.attached = attached;
-        //this.fieldValueRendere.setEditors(this.editorObjects);
-        //this.fieldValueEditor.set(this.editorObjects,attached);
         for( var fielName : nameFields.keySet()) {
             var component = (AttributeEditor) editorObjects.get(fielName);
             var field = nameFields.get(fielName);
             field.setAccessible(true);
             try {
-                if(field.get(attached.getAttributes()) != null) {
-                    component.updateValueFromModel(field.get(attached.getAttributes()));
+                if(field.get(attached) != null) {
+                    component.updateValueFromModel(field.get(attached));
                 }
             } catch (IllegalAccessException e) {
             }
@@ -290,7 +288,6 @@ public class JAttributeTable extends JPanel implements Observer {
                 updateView();
             }
         }
-
 
     }
 

@@ -25,11 +25,11 @@ public class NegativeExponentialDistribution extends VDistribution<AttributesNeg
 	}
 	public NegativeExponentialDistribution(AttributesNegativeExponentialDistribution parameter, int spawnNumber,
 										   RandomGenerator randomGenerator) throws Exception {
-		super(parameter, spawnNumber, randomGenerator);
+		super(parameter, randomGenerator);
 	}
 
 	@Override
-	protected void setValues(AttributesNegativeExponentialDistribution parameter, int spawnNumber, RandomGenerator randomGenerator)
+	protected void setValues(AttributesNegativeExponentialDistribution parameter, RandomGenerator randomGenerator)
 	        throws Exception {
 		this.distribution = new ExponentialDistribution(randomGenerator, parameter.getMean());
 		//this.spawnNumber = spawnNumber;

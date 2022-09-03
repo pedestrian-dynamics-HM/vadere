@@ -1,6 +1,7 @@
 package org.vadere.simulator.control.util;
 
 import org.vadere.state.attributes.scenario.AttributesSource;
+import org.vadere.state.attributes.spawner.AttributesSpawner;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
@@ -39,13 +40,13 @@ public class SpawnArray {
 					  final VRectangle spawnElementBound,
 					  Function<VPoint, VShape> shapeProducer,
 					  SpawnOverlapCheck testFreeSpace,
-					  final AttributesSource sourceAttributes) {
+					  final AttributesSpawner spawnerAttributes) {
 		this.bound = new VRectangle(boundShape.getBounds2D());
 		this.spawnElementBound = spawnElementBound;
 		this.shapeProducer = shapeProducer;
 		this.testFreeSpace = testFreeSpace;
 
-		if(sourceAttributes.isSpawnAtGridPositionsCA()){
+		if(spawnerAttributes.isEventPositionGridCA()){
 			SPAWN_BUFFER = 0;
 		}
 
@@ -55,7 +56,7 @@ public class SpawnArray {
 		double offset_x_high = 0;
 		double offset_y_high = 0;
 
-		if(sourceAttributes.isSpawnAtGridPositionsCA()){
+		if(spawnerAttributes.isEventPositionGridCA()){
 			offset_x_low = calculateOffsetLow(bound.x);
 			offset_x_high = calculateOffsetHigh(bound.x+bound.width);
 			offset_y_low = calculateOffsetLow(bound.y);

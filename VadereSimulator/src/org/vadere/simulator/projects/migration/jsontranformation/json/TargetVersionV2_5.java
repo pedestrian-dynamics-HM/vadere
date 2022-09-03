@@ -23,7 +23,9 @@ public class TargetVersionV2_5 extends SimpleJsonTransformation {
     private final String PATH_TRG = "scenario/topography/targets";
     private final String DIST_FIELD_SRC = "interSpawnTimeDistribution";
     private final String DIST_FIELD_TRG = "waitingTimeDistribution";
+    private final String DIST_FIELD_NEW = "distribution";
 
+    private final String SPAWNER_FIELD = "spawner";
     private final String PARAM_FIELD ="distributionParameters";
 
     private final String TYPE_STRING = "type";
@@ -36,8 +38,26 @@ public class TargetVersionV2_5 extends SimpleJsonTransformation {
     @Override
     protected void initDefaultHooks() {
         addPostHookLast(this::mergeDistributionNameWithParameters);
+        addPostHookLast(this::createSpawnerNodeInSources);
+        addPostHookLast(this::moveAndRenameSourceFields);
         /* rearange nodes of distributions */
         addPostHookLast(this::sort);
+    }
+
+    private JsonNode moveAndRenameSourceFields(JsonNode node) {
+        moveField(node,"scenario/topography/sources/spawnNumber",PATH_SRC +"/"+SPAWNER_FIELD);
+        return node;
+    }
+
+    private JsonNode createSpawnerNodeInSources(JsonNode node) throws MigrationException {
+        if (!path(node, PATH_SRC).isMissingNode()) {
+            Iterator<JsonNode> iter = iteratorSources(node);
+            while (iter.hasNext()) {
+                var nd = (ObjectNode) iter.next();
+                nd.set(SPAWNER_FIELD,getMapper().createObjectNode());
+            }
+        }
+        return node;
     }
 
     private JsonNode mergeDistributionNameWithParameters(JsonNode node) throws MigrationException {
@@ -60,8 +80,17 @@ public class TargetVersionV2_5 extends SimpleJsonTransformation {
                 var newNode = getMapper().createObjectNode();
                 newNode.put(TYPE_STRING,distrName);
                 newNode.set(PARAM_STRING,paramNode);
-                nd.set(nodeName,newNode);
+                nd.set(DIST_FIELD_NEW,newNode);
             }
         }
+    }
+
+    private void moveField(JsonNode node,String fieldPath,String newParent){
+        var ndSrc = path(node, fieldPath);
+        var ndTrg = path(node, newParent);
+        if(!ndSrc.isMissingNode()){
+            ((ObjectNode)ndTrg).put(ndSrc.asText(),"");
+        }
+
     }
 }

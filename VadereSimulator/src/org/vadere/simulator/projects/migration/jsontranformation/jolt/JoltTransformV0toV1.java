@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import org.vadere.annotation.factories.migrationassistant.MigrationTransformation;
+import org.vadere.state.attributes.spawner.AttributesSpawner;
 import org.vadere.util.version.Version;
 import org.vadere.simulator.models.bhm.BehaviouralHeuristicsModel;
 import org.vadere.simulator.models.gnm.GradientNavigationModel;
@@ -141,7 +142,7 @@ public class JoltTransformV0toV1 extends JoltTransformation {
 			JsonNode distribution = source.path("interSpawnTimeDistribution");
 
 			if (spawnDelay != -1.0 && (!distribution.isMissingNode() ||
-					distribution.asText().equals(AttributesSource.CONSTANT_DISTRIBUTION))){
+					distribution.asText().equals(AttributesSpawner.CONSTANT_DISTRIBUTION))){
 				ArrayNode arrayNode = ((ObjectNode)source).putArray("distributionParameters");
 				arrayNode.add(spawnDelay);
 			}

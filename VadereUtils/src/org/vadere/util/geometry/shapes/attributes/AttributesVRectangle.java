@@ -3,7 +3,7 @@ package org.vadere.util.geometry.shapes.attributes;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.reflection.VadereAttribute;
 
-public class AttributsVRectangle extends AttributesVShape{
+public class AttributesVRectangle extends AttributesVShape{
     @VadereAttribute
     private Double x;
     @VadereAttribute
@@ -14,7 +14,7 @@ public class AttributsVRectangle extends AttributesVShape{
     private Double height;
 
 
-    public AttributsVRectangle(VRectangle rectangle){
+    public AttributesVRectangle(VRectangle rectangle){
         this.x = rectangle.getX();
         this.y = rectangle.getY();
         this.width = rectangle.getWidth();

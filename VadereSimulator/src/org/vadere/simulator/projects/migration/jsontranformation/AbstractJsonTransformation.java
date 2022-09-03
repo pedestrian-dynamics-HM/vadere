@@ -239,8 +239,8 @@ public abstract class AbstractJsonTransformation implements JsonTransformation, 
      */
     public static JsonNode addNewMembersWithDefaultValues(JsonNode node) throws MigrationException{
         try {
-            Scenario scenario = JsonConverter.deserializeScenarioRunManagerFromNode(node);
-            node = JsonConverter.serializeScenarioRunManagerToNode(scenario, true);
+            Scenario scenario = JsonConverter.deserializeScenarioFromNode(node);
+            node = JsonConverter.serializeScenarioToNode(scenario, true);
         } catch (IOException e) {
             throw new MigrationException("Error while serializing and deserializing scenario",e);
         }

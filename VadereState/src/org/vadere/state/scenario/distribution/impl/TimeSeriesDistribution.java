@@ -31,7 +31,7 @@ public class TimeSeriesDistribution extends VDistribution<AttributesTimeSeriesDi
 	}
 	public TimeSeriesDistribution(AttributesTimeSeriesDistribution parameter, int spawnNumber, RandomGenerator unused)
 	        throws Exception {
-		super(parameter, spawnNumber, unused);
+		super(parameter,unused);
 	}
 /*
 	@Override
@@ -55,7 +55,7 @@ public class TimeSeriesDistribution extends VDistribution<AttributesTimeSeriesDi
 	}
 */
 	@Override
-	protected void setValues(AttributesTimeSeriesDistribution parameter, int unused1, RandomGenerator unused2) throws Exception {
+	protected void setValues(AttributesTimeSeriesDistribution parameter,RandomGenerator unused2) throws Exception {
 		ArrayList<Integer> spawnsPerInterval = parameter.getSpawnsPerInterval();
 		ArrayList<Double> switchpoints = new ArrayList<>();
 		ArrayList<MixedParameterDistribution> distributions = new ArrayList<>();

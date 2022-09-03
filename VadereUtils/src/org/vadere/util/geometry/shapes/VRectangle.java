@@ -1,12 +1,8 @@
 package org.vadere.util.geometry.shapes;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.github.davidmoten.rtree.geometry.Rectangle;
-import com.github.davidmoten.rtree.geometry.internal.RectangleDouble;
-
 import org.vadere.util.Attributes;
 import org.vadere.util.geometry.GeometryUtils;
-import org.vadere.util.geometry.shapes.attributes.AttributsVRectangle;
+import org.vadere.util.geometry.shapes.attributes.AttributesVRectangle;
 
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
@@ -225,20 +221,4 @@ public class VRectangle extends Rectangle2D.Double implements VShape {
 		return lines;
 	}
 
-	@Override
-	public Attributes getAttributes() {
-		return new AttributsVRectangle(this);
-	}
-
-	@Override
-	public void setAttributes(Attributes attributes) {
-		if(attributes instanceof AttributsVRectangle){
-			var attr = (AttributsVRectangle)attributes;
-			this.x = attr.getX();
-			this.y = attr.getY();
-			this.width = attr.getWidth();
-			this.height = attr.getHeight();
-		}
-		else throw new IllegalArgumentException();
-	}
 }

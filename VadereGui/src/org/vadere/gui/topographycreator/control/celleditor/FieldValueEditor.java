@@ -9,60 +9,27 @@ import java.lang.reflect.Field;
 import java.util.EventObject;
 import java.util.HashMap;
 
-public class FieldValueEditor implements TableCellEditor {
+public class FieldValueEditor extends DefaultCellEditor implements TableCellEditor {
 
     private HashMap<String, JComponent> editorObjects;
 
     public FieldValueEditor(){
+        super(new JTextField());
     }
 
     public void set(HashMap<String, JComponent> editorObjects) {
         this.editorObjects = editorObjects;
     }
 
-    JComponent comp;
-    String name;
-    Field field;
-
     @Override
     public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
-        this.field = (Field) table.getValueAt(row, 0);
-        this.name = field.getName();
-        this.comp = editorObjects.get(name);
-        return comp;
-    }
-    @Override
-    public Object getCellEditorValue() {
-        return null;
+        return getComponent(table, row);
     }
 
-    @Override
-    public boolean isCellEditable(EventObject anEvent) {
-        return true;
+    private JComponent getComponent(JTable table, int row) {
+        var field = (Field) table.getValueAt(row, 0);
+        var name = field.getName();
+        return editorObjects.get(name);
     }
 
-    @Override
-    public boolean shouldSelectCell(EventObject anEvent) {
-        return true;
-    }
-
-    @Override
-    public boolean stopCellEditing() {
-        return true;
-    }
-
-    @Override
-    public void cancelCellEditing() {
-
-    }
-
-    @Override
-    public void addCellEditorListener(CellEditorListener l) {
-
-    }
-
-    @Override
-    public void removeCellEditorListener(CellEditorListener l) {
-
-    }
 }

@@ -1,15 +1,20 @@
 package org.vadere.simulator.control.scenarioelements;
 
+import org.apache.commons.math3.random.JDKRandomGenerator;
 import org.vadere.simulator.control.scenarioelements.listener.ControllerEventListener;
 import org.vadere.simulator.control.scenarioelements.listener.ControllerEventProvider;
 import org.vadere.simulator.models.DynamicElementFactory;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesDynamicElement;
 import org.vadere.state.attributes.scenario.AttributesSource;
+import org.vadere.state.attributes.spawner.AttributesRegularSpawner;
+import org.vadere.state.attributes.spawner.AttributesSpawner;
 import org.vadere.state.scenario.*;
+import org.vadere.state.scenario.distribution.DistributionFactory;
 import org.vadere.state.scenario.distribution.VDistribution;
 import org.vadere.state.scenario.spawner.VSpawner;
 import org.vadere.state.scenario.distribution.impl.MixedDistribution;
+import org.vadere.state.scenario.spawner.impl.RegularSpawner;
 import org.vadere.util.geometry.LinkedCellsGrid;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -30,7 +35,9 @@ public abstract class SourceController extends ScenarioElementController impleme
     protected final Source source;
     protected final DynamicElementFactory dynamicElementFactory;
     protected final Random random;
-    protected final AttributesSource sourceAttributes;
+
+    protected final  AttributesSource sourceAttributes;
+    protected final AttributesSpawner spawnerAttributes;
     protected final AttributesDynamicElement attributesDynamicElement;
     private final Topography topography;
 
@@ -50,25 +57,26 @@ public abstract class SourceController extends ScenarioElementController impleme
                             Random random) {
         this.source = source;
         this.sourceAttributes = source.getAttributes();
+
         this.attributesDynamicElement = attributesDynamicElement;
         this.dynamicElementFactory = dynamicElementFactory;
         this.topography = scenario;
         this.random = random;
+        this.spawnerAttributes = sourceAttributes.getSpawnerAttributes();
         this.eventListener = new ArrayList<>();
-
-        timeOfNextEvent = sourceAttributes.getStartTime();
+        timeOfNextEvent = spawnerAttributes.getConstraintsTimeStart();
         try {
-            distribution = sourceAttributes.getInterSpawnTimeDistribution();/*DistributionFactory.create(
-                    sourceAttributes.getInterSpawnTimeDistribution(),
-                    sourceAttributes.getDistributionParameters(),
-                    sourceAttributes.getSpawnNumber(),
+            var distributionAttributes = spawnerAttributes.getDistributionAttributes();
+            distribution = DistributionFactory.create(
+                    distributionAttributes,
                     new JDKRandomGenerator(random.nextInt())
-            );*/
+            );
 
         } catch (Exception e) {
             throw new IllegalArgumentException("Problem with scenario parameters for source: "
                     + "interSpawnTimeDistribution and/or distributionParameters. See causing Excepion herefafter.", e);
         }
+        this.spawner = new RegularSpawner(new AttributesRegularSpawner(),topography,distribution);
     }
 
 
@@ -91,28 +99,28 @@ public abstract class SourceController extends ScenarioElementController impleme
             return true;
         }
         if (isSourceWithOneSingleSpawnEvent()) {
-            return dynamicElementsCreatedTotal == sourceAttributes.getSpawnNumber();
+            return dynamicElementsCreatedTotal == spawnerAttributes.getEventElementCount();//sourceAttributes.getSpawnNumber();
         }
         return isAfterSourceEndTime(simTimeInSec) && isQueueEmpty();
     }
 
     protected boolean isSourceWithOneSingleSpawnEvent() {
-        return sourceAttributes.getStartTime() == sourceAttributes.getEndTime();
+        return spawnerAttributes.getConstraintsTimeStart() == spawnerAttributes.getConstraintsTimeEnd();
     }
 
     protected boolean isAfterSourceEndTime(double simTimeInSec) {
-        return simTimeInSec > sourceAttributes.getEndTime();
+        return simTimeInSec > spawnerAttributes.getConstraintsTimeEnd();
     }
 
     protected boolean isMaximumNumberOfSpawnedElementsReached() {
-        final int maxNumber = sourceAttributes.getMaxSpawnNumberTotal();
-        return maxNumber != AttributesSource.NO_MAX_SPAWN_NUMBER_TOTAL
+        final int maxNumber = spawnerAttributes.getConstraintsElementsMax();
+        return maxNumber != spawnerAttributes.NO_MAX_SPAWN_NUMBER_TOTAL
                 && dynamicElementsCreatedTotal >= maxNumber;
     }
 
     protected boolean testFreeSpace(final VShape freeSpace, final List<VShape> blockPedestrianShapes) {
         VShape freeSpaceCA = new VCircle(((VCircle) freeSpace).getCenter(), ((VCircle) freeSpace).getRadius() - BUFFER_CA);
-        final VShape freeSpaceModelSpecific = sourceAttributes.isSpawnAtGridPositionsCA() ? freeSpaceCA : freeSpace;
+        final VShape freeSpaceModelSpecific = spawnerAttributes.isEventPositionGridCA() ? freeSpaceCA : freeSpace;
 
         boolean pedOverlap = blockPedestrianShapes.stream().noneMatch(shape -> shape.intersects(freeSpaceModelSpecific));
         boolean obstOverlap = this.getTopography().getObstacles().stream()
@@ -188,20 +196,16 @@ public abstract class SourceController extends ScenarioElementController impleme
 
     private DynamicElement createDynamicElement(final VPoint position) {
         Agent result;
-        switch (sourceAttributes.getDynamicElementType()) {
-            case PEDESTRIAN:
-                if (source.getAttributes().getAttributesPedestrian() == null) {
-                    result = (Agent) dynamicElementFactory.createElement(position, AttributesAgent.ID_NOT_SET, Pedestrian.class);
-                } else {
-                    result = (Agent) dynamicElementFactory.createElement(position, AttributesAgent.ID_NOT_SET, source.getAttributes().getAttributesPedestrian(), Pedestrian.class);
-                }
-                break;
-            case CAR:
-                result = (Agent) dynamicElementFactory.createElement(position, AttributesAgent.ID_NOT_SET, Car.class);
-                break;
-            default:
-                throw new IllegalArgumentException("The controller's source has an unsupported element type: "
-                        + sourceAttributes.getDynamicElementType());
+        var elementAttribute = spawnerAttributes.getEventElementAttributes();
+        if(elementAttribute == null){
+            result = (Agent) dynamicElementFactory.createElement(position, AttributesAgent.ID_NOT_SET, Pedestrian.class);
+        }
+        else if(elementAttribute instanceof AttributesAgent){
+            result = (Agent) dynamicElementFactory.createElement(position, AttributesAgent.ID_NOT_SET, elementAttribute, Pedestrian.class);
+        }
+        else{
+            throw new IllegalArgumentException("The controller's source has an unsupported element type: "
+                    + elementAttribute);
         }
         result.setSource(source);
         return result;

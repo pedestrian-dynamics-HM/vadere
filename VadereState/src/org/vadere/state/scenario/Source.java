@@ -46,7 +46,7 @@ public class Source extends ScenarioElement {
 
 
 	public double getStartTime() {
-		return attributes.getStartTime();
+		return attributes.getSpawnerAttributes().getConstraintsTimeStart();
 	}
 
 	@Override

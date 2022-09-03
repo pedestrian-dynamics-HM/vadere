@@ -29,7 +29,7 @@ public class TestOutputFile {
 		try {
 			String json = IOUtils
 					.readTextFile(new File(getClass().getResource("/data/basic_1_chicken_osm1.scenario").toURI()).getAbsolutePath());
-			testScenario = JsonConverter.deserializeScenarioRunManager(json);
+			testScenario = JsonConverter.deserializeScenario(json);
 			topography = testScenario.getTopography();
 			MainModelBuilder modelBuilder = new MainModelBuilder(testScenario.getScenarioStore(), null, null);
 			modelBuilder.createModelAndRandom();

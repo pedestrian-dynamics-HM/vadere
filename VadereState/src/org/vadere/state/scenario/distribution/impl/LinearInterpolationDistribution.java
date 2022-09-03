@@ -24,11 +24,11 @@ public class LinearInterpolationDistribution extends VDistribution<AttributesLin
 	}
 	public LinearInterpolationDistribution(AttributesLinearInterpolationDistribution parameter, int spawnNumber,
 										   RandomGenerator randomGenerator) throws Exception {
-		super(parameter, spawnNumber, randomGenerator);
+		super(parameter, randomGenerator);
 	}
 
 	@Override
-	protected void setValues(AttributesLinearInterpolationDistribution parameter, int unused, RandomGenerator randomGenerator) {
+	protected void setValues(AttributesLinearInterpolationDistribution parameter, RandomGenerator randomGenerator) {
 		// Most correctness is checked in LinearInterpolator
 		// double[] xValues = {0., 200., 400, 600, 700, 800};
 		// double[] yValues = {3., 8., 2., 10, 0, 0};

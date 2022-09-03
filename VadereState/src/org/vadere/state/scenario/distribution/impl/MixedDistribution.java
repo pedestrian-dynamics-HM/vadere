@@ -1,6 +1,7 @@
 package org.vadere.state.scenario.distribution.impl;
 
 import org.apache.commons.math3.random.RandomGenerator;
+import org.vadere.state.attributes.distributions.AttributesDistribution;
 import org.vadere.util.Attributes;
 import org.vadere.state.scenario.distribution.DistributionFactory;
 import org.vadere.state.scenario.distribution.VDistribution;
@@ -27,11 +28,11 @@ public class MixedDistribution extends VDistribution<AttributesMixedDistribution
 	}
 	public MixedDistribution(AttributesMixedDistribution parameter, int spawnNumber, RandomGenerator randomGenerator)
 	        throws Exception {
-		super(parameter, spawnNumber, randomGenerator);
+		super(parameter, randomGenerator);
 	}
 
 	@Override
-	protected void setValues(AttributesMixedDistribution parameter, int spawnNumber, RandomGenerator randomGenerator)
+	protected void setValues(AttributesMixedDistribution parameter, RandomGenerator randomGenerator)
 	        throws Exception {
 
 		final boolean tooManyFewSwitchPoints = parameter.getSwitchpoints().size() != parameter.getDistributions().size() - 1;
@@ -40,21 +41,19 @@ public class MixedDistribution extends VDistribution<AttributesMixedDistribution
 			        + "every given distribution minus 1. However there are not.");
 		}
 
-		setDistributions(parameter.getDistributions(), spawnNumber, randomGenerator);
+		setDistributions(parameter.getDistributions(), randomGenerator);
 		this.switchPoints = parameter.getSwitchpoints();
 
 	}
 
-	private void setDistributions(ArrayList<MixedParameterDistribution> distributions, int spawnNumber,
+	private void setDistributions(ArrayList<MixedParameterDistribution> distributions,
 	        RandomGenerator randomGenerator) throws Exception {
 		this.distributions = new ArrayList<>();
 
 		for (MixedParameterDistribution distribution : distributions) {
 			VDistribution<?> dist = DistributionFactory
 					.create(
-							distribution.getInterSpawnTimeDistribution(),
-							distribution.getDistributionParameters(),
-							spawnNumber,
+							(AttributesDistribution) getAttributes(),
 							randomGenerator
 					);
 			this.distributions.add(dist);

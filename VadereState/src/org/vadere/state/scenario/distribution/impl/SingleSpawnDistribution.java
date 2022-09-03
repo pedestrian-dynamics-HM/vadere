@@ -22,11 +22,11 @@ public class SingleSpawnDistribution extends VDistribution<AttributesSingleSpawn
 	}
 	public SingleSpawnDistribution(AttributesSingleSpawnDistribution parameter, int spawnNumber, RandomGenerator unused)
 	        throws Exception {
-		super(parameter, spawnNumber, unused);
+		super(parameter, unused);
 	}
 
 	@Override
-	protected void setValues(AttributesSingleSpawnDistribution parameter, int spawnNumber, RandomGenerator unused) throws Exception {
+	protected void setValues(AttributesSingleSpawnDistribution parameter, RandomGenerator unused) throws Exception {
 		this.spawnTime = parameter.getSpawnTime();
 	}
 

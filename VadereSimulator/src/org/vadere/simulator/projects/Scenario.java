@@ -81,7 +81,7 @@ public class Scenario {
 	}
 
 	public void saveChanges() { // get's called by VadereProject.saveChanges on init
-		savedStateSerialized = JsonConverter.serializeScenarioRunManager(this);
+		savedStateSerialized = JsonConverter.serializeScenario(this);
 		currentStateSerialized = savedStateSerialized;
 	}
 
@@ -90,11 +90,11 @@ public class Scenario {
 	}
 
 	public void updateCurrentStateSerialized() {
-		currentStateSerialized = JsonConverter.serializeScenarioRunManager(this);
+		currentStateSerialized = JsonConverter.serializeScenario(this);
 	}
 
 	public String getDiff() {
-		String currentStateSerialized = JsonConverter.serializeScenarioRunManager(this);
+		String currentStateSerialized = JsonConverter.serializeScenario(this);
 		if (!savedStateSerialized.equals(currentStateSerialized)) {
 			StringBuilder diff = new StringBuilder();
 			List<String> original = new ArrayList<>(Arrays.asList(savedStateSerialized.split("\n")));
@@ -162,7 +162,7 @@ public class Scenario {
 	@Override
 	public Scenario clone() {
 		try {
-			return JsonConverter.cloneScenarioRunManager(this);
+			return JsonConverter.cloneScenario(this);
 		} catch (IOException | VadereClassNotFoundException e) {
 			throw new RuntimeException(e);
 		}
@@ -179,7 +179,7 @@ public class Scenario {
 
 	public void discardChanges() {
 		try {
-			Scenario srm = JsonConverter.deserializeScenarioRunManager(savedStateSerialized);
+			Scenario srm = JsonConverter.deserializeScenario(savedStateSerialized);
 			// not all necessary! only the ones that could have changed
 			scenarioStore = srm.scenarioStore;
 			dataProcessingJsonManager = srm.dataProcessingJsonManager;
@@ -213,7 +213,7 @@ public class Scenario {
 
 	public void saveToOutputPath(@NotNull final Path outputPath) {
 		try (PrintWriter out = new PrintWriter(Paths.get(outputPath.toString(), getName() + IOUtils.SCENARIO_FILE_EXTENSION).toString())) {
-			out.println(JsonConverter.serializeScenarioRunManager(this, true));
+			out.println(JsonConverter.serializeScenario(this, true));
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}

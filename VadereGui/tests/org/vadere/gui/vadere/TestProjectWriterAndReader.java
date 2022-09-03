@@ -71,9 +71,9 @@ public class TestProjectWriterAndReader {
 		VadereProject projectJson = IOVadere.readProjectJson(testFileJson);
 
 		assertEquals(
-				projectJson.getScenarios().stream().map(scenario -> JsonConverter.serializeScenarioRunManager(scenario))
+				projectJson.getScenarios().stream().map(scenario -> JsonConverter.serializeScenario(scenario))
 						.collect(Collectors.toList()),
-				testProject.getScenarios().stream().map(scenario -> JsonConverter.serializeScenarioRunManager(scenario))
+				testProject.getScenarios().stream().map(scenario -> JsonConverter.serializeScenario(scenario))
 						.collect(Collectors.toList()));
 	}
 }
