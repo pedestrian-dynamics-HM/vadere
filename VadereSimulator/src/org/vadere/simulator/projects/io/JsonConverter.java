@@ -20,8 +20,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class JsonConverter {
 	
-	public static Scenario deserializeScenarioRunManager(String json) throws IOException, IllegalArgumentException {
-		return deserializeScenarioRunManagerFromNode(StateJsonConverter.readTree(json));
+	public static Scenario deserializeScenario(String json) throws IOException, IllegalArgumentException {
+		return deserializeScenarioFromNode(StateJsonConverter.readTree(json));
 	}
 
 	public static ModelDefinition deserializeModelDefinition(String json) throws IOException {
@@ -41,7 +41,7 @@ public class JsonConverter {
 		return new ModelDefinition(mainModelString, StateJsonConverter.deserializeAttributesListFromNode(node.get("attributesModel")));
 	}
 
-	public static Scenario deserializeScenarioRunManagerFromNode(JsonNode node) throws IOException, IllegalArgumentException {
+	public static Scenario deserializeScenarioFromNode(JsonNode node) throws IOException, IllegalArgumentException {
 		JsonNode rootNode = node;
 		JsonNode scenarioNode = rootNode.get(StateJsonConverter.SCENARIO_KEY);
 
@@ -63,36 +63,36 @@ public class JsonConverter {
 				mainModel, attributesModel,
 				attributesSimulation, attributesPsychology,
 				topography, stimulusInfoStore);
-		Scenario scenarioRunManager = new Scenario(scenarioStore);
+		Scenario scenario = new Scenario(scenarioStore);
 
-		scenarioRunManager.setDataProcessingJsonManager(DataProcessingJsonManager.deserializeFromNode(rootNode.get(DataProcessingJsonManager.DATAPROCCESSING_KEY)));
-		scenarioRunManager.saveChanges();
+		scenario.setDataProcessingJsonManager(DataProcessingJsonManager.deserializeFromNode(rootNode.get(DataProcessingJsonManager.DATAPROCCESSING_KEY)));
+		scenario.saveChanges();
 
-		return scenarioRunManager;
+		return scenario;
 	}
 
 
 
 	// used in hasUnsavedChanges, TODO [priority=high] [task=bugfix] check if commitHashIncluded can always be false
-	public static String serializeScenarioRunManager(Scenario scenarioRunManager) {
+	public static String serializeScenario(Scenario scenario) {
 		try {
-			return serializeScenarioRunManager(scenarioRunManager, false);
+			return serializeScenario(scenario, false);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		return null;
 	}
 
-	public static String serializeScenarioRunManager(Scenario scenarioRunManager, boolean commitHashIncluded)
+	public static String serializeScenario(Scenario scenario, boolean commitHashIncluded)
 			throws IOException {
-		return StateJsonConverter.writeValueAsString(serializeScenarioRunManagerToNode(scenarioRunManager, commitHashIncluded));
+		return StateJsonConverter.writeValueAsString(serializeScenarioToNode(scenario, commitHashIncluded));
 	}
 
-	public static JsonNode serializeScenarioRunManagerToNode(Scenario scenarioRunManager, boolean commitHashIncluded) {
-		ScenarioStore scenarioStore = scenarioRunManager.getScenarioStore();
+	public static JsonNode serializeScenarioToNode(Scenario scenario, boolean commitHashIncluded) {
+		ScenarioStore scenarioStore = scenario.getScenarioStore();
 		ObjectNode rootNode = StateJsonConverter.createObjectNode();
 		serializeMeta(rootNode, commitHashIncluded, scenarioStore);
-		rootNode.set(DataProcessingJsonManager.DATAPROCCESSING_KEY, scenarioRunManager.getDataProcessingJsonManager().serializeToNode());
+		rootNode.set(DataProcessingJsonManager.DATAPROCCESSING_KEY, scenario.getDataProcessingJsonManager().serializeToNode());
 		rootNode.set(StateJsonConverter.SCENARIO_KEY, serializeVadereNode(scenarioStore));
 		return rootNode;
 	}
@@ -128,9 +128,9 @@ public class JsonConverter {
 		return vadereNode;
 	}
 
-	public static Scenario cloneScenarioRunManager(Scenario original) throws IOException {
-		JsonNode clone = serializeScenarioRunManagerToNode(original, false);
-		return deserializeScenarioRunManagerFromNode(clone);
+	public static Scenario cloneScenario(Scenario original) throws IOException {
+		JsonNode clone = serializeScenarioToNode(original, false);
+		return deserializeScenarioFromNode(clone);
 	}
 
 	public static ScenarioStore cloneScenarioStore(ScenarioStore scenarioStore) throws IOException {
