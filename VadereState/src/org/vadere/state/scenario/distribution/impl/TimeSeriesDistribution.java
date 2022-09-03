@@ -101,7 +101,6 @@ public class TimeSeriesDistribution extends VDistribution<AttributesTimeSeriesDi
 		} else {
 			singleP.setSpawnTime(currentTime - intervalLength);
 		}
-		singleP.setSpawnNumber(0);
 		JsonNode node = mapper.convertValue(singleP, JsonNode.class);
 		dist.setInterSpawnTimeDistribution("singleSpawn");
 		dist.setDistributionParameters(node);

@@ -49,10 +49,6 @@ public class Target extends ScenarioElement implements Comparable<Target> {
 		return attributes.getParallelWaiters();
 	}
 
-	public WaitingBehaviour getWaitingBehaviour(){
-		return attributes.getWaitingBehaviour();
-	}
-
 	public Map<Integer, Double> getEnteringTimes() {
 		return enteringTimes;
 	}

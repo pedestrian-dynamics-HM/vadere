@@ -7,6 +7,7 @@ import org.vadere.state.scenario.Topography;
 import org.vadere.state.attributes.spawner.AttributesSpawner;
 import org.vadere.state.scenario.distribution.VDistribution;
 
+;
 public abstract class VSpawner  implements AttributesAttached {
 
     private final Topography topography;

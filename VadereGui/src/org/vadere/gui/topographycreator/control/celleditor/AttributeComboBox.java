@@ -19,7 +19,6 @@ public class AttributeComboBox extends AttributeEditor {
     }
 
     public void updateValueFromModel(Object value) {
-        super.updateValueFromModel(value);
         this.comboBox.setSelectedItem(value);
     }
 }

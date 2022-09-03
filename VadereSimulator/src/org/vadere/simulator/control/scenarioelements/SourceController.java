@@ -71,12 +71,12 @@ public abstract class SourceController extends ScenarioElementController impleme
                     distributionAttributes,
                     new JDKRandomGenerator(random.nextInt())
             );
-
+            this.spawner = new RegularSpawner(this.spawnerAttributes,topography,distribution);
         } catch (Exception e) {
             throw new IllegalArgumentException("Problem with scenario parameters for source: "
                     + "interSpawnTimeDistribution and/or distributionParameters. See causing Excepion herefafter.", e);
         }
-        this.spawner = new RegularSpawner(new AttributesRegularSpawner(),topography,distribution);
+
     }
 
 

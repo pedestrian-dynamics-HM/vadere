@@ -14,10 +14,7 @@ import org.vadere.state.scenario.distribution.registry.RegisterDistribution;
 public class NegativeExponentialDistribution extends VDistribution<AttributesNegativeExponentialDistribution> {
 	private Attributes exponAttributes;
 	private ExponentialDistribution distribution;
-	/*
-	private int spawnNumber;
-	private int remainingSpawnAgents;
-	*/
+
 	public NegativeExponentialDistribution(){
 		// Do not remove this constructor. It is us used through reflection.
 		super();
@@ -32,29 +29,14 @@ public class NegativeExponentialDistribution extends VDistribution<AttributesNeg
 	protected void setValues(AttributesNegativeExponentialDistribution parameter, RandomGenerator randomGenerator)
 	        throws Exception {
 		this.distribution = new ExponentialDistribution(randomGenerator, parameter.getMean());
-		//this.spawnNumber = spawnNumber;
+		this.exponAttributes = parameter;
 	}
-/*
-	@Override
-	public int getSpawnNumber(double timeCurrentEvent) {
-		return spawnNumber;
-	}
-*/
+
 	@Override
 	public double getNextSpawnTime(double timeCurrentEvent) {
 		return timeCurrentEvent + distribution.sample();
 	}
-/*
-	@Override
-	public int getRemainingSpawnAgents() {
-		return remainingSpawnAgents;
-	}
 
-	@Override
-	public void setRemainingSpawnAgents(int remainingSpawnAgents) {
-		this.remainingSpawnAgents = remainingSpawnAgents;
-	}
-*/
 	@Override
 	public Attributes getAttributes() {
 		return this.exponAttributes;

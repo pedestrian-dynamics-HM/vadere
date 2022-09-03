@@ -5,12 +5,13 @@ import java.util.List;
 import java.util.Random;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import org.apache.commons.math3.random.JDKRandomGenerator;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.commons.lang3.NotImplementedException;
 import org.vadere.state.attributes.distributions.AttributesDistribution;
-import org.vadere.state.scenario.distribution.DistributionFactory;
-import org.vadere.state.scenario.distribution.VDistribution;
+import org.vadere.state.attributes.spawner.AttributesRegularSpawner;
+import org.vadere.state.attributes.spawner.AttributesSpawner;
 import org.vadere.state.scenario.distribution.registry.DistributionRegistry;
-import org.vadere.state.scenario.distribution.registry.RegisterDistribution;
+import org.vadere.state.scenario.spawner.SpawnerType;
 import org.vadere.util.geometry.shapes.ShapeType;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.state.scenario.DynamicElement;
@@ -36,7 +37,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import org.vadere.util.geometry.shapes.attributes.AttributesVRectangle;
 
 public class JacksonObjectMapper extends ObjectMapper {
 
@@ -50,6 +50,7 @@ public class JacksonObjectMapper extends ObjectMapper {
 		this.random = random;
 		configure(DeserializationFeature.ACCEPT_FLOAT_AS_INT, true); // otherwise 4.7 will automatically be casted to 4 for integers, with this it throws an error
 		enable(JsonParser.Feature.STRICT_DUPLICATE_DETECTION); // forbids duplicate keys
+
 		disable(SerializationFeature.FAIL_ON_EMPTY_BEANS); // to allow empty attributes like "attributes.SeatingAttr": {}, useful while in dev
 		setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY); // otherwise private fields won't be usable
 		// these three are to forbid deriving class variables from getters/setters, otherwise e.g. Pedestrian would have too many fields
@@ -143,62 +144,7 @@ public class JacksonObjectMapper extends ObjectMapper {
 				}
 			}
 		});
-
-		sm.addDeserializer(VDistribution.class, new JsonDeserializer<VDistribution>() {
-			@Override
-			public VDistribution deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JsonProcessingException {
-				JsonNode node = jsonParser.readValueAsTree();
-				String type = node.get("type").asText();
-				JsonNode param = node.get("parameters");
-				AttributesDistribution attrib;
-				try {
-					attrib = (AttributesDistribution) convertValue(param, DistributionRegistry.get(type).getParameter());
-				} catch (Exception e) {
-					throw new RuntimeException(e);
-				}
-				if(type.equals("null")){
-					return null;
-				}
-				try {
-					return DistributionFactory.create(attrib,new JDKRandomGenerator(random.nextInt()));
-				} catch (Exception e) {
-					throw new RuntimeException(e);
-				}
-				//return deserializeVDistribution(jsonParser.readValueAsTree());
-			}
-		});
-		sm.addSerializer(VDistribution.class, new JsonSerializer<VDistribution>() {
-			@Override
-			public void serialize(VDistribution vDistribution, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
-				var mapper = new ObjectMapper();
-				var parentNode = mapper.createObjectNode();
-
-				parentNode.put("type",vDistribution.getClass().getAnnotation(RegisterDistribution.class).name());
-				parentNode.set("parameters",convertValue(vDistribution.getAttributes(),JsonNode.class));
-				jsonGenerator.writeTree(parentNode);
-
-			}
-		});
-
 		registerModule(sm);
-	}
-
-	private VDistribution deserializeVDistribution(JsonNode node){
-		return convertValue(node,VDistributionStore.class).newVDistribution();
-	}
-
-	private static class VDistributionStore{
-		public double distributionName;
-		public AttributesDistribution distributionAttributes;
-
-		public VDistributionStore(){}
-
-		public VDistributionStore(VDistributionStore store){
-			distributionName = store.distributionName;
-			distributionAttributes = store.distributionAttributes;
-		}
-
-		public VDistribution newVDistribution(){return null;}
 	}
 
 
@@ -209,7 +155,10 @@ public class JacksonObjectMapper extends ObjectMapper {
 	private JsonNode serializeVRectangle(VRectangle vRect) {
 		return convertValue(new VRectangleStore(vRect), JsonNode.class);
 	}
-
+	private static class VAttributesDistributionStore{
+		public AttributesDistribution attributesDistribution;
+		public String type;
+	}
 	@SuppressWarnings("unused")
 	private static class VRectangleStore {
 		public double x;

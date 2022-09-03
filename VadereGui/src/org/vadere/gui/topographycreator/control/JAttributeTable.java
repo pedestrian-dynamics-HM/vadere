@@ -144,7 +144,7 @@ public class JAttributeTable extends JPanel implements Observer {
         this.tableComponents.add(panel);
         try {
             this.nameFields.put(field.getName(), field);
-            var component = (JComponent) constrClass.getDeclaredConstructor(Class.class,JPanel.class, TopographyCreatorModel.class).newInstance(type,panel,model);
+            var component = (JComponent) constrClass.getDeclaredConstructor(Attributes.class,Field.class,TopographyCreatorModel.class,Class.class,JPanel.class).newInstance(attached,field,model,type,panel);
             insertComponentIntoMap(field, component);
         } catch (InstantiationException e) {
             throw new RuntimeException(e);

@@ -51,7 +51,6 @@ public class AttributeTextEditor extends AttributeEditor {
 
     @Override
     public void updateValueFromModel(Object value) {
-        super.updateValueFromModel(value);
         this.textField.setText((String) value);
     }
 }

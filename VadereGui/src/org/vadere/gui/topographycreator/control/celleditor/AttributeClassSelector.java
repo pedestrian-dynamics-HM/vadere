@@ -5,6 +5,7 @@ import org.vadere.gui.topographycreator.view.AttributeView;
 import org.vadere.util.Attributes;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -20,15 +21,18 @@ public class AttributeClassSelector extends AttributeEditor {
 
     private TopographyCreatorModel model;
 
-    private boolean contentPaneVisible = true;
+    private boolean contentPaneVisible = false;
 
     private final JPanel contentPanel;
 
     public AttributeClassSelector(Attributes attached, Field field, TopographyCreatorModel model, Class clazz, JPanel contentReceiver) {
         super(attached, field, model);
         this.contentPanel = contentReceiver;
+        this.contentPanel.setLayout(new BorderLayout());
+        this.contentPanel.setBorder(new EmptyBorder(2,2,2,2));
+        this.contentPanel.setVisible(contentPaneVisible);
         this.clazz = clazz;
-        this.button = new JButton();
+        this.button = new JButton(clazz.getSimpleName());
         this.add(button);
         Attributes attrs = null;
         try {
@@ -41,7 +45,7 @@ public class AttributeClassSelector extends AttributeEditor {
         this.button.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                super.mouseClicked(e);
+                //super.mouseClicked(e);
                 SwingUtilities.invokeLater(() -> {
                     contentPaneVisible = !contentPaneVisible;
                     contentPanel.setVisible(contentPaneVisible);
@@ -55,19 +59,18 @@ public class AttributeClassSelector extends AttributeEditor {
         this.gbc = new GridBagConstraints();
         this.gbc.gridwidth = GridBagConstraints.REMAINDER;
         this.gbc.anchor = GridBagConstraints.FIRST_LINE_START;
-        this.gbc.fill = GridBagConstraints.HORIZONTAL;
+        this.gbc.fill = GridBagConstraints.BOTH;
         this.gbc.weightx = 1;
         this.gbc.insets = new Insets(2, 2, 2, 2);
 
     }
 
     public void updateValueFromModel(Object value) {
-        super.updateValueFromModel(value);
     }
 
     private void createInternalPropertyPane(Attributes newObject, TopographyCreatorModel model) {
         var proppane = AttributeView.buildPage(newObject, model);
-        contentPanel.add(proppane, gbc);
+        contentPanel.add(proppane,BorderLayout.CENTER);
     }
 
     private Attributes constructNewObject() throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {

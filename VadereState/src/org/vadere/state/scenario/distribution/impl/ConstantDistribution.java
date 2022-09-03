@@ -9,16 +9,12 @@ import org.vadere.state.scenario.distribution.registry.RegisterDistribution;
 /**
  * @author Aleksandar Ivanov(ivanov0@hm.edu), Lukas Gradl (lgradl@hm.edu)
  */
+
 @RegisterDistribution(name = "constant", parameter = AttributesConstantDistribution.class)
 public class ConstantDistribution extends VDistribution<AttributesConstantDistribution> {
 
 	private Attributes constantAttributes;
 
-	private double updateFrequency;
-	/*
-	private int spawnNumber;
-	private int remainingSpawnAgents;
-	 */
 	public ConstantDistribution(){
 		// Do not remove this constructor. It is us used through reflection.
 		super();
@@ -37,7 +33,8 @@ public class ConstantDistribution extends VDistribution<AttributesConstantDistri
 	@Override
 	public double getNextSpawnTime(double timeCurrentEvent) {
 		// always add a constant value to the 'value'
-		return timeCurrentEvent + this.updateFrequency;
+		var attribs = (AttributesConstantDistribution)this.getAttributes();
+		return timeCurrentEvent + attribs.getUpdateFrequency();
 	}
 	@Override
 	public Attributes getAttributes() {

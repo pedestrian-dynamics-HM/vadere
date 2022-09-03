@@ -5,15 +5,17 @@ import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
 import org.vadere.gui.topographycreator.utils.RunnableRegistry;
 import org.vadere.gui.topographycreator.view.AttributeView;
 import org.vadere.util.Attributes;
-import org.vadere.util.AttributesAttached;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * This AttributeEditor Class is used by JAttributeTable as the default fallback for
@@ -24,15 +26,16 @@ import java.util.stream.Collectors;
 
 //TODO: add jtable to constructor for revalidation & repaint
 public class AttributeSubClassSelector extends AttributeEditor {
+    public static final String STRING_NULL = "[null]";
     private JComboBox<Object> comboBox;
     private JPanel contentPanel;
     private AttributeSubClassSelector self;
     private RunnableRegistry runnableRegistry;
-    private Map<Object,Class<?>> subObjectClasses;
+    private Map<Class<?>,Constructor<?>> classConstructorRegistry;
     private GridBagConstraints gbc;
-    private Attributes subAttached;
     private String selected;
 
+    private Object previousObject;
     public AttributeSubClassSelector(
             Attributes attached,
             Field field,
@@ -43,8 +46,13 @@ public class AttributeSubClassSelector extends AttributeEditor {
         super(attached, field, model);
         initializeGridBagConstraint();
         initializeRunnableRegistry(model);
-        initializeComboBox(subObjectModel, contentPanel);
+        try {
+            initializeComboBox(subObjectModel, contentPanel);
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
         initializeSelfReference();
+
     }
 
     private void initializeSelfReference() {
@@ -58,56 +66,63 @@ public class AttributeSubClassSelector extends AttributeEditor {
         });
         this.runnableRegistry.registerDefault(()->{
             try {
-                var newSubObject = constructNewSubObject(selected);
-                clearContentPanel();
-                setOwnerFieldTo(newSubObject);
-                createInternalPropertyPane(newSubObject, model);
-            } catch (Exception ignored) {
+                ifNotUpdatedFromOutside(()-> {
+                    try {
+                        constructNewInternalPropertyPane(selected,model);
+                    } catch (InstantiationException e) {
+                        throw new RuntimeException(e);
+                    } catch (IllegalAccessException e) {
+                        throw new RuntimeException(e);
+                    } catch (InvocationTargetException e) {
+                        throw new RuntimeException(e);
+                    } catch (NoSuchMethodException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+            } catch (Exception e) {
+                System.out.println(e);
             }
         });
     }
 
-    private void initializeComboBox(ArrayList<Class<?>> subObjectModel, JPanel contentReceiver) {
+    private void initializeComboBox(ArrayList<Class<?>> subObjectModel, JPanel contentReceiver) throws NoSuchMethodException {
         this.comboBox = new JComboBox<>();
         this.comboBox.setModel(initializeComboBoxModel(subObjectModel));
         this.contentPanel = contentReceiver;
         this.comboBox.addItemListener(e -> SwingUtilities.invokeLater(() -> {
-            this.selected = (String) comboBox.getSelectedItem();
-            this.runnableRegistry.apply(selected);
+            ifNotUpdatedFromOutside(()->{
+                this.runnableRegistry.apply(comboBox.getSelectedItem());
+            });
+
         }));
         this.add(comboBox);
     }
 
-    private void setOwnerFieldTo(Attributes newObject) {
-        updateModelFromValue(newObject);
-        this.subAttached = newObject;
-    }
     private void nullifyFieldValueOfAttached() {
-        setOwnerFieldTo(null);
-        self.setSubAttached(null);
     }
     @NotNull
-    private DefaultComboBoxModel<Object> initializeComboBoxModel(ArrayList<Class<?>> classesModel) {
-        this.subObjectClasses = classesModel
-                .stream()
-                .collect(Collectors.toMap(aClass -> (aClass).getSimpleName(), aClass -> aClass));
-        var comboModel = new DefaultComboBoxModel<>();
-        comboModel.addElement("[null]");
-        classesModel.forEach(c -> comboModel.addElement(c.getSimpleName()));
-        return comboModel;
+    private DefaultComboBoxModel<Object> initializeComboBoxModel(ArrayList<Class<?>> classesModel) throws NoSuchMethodException {
+        this.classConstructorRegistry = new HashMap<>();
+        var comboBoxModel = new DefaultComboBoxModel<>();
+        comboBoxModel.addElement(STRING_NULL);
+        for (var clazz : classesModel) {
+            classConstructorRegistry.put(clazz, clazz.getDeclaredConstructor());
+            comboBoxModel.addElement(clazz);
+        }
+        return comboBoxModel;
     }
+
     @Override
     public void updateValueFromModel(Object value) {
-        super.updateValueFromModel(value);
-        this.comboBox.setSelectedItem(value.getClass().getSimpleName());
-        nullifyFieldValueOfAttached();
-        clearContentPanel();
-        var newObject = (Attributes) value;
-        setOwnerFieldTo(newObject);
-        clearContentPanel();
-        createInternalPropertyPane(newObject, getModel());
+        if(value != previousObject) {
+            super.updateValueFromModel(value);
+            this.comboBox.getModel().setSelectedItem(value);
+            updateInternalPropertyPane((Attributes) value,getModel());
+        }
+        this.previousObject = value;
     }
-    private void createInternalPropertyPane(Attributes newObject, TopographyCreatorModel model) {
+    private void updateInternalPropertyPane(Attributes newObject, TopographyCreatorModel model) {
+        clearContentPanel();
         var proppane = AttributeView.buildPage(newObject, model);
         contentPanel.add(proppane, gbc);
     }
@@ -117,16 +132,14 @@ public class AttributeSubClassSelector extends AttributeEditor {
         contentPanel.repaint();
     }
 
-    private Attributes constructNewSubObject(String selected) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-        Class<? extends Attributes> clazz = (Class<? extends Attributes>) subObjectClasses.get(selected);
-        Attributes newObject = clazz.getDeclaredConstructor((Class<?>) null).newInstance();
-        setSubAttached(newObject);
+    private Attributes constructNewInternalPropertyPane(String selected, TopographyCreatorModel model) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+        var newObject = (Attributes) classConstructorRegistry.get(selected).newInstance();
+        updateInternalPropertyPane(newObject, model);
+        updateModelFromValue(newObject);
         return newObject;
     }
 
-    private void setSubAttached(Attributes attached){
-        this.subAttached = attached;
-    }
+
     private void initializeGridBagConstraint() {
         this.gbc = new GridBagConstraints();
         this.gbc.gridwidth = GridBagConstraints.REMAINDER;

@@ -19,7 +19,6 @@ public class AttributeSpinner extends AttributeEditor {
     }
 
     public void updateValueFromModel(Object value) {
-        super.updateValueFromModel(value);
         this.spinner.setValue(value);
     }
 

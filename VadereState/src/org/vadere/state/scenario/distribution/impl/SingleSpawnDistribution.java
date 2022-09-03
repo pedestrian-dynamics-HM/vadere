@@ -11,14 +11,12 @@ import org.vadere.state.scenario.distribution.registry.RegisterDistribution;
  */
 @RegisterDistribution(name = "singleSpawn", parameter = AttributesSingleSpawnDistribution.class)
 public class SingleSpawnDistribution extends VDistribution<AttributesSingleSpawnDistribution> {
-	private Attributes singelspawnAttributes;
-
-	private double spawnTime;
+	private Attributes singlespawnAttributes;
 
 	public SingleSpawnDistribution(){
 		// Do not remove this constructor. It is us used through reflection.
 		super();
-		this.singelspawnAttributes = new AttributesSingleSpawnDistribution();
+		this.singlespawnAttributes = new AttributesSingleSpawnDistribution();
 	}
 	public SingleSpawnDistribution(AttributesSingleSpawnDistribution parameter, int spawnNumber, RandomGenerator unused)
 	        throws Exception {
@@ -27,23 +25,24 @@ public class SingleSpawnDistribution extends VDistribution<AttributesSingleSpawn
 
 	@Override
 	protected void setValues(AttributesSingleSpawnDistribution parameter, RandomGenerator unused) throws Exception {
-		this.spawnTime = parameter.getSpawnTime();
+		this.singlespawnAttributes = parameter;
 	}
 
 	@Override
 	public double getNextSpawnTime(double timeCurrentEvent) {
-		return spawnTime;
+		var attribs = (AttributesSingleSpawnDistribution)getAttributes();
+		return attribs.getSpawnTime();
 	}
 
 	@Override
 	public Attributes getAttributes() {
-		return this.singelspawnAttributes;
+		return this.singlespawnAttributes;
 	}
 
 	@Override
 	public void setAttributes(Attributes attributes) {
 		if(attributes instanceof AttributesSingleSpawnDistribution)
-			this.singelspawnAttributes = attributes;
+			this.singlespawnAttributes = attributes;
 		else
 			throw new IllegalArgumentException();
 	}

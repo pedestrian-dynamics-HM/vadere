@@ -13,7 +13,7 @@ public class AttributesSource extends AttributesVisualElement {
 	@VadereAttribute
 	@JsonView(Views.CacheViewExclude.class)
 	private AttributesSpawner spawner;
-	@VadereAttribute
+	//@VadereAttribute
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
 	private List<Integer> targetIds = new LinkedList<>();
 	/**
@@ -30,7 +30,7 @@ public class AttributesSource extends AttributesVisualElement {
   	 *  GroupSize   [  1    2    3     4     5         ] ------------------------------------------
 	 *  uniform distribution of groups of the size from 3 to 5 ------------------------------------
 	 */
-
+	//@VadereAttribute
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
 	private List<Double> groupSizeDistribution = Arrays.asList(1.0);
 

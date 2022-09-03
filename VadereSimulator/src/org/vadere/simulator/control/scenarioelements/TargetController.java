@@ -22,8 +22,6 @@ import java.util.*;
 
 public class TargetController extends ScenarioElementController {
 
-
-	private final Target.WaitingBehaviour waitingBehaviour;
 	private static final Logger log = Logger.getLogger(TargetController.class);
 	private VDistribution distribution = null;
 	private final AttributesTarget targetAttributes;
@@ -37,7 +35,7 @@ public class TargetController extends ScenarioElementController {
 		this.targetAttributes = target.getAttributes();
 		this.topography = topography;
 
-		if (!targetAttributes.getWaitingBehaviour().equals(Target.WaitingBehaviour.NO_WAITING)) {
+		if (targetAttributes.isWaiting()) {
 			try {
 				distribution = DistributionFactory.create(
 						targetAttributes.getWaitingAreaAttributes().getDistribution(),
@@ -50,7 +48,6 @@ public class TargetController extends ScenarioElementController {
 			}
 
 		}
-		this.waitingBehaviour = target.getWaitingBehaviour();
 	}
 
 	public void update(double simTimeInSec) {
@@ -180,7 +177,7 @@ public class TargetController extends ScenarioElementController {
 			changeTargetOfFollowers(agent);
 			topography.removeElement(agent);
 		} else {
-			agent.checkNextTarget(target.getNextSpeed());
+			agent.checkNextTarget(target.getAttributes().getLeavingSpeed());
 		}
 	}
 

@@ -26,6 +26,7 @@ public class BinomialDistribution extends VDistribution<AttributesBinomialDistri
 	protected void setValues(AttributesBinomialDistribution parameter, RandomGenerator randomGenerator) {
 		this.distribution = new org.apache.commons.math3.distribution.BinomialDistribution(randomGenerator,
 				parameter.getTrials(), parameter.getP());
+		this.binomialAttributes = parameter;
 	}
 	@Override
 	public double getNextSpawnTime(double timeCurrentEvent) {

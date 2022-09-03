@@ -13,10 +13,6 @@ import org.vadere.state.scenario.distribution.registry.RegisterDistribution;
 @RegisterDistribution(name = "poisson", parameter = AttributesPoissonDistribution.class)
 public class PoissonDistribution extends VDistribution<AttributesPoissonDistribution> {
 	private ExponentialDistribution distribution;
-	/*
-	private int spawnNumber;
-	private int remainingSpawnAgents;
-	*/
 
 	private Attributes poissonAttributes;
 	public PoissonDistribution(){
@@ -33,29 +29,14 @@ public class PoissonDistribution extends VDistribution<AttributesPoissonDistribu
 	protected void setValues(AttributesPoissonDistribution parameter, RandomGenerator randomGenerator)
 	        throws Exception {
 		distribution = new ExponentialDistribution(randomGenerator, 1 / parameter.getNumberPedsPerSecond());
-		//this.spawnNumber = spawnNumber;
+		this.poissonAttributes = parameter;
 	}
-/*
-	@Override
-	public int getSpawnNumber(double timeCurrentEvent) {
-		return spawnNumber;
-	}
-*/
+
 	@Override
 	public double getNextSpawnTime(double timeCurrentEvent) {
 		return timeCurrentEvent + distribution.sample();
 	}
-/*
-	@Override
-	public int getRemainingSpawnAgents() {
-		return remainingSpawnAgents;
-	}
 
-	@Override
-	public void setRemainingSpawnAgents(int remainingSpawnAgents) {
-		this.remainingSpawnAgents = remainingSpawnAgents;
-	}
-*/
 	@Override
 	public Attributes getAttributes() {
 		return this.poissonAttributes;

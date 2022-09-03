@@ -1,33 +1,43 @@
 package org.vadere.state.attributes.spawner;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.vadere.state.attributes.distributions.AttributesDistribution;
 import org.vadere.state.attributes.scenario.AttributesVisualElement;
 import org.vadere.state.util.Views;
 import org.vadere.util.Attributes;
 import org.vadere.util.reflection.VadereAttribute;
-
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.NAME,
+        include = JsonTypeInfo.As.PROPERTY,
+        property = "type")
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = AttributesRegularSpawner.class, name = "org.vadere.state.attributes.spawner.AttributesRegularSpawner")
+})
 public abstract class AttributesSpawner extends Attributes {
     public static final int NO_MAX_SPAWN_NUMBER_TOTAL = -1;
     public static final String CONSTANT_DISTRIBUTION = "org.vadere.state.scenario.distribution.impl.ConstantDistribution";
     @VadereAttribute
     @JsonView(Views.CacheViewExclude.class)
-    protected Integer constraintsElementsMax;
+    protected Integer constraintsElementsMax = 0;
     @VadereAttribute
     @JsonView(Views.CacheViewExclude.class)
-    protected Double constraintsTimeStart;
+    protected Double constraintsTimeStart = 0.0;
     @VadereAttribute
     @JsonView(Views.CacheViewExclude.class)
-    protected Double constraintsTimeEnd;
+    protected Double constraintsTimeEnd = 0.0;
     @VadereAttribute
     @JsonView(Views.CacheViewExclude.class)
-    protected Boolean eventPositionRandom;
+    protected Boolean eventPositionRandom = false;
     @VadereAttribute
     @JsonView(Views.CacheViewExclude.class)
-    protected Boolean eventPositionGridCA;
+    protected Boolean eventPositionGridCA = false;
     @VadereAttribute
     @JsonView(Views.CacheViewExclude.class)
-    protected Boolean eventPositionFreeSpace;
+    protected Boolean eventPositionFreeSpace =false;
     @VadereAttribute
     @JsonView(Views.CacheViewExclude.class)
     protected AttributesVisualElement eventElement;

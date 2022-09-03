@@ -23,7 +23,7 @@ public class DistributionFactory {
 		Class<?> pClazz = registeredDistribution.getParameter();
 
 		Constructor<? extends VDistribution<?>> distributionConstructor = registeredDistribution.getDistribution()
-		        .getConstructor(pClazz, int.class, RandomGenerator.class);
+		        .getConstructor(pClazz,RandomGenerator.class);
 
 		//Object p = map(parameters, pClazz);
 		return distributionConstructor.newInstance(parameters,randomGenerator);

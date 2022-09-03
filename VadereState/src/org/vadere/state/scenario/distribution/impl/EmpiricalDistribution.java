@@ -31,31 +31,13 @@ public class EmpiricalDistribution extends VDistribution<AttributesEmpiricalDist
 	@Override
 	protected void setValues(AttributesEmpiricalDistribution parameter, RandomGenerator randomGenerator) {
 		distribution = new org.apache.commons.math3.random.EmpiricalDistribution(randomGenerator);
-		//distribution.load(parameter.getValues());
-		//this.spawnNumber = spawnNumber;
-
+		this.empiricalAttributes = parameter;
 	}
 	@Override
 	public double getNextSpawnTime(double timeCurrentEvent) {
 		return timeCurrentEvent + distribution.sample();
 	}
-	/*
-        @Override
-        public int getSpawnNumber(double timeCurrentEvent) {
-            return spawnNumber;
-        }
-    */
-/*
-	@Override
-	public int getRemainingSpawnAgents() {
-		return remainingSpawnAgents;
-	}
 
-	@Override
-	public void setRemainingSpawnAgents(int remainingSpawnAgents) {
-		this.remainingSpawnAgents = remainingSpawnAgents;
-	}
-*/
 	@Override
 	public Attributes getAttributes() {
 		return this.empiricalAttributes;

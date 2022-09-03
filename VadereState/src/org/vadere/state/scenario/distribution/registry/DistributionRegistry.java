@@ -1,5 +1,7 @@
 package org.vadere.state.scenario.distribution.registry;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Set;
 
@@ -32,6 +34,15 @@ public class DistributionRegistry {
 		return REGISTRY.get(name);
 	}
 
+	public static String getName(AttributesDistribution attributesDistribution) throws Exception{
+		for(var val : REGISTRY.values()){
+			if(val.getParameter().equals(attributesDistribution.getClass())){
+				return val.getDistribution().getName();
+			}
+		}
+		throw  new Exception(
+				"There is no distribution with name " + attributesDistribution + ". Possible options are " + getRegisteredNames());
+	}
 
 	public static Set<String> getRegisteredNames() {
 		return REGISTRY.keySet();
@@ -49,7 +60,7 @@ public class DistributionRegistry {
 				@SuppressWarnings("unchecked") // safe to cast because clazz extends VadereDistribution
 				Class<? extends VDistribution<?>> vadereDistributionclazz = (Class<? extends VDistribution<?>>) clazz;
 				RegisteredDistribution a = new RegisteredDistribution(annotation.parameter(), vadereDistributionclazz);
-				String name = annotation.parameter().getName();
+				String name = ((ParameterizedType)clazz.getGenericSuperclass()).getActualTypeArguments()[0].getTypeName();
 				registry.put(name, a);
 			}
 

@@ -22,15 +22,4 @@ public class AttributesSingleSpawnDistribution extends AttributesDistribution {
 	 */
 	Double spawnTime;
 
-	public int getSpawnNumber() {
-		return spawnNumber;
-	}
-
-	public void setSpawnNumber(int spawnNumber) {
-		this.spawnNumber = spawnNumber;
-	}
-
-	Integer spawnNumber;
-
-
 }

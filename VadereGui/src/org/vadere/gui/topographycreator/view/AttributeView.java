@@ -21,7 +21,7 @@ public class AttributeView extends JPanel implements ISelectScenarioElementListe
 
     JPanel pageView;
     JPanel helpView;
-
+    HashMap<ScenarioElement,JScrollPane> editorPages;
     TopographyCreatorModel panelModel;
 
 
@@ -30,6 +30,8 @@ public class AttributeView extends JPanel implements ISelectScenarioElementListe
 
         this.panelModel = defaultModel;
         this.panelModel.addSelectScenarioElementListener(this);
+
+        this.editorPages = new HashMap<>();
 
         pageView = new JPanel(new BorderLayout());
         helpView = new JPanel();
@@ -50,9 +52,14 @@ public class AttributeView extends JPanel implements ISelectScenarioElementListe
     @Override
     public void selectionChange(ScenarioElement scenarioElement) {
         if (scenarioElement != null){
+            if(!editorPages.containsKey(scenarioElement)){
+                var attributePage = buildPage(scenarioElement.getAttributes(),panelModel);
+                this.editorPages.put(scenarioElement,attributePage);
+            }
+            var attributePage = editorPages.get(scenarioElement);
             this.pageView.removeAll();
-            var attributePage = buildPage(scenarioElement.getAttributes(),panelModel);
             this.pageView.add(attributePage,BorderLayout.NORTH);
+
         }
     }
 

@@ -19,7 +19,6 @@ public class AttributeCheckBox extends AttributeEditor {
 
     @Override
     public void updateValueFromModel(Object value) {
-        super.updateValueFromModel(value);
         this.checkBox.setSelected((Boolean) value);
     }
 }

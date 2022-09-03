@@ -1,5 +1,6 @@
 package org.vadere.state.attributes.scenario;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonView;
 
 import org.vadere.state.scenario.Pedestrian;
@@ -12,11 +13,15 @@ import org.vadere.util.reflection.VadereAttribute;
  * @author Ludwig Jaeck
  */
 public class AttributesTarget extends AttributesVisualElement {
+	@VadereAttribute
 	private Boolean absorbing;
+	@VadereAttribute
 	private AttributesAbsorbingArea absorbingArea;
+	@VadereAttribute
 	private Boolean waiting;
+	@VadereAttribute
 	private AttributesWaitingArea waitingArea;
-
+	@VadereAttribute
 	private Double leavingSpeed;
 	/**
 	 *  Modes: <br>
@@ -29,8 +34,7 @@ public class AttributesTarget extends AttributesVisualElement {
 	 *      <p>Agents are switching target immediately of 'absorbing' is set to false else the get absorbed.</p>
 	 *  </ul>
 	 */
-	@JsonView(Views.CacheViewExclude.class)
-	private String waitingBehaviour = Target.WaitingBehaviour.NO_WAITING.toString();
+
 /*
 	private Double waitingTimeYellowPhase = 0.0;
 	/**
@@ -107,8 +111,6 @@ public class AttributesTarget extends AttributesVisualElement {
 		this.absorbing = true;
 		this.id = pedestrian.getIdAsTarget();
 		this.parallelWaiters = 0;
-		this.waitingBehaviour = Target.WaitingBehaviour.NO_WAITING.toString();
-
 	}
 
 	// Getters...
@@ -129,23 +131,6 @@ public class AttributesTarget extends AttributesVisualElement {
 	public void setParallelWaiters(int parallelWaiters) {
 		checkSealed();
 		this.parallelWaiters = parallelWaiters;
-	}
-
-	public Target.WaitingBehaviour getWaitingBehaviour() {
-		if (waitingBehaviour.equals(Target.WaitingBehaviour.INDIVIDUAL.toString())) {
-			return Target.WaitingBehaviour.INDIVIDUAL;
-		} else if (waitingBehaviour.equals(Target.WaitingBehaviour.TRAFFIC_LIGHT.toString())) {
-			return Target.WaitingBehaviour.TRAFFIC_LIGHT;
-		}
-		else if (waitingBehaviour.equals(Target.WaitingBehaviour.NO_WAITING.toString())){
-			return  Target.WaitingBehaviour.NO_WAITING;
-		}
-		throw new IllegalArgumentException("expected a waiting mode in AttributesTarget");
-	}
-
-	public void setWaitingBehaviour(Target.WaitingBehaviour behaviour){
-		checkSealed();
-		this.waitingBehaviour = behaviour.toString();
 	}
 
 	public AttributesAbsorbingArea getAbsorbingAreaAttributes() {

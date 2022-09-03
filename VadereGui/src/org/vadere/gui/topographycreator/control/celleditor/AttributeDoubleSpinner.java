@@ -20,7 +20,6 @@ public class AttributeDoubleSpinner extends AttributeEditor {
     }
 
     public void updateValueFromModel(Object value) {
-        super.updateValueFromModel(value);
         this.spinner.setValue(value);
     }
 

@@ -14,9 +14,6 @@ import org.vadere.state.scenario.distribution.registry.RegisterDistribution;
 public class LinearInterpolationDistribution extends VDistribution<AttributesLinearInterpolationDistribution> {
 	private Attributes lerpAttributes;
 
-	private double spawnFrequency;
-
-
 	public LinearInterpolationDistribution(){
 		// Do not remove this constructor. It is us used through reflection.
 		super();
@@ -44,17 +41,10 @@ public class LinearInterpolationDistribution extends VDistribution<AttributesLin
 	}
 	@Override
 	public double getNextSpawnTime(double timeCurrentEvent) {
-		return timeCurrentEvent + spawnFrequency;
+		var attribs = (AttributesLinearInterpolationDistribution)getAttributes();
+		return timeCurrentEvent + attribs.getSpawnFrequency();
 	}
-	/*
-        @Override
-        public int getSpawnNumber(double timeCurrentEvent) {
-            int spawnNumber = (int) Math.round(this.interpolator.value(timeCurrentEvent) + this.truncNormalDist.sample());
-            spawnNumber = Math.max(0, spawnNumber);
-            return spawnNumber;
-        }
 
-    */
 	@Override
 	public Attributes getAttributes() {
 		return this.lerpAttributes;

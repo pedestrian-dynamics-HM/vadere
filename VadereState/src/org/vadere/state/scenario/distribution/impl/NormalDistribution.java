@@ -30,30 +30,15 @@ public class NormalDistribution extends VDistribution<AttributesNormalDistributi
 	        throws Exception {
 		distribution = new TruncatedNormalDistribution(randomGenerator, parameter.getMean(), parameter.getSd(), 0,
 		        Double.MAX_VALUE, 1000);
-		//this.spawnNumber = spawnNumber;
+		this.normalAttributes = parameter;
 
 	}
-/*
-	@Override
-	public int getSpawnNumber(double timeCurrentEvent) {
-		return spawnNumber;
-	}
-*/
+
 	@Override
 	public double getNextSpawnTime(double timeCurrentEvent) {
 		return timeCurrentEvent + distribution.sample();
 	}
-/*
-	@Override
-	public int getRemainingSpawnAgents() {
-		return remainingSpawnAgents;
-	}
 
-	@Override
-	public void setRemainingSpawnAgents(int remainingSpawnAgents) {
-		this.remainingSpawnAgents = remainingSpawnAgents;
-	}
-*/
 	@Override
 	public Attributes getAttributes() {
 		return this.normalAttributes;
