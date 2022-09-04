@@ -28,9 +28,9 @@ public class ActionSubtractMeasurementArea extends TopographyAction {
 
     private final UndoableEditSupport undoSupport;
 
-    public ActionSubtractMeasurementArea(String name, ImageIcon icon, IDrawPanelModel panelModel,
+    public ActionSubtractMeasurementArea(String name, String iconPath, IDrawPanelModel panelModel,
                                          UndoableEditSupport undoSupport) {
-        super(name, icon, panelModel);
+        super(name, iconPath, panelModel);
         this.undoSupport = undoSupport;
     }
 

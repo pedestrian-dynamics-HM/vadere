@@ -2,7 +2,6 @@ package org.vadere.gui.topographycreator.control;
 
 import java.awt.event.ActionEvent;
 
-import javax.swing.ImageIcon;
 import javax.swing.undo.UndoableEdit;
 import javax.swing.undo.UndoableEditSupport;
 
@@ -21,9 +20,9 @@ public class ActionResetTopography extends TopographyAction {
 
 	private final UndoableEditSupport undoSupport;
 
-	public ActionResetTopography(String name, ImageIcon icon, IDrawPanelModel panelModel,
+	public ActionResetTopography(String name, String iconPath,String shortDescription, IDrawPanelModel panelModel,
 			UndoableEditSupport undoSupport) {
-		super(name, icon, panelModel);
+		super(name, iconPath, shortDescription, panelModel);
 		this.undoSupport = undoSupport;
 	}
 

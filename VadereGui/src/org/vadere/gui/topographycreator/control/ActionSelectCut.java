@@ -3,7 +3,6 @@ package org.vadere.gui.topographycreator.control;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 
-import javax.swing.ImageIcon;
 import javax.swing.undo.UndoableEditSupport;
 
 import org.vadere.gui.components.control.IMode;
@@ -19,9 +18,9 @@ public class ActionSelectCut extends TopographyAction {
 	private static final long serialVersionUID = 2258668034342242491L;
 	private final IMode mode;
 
-	public ActionSelectCut(String name, ImageIcon icon, IDrawPanelModel panelModel,
-			final UndoableEditSupport undoSupport) {
-		super(name, icon, panelModel);
+	public ActionSelectCut(String name, String iconPath, String shortDescription, IDrawPanelModel panelModel,
+						   final UndoableEditSupport undoSupport) {
+		super(name, iconPath, shortDescription, panelModel);
 		mode = new CutScenarioMode(panelModel, undoSupport);
 	}
 

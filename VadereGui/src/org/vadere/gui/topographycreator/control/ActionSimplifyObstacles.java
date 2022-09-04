@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.swing.*;
 import javax.swing.undo.UndoableEditSupport;
 
 public class ActionSimplifyObstacles extends TopographyAction{
@@ -22,9 +21,9 @@ public class ActionSimplifyObstacles extends TopographyAction{
 	ActionCombineDialog dialog;
 	private List<Integer> obstacleIds;
 
-	public ActionSimplifyObstacles(String name, ImageIcon icon, IDrawPanelModel<?> panelModel,
+	public ActionSimplifyObstacles(final String name, final String iconPath,String shortDescription, IDrawPanelModel<?> panelModel,
 									   TopographyAction action, final UndoableEditSupport undoSupport) {
-		super(name, icon, panelModel);
+		super(name, iconPath, shortDescription, panelModel);
 		this.action = action;
 		this.undoableEditSupport = undoSupport;
 		this.obstacleIds = new ArrayList<>();

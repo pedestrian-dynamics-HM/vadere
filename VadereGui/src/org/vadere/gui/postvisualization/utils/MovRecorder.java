@@ -5,10 +5,7 @@ import org.apache.commons.configuration2.Configuration;
 import org.jcodec.api.awt.SequenceEncoder;
 import org.vadere.gui.components.model.SimulationModel;
 import org.vadere.gui.components.utils.Messages;
-import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.components.view.SimulationRenderer;
-import org.vadere.gui.postvisualization.model.PostvisualizationModel;
-import org.vadere.gui.postvisualization.view.PostvisualizationRenderer;
 import org.vadere.util.config.VadereConfig;
 import org.vadere.util.logging.Logger;
 

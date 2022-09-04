@@ -17,9 +17,9 @@ public class ActionCloseDrawOptionPanel extends TopographyAction {
 
 	private final TopographyAction action;
 
-	public ActionCloseDrawOptionPanel(final String name, final ImageIcon icon, final IDrawPanelModel panelModel,
+	public ActionCloseDrawOptionPanel(final String name, final String iconPath, final IDrawPanelModel panelModel,
 			final TopographyAction action) {
-		super(name, icon, panelModel);
+		super(name, iconPath, panelModel);
 		this.action = action;
 	}
 

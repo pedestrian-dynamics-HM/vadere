@@ -20,8 +20,8 @@ public class ActionMinimizeSize extends TopographyAction {
 	private static final long serialVersionUID = 6347273710084940359L;
 	private final IMode mode;
 
-	public ActionMinimizeSize(String name, ImageIcon icon, IDrawPanelModel panelModel) {
-		super(name, icon, panelModel);
+	public ActionMinimizeSize(String name, String iconPath, IDrawPanelModel panelModel) {
+		super(name, iconPath, panelModel);
 		mode = new SelectViewportMode(panelModel);
 	}
 

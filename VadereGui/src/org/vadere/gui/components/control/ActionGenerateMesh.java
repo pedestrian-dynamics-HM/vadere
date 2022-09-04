@@ -29,8 +29,9 @@ public class ActionGenerateMesh extends AbstractAction {
 	private static Logger logger = Logger.getLogger(ActionGenerateMesh.class);
 	private final ProjectViewModel model;
 
-	public ActionGenerateMesh(final String name, Icon icon, final ProjectViewModel model) {
+	public ActionGenerateMesh(final String name, Icon icon,String shortDescription, final ProjectViewModel model) {
 		super(name, icon);
+		putValue(SHORT_DESCRIPTION,shortDescription);
 		this.model = model;
 	}
 

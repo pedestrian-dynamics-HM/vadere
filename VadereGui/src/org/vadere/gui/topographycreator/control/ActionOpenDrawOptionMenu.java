@@ -2,6 +2,7 @@ package org.vadere.gui.topographycreator.control;
 
 import javax.swing.*;
 
+import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.topographycreator.model.IDrawPanelModel;
 
 import java.awt.*;
@@ -22,17 +23,13 @@ public class ActionOpenDrawOptionMenu extends TopographyAction {
 	private final List<Action> miscActions;
 	private JPopupMenu menu;
 
-	public ActionOpenDrawOptionMenu(final String name, final ImageIcon icon, final IDrawPanelModel panelModel,
+	public ActionOpenDrawOptionMenu(final String name, final String iconPath,String shortDescription, final IDrawPanelModel panelModel,
 			final TopographyAction action, final Component parent, final List<Action> drawActions, final List<Action> miscActions) {
-		super(name, icon, panelModel);
+		super(name,iconPath,shortDescription, panelModel);
 		this.action = action;
 		this.parent = parent;
 		this.drawActions = drawActions;
 		this.miscActions = miscActions;
-	}
-	public ActionOpenDrawOptionMenu(final String name, final ImageIcon icon, final IDrawPanelModel panelModel,
-									final TopographyAction action, final Component parent, final List<Action> drawActions) {
-		this(name, icon, panelModel, action, parent, drawActions, null);
 	}
 
 	public ActionOpenDrawOptionMenu(final String name, final IDrawPanelModel panelModel, final TopographyAction action,
@@ -47,6 +44,15 @@ public class ActionOpenDrawOptionMenu extends TopographyAction {
 	public ActionOpenDrawOptionMenu(final String name, final IDrawPanelModel panelModel, final TopographyAction action,
 									final Component parent, final List<Action> actions) {
 		this(name, panelModel, action, parent, actions, null);
+	}
+
+	public ActionOpenDrawOptionMenu(final String name, final String iconPath,String shortDescription, final IDrawPanelModel panelModel,
+									final TopographyAction action,JComponent parent, final List<Action> drawActions) {
+		this(name, iconPath,shortDescription,
+				panelModel,
+				action,
+				parent,
+				drawActions, null);
 	}
 
 	@Override

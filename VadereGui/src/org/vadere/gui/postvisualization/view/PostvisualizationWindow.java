@@ -18,6 +18,7 @@ import org.vadere.gui.components.control.simulation.ActionSwapSelectionMode;
 import org.vadere.gui.components.control.simulation.ActionVisualization;
 import org.vadere.gui.components.model.IDefaultModel;
 import org.vadere.gui.components.utils.Messages;
+import org.vadere.gui.components.utils.ResourceStrings;
 import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.components.utils.SwingUtils;
 import org.vadere.gui.components.view.DialogFactory;
@@ -318,6 +319,7 @@ public class PostvisualizationWindow extends JPanel implements Observer, DropTar
 				renderer, model);
 
 		AbstractAction polyImg = new ActionGeneratePoly(Messages.getString("ProjectView.btnPolySnapshot.tooltip"), resources.getIcon("camera_poly.png", iconWidth, iconHeight),
+				ResourceStrings.TOPOGRAPHY_CREATOR_BTN_GENERATE_POLY_TOOLTIP,
 				model);
 
 		imgOptions.add(pngImg);

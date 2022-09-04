@@ -36,7 +36,7 @@ public class ActionPlaceRandomPedestrians extends TopographyAction {
 
 	private final double agentRadius;
 
-	public ActionPlaceRandomPedestrians(String name, ImageIcon icon, IDrawPanelModel panelModel,
+	public ActionPlaceRandomPedestrians(String name, String icon, IDrawPanelModel panelModel,
 										 UndoableEditSupport undoSupport) {
 		super(name, icon, panelModel);
 		this.agentRadius = new AttributesAgent().getRadius();

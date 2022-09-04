@@ -91,7 +91,7 @@ public class AttributeSubClassSelector extends AttributeEditor {
         this.contentPanel = contentReceiver;
         this.comboBox.addItemListener(e -> SwingUtilities.invokeLater(() -> {
             ifNotUpdatedFromOutside(()->{
-                this.runnableRegistry.apply(comboBox.getSelectedItem());
+                this.runnableRegistry.apply(comboBox.getModel().getSelectedItem());
             });
 
         }));

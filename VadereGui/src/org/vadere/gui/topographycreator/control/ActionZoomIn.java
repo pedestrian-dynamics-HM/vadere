@@ -2,8 +2,6 @@ package org.vadere.gui.topographycreator.control;
 
 import java.awt.event.ActionEvent;
 
-import javax.swing.ImageIcon;
-
 import org.vadere.gui.components.control.IMode;
 import org.vadere.gui.topographycreator.model.IDrawPanelModel;
 
@@ -18,8 +16,8 @@ public class ActionZoomIn extends TopographyAction {
 	private static final long serialVersionUID = 6346468270486683058L;
 	private final IMode mode;
 
-	public ActionZoomIn(final String name, final ImageIcon icon, final IDrawPanelModel panelModel) {
-		super(name, icon, panelModel);
+	public ActionZoomIn(final String name, final String iconPath,final String shortDescription, final IDrawPanelModel panelModel) {
+		super(name, iconPath, shortDescription, panelModel);
 		mode = new ZoomInMode(panelModel);
 	}
 

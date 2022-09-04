@@ -20,8 +20,8 @@ public class ActionSaveTopography extends TopographyAction {
 
 	private static final long serialVersionUID = -4666995743959028627L;
 
-	public ActionSaveTopography(String name, ImageIcon icon, IDrawPanelModel panelModel) {
-		super(name, icon, panelModel);
+	public ActionSaveTopography(String name, String iconPath, IDrawPanelModel panelModel) {
+		super(name, iconPath, panelModel);
 	}
 	public ActionSaveTopography(String name, IDrawPanelModel panelModel) {
 		super(name, panelModel);

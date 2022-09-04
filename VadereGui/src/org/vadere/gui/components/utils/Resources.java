@@ -27,6 +27,8 @@ import javax.swing.*;
  */
 public class Resources {
 
+
+
 	private static Logger logger = Logger.getLogger(Resources.class);
 
 	private Properties properties = null;

@@ -7,7 +7,6 @@ import org.vadere.util.geometry.shapes.VRectangle;
 
 import java.awt.event.ActionEvent;
 
-import javax.swing.*;
 import javax.swing.undo.UndoableEditSupport;
 
 /**
@@ -18,9 +17,9 @@ public class ActionResizeTopographyBound extends TopographyAction {
 	private TopographyAction action;
 	private final UndoableEditSupport undoableEditSupport;
 
-	public ActionResizeTopographyBound(String name, ImageIcon icon, IDrawPanelModel<?> panelModel,
+	public ActionResizeTopographyBound(String name, String iconPath,String shortDescription, IDrawPanelModel<?> panelModel,
 									   TopographyAction action, final UndoableEditSupport undoSupport) {
-		super(name, icon, panelModel);
+		super(name,iconPath, shortDescription, panelModel);
 		this.action = action;
 		this.undoableEditSupport = undoSupport;
 	}

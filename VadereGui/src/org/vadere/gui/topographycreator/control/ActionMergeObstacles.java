@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.swing.*;
 import javax.swing.undo.UndoableEdit;
 import javax.swing.undo.UndoableEditSupport;
 
@@ -26,9 +25,9 @@ public class ActionMergeObstacles extends TopographyAction {
 	private final UndoableEditSupport undoSupport;
 	private static Logger logger = Logger.getLogger(ActionMergeObstacles.class);
 
-	public ActionMergeObstacles(String name, ImageIcon icon, IDrawPanelModel panelModel,
+	public ActionMergeObstacles(String name, String icon,String shortDescription, IDrawPanelModel panelModel,
 	                            UndoableEditSupport undoSupport) {
-		super(name, icon, panelModel);
+		super(name, icon, shortDescription, panelModel);
 		this.undoSupport = undoSupport;
 	}
 

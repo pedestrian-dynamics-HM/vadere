@@ -39,7 +39,7 @@ public class FieldNameRenderer extends DefaultTableCellRenderer implements Table
         typeTextPane.setHorizontalAlignment(JLabel.RIGHT);
         fieldNamePanel.setBorder(new EmptyBorder(4, 4, 4, 4));
         fieldNamePanel.add(nameTextPane,BorderLayout.PAGE_START);
-        fieldNamePanel.add(typeTextPane,BorderLayout.PAGE_END);
+        //fieldNamePanel.add(typeTextPane,BorderLayout.PAGE_END);
 
         return fieldNamePanel;
     }

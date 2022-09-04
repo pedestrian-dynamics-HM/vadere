@@ -1,6 +1,7 @@
 package org.vadere.gui.topographycreator.control;
 
 
+import org.vadere.gui.components.utils.Resources;
 import org.vadere.util.logging.Logger;
 
 import java.awt.*;
@@ -22,8 +23,9 @@ public class ActionUndo extends AbstractAction {
 	private final TopographyAction action;
 	private static Logger logger = Logger.getLogger(ActionUndo.class);
 
-	public ActionUndo(final String name, final ImageIcon icon, UndoManager undoManager, final TopographyAction action) {
-		super(name, icon);
+	public ActionUndo(final String name, final String iconPath,String shortDescription, UndoManager undoManager, final TopographyAction action) {
+		super(name,new ImageIcon(Resources.class.getResource(iconPath)));
+		putValue(SHORT_DESCRIPTION,shortDescription);
 		this.undoManager = undoManager;
 		this.action = action;
 	}

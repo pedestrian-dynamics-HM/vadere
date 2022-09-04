@@ -10,7 +10,6 @@ import org.vadere.util.geometry.shapes.VRectangle;
 import java.awt.event.ActionEvent;
 import java.awt.geom.Rectangle2D;
 
-import javax.swing.*;
 import javax.swing.undo.UndoableEditSupport;
 
 /**
@@ -22,11 +21,12 @@ public class ActionTranslateTopography extends TopographyAction {
 	private final UndoableEditSupport undoableEditSupport;
 
 	public ActionTranslateTopography(String name,
-	                                 ImageIcon icon,
+	                                 String iconPath,
+									 String shortDescription,
 	                                 @NotNull IDrawPanelModel<?> panelModel,
 	                                 @NotNull TopographyAction action,
 	                                 @NotNull final UndoableEditSupport undoSupport) {
-		super(name, icon, panelModel);
+		super(name, iconPath, shortDescription, panelModel);
 		this.action = action;
 		this.undoableEditSupport = undoSupport;
 	}

@@ -35,8 +35,9 @@ public class ActionGeneratePoly extends AbstractAction {
 	private static final Configuration CONFIG = VadereConfig.getConfig();
 	private final DefaultModel<? extends DefaultSimulationConfig> model;
 
-	public ActionGeneratePoly(final String name, Icon icon, final DefaultModel<? extends DefaultSimulationConfig> model) {
+	public ActionGeneratePoly(final String name, Icon icon,String shortDescription, final DefaultModel<? extends DefaultSimulationConfig> model) {
 		super(name, icon);
+		putValue(SHORT_DESCRIPTION,shortDescription);
 		this.model = model;
 	}
 

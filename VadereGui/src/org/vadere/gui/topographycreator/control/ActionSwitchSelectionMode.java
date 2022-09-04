@@ -18,9 +18,9 @@ public class ActionSwitchSelectionMode extends TopographyAction {
 	private final IMode mode;
 	private final TopographyAction action;
 
-	public ActionSwitchSelectionMode(final String name, final ImageIcon icon, final IDrawPanelModel panelModel,
+	public ActionSwitchSelectionMode(final String name, final String icon,String shortDescription, final IDrawPanelModel panelModel,
 			final IMode mode, final TopographyAction action) {
-		super(name, icon, panelModel);
+		super(name, icon,shortDescription, panelModel);
 		this.mode = mode;
 		this.action = action;
 	}

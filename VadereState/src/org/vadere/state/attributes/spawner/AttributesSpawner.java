@@ -23,19 +23,19 @@ public abstract class AttributesSpawner extends Attributes {
     @VadereAttribute
     @JsonView(Views.CacheViewExclude.class)
     protected Integer constraintsElementsMax = 0;
-    @VadereAttribute
+    @VadereAttribute(group = "Time Constraints")
     @JsonView(Views.CacheViewExclude.class)
     protected Double constraintsTimeStart = 0.0;
-    @VadereAttribute
+    @VadereAttribute(group = "Time Constraints")
     @JsonView(Views.CacheViewExclude.class)
     protected Double constraintsTimeEnd = 0.0;
-    @VadereAttribute
+    @VadereAttribute(group = "Position Constraints")
     @JsonView(Views.CacheViewExclude.class)
     protected Boolean eventPositionRandom = false;
-    @VadereAttribute
+    @VadereAttribute(group = "Position Constraints")
     @JsonView(Views.CacheViewExclude.class)
     protected Boolean eventPositionGridCA = false;
-    @VadereAttribute
+    @VadereAttribute(group = "Position Constraints")
     @JsonView(Views.CacheViewExclude.class)
     protected Boolean eventPositionFreeSpace =false;
     @VadereAttribute

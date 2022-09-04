@@ -7,7 +7,6 @@ import org.vadere.gui.components.utils.Resources;
 import org.vadere.util.version.Version;
 
 import java.awt.event.ActionEvent;
-import java.text.MessageFormat;
 
 public class ActionShowAboutDialog extends AbstractAction {
 
