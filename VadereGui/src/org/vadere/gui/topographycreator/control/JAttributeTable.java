@@ -12,6 +12,8 @@ import org.vadere.util.observer.NotifyContext;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
@@ -67,6 +69,7 @@ public class JAttributeTable extends JPanel implements Observer {
         this.fieldValueRendere.setEditors(this.editorObjects);
         this.fieldValueEditor.set(this.editorObjects);
         this.attributeListeners = new ArrayList<>();
+
     }
     private void registerDefaultEditors() {
         this.typeEditors = new HashMap<>();
@@ -176,6 +179,17 @@ public class JAttributeTable extends JPanel implements Observer {
         activeTable.setIntercellSpacing(new Dimension(0,4));
         activeTable.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         activeTable.setBackground(UIManager.getColor("Panel.background"));
+        activeTable.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                //super.mouseMoved(e);
+                SwingUtilities.invokeLater(()->
+                AttributeHelpView.getInstance().loadHelpFromField(
+                        (Field) activeTable.getModel().getValueAt(activeTable.rowAtPoint(e.getPoint()),0)
+                )
+                );
+            }
+        });
         return activeTable;
     }
 

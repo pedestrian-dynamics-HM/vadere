@@ -506,8 +506,6 @@ public class TopographyWindow extends JPanel {
 		);
 		var sectionD = new ScenarioToolBarSection(
 				mergeObstaclesAction,
-				zoomInAction,
-				zoomOutAction,
 				maximizeAction,
 				resizeTopographyBound,
 				simplifyObstacle,
@@ -515,25 +513,20 @@ public class TopographyWindow extends JPanel {
 				translateElements
 		);
 		var sectionE = new ScenarioToolBarSection(
-				selectCutAction,
 				resetScenarioAction,
 				saveScenarioAction,
+				selectCutAction,
 				polyImg,
 				generateMesh
 		);
 		var sectionF = new ScenarioToolBarSection(
-				selectCutAction,
-				resetScenarioAction,
-				saveScenarioAction,
-				polyImg,
-				generateMesh
-		);
-		var sectionG = new ScenarioToolBarSection(
 				undoAction,
 				redoAction,
+				zoomInAction,
+				zoomOutAction,
 				actionTopographyMakroMenu
 		);
-		toolbar.addSections(sectionA,sectionB,sectionC,sectionD,sectionE,sectionF,sectionG);
+		toolbar.addSections(sectionE,sectionF,sectionA,sectionB,sectionC,sectionD);
 
 		mainPanel.setBorder(BorderFactory.createLineBorder(Color.red));
 

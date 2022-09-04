@@ -3,6 +3,7 @@ package org.vadere.gui.topographycreator.view;
 import org.vadere.gui.components.model.DefaultConfig;
 import org.vadere.gui.components.view.DefaultRenderer;
 import org.vadere.gui.topographycreator.model.IDrawPanelModel;
+import org.vadere.state.attributes.scenario.AttributesVisualElement;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -52,13 +53,13 @@ public class TopographyCreatorRenderer  extends DefaultRenderer {
 
 		renderGrid(graphics);
 
-		if (panelModel.isElementSelected()) {
-			renderSelectionBorder(graphics);
-		}
 
 		for (ScenarioElement element : panelModel) {
 			Color color = panelModel.getScenarioElementColor(element.getType());
-			renderers[element.getType().ordinal()].render(element, graphics, color);
+
+			if(((AttributesVisualElement)element.getAttributes()).isVisible()) {
+				renderers[element.getType().ordinal()].render(element, graphics, color);
+			}
 		}
 
 		if (panelModel.isPrototypeVisble()) {
@@ -67,7 +68,9 @@ public class TopographyCreatorRenderer  extends DefaultRenderer {
 		}
 
 		if (panelModel.isElementSelected()) {
-			renderSelectionBorder(graphics);
+			if(((AttributesVisualElement)panelModel.getSelectedElement().getAttributes()).isVisible()) {
+				renderSelectionBorder(graphics);
+			}
 		}
 
 		if (panelModel.isSelectionVisible()) {
@@ -91,41 +94,4 @@ public class TopographyCreatorRenderer  extends DefaultRenderer {
 		draw(new Line2D.Double(absolutCursorX, absolutCursorY - resolution * 0.2, absolutCursorX, absolutCursorY + resolution * 0.2), g);
 	}
 
-	/*
-	 * private void paintGrid(Graphics2D graphics, double width, double height, double resolution,
-	 * float lineWidth) {
-	 * 
-	 * // cache the image so the calculation has not to be done anytime! This is for performance
-	 * reason.
-	 * if(gridImage == null || panelModel.getBoundId() != boundId)
-	 * {
-	 * boundId = panelModel.getBoundId();
-	 * gridImage = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB);
-	 * 
-	 * Graphics2D g = (Graphics2D) gridImage.getGraphics();
-	 * g.setTransform(graphics.getTransform());
-	 * 
-	 * g.setColor(Color.LIGHT_GRAY);
-	 * g.setStroke(new BasicStroke(lineWidth));
-	 * 
-	 * for (double y = 0; y <= height + 0.01; y += resolution) {
-	 * for (double x = 0; x <= width + 0.01; x += resolution) {
-	 * g.draw(new Line2D.Double(x - resolution * 0.2, y, x + resolution * 0.2, y));
-	 * g.draw(new Line2D.Double(x, y - resolution * 0.2, x, y + resolution * 0.2));
-	 * }
-	 * }
-	 * }
-	 * AffineTransform transform = graphics.getTransform();
-	 * graphics.setTransform(new AffineTransform());
-	 * graphics.drawImage(gridImage, 0, 0, null);
-	 * graphics.setTransform(transform);
-	 * }
-	 * 
-	 * public void drawThickLine(Graphics2D g, double x1, double y1, double x2, double y2, float
-	 * lineWidth, Color c) {
-	 * g.setColor(c);
-	 * g.setStroke(new BasicStroke(lineWidth));
-	 * g.draw(new Line2D.Double(x1, y1, x2, y2));
-	 * }
-	 */
 }

@@ -33,7 +33,7 @@ public class HelpTextAnnotationProcessor extends AbstractProcessor {
 	ArrayList<Function<String, String>> pattern;
 	Set<String> importedTypes;
 
-	List<String> primitiveTypes = Arrays.asList(new String[]{"int","double","float","boolean"});
+	List<String> primitiveTypes = Arrays.asList(new String[]{"int","double","float","boolean","Double","Boolean","Integer","java.lang.String"});
 
 	@Override
 	public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
@@ -53,7 +53,7 @@ public class HelpTextAnnotationProcessor extends AbstractProcessor {
 							String relname = buildHelpTextPath(e.asType().toString()+"#"+f.getSimpleName());
 							FileObject file = processingEnv.getFiler().createResource(StandardLocation.CLASS_OUTPUT, "", relname);
 							try (PrintWriter w = new PrintWriter(file.openWriter())) {
-								printMemberDocString(e, w);
+								printSingleMemberString(f,w);
 							}
 						} catch (Exception ex) {
 							ex.printStackTrace();

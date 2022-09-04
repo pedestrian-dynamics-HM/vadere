@@ -32,7 +32,7 @@ public class AttributesVisualElement extends AttributesScenarioElement {
         this.visible = visible;
     }
 
-    public Boolean getVisible(){
+    public Boolean isVisible(){
         return this.visible;
     }
 
