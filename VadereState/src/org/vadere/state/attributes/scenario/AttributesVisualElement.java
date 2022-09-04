@@ -16,6 +16,7 @@ public class AttributesVisualElement extends AttributesScenarioElement {
     protected Boolean visible;
 
     public AttributesVisualElement(){
+        super();
         this.shape = new VRectangle(0,0,1,1);
         this.visible = true;
     }

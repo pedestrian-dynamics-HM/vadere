@@ -45,9 +45,9 @@ public class TargetVersionV2_5 extends SimpleJsonTransformation {
     private final String TYPE_STRING = "type";
     private final String PARAM_STRING = "parameters";
 
-    private final String WAITER = "waitingArea";
+    private final String WAITER = "waiter";
 
-    private final String ABSORBER = "absorbingArea";
+    private final String ABSORBER = "absorber";
 
     public TargetVersionV2_5() {
         super(Version.V2_5);
@@ -82,13 +82,15 @@ public class TargetVersionV2_5 extends SimpleJsonTransformation {
             while (iter.hasNext()) {
                 var nd = (ObjectNode) iter.next();
                 moveRenameField(nd,"deletionDistance","deletionDistance",ABSORBER);
+                moveRenameField(nd,"enabled","absorbing",ABSORBER);
                 moveRenameField(nd,"parallelEvents","parallelWaiters","");
                 moveRenameField(nd,"leavingSpeed","nextSpeed","");
+
                 moveRenameField(nd,DIST_FIELD_NEW,DIST_FIELD_TRG,WAITER);
                 if(nd.get("waitingBehaviour").asText().equals("NO_WAITING")){
-                    nd.put("waiting",false);
+                    //((ObjectNode)nd.path(WAITER)).put("enabled",false);
                 }else{
-                    nd.put("waiting",true);
+                    ((ObjectNode)nd.path(WAITER)).put("enabled",true);
                 }
                 remove(nd,"waitingBehaviour");
                 remove(nd,"startingWithRedLight");

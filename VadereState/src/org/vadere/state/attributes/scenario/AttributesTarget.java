@@ -1,8 +1,9 @@
 package org.vadere.state.attributes.scenario;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonView;
 
+import org.vadere.state.attributes.AttributesAbsorber;
+import org.vadere.state.attributes.AttributesWaiter;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Target;
 import org.vadere.state.util.Views;
@@ -14,33 +15,12 @@ import org.vadere.util.reflection.VadereAttribute;
  */
 public class AttributesTarget extends AttributesVisualElement {
 	@VadereAttribute
-	private Boolean absorbing;
+	private AttributesAbsorber absorber = new AttributesAbsorber();
 	@VadereAttribute
-	private AttributesAbsorbingArea absorbingArea;
+	private AttributesWaiter waiter = new AttributesWaiter();
 	@VadereAttribute
-	private Boolean waiting;
-	@VadereAttribute
-	private AttributesWaitingArea waitingArea;
-	@VadereAttribute
-	private Double leavingSpeed;
-	/**
-	 *  Modes: <br>
-	 *  <ul>
-	 *      <li>INDIVIDUAL</li>
-	 *      <p>Agents have an individual waiting time at the target. The waiting by time is described by {@link AttributesTarget#waitingTimeDistribution}.</p>
-	 *      <li>TRAFFIC_LIGHT</li>
-	 *      <p>The target is a traffic light. Agents wait for the green phase.</p>
-	 *      <li>NO_WAITING</li>
-	 *      <p>Agents are switching target immediately of 'absorbing' is set to false else the get absorbed.</p>
-	 *  </ul>
-	 */
+	private Double leavingSpeed = 0.0;
 
-/*
-	private Double waitingTimeYellowPhase = 0.0;
-	/**
-	 * Number of elements that can wait or be absorbed at one time in parallel on this area.
-	 * If zero, an infinite amount can wait or be absorbed.
-	 */
 	@VadereAttribute
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
 	private Integer parallelWaiters = 0;
@@ -63,52 +43,23 @@ public class AttributesTarget extends AttributesVisualElement {
 	 *  <li>"singleSpawn"
 	 *  <li>"timeSeries"
 	 *  </ul>
-	 *//*
-	 @VadereAttribute
-	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
-	private VDistribution waitingTimeDistribution;
-*/
-
-	/*
-	@JsonIgnore
-	private JsonNode distributionParameters ;
-
-	/**
-	 * If set to false, starts with green phase (nonblocking), otherwise blocks the path (red
-	 * phase).
 	 */
-			/*
-	@VadereAttribute
-	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
-	private Boolean startingWithRedLight = false;
+	public AttributesTarget() {
+		super();
+	}
 
-	/**
-	 * If non-negative, determines the desired speed the particle (pedestrian, car) is assigned
-	 * after passing this target.
-	 * Can be used to model street networks with differing maximal speeds on roads.
-	 */
-			/*
-	@VadereAttribute
-	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
-	private Double nextSpeed = -1.0;
-
-*/
-
-	public AttributesTarget() {}
-
-	public AttributesTarget(final VShape shape) {
+	public AttributesTarget(final int id,final VShape shape) {
+		super();
 		this.shape = shape;
 	}
 
-	public AttributesTarget(final VShape shape, final int id, final boolean absorbing) {
+	public AttributesTarget(final VShape shape, final int id) {
 		this.shape = shape;
 		this.id = id;
-		this.absorbing = absorbing;
 	}
 
 	public AttributesTarget(Pedestrian pedestrian) {
 		this.shape = pedestrian.getShape();
-		this.absorbing = true;
 		this.id = pedestrian.getIdAsTarget();
 		this.parallelWaiters = 0;
 	}
@@ -116,12 +67,12 @@ public class AttributesTarget extends AttributesVisualElement {
 	// Getters...
 
 	public boolean isAbsorbing() {
-		return absorbing;
+		return this.absorber.isEnabled();
 	}
 
 	public void setAbsorbing(boolean absorbing) {
 		checkSealed();
-		this.absorbing = absorbing;
+		this.absorber.setEnabled(absorbing);
 	}
 
 	public int getParallelWaiters() {
@@ -133,28 +84,30 @@ public class AttributesTarget extends AttributesVisualElement {
 		this.parallelWaiters = parallelWaiters;
 	}
 
-	public AttributesAbsorbingArea getAbsorbingAreaAttributes() {
-		return absorbingArea;
+	public AttributesAbsorber getAbsorberAttributes() {
+		return absorber;
 	}
 
-	public void setAbsorbingAreaAttributes(AttributesAbsorbingArea absorbingArea) {
-		this.absorbingArea = absorbingArea;
+	public void setAbsorberAttributes(AttributesAbsorber absorber) {
+		this.absorber = absorber;
 	}
 
 	public Boolean isWaiting() {
-		return waiting;
+		return this.waiter.isEnabled();
 	}
 
 	public void setWaiting(Boolean waiting) {
-		this.waiting = waiting;
+		checkSealed();
+		this.absorber.setEnabled(waiting);
 	}
 
-	public AttributesWaitingArea getWaitingAreaAttributes() {
-		return waitingArea;
+	public AttributesWaiter getWaiterAttributes() {
+		return waiter;
 	}
 
-	public void setWaitingAreaAttributes(AttributesWaitingArea waitingArea) {
-		this.waitingArea = waitingArea;
+	public void setWaiterAttributes(AttributesWaiter waiter) {
+		checkSealed();
+		this.waiter = waiter;
 	}
 
 	public Double getLeavingSpeed() {
@@ -162,6 +115,7 @@ public class AttributesTarget extends AttributesVisualElement {
 	}
 
 	public void setLeavingSpeed(Double leavingSpeed) {
+		checkSealed();
 		this.leavingSpeed = leavingSpeed;
 	}
 }

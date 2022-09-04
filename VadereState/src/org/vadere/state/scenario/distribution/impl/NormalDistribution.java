@@ -20,7 +20,7 @@ public class NormalDistribution extends VDistribution<AttributesNormalDistributi
 		super();
 		this.normalAttributes = new AttributesNormalDistribution();
 	}
-	public NormalDistribution(AttributesNormalDistribution parameter, int spawnNumber, RandomGenerator randomGenerator)
+	public NormalDistribution(AttributesNormalDistribution parameter, RandomGenerator randomGenerator)
 	        throws Exception {
 		super(parameter, randomGenerator);
 	}

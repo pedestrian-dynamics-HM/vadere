@@ -18,7 +18,7 @@ public class SingleSpawnDistribution extends VDistribution<AttributesSingleSpawn
 		super();
 		this.singlespawnAttributes = new AttributesSingleSpawnDistribution();
 	}
-	public SingleSpawnDistribution(AttributesSingleSpawnDistribution parameter, int spawnNumber, RandomGenerator unused)
+	public SingleSpawnDistribution(AttributesSingleSpawnDistribution parameter,RandomGenerator unused)
 	        throws Exception {
 		super(parameter, unused);
 	}

@@ -1,17 +1,20 @@
 package org.vadere.state.attributes.distributions;
 
 
+import org.vadere.state.attributes.VadereAttributeClass;
 import org.vadere.state.attributes.distributions.AttributesDistribution;
+import org.vadere.util.reflection.VadereAttribute;
 
 /**
  * This is the parameter structure used with a binomial distribution.
  * @author Aleksandar Ivanov(ivanov0@hm.edu), Lukas Gradl (lgradl@hm.edu), Ludwig Jaeck
  */
 
-
+@VadereAttributeClass(includeAll = true)
 public class AttributesBinomialDistribution extends AttributesDistribution {
-
+	@VadereAttribute
 	private Integer trials;
+	@VadereAttribute
 	private Double p;
 
 	public int getTrials() {

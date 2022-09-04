@@ -38,7 +38,7 @@ public class TargetController extends ScenarioElementController {
 		if (targetAttributes.isWaiting()) {
 			try {
 				distribution = DistributionFactory.create(
-						targetAttributes.getWaitingAreaAttributes().getDistribution(),
+						targetAttributes.getWaiterAttributes().getDistribution(),
 						new JDKRandomGenerator(random.nextInt())
 				);
 
@@ -92,7 +92,7 @@ public class TargetController extends ScenarioElementController {
 	}
 
 	private Collection<DynamicElement> getPrefilteredDynamicElements() {
-		final double reachedDistance = target.getAttributes().getAbsorbingAreaAttributes().getDeletionDistance();
+		final double reachedDistance = target.getAttributes().getAbsorberAttributes().getDeletionDistance();
 
 		final Rectangle2D bounds = target.getShape().getBounds2D();
 		final VPoint center = new VPoint(bounds.getCenterX(), bounds.getCenterY());
@@ -152,7 +152,7 @@ public class TargetController extends ScenarioElementController {
 	}
 
 	private boolean hasAgentReachedThisTarget(Agent agent) {
-		final double reachedDistance = target.getAttributes().getAbsorbingAreaAttributes().getDeletionDistance();
+		final double reachedDistance = target.getAttributes().getAbsorberAttributes().getDeletionDistance();
 		final VPoint agentPosition = agent.getPosition();
 		final VShape targetShape = target.getShape();
 

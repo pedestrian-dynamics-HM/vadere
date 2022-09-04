@@ -6,7 +6,11 @@ import org.vadere.util.reflection.VadereAttribute;
 
 public class AttributesRegularSpawner extends AttributesSpawner{
     @VadereAttribute
-    protected Integer eventElementCount;
+    protected Integer eventElementCount = 0;
+
+    public AttributesRegularSpawner(){
+        super();
+    }
 
     @Override
     public int getEventElementCount() {

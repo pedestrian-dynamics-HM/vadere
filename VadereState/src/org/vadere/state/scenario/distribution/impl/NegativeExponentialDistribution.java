@@ -20,7 +20,7 @@ public class NegativeExponentialDistribution extends VDistribution<AttributesNeg
 		super();
 		this.exponAttributes = new AttributesNegativeExponentialDistribution();
 	}
-	public NegativeExponentialDistribution(AttributesNegativeExponentialDistribution parameter, int spawnNumber,
+	public NegativeExponentialDistribution(AttributesNegativeExponentialDistribution parameter,
 										   RandomGenerator randomGenerator) throws Exception {
 		super(parameter, randomGenerator);
 	}

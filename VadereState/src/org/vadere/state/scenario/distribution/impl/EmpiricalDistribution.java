@@ -13,17 +13,13 @@ import org.vadere.state.scenario.distribution.registry.RegisterDistribution;
 public class EmpiricalDistribution extends VDistribution<AttributesEmpiricalDistribution> {
 	private Attributes empiricalAttributes;
 	private org.apache.commons.math3.random.EmpiricalDistribution distribution;
-	/*
-	private int spawnNumber;
-	private int remainingSpawnAgents;
-	 */
 
 	public EmpiricalDistribution(){
 		// Do not remove this constructor. It is us used through reflection.
 		super();
 		this.empiricalAttributes = new AttributesEmpiricalDistribution();
 	}
-	public EmpiricalDistribution(AttributesEmpiricalDistribution parameter, int spawnNumber, RandomGenerator randomGenerator)
+	public EmpiricalDistribution(AttributesEmpiricalDistribution parameter,RandomGenerator randomGenerator)
 	        throws Exception {
 		super(parameter, randomGenerator);
 	}

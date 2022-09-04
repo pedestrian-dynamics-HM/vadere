@@ -1,5 +1,6 @@
 package org.vadere.state.attributes.scenario;
 
+import org.vadere.state.attributes.AttributesAbsorber;
 import org.vadere.state.attributes.AttributesEmbedShape;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.reflection.VadereAttribute;
@@ -9,34 +10,37 @@ import org.vadere.util.reflection.VadereAttribute;
  */
 public class AttributesAbsorbingArea extends AttributesVisualElement {
     @VadereAttribute
-    protected Double deletionDistance = 0.0;
+    protected AttributesAbsorber absorber = new AttributesAbsorber();
 
     // Constructors
     public AttributesAbsorbingArea() {
+        super();
     }
-
     public AttributesAbsorbingArea(final VShape shape) {
+        super();
         this.shape = shape;
     }
 
     public AttributesAbsorbingArea(final VShape shape, final int id) {
+        super();
         this.shape = shape;
         this.id = id;
     }
 
     public AttributesAbsorbingArea(final VShape shape, final int id, double deletionDistance) {
+        super();
         this.shape = shape;
         this.id = id;
-        this.deletionDistance = deletionDistance;
+        this.absorber.setDeletionDistance(deletionDistance);
     }
 
     public double getDeletionDistance() {
-        return deletionDistance;
+        return this.absorber.getDeletionDistance();
     }
 
     public void setDeletionDistance(double deletionDistance) {
         checkSealed();
-        this.deletionDistance = deletionDistance;
+        this.absorber.setDeletionDistance(deletionDistance);
     }
 
 }

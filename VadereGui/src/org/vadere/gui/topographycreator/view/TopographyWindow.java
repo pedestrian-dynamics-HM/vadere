@@ -100,22 +100,6 @@ public class TopographyWindow extends JPanel {
 		setTopography(new TopographyCreatorModel(currentScenario), model);
 	}
 
-	/*private static void addActionToToolbar(final JToolBar toolbar, final Action action,
-											  final String toolTipProperty) {
-		JButton button = toolbar.add(action);
-		button.setBorderPainted(false);
-		button.setToolTipText(Messages.getString(toolTipProperty));
-	}
-
-	private static void addActionToToolbar2(final JToolBar toolbar, final Action action, final String toolTipProperty,
-											final JButton button) {
-		button.setAction(action);
-		button.setText("");
-		toolbar.add(button);
-		button.setBorderPainted(false);
-		button.setToolTipText(Messages.getString(toolTipProperty));
-	}
-*/
 	private void setTopography(final TopographyCreatorModel panelModel, @NotNull final ProjectViewModel model) {
 
 		this.panelModel = panelModel;
@@ -364,25 +348,21 @@ public class TopographyWindow extends JPanel {
 		pedestrianMiscActions.add(placeRandomPedestrians);
 
 		/* open obstacle paint method dialog action */
-		JButton obsButton = new JButton();
 		TopographyAction openObstacleDialog = new ActionOpenDrawOptionMenu(
 				"Obstacle",
 				ResourceStrings.ICONS_OBSTACLE_ICON_PNG,
 				ResourceStrings.TOPOGRAPHY_CREATOR_BTN_INSERT_OBSTACLE_TOOLTIP,
 				panelModel,
 				switchToObstacleAction,
-				obsButton,
 				obstacleAndTargetDrawModes);
 
 		/* open target paint method dialog action */
-		JButton targetButton = new JButton();
 		TopographyAction openTargetDialog = new ActionOpenDrawOptionMenu(
 				"Target",
 				ResourceStrings.ICONS_TARGET_ICON_PNG,
 				ResourceStrings.TOPOGRAPHY_CREATOR_BTN_INSERT_TARGET_TOOLTIP,
 				panelModel,
 				switchToTargetAction,
-				targetButton,
 				obstacleAndTargetDrawModes);
 
 		JButton targetChangerButton = new JButton();
@@ -390,7 +370,7 @@ public class TopographyWindow extends JPanel {
 				"TargetChanger",
 				ResourceStrings.ICONS_TARGET_CHANGER_ICON_PNG,
 				ResourceStrings.TOPOGRAPHY_CREATOR_BTN_INSERT_TARGET_CHANGER_TOOLTIP
-				,panelModel, switchToTargetChangerAction, targetChangerButton,
+				,panelModel, switchToTargetChangerAction,
 				obstacleAndTargetDrawModes);
 
 		/* open absorbing area paint method dialog action */
@@ -401,7 +381,6 @@ public class TopographyWindow extends JPanel {
 				ResourceStrings.TOPOGRAPHY_CREATOR_BTN_INSERT_ABSORBING_AREA_TOOLTIP,
 				panelModel,
 				switchToAbsorbingAreaAction,
-				absorbingAreaButton,
 				absorbingAreaDrawModes);
 
 		/* open stairs paint method dialog action */
@@ -412,18 +391,15 @@ public class TopographyWindow extends JPanel {
 				ResourceStrings.TOPOGRAPHY_CREATOR_BTN_INSERT_STAIRS_TOOLTIP,
 				panelModel,
 				switchToStairsAction,
-				stairsButton,
 				obstacleAndTargetDrawModes);
 
 		/* open measurement area paint method dialog action*/
-		JButton measurementAreaButton = new JButton();
 		TopographyAction openMeasurementAreaDialog = new ActionOpenDrawOptionMenu(
 				"MeasurementArea",
 				ResourceStrings.ICONS_MEASUREMENT_AREA_ICON_PNG,
 				ResourceStrings.TOPOGRAPHY_CREATOR_BTN_INSERT_MEASUREMENT_AREA_TOOLTIP,
 				panelModel,
 				switchToMeasurementAreaAction,
-				measurementAreaButton,
 				measurementAreaDrawModes,
 				measurementAreaMiscActions);
 
@@ -432,14 +408,12 @@ public class TopographyWindow extends JPanel {
 		TopographyAction switchToPedestrianAction = new ActionSwitchCategory("switch to pedestrian", panelModel,
 				ScenarioElementType.PEDESTRIAN, selectDotModeAction);
 
-		JButton pedestrianButton = new JButton();
 		TopographyAction openPedestrianDialog = new ActionOpenDrawOptionMenu(
 				"Pedestrian",
 				ResourceStrings.ICONS_PEDESTRIANS_ICON_PNG,
 				ResourceStrings.TOPOGRAPHY_CREATOR_BTN_INSERT_PEDESTRIAN_TOOLTIP,
 				panelModel,
 				switchToPedestrianAction,
-				pedestrianButton,
 				pedestrianDrawModes,
 				pedestrianMiscActions);
 
@@ -455,7 +429,6 @@ public class TopographyWindow extends JPanel {
 				ResourceStrings.TOPOGRAPHY_CREATOR_BTN_INSERT_SOURCE_TOOLTIP,
 				panelModel,
 				switchToSourceAction,
-				sourceButton,
 				sourceDrawModes);
 
 		ActionSelectSelectShape selectShape = new ActionSelectSelectShape(

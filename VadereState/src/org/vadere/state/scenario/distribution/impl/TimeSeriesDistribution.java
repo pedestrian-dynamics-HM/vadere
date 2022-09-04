@@ -29,7 +29,7 @@ public class TimeSeriesDistribution extends VDistribution<AttributesTimeSeriesDi
 		super();
 		this.timeSeriesAttributes = new AttributesTimeSeriesDistribution();
 	}
-	public TimeSeriesDistribution(AttributesTimeSeriesDistribution parameter, int spawnNumber, RandomGenerator unused)
+	public TimeSeriesDistribution(AttributesTimeSeriesDistribution parameter, RandomGenerator unused)
 	        throws Exception {
 		super(parameter,unused);
 	}
@@ -72,7 +72,7 @@ public class TimeSeriesDistribution extends VDistribution<AttributesTimeSeriesDi
 		AttributesMixedDistribution mixedP = new AttributesMixedDistribution();
 		mixedP.setSwitchpoints(switchpoints);
 		mixedP.setDistributions(distributions);
-		distribution = new MixedDistribution(mixedP, 1, unused2);
+		distribution = new MixedDistribution(mixedP,unused2);
 
 	}
 

@@ -18,7 +18,7 @@ public class BinomialDistribution extends VDistribution<AttributesBinomialDistri
 		super();
 		this.binomialAttributes = new AttributesBinomialDistribution();
 	}
-	public BinomialDistribution(AttributesBinomialDistribution parameter, int spawnNumber, RandomGenerator randomGenerator)
+	public BinomialDistribution(AttributesBinomialDistribution parameter,RandomGenerator randomGenerator)
 			throws Exception {
 		super(parameter,randomGenerator);
 	}

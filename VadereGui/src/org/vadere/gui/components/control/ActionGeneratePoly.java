@@ -37,7 +37,7 @@ public class ActionGeneratePoly extends AbstractAction {
 
 	public ActionGeneratePoly(final String name, Icon icon,String shortDescription, final DefaultModel<? extends DefaultSimulationConfig> model) {
 		super(name, icon);
-		putValue(SHORT_DESCRIPTION,shortDescription);
+		putValue(SHORT_DESCRIPTION,Messages.getString(shortDescription));
 		this.model = model;
 	}
 

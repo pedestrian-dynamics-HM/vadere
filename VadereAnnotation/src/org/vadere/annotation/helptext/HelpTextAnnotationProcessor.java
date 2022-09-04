@@ -5,6 +5,7 @@ import com.google.auto.service.AutoService;
 import org.vadere.annotation.ImportScanner;
 
 import java.io.PrintWriter;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -41,9 +42,25 @@ public class HelpTextAnnotationProcessor extends AbstractProcessor {
 		ImportScanner scanner = new ImportScanner();
 		scanner.scan(roundEnv.getRootElements(), null);
 		importedTypes = scanner.getImportedTypes();
-
 		for (Element e: roundEnv.getRootElements()){
-			if (e.getKind().isClass()  && e.asType().toString().startsWith("org.vadere.")) {
+			if ((e.getKind().isClass())  && e.asType().toString().startsWith("org.vadere.")) {
+				for(Element f : e.getEnclosedElements()){
+					if(f.getKind().isField()){
+						try {
+							//String comment = processingEnv.getElementUtils().getDocComment(e);
+							//String relname = buildHelpTextPath(e.asType().toString());
+							String comment = processingEnv.getElementUtils().getDocComment(f);
+							String relname = buildHelpTextPath(e.asType().toString()+"#"+f.getSimpleName());
+							FileObject file = processingEnv.getFiler().createResource(StandardLocation.CLASS_OUTPUT, "", relname);
+							try (PrintWriter w = new PrintWriter(file.openWriter())) {
+								printMemberDocString(e, w);
+							}
+						} catch (Exception ex) {
+							ex.printStackTrace();
+						}
+
+					}
+				}
 				try {
 					String comment = processingEnv.getElementUtils().getDocComment(e);
 					String relname = buildHelpTextPath(e.asType().toString());
@@ -58,7 +75,9 @@ public class HelpTextAnnotationProcessor extends AbstractProcessor {
 				} catch (Exception ex) {
 					ex.printStackTrace();
 				}
+
 			}
+
 		}
 		return false; // allow further processing
 	}
@@ -136,6 +155,18 @@ public class HelpTextAnnotationProcessor extends AbstractProcessor {
 		}
 
 	}
+
+	private void printSingleMemberString(Element e, PrintWriter w) {
+			String typeString;
+			if(isPrimitiveType(e)) {
+				typeString = getTypeString(e);
+			}else{
+				typeString = String.format("<a href='%s' class='class_link'>%s</a>",findFullPath(getTypeString(e)),strippedTypeString(e));
+			}
+			String comment = processingEnv.getElementUtils().getDocComment(e);
+			w.println("<b>" + e.getSimpleName() + " [" + typeString + "]:</b><br>+" + comment);
+	}
+
 	private boolean isPrimitiveType(Element field){
 		return primitiveTypes.contains(field.asType().toString());
 	}

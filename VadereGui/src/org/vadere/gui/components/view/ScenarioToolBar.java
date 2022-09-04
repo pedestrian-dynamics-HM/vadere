@@ -3,6 +3,7 @@ package org.vadere.gui.components.view;
 import javax.swing.JToolBar;
 
 import org.vadere.gui.components.view.IActionContainer;
+import org.vadere.gui.topographycreator.control.ActionOpenDrawOptionMenu;
 import org.vadere.util.config.VadereConfig;
 
 import java.awt.*;
@@ -36,6 +37,9 @@ public class ScenarioToolBar extends JToolBar implements IActionContainer {
 		}
 		for(var action : section.getActions()){
 			var btn = add(action);
+			if(action instanceof ActionOpenDrawOptionMenu){
+				((ActionOpenDrawOptionMenu) action).setParent(btn);
+			}
 			btn.setBorderPainted(false);
 		}
 		this.initialized = false;

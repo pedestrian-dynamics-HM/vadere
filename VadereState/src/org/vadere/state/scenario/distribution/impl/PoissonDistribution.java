@@ -20,7 +20,7 @@ public class PoissonDistribution extends VDistribution<AttributesPoissonDistribu
 		super();
 		this.poissonAttributes = new AttributesPoissonDistribution();
 	}
-	public PoissonDistribution(AttributesPoissonDistribution parameter, int spawnNumber, RandomGenerator randomGenerator)
+	public PoissonDistribution(AttributesPoissonDistribution parameter, RandomGenerator randomGenerator)
 	        throws Exception {
 		super(parameter, randomGenerator);
 	}

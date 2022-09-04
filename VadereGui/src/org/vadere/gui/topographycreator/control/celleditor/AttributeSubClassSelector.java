@@ -33,7 +33,7 @@ public class AttributeSubClassSelector extends AttributeEditor {
     private RunnableRegistry runnableRegistry;
     private Map<Class<?>,Constructor<?>> classConstructorRegistry;
     private GridBagConstraints gbc;
-    private String selected;
+    private Class selected;
 
     private Object previousObject;
     public AttributeSubClassSelector(
@@ -60,7 +60,7 @@ public class AttributeSubClassSelector extends AttributeEditor {
     }
     private void initializeRunnableRegistry(TopographyCreatorModel model) {
         this.runnableRegistry = new RunnableRegistry();
-        this.runnableRegistry.registerAction("[null]",()->{
+        this.runnableRegistry.registerAction(null,()->{
             nullifyFieldValueOfAttached();
             clearContentPanel();
         });
@@ -68,6 +68,7 @@ public class AttributeSubClassSelector extends AttributeEditor {
             try {
                 ifNotUpdatedFromOutside(()-> {
                     try {
+                        selected = (Class) comboBox.getModel().getSelectedItem();
                         constructNewInternalPropertyPane(selected,model);
                     } catch (InstantiationException e) {
                         throw new RuntimeException(e);
@@ -117,6 +118,7 @@ public class AttributeSubClassSelector extends AttributeEditor {
         if(value != previousObject) {
             super.updateValueFromModel(value);
             this.comboBox.getModel().setSelectedItem(value);
+            this.selected = value.getClass();
             updateInternalPropertyPane((Attributes) value,getModel());
         }
         this.previousObject = value;
@@ -132,7 +134,7 @@ public class AttributeSubClassSelector extends AttributeEditor {
         contentPanel.repaint();
     }
 
-    private Attributes constructNewInternalPropertyPane(String selected, TopographyCreatorModel model) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+    private Attributes constructNewInternalPropertyPane(Class selected, TopographyCreatorModel model) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         var newObject = (Attributes) classConstructorRegistry.get(selected).newInstance();
         updateInternalPropertyPane(newObject, model);
         updateModelFromValue(newObject);

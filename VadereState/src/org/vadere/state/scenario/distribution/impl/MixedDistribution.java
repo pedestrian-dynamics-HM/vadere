@@ -26,7 +26,7 @@ public class MixedDistribution extends VDistribution<AttributesMixedDistribution
 		super();
 		this.mixedAttributes = new AttributesMixedDistribution();
 	}
-	public MixedDistribution(AttributesMixedDistribution parameter, int spawnNumber, RandomGenerator randomGenerator)
+	public MixedDistribution(AttributesMixedDistribution parameter,RandomGenerator randomGenerator)
 	        throws Exception {
 		super(parameter, randomGenerator);
 	}

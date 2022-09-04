@@ -3,6 +3,7 @@ package org.vadere.gui.components.control;
 import org.apache.commons.configuration2.Configuration;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.components.control.simulation.ActionGeneratePNG;
+import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.projectview.model.ProjectViewModel;
 import org.vadere.gui.topographycreator.view.ActionTranslateTopographyDialog;
 import org.vadere.meshing.mesh.gen.PFace;
@@ -31,7 +32,7 @@ public class ActionGenerateMesh extends AbstractAction {
 
 	public ActionGenerateMesh(final String name, Icon icon,String shortDescription, final ProjectViewModel model) {
 		super(name, icon);
-		putValue(SHORT_DESCRIPTION,shortDescription);
+		putValue(SHORT_DESCRIPTION, Messages.getString(shortDescription));
 		this.model = model;
 	}
 

@@ -46,7 +46,7 @@ public class Queue implements DynamicElementRemoveListener<Pedestrian>, DynamicE
 	}
 
 	public List<Target> getTarget() {
-		return polytopes.stream().map(p -> new Target(new AttributesTarget(p, queueTailId, false)))
+		return polytopes.stream().map(p -> new Target(new AttributesTarget(p, queueTailId)))
 				.collect(Collectors.toList());
 	}
 
@@ -109,7 +109,7 @@ public class Queue implements DynamicElementRemoveListener<Pedestrian>, DynamicE
 			 */
 			topography.getTargets().removeIf(target -> target.getId() == this.queueTailId);
 			polytopes.forEach(polytope -> topography.getTargets()
-					.add(new TargetQueue(new AttributesTarget(polytope, queueTailId, false))));
+					.add(new TargetQueue(new AttributesTarget(polytope, queueTailId))));
 		}
 	}
 

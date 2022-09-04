@@ -19,7 +19,7 @@ public class LinearInterpolationDistribution extends VDistribution<AttributesLin
 		super();
 		this.lerpAttributes = new AttributesLinearInterpolationDistribution();
 	}
-	public LinearInterpolationDistribution(AttributesLinearInterpolationDistribution parameter, int spawnNumber,
+	public LinearInterpolationDistribution(AttributesLinearInterpolationDistribution parameter,
 										   RandomGenerator randomGenerator) throws Exception {
 		super(parameter, randomGenerator);
 	}

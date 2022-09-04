@@ -5,8 +5,8 @@ import org.vadere.gui.topographycreator.control.JAttributeTable;
 import org.vadere.gui.topographycreator.control.JCollapsablePanel;
 import org.vadere.gui.topographycreator.model.AttributeTableModel;
 import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
+import org.vadere.state.attributes.VadereAttributeClass;
 import org.vadere.util.Attributes;
-import org.vadere.util.AttributesAttached;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.util.reflection.VadereAttribute;
 
@@ -80,24 +80,27 @@ public class AttributeView extends JPanel implements ISelectScenarioElementListe
 
     private static JPanel createPanel(Class baseClass, Attributes object, TopographyCreatorModel model) {
         var gbc = initGridBagConstraint(1.0);
+
+        var optClassAnnot = Optional.ofNullable(object.getClass().getAnnotation(VadereAttributeClass.class));
+        var noHeader = false;
+        var skipEmpty = true;
+        if(optClassAnnot.isPresent()){
+            var classAnnot = optClassAnnot.get();
+            noHeader = classAnnot.noHeader();
+        }
+
+        var classPanel = generateClassPanelFromRule(baseClass, noHeader);
+
+
         var fieldsGroupedBySuperClass = getFieldsGroupedBySuperClass(baseClass);
+
         if (!fieldsGroupedBySuperClass.isEmpty()) {
-            var simpleClassName = baseClass.getSimpleName();
-            var semanticList = getFieldsGroupedBySemanticMeaning(fieldsGroupedBySuperClass.get(baseClass));
-            var classPanel = new JCollapsablePanel(simpleClassName, false);
+            var semanticList = getFieldsGroupedBySemanticMeaning( fieldsGroupedBySuperClass.get(baseClass));
             var groups = semanticList.keySet();
 
             for (var group : groups) {
                 var tableModel = new AttributeTableModel(semanticList.get(group));
                 var table = new JAttributeTable(tableModel,model,object);
-                /*table.addAttributeListener(new AttributeListener() {
-                    @Override
-                    public void attributeSelected(Field field) {
-                        //selectedField = field;
-                        firePropertyChange("property",null,field.getAnnotation(VadereAttribute.class).descr());
-                        System.out.println(field.getAnnotation(VadereAttribute.class).descr());
-                    }
-                });*/
                 if (groupIsUnNamed(group)) {
                     classPanel.add(table, gbc);
                 } else {//groupHasName
@@ -112,6 +115,17 @@ public class AttributeView extends JPanel implements ISelectScenarioElementListe
         return null;
     }
 
+    private static JPanel generateClassPanelFromRule(Class baseClass, boolean noHeader) {
+        JPanel classPanel = null;
+        var simpleClassName = baseClass.getSimpleName();
+        if(noHeader){
+            classPanel = new JPanel(new GridBagLayout());
+        }else{
+            classPanel = new JCollapsablePanel(simpleClassName, false);
+        }
+        return classPanel;
+    }
+
     private static boolean groupIsUnNamed(String group) {
         return group.equals("");
     }
@@ -120,6 +134,22 @@ public class AttributeView extends JPanel implements ISelectScenarioElementListe
                 .filter(field -> field.getAnnotation(VadereAttribute.class)!= null)
                 .collect(Collectors.groupingBy(field -> field.getDeclaringClass(),Collectors.toList()));
     }
+
+    private static java.util.List<Field> generateFieldModelFromRule(Class clazz){
+        return Arrays.stream(clazz.getDeclaredFields())
+                .filter(field ->{
+                    var optAnnot = Optional.ofNullable(field.getDeclaringClass().getAnnotation(VadereAttributeClass.class));
+                    if(optAnnot.isPresent() && optAnnot.get().includeAll()){
+                        return true;
+                    }
+                    else if (Optional.ofNullable(field.getAnnotation(VadereAttribute.class)).isPresent()){
+                        return true;
+                    }
+                    return false;
+                })
+                .collect(Collectors.toList());
+    }
+
     private static Map<String, java.util.List<Field>> getFieldsGroupedBySemanticMeaning(java.util.List<Field> fieldList){
         return fieldList.stream().collect(Collectors.groupingBy(field->field.getAnnotation(VadereAttribute.class).group(),Collectors.toList()));
     }

@@ -1,5 +1,6 @@
 package org.vadere.gui.topographycreator.model;
 
+import org.vadere.state.attributes.spawner.AttributesRegularSpawner;
 import org.vadere.util.Attributes;
 import org.vadere.state.attributes.scenario.*;
 import org.vadere.state.scenario.ScenarioElement;
@@ -31,7 +32,7 @@ public class TopographyElementFactory {
 			case SOURCE:
 				return new org.vadere.state.scenario.Source(new AttributesSource(-1, shape));
 			case TARGET:
-				return new org.vadere.state.scenario.Target(new AttributesTarget(shape));
+				return new org.vadere.state.scenario.Target(new AttributesTarget(-1,shape));
 			case TARGET_CHANGER:
 				return new org.vadere.state.scenario.TargetChanger(new AttributesTargetChanger(shape));
 			case ABSORBING_AREA:

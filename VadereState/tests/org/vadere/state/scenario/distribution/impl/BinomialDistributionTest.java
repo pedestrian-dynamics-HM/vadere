@@ -34,7 +34,7 @@ public class BinomialDistributionTest extends VDistributionTest {
 		PowerMockito.whenNew(org.apache.commons.math3.distribution.BinomialDistribution.class).withAnyArguments()
 		        .thenReturn(distMock);
 
-		BinomialDistribution dist = new BinomialDistribution(parameter, spawnNumber, randomGenerator);
+		BinomialDistribution dist = new BinomialDistribution(parameter,randomGenerator);
 
 		PowerMockito.verifyNew(org.apache.commons.math3.distribution.BinomialDistribution.class)
 		        .withArguments(randomGenerator, parameter.getTrials(), parameter.getP());
