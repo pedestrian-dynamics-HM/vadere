@@ -9,17 +9,25 @@ import java.lang.reflect.Field;
 
 public class AttributeSpinner extends AttributeEditor {
     private JSpinner spinner;
-
-    public AttributeSpinner(Attributes attached, Field field, TopographyCreatorModel model) {
-        super(attached, field, model);
-        this.spinner = new JSpinner();
-        this.add(spinner);
-        this.spinner.addChangeListener(e ->updateModelFromValue(spinner.getValue()));
-        //this.setBorder(new FlatTextBorder());
+    private Integer oldValue;
+    public AttributeSpinner(Attributes attached, Field field, TopographyCreatorModel model,JPanel contentPanel) {
+        super(attached, field, model,null);
     }
 
-    public void updateValueFromModel(Object value) {
-        this.spinner.setValue(value);
+    @Override
+    protected void initialize() {
+        this.spinner = new JSpinner();
+        this.add(spinner);
+        this.spinner.addChangeListener(e ->updateModel(spinner.getValue()));
+    }
+
+    public void modelChanged(Object value) {
+        var integer = (Integer)value;
+        if(integer!=oldValue) {
+            oldValue = integer;
+            this.spinner.setValue(integer);
+        }
+
     }
 
 }

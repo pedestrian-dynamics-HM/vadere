@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.Optional;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -175,22 +176,24 @@ public class ScenarioElementView extends JPanel implements ISelectScenarioElemen
 	}
 
 	@Override
-	public void selectionChange(final ScenarioElement scenarioElement) {
+	public void selectionChange(final Optional<ScenarioElement> optionalElement) {
 		synchronized (txtrTextfiletextarea) {
-			if (scenarioElement == null) {
+			if(optionalElement.isPresent()){
+				var element = optionalElement.get();
+				if (element instanceof AgentWrapper) {
+					this.txtrTextfiletextarea.setText(
+							StateJsonConverter.serializeObjectPretty(((AgentWrapper) element).getAgentInitialStore()));
+				} else if (element instanceof Pedestrian) {
+					this.txtrTextfiletextarea.setText(StateJsonConverter.serializeObjectPretty(element));
+				} else {
+					this.txtrTextfiletextarea.setText(StateJsonConverter
+							.serializeObjectPretty(element.getAttributes()));
+				}
+
+			}else{
 				this.txtrTextfiletextarea.setText("");
 				if(jsonValidIndicator != null) {
 					jsonValidIndicator.hide();
-				}
-			} else {
-				if (scenarioElement instanceof AgentWrapper) {
-					this.txtrTextfiletextarea.setText(
-							StateJsonConverter.serializeObjectPretty(((AgentWrapper) scenarioElement).getAgentInitialStore()));
-				} else if (scenarioElement instanceof Pedestrian) {
-					this.txtrTextfiletextarea.setText(StateJsonConverter.serializeObjectPretty(scenarioElement));
-				} else {
-					this.txtrTextfiletextarea.setText(StateJsonConverter
-							.serializeObjectPretty(scenarioElement.getAttributes()));
 				}
 			}
 		}
@@ -201,7 +204,7 @@ public class ScenarioElementView extends JPanel implements ISelectScenarioElemen
 		if (arg instanceof NotifyContext) {
 			var ctx = (NotifyContext) arg;
 			if (ctx.getNotifyContext().equals(AttributeEditor.class)) {
-				SwingUtilities.invokeLater(()->selectionChange(panelModel.getSelectedElement()));
+				SwingUtilities.invokeLater(()->selectionChange(Optional.ofNullable(panelModel.getSelectedElement())));
 			}
 		}
 	}

@@ -10,6 +10,7 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.swing.*;
@@ -82,17 +83,20 @@ public class ActionCombineDialog extends JDialog implements ISelectScenarioEleme
 	}
 
 	@Override
-	public void selectionChange(ScenarioElement scenarioElement) {
-		if (scenarioElement.getId() != -1){
-			String tmp = textField.getText().strip();
-			if (tmp.length() == 0){
-				textField.setText(Integer.toString(scenarioElement.getId()));
-			} else if (tmp.endsWith(",")){
-				textField.setText(tmp + " " + scenarioElement.getId());
-			} else {
-				textField.setText(tmp + ", " + scenarioElement.getId());
-			}
+	public void selectionChange(Optional<ScenarioElement> optionalElement) {
+		if(optionalElement.isPresent()) {
+			var element = optionalElement.get();
+			if (element.getId() != -1) {
+				String tmp = textField.getText().strip();
+				if (tmp.length() == 0) {
+					textField.setText(Integer.toString(element.getId()));
+				} else if (tmp.endsWith(",")) {
+					textField.setText(tmp + " " + element.getId());
+				} else {
+					textField.setText(tmp + ", " + element.getId());
+				}
 
+			}
 		}
 	}
 }

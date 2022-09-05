@@ -8,12 +8,7 @@ import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.types.ScenarioElementType;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Observable;
-import java.util.Observer;
+import java.util.*;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -124,12 +119,10 @@ public class TopographyTreeView extends JPanel implements ISelectScenarioElement
 	}
 
 	@Override
-	public void selectionChange(ScenarioElement scenarioElement) {
+	public void selectionChange(Optional<ScenarioElement> optionalElement) {
 		if (isVisible()){
-			if (scenarioElement == null){
-				jTree.addSelectionPath(null);
-
-			} else {
+			if (optionalElement.isPresent()){
+				var scenarioElement = optionalElement.get();
 				DefaultMutableTreeNode category = categories.get(scenarioElement.getType());
 				TreeElementWrapper newNode = TreeElementWrapper.leaf(scenarioElement);
 
@@ -143,6 +136,10 @@ public class TopographyTreeView extends JPanel implements ISelectScenarioElement
 						jTree.expandPath(jTree.getSelectionPath());
 					}
 				});
+
+			} else {
+				jTree.addSelectionPath(null);
+
 			}
 		}
 	}
@@ -164,7 +161,7 @@ public class TopographyTreeView extends JPanel implements ISelectScenarioElement
 			if (expanded != null){
 				expanded.asIterator().forEachRemaining(p-> jTree.expandPath(p));
 			}
-			selectionChange(panelModel.getSelectedElement());
+			selectionChange(Optional.ofNullable(panelModel.getSelectedElement()));
 		}
 	}
 }

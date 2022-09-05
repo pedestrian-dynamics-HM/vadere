@@ -1,19 +1,19 @@
 package org.vadere.gui.topographycreator.control;
 
-import org.reflections.Reflections;
+import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.topographycreator.control.celleditor.*;
 import org.vadere.gui.topographycreator.control.cellrenderer.FieldNameRenderer;
 import org.vadere.gui.topographycreator.control.cellrenderer.FieldValueRenderer;
 import org.vadere.gui.topographycreator.model.AttributeTableModel;
 import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
 import org.vadere.util.Attributes;
-import org.vadere.util.AttributesAttached;
 import org.vadere.util.observer.NotifyContext;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
@@ -31,7 +31,7 @@ public class JAttributeTable extends JPanel implements Observer {
     /**
      * this attribute is used as the editor registry
      */
-    private HashMap<String,Class> typeEditors;
+    private HashMap<String, Constructor> editorConstructors;
 
     /**
      * this attribute is used as the model for attaching fields with the TableCellEditors
@@ -72,7 +72,7 @@ public class JAttributeTable extends JPanel implements Observer {
 
     }
     private void registerDefaultEditors() {
-        this.typeEditors = new HashMap<>();
+        this.editorConstructors = new HashMap<>();
         this.editorObjects = new HashMap<>();
         this.nameFields = new HashMap<>();
         this.tableComponents = new ArrayList<>();
@@ -98,20 +98,19 @@ public class JAttributeTable extends JPanel implements Observer {
         gbc.weightx = 1;
     }
 
-    public void setModel(AttributeTableModel dataModel,TopographyCreatorModel topoModel) {
+    public void setModel(AttributeTableModel fieldModel,TopographyCreatorModel topoModel) {
         this.topmodel = topoModel;
-        JTable activeTable = initializeNewTableSection();
-        var activeModel = new AttributeTableModel();
+        var activeTable = initializeNewTableSection();
+        var activeModel = intitializeNewTableModel();
 
-        for(int row = 0; row < dataModel.getRowCount();row++){
-            var field = (Field) dataModel.getValueAt(row,AttributeTableModel.PropertiesIndex);
-            var type = (Class) dataModel.getValueAt(row,AttributeTableModel.ValuesIndex);
+        for(int row = 0; row < fieldModel.getRowCount();row++){
+            var field = (Field) fieldModel.getValueAt(row,AttributeTableModel.PropertiesIndex);
+            var type = (Class) fieldModel.getValueAt(row,AttributeTableModel.ValuesIndex);
             var typeName = type.getName();
-
             checkTypeRegisterIfEnum(type);
 
-            if(this.typeEditors.containsKey(typeName)){
-                createTableEntryFromRegisteredClass(activeModel, field, type);
+            if(this.editorConstructors.containsKey(typeName)){
+                createTableEntryFromRegisteredClass(activeModel, field, type,panel);
             }else{
                 // finish current table add it to tableComponents list
                 // so that now other components can be inserted between
@@ -121,7 +120,7 @@ public class JAttributeTable extends JPanel implements Observer {
                     this.tableComponents.add(activeTable);
 
                     activeTable = initializeNewTableSection();
-                    activeModel = new AttributeTableModel();
+                    activeModel = intitializeNewTableModel();
                 }
                 if(Modifier.isAbstract(type.getModifiers())) {
                     //sideffect here will insert a component into tableComponents
@@ -138,24 +137,27 @@ public class JAttributeTable extends JPanel implements Observer {
         addTablesToView();
     }
 
+    @NotNull
+    private static AttributeTableModel intitializeNewTableModel() {
+        return new AttributeTableModel();
+    }
+
     private void createTableEditorFromType(Field field, Class type,TopographyCreatorModel model) {
         this.addTypeEditor(type, AttributeClassSelector.class);
-        var constrClass = this.typeEditors.get(type.getName());
+        var constructor = this.editorConstructors.get(type.getName());
         var panel = new JPanel(new GridBagLayout());
 
         panel.setBackground(UIManager.getColor("Table.selectionBackground").brighter());
         this.tableComponents.add(panel);
         try {
             this.nameFields.put(field.getName(), field);
-            var component = (JComponent) constrClass.getDeclaredConstructor(Attributes.class,Field.class,TopographyCreatorModel.class,Class.class,JPanel.class).newInstance(attached,field,model,type,panel);
+            var component = (JComponent) constructor.newInstance(attached,field,model,type,panel);
             insertComponentIntoMap(field, component);
         } catch (InstantiationException e) {
             throw new RuntimeException(e);
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         } catch (InvocationTargetException e) {
-            throw new RuntimeException(e);
-        } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
     }
@@ -194,27 +196,25 @@ public class JAttributeTable extends JPanel implements Observer {
     }
 
     private void createTableEditorFromAbstractType(Field field, Class type,TopographyCreatorModel model) {
-        var reflections = new Reflections("org.vadere");
-        var subClass = new ArrayList(reflections.getSubTypesOf(type));
+
+
 
         this.addTypeEditor(type, AttributeSubClassSelector.class);
 
-        var constrClass = this.typeEditors.get(type.getName());
+        var constructor = this.editorConstructors.get(type.getName());
         var panel = new JPanel(new GridBagLayout());
 
         panel.setBackground(UIManager.getColor("Table.selectionBackground").brighter());
         this.tableComponents.add(panel);
         try {
             this.nameFields.put(field.getName(), field);
-            var component = (JComponent) constrClass.getDeclaredConstructor(Attributes.class,Field.class, TopographyCreatorModel.class,ArrayList.class,JPanel.class).newInstance(attached,field,model,subClass,panel);
+            var component = (JComponent) constructor.newInstance(attached,field,model,panel);
             insertComponentIntoMap(field, component);
         } catch (InstantiationException e) {
             throw new RuntimeException(e);
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         } catch (InvocationTargetException e) {
-            throw new RuntimeException(e);
-        } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
     }
@@ -226,31 +226,18 @@ public class JAttributeTable extends JPanel implements Observer {
         }
     }
 
-    private void createTableEntryFromRegisteredClass(AttributeTableModel activeModel, Field field, Class type) {
+    private void createTableEntryFromRegisteredClass(AttributeTableModel activeModel, Field field, Class type,JPanel panel) {
         activeModel.addRow(field);
-
-        Class constrClass = this.typeEditors.get(type.getName());
-        try {
-            this.nameFields.put(field.getName(), field);
-            initializeNewComponent(field, constrClass);
-            if(type.isEnum()){
-                initializeEnum(field, type.getEnumConstants());
-            }
-
-        } catch (InstantiationException e) {
-            throw new RuntimeException(e);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        } catch (InvocationTargetException e) {
-            throw new RuntimeException(e);
-        } catch (NoSuchMethodException e) {
-            throw new RuntimeException(e);
+        Constructor constructor = this.editorConstructors.get(type.getName());
+        this.nameFields.put(field.getName(), field);
+        initializeNewComponent(field, constructor,panel);
+        if(type.isEnum()){
+            initializeEnum(field, type.getEnumConstants());
         }
     }
 
-    private void initializeNewComponent(Field field, Class constrClass) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-        var component = createNewInstanceOf(constrClass,attached,field,topmodel);
-        insertComponentIntoMap(field, (JComponent) component);
+    private void initializeNewComponent(Field field, Constructor constrClass,JPanel panel) {
+        insertComponentIntoMap(field, createNewInstanceOf(constrClass,attached,field,topmodel,panel));
     }
 
     private void insertComponentIntoMap(Field field, JComponent component) {
@@ -262,19 +249,29 @@ public class JAttributeTable extends JPanel implements Observer {
         ((JComboBox)this.editorObjects.get(field.getName())).setModel(new DefaultComboBoxModel(values));
     }
 
-    private static AttributeEditor createNewInstanceOf(Class constrClass, Attributes attached, Field field, TopographyCreatorModel model) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-        AttributeEditor component = (AttributeEditor) constrClass.getDeclaredConstructor(Attributes.class,Field.class,TopographyCreatorModel.class).newInstance(attached,field,model);
+    private static AttributeEditor createNewInstanceOf(Constructor constructor, Attributes attached, Field field, TopographyCreatorModel model,JPanel panel) {
+        AttributeEditor component = null;
+        try {
+            component = (AttributeEditor) constructor.newInstance(attached,field,model,panel);
+        } catch (InstantiationException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        } catch (InvocationTargetException e) {
+            throw new RuntimeException(e);
+        }
         return component;
     }
 
-    public void addTypeEditor(Class type,Class clazz) {
-        try {
-            clazz.getDeclaredMethod("updateValueFromModel",new Class[]{Object.class});
-        }catch (NoSuchMethodException e){
-            throw new IllegalArgumentException();
-        }
-        if(!this.typeEditors.containsKey(type)){
-            this.typeEditors.put(type.getName(),clazz);
+    public void addTypeEditor(Class type,Class<? extends AttributeEditor> clazz) {
+        if(!this.editorConstructors.containsKey(type)){
+            Constructor<? extends AttributeEditor> constructor = null;
+            try {
+                constructor = clazz.getDeclaredConstructor(Attributes.class, Field.class, TopographyCreatorModel.class,Class.class, JPanel.class);
+            } catch (NoSuchMethodException e) {
+                throw new RuntimeException(e);
+            }
+            this.editorConstructors.put(type.getName(),constructor);
         }
     }
 
@@ -285,7 +282,7 @@ public class JAttributeTable extends JPanel implements Observer {
             field.setAccessible(true);
             try {
                 if(field.get(attached) != null) {
-                    component.updateValueFromModel(field.get(attached));
+                    component.updateView(field.get(attached));
                 }
             } catch (IllegalAccessException e) {
             }

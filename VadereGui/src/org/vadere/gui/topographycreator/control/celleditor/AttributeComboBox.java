@@ -2,23 +2,30 @@ package org.vadere.gui.topographycreator.control.celleditor;
 
 import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
 import org.vadere.util.Attributes;
-import org.vadere.util.AttributesAttached;
 
 import javax.swing.*;
 import java.lang.reflect.Field;
 
 public class AttributeComboBox extends AttributeEditor {
     private JComboBox comboBox;
-
-    public AttributeComboBox(Attributes attached, Field field, TopographyCreatorModel model) {
-        super(attached, field, model);
+    private Object oldValue;
+    public AttributeComboBox(Attributes attached,
+                             Field field,
+                             TopographyCreatorModel model,
+                             JPanel unused) {
+        super(attached, field, model,null);
+    }
+    @Override
+    protected void initialize() {
         this.comboBox = new JComboBox();
         this.add(comboBox);
-        this.comboBox.addItemListener(e ->updateModelFromValue(comboBox.getSelectedItem()));
-        //this.setBorder(new FlatTextBorder());
+        this.comboBox.addItemListener(e -> updateModel(comboBox.getSelectedItem()));
     }
 
-    public void updateValueFromModel(Object value) {
-        this.comboBox.setSelectedItem(value);
+    public void modelChanged(Object value) {
+        if(value!=oldValue) {
+            oldValue = value;
+            this.comboBox.setSelectedItem(value);
+        }
     }
 }

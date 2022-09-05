@@ -476,7 +476,7 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 
 	protected synchronized void notifySelectSecenarioElementListener(final ScenarioElement scenarioElement) {
 		for (ISelectScenarioElementListener listener : selectScenarioElementListener) {
-			listener.selectionChange(scenarioElement);
+			listener.selectionChange(Optional.ofNullable(scenarioElement));
 		}
 	}
 

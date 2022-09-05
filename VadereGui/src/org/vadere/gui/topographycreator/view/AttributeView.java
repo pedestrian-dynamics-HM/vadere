@@ -1,5 +1,6 @@
 package org.vadere.gui.topographycreator.view;
 
+import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.components.view.ISelectScenarioElementListener;
 import org.vadere.gui.topographycreator.control.AttributeHelpView;
 import org.vadere.gui.topographycreator.control.JAttributeTable;
@@ -23,7 +24,7 @@ public class AttributeView extends JPanel implements ISelectScenarioElementListe
 
     JPanel pageView;
     JTextPane helpView;
-    HashMap<ScenarioElement,JScrollPane> editorPages;
+    HashMap<ScenarioElement,JPanel> editorPages;
     TopographyCreatorModel panelModel;
 
 
@@ -53,24 +54,30 @@ public class AttributeView extends JPanel implements ISelectScenarioElementListe
     }
 
     @Override
-    public void selectionChange(ScenarioElement scenarioElement) {
-        if (scenarioElement != null){
-            if(!editorPages.containsKey(scenarioElement)){
-                var attributePage = buildPage(scenarioElement.getAttributes(),panelModel);
-                this.editorPages.put(scenarioElement,attributePage);
+    public void selectionChange(Optional<ScenarioElement> optionalElement) {
+        if(optionalElement.isPresent()) {
+            var element = optionalElement.get();
+            if(!editorPages.containsKey(element)){
+                var attributePage = buildPage(element.getAttributes(),panelModel);
+                this.editorPages.put(element,attributePage);
             }
-            var attributePage = editorPages.get(scenarioElement);
+            var attributePage = editorPages.get(element);
             this.pageView.removeAll();
             this.pageView.add(attributePage,BorderLayout.NORTH);
+            this.revalidate();
+            this.repaint();
+        }else{
+            this.pageView.removeAll();
             this.revalidate();
             this.repaint();
         }
     }
 
-    public static JScrollPane buildPage(Attributes object, TopographyCreatorModel model){
+    public static JPanel buildPage(Attributes object, TopographyCreatorModel model){
         var clazz = object.getClass();
         var panel = new JPanel(new GridBagLayout());
         var gbc = initGridBagConstraint(1.0);
+
         getSuperClassHierarchy(clazz)
                 .stream()
                 .forEach(c ->{
@@ -79,21 +86,20 @@ public class AttributeView extends JPanel implements ISelectScenarioElementListe
                         panel.add(pnl, gbc);
                     }
                 });
-        return new JScrollPane(panel);
+        var parentPane = new JCollapsablePanel(generateHeaderName(object.getClass()), false);
+        parentPane.add(new JScrollPane(panel));
+        return parentPane;
+    }
+
+    @NotNull
+    public static String generateHeaderName(Class clazz) {
+        return clazz.getSimpleName().replaceFirst("Attributes", "");
     }
 
     private static JPanel createPanel(Class baseClass, Attributes object, TopographyCreatorModel model) {
         var gbc = initGridBagConstraint(1.0);
 
-        var optClassAnnot = Optional.ofNullable(object.getClass().getAnnotation(VadereAttributeClass.class));
-        var noHeader = false;
-        var skipEmpty = true;
-        if(optClassAnnot.isPresent()){
-            var classAnnot = optClassAnnot.get();
-            noHeader = classAnnot.noHeader();
-        }
-
-        var classPanel = generateClassPanelFromRule(baseClass, noHeader);
+        var classPanel = new JPanel(new GridBagLayout()); //generateClassPanelFromRule(baseClass, noHeader);
 
 
         var fieldsGroupedBySuperClass = getFieldsGroupedBySuperClass(baseClass);

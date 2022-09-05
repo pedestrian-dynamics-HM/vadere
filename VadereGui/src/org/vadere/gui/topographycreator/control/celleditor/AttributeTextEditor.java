@@ -2,7 +2,6 @@ package org.vadere.gui.topographycreator.control.celleditor;
 
 import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
 import org.vadere.util.Attributes;
-import org.vadere.util.AttributesAttached;
 
 import javax.swing.*;
 import javax.swing.text.AttributeSet;
@@ -22,35 +21,43 @@ import java.lang.reflect.Field;
 public class AttributeTextEditor extends AttributeEditor {
     private JTextField textField;
 
-    public AttributeTextEditor(Attributes attached, Field field, TopographyCreatorModel model) {
-        super(attached, field, model);
+    private String oldValue;
+
+    public AttributeTextEditor(Attributes attached, Field field, TopographyCreatorModel model,JPanel unused) {
+        super(attached, field, model,null);
+    }
+
+    @Override
+    protected void initialize() {
         this.textField = new JTextField();
         this.add(textField);
-
         ((PlainDocument) this.textField.getDocument()).setDocumentFilter(new DocumentFilter() {
             @Override
             public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
-                SwingUtilities.invokeLater(()->{
                     try {
                         super.replace(fb, offset, length, text, attrs);
                     } catch (BadLocationException e) {
                         throw new RuntimeException(e);
                     }
                     var document = fb.getDocument();
-                var textBegin = 0;
-                var textEnd = document.getLength();
+                    var textBegin = 0;
+                    var textEnd = document.getLength();
                     try {
-                        updateModelFromValue(fb.getDocument().getText(textBegin, textEnd));
+                        var texte = fb.getDocument().getText(textBegin, textEnd);
                     } catch (BadLocationException e) {
                         throw new RuntimeException(e);
                     }
-                });
+                    updateModel(text);
             }
         });
     }
 
     @Override
-    public void updateValueFromModel(Object value) {
-        this.textField.setText((String) value);
+    public void modelChanged(Object value) {
+        var text = (String)value;
+        if(text!=oldValue) {
+            oldValue = text;
+            this.textField.setText(text);
+        }
     }
 }

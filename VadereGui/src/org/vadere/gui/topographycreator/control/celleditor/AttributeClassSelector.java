@@ -23,16 +23,14 @@ public class AttributeClassSelector extends AttributeEditor {
 
     private boolean contentPaneVisible = false;
 
-    private final JPanel contentPanel;
 
-    public AttributeClassSelector(Attributes attached, Field field, TopographyCreatorModel model, Class clazz, JPanel contentReceiver) {
-        super(attached, field, model);
-        this.contentPanel = contentReceiver;
+    public AttributeClassSelector(Attributes attached, Field field, TopographyCreatorModel model, Class clazz, JPanel contentPanel) {
+        super(attached, field, model,contentPanel);
         this.contentPanel.setLayout(new BorderLayout());
         this.contentPanel.setBorder(new EmptyBorder(2,2,2,2));
         this.contentPanel.setVisible(contentPaneVisible);
         this.clazz = clazz;
-        this.button = new JButton(clazz.getSimpleName());
+        this.button = new JButton(AttributeView.generateHeaderName(clazz));
         this.add(button);
         Attributes attrs = null;
         try {
@@ -65,7 +63,12 @@ public class AttributeClassSelector extends AttributeEditor {
 
     }
 
-    public void updateValueFromModel(Object value) {
+    @Override
+    protected void initialize() {
+
+    }
+
+    public void modelChanged(Object value) {
     }
 
     private void createInternalPropertyPane(Attributes newObject, TopographyCreatorModel model) {

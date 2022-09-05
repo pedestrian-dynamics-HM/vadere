@@ -9,21 +9,56 @@ import java.awt.*;
 import java.lang.reflect.Field;
 
 public abstract class AttributeEditor extends JPanel {
+    @FunctionalInterface interface ValueProvider{
+        Object value();
+    }
+
+    JPanel contentPanel;
+
     protected final Field field;
     protected Attributes fieldOwner;
     private final TopographyCreatorModel model;
     private boolean locked = false;
     protected final NotifyContext ctx = new NotifyContext(this.getClass());
 
-    public  AttributeEditor(Attributes fieldOwner, Field field, TopographyCreatorModel model){
+    public AttributeEditor(Attributes fieldOwner, Field field, TopographyCreatorModel model,JPanel contentPanel){
         super(new BorderLayout());
         this.fieldOwner = fieldOwner;
         this.field = field;
         this.model = model;
-    }
-    public void updateValueFromModel(Object value){this.locked = true;};
+        this.contentPanel = contentPanel;
 
-    protected void updateModelFromValue(Object newValue){
+        disableNotify();
+        initialize();
+        enableNotify();
+    }
+
+    protected abstract void initialize();
+
+    protected abstract void modelChanged(Object value);
+
+    public void updateView(Object value){
+        disableNotify();
+        modelChanged(value);
+        enableNotify();
+    }
+
+    private void disableNotify(){
+        this.locked = true;
+    }
+
+    private void enableNotify(){
+        this.locked = false;
+    }
+
+    private boolean canUpdate(){
+        return !locked;
+    }
+
+    protected void updateModel(Object value){
+        if(canUpdate())updateModelFromValue(value);
+    }
+    private void updateModelFromValue(Object newValue){
         try {
             var element = model.getSelectedElement();
 
@@ -38,12 +73,6 @@ public abstract class AttributeEditor extends JPanel {
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
-    }
-    protected void ifNotUpdatedFromOutside(Runnable runner){
-        if(!this.locked){
-            runner.run();
-        }
-        this.locked = false;
     }
 
     protected TopographyCreatorModel getModel(){

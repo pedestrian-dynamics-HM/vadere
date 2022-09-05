@@ -34,10 +34,10 @@ public class DistributionRegistry {
 		return REGISTRY.get(name);
 	}
 
-	public static String getName(AttributesDistribution attributesDistribution) throws Exception{
+	public static String getName(Class attributesDistribution) throws Exception{
 		for(var val : REGISTRY.values()){
-			if(val.getParameter().equals(attributesDistribution.getClass())){
-				return val.getDistribution().getName();
+			if(val.getParameter().equals(attributesDistribution)){
+				return val.getDistribution().getName().split(".impl.")[1];
 			}
 		}
 		throw  new Exception(

@@ -1,6 +1,7 @@
 package org.vadere.gui.topographycreator.control.celleditor;
 
 import org.jetbrains.annotations.NotNull;
+import org.reflections.Reflections;
 import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
 import org.vadere.gui.topographycreator.utils.RunnableRegistry;
 import org.vadere.gui.topographycreator.view.AttributeView;
@@ -8,8 +9,6 @@ import org.vadere.util.Attributes;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -28,101 +27,111 @@ import java.util.Map;
 public class AttributeSubClassSelector extends AttributeEditor {
     public static final String STRING_NULL = "[null]";
     private JComboBox<Object> comboBox;
-    private JPanel contentPanel;
     private AttributeSubClassSelector self;
     private RunnableRegistry runnableRegistry;
     private Map<Class<?>,Constructor<?>> classConstructorRegistry;
+    private Map<String,Class<?>> classNameRegistry;
     private GridBagConstraints gbc;
-    private Class selected;
+    private String selected;
 
     private Object previousObject;
     public AttributeSubClassSelector(
             Attributes attached,
             Field field,
             TopographyCreatorModel model,
-            ArrayList<Class<?>> subObjectModel,
             JPanel contentPanel
     ) {
-        super(attached, field, model);
-        initializeGridBagConstraint();
-        initializeRunnableRegistry(model);
-        try {
-            initializeComboBox(subObjectModel, contentPanel);
-        } catch (NoSuchMethodException e) {
-            throw new RuntimeException(e);
-        }
-        initializeSelfReference();
+        super(attached, field, model,contentPanel);
 
+    }
+    @Override
+    protected void initialize() {
+        initializeGridBagConstraint();
+        initializeRunnableRegistry();
+        initializeComboBox();
+        initializeSelfReference();
+    }
+    @Override
+    public void modelChanged(Object value) {
+        if(value.getClass() != previousObject) {
+            this.previousObject = value.getClass();
+            var simpleName = getSimpleName(value.getClass());
+            this.comboBox.getModel().setSelectedItem(simpleName);
+            this.selected = simpleName;
+            updateInternalPropertyPane((Attributes) value, getModel());
+        }
     }
 
     private void initializeSelfReference() {
         this.self = this;
     }
-    private void initializeRunnableRegistry(TopographyCreatorModel model) {
+    private void initializeRunnableRegistry() {
+        var model = getModel();
         this.runnableRegistry = new RunnableRegistry();
         this.runnableRegistry.registerAction(null,()->{
-            nullifyFieldValueOfAttached();
+            updateModel(null);
             clearContentPanel();
         });
         this.runnableRegistry.registerDefault(()->{
             try {
-                ifNotUpdatedFromOutside(()-> {
-                    try {
-                        selected = (Class) comboBox.getModel().getSelectedItem();
-                        constructNewInternalPropertyPane(selected,model);
-                    } catch (InstantiationException e) {
-                        throw new RuntimeException(e);
-                    } catch (IllegalAccessException e) {
-                        throw new RuntimeException(e);
-                    } catch (InvocationTargetException e) {
-                        throw new RuntimeException(e);
-                    } catch (NoSuchMethodException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
+                selected = (String) comboBox.getModel().getSelectedItem();
+                constructNewInternalPropertyPane(selected, model);
             } catch (Exception e) {
                 System.out.println(e);
             }
         });
     }
 
-    private void initializeComboBox(ArrayList<Class<?>> subObjectModel, JPanel contentReceiver) throws NoSuchMethodException {
+    private void initializeComboBox(){
+        var reflections = new Reflections("org.vadere");
+        var subClassModel = new ArrayList(reflections.getSubTypesOf(this.field.getType()));
         this.comboBox = new JComboBox<>();
-        this.comboBox.setModel(initializeComboBoxModel(subObjectModel));
-        this.contentPanel = contentReceiver;
-        this.comboBox.addItemListener(e -> SwingUtilities.invokeLater(() -> {
-            ifNotUpdatedFromOutside(()->{
+        this.comboBox.setModel(initializeComboBoxModel(subClassModel));
+        this.comboBox.setRenderer((list, value, index, isSelected, cellHasFocus) -> {
+            if( value instanceof Attributes) {
+                try {
+                    var splitPath = value.toString().split(".Attributes");
+                    return new JLabel(splitPath[splitPath.length-1]);
+                } catch (Exception e) {
+                    throw new RuntimeException("This should not happen registered distribution not found"+value);
+                }
+            }
+            return new JLabel(value.toString());
+        });
+        this.comboBox.addItemListener(e ->  {
                 this.runnableRegistry.apply(comboBox.getModel().getSelectedItem());
-            });
-
-        }));
+        });
         this.add(comboBox);
     }
 
-    private void nullifyFieldValueOfAttached() {
-    }
-    @NotNull
-    private DefaultComboBoxModel<Object> initializeComboBoxModel(ArrayList<Class<?>> classesModel) throws NoSuchMethodException {
+    private DefaultComboBoxModel<Object> initializeComboBoxModel(ArrayList<Class<?>> classesModel){
         this.classConstructorRegistry = new HashMap<>();
+        this.classNameRegistry = new HashMap<>();
         var comboBoxModel = new DefaultComboBoxModel<>();
         comboBoxModel.addElement(STRING_NULL);
         for (var clazz : classesModel) {
-            classConstructorRegistry.put(clazz, clazz.getDeclaredConstructor());
-            comboBoxModel.addElement(clazz);
+            try {
+                classConstructorRegistry.put(clazz, clazz.getDeclaredConstructor());
+            } catch (NoSuchMethodException e) {
+                throw new RuntimeException(e);
+            }
+            var simpleName = getSimpleName(clazz);
+            if(Attributes.class.isAssignableFrom(clazz)){
+                classNameRegistry.put(simpleName,clazz);
+            }
+            comboBoxModel.addElement(simpleName);
         }
         return comboBoxModel;
     }
 
-    @Override
-    public void updateValueFromModel(Object value) {
-        if(value != previousObject) {
-            super.updateValueFromModel(value);
-            this.comboBox.getModel().setSelectedItem(value);
-            this.selected = value.getClass();
-            updateInternalPropertyPane((Attributes) value,getModel());
-        }
-        this.previousObject = value;
+    @NotNull
+    private static String getSimpleName(Class<?> clazz) {
+        return clazz.getSimpleName().replace("Attributes", "");
     }
+
+
+
+
     private void updateInternalPropertyPane(Attributes newObject, TopographyCreatorModel model) {
         clearContentPanel();
         var proppane = AttributeView.buildPage(newObject, model);
@@ -134,10 +143,19 @@ public class AttributeSubClassSelector extends AttributeEditor {
         contentPanel.repaint();
     }
 
-    private Attributes constructNewInternalPropertyPane(Class selected, TopographyCreatorModel model) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-        var newObject = (Attributes) classConstructorRegistry.get(selected).newInstance();
+    private Attributes constructNewInternalPropertyPane(String selected, TopographyCreatorModel model) {
+        Attributes newObject = null;
+        try {
+            newObject = (Attributes) classConstructorRegistry.get(classNameRegistry.get(selected)).newInstance();
+        } catch (InstantiationException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        } catch (InvocationTargetException e) {
+            throw new RuntimeException(e);
+        }
         updateInternalPropertyPane(newObject, model);
-        updateModelFromValue(newObject);
+        updateModel(newObject);
         return newObject;
     }
 

@@ -7,8 +7,8 @@ import org.vadere.util.Attributes;
 
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
-        property = "type",
-        defaultImpl = AttributesNoDistribution.class)
+        property = "type"//,defaultImpl = AttributesNoDistribution.class
+        )
 @JsonSubTypes({
         @JsonSubTypes.Type(value = AttributesBinomialDistribution.class, name = "org.vadere.state.attributes.distributions.AttributesBinomialDistribution"),
         @JsonSubTypes.Type(value = AttributesConstantDistribution.class, name = "org.vadere.state.attributes.distributions.AttributesConstantDistribution"),
