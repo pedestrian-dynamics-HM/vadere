@@ -187,6 +187,10 @@ public interface JsonNodeExplorer {
 		JsonNode tChanger = pathMustExist(node, "scenario/topography/targets");
 		return new JsonFilterIterator(tChanger, n->true);
 	}
+	default Iterator<JsonNode> iteratorTargets(JsonNode node) throws MigrationException{
+		JsonNode tChanger = pathMustExist(node, "scenario/topography/targets");
+		return new JsonFilterIterator(tChanger, n->true);
+	}
 
 	default  Iterator<JsonNode> iteratorMeasurementArea(JsonNode node, int id) throws MigrationException {
 		JsonNode processors = pathMustExist(node, "scenario/topography/measurementAreas");
