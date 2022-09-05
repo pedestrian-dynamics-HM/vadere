@@ -14,7 +14,7 @@ public class AttributeComboBox extends AttributeEditor {
         super(attached, field, model);
         this.comboBox = new JComboBox();
         this.add(comboBox);
-        this.comboBox.addItemListener(e ->SwingUtilities.invokeLater(()-> updateModelFromValue(comboBox.getSelectedItem())));
+        this.comboBox.addItemListener(e ->updateModelFromValue(comboBox.getSelectedItem()));
         //this.setBorder(new FlatTextBorder());
     }
 

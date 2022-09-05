@@ -14,7 +14,7 @@ public class AttributeCheckBox extends AttributeEditor {
         super(attached, field, model);
         this.checkBox = new JCheckBox();
         this.add(checkBox);
-        this.checkBox.addItemListener(e ->SwingUtilities.invokeLater(()-> updateModelFromValue(checkBox.isSelected())));
+        this.checkBox.addItemListener(e ->updateModelFromValue(checkBox.isSelected()));
     }
 
     @Override

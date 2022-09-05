@@ -15,7 +15,7 @@ public class AttributeDoubleSpinner extends AttributeEditor {
         this.spinner = new JSpinner();
         this.spinner.setModel(new SpinnerNumberModel(0.0, -1000.0, 1000.0, 0.1));
         this.add(spinner);
-        this.spinner.addChangeListener(e ->SwingUtilities.invokeLater(()-> updateModelFromValue(spinner.getValue())));
+        this.spinner.addChangeListener(e -> updateModelFromValue(spinner.getValue()));
         //this.setBorder(new FlatTextBorder());
     }
 

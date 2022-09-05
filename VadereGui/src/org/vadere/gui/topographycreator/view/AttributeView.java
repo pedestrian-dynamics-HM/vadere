@@ -62,7 +62,8 @@ public class AttributeView extends JPanel implements ISelectScenarioElementListe
             var attributePage = editorPages.get(scenarioElement);
             this.pageView.removeAll();
             this.pageView.add(attributePage,BorderLayout.NORTH);
-
+            this.revalidate();
+            this.repaint();
         }
     }
 

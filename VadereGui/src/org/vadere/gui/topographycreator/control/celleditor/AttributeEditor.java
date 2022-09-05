@@ -25,12 +25,14 @@ public abstract class AttributeEditor extends JPanel {
 
     protected void updateModelFromValue(Object newValue){
         try {
+            var element = model.getSelectedElement();
+
             field.setAccessible(true);
             this.field.set(this.fieldOwner, newValue);
             field.setAccessible(false);
 
             model.getScenario().updateCurrentStateSerialized();
-            model.setElementHasChanged(model.getSelectedElement());
+            model.setElementHasChanged(element);
             model.notifyObservers(ctx);
 
         } catch (IllegalAccessException e) {
