@@ -7,14 +7,14 @@ import org.vadere.state.scenario.spawner.VSpawner;
 
 import java.util.ArrayList;
 
-public class TimeSeriesSpawner extends RegularSpawner {
+public class TimeSeriesSpawner extends VSpawner {
 
     Double[] switchpoints;
     private int currentInterval = 0;
     ArrayList<VSpawner> spawners;
 
-    protected TimeSeriesSpawner(AttributesSpawner attributes, Topography topography,TimeSeriesDistribution distribution) {
-        super(attributes, topography,distribution);
+    protected TimeSeriesSpawner(AttributesSpawner attributes) {
+        super(attributes);
     }
 
     @Override

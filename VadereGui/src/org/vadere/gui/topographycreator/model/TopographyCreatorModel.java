@@ -517,4 +517,5 @@ public class TopographyCreatorModel extends DefaultModel implements IDrawPanelMo
 		return new VPoint(Math.round(point.x * factor) / factor, Math.round(point.y * factor) / factor);
 	}
 
+
 }

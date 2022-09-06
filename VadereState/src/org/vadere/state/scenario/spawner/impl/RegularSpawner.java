@@ -13,8 +13,11 @@ public class RegularSpawner extends VSpawner {
 
     protected VDistribution distribution;
 
-    public RegularSpawner(AttributesSpawner attributes, Topography topography, VDistribution distribution) {
-        super(attributes,topography,distribution);
+    public RegularSpawner(){
+        super(new AttributesRegularSpawner());
+    }
+    public RegularSpawner(AttributesSpawner attributes) {
+        super(attributes);
     }
 
     @Override

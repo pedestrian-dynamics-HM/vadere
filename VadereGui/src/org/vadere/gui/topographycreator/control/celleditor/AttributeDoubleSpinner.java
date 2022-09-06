@@ -10,7 +10,7 @@ import java.lang.reflect.Field;
 public class AttributeDoubleSpinner extends AttributeEditor {
     private JSpinner spinner;
     private Double oldValue;
-    public AttributeDoubleSpinner(Attributes attached, Field field, TopographyCreatorModel model,JPanel unused) {
+    public AttributeDoubleSpinner(Field attached, Field field, TopographyCreatorModel model,JPanel unused) {
         super(attached, field, model,null);
     }
     @Override

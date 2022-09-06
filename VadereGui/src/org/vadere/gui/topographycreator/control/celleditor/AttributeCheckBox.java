@@ -2,6 +2,7 @@ package org.vadere.gui.topographycreator.control.celleditor;
 
 import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
 import org.vadere.util.Attributes;
+import org.vadere.util.AttributesAttached;
 
 import javax.swing.*;
 import java.lang.reflect.Field;
@@ -9,7 +10,7 @@ import java.lang.reflect.Field;
 public class AttributeCheckBox extends AttributeEditor {
     private JCheckBox checkBox;
     private boolean isInit = true;
-    public AttributeCheckBox(Attributes attached,
+    public AttributeCheckBox(Field attached,
                              Field field,
                              TopographyCreatorModel model,
                              JPanel unused) {

@@ -2,6 +2,7 @@ package org.vadere.gui.topographycreator.control.celleditor;
 
 import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
 import org.vadere.util.Attributes;
+import org.vadere.util.AttributesAttached;
 
 import javax.swing.*;
 import javax.swing.text.AttributeSet;
@@ -23,7 +24,7 @@ public class AttributeTextEditor extends AttributeEditor {
 
     private String oldValue;
 
-    public AttributeTextEditor(Attributes attached, Field field, TopographyCreatorModel model,JPanel unused) {
+    public AttributeTextEditor(Field attached, Field field, TopographyCreatorModel model, JPanel unused) {
         super(attached, field, model,null);
     }
 

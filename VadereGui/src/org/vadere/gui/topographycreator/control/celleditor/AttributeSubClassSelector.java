@@ -4,7 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.reflections.Reflections;
 import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
 import org.vadere.gui.topographycreator.utils.RunnableRegistry;
-import org.vadere.gui.topographycreator.view.AttributeView;
+import org.vadere.gui.topographycreator.view.AttributeTableView;
 import org.vadere.util.Attributes;
 
 import javax.swing.*;
@@ -12,9 +12,8 @@ import java.awt.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * This AttributeEditor Class is used by JAttributeTable as the default fallback for
@@ -34,9 +33,10 @@ public class AttributeSubClassSelector extends AttributeEditor {
     private GridBagConstraints gbc;
     private String selected;
 
+    private AttributeTableView attributeTableView;
     private Object previousObject;
     public AttributeSubClassSelector(
-            Attributes attached,
+            Field attached,
             Field field,
             TopographyCreatorModel model,
             JPanel contentPanel
@@ -46,19 +46,20 @@ public class AttributeSubClassSelector extends AttributeEditor {
     }
     @Override
     protected void initialize() {
+        this.attributeTableView = new AttributeTableView(getModel());
         initializeGridBagConstraint();
         initializeRunnableRegistry();
         initializeComboBox();
         initializeSelfReference();
+        this.contentPanel.add(attributeTableView,gbc);
     }
     @Override
     public void modelChanged(Object value) {
         if(value.getClass() != previousObject) {
-            this.previousObject = value.getClass();
-            var simpleName = getSimpleName(value.getClass());
-            this.comboBox.getModel().setSelectedItem(simpleName);
-            this.selected = simpleName;
-            updateInternalPropertyPane((Attributes) value, getModel());
+            this.previousObject = value;
+            this.selected = getSimpleName(value.getClass());
+            this.comboBox.getModel().setSelectedItem(this.selected);
+            this.attributeTableView.updateView(parent,this.fieldOwner);
         }
     }
 
@@ -68,23 +69,32 @@ public class AttributeSubClassSelector extends AttributeEditor {
     private void initializeRunnableRegistry() {
         var model = getModel();
         this.runnableRegistry = new RunnableRegistry();
-        this.runnableRegistry.registerAction(null,()->{
+        this.runnableRegistry.registerAction("[null]",()->{
             updateModel(null);
-            clearContentPanel();
+            this.attributeTableView.selectionChange(null,null);
         });
         this.runnableRegistry.registerDefault(()->{
+            selected = getSelectedItem();
+            Attributes newAttributeInstance = null;
+
             try {
-                selected = (String) comboBox.getModel().getSelectedItem();
-                constructNewInternalPropertyPane(selected, model);
-            } catch (Exception e) {
-                System.out.println(e);
+                newAttributeInstance = (Attributes) classConstructorRegistry.get(classNameRegistry.get(selected)).newInstance();
+            } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                throw new RuntimeException(e);
             }
+            this.attributeTableView.selectionChange(parent,fieldOwner);
+            updateModel(previousObject);
         });
+    }
+
+    private String getSelectedItem() {
+        return (String) comboBox.getModel().getSelectedItem();
     }
 
     private void initializeComboBox(){
         var reflections = new Reflections("org.vadere");
         var subClassModel = new ArrayList(reflections.getSubTypesOf(this.field.getType()));
+
         this.comboBox = new JComboBox<>();
         this.comboBox.setModel(initializeComboBoxModel(subClassModel));
         this.comboBox.setRenderer((list, value, index, isSelected, cellHasFocus) -> {
@@ -109,6 +119,7 @@ public class AttributeSubClassSelector extends AttributeEditor {
         this.classNameRegistry = new HashMap<>();
         var comboBoxModel = new DefaultComboBoxModel<>();
         comboBoxModel.addElement(STRING_NULL);
+        classesModel.sort(Comparator.comparing(Class::getSimpleName));
         for (var clazz : classesModel) {
             try {
                 classConstructorRegistry.put(clazz, clazz.getDeclaredConstructor());
@@ -129,44 +140,13 @@ public class AttributeSubClassSelector extends AttributeEditor {
         return clazz.getSimpleName().replace("Attributes", "");
     }
 
-
-
-
-    private void updateInternalPropertyPane(Attributes newObject, TopographyCreatorModel model) {
-        clearContentPanel();
-        var proppane = AttributeView.buildPage(newObject, model);
-        contentPanel.add(proppane, gbc);
-    }
-    private void clearContentPanel() {
-        contentPanel.removeAll();
-        contentPanel.revalidate();
-        contentPanel.repaint();
-    }
-
-    private Attributes constructNewInternalPropertyPane(String selected, TopographyCreatorModel model) {
-        Attributes newObject = null;
-        try {
-            newObject = (Attributes) classConstructorRegistry.get(classNameRegistry.get(selected)).newInstance();
-        } catch (InstantiationException e) {
-            throw new RuntimeException(e);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        } catch (InvocationTargetException e) {
-            throw new RuntimeException(e);
-        }
-        updateInternalPropertyPane(newObject, model);
-        updateModel(newObject);
-        return newObject;
-    }
-
-
     private void initializeGridBagConstraint() {
         this.gbc = new GridBagConstraints();
         this.gbc.gridwidth = GridBagConstraints.REMAINDER;
         this.gbc.anchor = GridBagConstraints.FIRST_LINE_START;
         this.gbc.fill = GridBagConstraints.HORIZONTAL;
         this.gbc.weightx = 1;
-        this.gbc.insets = new Insets(2, 2, 2, 2);
+        this.gbc.insets = new Insets(1, 1, 1, 1);
 
     }
 }

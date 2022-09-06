@@ -1,5 +1,9 @@
 package org.vadere.state.scenario.spawner;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import org.vadere.state.attributes.distributions.AttributesBinomialDistribution;
+import org.vadere.state.scenario.spawner.impl.RegularSpawner;
 import org.vadere.util.Attributes;
 import org.vadere.util.AttributesAttached;
 import org.vadere.state.attributes.scenario.AttributesSource;
@@ -7,20 +11,22 @@ import org.vadere.state.scenario.Topography;
 import org.vadere.state.attributes.spawner.AttributesSpawner;
 import org.vadere.state.scenario.distribution.VDistribution;
 
-;
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.NAME,
+        property = "type"
+)
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = RegularSpawner.class, name = "org.vadere.state.scenario.spawner.impl.RegularSpawner"),
+})
 public abstract class VSpawner  implements AttributesAttached {
-
-    private final Topography topography;
+    private final Topography topography = null;
     protected AttributesSpawner spawnerAttributes;
+    protected int dynamicElementsCreatedTotal = 0;
 
-    protected VDistribution distribution;
-    protected int dynamicElementsCreatedTotal;
+    public VSpawner(){}
 
-
-    protected VSpawner(AttributesSpawner attributes,Topography topography,VDistribution distribution) {
+    public VSpawner(AttributesSpawner attributes) {
         this.spawnerAttributes = attributes;
-        this.topography = topography;
-        this.distribution = distribution;
     }
 
     public abstract int getSpawnNumber(double timeCurrentEvent);

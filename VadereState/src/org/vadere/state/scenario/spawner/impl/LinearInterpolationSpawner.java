@@ -14,8 +14,8 @@ public class LinearInterpolationSpawner extends RegularSpawner {
     private TruncatedNormalDistribution truncNormalDist;
     private PolynomialSplineFunction interpolator;
 
-    public LinearInterpolationSpawner(AttributesSpawner attributes,Topography topography, LinearInterpolationDistribution distribution) {
-        super(attributes,topography,distribution);
+    public LinearInterpolationSpawner(AttributesSpawner attributes) {
+        super(attributes);
 
         double[] xValues = { 0, 200, 400, 600, 800, 1000, 1200, 1400, 1600, 1800, 2000, 2200, 2400 };
         double[] yValues = { -1., 8., -1., 8., -1.0, 8., -1, 8, -1, 8, -1, 8, -1 };

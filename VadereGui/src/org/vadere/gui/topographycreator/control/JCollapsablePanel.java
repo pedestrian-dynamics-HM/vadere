@@ -61,8 +61,8 @@ public class JCollapsablePanel extends JPanel implements Observer {
     }
 
     private void initializeGroupHeaderStyle(JLabel head) {
-        setBackground(UIManager.getColor("Panel.background"));
-        setBackground(new Color(0,192,163,100));
+        var c= UIManager.getColor("Table.selectionBackground");
+        setBackground(new Color(c.getRed(),c.getGreen(),c.getBlue(),(int)(c.getAlpha()*0.5)));
         head.setBorder(new EmptyBorder(4,4,4,4));
         head.setIcon(UIManager.getIcon("Tree.expandedIcon"));
     }
@@ -119,6 +119,8 @@ public class JCollapsablePanel extends JPanel implements Observer {
                 contentPanel.setVisible(false);
                 hidden = true;
             }
+            revalidate();
+            repaint();
         }
     }
 

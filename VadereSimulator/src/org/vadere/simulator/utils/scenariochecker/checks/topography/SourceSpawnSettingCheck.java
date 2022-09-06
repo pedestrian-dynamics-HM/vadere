@@ -18,13 +18,16 @@ public class SourceSpawnSettingCheck extends AbstractScenarioCheck implements To
 
 		for (Source source : sourceList) {
 			AttributesSpawner attr = source.getAttributes().getSpawnerAttributes();
-
-			if (attr.isEventPositionRandom() && !attr.isEventPositionFreeSpace()){
-				messages.add(msgBuilder.topographyWarning().target(source)
-						.reason(ScenarioCheckerReason.SOURCE_SPAWN_RND_POS_NOT_FREE_SPACE).build());
-			} else if (!attr.isEventPositionFreeSpace()){
-				messages.add(msgBuilder.topographyWarning().target(source)
-						.reason(ScenarioCheckerReason.SOURCE_SPAWN_USE_NOT_FREE_SPACE).build());
+			if(attr == null){
+				messages.add(msgBuilder.topographyError().target(source).reason(ScenarioCheckerReason.SOURCE_NEEDS_SPAWNER).build());
+			}else {
+				if (attr.isEventPositionRandom() && !attr.isEventPositionFreeSpace()) {
+					messages.add(msgBuilder.topographyWarning().target(source)
+							.reason(ScenarioCheckerReason.SOURCE_SPAWN_RND_POS_NOT_FREE_SPACE).build());
+				} else if (!attr.isEventPositionFreeSpace()) {
+					messages.add(msgBuilder.topographyWarning().target(source)
+							.reason(ScenarioCheckerReason.SOURCE_SPAWN_USE_NOT_FREE_SPACE).build());
+				}
 			}
 
 		}

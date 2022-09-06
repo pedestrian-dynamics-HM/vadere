@@ -176,10 +176,9 @@ public class ScenarioElementView extends JPanel implements ISelectScenarioElemen
 	}
 
 	@Override
-	public void selectionChange(final Optional<ScenarioElement> optionalElement) {
+	public void selectionChange(final ScenarioElement element) {
 		synchronized (txtrTextfiletextarea) {
-			if(optionalElement.isPresent()){
-				var element = optionalElement.get();
+			if(element != null){
 				if (element instanceof AgentWrapper) {
 					this.txtrTextfiletextarea.setText(
 							StateJsonConverter.serializeObjectPretty(((AgentWrapper) element).getAgentInitialStore()));
@@ -203,8 +202,8 @@ public class ScenarioElementView extends JPanel implements ISelectScenarioElemen
 	public void update(Observable o, Object arg) {
 		if (arg instanceof NotifyContext) {
 			var ctx = (NotifyContext) arg;
-			if (ctx.getNotifyContext().equals(AttributeEditor.class)) {
-				SwingUtilities.invokeLater(()->selectionChange(Optional.ofNullable(panelModel.getSelectedElement())));
+			if (AttributeEditor.class.isAssignableFrom(ctx.getNotifyContext())) {
+				selectionChange(panelModel.getSelectedElement());
 			}
 		}
 	}

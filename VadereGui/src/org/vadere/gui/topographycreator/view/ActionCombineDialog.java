@@ -83,9 +83,8 @@ public class ActionCombineDialog extends JDialog implements ISelectScenarioEleme
 	}
 
 	@Override
-	public void selectionChange(Optional<ScenarioElement> optionalElement) {
-		if(optionalElement.isPresent()) {
-			var element = optionalElement.get();
+	public void selectionChange(ScenarioElement element) {
+		if(element != null) {
 			if (element.getId() != -1) {
 				String tmp = textField.getText().strip();
 				if (tmp.length() == 0) {

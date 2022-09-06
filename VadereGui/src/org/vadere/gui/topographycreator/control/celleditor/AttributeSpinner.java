@@ -10,7 +10,7 @@ import java.lang.reflect.Field;
 public class AttributeSpinner extends AttributeEditor {
     private JSpinner spinner;
     private Integer oldValue;
-    public AttributeSpinner(Attributes attached, Field field, TopographyCreatorModel model,JPanel contentPanel) {
+    public AttributeSpinner(Field attached, Field field, TopographyCreatorModel model,JPanel contentPanel) {
         super(attached, field, model,null);
     }
 

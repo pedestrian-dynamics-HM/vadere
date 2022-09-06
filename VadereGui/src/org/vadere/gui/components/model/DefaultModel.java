@@ -23,7 +23,7 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-
+import java.util.Queue;
 import javax.swing.*;
 
 public abstract class DefaultModel<T extends DefaultConfig> extends Observable implements IDefaultModel<T> {
@@ -67,6 +67,8 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 	private JScrollPane scrollPane;
 
 	public T config;
+	private Queue<ISelectScenarioElementListener> selectScenarioElementListenerQueue;
+
 
 	public DefaultModel(final T config) {
 		this.config = config;
@@ -75,6 +77,7 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 		this.viewportBound = new Rectangle2D.Double(0, 0, 50, 50);
 		this.cursorWorldPosition = VPoint.ZERO;
 		this.selectScenarioElementListener = new LinkedList<>();
+		this.selectScenarioElementListenerQueue = new LinkedList<>();
 		this.voronoiDiagram = null;
 		this.showVoroniDiagram = true;
 		this.showSelection = false;
@@ -432,6 +435,14 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 	public synchronized void setSelectedElement(final ScenarioElement selectedElement) {
 		this.selectedElement = selectedElement;
 		notifySelectSecenarioElementListener(selectedElement);
+		pullUpSelectScenarioElementQueue();
+		System.out.println(selectScenarioElementListener.size());
+	}
+
+	private synchronized void pullUpSelectScenarioElementQueue() {
+		while(!selectScenarioElementListenerQueue.isEmpty()){
+			this.selectScenarioElementListener.add(selectScenarioElementListenerQueue.poll());
+		}
 	}
 
 	@Override
@@ -452,6 +463,10 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 	@Override
 	public synchronized void addSelectScenarioElementListener(final ISelectScenarioElementListener listener) {
 		this.selectScenarioElementListener.add(listener);
+	}
+
+	public synchronized void addSelectScenarioElementListenerQueue(final ISelectScenarioElementListener listener) {
+		this.selectScenarioElementListenerQueue.add(listener);
 	}
 
 	@Override
@@ -476,7 +491,7 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 
 	protected synchronized void notifySelectSecenarioElementListener(final ScenarioElement scenarioElement) {
 		for (ISelectScenarioElementListener listener : selectScenarioElementListener) {
-			listener.selectionChange(Optional.ofNullable(scenarioElement));
+			listener.selectionChange(scenarioElement);
 		}
 	}
 

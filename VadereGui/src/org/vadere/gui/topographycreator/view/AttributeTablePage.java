@@ -1,8 +1,6 @@
 package org.vadere.gui.topographycreator.view;
 
 import org.jetbrains.annotations.NotNull;
-import org.vadere.gui.components.view.ISelectScenarioElementListener;
-import org.vadere.gui.topographycreator.control.AttributeHelpView;
 import org.vadere.gui.topographycreator.control.JAttributeTable;
 import org.vadere.gui.topographycreator.control.JCollapsablePanel;
 import org.vadere.gui.topographycreator.model.AttributeTableModel;
@@ -10,70 +8,92 @@ import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
 import org.vadere.state.attributes.VadereAttributeClass;
 import org.vadere.util.Attributes;
 import org.vadere.state.scenario.ScenarioElement;
+import org.vadere.util.AttributesAttached;
 import org.vadere.util.reflection.VadereAttribute;
 
 import javax.swing.*;
-import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class AttributeView extends JPanel implements ISelectScenarioElementListener{
+import static org.vadere.gui.topographycreator.utils.Layouts.initGridBagConstraint;
 
-    JPanel pageView;
-    JTextPane helpView;
-    HashMap<ScenarioElement,JPanel> editorPages;
+public class AttributeTablePage extends JPanel{
     TopographyCreatorModel panelModel;
 
+    private List<JAttributeTable> tablesListeners;
 
-    AttributeView(final TopographyCreatorModel defaultModel){
-        super(new GridBagLayout());
+    public AttributeTablePage(final Class clazz,final TopographyCreatorModel defaultModel){
+        super(new BorderLayout());
         this.setBackground(Color.white);
         this.panelModel = defaultModel;
-        this.panelModel.addSelectScenarioElementListener(this);
 
-        this.editorPages = new HashMap<>();
+        this.tablesListeners = new ArrayList<>();
 
-        pageView = new JPanel(new BorderLayout());
-        helpView = AttributeHelpView.getInstance();
+        var panel = new JPanel(new GridBagLayout());
+        var gbc = initGridBagConstraint(1.0);
 
-        var minimalHelpViewSize = new Dimension(1,Toolkit.getDefaultToolkit().getScreenSize().height/10);
-
-        helpView.setMinimumSize(minimalHelpViewSize);
-        helpView.setBorder(new LineBorder(UIManager.getColor("Component.borderColor")));
-
-
-        var gbcPage = initGridBagConstraint(1.0);
-        var gbcHelp = initGridBagConstraint(0.2);
-
-        this.add(pageView,gbcPage);
-        this.add(helpView,gbcHelp);
-
+        getSuperClassHierarchy(clazz)
+                .stream()
+                .forEach(c ->{
+                    var pnl = createPanel(c,null,defaultModel);
+                    if(pnl != null) {
+                        panel.add(pnl, gbc);
+                    }
+                });
+        var parentPane = new JCollapsablePanel(generateHeaderName(clazz),false);
+        parentPane.add(panel);
+        this.add(new JScrollPane(parentPane));
     }
 
-    @Override
-    public void selectionChange(Optional<ScenarioElement> optionalElement) {
-        if(optionalElement.isPresent()) {
-            var element = optionalElement.get();
-            if(!editorPages.containsKey(element)){
-                var attributePage = buildPage(element.getAttributes(),panelModel);
-                this.editorPages.put(element,attributePage);
-            }
-            var attributePage = editorPages.get(element);
-            this.pageView.removeAll();
-            this.pageView.add(attributePage,BorderLayout.NORTH);
-            this.revalidate();
-            this.repaint();
-        }else{
-            this.pageView.removeAll();
-            this.revalidate();
-            this.repaint();
+    public void updateView(Object parent,Field attachedObject){
+        for(var table : tablesListeners){
+            table.updateView(parent,attachedObject);
         }
     }
-
-    public static JPanel buildPage(Attributes object, TopographyCreatorModel model){
+/*
+    @Override
+    public void selectionChange(ScenarioElement element) {
+        if(element != null) {
+            System.out.println(element);
+            System.out.println(element.getAttributes());
+            Class elementClass = element.getAttributes().getClass();
+            if(!editorPages.containsKey(elementClass)){
+                var attributePage = buildPage(element.getAttributes(),panelModel);
+                this.editorPages.put(elementClass,attributePage);
+            }
+            var attributePage = editorPages.get(elementClass);
+            attributePage.updateFields(element);
+            this.removeAll();
+            this.add(attributePage,BorderLayout.NORTH);
+        }else{
+            this.removeAll();
+        }
+        this.revalidate();
+        this.repaint();
+    }
+*/
+    /*
+    public void attributeSelectionChanged(Attributes optionalElement) {
+        if(optionalElement != null) {
+            if(!editorPages.containsKey(optionalElement.getClass())){
+                var attributePage = buildPage(optionalElement,panelModel);
+                this.editorPages.put(optionalElement.getClass(),attributePage);
+            }
+            var attributePage = editorPages.get(optionalElement.getClass());
+            this.removeAll();
+            this.add(attributePage,BorderLayout.NORTH);
+        }else{
+            this.removeAll();
+        }
+        this.revalidate();
+        this.repaint();
+    }
+*/
+    /*
+    public static JAttributePage buildPage(Attributes object, TopographyCreatorModel model){
         var clazz = object.getClass();
         var panel = new JPanel(new GridBagLayout());
         var gbc = initGridBagConstraint(1.0);
@@ -86,17 +106,17 @@ public class AttributeView extends JPanel implements ISelectScenarioElementListe
                         panel.add(pnl, gbc);
                     }
                 });
-        var parentPane = new JCollapsablePanel(generateHeaderName(object.getClass()), false);
-        parentPane.add(new JScrollPane(panel));
+        var parentPane = new JAttributePage2(generateHeaderName(object.getClass()));
+        parentPane.addScrollContent(panel);
         return parentPane;
     }
-
+*/
     @NotNull
     public static String generateHeaderName(Class clazz) {
         return clazz.getSimpleName().replaceFirst("Attributes", "");
     }
 
-    private static JPanel createPanel(Class baseClass, Attributes object, TopographyCreatorModel model) {
+    private JPanel createPanel(Class baseClass, Attributes object, TopographyCreatorModel model) {
         var gbc = initGridBagConstraint(1.0);
 
         var classPanel = new JPanel(new GridBagLayout()); //generateClassPanelFromRule(baseClass, noHeader);
@@ -111,6 +131,7 @@ public class AttributeView extends JPanel implements ISelectScenarioElementListe
             for (var group : groups) {
                 var tableModel = new AttributeTableModel(semanticList.get(group));
                 var table = new JAttributeTable(tableModel,model,object);
+                this.tablesListeners.add(table);
                 if (groupIsUnNamed(group)) {
                     classPanel.add(table, gbc);
                 } else {//groupHasName
@@ -177,13 +198,4 @@ public class AttributeView extends JPanel implements ISelectScenarioElementListe
         return classOrder;
     }
 
-    private static GridBagConstraints initGridBagConstraint(double weighty) {
-        var gbc = new GridBagConstraints();
-        gbc.gridwidth = GridBagConstraints.REMAINDER;
-        gbc.anchor = GridBagConstraints.PAGE_START;
-        gbc.fill = GridBagConstraints.BOTH;
-        gbc.weightx = 1;
-        gbc.weighty = weighty;
-        return gbc;
-    }
 }

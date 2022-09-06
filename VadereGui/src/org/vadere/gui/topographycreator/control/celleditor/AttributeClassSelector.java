@@ -1,8 +1,9 @@
 package org.vadere.gui.topographycreator.control.celleditor;
 
 import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
-import org.vadere.gui.topographycreator.view.AttributeView;
+import org.vadere.gui.topographycreator.view.AttributeTablePage;
 import org.vadere.util.Attributes;
+import org.vadere.util.AttributesAttached;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -24,13 +25,13 @@ public class AttributeClassSelector extends AttributeEditor {
     private boolean contentPaneVisible = false;
 
 
-    public AttributeClassSelector(Attributes attached, Field field, TopographyCreatorModel model, Class clazz, JPanel contentPanel) {
+    public AttributeClassSelector(Field attached, Field field, TopographyCreatorModel model, JPanel contentPanel) {
         super(attached, field, model,contentPanel);
         this.contentPanel.setLayout(new BorderLayout());
         this.contentPanel.setBorder(new EmptyBorder(2,2,2,2));
         this.contentPanel.setVisible(contentPaneVisible);
-        this.clazz = clazz;
-        this.button = new JButton(AttributeView.generateHeaderName(clazz));
+        this.clazz = field.getType();
+        this.button = new JButton(AttributeTablePage.generateHeaderName(clazz));
         this.add(button);
         Attributes attrs = null;
         try {
@@ -72,7 +73,7 @@ public class AttributeClassSelector extends AttributeEditor {
     }
 
     private void createInternalPropertyPane(Attributes newObject, TopographyCreatorModel model) {
-        var proppane = AttributeView.buildPage(newObject, model);
+        var proppane = new AttributeTablePage(newObject.getClass(), model);
         contentPanel.add(proppane,BorderLayout.CENTER);
     }
 

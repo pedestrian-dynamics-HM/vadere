@@ -119,10 +119,9 @@ public class TopographyTreeView extends JPanel implements ISelectScenarioElement
 	}
 
 	@Override
-	public void selectionChange(Optional<ScenarioElement> optionalElement) {
+	public void selectionChange(ScenarioElement scenarioElement) {
 		if (isVisible()){
-			if (optionalElement.isPresent()){
-				var scenarioElement = optionalElement.get();
+			if (scenarioElement != null){
 				DefaultMutableTreeNode category = categories.get(scenarioElement.getType());
 				TreeElementWrapper newNode = TreeElementWrapper.leaf(scenarioElement);
 
@@ -161,7 +160,7 @@ public class TopographyTreeView extends JPanel implements ISelectScenarioElement
 			if (expanded != null){
 				expanded.asIterator().forEachRemaining(p-> jTree.expandPath(p));
 			}
-			selectionChange(Optional.ofNullable(panelModel.getSelectedElement()));
+			selectionChange(panelModel.getSelectedElement());
 		}
 	}
 }
