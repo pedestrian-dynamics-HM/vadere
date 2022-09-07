@@ -1,14 +1,15 @@
 package org.vadere.simulator.models.osm;
 
 import org.vadere.annotation.factories.models.ModelClass;
-import org.vadere.simulator.models.*;
+import org.vadere.simulator.models.Model;
 import org.vadere.simulator.projects.Domain;
-import org.vadere.util.Attributes;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesCA;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.util.logging.Logger;
 
-import java.util.*;
+import java.util.List;
+import java.util.Random;
 
 /** Introduces to allow to load CA model presets in GUI
  * @author hm-mgoedel

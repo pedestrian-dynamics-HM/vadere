@@ -1,6 +1,6 @@
 package org.vadere.state.attributes.models.infection;
 
-import org.vadere.util.Attributes;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.scenario.AttributesDroplets;
 import org.vadere.state.scenario.Droplets;
 
@@ -14,13 +14,13 @@ public class AttributesAirTransmissionModelDroplets extends Attributes {
      * Describes how often {@link Droplets} are emitted by an infectious pedestrian.
      * Unit: 1 / second
      */
-    private double emissionFrequency;
+    private final double emissionFrequency;
 
     /**
      * Describes the shape of {@link AttributesDroplets}: Radius of the circular segment.
      * Unit: meter
      */
-    private double distanceOfSpread;
+    private final double distanceOfSpread;
 
     /**
      * Describes the shape of {@link AttributesDroplets}: Angle of the circular segment.
@@ -39,14 +39,14 @@ public class AttributesAirTransmissionModelDroplets extends Attributes {
      * {@link #lifeTime}.
      * Unit: particles
      */
-    private double pathogenLoad;
+    private final double pathogenLoad;
 
     /**
      * Describes the fraction infectious particles inhaled from droplets if the inhaling agent is located within
      * droplets.
      * Unit: 1 / inhalation
      */
-    private double absorptionRate;
+    private final double absorptionRate;
 
     public AttributesAirTransmissionModelDroplets() {
         this.emissionFrequency = 1.0 / 60.0;

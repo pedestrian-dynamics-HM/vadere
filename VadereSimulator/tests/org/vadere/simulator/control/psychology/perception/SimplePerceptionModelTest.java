@@ -2,7 +2,7 @@ package org.vadere.simulator.control.psychology.perception;
 
 import org.junit.Test;
 import org.vadere.simulator.control.psychology.perception.models.SimplePerceptionModel;
-import org.vadere.util.Attributes;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.psychology.perception.AttributesSimplePerceptionModel;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesTarget;
@@ -20,8 +20,8 @@ import static org.junit.Assert.*;
 
 public class SimplePerceptionModelTest {
 
-    private static double ALLOWED_DOUBLE_ERROR = 10e-3;
-    private List<Attributes> attributesList = Collections.singletonList(new AttributesSimplePerceptionModel());
+    private static final double ALLOWED_DOUBLE_ERROR = 10e-3;
+    private final List<Attributes> attributesList = Collections.singletonList(new AttributesSimplePerceptionModel());
 
 
     private List<Pedestrian> createPedestrians(int totalPedestrians) {
@@ -95,7 +95,7 @@ public class SimplePerceptionModelTest {
         simplePerceptionModel.update(getPedSpecififStimuli(pedestrians, stimuli));
 
         Stimulus expectedStimulus = stimuli.get(0);
-        pedestrians.forEach(pedestrian -> assertTrue(expectedStimulus == pedestrian.getMostImportantStimulus()));
+        pedestrians.forEach(pedestrian -> assertSame(expectedStimulus, pedestrian.getMostImportantStimulus()));
     }
 
     @Test
@@ -117,7 +117,7 @@ public class SimplePerceptionModelTest {
         simplePerceptionModel.update(getPedSpecififStimuli(pedestrians, stimuli));
 
         // Use "==" to compare if it is the same reference!
-        pedestrians.forEach(pedestrian -> assertTrue(expectedStimulus == pedestrian.getMostImportantStimulus()));
+        pedestrians.forEach(pedestrian -> assertSame(expectedStimulus, pedestrian.getMostImportantStimulus()));
     }
 
     @Test
@@ -139,7 +139,7 @@ public class SimplePerceptionModelTest {
         simplePerceptionModel.update(getPedSpecififStimuli(pedestrians, stimuli));
 
         // Use "==" to compare if it is the same reference!
-        pedestrians.forEach(pedestrian -> assertTrue(expectedStimulus == pedestrian.getMostImportantStimulus()));
+        pedestrians.forEach(pedestrian -> assertSame(expectedStimulus, pedestrian.getMostImportantStimulus()));
     }
 
     @Test
@@ -164,7 +164,7 @@ public class SimplePerceptionModelTest {
 
         simplePerceptionModel.update(getPedSpecififStimuli(pedestrians, stimuli));
 
-        pedestrians.forEach(pedestrian -> assertTrue(expectedStimulus.getTime() == pedestrian.getMostImportantStimulus().getTime()));
+        pedestrians.forEach(pedestrian -> assertEquals(expectedStimulus.getTime(), pedestrian.getMostImportantStimulus().getTime(), 0.0));
     }
 
 
@@ -187,7 +187,7 @@ public class SimplePerceptionModelTest {
         simplePerceptionModel.update(getPedSpecififStimuli(pedestrians, stimuli));
 
         // Use "==" to compare if it is the same reference!
-        pedestrians.forEach(pedestrian -> assertTrue(expectedStimulus == pedestrian.getMostImportantStimulus()));
+        pedestrians.forEach(pedestrian -> assertSame(expectedStimulus, pedestrian.getMostImportantStimulus()));
     }
 
 
@@ -212,7 +212,7 @@ public class SimplePerceptionModelTest {
         simplePerceptionModel.update(getPedSpecififStimuli(pedestrians, stimuli));
 
         // Use "==" to compare if it is the same reference!
-        pedestrians.forEach(pedestrian -> assertTrue(expectedStimulus == pedestrian.getMostImportantStimulus()));
+        pedestrians.forEach(pedestrian -> assertSame(expectedStimulus, pedestrian.getMostImportantStimulus()));
     }
 
     private HashMap<Pedestrian, List<Stimulus>> getPedSpecififStimuli(List<Pedestrian> pedestrians, List<Stimulus> stimuli){

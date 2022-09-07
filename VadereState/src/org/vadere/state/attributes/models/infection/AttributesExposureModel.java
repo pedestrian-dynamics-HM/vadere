@@ -1,9 +1,9 @@
 package org.vadere.state.attributes.models.infection;
 
-import org.vadere.util.Attributes;
+import org.vadere.state.attributes.Attributes;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.List;
 
 /**
  * AttributesExposureModel contains user-defined properties describing the
@@ -11,16 +11,16 @@ import java.util.Arrays;
  */
 public abstract class AttributesExposureModel extends Attributes {
 
-    private ArrayList<AttributesExposureModelSourceParameters> exposureModelSourceParameters;
+    private final ArrayList<AttributesExposureModelSourceParameters> exposureModelSourceParameters;
 
     /**
      * Contains the Ids of pedestrians that are directly set into the topography (and not spawned by  sources).
      * Any agent contained in the list is infectious. All others (not spawned by sources) are not infectious.
      */
-    private ArrayList<Integer> infectiousPedestrianIdsNoSource;
+    private final ArrayList<Integer> infectiousPedestrianIdsNoSource;
 
     public AttributesExposureModel() {
-        this.exposureModelSourceParameters = new ArrayList<>(Arrays.asList(new AttributesExposureModelSourceParameters()));
+        this.exposureModelSourceParameters = new ArrayList<>(List.of(new AttributesExposureModelSourceParameters()));
         this.infectiousPedestrianIdsNoSource = new ArrayList<>();
     }
 

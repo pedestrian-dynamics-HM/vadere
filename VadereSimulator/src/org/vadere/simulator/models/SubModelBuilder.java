@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Random;
 
 import org.vadere.simulator.projects.Domain;
-import org.vadere.util.Attributes;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.util.reflection.DynamicClassInstantiator;
 

@@ -1,10 +1,12 @@
 package org.vadere.state.scenario;
 
 import org.jetbrains.annotations.NotNull;
-import org.vadere.util.Attributes;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.scenario.AttributesAerosolCloud;
 import org.vadere.state.types.ScenarioElementType;
-import org.vadere.util.geometry.shapes.*;
+import org.vadere.util.geometry.shapes.VCircle;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VShape;
 
 /**
  * AerosolCloud represents one medium of transmission how pathogen can spread among

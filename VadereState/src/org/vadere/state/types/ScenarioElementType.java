@@ -2,7 +2,7 @@ package org.vadere.state.types;
 
 import java.awt.*;
 
-import org.vadere.util.Attributes;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.scenario.*;
 
 public enum ScenarioElementType {
@@ -20,8 +20,8 @@ public enum ScenarioElementType {
 	AEROSOL_CLOUD(Color.YELLOW, AttributesAerosolCloud.class),
 	DROPLETS(Color.YELLOW, AttributesDroplets.class);
 
-	private Color color;
-	private Class<? extends Attributes> clazz;
+	private final Color color;
+	private final Class<? extends Attributes> clazz;
 
 	ScenarioElementType(final Color color, final Class<? extends Attributes> clazz) {
 		this.color = color;

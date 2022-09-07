@@ -3,7 +3,7 @@ package org.vadere.simulator.projects;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
 import org.vadere.simulator.projects.io.JsonConverter;
-import org.vadere.util.Attributes;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.AttributesPsychology;
 import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.scenario.AttributesAgent;
@@ -32,7 +32,7 @@ import difflib.DiffUtils;
  */
 public class Scenario {
 
-	private static Logger logger = Logger.getLogger(Scenario.class);
+	private static final Logger logger = Logger.getLogger(Scenario.class);
 	private ScenarioStore scenarioStore;
 	private ScenarioStore simulationScenarioStore;
 	private DataProcessingJsonManager dataProcessingJsonManager;

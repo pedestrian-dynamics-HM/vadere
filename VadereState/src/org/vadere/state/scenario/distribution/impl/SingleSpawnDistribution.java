@@ -4,7 +4,7 @@ import org.apache.commons.math3.random.RandomGenerator;
 import org.vadere.state.attributes.distributions.AttributesSingleSpawnDistribution;
 import org.vadere.state.scenario.distribution.VDistribution;
 import org.vadere.state.scenario.distribution.registry.RegisterDistribution;
-import org.vadere.util.Attributes;
+import org.vadere.state.attributes.Attributes;
 
 /**
  * @author Aleksandar Ivanov(ivanov0@hm.edu), Lukas Gradl (lgradl@hm.edu)

@@ -1,22 +1,23 @@
 package org.vadere.simulator.projects.io;
 
-import java.io.IOException;
-import java.util.List;
-
-import org.vadere.state.attributes.*;
-import org.vadere.util.Attributes;
-import org.vadere.util.version.Version;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.ScenarioStore;
 import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
+import org.vadere.state.attributes.Attributes;
+import org.vadere.state.attributes.AttributesPsychology;
+import org.vadere.state.attributes.AttributesSimulation;
+import org.vadere.state.attributes.ModelDefinition;
 import org.vadere.state.psychology.perception.json.StimulusInfoStore;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.reflection.DynamicClassInstantiator;
+import org.vadere.util.version.Version;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.io.IOException;
+import java.util.List;
 
 public class JsonConverter {
 	

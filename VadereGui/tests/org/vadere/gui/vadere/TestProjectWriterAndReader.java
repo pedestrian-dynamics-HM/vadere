@@ -9,7 +9,7 @@ import org.vadere.simulator.projects.ScenarioStore;
 import org.vadere.simulator.projects.VadereProject;
 import org.vadere.simulator.projects.io.IOVadere;
 import org.vadere.simulator.projects.io.JsonConverter;
-import org.vadere.util.Attributes;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.models.AttributesOSM;
@@ -33,8 +33,8 @@ import static org.junit.Assert.assertEquals;
 public class TestProjectWriterAndReader {
 
 	private static VadereProject testProject;
-	private static String testProjectName = "testprojectname";
-	private static String testName = "testname";
+	private static final String testProjectName = "testprojectname";
+	private static final String testName = "testname";
 
 	/**
 	 * @throws java.lang.Exception

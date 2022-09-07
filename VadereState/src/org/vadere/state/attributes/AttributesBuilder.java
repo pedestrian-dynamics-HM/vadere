@@ -2,7 +2,6 @@ package org.vadere.state.attributes;
 
 
 
-import org.vadere.util.Attributes;
 import org.vadere.util.logging.Logger;
 
 import java.lang.reflect.Field;
@@ -13,7 +12,7 @@ import java.lang.reflect.Field;
  */
 public class AttributesBuilder<T extends Attributes> {
 
-    private static Logger logger = Logger.getLogger(AttributesBuilder.class);
+    private static final Logger logger = Logger.getLogger(AttributesBuilder.class);
     private final T attributes;
 
     @SuppressWarnings("unchecked")

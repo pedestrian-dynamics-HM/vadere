@@ -1,31 +1,31 @@
 package org.vadere.state.attributes.models;
 
 import org.vadere.annotation.factories.attributes.ModelAttributeClass;
-import org.vadere.util.Attributes;
+import org.vadere.state.attributes.Attributes;
 
 @ModelAttributeClass
 public class AttributesGFM extends Attributes {
 
-	private double gravityFactor = 1;
-	private double normalParticleStiffness = 5000;
-	private double dampingParticle = 40;
-	private double normalObstacleStiffness = 10000;
-	private double dampingObstacle = 40;
-	private double timeStepSize = 0.01;
-	private double dynamicFrictionParticle = 0.25;
-	private double staticFrictionParticle = 0.2;
-	private double dynamicFrictionObstacle = 0.25;
-	private double staticFrictionObstacle = 0.2;
-	private double addhesionCoefficient = 0.1;
-	private double tangentialStiffness = 1000;
-	private double tangentialDissipation = 10;
-	private double startAccelerationX = 0;
-	private double startAccelerationY = 0;
-	private double accelerationTime = 0;
-	private int accelerationId = 0;
-	private double massParticle = 1;
-	private double momOfInertia = 1;
-	private double startOmega = 0;
+	private final double gravityFactor = 1;
+	private final double normalParticleStiffness = 5000;
+	private final double dampingParticle = 40;
+	private final double normalObstacleStiffness = 10000;
+	private final double dampingObstacle = 40;
+	private final double timeStepSize = 0.01;
+	private final double dynamicFrictionParticle = 0.25;
+	private final double staticFrictionParticle = 0.2;
+	private final double dynamicFrictionObstacle = 0.25;
+	private final double staticFrictionObstacle = 0.2;
+	private final double addhesionCoefficient = 0.1;
+	private final double tangentialStiffness = 1000;
+	private final double tangentialDissipation = 10;
+	private final double startAccelerationX = 0;
+	private final double startAccelerationY = 0;
+	private final double accelerationTime = 0;
+	private final int accelerationId = 0;
+	private final double massParticle = 1;
+	private final double momOfInertia = 1;
+	private final double startOmega = 0;
 
 	public double getGravityFactor() {
 		return gravityFactor;

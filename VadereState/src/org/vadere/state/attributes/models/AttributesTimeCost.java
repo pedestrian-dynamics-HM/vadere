@@ -1,7 +1,7 @@
 package org.vadere.state.attributes.models;
 
 import org.vadere.annotation.factories.attributes.ModelAttributeClass;
-import org.vadere.util.Attributes;
+import org.vadere.state.attributes.Attributes;
 
 /**
  * Provides all! parameters for all! time cost functions.
@@ -24,36 +24,36 @@ public class AttributesTimeCost extends Attributes {
 		 * individual loading.
 		 */
 		DYNAMIC,
-		QUEUEGAME;
+		QUEUEGAME
 	}
 
 	/** the standard derivation required for the gaussian method. */
-	private double standardDeviation = 0.7;
+	private final double standardDeviation = 0.7;
 	/** the method of density measurement. */
-	private TimeCostFunctionType type = TimeCostFunctionType.UNIT;
+	private final TimeCostFunctionType type = TimeCostFunctionType.UNIT;
 	/** the weight of the density. */
-	private double obstacleDensityWeight = 3.5;
+	private final double obstacleDensityWeight = 3.5;
 	/**
 	 * (hartmann-2012, c_D) = the weight of the pedestrian that has the some
 	 * target as the potential field that will be generated.
 	 */
-	private double pedestrianSameTargetDensityWeight = 3.5;
+	private final double pedestrianSameTargetDensityWeight = 3.5;
 	/**
 	 * (hartmann-2012, c_D') = the weight of the pedestrian that has on other
 	 * target than the potential field that will be generated.
 	 */
-	private double pedestrianOtherTargetDensityWeight = 3.5;
+	private final double pedestrianOtherTargetDensityWeight = 3.5;
 	/** the weight for the constant loading c in hartmann-2012. */
-	private double pedestrianWeight = 3.5;
+	private final double pedestrianWeight = 3.5;
 	/**
 	 * (queueing only) the factor that influences the queue width. = 1 > means
 	 * lower width. The value should be in the interval [1;infty[.
 	 */
 	// @SerializedName("queueWidthLoading")
-	private double queueWidthLoading = 1;
+	private final double queueWidthLoading = 1;
 
 	/** the loading that will be multiplied to the dynamic loading. */
-	private double pedestrianDynamicWeight = 6.0;
+	private final double pedestrianDynamicWeight = 6.0;
 	/**
 	 * indicate that the dynamic potential field should calculate a individual
 	 * loading for each pedestrian or uses a constant loading strategy. This
@@ -64,17 +64,17 @@ public class AttributesTimeCost extends Attributes {
 	 * set.
 	 */
 	// @SerializedName("loadingType")
-	private LoadingType loadingType = LoadingType.CONSTANT;
+	private final LoadingType loadingType = LoadingType.CONSTANT;
 
 	/**
 	 * only used in TimeCostFunctionObstacleDistance
 	 */
-	private double width = 0.2;
+	private final double width = 0.2;
 
 	/**
 	 * only used in TimeCostFunctionObstacleDistance
 	 */
-	private double height = 1.0;
+	private final double height = 1.0;
 
 	// Getters...
 	public double getWidth() {

@@ -4,7 +4,7 @@ import org.junit.Test;
 import org.vadere.simulator.models.SpeedAdjuster;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTargetGrid;
 import org.vadere.simulator.projects.Domain;
-import org.vadere.util.Attributes;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.models.AttributesOSM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
@@ -24,7 +24,7 @@ import static org.junit.Assert.*;
 
 public class OSMBehaviorControllerTest {
 
-    private static double ALLOWED_DOUBLE_TOLERANCE = 10e-3;
+    private static final double ALLOWED_DOUBLE_TOLERANCE = 10e-3;
 
     private PedestrianOSM pedestrian1;
     private PedestrianOSM pedestrian2;

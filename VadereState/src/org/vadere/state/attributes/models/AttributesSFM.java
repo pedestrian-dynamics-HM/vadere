@@ -1,17 +1,17 @@
 package org.vadere.state.attributes.models;
 
 import org.vadere.annotation.factories.attributes.ModelAttributeClass;
-import org.vadere.util.Attributes;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.types.GradientProviderType;
 
 @ModelAttributeClass
 public class AttributesSFM extends Attributes {
-	private AttributesODEIntegrator attributesODEIntegrator;
-	private GradientProviderType floorGradientProviderType = GradientProviderType.FLOOR_EIKONAL_DISCRETE;
+	private final AttributesODEIntegrator attributesODEIntegrator;
+	private final GradientProviderType floorGradientProviderType = GradientProviderType.FLOOR_EIKONAL_DISCRETE;
 
-	private String targetPotentialModel = "org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid";
-	private String pedestrianPotentialModel = "org.vadere.simulator.models.sfm.PotentialFieldPedestrianSFM";
-	private String obstaclePotentialModel = "org.vadere.simulator.models.sfm.PotentialFieldObstacleSFM";
+	private final String targetPotentialModel = "org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid";
+	private final String pedestrianPotentialModel = "org.vadere.simulator.models.sfm.PotentialFieldPedestrianSFM";
+	private final String obstaclePotentialModel = "org.vadere.simulator.models.sfm.PotentialFieldObstacleSFM";
 
 	public AttributesSFM() {
 		attributesODEIntegrator = new AttributesODEIntegrator();

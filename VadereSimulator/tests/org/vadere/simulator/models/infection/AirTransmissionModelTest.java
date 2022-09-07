@@ -9,7 +9,7 @@ import org.vadere.simulator.control.scenarioelements.TopographyController;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.osm.OptimalStepsModel;
 import org.vadere.simulator.projects.Domain;
-import org.vadere.util.Attributes;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.infection.AttributesAirTransmissionModel;
 import org.vadere.state.attributes.scenario.AttributesAerosolCloud;
 import org.vadere.state.attributes.scenario.AttributesAgent;
@@ -179,7 +179,7 @@ public class AirTransmissionModelTest {
         initUpdate(simTime);
 
         Pedestrian pedestrian = topography.getPedestrianDynamicElements().getElements().stream().filter(p -> !p.isInfectious()).findFirst().get();
-        AirTransmissionModelHealthStatus actualStatus = pedestrian.<AirTransmissionModelHealthStatus>getHealthStatus();
+        AirTransmissionModelHealthStatus actualStatus = pedestrian.getHealthStatus();
         AirTransmissionModelHealthStatus expectedStatus = actualStatus.clone();
 
         runUpdate(simTime);
@@ -195,7 +195,7 @@ public class AirTransmissionModelTest {
         initUpdate(simTime);
 
         Pedestrian pedestrian = topography.getPedestrianDynamicElements().getElements().stream().filter(p -> !p.isInfectious()).findFirst().get();
-        AirTransmissionModelHealthStatus actualStatus = pedestrian.<AirTransmissionModelHealthStatus>getHealthStatus();
+        AirTransmissionModelHealthStatus actualStatus = pedestrian.getHealthStatus();
         AirTransmissionModelHealthStatus unexpectedStatus = actualStatus.clone();
 
         runUpdate(simTime);
@@ -212,7 +212,7 @@ public class AirTransmissionModelTest {
         initUpdate(simTime);
 
         Pedestrian pedestrian = topography.getPedestrianDynamicElements().getElements().stream().filter(p -> !p.isInfectious()).findFirst().get();
-        AirTransmissionModelHealthStatus actualStatus = pedestrian.<AirTransmissionModelHealthStatus>getHealthStatus();
+        AirTransmissionModelHealthStatus actualStatus = pedestrian.getHealthStatus();
         AirTransmissionModelHealthStatus unexpectedStatus = actualStatus.clone();
 
         runUpdate(simTime);
@@ -482,7 +482,7 @@ public class AirTransmissionModelTest {
 
         airTransmissionModel.deleteExpiredDroplets(simTimeInSec);
 
-        Assert.assertTrue(topography.getDroplets().size() == 0);
+        Assert.assertEquals(0, topography.getDroplets().size());
     }
 
     public void initTestDeleteExpiredDroplets(double lifeTime) {
@@ -502,7 +502,7 @@ public class AirTransmissionModelTest {
     public void testUpdatePedestriansExposureOutsideDroplets() {
         Pedestrian pedestrian = testUpdatePedestriansExposureToDroplets(true);
 
-        Assert.assertTrue(pedestrian.getDegreeOfExposure() == 0);
+        Assert.assertEquals(0, pedestrian.getDegreeOfExposure(), 0.0);
     }
 
     private Pedestrian testUpdatePedestriansExposureToDroplets(boolean pedestrianOutsideDroplets) {

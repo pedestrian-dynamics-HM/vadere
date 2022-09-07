@@ -3,7 +3,7 @@ package org.vadere.simulator.models.potential.fields;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.potential.PedestrianRepulsionPotentialCycle;
 import org.vadere.simulator.projects.Domain;
-import org.vadere.util.Attributes;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Topography;

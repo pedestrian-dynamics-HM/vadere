@@ -5,7 +5,6 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.Path2D;
 import java.awt.geom.PathIterator;
-import java.awt.geom.Rectangle2D;
 import java.util.Collections;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -278,7 +277,7 @@ public class VPolygon extends Path2D.Double implements VShape {
 		VPoint deltaCurLast = VPoint.ZERO;
 		VPoint deltaNxtCur = VPoint.ZERO;
 		VPoint deltaNxtLast = VPoint.ZERO;
-		double coord[] = new double[2];
+		double[] coord = new double[2];
 		double distCurLast;
 		double distNxtCur;
 		double distNxtLastScaled;
@@ -345,9 +344,9 @@ public class VPolygon extends Path2D.Double implements VShape {
 	public LinkedList<VPolygon> borderAsShapes(double borderWidth, double shapeShrinkOffset, double segmentGrowOffset) {
 		LinkedList<VPolygon> border = new LinkedList<VPolygon>();
 		PathIterator vertexItr = getPathIterator(null);
-		double lastVertex[] = null;
-		double curVertex[] = new double[2];
-		double delta[] = new double[2];
+		double[] lastVertex = null;
+		double[] curVertex = new double[2];
+		double[] delta = new double[2];
 		double dist;
 		double borderOffset = borderWidth / 2.0;
 
@@ -574,10 +573,7 @@ public class VPolygon extends Path2D.Double implements VShape {
 		List<VPoint> thisPoints = this.getPoints();
 		List<VPoint> otherPoints = other.getPoints();
 
-		if (!thisPoints.equals(otherPoints))
-			return false;
-
-		return true;
+		return thisPoints.equals(otherPoints);
 	}
 
 	@Override

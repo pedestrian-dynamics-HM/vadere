@@ -7,7 +7,7 @@ import org.vadere.state.attributes.scenario.AttributesAerosolCloud;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
 
-import static org.vadere.util.Attributes.ID_NOT_SET;
+import static org.vadere.state.attributes.Attributes.ID_NOT_SET;
 
 
 public class AerosolCloudTest {

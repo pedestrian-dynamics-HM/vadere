@@ -1,6 +1,6 @@
 package org.vadere.state.attributes.models.infection;
 
-import org.vadere.util.Attributes;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.AttributesEmbedShape;
 
 /**
@@ -12,12 +12,12 @@ public class AttributesExposureModelSourceParameters extends Attributes {
     /**
      * Default value -1 refers to any source that has not referenced explicitly by another sourceId.
      */
-    private int sourceId;
+    private final int sourceId;
 
     /**
      * Describes whether agents from this source are infectious or not.
      */
-    private boolean infectious;
+    private final boolean infectious;
 
 
 

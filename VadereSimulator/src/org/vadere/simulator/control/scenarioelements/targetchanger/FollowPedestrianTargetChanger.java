@@ -2,13 +2,8 @@ package org.vadere.simulator.control.scenarioelements.targetchanger;
 
 
 import org.apache.commons.math3.distribution.BinomialDistribution;
-import org.vadere.util.Attributes;
-import org.vadere.state.scenario.Agent;
-import org.vadere.state.scenario.Pedestrian;
-import org.vadere.state.scenario.TargetChanger;
-import org.vadere.state.scenario.TargetChangerAlgorithmType;
-import org.vadere.state.scenario.TargetPedestrian;
-import org.vadere.state.scenario.Topography;
+import org.vadere.state.attributes.Attributes;
+import org.vadere.state.scenario.*;
 
 import java.util.Collection;
 import java.util.List;
@@ -62,7 +57,7 @@ public class FollowPedestrianTargetChanger extends BaseTargetChangerAlgorithm {
 			// Try to use a pedestrian which has already some followers
 			// to avoid calculating multiple dynamic floor fields.
 			List<Pedestrian> pedsWithFollowers = pedsWithCorrectTargetId.stream()
-					.filter(pedestrian -> pedestrian.getFollowers().isEmpty() == false)
+					.filter(pedestrian -> !pedestrian.getFollowers().isEmpty())
 					.collect(Collectors.toList());
 
 			Pedestrian pedToFollow = (pedsWithFollowers.isEmpty()) ? pedsWithCorrectTargetId.get(0) : pedsWithFollowers.get(0);

@@ -8,7 +8,7 @@ import org.vadere.state.scenario.spawner.impl.LERPSpawner;
 import org.vadere.state.scenario.spawner.impl.MixedSpawner;
 import org.vadere.state.scenario.spawner.impl.RegularSpawner;
 import org.vadere.state.scenario.spawner.impl.TimeSeriesSpawner;
-import org.vadere.util.AttributesAttached;
+import org.vadere.state.scenario.AttributesAttached;
 
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,

@@ -2,7 +2,7 @@ package org.vadere.simulator.models;
 
 import org.vadere.simulator.control.simulation.ControllerProvider;
 import org.vadere.simulator.projects.Domain;
-import org.vadere.util.Attributes;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.exceptions.AttributesMultiplyDefinedException;
 import org.vadere.state.attributes.exceptions.AttributesNotFoundException;
 import org.vadere.state.attributes.scenario.AttributesAgent;

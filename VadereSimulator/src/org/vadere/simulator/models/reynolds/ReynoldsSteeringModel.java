@@ -11,7 +11,7 @@ import org.vadere.simulator.models.reynolds.behaviour.Separation;
 import org.vadere.simulator.models.reynolds.behaviour.WallAvoidance;
 import org.vadere.simulator.models.reynolds.behaviour.Wander;
 import org.vadere.simulator.projects.Domain;
-import org.vadere.util.Attributes;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesReynolds;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.psychology.cognition.UnsupportedSelfCategoryException;
@@ -32,12 +32,12 @@ public class ReynoldsSteeringModel implements MainModel {
 	private Random random;
 	private Domain domain;
 
-	private Seek bSeek;
-	private Separation bSeparation;
-	private Containment bContainment;
-	private CollisionAvoidance bCollisionAvoidance;
-	private WallAvoidance bWallAvoidance;
-	private Wander bWander;
+	private final Seek bSeek;
+	private final Separation bSeparation;
+	private final Containment bContainment;
+	private final CollisionAvoidance bCollisionAvoidance;
+	private final WallAvoidance bWallAvoidance;
+	private final Wander bWander;
 	private List<Model> submodels;
 
 	public ReynoldsSteeringModel() {
@@ -77,7 +77,7 @@ public class ReynoldsSteeringModel implements MainModel {
 		Iterator<Pedestrian> it = pedestrians.iterator();
 		double maxSpeed = 3;
 
-		for (; it.hasNext();) {
+		while (it.hasNext()) {
 			PedestrianReynolds ped = (PedestrianReynolds) it.next();
 			Vector2D mov = new Vector2D(0, 0);
 

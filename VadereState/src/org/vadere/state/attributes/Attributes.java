@@ -1,4 +1,6 @@
-package org.vadere.util;
+package org.vadere.state.attributes;
+
+import org.vadere.util.DefaultSealable;
 
 import java.io.IOException;
 

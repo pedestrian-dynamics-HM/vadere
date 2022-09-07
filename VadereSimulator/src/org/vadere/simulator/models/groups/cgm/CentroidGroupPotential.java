@@ -4,7 +4,7 @@ import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
 import org.vadere.simulator.projects.Domain;
-import org.vadere.util.Attributes;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesCGM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
@@ -23,7 +23,7 @@ import java.util.Random;
 @ModelClass
 public class CentroidGroupPotential implements PotentialFieldAgent {
 
-	private static Logger logger = Logger.getLogger(CentroidGroupPotential.class);
+	private static final Logger logger = Logger.getLogger(CentroidGroupPotential.class);
 
 	private final AttributesCGM attributesCGM;
 	private final CentroidGroupModel groupCollection;

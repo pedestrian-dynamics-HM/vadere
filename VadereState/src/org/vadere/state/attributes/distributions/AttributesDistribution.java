@@ -1,9 +1,9 @@
 package org.vadere.state.attributes.distributions;
+
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.scenario.distribution.impl.SingleSpawnDistribution;
-import org.vadere.util.Attributes;
 
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,

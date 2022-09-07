@@ -1,9 +1,9 @@
 package org.vadere.state.attributes.scenario.builder;
 
-import org.vadere.util.Attributes;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.scenario.AttributesStairs;
-import org.vadere.util.geometry.shapes.Vector2D;
 import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.util.geometry.shapes.Vector2D;
 
 public final class AttributesStairsBuilder {
 	private VShape shape = null;

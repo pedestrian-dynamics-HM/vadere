@@ -5,7 +5,7 @@ import org.jetbrains.annotations.Nullable;
 import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
 import org.vadere.simulator.projects.Domain;
-import org.vadere.util.Attributes;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
@@ -30,7 +30,7 @@ import java.util.function.Function;
  */
 public class PotentialFieldTarget implements IPotentialFieldTarget {
 
-	private static Logger logger = Logger.getLogger(PotentialFieldTargetGrid.class);
+	private static final Logger logger = Logger.getLogger(PotentialFieldTargetGrid.class);
 
 	/**
 	 * the simulation time in seconds in which the last update was performed.
@@ -50,12 +50,12 @@ public class PotentialFieldTarget implements IPotentialFieldTarget {
 	/**
 	 * configuration of the potential fields.
 	 */
-	private AttributesFloorField attributes;
+	private final AttributesFloorField attributes;
 
 	/**
 	 * configuration of the agents.
 	 */
-	private AttributesAgent attributesPedestrian;
+	private final AttributesAgent attributesPedestrian;
 
 	/**
 	 * Stores all potential fields which represent to a target (targetId).

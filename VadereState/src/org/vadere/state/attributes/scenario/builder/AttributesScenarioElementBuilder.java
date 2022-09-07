@@ -1,7 +1,7 @@
 package org.vadere.state.attributes.scenario.builder;
 
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.AttributesScenarioElement;
-import org.vadere.util.Attributes;
 
 public final class AttributesScenarioElementBuilder {
     private Integer id = Attributes.ID_NOT_SET;

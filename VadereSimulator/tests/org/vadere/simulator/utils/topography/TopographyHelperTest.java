@@ -5,7 +5,7 @@ import org.vadere.simulator.models.SpeedAdjuster;
 import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTargetGrid;
 import org.vadere.simulator.projects.Domain;
-import org.vadere.util.Attributes;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.models.AttributesOSM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
@@ -25,7 +25,7 @@ import static org.junit.Assert.*;
 
 public class TopographyHelperTest {
 
-    private static double ALLOWED_DOUBLE_TOLERANCE = 10e-3;
+    private static final double ALLOWED_DOUBLE_TOLERANCE = 10e-3;
 
     private PedestrianOSM pedestrian1;
     private PedestrianOSM pedestrian2;
@@ -164,7 +164,7 @@ public class TopographyHelperTest {
             currentPedestrian.setMostImportantStimulus(new ElapsedTime());
             currentPedestrian.setSelfCategory(SelfCategory.TARGET_ORIENTED);
 
-            LinkedList<Integer> targetIds = (usePedIdAsTargetId) ? new LinkedList<>(Arrays.asList(i)) : new LinkedList<>();
+            LinkedList<Integer> targetIds = (usePedIdAsTargetId) ? new LinkedList<>(List.of(i)) : new LinkedList<>();
             currentPedestrian.setTargets(targetIds);
 
             pedestrians.add(currentPedestrian);

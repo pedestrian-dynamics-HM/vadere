@@ -16,7 +16,7 @@ import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.util.StateJsonConverter;
-import org.vadere.util.Attributes;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.observer.NotifyContext;
 

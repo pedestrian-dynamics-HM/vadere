@@ -17,7 +17,7 @@ import org.vadere.state.psychology.perception.json.StimulusInfo;
 import org.vadere.state.psychology.perception.json.StimulusInfoStore;
 import org.vadere.state.scenario.*;
 import org.vadere.state.types.ScenarioElementType;
-import org.vadere.util.Attributes;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.reflection.DynamicClassInstantiator;
 
@@ -39,15 +39,15 @@ public abstract class StateJsonConverter {
 	private static final TypeReference<Map<String, Object>> mapTypeReference =
 			new TypeReference<Map<String, Object>>() {};
 
-	private static Logger logger = Logger.getLogger(StateJsonConverter.class);
+	private static final Logger logger = Logger.getLogger(StateJsonConverter.class);
 
 	/** Connection to jackson library. */
-	private static ObjectMapper mapper = new JacksonObjectMapper(new Random());
+	private static final ObjectMapper mapper = new JacksonObjectMapper(new Random());
 
 	/** Connection to jackson library. */
-	private static ObjectWriter prettyWriter = mapper.writerWithDefaultPrettyPrinter();
+	private static final ObjectWriter prettyWriter = mapper.writerWithDefaultPrettyPrinter();
 
-	private static ObjectWriter writer = mapper.writer();
+	private static final ObjectWriter writer = mapper.writer();
 
 	public static ObjectMapper getMapper() {
 		return mapper;

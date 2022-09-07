@@ -7,7 +7,7 @@ import org.vadere.gui.topographycreator.control.attribtable.cells.renderer.Field
 import org.vadere.gui.topographycreator.control.attribtable.cells.renderer.FieldValueRenderer;
 import org.vadere.gui.topographycreator.control.attribtable.model.AttributeTableModel;
 import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
-import org.vadere.util.Attributes;
+import org.vadere.state.attributes.Attributes;
 
 import javax.swing.*;
 import java.awt.*;

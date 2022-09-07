@@ -1,6 +1,6 @@
 package org.vadere.state.attributes.scenario.builder;
 
-import org.vadere.util.Attributes;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 
 public final class AttributesAgentBuilder {

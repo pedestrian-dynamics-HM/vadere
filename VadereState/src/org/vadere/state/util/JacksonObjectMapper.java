@@ -10,12 +10,12 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.scenario.DynamicElement;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.distribution.VDistribution;
 import org.vadere.state.scenario.spawner.VSpawner;
 import org.vadere.state.types.ScenarioElementType;
-import org.vadere.util.Attributes;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.*;
 

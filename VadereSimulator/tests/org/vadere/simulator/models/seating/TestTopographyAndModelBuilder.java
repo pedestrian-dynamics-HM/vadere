@@ -1,6 +1,7 @@
 package org.vadere.simulator.models.seating;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
@@ -8,7 +9,7 @@ import java.util.Scanner;
 
 import org.vadere.simulator.models.seating.trainmodel.TrainModel;
 import org.vadere.simulator.projects.Domain;
-import org.vadere.util.Attributes;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesSeating;
 import org.vadere.state.scenario.Et423Geometry;
 import org.vadere.state.scenario.Topography;
@@ -30,7 +31,7 @@ public class TestTopographyAndModelBuilder {
 	public static final int nSourcesLeft = 24;
 	public static final int nSourcesRight = 24;
 
-	private Topography topography;
+	private final Topography topography;
 
 	public TestTopographyAndModelBuilder() {
 		topography = createTestTopography();
@@ -55,7 +56,7 @@ public class TestTopographyAndModelBuilder {
 	private Topography createTestTopography() {
 		try {
 			@SuppressWarnings("resource")
-			final String json = new Scanner(TestTopographyAndModelBuilder.class.getResourceAsStream(TEST_TRAIN_TOPOGRAPHY_RESOURCE), "UTF-8").useDelimiter("\\A").next();
+			final String json = new Scanner(TestTopographyAndModelBuilder.class.getResourceAsStream(TEST_TRAIN_TOPOGRAPHY_RESOURCE), StandardCharsets.UTF_8).useDelimiter("\\A").next();
 			return StateJsonConverter.deserializeTopography(json);
 		} catch (IOException e) {
 			e.printStackTrace();

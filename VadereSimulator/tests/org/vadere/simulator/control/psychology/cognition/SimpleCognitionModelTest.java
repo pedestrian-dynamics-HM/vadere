@@ -2,7 +2,7 @@ package org.vadere.simulator.control.psychology.cognition;
 
 import org.junit.Test;
 import org.vadere.simulator.control.psychology.cognition.models.SimpleCognitionModel;
-import org.vadere.util.Attributes;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.psychology.perception.types.*;
@@ -19,7 +19,7 @@ import static org.junit.Assert.assertEquals;
 
 public class SimpleCognitionModelTest {
 
-    private List<Attributes> attributes = new LinkedList<>();
+    private final List<Attributes> attributes = new LinkedList<>();
 
     private Topography createTopography() {
         return new Topography();

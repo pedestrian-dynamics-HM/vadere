@@ -4,7 +4,7 @@ import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
 import org.vadere.simulator.projects.Domain;
-import org.vadere.util.Attributes;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesPotentialCompactSoftshell;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
@@ -22,7 +22,7 @@ import java.util.Random;
 @ModelClass
 public class PotentialFieldObstacleCompactSoftshell implements PotentialFieldObstacle {
 
-	private static Logger log = Logger.getLogger(PotentialFieldObstacleCompactSoftshell.class);
+	private static final Logger log = Logger.getLogger(PotentialFieldObstacleCompactSoftshell.class);
 	private AttributesPotentialCompactSoftshell attributes;
 	private Random random;
 	private double width;

@@ -5,7 +5,7 @@ import org.vadere.simulator.control.scenarioelements.SourceController;
 import org.vadere.simulator.control.scenarioelements.TopographyController;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.projects.Domain;
-import org.vadere.util.Attributes;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.infection.AttributesThresholdResponseModel;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.health.ExposureModelHealthStatus;

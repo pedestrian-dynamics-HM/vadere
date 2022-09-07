@@ -1,6 +1,6 @@
 package org.vadere.state.attributes.processor;
 
-import org.vadere.util.Attributes;
+import org.vadere.state.attributes.Attributes;
 
 /**
  * Attributes for data processors.

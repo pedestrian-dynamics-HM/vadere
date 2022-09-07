@@ -1,6 +1,6 @@
 package org.vadere.state.attributes.scenario;
 
-import org.vadere.util.Attributes;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.scenario.ReferenceCoordinateSystem;
 import org.vadere.util.geometry.shapes.VRectangle;
 
@@ -10,8 +10,8 @@ public class AttributesTopography extends Attributes {
 
 	// private double finishTime = 500; // moved to AttributesSimulation
 	private VRectangle bounds = new VRectangle(0, 0, 10, 10);
-	private double boundingBoxWidth = 0.5;
-	private boolean bounded = true;
+	private final double boundingBoxWidth = 0.5;
+	private final boolean bounded = true;
 	/**
 	 *  Reference coordinate system to translate vadere topography to world cooridnate systems
 	 *  such as UTM zones, or GPS lon lat.

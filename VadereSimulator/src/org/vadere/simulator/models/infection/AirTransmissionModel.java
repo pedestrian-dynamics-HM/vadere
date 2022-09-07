@@ -6,7 +6,7 @@ import org.vadere.simulator.control.scenarioelements.SourceController;
 import org.vadere.simulator.control.scenarioelements.TopographyController;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.projects.Domain;
-import org.vadere.util.Attributes;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.infection.AttributesAirTransmissionModel;
 import org.vadere.state.attributes.models.infection.AttributesExposureModelSourceParameters;
 import org.vadere.state.attributes.scenario.AttributesAerosolCloud;

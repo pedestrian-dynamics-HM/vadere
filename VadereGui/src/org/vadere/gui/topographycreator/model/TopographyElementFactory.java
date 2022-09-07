@@ -1,7 +1,6 @@
 package org.vadere.gui.topographycreator.model;
 
-import org.vadere.state.attributes.spawner.AttributesRegularSpawner;
-import org.vadere.util.Attributes;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.scenario.*;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.types.ScenarioElementType;
@@ -15,7 +14,7 @@ import org.vadere.util.geometry.shapes.VShape;
  *
  */
 public class TopographyElementFactory {
-	private static TopographyElementFactory instance = new TopographyElementFactory();
+	private static final TopographyElementFactory instance = new TopographyElementFactory();
 
 	private TopographyElementFactory() {}
 

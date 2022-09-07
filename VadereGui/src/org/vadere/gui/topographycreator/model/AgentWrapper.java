@@ -1,6 +1,6 @@
 package org.vadere.gui.topographycreator.model;
 
-import org.vadere.util.Attributes;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
@@ -34,7 +34,7 @@ public final class AgentWrapper extends ScenarioElement {
 	}
 
 	public AgentWrapper(final Agent agent) {
-		this.agent = (Agent) agent.clone();
+		this.agent = agent.clone();
 	}
 
 	public Agent getAgentInitialStore() {
@@ -83,7 +83,7 @@ public final class AgentWrapper extends ScenarioElement {
 
 	@Override
 	public AgentWrapper clone() {
-		return new AgentWrapper((Agent) agent.clone());
+		return new AgentWrapper(agent.clone());
 	}
 
 }

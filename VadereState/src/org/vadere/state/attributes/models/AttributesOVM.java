@@ -1,18 +1,18 @@
 package org.vadere.state.attributes.models;
 
 import org.vadere.annotation.factories.attributes.ModelAttributeClass;
-import org.vadere.util.Attributes;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.util.geometry.shapes.VPoint;
 
 @ModelAttributeClass
 public class AttributesOVM extends Attributes {
 
-	private AttributesODEIntegrator attributesODEIntegrator;
-	private double sensitivity = 1.0;
-	private double sightDistance = 10.0;
-	private double sightDistanceFactor = 1.0;
-	private VPoint firstDistanceRandom = new VPoint(5, 15);
-	private boolean ignoreOtherCars = true;
+	private final AttributesODEIntegrator attributesODEIntegrator;
+	private final double sensitivity = 1.0;
+	private final double sightDistance = 10.0;
+	private final double sightDistanceFactor = 1.0;
+	private final VPoint firstDistanceRandom = new VPoint(5, 15);
+	private final boolean ignoreOtherCars = true;
 
 	public AttributesOVM() {
 		attributesODEIntegrator = new AttributesODEIntegrator();

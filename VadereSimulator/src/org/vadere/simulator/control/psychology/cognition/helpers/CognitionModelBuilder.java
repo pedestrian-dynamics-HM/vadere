@@ -3,7 +3,7 @@ package org.vadere.simulator.control.psychology.cognition.helpers;
 import org.vadere.simulator.control.psychology.cognition.models.ICognitionModel;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.projects.ScenarioStore;
-import org.vadere.util.Attributes;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.psychology.cognition.AttributesCognitionModel;
 import org.vadere.util.reflection.DynamicClassInstantiator;
 

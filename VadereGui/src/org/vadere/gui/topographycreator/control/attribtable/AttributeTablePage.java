@@ -3,7 +3,7 @@ package org.vadere.gui.topographycreator.control.attribtable;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.topographycreator.control.attribtable.model.AttributeTableModel;
 import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
-import org.vadere.util.Attributes;
+import org.vadere.state.attributes.Attributes;
 
 import javax.swing.*;
 import java.awt.*;

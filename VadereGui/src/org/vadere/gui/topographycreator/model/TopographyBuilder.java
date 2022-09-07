@@ -2,7 +2,7 @@ package org.vadere.gui.topographycreator.model;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.topographycreator.control.AttributeModifier;
-import org.vadere.util.Attributes;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesCar;
 import org.vadere.state.attributes.scenario.AttributesTopography;
@@ -43,12 +43,12 @@ public class TopographyBuilder implements Iterable<ScenarioElement> {
 	private LinkedList<AbsorbingArea> absorbingAreas;
 	private LinkedList<MeasurementArea> measurementAreas;
 	private Teleporter teleporter;
-	private LinkedList<ScenarioElement> topographyElements;
+	private final LinkedList<ScenarioElement> topographyElements;
 	private AttributesTopography attributes;
 	private AttributesAgent attributesPedestrian;
 	private AttributesCar attributesCar;
 
-	private AtomicInteger idProvider;
+	private final AtomicInteger idProvider;
 
 	/**
 	 * Default-Constructor that initialize an empty TopographyBuilder.

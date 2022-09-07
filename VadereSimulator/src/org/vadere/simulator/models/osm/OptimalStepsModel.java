@@ -17,7 +17,7 @@ import org.vadere.simulator.models.potential.fields.IPotentialFieldTargetGrid;
 import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
 import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
 import org.vadere.simulator.projects.Domain;
-import org.vadere.util.Attributes;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesOSM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.DynamicElement;
@@ -45,12 +45,12 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 	private IPotentialFieldTarget potentialFieldTarget;
 	private PotentialFieldObstacle potentialFieldObstacle;
 	private PotentialFieldAgent potentialFieldPedestrian;
-	private List<SpeedAdjuster> speedAdjusters;
-	private List<StepSizeAdjuster> stepSizeAdjusters;
+	private final List<SpeedAdjuster> speedAdjusters;
+	private final List<StepSizeAdjuster> stepSizeAdjusters;
 	private Domain domain;
 	private double lastSimTimeInSec;
 	private ExecutorService executorService;
-	private List<Model> models = new LinkedList<>();
+	private final List<Model> models = new LinkedList<>();
 
 	public OptimalStepsModel() {
 		this.speedAdjusters = new LinkedList<>();
@@ -135,10 +135,7 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 			@NotNull final List<Attributes> attributesList,
 			@NotNull final Topography topography,
 			@NotNull final AttributesOSM attributesOSM) {
-		switch (attributesOSM.getUpdateType()) {
-			case PARALLEL_OPEN_CL: {
-				throw new UnsupportedOperationException("not jet implemented.");
-				/*return UpdateSchemeOSM.createOpenCLUpdateScheme(
+		/*return UpdateSchemeOSM.createOpenCLUpdateScheme(
 						topography,
 						attributesOSM,
 						Model.findAttributes(attributesList, AttributesFloorField.class),
@@ -210,9 +207,11 @@ public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 							}
 						}
 						);
-			*/}
-			default: return UpdateSchemeOSM.create(attributesOSM.getUpdateType(), topography, random, getPotentialFieldAgent().getMaximalInfluenceRadius());
+			*/
+		if (attributesOSM.getUpdateType() == UpdateType.PARALLEL_OPEN_CL) {
+			throw new UnsupportedOperationException("not jet implemented.");
 		}
+		return UpdateSchemeOSM.create(attributesOSM.getUpdateType(), topography, random, getPotentialFieldAgent().getMaximalInfluenceRadius());
 	}
 
 	@Override

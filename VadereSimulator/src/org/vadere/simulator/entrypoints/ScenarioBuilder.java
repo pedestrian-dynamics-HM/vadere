@@ -3,7 +3,7 @@ package org.vadere.simulator.entrypoints;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.ScenarioStore;
-import org.vadere.util.Attributes;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.AttributesBuilder;
 import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.scenario.AttributesAgent;
@@ -28,10 +28,10 @@ import java.util.List;
  *
  */
 public class ScenarioBuilder {
-    private static Logger logger = Logger.getLogger(ScenarioBuilder.class);
+    private static final Logger logger = Logger.getLogger(ScenarioBuilder.class);
 
-    private Scenario scenario;
-    private ScenarioStore store;
+    private final Scenario scenario;
+    private final ScenarioStore store;
 
     public ScenarioBuilder(final Scenario base) {
         scenario = base.clone();
@@ -78,7 +78,7 @@ public class ScenarioBuilder {
 			builder = new AttributesBuilder<>((E) store.getTopography().getAttributes());
             builder.setField(fieldName, value);
             ReflectionAttributeModifier reflectionAttributeModifier = new ReflectionAttributeModifier();
-			reflectionAttributeModifier.setAttributes(store.getTopography(), builder.build());
+			ReflectionAttributeModifier.setAttributes(store.getTopography(), builder.build());
         }
         else {
             builder = new AttributesBuilder<>(store.getAttributes(clazz));

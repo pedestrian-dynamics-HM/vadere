@@ -2,7 +2,6 @@ package org.vadere.state.attributes;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.vadere.util.Attributes;
 
 import java.io.File;
 import java.io.IOException;
@@ -45,7 +44,7 @@ public class TestAttributesSerializability {
 		pathToAttributePackage =
 				uriToAttributePackage.toString().replaceAll(Attributes.class.getSimpleName() + ".class", "");
 		packagePath = Attributes.class.getProtectionDomain().getCodeSource().getLocation().getPath();
-		packagePath = pathToAttributePackage.toString().substring(pathToAttributePackage.lastIndexOf(packagePath))
+		packagePath = pathToAttributePackage.substring(pathToAttributePackage.lastIndexOf(packagePath))
 				.replaceAll(packagePath, "").replaceAll("/", ".");
 
 		if (packagePath.endsWith(".")) {

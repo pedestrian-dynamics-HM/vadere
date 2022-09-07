@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.projects.io.JsonConverter;
-import org.vadere.util.Attributes;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.AttributesPsychology;
 import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.scenario.AttributesCar;
@@ -27,7 +27,7 @@ import java.util.function.Predicate;
  */
 public class ScenarioStore {
 
-	private static Logger logger = Logger.getLogger(ScenarioStore.class);
+	private static final Logger logger = Logger.getLogger(ScenarioStore.class);
 	private String name;
 	private String description;
 	private String mainModel;

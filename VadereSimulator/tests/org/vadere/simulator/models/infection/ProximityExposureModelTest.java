@@ -8,7 +8,7 @@ import org.vadere.simulator.control.scenarioelements.TopographyController;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.osm.OptimalStepsModel;
 import org.vadere.simulator.projects.Domain;
-import org.vadere.util.Attributes;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.infection.AttributesProximityExposureModel;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.health.BasicExposureModelHealthStatus;
@@ -78,7 +78,7 @@ public class ProximityExposureModelTest {
 
     @Test
     public void testUpdateAgentWithinRangeOfInfectiousAgent() {
-        double expectedDegreeOfExposure = proximityExposureModel.MAX_DEG_OF_EXPOSURE;
+        double expectedDegreeOfExposure = ProximityExposureModel.MAX_DEG_OF_EXPOSURE;
         double actualDegreeOfExposure = testUpdate(true);
 
         Assert.assertEquals(expectedDegreeOfExposure, actualDegreeOfExposure, ALLOWED_DOUBLE_TOLERANCE);
@@ -162,11 +162,7 @@ public class ProximityExposureModelTest {
 
         pedestrian.setPosition(position);
 
-        if (infectious) {
-            pedestrian.setInfectious(true);
-        } else {
-            pedestrian.setInfectious(false);
-        }
+        pedestrian.setInfectious(infectious);
 
         topography.addElement(pedestrian);
     }

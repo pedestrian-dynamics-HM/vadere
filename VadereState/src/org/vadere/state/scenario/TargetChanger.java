@@ -1,6 +1,6 @@
 package org.vadere.state.scenario;
 
-import org.vadere.util.Attributes;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.scenario.AttributesTargetChanger;
 import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.geometry.shapes.VShape;
@@ -99,13 +99,8 @@ public class TargetChanger extends ScenarioElement implements Comparable<TargetC
         }
         TargetChanger other = (TargetChanger) obj;
         if (attributes == null) {
-            if (other.attributes != null) {
-                return false;
-            }
-        } else if (!attributes.equals(other.attributes)) {
-            return false;
-        }
-        return true;
+            return other.attributes == null;
+        } else return attributes.equals(other.attributes);
     }
 
     @Override

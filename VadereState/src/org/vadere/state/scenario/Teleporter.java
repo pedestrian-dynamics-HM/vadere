@@ -1,11 +1,13 @@
 package org.vadere.state.scenario;
 
 import org.vadere.util.geometry.shapes.Vector2D;
-import org.vadere.util.Attributes;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.scenario.AttributesTeleporter;
 import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
+
+import java.util.Objects;
 
 public class Teleporter extends ScenarioElement {
 
@@ -67,10 +69,7 @@ public class Teleporter extends ScenarioElement {
 
 		Teleporter that = (Teleporter) o;
 
-		if (attributes != null ? !attributes.equals(that.attributes) : that.attributes != null)
-			return false;
-
-		return true;
+		return Objects.equals(attributes, that.attributes);
 	}
 
 	@Override

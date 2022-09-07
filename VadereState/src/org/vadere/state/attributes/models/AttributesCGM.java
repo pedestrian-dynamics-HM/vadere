@@ -1,14 +1,14 @@
 package org.vadere.state.attributes.models;
 
 import org.vadere.annotation.factories.attributes.ModelAttributeClass;
-import org.vadere.util.Attributes;
+import org.vadere.state.attributes.Attributes;
 
 @ModelAttributeClass
 public class AttributesCGM extends Attributes {
 
-	private double groupMemberRepulsionFactor = 0.01;
-	private double leaderAttractionFactor = 0.003;
-	private boolean lostMembers = false;
+	private final double groupMemberRepulsionFactor = 0.01;
+	private final double leaderAttractionFactor = 0.003;
+	private final boolean lostMembers = false;
 
 	private int waitBehaviourRelevantAgentsFactor = -1;
 

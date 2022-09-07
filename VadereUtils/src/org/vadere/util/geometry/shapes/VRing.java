@@ -1,7 +1,5 @@
 package org.vadere.util.geometry.shapes;
 
-import com.github.davidmoten.rtree.geometry.internal.RectangleDouble;
-
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.PathIterator;
@@ -12,7 +10,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.vadere.util.Attributes;
-import org.vadere.util.geometry.shapes.ShapeType;
 
 /**
  * A ring consists of two circles of different size.
@@ -225,11 +222,7 @@ public class VRing implements VShape {
 		if (this.radiusInnerCircle != other.radiusInnerCircle || this.radiusOuterCircle != other.radiusOuterCircle) {
 			return false;
 		}
-		if (!(this.center.equals(other.center))) {
-			return false;
-		}
-
-		return true;
+		return this.center.equals(other.center);
 	}
 
 	@Override

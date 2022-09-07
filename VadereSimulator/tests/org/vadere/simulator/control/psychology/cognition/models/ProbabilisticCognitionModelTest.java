@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.vadere.util.Attributes;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.psychology.cognition.AttributesProbabilisticCognitionModel;
 import org.vadere.state.attributes.models.psychology.cognition.AttributesRouteChoiceDefinition;
 import org.vadere.state.attributes.scenario.AttributesAgent;
@@ -27,10 +27,10 @@ public class ProbabilisticCognitionModelTest {
     private List<Attributes> attributes;
 
     private AttributesProbabilisticCognitionModel attributesProbabilisticCognitionModel;
-    private String instruction  = "take target 2";
+    private final String instruction  = "take target 2";
 
 
-    private static double ALLOWED_DOUBLE_ERROR = 10e-3;
+    private static final double ALLOWED_DOUBLE_ERROR = 10e-3;
 
     @Before
     public void initializeReactionBehavior(){
@@ -156,10 +156,10 @@ public class ProbabilisticCognitionModelTest {
         pedestrians.stream().forEach(ped -> ped.setMostImportantStimulus(new InformationStimulus("A")));
 
         probabilisticPerceptionModel.update(pedestrians);
-        assertTrue(pedestrians.get(0).getSelfCategory().equals(SelfCategory.CHANGE_TARGET));
+        assertEquals(pedestrians.get(0).getSelfCategory(), SelfCategory.CHANGE_TARGET);
 
         probabilisticPerceptionModel.update(pedestrians);
-        assertTrue(pedestrians.get(0).getSelfCategory().equals(SelfCategory.TARGET_ORIENTED));
+        assertEquals(pedestrians.get(0).getSelfCategory(), SelfCategory.TARGET_ORIENTED);
 
     }
 

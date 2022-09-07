@@ -8,21 +8,14 @@ import org.vadere.simulator.models.groups.Group;
 import org.vadere.simulator.models.groups.GroupSizeDeterminator;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.simulator.projects.Domain;
-import org.vadere.util.Attributes;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesCGM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.DynamicElementContainer;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -41,9 +34,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class CentroidGroupModel extends AbstractGroupModel<CentroidGroup> {
 
 	private Random random;
-	private LinkedHashMap<Integer, CentroidGroup> groupsById;
-	private Map<Integer, LinkedList<CentroidGroup>> sourceNextGroups;
-	private Map<Integer, GroupSizeDeterminator> sourceGroupSizeDeterminator;
+	private final LinkedHashMap<Integer, CentroidGroup> groupsById;
+	private final Map<Integer, LinkedList<CentroidGroup>> sourceNextGroups;
+	private final Map<Integer, GroupSizeDeterminator> sourceGroupSizeDeterminator;
 
 	private Topography topography;
 	private IPotentialFieldTarget potentialFieldTarget;

@@ -1,6 +1,6 @@
 package org.vadere.state.attributes.models.infection;
 
-import org.vadere.util.Attributes;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.scenario.AerosolCloud;
 
 /**
@@ -22,7 +22,7 @@ public class AttributesAirTransmissionModelAerosolCloud extends Attributes {
      * circular extent (in the two-dimensional model). In 3D, we actually imagine them as spheres.
      * Unit: meter
      */
-    private double initialRadius;
+    private final double initialRadius;
 
     /**
      * Describes the amount of pathogen in an aerosol cloud immediately after exhalation.
@@ -30,7 +30,7 @@ public class AttributesAirTransmissionModelAerosolCloud extends Attributes {
      * is mitigated, e.g. by masks.
      * Unit: particles / exhalation
      */
-    private double initialPathogenLoad;
+    private final double initialPathogenLoad;
 
     /**
      * Describes constant dispersion (over time), i.e. the spatial spread over time due to local air movement.
@@ -53,7 +53,7 @@ public class AttributesAirTransmissionModelAerosolCloud extends Attributes {
      * inhalation is mitigated, e.g. by masks.
      * Unit: 1 / inhalation (can also be interpreted as m^3 / inhalation)
      */
-    private double absorptionRate;
+    private final double absorptionRate;
 
     public AttributesAirTransmissionModelAerosolCloud() {
         this.halfLife = 600;

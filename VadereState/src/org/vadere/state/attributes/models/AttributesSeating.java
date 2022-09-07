@@ -1,16 +1,16 @@
 package org.vadere.state.attributes.models;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.apache.commons.math3.util.Pair;
 import org.vadere.annotation.factories.attributes.ModelAttributeClass;
-import org.vadere.util.Attributes;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.seating.SeatRelativePosition;
 import org.vadere.state.attributes.models.seating.ValueWithProbabilityFraction;
 import org.vadere.state.attributes.models.seating.model.SeatPosition;
 import org.vadere.state.scenario.Et423Geometry;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Parameters for the seating model.
@@ -20,17 +20,17 @@ import org.vadere.state.scenario.Et423Geometry;
 public class AttributesSeating extends Attributes {
 
 	/** The train geometry class name used to generate the scenario with Traingen. */
-	private String trainGeometry = Et423Geometry.class.getName();
+	private final String trainGeometry = Et423Geometry.class.getName();
 	
 	/**
 	 * Choices with probabilities for the seat group. <code>true</code> is
 	 * choosing a seat group with the least number of other passengers.
 	 */
-	private List<ValueWithProbabilityFraction<Boolean>> seatGroupChoice;
+	private final List<ValueWithProbabilityFraction<Boolean>> seatGroupChoice;
 
-	private List<ValueWithProbabilityFraction<SeatPosition>> seatChoice0;
+	private final List<ValueWithProbabilityFraction<SeatPosition>> seatChoice0;
 
-	private List<ValueWithProbabilityFraction<SeatRelativePosition>> seatChoice1;
+	private final List<ValueWithProbabilityFraction<SeatRelativePosition>> seatChoice1;
 
 	{
 		// initialize fields with values from data collection

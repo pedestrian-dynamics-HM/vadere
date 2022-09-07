@@ -13,7 +13,7 @@ import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
 import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
 import org.vadere.simulator.models.potential.solver.gradients.GradientProvider;
 import org.vadere.simulator.projects.Domain;
-import org.vadere.util.Attributes;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesGNM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.psychology.cognition.UnsupportedSelfCategoryException;
@@ -35,7 +35,7 @@ public class GradientNavigationModel extends ODEModel<Pedestrian, AttributesAgen
 	private IPotentialFieldTargetGrid potentialFieldTarget;
 	private PotentialFieldObstacle potentialFieldObstacle;
 	private PotentialFieldAgent potentialFieldPedestrian;
-	private List<Model> models = new LinkedList<>();
+	private final List<Model> models = new LinkedList<>();
 
 	@Deprecated
 	public GradientNavigationModel(final Domain domain,

@@ -14,7 +14,7 @@ import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
 import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
 import org.vadere.simulator.models.psychology.selfcategorization.locomotion.UpdateSchemeEventDriven;
 import org.vadere.simulator.projects.Domain;
-import org.vadere.util.Attributes;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesOSM;
 import org.vadere.state.attributes.models.AttributesSelfCatThreat;
 import org.vadere.state.attributes.scenario.AttributesAgent;
@@ -75,7 +75,7 @@ public class SelfCatThreatModel implements MainModel {
     private UpdateSchemeEventDriven updateSchemeEventDriven;
 
     // These models are updated in the actual simulation loop.
-    private List<Model> models = new LinkedList<>();
+    private final List<Model> models = new LinkedList<>();
     private double lastSimTimeInSec;
 
     // Distribution to assign pedestrians as IN_GROUP or OUT_GROUP members.

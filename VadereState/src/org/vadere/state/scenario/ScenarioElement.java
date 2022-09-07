@@ -2,7 +2,6 @@ package org.vadere.state.scenario;
 
 import org.vadere.state.attributes.AttributesScenarioElement;
 import org.vadere.state.types.ScenarioElementType;
-import org.vadere.util.AttributesAttached;
 import org.vadere.util.geometry.shapes.VShape;
 
 public abstract class ScenarioElement<T extends AttributesScenarioElement> extends AttributesAttached<T> {

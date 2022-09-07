@@ -7,7 +7,7 @@ import org.vadere.gui.topographycreator.control.attribtable.AttributeTranslator;
 import org.vadere.gui.topographycreator.control.attribtable.JAttributeTable;
 import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
 import org.vadere.gui.topographycreator.utils.RunnableRegistry;
-import org.vadere.util.Attributes;
+import org.vadere.state.attributes.Attributes;
 
 import javax.swing.*;
 import java.awt.*;

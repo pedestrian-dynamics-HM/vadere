@@ -3,7 +3,7 @@ package org.vadere.simulator.models.potential.fields;
 import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
 import org.vadere.simulator.projects.Domain;
-import org.vadere.util.Attributes;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.Agent;
@@ -27,12 +27,12 @@ public class PotentialFieldSingleTargetGrid extends PotentialFieldTargetGrid {
     /**
      * configuration of the potential fields.
      */
-    private AttributesFloorField attributesFloorField;
+    private final AttributesFloorField attributesFloorField;
 
     /**
      * configuration of the agents.
      */
-    private AttributesAgent attributesPedestrian;
+    private final AttributesAgent attributesPedestrian;
 
     /**
      * the id for which this potential field will be created.

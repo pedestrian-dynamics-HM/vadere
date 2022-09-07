@@ -2,7 +2,7 @@ package org.vadere.simulator.control.psychology.cognition;
 
 import org.junit.Test;
 import org.vadere.simulator.control.psychology.cognition.models.CounterflowCognitionModel;
-import org.vadere.util.Attributes;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesTarget;
 import org.vadere.state.psychology.cognition.SelfCategory;
@@ -14,13 +14,16 @@ import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
 
 public class CounterflowCognitionModelTest {
 
-    private List<Attributes> attributes = new LinkedList<>();
+    private final List<Attributes> attributes = new LinkedList<>();
 
 
     private List<Pedestrian> createPedestrians(int totalPedestrians, boolean usePedIdAsTargetId) {
@@ -36,7 +39,7 @@ public class CounterflowCognitionModelTest {
             currentPedestrian.setMostImportantStimulus(new ElapsedTime());
             currentPedestrian.setSelfCategory(SelfCategory.TARGET_ORIENTED);
 
-            LinkedList<Integer> targetIds = (usePedIdAsTargetId) ? new LinkedList<>(Arrays.asList(i)) : new LinkedList<>();
+            LinkedList<Integer> targetIds = (usePedIdAsTargetId) ? new LinkedList<>(List.of(i)) : new LinkedList<>();
             currentPedestrian.setTargets(targetIds);
 
             pedestrians.add(currentPedestrian);

@@ -8,7 +8,7 @@ import org.vadere.simulator.models.potential.fields.IPotentialFieldTargetGrid;
 import org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid;
 import org.vadere.simulator.models.potential.solver.timecost.UnitTimeCostFunction;
 import org.vadere.simulator.projects.Domain;
-import org.vadere.util.Attributes;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.models.AttributesQueuingGame;
 import org.vadere.state.attributes.models.TimeCostFunctionType;
@@ -45,20 +45,20 @@ import java.util.stream.Collectors;
 public class PotentialFieldTargetQueuingGrid implements IPotentialFieldTargetGrid, DynamicElementRemoveListener<Pedestrian>,
 		DynamicElementAddListener<Pedestrian> {
 
-	private static Logger logger = Logger.getLogger(PotentialFieldTargetQueuingGrid.class);
+	private static final Logger logger = Logger.getLogger(PotentialFieldTargetQueuingGrid.class);
 
-	private PotentialFieldTargetGrid competitiveField;
-	private PotentialFieldTargetGrid gentleField;
+	private final PotentialFieldTargetGrid competitiveField;
+	private final PotentialFieldTargetGrid gentleField;
 
 	private final Domain domain;
-	private Map<Pedestrian, PedestrianAttitudeType> pedestrianAttitudeMap;
-	private Map<Pedestrian, Double> lifeTimeMap;
-	private List<Pedestrian> pedestrians;
+	private final Map<Pedestrian, PedestrianAttitudeType> pedestrianAttitudeMap;
+	private final Map<Pedestrian, Double> lifeTimeMap;
+	private final List<Pedestrian> pedestrians;
 	private final Random random;
 	private final AttributesQueuingGame attributesQueuingGame;
 	private double lastSimTimInSec = 0;
 
-	private QueueDetector detector;
+	private final QueueDetector detector;
 	private List<Queue> queues;
 
 	public PotentialFieldTargetQueuingGrid(

@@ -1,15 +1,11 @@
 package org.vadere.state.scenario;
 
-import org.vadere.util.Attributes;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.scenario.AttributesAbsorbingArea;
 import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.geometry.shapes.VShape;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.*;
 
 /**
  * An area with an arbitrary shape that absorbs agents event if they have not reached their target.
@@ -99,13 +95,8 @@ public class AbsorbingArea extends ScenarioElement implements Comparable<Absorbi
 		}
 		AbsorbingArea other = (AbsorbingArea) obj;
 		if (attributes == null) {
-			if (other.attributes != null) {
-				return false;
-			}
-		} else if (!attributes.equals(other.attributes)) {
-			return false;
-		}
-		return true;
+			return other.attributes == null;
+		} else return attributes.equals(other.attributes);
 	}
 
 	@Override

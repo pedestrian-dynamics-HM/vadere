@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonView;
 
 import org.jetbrains.annotations.NotNull;
-import org.vadere.util.Attributes;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesCar;
 import org.vadere.state.attributes.scenario.AttributesDynamicElement;
@@ -41,7 +41,7 @@ import java.util.stream.Collectors;
 public class Topography implements DynamicElementMover{
 
 	/** Transient to prevent JSON serialization. */
-	private static Logger logger = Logger.getLogger(Topography.class);
+	private static final Logger logger = Logger.getLogger(Topography.class);
 
 	private IDistanceFunctionCached obstacleDistanceFunction;
 	private IReachablePointProvider reachablePointProvider;
@@ -102,7 +102,7 @@ public class Topography implements DynamicElementMover{
 	/**
 	 * List of obstacles used as a boundary for the whole topography.
 	 */
-	private List<Obstacle> boundaryObstacles;
+	private final List<Obstacle> boundaryObstacles;
 
 	private final List<Stairs> stairs;
 
@@ -118,13 +118,13 @@ public class Topography implements DynamicElementMover{
 	private AttributesCar attributesCar;
 
 	/** Used to get attributes of all scenario elements. */
-	private Set<List<? extends ScenarioElement>> allScenarioElements = new HashSet<>(); // will be filled in the constructor
+	private final Set<List<? extends ScenarioElement>> allScenarioElements = new HashSet<>(); // will be filled in the constructor
 	
 	/** Used to store links to all attributes that are not part of scenario elements. */
-	private Set<Attributes> allOtherAttributes = new HashSet<>(); // will be filled in the constructor
+	private final Set<Attributes> allOtherAttributes = new HashSet<>(); // will be filled in the constructor
 
 	/** set dynamicElementIds to values bigger than the biggest initial element to ensure unique ids.**/
-	private AtomicInteger dynamicElementIdCounter;
+	private final AtomicInteger dynamicElementIdCounter;
 
 	public Topography(
 			AttributesTopography attributes,

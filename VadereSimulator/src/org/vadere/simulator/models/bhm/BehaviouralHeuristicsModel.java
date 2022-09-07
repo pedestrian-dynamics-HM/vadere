@@ -8,7 +8,7 @@ import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTargetGrid;
 import org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid;
 import org.vadere.simulator.projects.Domain;
-import org.vadere.util.Attributes;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.exceptions.AttributesNotFoundException;
 import org.vadere.state.attributes.models.AttributesBHM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
@@ -20,11 +20,7 @@ import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
 
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.PriorityQueue;
-import java.util.Random;
+import java.util.*;
 
 @ModelClass(isMainModel = true)
 public class BehaviouralHeuristicsModel implements MainModel {
@@ -46,14 +42,14 @@ public class BehaviouralHeuristicsModel implements MainModel {
 		}
 	}
 	
-	private List<Model> models = new LinkedList<>();
+	private final List<Model> models = new LinkedList<>();
 
 	private AttributesBHM attributesBHM;
 	private AttributesAgent attributesPedestrian;
 	private Random random;
 	private Topography topography;
 	private double lastSimTimeInSec;
-	private PriorityQueue<PedestrianBHM> pedestrianEventsQueue;
+	private final PriorityQueue<PedestrianBHM> pedestrianEventsQueue;
 
 	public BehaviouralHeuristicsModel() {
 		this.pedestrianEventsQueue = new PriorityQueue<>(100, new ComparatorPedestrianBHM());

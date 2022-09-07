@@ -10,7 +10,7 @@ import org.vadere.state.attributes.distributions.AttributesTimeSeriesDistributio
 import org.vadere.state.scenario.distribution.VDistribution;
 import org.vadere.state.scenario.distribution.parameter.MixedParameterDistribution;
 import org.vadere.state.scenario.distribution.registry.RegisterDistribution;
-import org.vadere.util.Attributes;
+import org.vadere.state.attributes.Attributes;
 
 import java.util.ArrayList;
 

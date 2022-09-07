@@ -1,6 +1,6 @@
 package org.vadere.state.attributes.exceptions;
 
-import org.vadere.util.Attributes;
+import org.vadere.state.attributes.Attributes;
 
 @SuppressWarnings("serial")
 public class AttributesMultiplyDefinedException extends RuntimeException {

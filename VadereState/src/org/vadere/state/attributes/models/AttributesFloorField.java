@@ -1,9 +1,8 @@
 package org.vadere.state.attributes.models;
 
 import com.fasterxml.jackson.annotation.JsonView;
-
 import org.vadere.annotation.factories.attributes.ModelAttributeClass;
-import org.vadere.util.Attributes;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.types.CacheType;
 import org.vadere.state.types.EikonalSolverType;
 import org.vadere.state.util.Views;

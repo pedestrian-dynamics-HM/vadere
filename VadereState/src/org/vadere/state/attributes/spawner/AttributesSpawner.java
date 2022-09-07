@@ -4,10 +4,10 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonView;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.distributions.AttributesDistribution;
 import org.vadere.state.attributes.scenario.AttributesVisualElement;
 import org.vadere.state.util.Views;
-import org.vadere.util.Attributes;
 import org.vadere.util.reflection.VadereAttribute;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonTypeInfo(

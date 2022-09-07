@@ -1,14 +1,14 @@
 package org.vadere.state.attributes.models;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-
 import org.vadere.annotation.factories.attributes.ModelAttributeClass;
-import org.vadere.util.Attributes;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.types.MovementType;
 import org.vadere.state.types.OptimizationType;
 import org.vadere.state.types.UpdateType;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * <p>
@@ -76,26 +76,26 @@ public class AttributesOSM extends Attributes {
 	 * 	<li><tt>OptimizationType.DISCRETE</tt>: each point and the position of the agent is used to directly evaluate the evaluation function (brute force)</li>
 	 * </ul>
 	 */
-	private int stepCircleResolution = 4;
+	private final int stepCircleResolution = 4;
 
 	/**
 	 * Parameter of the optimization solver method: the number of circles. Together with the {@link AttributesOSM#stepCircleResolution}
 	 * this gives the number of points used by the optimization solver. If r is the radius of the most outer circle and k is the number
 	 * of circles the radii of the circles are r/k, 2 * r/k, ... (k-1) * r/k, r.
 	 */
-	private int numberOfCircles = 1;
+	private final int numberOfCircles = 1;
 
 	/**
 	 * Parameter of the optimization method: Specifies the concrete optimization solver.
 	 */
-	private OptimizationType optimizationType = OptimizationType.NELDER_MEAD;
+	private final OptimizationType optimizationType = OptimizationType.NELDER_MEAD;
 
 	/**
 	 * If <tt>true</tt>, introduced for every optimization process a noise term by which points will be shifted (on their circle). See Eq. 4 in [1].
 	 * If <tt>false</tt>, there will be no noise term which might lead to artifacts, especially in case of <tt>OptimizationType.DISCRETE</tt>.
 	 * In that case and with {@link AttributesOSM#movementType} not <tt>DIRECTIONAL</tt>, the first point of each circle will at (r * cos(0), r * sin(0)).
 	 */
-	private boolean varyStepDirection = true;
+	private final boolean varyStepDirection = true;
 
 	/**
 	 * This has only an effect if {@link OptimizationType} is equal <tt>DISCRETE</tt> or <tt>PSO</tt>, since all other optimization (on the disc) do not
@@ -103,73 +103,73 @@ public class AttributesOSM extends Attributes {
 	 * This does not effect the number of used points. The shape of the cone is computed by Eq. 4.6, 4.7 which
 	 * depends on the current velocity of the agent.
 	 */
-	private MovementType movementType = MovementType.ARBITRARY;
+	private final MovementType movementType = MovementType.ARBITRARY;
 
 	/**
 	 * Used to compute the desired step length which is {@link AttributesOSM#stepLengthIntercept} + {@link AttributesOSM#stepLengthSlopeSpeed} * speed, i.e.
 	 * Eq. 6 in [1].
 	 */
-	private double stepLengthIntercept = 0.4625;
+	private final double stepLengthIntercept = 0.4625;
 
 	/**
 	 * Used to compute the desired step length which is {@link AttributesOSM#stepLengthIntercept} + {@link AttributesOSM#stepLengthSlopeSpeed} * speed + error, i.e.
 	 * Eq. 6 in [1].
 	 */
-	private double stepLengthSlopeSpeed = 0.2345;
+	private final double stepLengthSlopeSpeed = 0.2345;
 
 	/**
 	 * Used to compute the error term of the desired step length i.e. the standard deviation of the normal
 	 * distribution which is the distribution of the error variable (see Eq. 6 in [1]).
 	 */
-	private double stepLengthSD = 0.036;
+	private final double stepLengthSD = 0.036;
 
 	/**
 	 * Only used if {@link OptimizationType} is equal <tt>DISCRETE</tt> or <tt>PSO</tt>. If the potential does not improve by this
 	 * threshold, the agent will not move. This is in some sense similar to the effect of {@link AttributesOSM#minStepLength}.
 	 */
-	private double movementThreshold = 0;
+	private final double movementThreshold = 0;
 
 	/**
 	 * Only used if {@link AttributesOSM#minimumStepLength} is <tt>true</tt>. The agent will not move if the
 	 * next improvement is less than {@link AttributesOSM#minStepLength} away from its current position.
 	 * Furthermore, this will be ignored if an agent is on stairs.
 	 */
-	private double minStepLength = 0.10;
+	private final double minStepLength = 0.10;
 
 	/**
 	 * If <tt>true</tt> enables the use of {@link AttributesOSM#minStepLength}. This attribute could be removed.
 	 */
-	private boolean minimumStepLength = true;
+	private final boolean minimumStepLength = true;
 
 	/**
 	 * The maximum amount of time a foot step of an agent can take. If the foot step takes more time
 	 * its duration is reduced to {@link AttributesOSM#maxStepDuration}.
 	 */
-	private double maxStepDuration = Double.MAX_VALUE;
+	private final double maxStepDuration = Double.MAX_VALUE;
 
 	/**
 	 * <tt>SpeedAdjusters</tt> will only be active if this is <tt>true</tt>. For example this has to be true if the group model is
 	 * active.
 	 */
-	private boolean dynamicStepLength = true;
+	private final boolean dynamicStepLength = true;
 
 	/**
 	 * Specifies which update schema is used. The OSM should use the event driven update schema, see [3].
 	 */
-	private UpdateType updateType = UpdateType.EVENT_DRIVEN;
+	private final UpdateType updateType = UpdateType.EVENT_DRIVEN;
 
 	/**
 	 * If <tt>true</tt> this avoids agent jumping over small walls. However, this does not fix the problem that
 	 * the target potential computation fails due to small obstacles. Since this is a quick fix and the
 	 * test is very expensive the default should be false!
 	 */
-	private boolean seeSmallWalls = false;
+	private final boolean seeSmallWalls = false;
 
 
-	private String targetPotentialModel = "org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid";
-	private String pedestrianPotentialModel = "org.vadere.simulator.models.potential.PotentialFieldPedestrianCompactSoftshell";
-	private String obstaclePotentialModel = "org.vadere.simulator.models.potential.PotentialFieldObstacleCompactSoftshell";
-	private List<String> submodels = new LinkedList<>();
+	private final String targetPotentialModel = "org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid";
+	private final String pedestrianPotentialModel = "org.vadere.simulator.models.potential.PotentialFieldPedestrianCompactSoftshell";
+	private final String obstaclePotentialModel = "org.vadere.simulator.models.potential.PotentialFieldObstacleCompactSoftshell";
+	private final List<String> submodels = new LinkedList<>();
 
 	public AttributesOSM() {
 

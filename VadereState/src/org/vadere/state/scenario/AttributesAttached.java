@@ -1,4 +1,4 @@
-package org.vadere.util;
+package org.vadere.state.scenario;
 
 public abstract class AttributesAttached<T extends Attributes> {
     protected T attributes;

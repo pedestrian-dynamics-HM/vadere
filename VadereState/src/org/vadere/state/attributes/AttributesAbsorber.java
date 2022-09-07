@@ -1,6 +1,5 @@
 package org.vadere.state.attributes;
 
-import org.vadere.util.Attributes;
 import org.vadere.util.reflection.VadereAttribute;
 
 @VadereAttributeClass(noHeader = true)

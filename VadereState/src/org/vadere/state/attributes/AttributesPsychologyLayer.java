@@ -2,9 +2,10 @@ package org.vadere.state.attributes;
 
 import org.vadere.state.attributes.models.psychology.cognition.AttributesSimpleCognitionModel;
 import org.vadere.state.attributes.models.psychology.perception.AttributesSimplePerceptionModel;
-import org.vadere.util.Attributes;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * This class beautifies the JSON content by mapping

@@ -1,22 +1,22 @@
 package org.vadere.gui.projectview.view;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.bhm.BehaviouralHeuristicsModel;
 import org.vadere.simulator.models.bmm.BiomechanicsModel;
 import org.vadere.simulator.models.gnm.GradientNavigationModel;
-import org.vadere.simulator.models.osm.OptimalStepsModel;
 import org.vadere.simulator.models.osm.CellularAutomaton;
+import org.vadere.simulator.models.osm.OptimalStepsModel;
 import org.vadere.simulator.models.ovm.OptimalVelocityModel;
 import org.vadere.simulator.models.psychology.selfcategorization.SelfCatThreatModel;
 import org.vadere.simulator.models.reynolds.ReynoldsSteeringModel;
 import org.vadere.simulator.models.sfm.SocialForceModel;
-import org.vadere.util.Attributes;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.ModelDefinition;
 import org.vadere.state.attributes.models.*;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Singleton for model presets.

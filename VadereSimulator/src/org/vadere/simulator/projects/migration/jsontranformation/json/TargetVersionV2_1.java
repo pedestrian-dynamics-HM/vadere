@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.vadere.annotation.factories.migrationassistant.MigrationTransformation;
 import org.vadere.simulator.projects.migration.MigrationException;
 import org.vadere.simulator.projects.migration.jsontranformation.SimpleJsonTransformation;
-import org.vadere.util.Attributes;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.infection.AttributesAirTransmissionModelAerosolCloud;
 import org.vadere.state.attributes.models.infection.AttributesAirTransmissionModelDroplets;
 import org.vadere.state.attributes.models.infection.AttributesThresholdResponseModel;
@@ -398,11 +398,7 @@ public class TargetVersionV2_1 extends SimpleJsonTransformation {
         if (sourceParamsArray.isArray() && sourceParamsArray.size() > 0) {
             for (int i = 0; i < sourceParamsArray.size(); i++) {
                 ObjectNode child = (ObjectNode) sourceParamsArray.get(i);
-                if (child.get(oldKey).asText().equals("INFECTIOUS")) {
-                    child.put(newKey, true);
-                } else {
-                    child.put(newKey, false);
-                }
+                child.put(newKey, child.get(oldKey).asText().equals("INFECTIOUS"));
                 child.remove(oldKey);
             }
         }

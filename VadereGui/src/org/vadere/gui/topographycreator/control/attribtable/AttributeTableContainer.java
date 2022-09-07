@@ -3,8 +3,8 @@ package org.vadere.gui.topographycreator.control.attribtable;
 import org.vadere.gui.components.view.ISelectScenarioElementListener;
 import org.vadere.gui.topographycreator.control.AttributeHelpView;
 import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.scenario.ScenarioElement;
-import org.vadere.util.Attributes;
 import org.vadere.util.observer.NotifyContext;
 
 import javax.swing.*;

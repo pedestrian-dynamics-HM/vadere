@@ -1,19 +1,19 @@
 package org.vadere.state.attributes.models;
 
 import org.vadere.annotation.factories.attributes.ModelAttributeClass;
-import org.vadere.util.Attributes;
+import org.vadere.state.attributes.Attributes;
 
 @ModelAttributeClass
 public class AttributesPotentialCompactSoftshell extends Attributes {
 
-	private double pedPotentialIntimateSpaceWidth = 0.45;
-	private double pedPotentialPersonalSpaceWidth = 1.20;
-	private double pedPotentialHeight = 50.0;
-	private double obstPotentialWidth = 0.8;
-	private double obstPotentialHeight = 6.0;
-	private double intimateSpaceFactor = 1.2;
-	private int personalSpacePower = 1;
-	private int intimateSpacePower = 1;
+	private final double pedPotentialIntimateSpaceWidth = 0.45;
+	private final double pedPotentialPersonalSpaceWidth = 1.20;
+	private final double pedPotentialHeight = 50.0;
+	private final double obstPotentialWidth = 0.8;
+	private final double obstPotentialHeight = 6.0;
+	private final double intimateSpaceFactor = 1.2;
+	private final int personalSpacePower = 1;
+	private final int intimateSpacePower = 1;
 
 	public int getIntimateSpacePower() {
 		return intimateSpacePower;

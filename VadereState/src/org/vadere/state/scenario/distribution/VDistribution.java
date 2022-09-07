@@ -2,7 +2,7 @@ package org.vadere.state.scenario.distribution;
 
 import org.apache.commons.math3.random.RandomGenerator;
 import org.vadere.state.attributes.distributions.AttributesDistribution;
-import org.vadere.util.AttributesAttached;
+import org.vadere.state.scenario.AttributesAttached;
 
 /**
  * @author Aleksandar Ivanov(ivanov0@hm.edu), Lukas Gradl (lgradl@hm.edu)
