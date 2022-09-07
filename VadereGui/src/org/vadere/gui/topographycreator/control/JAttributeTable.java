@@ -104,7 +104,6 @@ public class JAttributeTable extends JPanel implements Observer {
         addTypeEditor(Integer.class, SpinnerCellEditor.class);
         addTypeEditor(Double.class, DoubleSpinnerCellEditor.class);
         addTypeEditor(Boolean.class, CheckBoxCellEditor.class);
-
     }
 
     public void setModel(AttributeTableModel fieldModel,TopographyCreatorModel topoModel) {
@@ -116,7 +115,6 @@ public class JAttributeTable extends JPanel implements Observer {
             var field = (Field) fieldModel.getValueAt(row,AttributeTableModel.PropertiesIndex);
             var type = (Class) fieldModel.getValueAt(row,AttributeTableModel.ValuesIndex);
             var typeName = type.getName();
-
             JPanel subPanel = new JPanel(new GridBagLayout());
             subPanel.setBackground(UIManager.getColor("Table.selectionBackground").brighter());
 

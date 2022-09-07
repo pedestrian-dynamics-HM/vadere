@@ -28,6 +28,8 @@ public class ChildObjectCellEditor extends AttributeEditor implements AttributeT
 
     private AttributeTableView view;
 
+    protected Object objectInstance;
+
     public ChildObjectCellEditor(
             JAttributeTable parent,
             Attributes fieldOwner,
@@ -35,20 +37,19 @@ public class ChildObjectCellEditor extends AttributeEditor implements AttributeT
             TopographyCreatorModel model,
             JPanel contentPanel
     ) {
-        super(parent,fieldOwner, field, model,contentPanel);
+        super(parent, fieldOwner, field, model, contentPanel);
         this.contentPanel.setLayout(new BorderLayout());
         this.contentPanel.setBorder(new EmptyBorder(2,2,2,2));
         this.contentPanel.setVisible(contentPaneVisible);
         this.clazz = field.getType();
         this.button = new JButton(AttributeTablePage.generateHeaderName(clazz));
         this.add(button);
-        Attributes attrs = null;
         try {
-            attrs = this.constructNewObject();
+            this.constructNewObject();
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
-        this.createInternalPropertyPane(attrs,model);
+        this.createInternalPropertyPane(objectInstance, model);
 
         this.button.addMouseListener(new MouseAdapter() {
             @Override
@@ -82,19 +83,18 @@ public class ChildObjectCellEditor extends AttributeEditor implements AttributeT
         view.updateView((Attributes) value);
     }
 
-    private void createInternalPropertyPane(Attributes newObject, TopographyCreatorModel model) {
-        view = new AttributeTableView(this,model);
-        view.selectionChange(newObject);
-        contentPanel.add(view,BorderLayout.CENTER);
+    protected void createInternalPropertyPane(Object newObject, TopographyCreatorModel model) {
+        view = new AttributeTableView(this, model);
+        view.selectionChange((Attributes) newObject);
+        contentPanel.add(view, BorderLayout.CENTER);
     }
 
-    private Attributes constructNewObject() throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-        Attributes newObject =(Attributes) clazz.getDeclaredConstructor(null).newInstance(null);
-        return newObject;
+    protected void constructNewObject() throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+        objectInstance = clazz.getDeclaredConstructor(null).newInstance(null);
     }
 
     @Override
     public void updateModel(Attributes attributes) {
-        parentTranslator.updateModel(field,attributes);
+        parentTranslator.updateModel(field, attributes);
     }
 }

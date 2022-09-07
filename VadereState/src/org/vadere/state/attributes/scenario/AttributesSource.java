@@ -8,7 +8,7 @@ import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.reflection.VadereAttribute;
 
 import java.io.IOException;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 public class AttributesSource extends AttributesVisualElement {
@@ -17,7 +17,7 @@ public class AttributesSource extends AttributesVisualElement {
 	private AttributesSpawner spawner = new AttributesRegularSpawner();
 	//@VadereAttribute
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
-	private List<Integer> targetIds = new LinkedList<>();
+	private ArrayList<Integer> targetIds = new ArrayList<>();
 	/**
 	 *  This Attribute only takes affect if a model org.vadere.simulator.models.groups.GroupModel
 	 *  is present in the scenario. When this is the case this list defines the group size
@@ -80,7 +80,7 @@ public class AttributesSource extends AttributesVisualElement {
 	}
 
 
-	public void setTargetIds(List<Integer> targetIds) {
+	public void setTargetIds(ArrayList<Integer> targetIds) {
 		checkSealed();
 		this.targetIds = targetIds;
 	}

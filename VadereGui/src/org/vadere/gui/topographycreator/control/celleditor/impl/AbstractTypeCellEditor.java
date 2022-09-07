@@ -141,14 +141,14 @@ public class AbstractTypeCellEditor extends AttributeEditor implements Attribute
         for (var clazz : classesModel) {
             try {
                 classConstructorRegistry.put(getSimpleName(clazz), clazz.getDeclaredConstructor());
+                var simpleName = getSimpleName(clazz);
+                if (Attributes.class.isAssignableFrom(clazz)) {
+                    classNameRegistry.put(simpleName, clazz);
+                }
+                comboBoxModel.addElement(simpleName);
             } catch (NoSuchMethodException e) {
-                throw new RuntimeException(e);
+                System.out.println(getSimpleName(clazz) + " does not implement a default constructor. will be skipped");
             }
-            var simpleName = getSimpleName(clazz);
-            if(Attributes.class.isAssignableFrom(clazz)){
-                classNameRegistry.put(simpleName,clazz);
-            }
-            comboBoxModel.addElement(simpleName);
         }
         return comboBoxModel;
     }

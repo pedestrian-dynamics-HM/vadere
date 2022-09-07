@@ -2,12 +2,12 @@ package org.vadere.state.attributes.scenario.builder;
 
 import org.vadere.state.attributes.scenario.AttributesSource;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 
 public final class AttributesSourceBuilder{
-	private List<Integer> targetIds = new LinkedList<>();
+	private ArrayList<Integer> targetIds = new ArrayList<>();
 	private List<Double> groupSizeDistribution = List.of(1.0);
 
 	private AttributesVisualElementBuilder visualBuilder = new AttributesVisualElementBuilder();
@@ -32,13 +32,13 @@ public final class AttributesSourceBuilder{
 	}
 
 
-	public AttributesSourceBuilder setTargetIds(List<Integer> targetIds) {
+	public AttributesSourceBuilder setTargetIds(ArrayList<Integer> targetIds) {
 		this.targetIds = targetIds;
 		return this;
 	}
 
 	public AttributesSourceBuilder setTargetIds(Integer... targetIds) {
-		this.targetIds = Arrays.asList(targetIds);
+		this.targetIds = (ArrayList<Integer>) Arrays.asList(targetIds);
 		return this;
 	}
 

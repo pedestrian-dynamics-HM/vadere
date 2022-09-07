@@ -3,21 +3,21 @@ package org.vadere.state.scenario.spawner.impl;
 import org.apache.commons.math3.analysis.interpolation.LinearInterpolator;
 import org.apache.commons.math3.analysis.polynomials.PolynomialSplineFunction;
 import org.apache.commons.math3.random.JDKRandomGenerator;
-import org.vadere.state.attributes.spawner.AttributesSpawner;
+import org.vadere.state.attributes.spawner.AttributesLerpSpawner;
 import org.vadere.state.scenario.spawner.VSpawner;
 import org.vadere.util.math.TruncatedNormalDistribution;
 
 import java.util.Random;
 
-public class LinearInterpolationSpawner extends VSpawner {
+public class LERPSpawner extends VSpawner<AttributesLerpSpawner> {
     private final TruncatedNormalDistribution truncNormalDist;
     private final PolynomialSplineFunction interpolator;
 
-    public LinearInterpolationSpawner(AttributesSpawner attributes) {
+    public LERPSpawner(AttributesLerpSpawner attributes) {
         super(attributes);
 
-        double[] xValues = { 0, 200, 400, 600, 800, 1000, 1200, 1400, 1600, 1800, 2000, 2200, 2400 };
-        double[] yValues = { -1., 8., -1., 8., -1.0, 8., -1, 8, -1, 8, -1, 8, -1 };
+        double[] xValues = {0, 200, 400, 600, 800, 1000, 1200, 1400, 1600, 1800, 2000, 2200, 2400};
+        double[] yValues = {-1., 8., -1., 8., -1.0, 8., -1, 8, -1, 8, -1, 8, -1};
 
         for (double d : yValues) {
             if (d < -1) {
@@ -30,7 +30,6 @@ public class LinearInterpolationSpawner extends VSpawner {
         // https://www.wolframalpha.com/input/?i=normal+distribution%2C+mean%3D0%2C+sd%3D3+from+-4+to+4
         this.truncNormalDist = new TruncatedNormalDistribution(new JDKRandomGenerator(new Random().nextInt()), 0, 3, -4, 4, 1000);
     }
-
 
 
     @Override
@@ -48,13 +47,13 @@ public class LinearInterpolationSpawner extends VSpawner {
     }
 
     @Override
-    public void update(double simTimeInSec) {
-
+    public void setRemainingSpawnAgents(int remainingAgents) {
+        // do nothing
     }
 
     @Override
-    public void setRemainingSpawnAgents(int remainingAgents) {
-        // do nothing
+    public void update(double simTimeInSec) {
+
     }
 
     @Override

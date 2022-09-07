@@ -4,7 +4,10 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.vadere.state.attributes.spawner.AttributesSpawner;
 import org.vadere.state.scenario.Topography;
+import org.vadere.state.scenario.spawner.impl.LERPSpawner;
+import org.vadere.state.scenario.spawner.impl.MixedSpawner;
 import org.vadere.state.scenario.spawner.impl.RegularSpawner;
+import org.vadere.state.scenario.spawner.impl.TimeSeriesSpawner;
 import org.vadere.util.AttributesAttached;
 
 @JsonTypeInfo(
@@ -13,6 +16,9 @@ import org.vadere.util.AttributesAttached;
 )
 @JsonSubTypes({
         @JsonSubTypes.Type(value = RegularSpawner.class, name = "org.vadere.state.scenario.spawner.impl.RegularSpawner"),
+        @JsonSubTypes.Type(value = LERPSpawner.class, name = "org.vadere.state.scenario.spawner.impl.LERPSpawner"),
+        @JsonSubTypes.Type(value = TimeSeriesSpawner.class, name = "org.vadere.state.scenario.spawner.impl.TimeSeriesSpawner"),
+        @JsonSubTypes.Type(value = MixedSpawner.class, name = "org.vadere.state.scenario.spawner.impl.MixedSpawner")
 })
 public abstract class VSpawner<T extends AttributesSpawner>  extends AttributesAttached<T> {
     private final Topography topography = null;

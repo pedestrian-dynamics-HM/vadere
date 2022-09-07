@@ -1,14 +1,9 @@
 package org.vadere.util.geometry.shapes;
 
-import org.vadere.util.Attributes;
 import org.vadere.util.geometry.GeometryUtils;
-import org.vadere.util.geometry.shapes.attributes.AttributesVRectangle;
 
 import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @SuppressWarnings("serial")
 /**
@@ -32,6 +27,10 @@ public class VRectangle extends Rectangle2D.Double implements VShape {
 			throw new IllegalArgumentException(
 					"Width and height have to be positive.");
 		}
+	}
+
+	public VRectangle() {
+		this(0, 0, 1, 1);
 	}
 
 	public VRectangle(final Rectangle2D rectangle) {
@@ -174,10 +173,7 @@ public class VRectangle extends Rectangle2D.Double implements VShape {
 
 	@Override
 	public boolean intersects(VLine intersectingLine) {
-		if (intersectingLine.intersects(this)) {
-			return true;
-		}
-		return false;
+		return intersectingLine.intersects(this);
 	}
 
 	@Override
@@ -215,9 +211,7 @@ public class VRectangle extends Rectangle2D.Double implements VShape {
 	@Override
 	public List<VLine> lines() {
 		List<VLine> lines = new ArrayList<>();
-		for (VLine line : getLines()) {
-			lines.add(line);
-		}
+		Collections.addAll(lines, getLines());
 		return lines;
 	}
 
