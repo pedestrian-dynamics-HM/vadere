@@ -5,7 +5,6 @@ import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
 import org.vadere.gui.topographycreator.view.AttributeTablePage;
 import org.vadere.gui.topographycreator.view.AttributeTableView;
 import org.vadere.gui.topographycreator.view.AttributeTranslator;
-import org.vadere.util.Attributes;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -32,7 +31,7 @@ public class ChildObjectCellEditor extends AttributeEditor implements AttributeT
 
     public ChildObjectCellEditor(
             JAttributeTable parent,
-            Attributes fieldOwner,
+            Object fieldOwner,
             Field field,
             TopographyCreatorModel model,
             JPanel contentPanel
@@ -80,12 +79,12 @@ public class ChildObjectCellEditor extends AttributeEditor implements AttributeT
     }
 
     public void modelChanged(Object value) {
-        view.updateView((Attributes) value);
+        view.updateView(value);
     }
 
     protected void createInternalPropertyPane(Object newObject, TopographyCreatorModel model) {
         view = new AttributeTableView(this, model);
-        view.selectionChange((Attributes) newObject);
+        view.selectionChange(newObject);
         contentPanel.add(view, BorderLayout.CENTER);
     }
 
@@ -94,7 +93,7 @@ public class ChildObjectCellEditor extends AttributeEditor implements AttributeT
     }
 
     @Override
-    public void updateModel(Attributes attributes) {
+    public void updateModel(Object attributes) {
         parentTranslator.updateModel(field, attributes);
     }
 }

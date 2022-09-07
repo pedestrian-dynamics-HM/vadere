@@ -8,7 +8,6 @@ import org.vadere.gui.topographycreator.model.AttributeTableModel;
 import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
 import org.vadere.gui.topographycreator.view.AttributeTablePage;
 import org.vadere.util.Attributes;
-import org.vadere.util.observer.NotifyContext;
 
 import javax.swing.*;
 import java.awt.*;
@@ -18,16 +17,17 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.*;
 
-public class JAttributeTable extends JPanel implements Observer {
+public class JAttributeTable extends JPanel {
     /**
      *
      */
     private final AttributeTablePage parent;
     private Field ownerField;
-    private Attributes fieldOwner;
+    private Object fieldOwner;
     private final List<JComponent> renderOrderModel;
 
     /**
@@ -55,7 +55,7 @@ public class JAttributeTable extends JPanel implements Observer {
             AttributeTablePage parent,
             AttributeTableModel attrmodel,
             TopographyCreatorModel topmodel,
-            Attributes object)
+            Object object)
     {
         super(new GridBagLayout());
         this.editorConstructors = new HashMap<>();
@@ -91,7 +91,7 @@ public class JAttributeTable extends JPanel implements Observer {
         if(!this.editorConstructors.containsKey(type)){
             Constructor<? extends AttributeEditor> constructor = null;
             try {
-                constructor = clazz.getDeclaredConstructor(JAttributeTable.class,Attributes.class, Field.class, TopographyCreatorModel.class,JPanel.class);
+                constructor = clazz.getDeclaredConstructor(JAttributeTable.class, Object.class, Field.class, TopographyCreatorModel.class, JPanel.class);
             } catch (NoSuchMethodException e) {
                 throw new RuntimeException(e);
             }
@@ -208,8 +208,8 @@ public class JAttributeTable extends JPanel implements Observer {
         }
     }
 
-    public void updateView(Attributes object){
-        if(object != null) {
+    public void updateView(Object object) {
+        if (object != null) {
             for (var fieldName : editorInstances.keySet()) {
                 var field = nameFields.get(fieldName);
                 var editor = (AttributeEditor) editorInstances.get(fieldName);
@@ -219,24 +219,25 @@ public class JAttributeTable extends JPanel implements Observer {
                     editor.updateView(field.get(object));
                     field.setAccessible(false);
                 } catch (IllegalAccessException e) {
-                    throw new RuntimeException(e);
+                    throw new RuntimeException(fieldName + " " + field + " " + editor);
                 }
             }
         }
     }
 
-    @Override
-    public void update(Observable o, Object arg) {
-        var model = (TopographyCreatorModel)o;
-        if(arg instanceof NotifyContext){
-            var ctx = (NotifyContext)arg;
-            if(!ctx.getNotifyContext().equals(AttributeEditor.class)){
-                updateView();
+    /*
+        @Override
+        public void update(Observable o, Object arg) {
+            var model = (TopographyCreatorModel)o;
+            if(arg instanceof NotifyContext){
+                var ctx = (NotifyContext)arg;
+                if(!ctx.getNotifyContext().equals(AttributeEditor.class)){
+                    updateView();
+                }
             }
+
         }
-
-    }
-
+    */
     public void setFieldOwner(Attributes element) {
         this.fieldOwner = element;
     }

@@ -41,7 +41,7 @@ public class AbstractTypeCellEditor extends AttributeEditor implements Attribute
     private Attributes instanceOfSelected;
     public AbstractTypeCellEditor(
             JAttributeTable parent,
-            Attributes fieldOwner,
+            Object fieldOwner,
             Field field,
             TopographyCreatorModel model,
             JPanel contentPanel
@@ -69,7 +69,7 @@ public class AbstractTypeCellEditor extends AttributeEditor implements Attribute
             }
             this.instanceOfSelected = (Attributes) value;
             this.comboBox.getModel().setSelectedItem(this.selected);
-            this.attributeTableView.updateView((Attributes) value);
+            this.attributeTableView.selectionChange(value);
             this.contentPanel.setVisible(true);
             this.contentPanel.revalidate();
             this.contentPanel.repaint();
@@ -169,8 +169,8 @@ public class AbstractTypeCellEditor extends AttributeEditor implements Attribute
     }
 
     @Override
-    public void updateModel(Attributes attributes) {
-        parentTranslator.updateModel(field,attributes);
+    public void updateModel(Object attributes) {
+        parentTranslator.updateModel(field, attributes);
         this.contentPanel.revalidate();
         this.contentPanel.repaint();
     }

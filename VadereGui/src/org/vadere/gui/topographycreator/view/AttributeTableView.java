@@ -1,7 +1,6 @@
 package org.vadere.gui.topographycreator.view;
 
 import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
-import org.vadere.util.Attributes;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,7 +11,7 @@ public class AttributeTableView extends JPanel{
     private final TopographyCreatorModel defaultModel;
     HashMap<Class, AttributeTablePage> editorPages;
 
-    private Attributes selectedAttributesInstance;
+    private Object selectedAttributesInstance;
 
     AttributeTablePage activePage;
 
@@ -25,32 +24,33 @@ public class AttributeTableView extends JPanel{
         this.editorPages = new HashMap<>();
     }
 
-    public void selectionChange(Attributes object) {
+    public void selectionChange(Object object) {
         this.selectedAttributesInstance = object;
         this.removeAll();
-        if(object != null) {
+        if (object != null) {
 
             if (!editorPages.containsKey(object.getClass())) {
                 var archetype = object.getClass();
-                var attributePage = new AttributeTablePage(this,archetype, defaultModel);
+                var attributePage = new AttributeTablePage(this, archetype, defaultModel);
                 this.editorPages.put(object.getClass(), attributePage);
             }
             activePage = editorPages.get(object.getClass());
             activePage.updateView(object);
-            this.add(activePage,BorderLayout.NORTH);
+            this.add(activePage, BorderLayout.NORTH);
 
-        }else{
+        } else {
             this.removeAll();
         }
         revalidate();
         repaint();
     }
-    public  void updateView(Attributes object){
-        if(activePage!= null)
+
+    public void updateView(Object object) {
+        if (activePage != null)
             activePage.updateView(object);
     }
 
-    public void updateModel(Attributes selectedAttributesInstance) {
+    public void updateModel(Object selectedAttributesInstance) {
         parentModelTranslator.updateModel(selectedAttributesInstance);
         this.revalidate();
         this.repaint();

@@ -2,7 +2,6 @@ package org.vadere.gui.topographycreator.control.celleditor.impl;
 
 import org.vadere.gui.topographycreator.control.JAttributeTable;
 import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
-import org.vadere.util.Attributes;
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,7 +12,7 @@ public abstract class AttributeEditor extends JPanel {
     JPanel contentPanel;
 
     protected final Field field;
-    protected Attributes fieldOwner;
+    protected Object fieldOwner;
     private final TopographyCreatorModel model;
     private boolean locked = false;
 
@@ -21,14 +20,14 @@ public abstract class AttributeEditor extends JPanel {
     protected JAttributeTable parentTranslator;
 
     Object oldValue;
-    public AttributeEditor(JAttributeTable parentTranslator, Attributes fieldOwner, Field field, TopographyCreatorModel model, JPanel contentPanel){
+
+    public AttributeEditor(JAttributeTable parentTranslator, Object fieldOwner, Field field, TopographyCreatorModel model, JPanel contentPanel) {
         super(new BorderLayout());
         this.parentTranslator = parentTranslator;
         this.fieldOwner = fieldOwner;
         this.field = field;
         this.model = model;
         this.contentPanel = contentPanel;
-
         disableNotify();
         initialize();
         enableNotify();
@@ -80,7 +79,7 @@ public abstract class AttributeEditor extends JPanel {
         return this.model;
     }
 
-    public void setFieldOwner(Attributes fieldOwner) {
+    public void setFieldOwner(Object fieldOwner) {
         this.fieldOwner = fieldOwner;
     }
 }

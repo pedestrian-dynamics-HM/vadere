@@ -2,7 +2,6 @@ package org.vadere.gui.topographycreator.control.celleditor.impl;
 
 import org.vadere.gui.topographycreator.control.JAttributeTable;
 import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
-import org.vadere.util.Attributes;
 
 import javax.swing.*;
 import javax.swing.text.AttributeSet;
@@ -26,7 +25,7 @@ public class TextEditCellEditor extends AttributeEditor {
 
     public TextEditCellEditor(
             JAttributeTable parent,
-            Attributes fieldOwner,
+            Object fieldOwner,
             Field field,
             TopographyCreatorModel model,
             JPanel unused

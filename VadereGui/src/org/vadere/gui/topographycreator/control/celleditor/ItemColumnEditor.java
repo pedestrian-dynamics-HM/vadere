@@ -45,7 +45,7 @@ public class ItemColumnEditor implements TableCellEditor {
 
     @Override
     public boolean isCellEditable(EventObject anEvent) {
-        return false;
+        return true;
     }
 
     @Override
@@ -55,7 +55,7 @@ public class ItemColumnEditor implements TableCellEditor {
 
     @Override
     public boolean stopCellEditing() {
-        return false;
+        return true;
     }
 
     @Override

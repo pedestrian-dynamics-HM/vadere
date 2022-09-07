@@ -19,10 +19,10 @@ import static org.vadere.gui.topographycreator.utils.Layouts.initGridBagConstrai
 public class AttributeTablePage extends JPanel{
     TopographyCreatorModel panelModel;
     AttributeTableView parentView;
-    Attributes selectedAttributesInstance;
+    Object selectedAttributesInstance;
     private final List<JAttributeTable> tablesListeners;
 
-    public AttributeTablePage(AttributeTableView parentView,final Class<? extends Attributes> clazz,final TopographyCreatorModel defaultModel){
+    public AttributeTablePage(AttributeTableView parentView, final Class<? extends Object> clazz, final TopographyCreatorModel defaultModel) {
         super(new BorderLayout());
 
         this.setBackground(Color.white);
@@ -49,9 +49,9 @@ public class AttributeTablePage extends JPanel{
         }
     }
 
-    public void updateView(Attributes object){
+    public void updateView(Object object) {
         this.selectedAttributesInstance = object;
-        for(var table : tablesListeners){
+        for (var table : tablesListeners) {
             table.updateView(object);
         }
     }
@@ -99,7 +99,7 @@ public class AttributeTablePage extends JPanel{
                 field.setAccessible(false);
                 parentView.updateModel(selectedAttributesInstance);
             } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
+                throw new RuntimeException("Meh");
             }
         }
         this.revalidate();
