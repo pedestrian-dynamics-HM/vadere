@@ -15,7 +15,10 @@ import org.vadere.util.reflection.VadereAttribute;
         include = JsonTypeInfo.As.PROPERTY,
         property = "type")
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = AttributesRegularSpawner.class, name = "org.vadere.state.attributes.spawner.AttributesRegularSpawner")
+        @JsonSubTypes.Type(value = AttributesRegularSpawner.class, name = "org.vadere.state.attributes.spawner.AttributesRegularSpawner"),
+        @JsonSubTypes.Type(value = AttributesLerpSpawner.class, name = "org.vadere.state.attributes.spawner.AttributesLerpSpawner"),
+        @JsonSubTypes.Type(value = AttributesMixedSpawner.class, name = "org.vadere.state.attributes.spawner.AttributesMixedSpawner"),
+        @JsonSubTypes.Type(value = AttributesTimeSeriesSpawner.class, name = "org.vadere.state.attributes.spawner.AttributesTimeSeriesSpawner")
 })
 public abstract class AttributesSpawner extends Attributes {
     public static final int NO_MAX_SPAWN_NUMBER_TOTAL = -1;

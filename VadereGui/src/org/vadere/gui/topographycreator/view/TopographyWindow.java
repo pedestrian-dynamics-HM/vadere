@@ -2,17 +2,11 @@ package org.vadere.gui.topographycreator.view;
 
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
-
 import org.jetbrains.annotations.NotNull;
-import org.vadere.gui.components.control.ActionGenerateMesh;
-import org.vadere.gui.components.control.ActionGeneratePoly;
-import org.vadere.gui.components.control.IViewportChangeListener;
-import org.vadere.gui.components.control.JViewportChangeListener;
-import org.vadere.gui.components.control.PanelResizeListener;
-import org.vadere.gui.components.control.ViewportChangeListener;
+import org.vadere.gui.components.control.*;
 import org.vadere.gui.components.utils.Messages;
-import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.components.utils.ResourceStrings;
+import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.components.view.InfoPanel;
 import org.vadere.gui.components.view.ScenarioElementView;
 import org.vadere.gui.components.view.ScenarioToolBar;
@@ -20,55 +14,24 @@ import org.vadere.gui.components.view.ScenarioToolBarSection;
 import org.vadere.gui.projectview.control.ActionDeselect;
 import org.vadere.gui.projectview.model.ProjectViewModel;
 import org.vadere.gui.projectview.view.JsonValidIndicator;
-import org.vadere.gui.topographycreator.control.ActionBasic;
-import org.vadere.gui.topographycreator.control.ActionCopyElement;
-import org.vadere.gui.topographycreator.control.ActionDeleteElement;
-import org.vadere.gui.topographycreator.control.ActionInsertCopiedElement;
-import org.vadere.gui.topographycreator.control.ActionMaximizeSize;
-import org.vadere.gui.topographycreator.control.ActionMergeObstacles;
-import org.vadere.gui.topographycreator.control.ActionOpenDrawOptionMenu;
-import org.vadere.gui.topographycreator.control.ActionPlaceRandomPedestrians;
-import org.vadere.gui.topographycreator.control.ActionQuickSaveTopography;
-import org.vadere.gui.topographycreator.control.ActionRedo;
-import org.vadere.gui.topographycreator.control.ActionResetTopography;
-import org.vadere.gui.topographycreator.control.ActionResizeTopographyBound;
-import org.vadere.gui.topographycreator.control.ActionSelectCut;
-import org.vadere.gui.topographycreator.control.ActionSelectSelectShape;
-import org.vadere.gui.topographycreator.control.ActionSimplifyObstacles;
-import org.vadere.gui.topographycreator.control.ActionSubtractMeasurementArea;
-import org.vadere.gui.topographycreator.control.ActionSwitchCategory;
-import org.vadere.gui.topographycreator.control.ActionSwitchSelectionMode;
-import org.vadere.gui.topographycreator.control.ActionTopographyMakroMenu;
-import org.vadere.gui.topographycreator.control.ActionTranslateElements;
-import org.vadere.gui.topographycreator.control.ActionTranslateTopography;
-import org.vadere.gui.topographycreator.control.ActionUndo;
-import org.vadere.gui.topographycreator.control.ActionZoomIn;
-import org.vadere.gui.topographycreator.control.ActionZoomOut;
-import org.vadere.gui.topographycreator.control.DrawConvexHullMode;
-import org.vadere.gui.topographycreator.control.DrawDotMode;
-import org.vadere.gui.topographycreator.control.DrawRectangleMode;
-import org.vadere.gui.topographycreator.control.DrawSimplePolygonMode;
-import org.vadere.gui.topographycreator.control.EraserMode;
-import org.vadere.gui.topographycreator.control.SelectElementMode;
-import org.vadere.gui.topographycreator.control.TopographyAction;
-import org.vadere.gui.topographycreator.control.UndoAdaptor;
+import org.vadere.gui.topographycreator.control.*;
+import org.vadere.gui.topographycreator.control.attribtable.AttributeTableContainer;
 import org.vadere.gui.topographycreator.model.IDrawPanelModel;
 import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.config.VadereConfig;
 
+import javax.swing.*;
+import javax.swing.plaf.basic.BasicSplitPaneUI;
+import javax.swing.undo.UndoManager;
+import javax.swing.undo.UndoableEditSupport;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.swing.*;
-import javax.swing.plaf.basic.BasicSplitPaneUI;
-import javax.swing.undo.UndoManager;
-import javax.swing.undo.UndoableEditSupport;
 
 public class TopographyWindow extends JPanel {
 
@@ -86,9 +49,8 @@ public class TopographyWindow extends JPanel {
 	private JTabbedPane tabbedInfoPanel;
 
 
-
-	private UndoableEditSupport undoSupport;
-	private UndoManager undoManager;
+	private final UndoableEditSupport undoSupport;
+	private final UndoManager undoManager;
 
 	public TopographyWindow(final Scenario currentScenario, @NotNull final ProjectViewModel model) {
 		toolbar = new ScenarioToolBar("Toolbar");
