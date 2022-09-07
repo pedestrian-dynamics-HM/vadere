@@ -1,12 +1,10 @@
 package org.vadere.state.scenario.spawner.impl;
 
 import org.vadere.state.attributes.spawner.AttributesRegularSpawner;
-import org.vadere.state.attributes.spawner.AttributesSpawner;
-import org.vadere.state.scenario.Topography;
 import org.vadere.state.scenario.distribution.VDistribution;
 import org.vadere.state.scenario.spawner.VSpawner;
 
-public class RegularSpawner extends VSpawner {
+public class RegularSpawner extends VSpawner<AttributesRegularSpawner> {
 
     private int remainingSpawnAgents;
     private int spawnNumber;
@@ -16,13 +14,13 @@ public class RegularSpawner extends VSpawner {
     public RegularSpawner(){
         super(new AttributesRegularSpawner());
     }
-    public RegularSpawner(AttributesSpawner attributes) {
+    public RegularSpawner(AttributesRegularSpawner attributes) {
         super(attributes);
     }
 
     @Override
     public int getSpawnNumber(double timeCurrentEvent) {
-        return ((AttributesRegularSpawner)this.spawnerAttributes).getEventElementCount();
+        return this.attributes.getEventElementCount();
     }
 
     @Override

@@ -1,22 +1,20 @@
 package org.vadere.state.attributes.scenario;
+
 import com.fasterxml.jackson.annotation.JsonView;
 import org.vadere.state.attributes.spawner.AttributesRegularSpawner;
 import org.vadere.state.attributes.spawner.AttributesSpawner;
-import org.vadere.state.scenario.spawner.VSpawner;
-import org.vadere.state.scenario.spawner.impl.RegularSpawner;
 import org.vadere.state.util.Views;
-import org.vadere.util.Attributes;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.reflection.VadereAttribute;
+
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
 public class AttributesSource extends AttributesVisualElement {
 	@VadereAttribute
 	@JsonView(Views.CacheViewExclude.class)
-	private AttributesSpawner spawner;
+	private AttributesSpawner spawner = new AttributesRegularSpawner();
 	//@VadereAttribute
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
 	private List<Integer> targetIds = new LinkedList<>();
@@ -36,7 +34,7 @@ public class AttributesSource extends AttributesVisualElement {
 	 */
 	//@VadereAttribute
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
-	private List<Double> groupSizeDistribution = Arrays.asList(1.0);
+	private List<Double> groupSizeDistribution = List.of(1.0);
 
 	public AttributesSource() {
 		super();
@@ -52,7 +50,7 @@ public class AttributesSource extends AttributesVisualElement {
 		this.id = id;
 		this.shape = shape;
 	}
-
+//TODO attributesshape
 	public AttributesSource(int id, VShape shape,AttributesSpawner spawner) {
 		super();
 		this.id = id;
@@ -60,13 +58,11 @@ public class AttributesSource extends AttributesVisualElement {
 		this.spawner = spawner;
 	}
 
-
-	public AttributesSpawner getSpawnerAttributes() {
-		return (AttributesSpawner) spawner;
+	public AttributesSpawner getSpawnerAttributes(){
+		return this.spawner;
 	}
 
-	public void setSpawnerAttributes(AttributesSpawner spawner) {
-		checkSealed();
+	public void setSpawnerAttributes(AttributesSpawner spawner){
 		this.spawner = spawner;
 	}
 

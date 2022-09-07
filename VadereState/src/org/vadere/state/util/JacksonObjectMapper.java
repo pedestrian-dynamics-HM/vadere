@@ -1,42 +1,30 @@
 package org.vadere.state.util;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Random;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.apache.commons.lang3.NotImplementedException;
-import org.vadere.state.attributes.distributions.AttributesDistribution;
-import org.vadere.state.attributes.spawner.AttributesRegularSpawner;
-import org.vadere.state.attributes.spawner.AttributesSpawner;
-import org.vadere.state.scenario.distribution.registry.DistributionRegistry;
-import org.vadere.state.scenario.spawner.SpawnerType;
-import org.vadere.util.geometry.shapes.ShapeType;
-import org.vadere.util.geometry.GeometryUtils;
-import org.vadere.state.scenario.DynamicElement;
-import org.vadere.state.scenario.Pedestrian;
-import org.vadere.state.types.ScenarioElementType;
-import org.vadere.util.geometry.shapes.VCircle;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VPolygon;
-import org.vadere.util.geometry.shapes.VRectangle;
-import org.vadere.util.geometry.shapes.VShape;
-
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.vadere.state.scenario.DynamicElement;
+import org.vadere.state.scenario.Pedestrian;
+import org.vadere.state.scenario.distribution.VDistribution;
+import org.vadere.state.scenario.spawner.VSpawner;
+import org.vadere.state.types.ScenarioElementType;
+import org.vadere.util.Attributes;
+import org.vadere.util.geometry.GeometryUtils;
+import org.vadere.util.geometry.shapes.*;
+
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
+import java.util.stream.Collectors;
 
 public class JacksonObjectMapper extends ObjectMapper {
 
@@ -129,21 +117,72 @@ public class JacksonObjectMapper extends ObjectMapper {
 			}
 		});
 
+		sm.addDeserializer(VSpawner.class, new JsonDeserializer<>() {
+			@Override
+			public VSpawner deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
+				System.out.println("In deserialising VSpawner");
+				JsonNode node = jsonParser.readValueAsTree();
+				String propertyName = VSpawner.class.getAnnotation(JsonTypeInfo.class).property();
+				var values = VSpawner.class.getAnnotation(JsonSubTypes.class).value();
+				var registeredTypes = Arrays.stream(values).collect(Collectors.toMap(t -> t.name(), t -> t.value()));
+				var requestesType = node.get(propertyName);
+				if (registeredTypes.containsKey(requestesType)) {
+					((ObjectNode) node).remove(propertyName);
+					var attributeClass = registeredTypes.get(requestesType).getGenericSuperclass().getClass();
+					var attributes = (Attributes) convertValue(node, registeredTypes.get(requestesType));
+					try {
+						return (VSpawner) registeredTypes.get(requestesType).getDeclaredConstructor(attributeClass).newInstance(attributes);
+					} catch (InstantiationException e) {
+						throw new RuntimeException(e);
+					} catch (IllegalAccessException e) {
+						throw new RuntimeException(e);
+					} catch (InvocationTargetException e) {
+						throw new RuntimeException(e);
+					} catch (NoSuchMethodException e) {
+						throw new RuntimeException(e);
+					}
+				}
+				throw new JsonParseException(jsonParser, "cannot deserialize VSpawner");
+			}
+		});
+
+		sm.addSerializer(VSpawner.class, new JsonSerializer<VSpawner>() {
+			@Override
+			public void serialize(VSpawner vSpawner, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
+
+				System.out.println();
+			}
+		});
+
 		sm.addDeserializer(DynamicElement.class, new JsonDeserializer<DynamicElement>() {
 			@Override
 			public DynamicElement deserialize(JsonParser jsonParser, DeserializationContext deserializationContext)
 					throws IOException {
 				JsonNode node = jsonParser.readValueAsTree();
 				ScenarioElementType type = convertValue(node.get("type"), ScenarioElementType.class);
-				switch (type) {
-					case PEDESTRIAN:
-						return convertValue(node, Pedestrian.class);
+				if (type == ScenarioElementType.PEDESTRIAN) {
+					return convertValue(node, Pedestrian.class);
 					// ... ?
-					default: 
-						return null;
 				}
+				return null;
 			}
 		});
+
+		sm.addDeserializer(VDistribution.class, new JsonDeserializer<VDistribution>() {
+			@Override
+			public VDistribution deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
+				System.out.println("In deserialising VDistribution");
+				return null;
+			}
+		});
+		sm.addSerializer(VDistribution.class, new JsonSerializer<VDistribution>() {
+			@Override
+			public void serialize(VDistribution distribution, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
+
+			}
+		});
+
+
 		registerModule(sm);
 	}
 
@@ -155,11 +194,6 @@ public class JacksonObjectMapper extends ObjectMapper {
 	private JsonNode serializeVRectangle(VRectangle vRect) {
 		return convertValue(new VRectangleStore(vRect), JsonNode.class);
 	}
-	private static class VAttributesDistributionStore{
-		public AttributesDistribution attributesDistribution;
-		public String type;
-	}
-	@SuppressWarnings("unused")
 	private static class VRectangleStore {
 		public double x;
 		public double y;

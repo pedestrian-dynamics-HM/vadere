@@ -1,10 +1,10 @@
 package org.vadere.state.scenario.distribution.impl;
 
 import org.apache.commons.math3.random.RandomGenerator;
-import org.vadere.util.Attributes;
-import org.vadere.state.scenario.distribution.VDistribution;
 import org.vadere.state.attributes.distributions.AttributesConstantDistribution;
+import org.vadere.state.scenario.distribution.VDistribution;
 import org.vadere.state.scenario.distribution.registry.RegisterDistribution;
+import org.vadere.util.Attributes;
 
 /**
  * @author Aleksandar Ivanov(ivanov0@hm.edu), Lukas Gradl (lgradl@hm.edu)
@@ -35,17 +35,5 @@ public class ConstantDistribution extends VDistribution<AttributesConstantDistri
 		// always add a constant value to the 'value'
 		var attribs = (AttributesConstantDistribution)this.getAttributes();
 		return timeCurrentEvent + attribs.getUpdateFrequency();
-	}
-	@Override
-	public Attributes getAttributes() {
-		return this.constantAttributes;
-	}
-
-	@Override
-	public void setAttributes(Attributes attributes) {
-		if(attributes instanceof AttributesConstantDistribution)
-			this.constantAttributes = attributes;
-		else
-			throw new IllegalArgumentException();
 	}
 }

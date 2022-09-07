@@ -1,17 +1,16 @@
 package org.vadere.state.scenario.distribution.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.math3.random.RandomGenerator;
-import org.vadere.util.Attributes;
 import org.vadere.state.attributes.distributions.AttributesConstantDistribution;
 import org.vadere.state.attributes.distributions.AttributesMixedDistribution;
 import org.vadere.state.attributes.distributions.AttributesSingleSpawnDistribution;
 import org.vadere.state.attributes.distributions.AttributesTimeSeriesDistribution;
 import org.vadere.state.scenario.distribution.VDistribution;
-import org.vadere.state.scenario.distribution.parameter.*;
+import org.vadere.state.scenario.distribution.parameter.MixedParameterDistribution;
 import org.vadere.state.scenario.distribution.registry.RegisterDistribution;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.vadere.util.Attributes;
 
 import java.util.ArrayList;
 
@@ -121,18 +120,5 @@ public class TimeSeriesDistribution extends VDistribution<AttributesTimeSeriesDi
 			currentTime += intervalLength;
 		}
 		return currentTime;
-	}
-
-	@Override
-	public Attributes getAttributes() {
-		return this.timeSeriesAttributes;
-	}
-
-	@Override
-	public void setAttributes(Attributes attributes) {
-		if(attributes instanceof AttributesTimeSeriesDistribution)
-			this.timeSeriesAttributes = attributes;
-		else
-			throw new IllegalArgumentException();
 	}
 }

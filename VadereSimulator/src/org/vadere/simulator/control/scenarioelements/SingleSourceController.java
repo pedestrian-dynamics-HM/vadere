@@ -4,7 +4,6 @@ import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.control.util.SingleSpawnArray;
 import org.vadere.simulator.models.DynamicElementFactory;
 import org.vadere.state.attributes.scenario.AttributesDynamicElement;
-import org.vadere.state.attributes.scenario.AttributesSource;
 import org.vadere.state.scenario.Source;
 import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.PointPositioned;
@@ -19,13 +18,13 @@ import java.util.stream.Collectors;
 
 public class SingleSourceController extends SourceController {
 
-	private static Logger logger = Logger.getLogger(SingleSourceController.class);
+	private static final Logger logger = Logger.getLogger(SingleSourceController.class);
 
 	private int numberToSpawn;
 	private static final int NUMBER_OF_REPOSITION_TRIES = 10;
 	private static final int NUMBER_OF_POINT_SEARCH = 1_500; // todo based on shape and position of source
 
-	private SingleSpawnArray spawnArray;
+	private final SingleSpawnArray spawnArray;
 
 	public SingleSourceController(Topography scenario, Source source,
 								  DynamicElementFactory dynamicElementFactory,

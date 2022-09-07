@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.vadere.simulator.projects.Scenario;
+import org.vadere.simulator.utils.reflection.TestResourceHandlerScenario;
 import org.vadere.simulator.utils.scenariochecker.ScenarioChecker;
 import org.vadere.simulator.utils.scenariochecker.ScenarioCheckerMessage;
 import org.vadere.simulator.utils.scenariochecker.ScenarioCheckerMessageType;
@@ -15,18 +16,13 @@ import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Source;
 import org.vadere.state.scenario.Topography;
-import org.vadere.simulator.utils.reflection.TestResourceHandlerScenario;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 
 import java.awt.geom.Area;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.PriorityQueue;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
@@ -96,7 +92,7 @@ public class ScenarioCheckerTest implements TestResourceHandlerScenario {
 	@Test
 	public void TestCheckValidTargetsInSourceNoIdNoSpawn() {
 		AttributesSourceBuilder srcBuilder = AttributesSourceBuilder.anAttributesSource();
-		AttributesSpawnerBuilder spnBuilder = AttributesSpawnerBuilder.anAttributesSpawner();
+		SpawnerBuilder spnBuilder = SpawnerBuilder.anAttributesSpawner();
 		spnBuilder.setEventElementCount(0);
 		builder.addSource(srcBuilder
 				.setSpawnerBuilder(spnBuilder)

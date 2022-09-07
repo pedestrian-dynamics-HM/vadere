@@ -18,20 +18,22 @@ public class JCollapsablePanel extends JPanel implements Observer {
     /**
      * contentPanel is used as a container for all added components
      */
-    private JPanel contentPanel;
+    private final JPanel contentPanel;
     /**
      * head is used as the header displayed at the top
      */
-    private JLabel head;
+    private final JLabel head;
     private GridBagConstraints gbc;
 
     /**
      * hidden is storing the visibility state of the contentPanel container
      */
     private  boolean hidden = false;
-
-    private Observable observable;
-    public JCollapsablePanel(String title, boolean isGroup){
+    public enum Style{
+        HEADER,GROUP
+    }
+    private final Observable observable;
+    public JCollapsablePanel(String title, Style panelStyle){
         super(new GridBagLayout());
         this.observable = new Observable();
         contentPanel = new JPanel(new GridBagLayout());
@@ -39,7 +41,7 @@ public class JCollapsablePanel extends JPanel implements Observer {
 
         initializeGridBagConstraint();
 
-        if(isGroup) {
+        if(panelStyle.equals(Style.GROUP)) {
             initializeGroupHeaderStyle(head);
             head.addMouseListener(new GroupHeaderMouseInputAdapter(head,contentPanel));
         } else {
@@ -102,7 +104,7 @@ public class JCollapsablePanel extends JPanel implements Observer {
      */
     private class SectionHeaderMouseInputAdapter extends MouseInputAdapter {
 
-        private JPanel contentPanel;
+        private final JPanel contentPanel;
 
         private SectionHeaderMouseInputAdapter(JPanel contentPanel) {
             this.contentPanel = contentPanel;

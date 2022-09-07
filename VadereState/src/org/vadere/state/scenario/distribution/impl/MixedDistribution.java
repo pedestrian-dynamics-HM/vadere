@@ -1,13 +1,12 @@
 package org.vadere.state.scenario.distribution.impl;
 
 import org.apache.commons.math3.random.RandomGenerator;
-import org.vadere.state.attributes.distributions.AttributesDistribution;
-import org.vadere.util.Attributes;
+import org.vadere.state.attributes.distributions.AttributesMixedDistribution;
 import org.vadere.state.scenario.distribution.DistributionFactory;
 import org.vadere.state.scenario.distribution.VDistribution;
-import org.vadere.state.attributes.distributions.AttributesMixedDistribution;
 import org.vadere.state.scenario.distribution.parameter.MixedParameterDistribution;
 import org.vadere.state.scenario.distribution.registry.RegisterDistribution;
+import org.vadere.util.Attributes;
 
 import java.util.ArrayList;
 
@@ -53,7 +52,7 @@ public class MixedDistribution extends VDistribution<AttributesMixedDistribution
 		for (MixedParameterDistribution distribution : distributions) {
 			VDistribution<?> dist = DistributionFactory
 					.create(
-							(AttributesDistribution) getAttributes(),
+							getAttributes(),
 							randomGenerator
 					);
 			this.distributions.add(dist);
@@ -94,16 +93,4 @@ public class MixedDistribution extends VDistribution<AttributesMixedDistribution
 		return distributions.get(currentInterval);
 	}
 
-	@Override
-	public Attributes getAttributes() {
-		return this.mixedAttributes;
-	}
-
-	@Override
-	public void setAttributes(Attributes attributes) {
-		if(attributes instanceof AttributesMixedDistribution)
-			this.mixedAttributes = attributes;
-		else
-			throw new IllegalArgumentException();
-	}
 }

@@ -1,9 +1,11 @@
-package org.vadere.gui.topographycreator.control.celleditor;
+package org.vadere.gui.topographycreator.control.celleditor.impl;
 
+import org.vadere.gui.topographycreator.control.JAttributeTable;
 import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
 import org.vadere.gui.topographycreator.view.AttributeTablePage;
+import org.vadere.gui.topographycreator.view.AttributeTableView;
+import org.vadere.gui.topographycreator.view.AttributeTranslator;
 import org.vadere.util.Attributes;
-import org.vadere.util.AttributesAttached;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -13,7 +15,7 @@ import java.awt.event.MouseEvent;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 
-public class AttributeClassSelector extends AttributeEditor {
+public class ChildObjectCellEditor extends AttributeEditor implements AttributeTranslator {
 
     private final JButton button;
     private GridBagConstraints gbc;
@@ -24,9 +26,16 @@ public class AttributeClassSelector extends AttributeEditor {
 
     private boolean contentPaneVisible = false;
 
+    private AttributeTableView view;
 
-    public AttributeClassSelector(Field attached, Field field, TopographyCreatorModel model, JPanel contentPanel) {
-        super(attached, field, model,contentPanel);
+    public ChildObjectCellEditor(
+            JAttributeTable parent,
+            Attributes fieldOwner,
+            Field field,
+            TopographyCreatorModel model,
+            JPanel contentPanel
+    ) {
+        super(parent,fieldOwner, field, model,contentPanel);
         this.contentPanel.setLayout(new BorderLayout());
         this.contentPanel.setBorder(new EmptyBorder(2,2,2,2));
         this.contentPanel.setVisible(contentPaneVisible);
@@ -70,11 +79,13 @@ public class AttributeClassSelector extends AttributeEditor {
     }
 
     public void modelChanged(Object value) {
+        view.updateView((Attributes) value);
     }
 
     private void createInternalPropertyPane(Attributes newObject, TopographyCreatorModel model) {
-        var proppane = new AttributeTablePage(newObject.getClass(), model);
-        contentPanel.add(proppane,BorderLayout.CENTER);
+        view = new AttributeTableView(this,model);
+        view.selectionChange(newObject);
+        contentPanel.add(view,BorderLayout.CENTER);
     }
 
     private Attributes constructNewObject() throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
@@ -82,4 +93,8 @@ public class AttributeClassSelector extends AttributeEditor {
         return newObject;
     }
 
+    @Override
+    public void updateModel(Attributes attributes) {
+        parentTranslator.updateModel(field,attributes);
+    }
 }

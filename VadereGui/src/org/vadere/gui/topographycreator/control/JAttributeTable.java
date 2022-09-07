@@ -1,13 +1,13 @@
 package org.vadere.gui.topographycreator.control;
 
-import org.vadere.gui.topographycreator.control.celleditor.*;
+import org.vadere.gui.topographycreator.control.celleditor.FieldValueEditor;
+import org.vadere.gui.topographycreator.control.celleditor.impl.*;
 import org.vadere.gui.topographycreator.control.cellrenderer.FieldNameRenderer;
 import org.vadere.gui.topographycreator.control.cellrenderer.FieldValueRenderer;
 import org.vadere.gui.topographycreator.model.AttributeTableModel;
 import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
-import org.vadere.state.scenario.ScenarioElement;
+import org.vadere.gui.topographycreator.view.AttributeTablePage;
 import org.vadere.util.Attributes;
-import org.vadere.util.AttributesAttached;
 import org.vadere.util.observer.NotifyContext;
 
 import javax.swing.*;
@@ -18,14 +18,16 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 public class JAttributeTable extends JPanel implements Observer {
     /**
      *
      */
-    private Attributes attached;
+    private final AttributeTablePage parent;
+    private Field ownerField;
+    private Attributes fieldOwner;
     private final List<JComponent> renderOrderModel;
 
     /**
@@ -48,7 +50,13 @@ public class JAttributeTable extends JPanel implements Observer {
     private final GridBagConstraints gbc = initializeGridBagConstraint();
 
     private TopographyCreatorModel topmodel;
-    public JAttributeTable(){
+
+    public JAttributeTable(
+            AttributeTablePage parent,
+            AttributeTableModel attrmodel,
+            TopographyCreatorModel topmodel,
+            Attributes object)
+    {
         super(new GridBagLayout());
         this.editorConstructors = new HashMap<>();
         this.editorInstances = new HashMap<>();
@@ -57,12 +65,10 @@ public class JAttributeTable extends JPanel implements Observer {
         this.registerDefaultEditors();
         initCellRenderer();
         this.setVisible(true);
-    }
-    public JAttributeTable(AttributeTableModel attrmodel, TopographyCreatorModel topmodel, Attributes object){
-        this();
-        this.attached = object;
+        this.parent = parent;
+        this.fieldOwner = object;
         setModel(attrmodel,topmodel);
-        updateView();
+        updateView(object);
         this.fieldValueRendere.setEditors(this.editorInstances);
         this.fieldValueEditor.set(this.editorInstances);
     }
@@ -85,7 +91,7 @@ public class JAttributeTable extends JPanel implements Observer {
         if(!this.editorConstructors.containsKey(type)){
             Constructor<? extends AttributeEditor> constructor = null;
             try {
-                constructor = clazz.getDeclaredConstructor(Field.class, Field.class, TopographyCreatorModel.class,JPanel.class);
+                constructor = clazz.getDeclaredConstructor(JAttributeTable.class,Attributes.class, Field.class, TopographyCreatorModel.class,JPanel.class);
             } catch (NoSuchMethodException e) {
                 throw new RuntimeException(e);
             }
@@ -94,10 +100,10 @@ public class JAttributeTable extends JPanel implements Observer {
     }
 
     private void registerDefaultEditors() {
-        addTypeEditor(String.class, AttributeTextEditor.class);
-        addTypeEditor(Integer.class, AttributeSpinner.class);
-        addTypeEditor(Double.class, AttributeDoubleSpinner.class);
-        addTypeEditor(Boolean.class, AttributeCheckBox.class);
+        addTypeEditor(String.class, TextEditCellEditor.class);
+        addTypeEditor(Integer.class, SpinnerCellEditor.class);
+        addTypeEditor(Double.class, DoubleSpinnerCellEditor.class);
+        addTypeEditor(Boolean.class, CheckBoxCellEditor.class);
 
     }
 
@@ -116,18 +122,18 @@ public class JAttributeTable extends JPanel implements Observer {
 
             if(!this.editorConstructors.containsKey(typeName)){
                 if(type.isEnum())
-                    this.addTypeEditor(type, AttributeComboBox.class);
+                    this.addTypeEditor(type, ComboBoxCellEditor.class);
                 else if(Modifier.isAbstract(type.getModifiers()))
-                    this.addTypeEditor(type, AttributeSubClassSelector.class);
+                    this.addTypeEditor(type, AbstractTypeCellEditor.class);
                 else
-                    this.addTypeEditor(type, AttributeClassSelector.class);
+                    this.addTypeEditor(type, ChildObjectCellEditor.class);
             }
 
             Constructor constructor = this.editorConstructors.get(type.getName());
             AttributeEditor component = null;
 
             try {
-                component = (AttributeEditor) constructor.newInstance(attached, field, topmodel, subPanel);
+                component = (AttributeEditor) constructor.newInstance(this,fieldOwner, field, topmodel, subPanel);
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
                 throw new RuntimeException(e);
             }
@@ -196,25 +202,26 @@ public class JAttributeTable extends JPanel implements Observer {
             var component = (AttributeEditor) editorInstances.get(fielName);
             var field = nameFields.get(fielName);
             field.setAccessible(true);
-            if(attached != null) {
-                component.updateView(attached);
+            if(fieldOwner != null) {
+                component.updateView(fieldOwner);
             }
             field.setAccessible(false);
         }
     }
 
-    public void updateView(Object parent,Field attachedObject){
-        for(var fieldName : editorInstances.keySet()){
-            var field = nameFields.get(fieldName);
-            var editor = (AttributeEditor)editorInstances.get(fieldName);
-            editor.setParent(parent);
-            editor.setAttached(attachedObject);
-            try {
-                field.setAccessible(true);
-                editor.updateView(field.get(attachedObject.get(((ScenarioElement)parent).getAttributes())));
-                field.setAccessible(false);
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
+    public void updateView(Attributes object){
+        if(object != null) {
+            for (var fieldName : editorInstances.keySet()) {
+                var field = nameFields.get(fieldName);
+                var editor = (AttributeEditor) editorInstances.get(fieldName);
+                try {
+                    field.setAccessible(true);
+                    editor.setFieldOwner(object);
+                    editor.updateView(field.get(object));
+                    field.setAccessible(false);
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
     }
@@ -231,8 +238,13 @@ public class JAttributeTable extends JPanel implements Observer {
 
     }
 
-    public void setAttached(Attributes element) {
-        this.attached = element;
+    public void setFieldOwner(Attributes element) {
+        this.fieldOwner = element;
     }
 
+    public void updateModel(Field field, Object object) {
+        parent.updateModel(field,object);
+        this.revalidate();
+        this.repaint();
+    }
 }

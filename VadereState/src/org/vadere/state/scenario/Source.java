@@ -1,13 +1,10 @@
 package org.vadere.state.scenario;
 
-import org.vadere.util.Attributes;
 import org.vadere.state.attributes.scenario.AttributesSource;
 import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.geometry.shapes.VShape;
 
-public class Source extends ScenarioElement {
-
-	private AttributesSource attributes;
+public class Source extends ScenarioElement<AttributesSource> {
 
 	public Source(AttributesSource attributes) {
 		this.attributes = attributes;
@@ -32,18 +29,6 @@ public class Source extends ScenarioElement {
 	public void setId(int id) {
 		attributes.setId(id);
 	}
-
-	@Override
-	public AttributesSource getAttributes() {
-		return attributes;
-	}
-
-	@Override
-	public void setAttributes(Attributes attributes) {
-		this.attributes = (AttributesSource) attributes;
-	}
-
-
 
 	public double getStartTime() {
 		return attributes.getSpawnerAttributes().getConstraintsTimeStart();
@@ -70,14 +55,8 @@ public class Source extends ScenarioElement {
 		}
 		Source other = (Source) obj;
 		if (attributes == null) {
-			if (other.attributes != null) {
-				return false;
-			}
-		} else if (!this.attributes.equals(other.attributes)) {
-			return false;
-		}
-
-		return true;
+			return other.attributes == null;
+		} else return this.attributes.equals(other.attributes);
 	}
 
 	@Override

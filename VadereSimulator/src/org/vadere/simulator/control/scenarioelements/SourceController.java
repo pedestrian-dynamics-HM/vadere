@@ -12,8 +12,8 @@ import org.vadere.state.attributes.spawner.AttributesSpawner;
 import org.vadere.state.scenario.*;
 import org.vadere.state.scenario.distribution.DistributionFactory;
 import org.vadere.state.scenario.distribution.VDistribution;
-import org.vadere.state.scenario.spawner.VSpawner;
 import org.vadere.state.scenario.distribution.impl.MixedDistribution;
+import org.vadere.state.scenario.spawner.VSpawner;
 import org.vadere.state.scenario.spawner.impl.RegularSpawner;
 import org.vadere.util.geometry.LinkedCellsGrid;
 import org.vadere.util.geometry.shapes.VCircle;
@@ -66,12 +66,10 @@ public abstract class SourceController extends ScenarioElementController impleme
         this.eventListener = new ArrayList<>();
         timeOfNextEvent = spawnerAttributes.getConstraintsTimeStart();
         try {
-            var distributionAttributes = spawnerAttributes.getDistributionAttributes();
             distribution = DistributionFactory.create(
-                    distributionAttributes,
-                    new JDKRandomGenerator(random.nextInt())
+                    spawnerAttributes.getDistributionAttributes(), new JDKRandomGenerator(random.nextInt())
             );
-            this.spawner = new RegularSpawner();//new RegularSpawner(this.spawnerAttributes,topography,distribution);
+            spawner = new RegularSpawner((AttributesRegularSpawner) spawnerAttributes);
         } catch (Exception e) {
             throw new IllegalArgumentException("Problem with scenario parameters for source: "
                     + "interSpawnTimeDistribution and/or distributionParameters. See causing Excepion herefafter.", e);
@@ -114,7 +112,7 @@ public abstract class SourceController extends ScenarioElementController impleme
 
     protected boolean isMaximumNumberOfSpawnedElementsReached() {
         final int maxNumber = spawnerAttributes.getConstraintsElementsMax();
-        return maxNumber != spawnerAttributes.NO_MAX_SPAWN_NUMBER_TOTAL
+        return maxNumber != AttributesSpawner.NO_MAX_SPAWN_NUMBER_TOTAL
                 && dynamicElementsCreatedTotal >= maxNumber;
     }
 

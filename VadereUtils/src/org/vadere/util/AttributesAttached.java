@@ -1,9 +1,8 @@
 package org.vadere.util;
 
-import org.vadere.util.Attributes;
+public abstract class AttributesAttached<T extends Attributes> {
+    protected T attributes;
+    public T getAttributes(){return attributes;}
 
-public interface AttributesAttached {
-    Attributes getAttributes();
-
-    void setAttributes(Attributes attributes);
+    public void setAttributes(T attributes){this.attributes = attributes;}
 }

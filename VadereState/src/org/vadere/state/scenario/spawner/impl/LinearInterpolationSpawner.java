@@ -4,15 +4,14 @@ import org.apache.commons.math3.analysis.interpolation.LinearInterpolator;
 import org.apache.commons.math3.analysis.polynomials.PolynomialSplineFunction;
 import org.apache.commons.math3.random.JDKRandomGenerator;
 import org.vadere.state.attributes.spawner.AttributesSpawner;
-import org.vadere.state.scenario.Topography;
-import org.vadere.state.scenario.distribution.impl.LinearInterpolationDistribution;
+import org.vadere.state.scenario.spawner.VSpawner;
 import org.vadere.util.math.TruncatedNormalDistribution;
 
 import java.util.Random;
 
-public class LinearInterpolationSpawner extends RegularSpawner {
-    private TruncatedNormalDistribution truncNormalDist;
-    private PolynomialSplineFunction interpolator;
+public class LinearInterpolationSpawner extends VSpawner {
+    private final TruncatedNormalDistribution truncNormalDist;
+    private final PolynomialSplineFunction interpolator;
 
     public LinearInterpolationSpawner(AttributesSpawner attributes) {
         super(attributes);

@@ -1,10 +1,10 @@
 package org.vadere.state.scenario.distribution.impl;
 
 import org.apache.commons.math3.random.RandomGenerator;
-import org.vadere.util.Attributes;
-import org.vadere.state.scenario.distribution.VDistribution;
 import org.vadere.state.attributes.distributions.AttributesBinomialDistribution;
+import org.vadere.state.scenario.distribution.VDistribution;
 import org.vadere.state.scenario.distribution.registry.RegisterDistribution;
+import org.vadere.util.Attributes;
 
 /**
  * @author Aleksandar Ivanov(ivanov0@hm.edu), Lukas Gradl (lgradl@hm.edu)
@@ -33,16 +33,4 @@ public class BinomialDistribution extends VDistribution<AttributesBinomialDistri
 		return timeCurrentEvent + distribution.sample();
 	}
 
-	@Override
-	public Attributes getAttributes() {
-		return this.binomialAttributes;
-	}
-
-	@Override
-	public void setAttributes(Attributes attributes) {
-		if(attributes instanceof  AttributesBinomialDistribution)
-			this.binomialAttributes = attributes;
-		else
-			throw new IllegalArgumentException();
-	}
 }

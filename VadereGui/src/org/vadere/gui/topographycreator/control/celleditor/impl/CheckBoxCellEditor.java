@@ -1,20 +1,23 @@
-package org.vadere.gui.topographycreator.control.celleditor;
+package org.vadere.gui.topographycreator.control.celleditor.impl;
 
+import org.vadere.gui.topographycreator.control.JAttributeTable;
 import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
 import org.vadere.util.Attributes;
-import org.vadere.util.AttributesAttached;
 
 import javax.swing.*;
 import java.lang.reflect.Field;
 
-public class AttributeCheckBox extends AttributeEditor {
+public class CheckBoxCellEditor extends AttributeEditor {
     private JCheckBox checkBox;
-    private boolean isInit = true;
-    public AttributeCheckBox(Field attached,
-                             Field field,
-                             TopographyCreatorModel model,
-                             JPanel unused) {
-        super(attached, field, model,null);
+    private final boolean isInit = true;
+    public CheckBoxCellEditor(
+            JAttributeTable parent,
+            Attributes fieldOwner,
+            Field field,
+            TopographyCreatorModel model,
+            JPanel unused
+    ) {
+        super(parent,fieldOwner, field, model,null);
     }
     @Override
     protected void initialize() {

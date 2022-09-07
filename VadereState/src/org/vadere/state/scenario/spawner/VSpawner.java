@@ -2,14 +2,10 @@ package org.vadere.state.scenario.spawner;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import org.vadere.state.attributes.distributions.AttributesBinomialDistribution;
-import org.vadere.state.scenario.spawner.impl.RegularSpawner;
-import org.vadere.util.Attributes;
-import org.vadere.util.AttributesAttached;
-import org.vadere.state.attributes.scenario.AttributesSource;
-import org.vadere.state.scenario.Topography;
 import org.vadere.state.attributes.spawner.AttributesSpawner;
-import org.vadere.state.scenario.distribution.VDistribution;
+import org.vadere.state.scenario.Topography;
+import org.vadere.state.scenario.spawner.impl.RegularSpawner;
+import org.vadere.util.AttributesAttached;
 
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
@@ -18,15 +14,14 @@ import org.vadere.state.scenario.distribution.VDistribution;
 @JsonSubTypes({
         @JsonSubTypes.Type(value = RegularSpawner.class, name = "org.vadere.state.scenario.spawner.impl.RegularSpawner"),
 })
-public abstract class VSpawner  implements AttributesAttached {
+public abstract class VSpawner<T extends AttributesSpawner>  extends AttributesAttached<T> {
     private final Topography topography = null;
-    protected AttributesSpawner spawnerAttributes;
     protected int dynamicElementsCreatedTotal = 0;
 
     public VSpawner(){}
 
-    public VSpawner(AttributesSpawner attributes) {
-        this.spawnerAttributes = attributes;
+    public VSpawner(T attributes) {
+        this.attributes= attributes;
     }
 
     public abstract int getSpawnNumber(double timeCurrentEvent);
@@ -42,38 +37,30 @@ public abstract class VSpawner  implements AttributesAttached {
             return true;
         }
         if (isSpawnerWithOneSingleSpawnEvent()) {
-            return dynamicElementsCreatedTotal == spawnerAttributes.getEventElementCount();
+            return dynamicElementsCreatedTotal == attributes.getEventElementCount();
         }
         return isAfterSourceEndTime(simTimeInSec) && isQueueEmpty();
     }
 
     public boolean isMaximumNumberOfSpawnedElementsReached() {
-        final int maxNumber = spawnerAttributes.getConstraintsElementsMax();
+        final int maxNumber = attributes.getConstraintsElementsMax();
         return maxNumber != AttributesSpawner.NO_MAX_SPAWN_NUMBER_TOTAL
                 && dynamicElementsCreatedTotal >= maxNumber;
     }
 
     protected boolean isAfterSourceEndTime(double simTimeInSec) {
-        return simTimeInSec > spawnerAttributes.getConstraintsTimeStart();
+        return simTimeInSec > attributes.getConstraintsTimeStart();
     }
 
     protected boolean isSpawnerWithOneSingleSpawnEvent() {
-        return spawnerAttributes.getConstraintsTimeEnd() == spawnerAttributes.getConstraintsTimeStart();
+        return attributes.getConstraintsTimeEnd() == attributes.getConstraintsTimeStart();
     }
 
     abstract protected boolean isQueueEmpty();
+    @Override
+    public T getAttributes(){return attributes;}
 
     @Override
-    public Attributes getAttributes() {
-        return this.spawnerAttributes;
-    }
-
-    @Override
-    public void setAttributes(Attributes attributes) {
-        if(attributes instanceof AttributesSpawner)
-            this.spawnerAttributes = (AttributesSpawner) attributes;
-        else
-            throw new IllegalArgumentException();
-    }
+    public void setAttributes(T attributes){this.attributes = attributes;}
 
 }

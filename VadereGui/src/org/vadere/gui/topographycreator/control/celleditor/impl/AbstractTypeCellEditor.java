@@ -1,10 +1,12 @@
-package org.vadere.gui.topographycreator.control.celleditor;
+package org.vadere.gui.topographycreator.control.celleditor.impl;
 
 import org.jetbrains.annotations.NotNull;
 import org.reflections.Reflections;
+import org.vadere.gui.topographycreator.control.JAttributeTable;
 import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
 import org.vadere.gui.topographycreator.utils.RunnableRegistry;
 import org.vadere.gui.topographycreator.view.AttributeTableView;
+import org.vadere.gui.topographycreator.view.AttributeTranslator;
 import org.vadere.util.Attributes;
 
 import javax.swing.*;
@@ -12,8 +14,10 @@ import java.awt.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * This AttributeEditor Class is used by JAttributeTable as the default fallback for
@@ -23,30 +27,31 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 
 //TODO: add jtable to constructor for revalidation & repaint
-public class AttributeSubClassSelector extends AttributeEditor {
+public class AbstractTypeCellEditor extends AttributeEditor implements AttributeTranslator {
     public static final String STRING_NULL = "[null]";
     private JComboBox<Object> comboBox;
-    private AttributeSubClassSelector self;
+    private AbstractTypeCellEditor self;
     private RunnableRegistry runnableRegistry;
-    private Map<Class<?>,Constructor<?>> classConstructorRegistry;
+    private Map<String,Constructor<?>> classConstructorRegistry;
     private Map<String,Class<?>> classNameRegistry;
     private GridBagConstraints gbc;
     private String selected;
 
     private AttributeTableView attributeTableView;
-    private Object previousObject;
-    public AttributeSubClassSelector(
-            Field attached,
+    private Attributes instanceOfSelected;
+    public AbstractTypeCellEditor(
+            JAttributeTable parent,
+            Attributes fieldOwner,
             Field field,
             TopographyCreatorModel model,
             JPanel contentPanel
     ) {
-        super(attached, field, model,contentPanel);
+        super(parent,fieldOwner, field, model,contentPanel);
 
     }
     @Override
     protected void initialize() {
-        this.attributeTableView = new AttributeTableView(getModel());
+        this.attributeTableView = new AttributeTableView(this,getModel());
         initializeGridBagConstraint();
         initializeRunnableRegistry();
         initializeComboBox();
@@ -55,11 +60,17 @@ public class AttributeSubClassSelector extends AttributeEditor {
     }
     @Override
     public void modelChanged(Object value) {
-        if(value.getClass() != previousObject) {
-            this.previousObject = value;
-            this.selected = getSimpleName(value.getClass());
+        if(value != instanceOfSelected) {
+            if(value == null){
+                this.selected = "[null]";
+            }else{
+                this.selected = getSimpleName(value.getClass());
+            }
+            this.instanceOfSelected = (Attributes) value;
             this.comboBox.getModel().setSelectedItem(this.selected);
-            this.attributeTableView.updateView(parent,this.fieldOwner);
+            this.attributeTableView.updateView((Attributes) value);
+            this.contentPanel.revalidate();
+            this.contentPanel.repaint();
         }
     }
 
@@ -71,19 +82,22 @@ public class AttributeSubClassSelector extends AttributeEditor {
         this.runnableRegistry = new RunnableRegistry();
         this.runnableRegistry.registerAction("[null]",()->{
             updateModel(null);
-            this.attributeTableView.selectionChange(null,null);
+            instanceOfSelected = null;
+            this.attributeTableView.selectionChange(instanceOfSelected);
         });
         this.runnableRegistry.registerDefault(()->{
             selected = getSelectedItem();
-            Attributes newAttributeInstance = null;
-
             try {
-                newAttributeInstance = (Attributes) classConstructorRegistry.get(classNameRegistry.get(selected)).newInstance();
-            } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                instanceOfSelected = (Attributes) classConstructorRegistry.get(selected).newInstance();
+            } catch (InstantiationException e) {
+                throw new RuntimeException(e);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            } catch (InvocationTargetException e) {
                 throw new RuntimeException(e);
             }
-            this.attributeTableView.selectionChange(parent,fieldOwner);
-            updateModel(previousObject);
+            updateModel(instanceOfSelected);
+            this.attributeTableView.selectionChange(instanceOfSelected);
         });
     }
 
@@ -122,7 +136,7 @@ public class AttributeSubClassSelector extends AttributeEditor {
         classesModel.sort(Comparator.comparing(Class::getSimpleName));
         for (var clazz : classesModel) {
             try {
-                classConstructorRegistry.put(clazz, clazz.getDeclaredConstructor());
+                classConstructorRegistry.put(getSimpleName(clazz), clazz.getDeclaredConstructor());
             } catch (NoSuchMethodException e) {
                 throw new RuntimeException(e);
             }
@@ -148,5 +162,12 @@ public class AttributeSubClassSelector extends AttributeEditor {
         this.gbc.weightx = 1;
         this.gbc.insets = new Insets(1, 1, 1, 1);
 
+    }
+
+    @Override
+    public void updateModel(Attributes attributes) {
+        parentTranslator.updateModel(field,attributes);
+        this.contentPanel.revalidate();
+        this.contentPanel.repaint();
     }
 }

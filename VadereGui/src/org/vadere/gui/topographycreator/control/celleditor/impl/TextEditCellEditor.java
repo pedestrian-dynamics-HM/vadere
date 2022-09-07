@@ -1,8 +1,8 @@
-package org.vadere.gui.topographycreator.control.celleditor;
+package org.vadere.gui.topographycreator.control.celleditor.impl;
 
+import org.vadere.gui.topographycreator.control.JAttributeTable;
 import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
 import org.vadere.util.Attributes;
-import org.vadere.util.AttributesAttached;
 
 import javax.swing.*;
 import javax.swing.text.AttributeSet;
@@ -19,13 +19,19 @@ import java.lang.reflect.Field;
  * the attached objects fields get updated.
  */
 
-public class AttributeTextEditor extends AttributeEditor {
+public class TextEditCellEditor extends AttributeEditor {
     private JTextField textField;
 
     private String oldValue;
 
-    public AttributeTextEditor(Field attached, Field field, TopographyCreatorModel model, JPanel unused) {
-        super(attached, field, model,null);
+    public TextEditCellEditor(
+            JAttributeTable parent,
+            Attributes fieldOwner,
+            Field field,
+            TopographyCreatorModel model,
+            JPanel unused
+    ) {
+        super(parent,fieldOwner, field, model,null);
     }
 
     @Override

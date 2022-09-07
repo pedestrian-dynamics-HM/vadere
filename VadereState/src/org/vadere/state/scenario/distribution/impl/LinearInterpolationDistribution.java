@@ -1,10 +1,10 @@
 package org.vadere.state.scenario.distribution.impl;
 
 import org.apache.commons.math3.random.RandomGenerator;
-import org.vadere.util.Attributes;
-import org.vadere.state.scenario.distribution.VDistribution;
 import org.vadere.state.attributes.distributions.AttributesLinearInterpolationDistribution;
+import org.vadere.state.scenario.distribution.VDistribution;
 import org.vadere.state.scenario.distribution.registry.RegisterDistribution;
+import org.vadere.util.Attributes;
 
 /**
  * @author Aleksandar Ivanov(ivanov0@hm.edu), Lukas Gradl (lgradl@hm.edu),
@@ -45,16 +45,4 @@ public class LinearInterpolationDistribution extends VDistribution<AttributesLin
 		return timeCurrentEvent + attribs.getSpawnFrequency();
 	}
 
-	@Override
-	public Attributes getAttributes() {
-		return this.lerpAttributes;
-	}
-
-	@Override
-	public void setAttributes(Attributes attributes) {
-		if(attributes instanceof AttributesLinearInterpolationDistribution)
-			this.lerpAttributes = attributes;
-		else
-			throw new IllegalArgumentException();
-	}
 }

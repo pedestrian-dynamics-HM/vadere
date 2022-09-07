@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonView;
-import org.vadere.state.attributes.distributions.AttributesConstantDistribution;
 import org.vadere.state.attributes.distributions.AttributesDistribution;
 import org.vadere.state.attributes.scenario.AttributesVisualElement;
 import org.vadere.state.util.Views;
@@ -44,7 +43,7 @@ public abstract class AttributesSpawner extends Attributes {
     protected AttributesVisualElement eventElement = null;
     @VadereAttribute
     @JsonView(Views.CacheViewExclude.class)
-    protected AttributesDistribution distribution = new AttributesConstantDistribution();
+    protected AttributesDistribution distribution = null;
 
     public AttributesSpawner(){
     }

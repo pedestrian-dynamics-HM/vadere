@@ -1,49 +1,58 @@
 package org.vadere.gui.topographycreator.view;
 
-import org.vadere.gui.components.view.ISelectScenarioElementListener;
-import org.vadere.gui.topographycreator.control.AttributeHelpView;
 import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
-import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.util.Attributes;
 
 import javax.swing.*;
-import javax.swing.border.LineBorder;
 import java.awt.*;
-import java.lang.reflect.Field;
 import java.util.HashMap;
-
-import static org.vadere.gui.topographycreator.utils.Layouts.initGridBagConstraint;
 
 public class AttributeTableView extends JPanel{
 
     private final TopographyCreatorModel defaultModel;
     HashMap<Class, AttributeTablePage> editorPages;
 
+    private Attributes selectedAttributesInstance;
+
     AttributeTablePage activePage;
 
-    public AttributeTableView(final TopographyCreatorModel defaultModel){
+    private final AttributeTranslator parentModelTranslator;
+
+    public AttributeTableView(AttributeTranslator parent,final TopographyCreatorModel defaultModel){
         super(new BorderLayout());
+        this.parentModelTranslator = parent;
         this.defaultModel = defaultModel;
         this.editorPages = new HashMap<>();
     }
 
-    public void selectionChange(Object parent,Field field) {
+    public void selectionChange(Attributes object) {
+        this.selectedAttributesInstance = object;
         this.removeAll();
-        if(parent != null) {
+        if(object != null) {
 
-            if (!editorPages.containsKey(parent.getClass())) {
-                var attributePage = new AttributeTablePage(field.getType(), defaultModel);
-                this.editorPages.put(parent.getClass(), attributePage);
+            if (!editorPages.containsKey(object.getClass())) {
+                var archetype = object.getClass();
+                var attributePage = new AttributeTablePage(this,archetype, defaultModel);
+                this.editorPages.put(object.getClass(), attributePage);
             }
-            activePage = editorPages.get(parent.getClass());
-            activePage.updateView(parent,field);
+            activePage = editorPages.get(object.getClass());
+            activePage.updateView(object);
             this.add(activePage,BorderLayout.NORTH);
-            revalidate();
-            repaint();
+
+        }else{
+            this.removeAll();
         }
+        revalidate();
+        repaint();
     }
-    public  void updateView(Object parent,Field attributes){
+    public  void updateView(Attributes object){
         if(activePage!= null)
-            activePage.updateView(parent,attributes);
+            activePage.updateView(object);
+    }
+
+    public void updateModel(Attributes selectedAttributesInstance) {
+        parentModelTranslator.updateModel(selectedAttributesInstance);
+        this.revalidate();
+        this.repaint();
     }
 }

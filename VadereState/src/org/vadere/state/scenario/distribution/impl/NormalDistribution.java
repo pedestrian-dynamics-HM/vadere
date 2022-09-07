@@ -1,10 +1,10 @@
 package org.vadere.state.scenario.distribution.impl;
 
 import org.apache.commons.math3.random.RandomGenerator;
-import org.vadere.util.Attributes;
-import org.vadere.state.scenario.distribution.VDistribution;
 import org.vadere.state.attributes.distributions.AttributesNormalDistribution;
+import org.vadere.state.scenario.distribution.VDistribution;
 import org.vadere.state.scenario.distribution.registry.RegisterDistribution;
+import org.vadere.util.Attributes;
 import org.vadere.util.math.TruncatedNormalDistribution;
 
 /**
@@ -39,16 +39,4 @@ public class NormalDistribution extends VDistribution<AttributesNormalDistributi
 		return timeCurrentEvent + distribution.sample();
 	}
 
-	@Override
-	public Attributes getAttributes() {
-		return this.normalAttributes;
-	}
-
-	@Override
-	public void setAttributes(Attributes attributes) {
-		if(attributes instanceof AttributesNormalDistribution)
-			this.normalAttributes = attributes;
-		else
-			throw new IllegalArgumentException();
-	}
 }

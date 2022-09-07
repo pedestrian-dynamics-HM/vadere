@@ -5,23 +5,31 @@ import org.vadere.gui.topographycreator.control.AttributeHelpView;
 import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.util.Attributes;
+import org.vadere.util.observer.NotifyContext;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import java.awt.*;
+import java.util.Observable;
+import java.util.Observer;
 
 import static org.vadere.gui.topographycreator.utils.Layouts.initGridBagConstraint;
 
-public class AttributeTableContainer extends JPanel implements ISelectScenarioElementListener {
+public class AttributeTableContainer extends JPanel implements ISelectScenarioElementListener, Observer,AttributeTranslator {
     AttributeTableView attrView;
-
     JTextPane helpView;
+
+    ScenarioElement selectedElement;
+
+    TopographyCreatorModel panelModel;
+
+    protected final NotifyContext ctx = new NotifyContext(this.getClass());
 
     public  AttributeTableContainer(final TopographyCreatorModel defaultModel){
         super(new GridBagLayout());
-        attrView = new AttributeTableView(defaultModel);
+        attrView = new AttributeTableView(this,defaultModel);
         helpView = AttributeHelpView.getInstance();
-
+        this.panelModel = defaultModel;
 
         var minimalHelpViewSize = new Dimension(1,Toolkit.getDefaultToolkit().getScreenSize().height/10);
 
@@ -38,16 +46,24 @@ public class AttributeTableContainer extends JPanel implements ISelectScenarioEl
     }
     @Override
     public void selectionChange(ScenarioElement scenarioElement) {
-        if(scenarioElement!= null){
-            var fields = scenarioElement.getClass().getDeclaredFields();
-            for(var field : fields){
-                if(Attributes.class.isAssignableFrom(field.getType())){
-                    attrView.selectionChange(scenarioElement,field);
-                    return;
-                }
-            }
-            throw new IllegalStateException("Every ScenarioElement should have only one field inheriting from Attributes");
-        }
-        attrView.selectionChange(null,null);
+        this.selectedElement = scenarioElement;
+        if(scenarioElement==null)
+            attrView.selectionChange(null);
+        else
+            attrView.selectionChange(scenarioElement.getAttributes());
     }
+
+    @Override
+    public void update(Observable o, Object arg) {
+        attrView.updateView(panelModel.getSelectedElement().getAttributes());
+    }
+
+    public void updateModel(Attributes attributes){
+        selectedElement.setAttributes(attributes);
+        panelModel.getScenario().updateCurrentStateSerialized();
+        panelModel.setElementHasChanged(selectedElement);
+        panelModel.notifyObservers(ctx);
+        System.out.println("Updated: "+panelModel.getSelectedElement().getAttributes());
+    }
+
 }
