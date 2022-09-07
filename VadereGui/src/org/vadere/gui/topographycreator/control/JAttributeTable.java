@@ -104,6 +104,7 @@ public class JAttributeTable extends JPanel implements Observer {
         addTypeEditor(Integer.class, SpinnerCellEditor.class);
         addTypeEditor(Double.class, DoubleSpinnerCellEditor.class);
         addTypeEditor(Boolean.class, CheckBoxCellEditor.class);
+        addTypeEditor(ArrayList.class, ListCellEditor.class);
     }
 
     public void setModel(AttributeTableModel fieldModel,TopographyCreatorModel topoModel) {
