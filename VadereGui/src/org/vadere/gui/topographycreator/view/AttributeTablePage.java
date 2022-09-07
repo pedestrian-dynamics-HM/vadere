@@ -76,7 +76,6 @@ public class AttributeTablePage extends JPanel{
                     groupPanel.add(table);
                     classPanel.add(groupPanel, gbc);
                 }
-                model.addObserver(table);
             }
             return classPanel;
         }

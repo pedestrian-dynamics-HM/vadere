@@ -18,12 +18,12 @@ import static org.vadere.gui.topographycreator.utils.Layouts.initGridBagConstrai
 public class AttributeTableContainer extends JPanel implements ISelectScenarioElementListener, Observer,AttributeTranslator {
     AttributeTableView attrView;
     JTextPane helpView;
+    private final NotifyContext ctx = new NotifyContext(this.getClass());
 
     ScenarioElement selectedElement;
 
     TopographyCreatorModel panelModel;
 
-    protected final NotifyContext ctx = new NotifyContext(this.getClass());
 
     public  AttributeTableContainer(final TopographyCreatorModel defaultModel){
         super(new GridBagLayout());
@@ -43,6 +43,7 @@ public class AttributeTableContainer extends JPanel implements ISelectScenarioEl
         this.add(helpView,gbcHelp);
 
         defaultModel.addSelectScenarioElementListener(this);
+        defaultModel.addObserver(this);
     }
     @Override
     public void selectionChange(ScenarioElement scenarioElement) {
@@ -55,7 +56,15 @@ public class AttributeTableContainer extends JPanel implements ISelectScenarioEl
 
     @Override
     public void update(Observable o, Object arg) {
-        attrView.updateView(panelModel.getSelectedElement().getAttributes());
+        if (arg instanceof NotifyContext) {
+            var ctx = (NotifyContext) arg;
+            if (!this.getClass().isAssignableFrom(ctx.getNotifyContext())) {
+                if (panelModel.getSelectedElement() != null)
+                    attrView.updateView(panelModel.getSelectedElement().getAttributes());
+                else
+                    attrView.updateView(null);
+            }
+        }
     }
 
     public void updateModel(Attributes attributes){
