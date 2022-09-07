@@ -63,12 +63,14 @@ public class AbstractTypeCellEditor extends AttributeEditor implements Attribute
         if(value != instanceOfSelected) {
             if(value == null){
                 this.selected = "[null]";
+                this.contentPanel.setVisible(false);
             }else{
                 this.selected = getSimpleName(value.getClass());
             }
             this.instanceOfSelected = (Attributes) value;
             this.comboBox.getModel().setSelectedItem(this.selected);
             this.attributeTableView.updateView((Attributes) value);
+            this.contentPanel.setVisible(true);
             this.contentPanel.revalidate();
             this.contentPanel.repaint();
         }
@@ -84,6 +86,7 @@ public class AbstractTypeCellEditor extends AttributeEditor implements Attribute
             updateModel(null);
             instanceOfSelected = null;
             this.attributeTableView.selectionChange(instanceOfSelected);
+            contentPanel.setVisible(false);
         });
         this.runnableRegistry.registerDefault(()->{
             selected = getSelectedItem();
@@ -98,6 +101,7 @@ public class AbstractTypeCellEditor extends AttributeEditor implements Attribute
             }
             updateModel(instanceOfSelected);
             this.attributeTableView.selectionChange(instanceOfSelected);
+            contentPanel.setVisible(true);
         });
     }
 
