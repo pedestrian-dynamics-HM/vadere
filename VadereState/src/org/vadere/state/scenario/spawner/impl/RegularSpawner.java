@@ -19,7 +19,7 @@ public class RegularSpawner extends VSpawner<AttributesRegularSpawner> {
     }
 
     @Override
-    public int getSpawnNumber(double timeCurrentEvent) {
+    public int getEventElementCount(double timeCurrentEvent) {
         return this.attributes.getEventElementCount();
     }
 

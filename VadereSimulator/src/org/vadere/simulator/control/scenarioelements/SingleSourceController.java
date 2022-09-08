@@ -227,7 +227,7 @@ public class SingleSourceController extends SourceController {
 		numberToSpawn = this.spawner.getRemainingSpawnAgents();
 
 		while (timeOfNextEvent <= simTimeInSec) {
-			numberToSpawn += spawner.getSpawnNumber(timeOfNextEvent);
+			numberToSpawn += spawner.getEventElementCount(timeOfNextEvent);
 			createNextEvent();
 		}
 	}

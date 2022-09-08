@@ -8,13 +8,19 @@ public class AttributesTimeSeriesSpawner extends AttributesSpawner {
 
     List<Integer> spawnsPerInterval;
 
-    @Override
-    public int getEventElementCount() {
-        return 0;
+    public Double getIntervalLength() {
+        return intervalLength;
     }
 
-    @Override
-    public void setEventElementCount(Integer eventElementCount) {
+    public void setIntervalLength(Double intervalLength) {
+        this.intervalLength = intervalLength;
+    }
 
+    public List<Integer> getSpawnsPerInterval() {
+        return spawnsPerInterval;
+    }
+
+    public void setSpawnsPerInterval(List<Integer> spawnsPerInterval) {
+        this.spawnsPerInterval = spawnsPerInterval;
     }
 }

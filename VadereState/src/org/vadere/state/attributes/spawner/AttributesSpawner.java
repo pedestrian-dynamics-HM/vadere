@@ -120,8 +120,4 @@ public abstract class AttributesSpawner extends Attributes {
         checkSealed();
         this.distribution = distribution;
     }
-
-    public abstract int getEventElementCount();
-
-    public abstract void setEventElementCount(Integer eventElementCount);
 }

@@ -1,20 +1,14 @@
 package org.vadere.util.geometry.shapes;
 
 import com.google.common.collect.ImmutableList;
-
-import java.awt.Rectangle;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.PathIterator;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Comparator;
-import java.util.Optional;
-
 import org.jetbrains.annotations.NotNull;
-import org.vadere.util.Attributes;
+
+import java.awt.*;
+import java.awt.geom.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
 
 public class VCircle implements VShape, ICircleSector {
 
@@ -197,10 +191,7 @@ public class VCircle implements VShape, ICircleSector {
 
 		if (this.radius != other.radius)
 			return false;
-		if (!this.center.equals(other.center))
-			return false;
-
-		return true;
+		return this.center.equals(other.center);
 	}
 
 	@Override
@@ -235,11 +226,7 @@ public class VCircle implements VShape, ICircleSector {
 	public boolean intersects(double x, double y, double w, double h) {
 		VRectangle rect = new VRectangle(x, y, w, h);
 
-		if (rect.distance(center) <= radius || rect.contains(center)) {
-			return true;
-		} else {
-			return false;
-		}
+		return rect.distance(center) <= radius || rect.contains(center);
 	}
 
 	@Override
@@ -293,9 +280,7 @@ public class VCircle implements VShape, ICircleSector {
 
 	@Override
 	public boolean intersects(VLine intersectingLine) {
-		if (intersectingLine.ptSegDist(this.getCenter()) <= this.getRadius())
-			return true;
-		return false;
+		return intersectingLine.ptSegDist(this.getCenter()) <= this.getRadius();
 	}
 
 	@Override

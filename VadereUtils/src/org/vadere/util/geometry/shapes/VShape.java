@@ -2,7 +2,6 @@ package org.vadere.util.geometry.shapes;
 
 import com.github.davidmoten.rtree.geometry.Geometry;
 import com.github.davidmoten.rtree.geometry.internal.RectangleDouble;
-import org.vadere.util.Attributes;
 
 import java.awt.*;
 import java.awt.geom.Area;

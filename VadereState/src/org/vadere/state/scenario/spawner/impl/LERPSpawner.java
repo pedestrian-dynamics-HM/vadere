@@ -33,7 +33,7 @@ public class LERPSpawner extends VSpawner<AttributesLerpSpawner> {
 
 
     @Override
-    public int getSpawnNumber(double timeCurrentEvent) {
+    public int getEventElementCount(double timeCurrentEvent) {
         int spawnNumber = (int) Math.round(this.interpolator.value(timeCurrentEvent) + this.truncNormalDist.sample());
         spawnNumber = Math.max(0, spawnNumber);
         return spawnNumber;

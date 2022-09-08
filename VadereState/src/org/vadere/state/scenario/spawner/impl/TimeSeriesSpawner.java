@@ -15,11 +15,12 @@ public class TimeSeriesSpawner extends VSpawner<AttributesTimeSeriesSpawner> {
 
     protected TimeSeriesSpawner(AttributesTimeSeriesSpawner attributes) {
         super(attributes);
+
     }
 
     @Override
-    public int getSpawnNumber(double timeCurrentEvent) {
-        return spawner.getSpawnNumber(timeCurrentEvent);
+    public int getEventElementCount(double timeCurrentEvent) {
+        return spawner.getEventElementCount(timeCurrentEvent);
     }
 
     @Override

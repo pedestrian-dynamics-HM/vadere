@@ -3,12 +3,12 @@ package org.vadere.state.scenario.spawner;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.vadere.state.attributes.spawner.AttributesSpawner;
+import org.vadere.state.scenario.AttributesAttached;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.scenario.spawner.impl.LERPSpawner;
 import org.vadere.state.scenario.spawner.impl.MixedSpawner;
 import org.vadere.state.scenario.spawner.impl.RegularSpawner;
 import org.vadere.state.scenario.spawner.impl.TimeSeriesSpawner;
-import org.vadere.state.scenario.AttributesAttached;
 
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
@@ -30,7 +30,7 @@ public abstract class VSpawner<T extends AttributesSpawner>  extends AttributesA
         this.attributes= attributes;
     }
 
-    public abstract int getSpawnNumber(double timeCurrentEvent);
+    public abstract int getEventElementCount(double timeCurrentEvent);
 
     public abstract int getRemainingSpawnAgents();
 
@@ -43,9 +43,9 @@ public abstract class VSpawner<T extends AttributesSpawner>  extends AttributesA
             return true;
         }
         if (isSpawnerWithOneSingleSpawnEvent()) {
-            return dynamicElementsCreatedTotal == attributes.getEventElementCount();
+            return dynamicElementsCreatedTotal == getEventElementCount(simTimeInSec);
         }
-        return isAfterSourceEndTime(simTimeInSec) && isQueueEmpty();
+        return isAfterSpawnerEndTime(simTimeInSec) && isQueueEmpty();
     }
 
     public boolean isMaximumNumberOfSpawnedElementsReached() {
@@ -54,7 +54,7 @@ public abstract class VSpawner<T extends AttributesSpawner>  extends AttributesA
                 && dynamicElementsCreatedTotal >= maxNumber;
     }
 
-    protected boolean isAfterSourceEndTime(double simTimeInSec) {
+    protected boolean isAfterSpawnerEndTime(double simTimeInSec) {
         return simTimeInSec > attributes.getConstraintsTimeStart();
     }
 

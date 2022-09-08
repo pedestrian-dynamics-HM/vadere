@@ -1,7 +1,5 @@
 package org.vadere.state.attributes.spawner;
 
-import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.attributes.scenario.AttributesVisualElement;
 import org.vadere.util.reflection.VadereAttribute;
 
 public class AttributesRegularSpawner extends AttributesSpawner{
@@ -12,15 +10,12 @@ public class AttributesRegularSpawner extends AttributesSpawner{
         super();
     }
 
-    @Override
     public int getEventElementCount() {
         return eventElementCount;
     }
 
-    @Override
     public void setEventElementCount(Integer eventElementCount) {
         checkSealed();
         this.eventElementCount = eventElementCount;
     }
-
 }

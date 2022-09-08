@@ -1,6 +1,6 @@
 package org.vadere.util.geometry.shapes;
 
-import java.awt.Rectangle;
+import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
@@ -8,8 +8,6 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import org.vadere.util.Attributes;
 
 /**
  * A ring consists of two circles of different size.

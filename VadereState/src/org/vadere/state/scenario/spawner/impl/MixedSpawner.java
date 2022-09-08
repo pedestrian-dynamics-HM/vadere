@@ -13,8 +13,8 @@ public class MixedSpawner extends VSpawner<AttributesMixedSpawner> {
     private int currentInterval = 0;
 
     @Override
-    public int getSpawnNumber(double timeCurrentEvent) {
-        return getSpawnerByTime(timeCurrentEvent).getSpawnNumber(timeCurrentEvent);
+    public int getEventElementCount(double timeCurrentEvent) {
+        return getSpawnerByTime(timeCurrentEvent).getEventElementCount(timeCurrentEvent);
     }
 
     @Override

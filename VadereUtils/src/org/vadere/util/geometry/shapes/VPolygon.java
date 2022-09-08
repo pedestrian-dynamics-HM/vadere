@@ -1,22 +1,16 @@
 package org.vadere.util.geometry.shapes;
 
-import java.awt.Shape;
+import org.vadere.util.geometry.GeometryUtils;
+import org.vadere.util.geometry.GrahamScan;
+
+import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.Path2D;
 import java.awt.geom.PathIterator;
-import java.util.Collections;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
-
-import org.vadere.util.Attributes;
-import org.vadere.util.geometry.GeometryUtils;
-import org.vadere.util.geometry.GrahamScan;
 
 /**
  * Note: A polygon which has the same points as a rectangle is not equals to the rectangle.
