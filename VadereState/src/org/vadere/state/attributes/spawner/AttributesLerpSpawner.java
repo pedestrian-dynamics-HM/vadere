@@ -13,16 +13,6 @@ public class AttributesLerpSpawner extends AttributesSpawner {
     List<Double> yValues;
 
 
-    @Override
-    public int getEventElementCount() {
-        return 0;
-    }
-
-    @Override
-    public void setEventElementCount(Integer eventElementCount) {
-
-    }
-
     public Double getSpawnFrequency() {
         return spawnFrequency;
     }

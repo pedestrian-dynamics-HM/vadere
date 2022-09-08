@@ -26,13 +26,4 @@ public class AttributesMixedSpawner extends AttributesSpawner {
         this.distributions = distributions;
     }
 
-    @Override
-    public int getEventElementCount() {
-        return 0;
-    }
-
-    @Override
-    public void setEventElementCount(Integer eventElementCount) {
-
-    }
 }
