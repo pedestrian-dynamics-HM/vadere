@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.distributions.AttributesDistribution;
+import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesVisualElement;
 import org.vadere.state.util.Views;
 import org.vadere.util.reflection.VadereAttribute;
@@ -40,10 +41,10 @@ public abstract class AttributesSpawner extends Attributes {
     protected Boolean eventPositionGridCA = false;
     @VadereAttribute(group = "Position Constraints")
     @JsonView(Views.CacheViewExclude.class)
-    protected Boolean eventPositionFreeSpace =false;
+    protected Boolean eventPositionFreeSpace = false;
     @VadereAttribute
     @JsonView(Views.CacheViewExclude.class)
-    protected AttributesVisualElement eventElement = null;
+    protected AttributesAgent eventElement = null;
     @VadereAttribute
     @JsonView(Views.CacheViewExclude.class)
     protected AttributesDistribution distribution = null;
@@ -107,7 +108,7 @@ public abstract class AttributesSpawner extends Attributes {
         return eventElement;
     }
 
-    public void setEventElementAttributes(AttributesVisualElement eventElement) {
+    public void setEventElementAttributes(AttributesAgent eventElement) {
         checkSealed();
         this.eventElement = eventElement;
     }
@@ -119,5 +120,10 @@ public abstract class AttributesSpawner extends Attributes {
     public void setDistributionAttributes(AttributesDistribution distribution) {
         checkSealed();
         this.distribution = distribution;
+    }
+
+    public Integer getEventElementCount() {
+        System.out.println("getEventElementCount() NOT IMPLEMENTED");
+        return 0;
     }
 }

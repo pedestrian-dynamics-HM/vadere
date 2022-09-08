@@ -13,10 +13,10 @@ import org.vadere.gui.projectview.view.ScenarioPanel;
 import org.vadere.gui.topographycreator.control.attribtable.AttributeTableContainer;
 import org.vadere.gui.topographycreator.model.AgentWrapper;
 import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.util.StateJsonConverter;
-import org.vadere.state.attributes.Attributes;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.observer.NotifyContext;
 
@@ -42,7 +42,7 @@ public class ScenarioElementView extends JPanel implements ISelectScenarioElemen
 
 	private final JsonValidIndicator jsonValidIndicator;
 
-	private final boolean externUpdate = false;
+	private boolean updateFromOutside = false;
 
 
 	public ScenarioElementView(final IDefaultModel defaultModel) {
@@ -99,7 +99,8 @@ public class ScenarioElementView extends JPanel implements ISelectScenarioElemen
 		documentListener = new DocumentListener() {
 			@Override
 			public void insertUpdate(DocumentEvent e) {
-				updateModel();
+				if (!updateFromOutside)
+					updateModel();
 			}
 
 			@Override
@@ -109,8 +110,8 @@ public class ScenarioElementView extends JPanel implements ISelectScenarioElemen
 
 			@Override
 			public void changedUpdate(DocumentEvent e) {
-
-				updateModel();
+				if (!updateFromOutside)
+					updateModel();
 			}
 		};
 
@@ -174,6 +175,7 @@ public class ScenarioElementView extends JPanel implements ISelectScenarioElemen
 
 	@Override
 	public void selectionChange(final ScenarioElement element) {
+		this.updateFromOutside = true;
 		synchronized (txtrTextfiletextarea) {
 			if(element != null){
 				if (element instanceof AgentWrapper) {
@@ -200,8 +202,11 @@ public class ScenarioElementView extends JPanel implements ISelectScenarioElemen
 		if (arg instanceof NotifyContext) {
 			var ctx = (NotifyContext) arg;
 			if (AttributeTableContainer.class.isAssignableFrom(ctx.getNotifyContext())) {
+				this.updateFromOutside = true;
 				selectionChange(panelModel.getSelectedElement());
+				this.updateFromOutside = false;
 			}
 		}
+
 	}
 }

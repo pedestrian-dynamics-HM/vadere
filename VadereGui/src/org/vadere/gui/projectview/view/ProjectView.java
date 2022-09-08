@@ -23,23 +23,18 @@ import org.vadere.util.io.IOUtils;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.opencl.CLUtils;
 
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.*;
-import java.util.List;
-
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.*;
 
 /**
  * Main view of the Vadere GUI.
@@ -50,7 +45,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 	 * Static variables
 	 */
 	private static final long serialVersionUID = -2081363246241235943L;
-	private static Logger logger = Logger.getLogger(ProjectView.class);
+	private static final Logger logger = Logger.getLogger(ProjectView.class);
 	/**
 	 * Store a reference to the main window as "owner" parameter for dialogs.
 	 */
@@ -59,19 +54,19 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 	/**
 	 * The model of the {@link ProjectView}
 	 */
-	private ProjectViewModel model;
+	private final ProjectViewModel model;
 
 	private final int n_repetitions = 10;
 
 	/**
 	 * GUI elements (part of the view) of the {@link ProjectView}
-	 *
+	 * <p>
 	 * TODO [priority=medium] [task=refactoring] do the actions have to be stored in member
 	 * variables or could it be better to store them locally where they are needed? Some are used in
 	 * different methods, maybe only store these as members?
 	 */
-	private JPanel contentPane = new JPanel();
-	private JPanel controlPanel = new JPanel(new GridBagLayout());
+	private final JPanel contentPane = new JPanel();
+	private final JPanel controlPanel = new JPanel(new GridBagLayout());
 	private JSplitPane mainSplitPanel = new JSplitPane();
 	private VTable scenarioTable;
 	private VTable outputTable;
@@ -83,18 +78,21 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 	private JButton btnNextSimulationStep;
 	private JButton btnResumeNormalSpeed;
 	private JMenu mntmRecentProjects;
-	private ProgressPanel progressPanel = new ProgressPanel();
+	private final ProgressPanel progressPanel = new ProgressPanel();
 	private ScenarioPanel scenarioJPanel;
 	private ScenarioNamePanel scenarioNamePanel;
 	private boolean scenariosRunning = false;
-	private Set<Action> projectSpecificActions = new HashSet<>(); // actions that should only be enabled, when a project is loaded
-	private ProjectRunResultDialog projectRunResultDialog;
+	private final Set<Action> projectSpecificActions = new HashSet<>(); // actions that should only be enabled, when a project is loaded
+	private final ProjectRunResultDialog projectRunResultDialog;
 
 	// ####################### Part of the control this should also be part of another class
 	// ##################
 	@Override
 	public void postProjectRun(final VadereProject scenario) {
 		EventQueue.invokeLater(() -> {
+			btnRunRepeatedlyScenario.setSelected(false);
+			btnRunSelectedScenario.setSelected(false);
+			btnRunAllScenarios.setSelected(false);
 			scenariosRunning = false;
 			model.refreshOutputTable();
 			setScenariosRunning(false);
@@ -165,7 +163,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 			replace(scenario, VadereState.INTERRUPTED);
 			setScenariosRunning(false);
 			selectCurrentScenarioRunManager();
-			logger.info(String.format("all running scenarios interrupted"));
+			logger.info("all running scenarios interrupted");
 		});
 	}
 
@@ -277,7 +275,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 	private void openLastUsedProject(final ProjectViewModel model) {
 		String lastUsedProjectPath =
 				VadereConfig.getConfig().getString("History.lastUsedProject");
-		if (lastUsedProjectPath != null && lastUsedProjectPath.isBlank() == false) {
+		if (lastUsedProjectPath != null && !lastUsedProjectPath.isBlank()) {
 			if (Files.exists(Paths.get(lastUsedProjectPath))) {
 				ActionLoadProject.loadProjectByPath(model, lastUsedProjectPath);
 			}

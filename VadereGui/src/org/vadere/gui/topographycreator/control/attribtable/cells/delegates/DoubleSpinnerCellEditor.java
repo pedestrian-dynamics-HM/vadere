@@ -4,6 +4,7 @@ import org.vadere.gui.topographycreator.control.attribtable.JAttributeTable;
 import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
 
 import javax.swing.*;
+import javax.swing.text.NumberFormatter;
 import java.lang.reflect.Field;
 
 public class DoubleSpinnerCellEditor extends AttributeEditor {
@@ -20,7 +21,11 @@ public class DoubleSpinnerCellEditor extends AttributeEditor {
     @Override
     protected void initialize() {
         this.spinner = new JSpinner();
-        this.spinner.setModel(new SpinnerNumberModel(0.0, -1000.0, 1000.0, 0.1));
+
+        this.spinner.setModel(new SpinnerNumberModel(0.0, -1000.0, 1000.0, 0.01));
+        this.spinner.setEditor(new JSpinner.NumberEditor(spinner, "0.00"));
+        JFormattedTextField txt = ((JSpinner.NumberEditor) spinner.getEditor()).getTextField();
+        ((NumberFormatter) txt.getFormatter()).setAllowsInvalid(false);
         this.add(spinner);
         this.spinner.addChangeListener(e -> updateModel(spinner.getValue()));
     }

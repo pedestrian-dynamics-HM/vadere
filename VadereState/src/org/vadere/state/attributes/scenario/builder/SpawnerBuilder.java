@@ -2,6 +2,7 @@ package org.vadere.state.attributes.scenario.builder;
 
 import org.vadere.state.attributes.distributions.AttributesConstantDistribution;
 import org.vadere.state.attributes.distributions.AttributesDistribution;
+import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesDynamicElement;
 import org.vadere.state.attributes.spawner.AttributesSpawner;
 import org.vadere.state.scenario.spawner.VSpawner;
@@ -20,7 +21,7 @@ public final class SpawnerBuilder {
     private Boolean eventPositionFreeSpace= false;
     private AttributesDistribution distribution = new AttributesConstantDistribution();
 
-    private AttributesDynamicElement eventElementAttributes = null;
+    private AttributesAgent eventElementAttributes = null;
 
     private Integer eventElementCount;
 
@@ -63,7 +64,7 @@ public final class SpawnerBuilder {
         return eventElementAttributes;
     }
 
-    public SpawnerBuilder setEventElementAttributes(AttributesDynamicElement eventElementAttributes) {
+    public SpawnerBuilder setEventElementAttributes(AttributesAgent eventElementAttributes) {
         this.eventElementAttributes = eventElementAttributes;
         return this;
     }
@@ -95,7 +96,7 @@ public final class SpawnerBuilder {
         attribs.setEventPositionFreeSpace(this.eventPositionFreeSpace);
         attribs.setDistributionAttributes(this.distribution);
         attribs.setEventElementAttributes(this.eventElementAttributes);
-        attribs.setEventElementCount(this.eventElementCount);
+        //attribs.setEventElementCount(this.eventElementCount);
         attributesSpawner.setAttributes(attribs);
         return attributesSpawner;
     }

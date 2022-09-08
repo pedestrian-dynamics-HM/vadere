@@ -97,7 +97,7 @@ public abstract class SourceController extends ScenarioElementController impleme
             return true;
         }
         if (isSourceWithOneSingleSpawnEvent()) {
-            return dynamicElementsCreatedTotal == spawnerAttributes.getEventElementCount();//sourceAttributes.getSpawnNumber();
+            return dynamicElementsCreatedTotal == spawner.getEventElementCount(simTimeInSec);//sourceAttributes.getSpawnNumber();
         }
         return isAfterSourceEndTime(simTimeInSec) && isQueueEmpty();
     }

@@ -10,7 +10,7 @@ public class AttributesRegularSpawner extends AttributesSpawner{
         super();
     }
 
-    public int getEventElementCount() {
+    public Integer getEventElementCount() {
         return eventElementCount;
     }
 
