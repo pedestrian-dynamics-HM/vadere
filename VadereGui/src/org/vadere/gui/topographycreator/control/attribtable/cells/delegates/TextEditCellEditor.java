@@ -1,14 +1,12 @@
 package org.vadere.gui.topographycreator.control.attribtable.cells.delegates;
 
-import org.vadere.gui.topographycreator.control.attribtable.JAttributeTable;
-import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
+import org.vadere.gui.topographycreator.control.attribtable.model.AbstractModel;
 
 import javax.swing.*;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
 import javax.swing.text.PlainDocument;
-import java.lang.reflect.Field;
 
 /**
  * All TableCellEditors in JAttributeTable need to implement the interface
@@ -17,21 +15,13 @@ import java.lang.reflect.Field;
  * JAttributeTable does add a addChangeListener(..) once instantiated, so
  * the attached objects fields get updated.
  */
-
 public class TextEditCellEditor extends AttributeEditor {
     private JTextField textField;
 
-    private String oldValue;
-
-    public TextEditCellEditor(
-            JAttributeTable parent,
-            Object fieldOwner,
-            Field field,
-            TopographyCreatorModel model,
-            JPanel unused
-    ) {
-        super(parent,fieldOwner, field, model,null);
+    public TextEditCellEditor(AbstractModel parent, String id, JPanel contentPanel) {
+        super(parent, id, contentPanel);
     }
+
 
     @Override
     protected void initialize() {
@@ -60,10 +50,6 @@ public class TextEditCellEditor extends AttributeEditor {
 
     @Override
     public void modelChanged(Object value) {
-        var text = (String)value;
-        if(text!=oldValue) {
-            oldValue = text;
-            this.textField.setText(text);
-        }
+        this.textField.setText((String) value);
     }
 }

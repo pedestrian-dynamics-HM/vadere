@@ -1,23 +1,21 @@
 package org.vadere.gui.topographycreator.control.attribtable.cells.renderer;
 
+import org.vadere.gui.topographycreator.control.attribtable.cells.delegates.AttributeEditor;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import java.awt.*;
-import java.lang.reflect.Field;
-import java.util.HashMap;
 
 public class FieldValueRenderer extends DefaultTableCellRenderer implements TableCellRenderer {
-    HashMap<String, JComponent> editorObjects;
+    AttributeEditor editor;
 
-    public FieldValueRenderer(){
+    public FieldValueRenderer(AttributeEditor editor) {
+        this.editor = editor;
     }
 
-    public void setEditors(HashMap<String, JComponent> editorObjects) {
-        this.editorObjects = editorObjects;
-    }
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-        return editorObjects.get(((Field) table.getValueAt(row, 0)).getName());
+        return this.editor;
     }
 }

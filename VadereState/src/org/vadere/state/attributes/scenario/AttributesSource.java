@@ -15,7 +15,7 @@ public class AttributesSource extends AttributesVisualElement {
 	@VadereAttribute
 	@JsonView(Views.CacheViewExclude.class)
 	private AttributesSpawner spawner = new AttributesRegularSpawner();
-	@VadereAttribute
+	//@VadereAttribute
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
 	private ArrayList<Integer> targetIds = new ArrayList<>();
 	/**

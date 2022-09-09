@@ -1,32 +1,25 @@
 package org.vadere.gui.topographycreator.control.attribtable.cells.delegates;
 
-import org.vadere.gui.topographycreator.control.attribtable.JAttributeTable;
-import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
+import org.vadere.gui.topographycreator.control.attribtable.ViewListener;
+import org.vadere.gui.topographycreator.control.attribtable.model.AbstractModel;
 
 import javax.swing.*;
 import java.awt.*;
-import java.lang.reflect.Field;
 
-public abstract class AttributeEditor extends JPanel {
+public abstract class AttributeEditor extends JPanel implements ViewListener {
 
-    JPanel contentPanel;
+    protected final AbstractModel model;
+    protected final String id;
+    protected JPanel contentPanel;
 
-    protected final Field field;
-    protected Object fieldOwner;
-    private final TopographyCreatorModel model;
+    Object oldValue;
     private boolean locked = false;
 
 
-    protected JAttributeTable parentTranslator;
-
-    Object oldValue;
-
-    public AttributeEditor(JAttributeTable parentTranslator, Object fieldOwner, Field field, TopographyCreatorModel model, JPanel contentPanel) {
+    public AttributeEditor(AbstractModel parent, String id, JPanel contentPanel) {
         super(new BorderLayout());
-        this.parentTranslator = parentTranslator;
-        this.fieldOwner = fieldOwner;
-        this.field = field;
-        this.model = model;
+        this.model = parent;
+        this.id = id;
         this.contentPanel = contentPanel;
         disableNotify();
         initialize();
@@ -57,29 +50,12 @@ public abstract class AttributeEditor extends JPanel {
         return !locked;
     }
 
-    protected void updateModel(Object value){
-        if(canUpdate())updateModelFromValue(value);
-    }
-    private void updateModelFromValue(Object newValue){
-        SwingUtilities.invokeLater(()->{
-        try {
-
-            var element = model.getSelectedElement();
-            field.setAccessible(true);
-            this.field.set(this.fieldOwner, newValue);
-            field.setAccessible(false);
-            parentTranslator.updateModel(field,newValue);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
-        });
+    public void updateModel(Object value) {
+        if (canUpdate()) updateModelFromValue(value);
     }
 
-    protected TopographyCreatorModel getModel(){
-        return this.model;
+    private void updateModelFromValue(Object newValue) {
+        this.model.updateModel(this.id, newValue);
     }
 
-    public void setFieldOwner(Object fieldOwner) {
-        this.fieldOwner = fieldOwner;
-    }
 }

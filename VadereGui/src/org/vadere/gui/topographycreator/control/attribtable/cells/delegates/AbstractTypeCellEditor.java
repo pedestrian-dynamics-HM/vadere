@@ -3,9 +3,8 @@ package org.vadere.gui.topographycreator.control.attribtable.cells.delegates;
 import org.jetbrains.annotations.NotNull;
 import org.reflections.Reflections;
 import org.vadere.gui.topographycreator.control.attribtable.AttributeTableView;
-import org.vadere.gui.topographycreator.control.attribtable.AttributeTranslator;
-import org.vadere.gui.topographycreator.control.attribtable.JAttributeTable;
-import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
+import org.vadere.gui.topographycreator.control.attribtable.ViewListener;
+import org.vadere.gui.topographycreator.control.attribtable.model.AbstractModel;
 import org.vadere.gui.topographycreator.utils.RunnableRegistry;
 import org.vadere.state.attributes.Attributes;
 
@@ -27,31 +26,28 @@ import java.util.Map;
  */
 
 //TODO: add jtable to constructor for revalidation & repaint
-public class AbstractTypeCellEditor extends AttributeEditor implements AttributeTranslator {
+
+public class AbstractTypeCellEditor extends AttributeEditor implements ViewListener {
     public static final String STRING_NULL = "[null]";
     private JComboBox<Object> comboBox;
     private AbstractTypeCellEditor self;
     private RunnableRegistry runnableRegistry;
-    private Map<String,Constructor<?>> classConstructorRegistry;
-    private Map<String,Class<?>> classNameRegistry;
+    private Map<String, Constructor<?>> classConstructorRegistry;
+    private Map<String, Class<?>> classNameRegistry;
     private GridBagConstraints gbc;
     private String selected;
 
     private AttributeTableView attributeTableView;
     private Object instanceOfSelected;
-    public AbstractTypeCellEditor(
-            JAttributeTable parent,
-            Object fieldOwner,
-            Field field,
-            TopographyCreatorModel model,
-            JPanel contentPanel
-    ) {
-        super(parent,fieldOwner, field, model,contentPanel);
 
+    public AbstractTypeCellEditor(AbstractModel parent, String id, JPanel contentPanel) {
+        super(parent, id, contentPanel);
     }
+
+
     @Override
     protected void initialize() {
-        this.attributeTableView = new AttributeTableView(this,getModel());
+        this.attributeTableView = new AttributeTableView(this);
         initializeGridBagConstraint();
         initializeRunnableRegistry();
         initializeComboBox();
@@ -80,7 +76,6 @@ public class AbstractTypeCellEditor extends AttributeEditor implements Attribute
         this.self = this;
     }
     private void initializeRunnableRegistry() {
-        var model = getModel();
         this.runnableRegistry = new RunnableRegistry();
         this.runnableRegistry.registerAction("[null]",()->{
             updateModel(null);
@@ -111,7 +106,7 @@ public class AbstractTypeCellEditor extends AttributeEditor implements Attribute
 
     private void initializeComboBox(){
         var reflections = new Reflections("org.vadere");
-        var subClassModel = new ArrayList(reflections.getSubTypesOf(this.field.getType()));
+        var subClassModel = new ArrayList(reflections.getSubTypesOf(((Field) model.getElement(id)).getType()));
 
         this.comboBox = new JComboBox<>();
         this.comboBox.setModel(initializeComboBoxModel(subClassModel));
@@ -170,7 +165,6 @@ public class AbstractTypeCellEditor extends AttributeEditor implements Attribute
 
     @Override
     public void updateModel(Object attributes) {
-        parentTranslator.updateModel(field, attributes);
         this.contentPanel.revalidate();
         this.contentPanel.repaint();
     }

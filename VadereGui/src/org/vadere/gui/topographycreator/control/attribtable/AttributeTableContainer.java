@@ -17,7 +17,7 @@ import java.util.Observer;
 
 import static org.vadere.gui.topographycreator.control.attribtable.util.Layouts.initGridBagConstraint;
 
-public class AttributeTableContainer extends JPanel implements ISelectScenarioElementListener, Observer,AttributeTranslator {
+public class AttributeTableContainer extends JPanel implements ISelectScenarioElementListener, Observer, ViewListener {
     AttributeTableView attrView;
     JTextPane helpView;
     private final NotifyContext ctx = new NotifyContext(this.getClass());
@@ -27,9 +27,9 @@ public class AttributeTableContainer extends JPanel implements ISelectScenarioEl
     TopographyCreatorModel panelModel;
 
 
-    public  AttributeTableContainer(final TopographyCreatorModel defaultModel){
+    public AttributeTableContainer(final TopographyCreatorModel defaultModel) {
         super(new GridBagLayout());
-        attrView = new AttributeTableView(this, defaultModel);
+        attrView = new AttributeTableView(this);
         helpView = AttributeHelpView.getInstance();
 
         this.panelModel = defaultModel;

@@ -8,7 +8,7 @@ import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.reflection.VadereAttribute;
 
 public class AttributesVisualElement extends AttributesScenarioElement {
-    @VadereAttribute
+    //@VadereAttribute
     @JsonView(Views.CacheViewExclude.class)
     protected VShape shape;
     @VadereAttribute

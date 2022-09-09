@@ -1,26 +1,22 @@
 package org.vadere.gui.topographycreator.control.attribtable;
 
-import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
-
 import javax.swing.*;
 import java.awt.*;
 import java.util.HashMap;
 
-public class AttributeTableView extends JPanel{
+public class AttributeTableView extends JPanel implements ViewListener {
 
-    private final TopographyCreatorModel defaultModel;
     HashMap<Class, AttributeTablePage> editorPages;
 
     private Object selectedAttributesInstance;
 
     AttributeTablePage activePage;
 
-    private final AttributeTranslator parentModelTranslator;
+    private final ViewListener parent;
 
-    public AttributeTableView(AttributeTranslator parent,final TopographyCreatorModel defaultModel){
+    public AttributeTableView(ViewListener parent) {
         super(new BorderLayout());
-        this.parentModelTranslator = parent;
-        this.defaultModel = defaultModel;
+        this.parent = parent;
         this.editorPages = new HashMap<>();
     }
 
@@ -31,7 +27,7 @@ public class AttributeTableView extends JPanel{
 
             if (!editorPages.containsKey(object.getClass())) {
                 var archetype = object.getClass();
-                var attributePage = new AttributeTablePage(this, archetype, defaultModel);
+                var attributePage = new AttributeTablePage(this, archetype);
                 this.editorPages.put(object.getClass(), attributePage);
             }
             activePage = editorPages.get(object.getClass());
@@ -51,7 +47,7 @@ public class AttributeTableView extends JPanel{
     }
 
     public void updateModel(Object selectedAttributesInstance) {
-        parentModelTranslator.updateModel(selectedAttributesInstance);
+        parent.updateModel(selectedAttributesInstance);
         this.revalidate();
         this.repaint();
     }

@@ -10,12 +10,15 @@ import java.awt.*;
 import java.lang.reflect.Field;
 
 public class FieldNameRenderer extends DefaultTableCellRenderer implements TableCellRenderer {
-    private static final Color Transparent = new Color(0,0,0,0);
+    private static final Color Transparent = new Color(0, 0, 0, 0);
     private Font font = UIManager.getFont("Label.font");
+    private final String id;
 
-    public FieldNameRenderer(){
-        this.font = new Font(font.getName(),Font.BOLD,font.getSize());
+    public FieldNameRenderer(String id) {
+        this.id = id;
+        this.font = new Font(font.getName(), Font.BOLD, font.getSize());
     }
+
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         Field field = (Field) value;
@@ -24,16 +27,16 @@ public class FieldNameRenderer extends DefaultTableCellRenderer implements Table
         JLabel nameTextPane = new JLabel();
         JLabel typeTextPane = new JLabel();
 
-        nameTextPane.setText(getName(field));
-        typeTextPane.setText(getType(field));
+        nameTextPane.setText(id);
+        //typeTextPane.setText(getType(field));
 
         nameTextPane.setBackground(Transparent);
         typeTextPane.setBackground(Transparent);
 
         nameTextPane.setIcon(null);
 
-        typeTextPane.setFont(font.deriveFont(Font.BOLD,10));
-        typeTextPane.setForeground(new Color(0,192,163));
+        typeTextPane.setFont(font.deriveFont(Font.BOLD, 10));
+        typeTextPane.setForeground(new Color(0, 192, 163));
 
         nameTextPane.setHorizontalAlignment(JLabel.LEFT);
         typeTextPane.setHorizontalAlignment(JLabel.RIGHT);
