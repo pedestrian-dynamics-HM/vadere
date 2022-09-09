@@ -7,7 +7,6 @@ import org.vadere.gui.topographycreator.control.attribtable.cells.renderer.Field
 import org.vadere.gui.topographycreator.control.attribtable.cells.renderer.FieldValueRenderer;
 import org.vadere.gui.topographycreator.control.attribtable.model.AttributeTableModel;
 import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
-import org.vadere.state.attributes.Attributes;
 
 import javax.swing.*;
 import java.awt.*;
@@ -26,8 +25,7 @@ public class JAttributeTable extends JPanel {
      *
      */
     private final AttributeTablePage parent;
-    private Field ownerField;
-    private Object fieldOwner;
+    private final Object fieldOwner;
     private final List<JComponent> renderOrderModel;
 
     /**
@@ -223,23 +221,6 @@ public class JAttributeTable extends JPanel {
                 }
             }
         }
-    }
-
-    /*
-        @Override
-        public void update(Observable o, Object arg) {
-            var model = (TopographyCreatorModel)o;
-            if(arg instanceof NotifyContext){
-                var ctx = (NotifyContext)arg;
-                if(!ctx.getNotifyContext().equals(AttributeEditor.class)){
-                    updateView();
-                }
-            }
-
-        }
-    */
-    public void setFieldOwner(Attributes element) {
-        this.fieldOwner = element;
     }
 
     public void updateModel(Field field, Object object) {

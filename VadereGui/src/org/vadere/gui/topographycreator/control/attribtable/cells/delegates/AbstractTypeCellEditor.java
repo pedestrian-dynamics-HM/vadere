@@ -38,7 +38,7 @@ public class AbstractTypeCellEditor extends AttributeEditor implements Attribute
     private String selected;
 
     private AttributeTableView attributeTableView;
-    private Attributes instanceOfSelected;
+    private Object instanceOfSelected;
     public AbstractTypeCellEditor(
             JAttributeTable parent,
             Object fieldOwner,
@@ -67,7 +67,7 @@ public class AbstractTypeCellEditor extends AttributeEditor implements Attribute
             }else{
                 this.selected = getSimpleName(value.getClass());
             }
-            this.instanceOfSelected = (Attributes) value;
+            this.instanceOfSelected = value;
             this.comboBox.getModel().setSelectedItem(this.selected);
             this.attributeTableView.selectionChange(value);
             this.contentPanel.setVisible(true);
@@ -91,7 +91,7 @@ public class AbstractTypeCellEditor extends AttributeEditor implements Attribute
         this.runnableRegistry.registerDefault(()->{
             selected = getSelectedItem();
             try {
-                instanceOfSelected = (Attributes) classConstructorRegistry.get(selected).newInstance();
+                instanceOfSelected = classConstructorRegistry.get(selected).newInstance();
             } catch (InstantiationException e) {
                 throw new RuntimeException(e);
             } catch (IllegalAccessException e) {

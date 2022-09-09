@@ -70,9 +70,9 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 	private JSplitPane mainSplitPanel = new JSplitPane();
 	private VTable scenarioTable;
 	private VTable outputTable;
-	private JToggleButton btnRunSelectedScenario;
-	private JToggleButton btnRunRepeatedlyScenario;
-	private JToggleButton btnRunAllScenarios;
+	private JButton btnRunSelectedScenario;
+	private JButton btnRunRepeatedlyScenario;
+	private JButton btnRunAllScenarios;
 	private JButton btnStopRunningScenarios;
 	private JButton btnPauseRunningScenarios;
 	private JButton btnNextSimulationStep;
@@ -90,9 +90,6 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 	@Override
 	public void postProjectRun(final VadereProject scenario) {
 		EventQueue.invokeLater(() -> {
-			btnRunRepeatedlyScenario.setSelected(false);
-			btnRunSelectedScenario.setSelected(false);
-			btnRunAllScenarios.setSelected(false);
 			scenariosRunning = false;
 			model.refreshOutputTable();
 			setScenariosRunning(false);
@@ -746,7 +743,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		runAllScenariosAction.putValue(Action.SHORT_DESCRIPTION,Messages.getString("ProjectView.btnRunAllTests.text"));
 		runAllScenariosAction.putValue(Action.LARGE_ICON_KEY,
 				new ImageIcon(ProjectView.class.getResource("/icons/greenarrows_right_small.png")));
-		btnRunAllScenarios = new JToggleButton(runAllScenariosAction);
+		btnRunAllScenarios = new JButton(runAllScenariosAction);
 		btnRunAllScenarios.setVerticalTextPosition(SwingConstants.BOTTOM);
 		btnRunAllScenarios.setHorizontalTextPosition(SwingConstants.CENTER);
 		toolBar.add(btnRunAllScenarios);
@@ -759,7 +756,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 				Messages.getString("ProjectView.btnRunSelectedTest.toolTipText"));
 		runSelectedScenarios.putValue(Action.LARGE_ICON_KEY,
 				new ImageIcon(ProjectView.class.getResource("/icons/greenarrow_right_small.png")));
-		btnRunSelectedScenario = new JToggleButton(runSelectedScenarios);
+		btnRunSelectedScenario = new JButton(runSelectedScenarios);
 		btnRunSelectedScenario.setVerticalTextPosition(SwingConstants.BOTTOM);
 		btnRunSelectedScenario.setHorizontalTextPosition(SwingConstants.CENTER);
 		toolBar.add(btnRunSelectedScenario);
@@ -772,7 +769,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 				Messages.getString("ProjectView.btnRunRepeatedlyTest.toolTipText"));
 		runRepeatedlyScenarios.putValue(Action.LARGE_ICON_KEY,
 				new ImageIcon(ProjectView.class.getResource("/icons/greenarrow_right_small.png")));
-		btnRunRepeatedlyScenario = new JToggleButton(runRepeatedlyScenarios);
+		btnRunRepeatedlyScenario = new JButton(runRepeatedlyScenarios);
 		btnRunRepeatedlyScenario.setVerticalTextPosition(SwingConstants.BOTTOM);
 		btnRunRepeatedlyScenario.setHorizontalTextPosition(SwingConstants.CENTER);
 		toolBar.add(btnRunRepeatedlyScenario);
