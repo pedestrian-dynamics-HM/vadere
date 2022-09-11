@@ -23,7 +23,6 @@ public class AttributeTableContainer extends JPanel implements ISelectScenarioEl
     private final NotifyContext ctx = new NotifyContext(this.getClass());
 
     ScenarioElement selectedElement;
-
     TopographyCreatorModel panelModel;
 
 
@@ -58,10 +57,11 @@ public class AttributeTableContainer extends JPanel implements ISelectScenarioEl
     @Override
     public void selectionChange(ScenarioElement scenarioElement) {
         this.selectedElement = scenarioElement;
-        if(scenarioElement==null)
+        if (scenarioElement == null)
             attrView.selectionChange(null);
-        else
+        else {
             attrView.selectionChange(scenarioElement.getAttributes());
+        }
     }
 
     @Override

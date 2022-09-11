@@ -44,19 +44,20 @@ public class EditorRegistry {
     }
 
     public AttributeEditor create(Class type, AbstractModel model, String id, JPanel contentPanel) {
-        if (!contains(type)) {
-            if (type.isEnum())
-                addTypeEditor(type, ComboBoxCellEditor.class);
-            else if (Modifier.isAbstract(type.getModifiers()))
-                addTypeEditor(type, AbstractTypeCellEditor.class);
-            else
-                addTypeEditor(type, ChildObjectCellEditor.class);
-        }
-
-        AttributeEditor component;
         Constructor constructor;
+        AttributeEditor component;
         try {
-            constructor = editorConstructors.get(type.getName());
+            if (!contains(type)) {
+                if (type.isEnum())
+                    constructor = ComboBoxCellEditor.class.getDeclaredConstructor(AbstractModel.class, String.class, JPanel.class);
+                    //addTypeEditor(type, ComboBoxCellEditor.class);
+                else if (Modifier.isAbstract(type.getModifiers()))
+                    constructor = AbstractTypeCellEditor.class.getDeclaredConstructor(AbstractModel.class, String.class, JPanel.class);
+                else
+                    constructor = ChildObjectCellEditor.class.getDeclaredConstructor(AbstractModel.class, String.class, JPanel.class);
+            } else {
+                constructor = editorConstructors.get(type.getName());
+            }
         } catch (Exception e) {
             throw new IllegalArgumentException(type.getName() + ": no editor registered for such type");
         }

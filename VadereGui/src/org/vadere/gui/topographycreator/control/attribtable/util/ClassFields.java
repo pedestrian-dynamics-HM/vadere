@@ -1,5 +1,6 @@
 package org.vadere.gui.topographycreator.control.attribtable.util;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.vadere.util.reflection.VadereAttribute;
 
 import java.lang.reflect.Field;
@@ -12,18 +13,24 @@ import java.util.stream.Collectors;
 public final class ClassFields {
     public static Vector<Class> getSuperClassHierarchy(Class clazz) {
         Vector<Class> classHierarchy = new Vector<>();
-        do{
-            classHierarchy.add(0,clazz);
+        do {
+            classHierarchy.add(0, clazz);
             clazz = clazz.getSuperclass();
-        }while(clazz.getSuperclass() != null);
+        } while (clazz.getSuperclass() != null);
         return classHierarchy;
     }
 
-    public static Map<String, List<Field>> getFieldsGroupedBySemanticMeaning(java.util.List<Field> fieldList){
+    public static Field[] getSuperDeclaredFields(Class clazz) {
+        return getSuperClassHierarchy(clazz).stream()
+                .map(c -> c.getDeclaredFields())
+                .reduce((c1, c2) -> ArrayUtils.addAll(c1, c2)).get();
+    }
+
+    public static Map<String, List<Field>> getFieldsGroupedBySemanticMeaning(java.util.List<Field> fieldList) {
         return fieldList.stream()
                 .collect(
                         Collectors.groupingBy(
-                                field->field.getAnnotation(VadereAttribute.class).group(),
+                                field -> field.getAnnotation(VadereAttribute.class).group(),
                                 Collectors.toList()
                         ));
     }

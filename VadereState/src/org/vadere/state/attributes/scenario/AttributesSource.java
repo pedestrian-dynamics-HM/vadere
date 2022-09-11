@@ -18,6 +18,8 @@ public class AttributesSource extends AttributesVisualElement {
 	@VadereAttribute
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
 	private ArrayList<Integer> targetIds = new ArrayList<>();
+	@VadereAttribute
+	private final Integer[] somfields = new Integer[3];
 
 	/**
 	 *  This Attribute only takes affect if a model org.vadere.simulator.models.groups.GroupModel
