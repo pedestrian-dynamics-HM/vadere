@@ -8,19 +8,19 @@ import javax.swing.event.CellEditorListener;
 import javax.swing.table.TableCellEditor;
 import java.awt.*;
 import java.util.EventObject;
-import java.util.HashMap;
 
-public class FieldValueEditor extends JPanel implements TableCellEditor {
+public class FieldValueEditor implements TableCellEditor {
 
-    private HashMap<String, JComponent> editorObjects;
     private AttributeEditor editor;
 
     public FieldValueEditor(AttributeEditor editor) {
         super();
+        this.editor = editor;
     }
 
-    public void set(HashMap<String, JComponent> editorObjects) {
-        this.editorObjects = editorObjects;
+
+    public void setEditor(AttributeEditor editor) {
+        this.editor = editor;
     }
 
     @Override

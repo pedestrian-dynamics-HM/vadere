@@ -1,7 +1,7 @@
 package org.vadere.gui.projectview.view;
 
 
-import com.formdev.flatlaf.FlatLightLaf;
+import com.formdev.flatlaf.FlatDarkLaf;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.postvisualization.control.Player;
@@ -234,7 +234,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 					| IllegalAccessException e) {
 				IOUtils.errorBox("The system look and feel could not be loaded.", "Error setLookAndFeel");
 			}
-			FlatLightLaf.setup();
+			FlatDarkLaf.setup();
 			// show GUI
 			ProjectViewModel model = new ProjectViewModel();
 			ProjectView frame = new ProjectView(model);

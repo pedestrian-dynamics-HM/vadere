@@ -2,14 +2,10 @@ package org.vadere.gui.topographycreator.control.attribtable.model;
 
 import org.vadere.gui.topographycreator.control.attribtable.ViewListener;
 import org.vadere.gui.topographycreator.control.attribtable.cells.delegates.AttributeEditor;
-import org.vadere.gui.topographycreator.control.attribtable.cells.editors.EditorRegistry;
 
 import javax.swing.*;
-import java.awt.*;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.function.Function;
 
 public class FieldModel extends AbstractModel<Field> {
@@ -24,16 +20,10 @@ public class FieldModel extends AbstractModel<Field> {
     }
 
     @Override
-    protected void createEditors(Map<String, Field> model, HashMap<String, AttributeEditor> attributeEditors, HashMap<String, JPanel> editorContentPanels) {
-        var registry = EditorRegistry.getInstance();
-        for (var field : model.keySet()) {
-            var subPanel = new JPanel(new GridBagLayout());
-            var editor = registry.create(model.get(field).getType(), this, model.get(field).getName(), subPanel);
-            editorContentPanels.put(field, subPanel);
-            attributeEditors.put(field, editor);
-            subPanel.setBackground(UIManager.getColor("Table.selectionBackground").brighter());
-        }
+    protected AttributeEditor createEditor(Field object, JPanel contentPanel) {
+        return registry.create(object.getType(), this, object.getName(), contentPanel);
     }
+
 
     @Override
     public void updateModel(String index, Object obj) {
@@ -52,6 +42,7 @@ public class FieldModel extends AbstractModel<Field> {
 
     @Override
     public void updateView(Object obj) {
+        this.ownerRef = obj;
         var fields = this.getElements();
         var editors = this.getEditors();
         for (var fieldName : fields.keySet()) {

@@ -25,23 +25,29 @@ public class JCollapsablePanel extends JPanel implements Observer {
     private final JLabel head;
     private GridBagConstraints gbc;
 
+    private final JComponent mouseBubbler;
+
     /**
      * hidden is storing the visibility state of the contentPanel container
      */
-    private  boolean hidden = false;
-    public enum Style{
-        HEADER,GROUP
+    private boolean hidden = false;
+
+    public enum Style {
+        HEADER, GROUP
     }
+
     private final Observable observable;
-    public JCollapsablePanel(String title, Style panelStyle){
+
+    public JCollapsablePanel(String title, Style panelStyle, JComponent mouseBubbler) {
         super(new GridBagLayout());
         this.observable = new Observable();
         contentPanel = new JPanel(new GridBagLayout());
         head = new JLabel(title);
+        this.mouseBubbler = mouseBubbler;
 
         initializeGridBagConstraint();
 
-        if(panelStyle.equals(Style.GROUP)) {
+        if (panelStyle.equals(Style.GROUP)) {
             initializeGroupHeaderStyle(head);
             head.addMouseListener(new GroupHeaderMouseInputAdapter(head,contentPanel));
         } else {
@@ -123,6 +129,8 @@ public class JCollapsablePanel extends JPanel implements Observer {
             }
             revalidate();
             repaint();
+            mouseBubbler.revalidate();
+            mouseBubbler.repaint();
         }
     }
 
@@ -153,6 +161,10 @@ public class JCollapsablePanel extends JPanel implements Observer {
                 head.setIcon(UIManager.getIcon("Tree.collapsedIcon"));
                 hidden = true;
             }
+            revalidate();
+            repaint();
+            mouseBubbler.revalidate();
+            mouseBubbler.repaint();
         }
     }
 }

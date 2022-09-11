@@ -165,6 +165,7 @@ public class AbstractTypeCellEditor extends AttributeEditor implements ViewListe
 
     @Override
     public void updateModel(Object attributes) {
+        this.model.updateModel(this.id, instanceOfSelected);
         this.contentPanel.revalidate();
         this.contentPanel.repaint();
     }

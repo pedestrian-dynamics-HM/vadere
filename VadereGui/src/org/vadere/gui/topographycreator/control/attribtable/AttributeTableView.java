@@ -18,6 +18,7 @@ public class AttributeTableView extends JPanel implements ViewListener {
         super(new BorderLayout());
         this.parent = parent;
         this.editorPages = new HashMap<>();
+        this.setBackground(Color.red);
     }
 
     public void selectionChange(Object object) {

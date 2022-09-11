@@ -1,39 +1,33 @@
 package org.vadere.gui.topographycreator.control.attribtable.cells.editors;
 
 
+import org.vadere.gui.topographycreator.control.attribtable.cells.delegates.AttributeEditor;
+
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.event.CellEditorListener;
 import javax.swing.table.TableCellEditor;
 import java.awt.*;
-import java.lang.reflect.Field;
 import java.util.EventObject;
-import java.util.HashMap;
 
-public class ListValueEditor extends JPanel implements TableCellEditor {
+public class ListValueEditor implements TableCellEditor {
 
-    private HashMap<String, JComponent> editorObjects;
+    private final AttributeEditor editor;
+    private final String id;
 
-    public ListValueEditor() {
-        super(new BorderLayout());
-    }
-
-    public void set(HashMap<String, JComponent> editorObjects) {
-        this.editorObjects = editorObjects;
+    public ListValueEditor(AttributeEditor editor, String id) {
+        this.editor = editor;
+        this.id = id;
     }
 
     @Override
     public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
         var panel = new JPanel(new BorderLayout());
-        panel.add(new JLabel(String.valueOf(row)), BorderLayout.WEST);
-        panel.add(getComponent(table, row));
-        this.add(panel, BorderLayout.CENTER);
-        return this;
-    }
-
-    private JComponent getComponent(JTable table, int row) {
-        var field = (Field) table.getValueAt(row, 0);
-        var name = field.getName();
-        return editorObjects.get(name);
+        var lable = new JLabel(id);
+        lable.setBorder(new EmptyBorder(0, 8, 0, 8));
+        panel.add(lable, BorderLayout.WEST);
+        panel.add(editor);
+        return panel;
     }
 
     @Override

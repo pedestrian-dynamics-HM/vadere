@@ -8,23 +8,24 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.BiFunction;
 
 public class JAttributeTable extends JPanel {
 
     private final List<JComponent> renderOrderModel;
     private final GridBagConstraints gbc = Layouts.initGridBagConstraint(1.0);
-    BiFunction<String, AttributeEditor, JTable> rowDelegate;
+    Styler rowDelegate;
 
-    public JAttributeTable(AbstractModel model, BiFunction<String, AttributeEditor, JTable> rowDelegate) {
+    public JAttributeTable(AbstractModel model, Styler rowDelegateStyler) {
         super(new GridBagLayout());
         this.renderOrderModel = new ArrayList<>();
-        this.rowDelegate = rowDelegate;
+        this.rowDelegate = rowDelegateStyler;
         this.setVisible(true);
         setModel(model);
     }
 
     public void setModel(AbstractModel model) {
+        this.removeAll();
+        this.renderOrderModel.clear();
         var editors = model.getEditors();
         var panels = model.getContentPanels();
         var keySet = editors.keySet();
@@ -32,7 +33,7 @@ public class JAttributeTable extends JPanel {
         for (var key : keySet) {
             var editor = (AttributeEditor) editors.get(key);
             var panel = (JPanel) panels.get(key);
-            var delegate = this.rowDelegate.apply((String) key, editor);
+            var delegate = this.rowDelegate.rowDelegateStyle((String) key, editor);
             renderOrderModel.add(delegate);
             if (panel.getComponentCount() > 0) {
                 renderOrderModel.add(panel);
@@ -41,29 +42,13 @@ public class JAttributeTable extends JPanel {
         addTablesToView();
     }
 
+    public static abstract class Styler {
+        public abstract JTable rowDelegateStyle(String id, AttributeEditor editor);
+    }
+
     private void addTablesToView() {
         for (var component : this.renderOrderModel) {
             this.add(component, gbc);
         }
     }
-/*
-    private JTable initializeNewTableSection() {
-        var activeTable = new JTable();
-        activeTable.setRowHeight(28);
-        activeTable.setIntercellSpacing(new Dimension(0,4));
-        activeTable.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        activeTable.setBackground(UIManager.getColor("Panel.background"));
-        activeTable.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                SwingUtilities.invokeLater(()->
-                        AttributeHelpView.getInstance().loadHelpFromField(
-                                (Field) activeTable.getModel().getValueAt(activeTable.rowAtPoint(e.getPoint()),0)
-                        )
-                );
-            }
-        });
-        return activeTable;
-    }
-*/
 }

@@ -7,6 +7,7 @@ import javax.swing.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class EditorRegistry {
@@ -19,6 +20,8 @@ public class EditorRegistry {
         addTypeEditor(Integer.class, SpinnerCellEditor.class);
         addTypeEditor(Double.class, DoubleSpinnerCellEditor.class);
         addTypeEditor(Boolean.class, CheckBoxCellEditor.class);
+        addTypeEditor(ArrayList.class, ListCellEditor.class);
+        addTypeEditor(Object.class, EmptyEditor.class);
     }
 
     public static EditorRegistry getInstance() {

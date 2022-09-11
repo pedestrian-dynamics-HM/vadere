@@ -2,8 +2,10 @@ package org.vadere.gui.topographycreator.control.attribtable.model;
 
 import org.vadere.gui.topographycreator.control.attribtable.ViewListener;
 import org.vadere.gui.topographycreator.control.attribtable.cells.delegates.AttributeEditor;
+import org.vadere.gui.topographycreator.control.attribtable.cells.editors.EditorRegistry;
 
 import javax.swing.*;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -19,6 +21,7 @@ public abstract class AbstractModel<T> {
     protected ViewListener listener;
     protected Object ownerRef;
 
+    protected static EditorRegistry registry = EditorRegistry.getInstance();
     public AbstractModel(ArrayList<T> model, Object ownerRef, ViewListener listener) {
         keyMapper = keyMapper();
         this.ownerRef = ownerRef;
@@ -26,19 +29,16 @@ public abstract class AbstractModel<T> {
         this.editorContentPanels = new HashMap<>();
         this.modelElements = new HashMap<>();
         this.listener = listener;
-        for (var val : model) {
-            modelElements.put(keyMapper.apply(val), val);
+        if (model != null) {
+            for (var val : model) {
+                addElement(val);
+            }
         }
-        createEditors(Collections.unmodifiableMap(modelElements), this.attributeEditors, this.editorContentPanels);
     }
 
     protected abstract Function<? super Object, String> keyMapper();
 
-    abstract protected void createEditors(
-            Map<String, T> model,
-            HashMap<String, AttributeEditor> attributeEditors,
-            HashMap<String, JPanel> editorContentPanels);
-
+    protected abstract AttributeEditor createEditor(T object, JPanel contentPanel);
 
     public T getElement(String id) {
         return this.modelElements.get(id);
@@ -61,9 +61,15 @@ public abstract class AbstractModel<T> {
     public abstract void updateView(Object obj);
 
     public void addElement(T element) {
-        var map = new HashMap<String, T>();
-        map.put(keyMapper.apply(element), element);
-        createEditors(map, this.attributeEditors, this.editorContentPanels);
+        var key = keyMapper.apply(element);
+        modelElements.put(key, element);
+
+        var subPanel = new JPanel(new GridBagLayout());
+        subPanel.setBackground(UIManager.getColor("Table.selectionBackground").brighter());
+        var editor = createEditor(element, subPanel);
+
+        attributeEditors.put(key, editor);
+        editorContentPanels.put(key, subPanel);
     }
 
     public void removeElement(String mappedKey) {

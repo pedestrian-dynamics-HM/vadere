@@ -15,9 +15,10 @@ public class AttributesSource extends AttributesVisualElement {
 	@VadereAttribute
 	@JsonView(Views.CacheViewExclude.class)
 	private AttributesSpawner spawner = new AttributesRegularSpawner();
-	//@VadereAttribute
+	@VadereAttribute
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
 	private ArrayList<Integer> targetIds = new ArrayList<>();
+
 	/**
 	 *  This Attribute only takes affect if a model org.vadere.simulator.models.groups.GroupModel
 	 *  is present in the scenario. When this is the case this list defines the group size

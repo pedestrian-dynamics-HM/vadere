@@ -12,15 +12,14 @@ public class ButtonColumnRenderer extends JPanel implements TableCellRenderer {
     public ButtonColumnRenderer() {
     }
 
-    private static boolean isItemInLastRow(JTable table, int row) {
-        return row == table.getModel().getRowCount() - 1;
-    }
-
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-        if (isItemInLastRow(table, row)) {
-            return ADD_BUTTON;
+        if (column == 1) {
+            if (row == table.getModel().getRowCount() - 1) {
+                return ADD_BUTTON;
+            }
+            return ERASE_BUTTON;
         }
-        return ERASE_BUTTON;
+        throw new IllegalArgumentException();
     }
 }
