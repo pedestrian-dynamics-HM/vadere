@@ -15,7 +15,7 @@ import org.vadere.gui.projectview.control.ActionDeselect;
 import org.vadere.gui.projectview.model.ProjectViewModel;
 import org.vadere.gui.projectview.view.JsonValidIndicator;
 import org.vadere.gui.topographycreator.control.*;
-import org.vadere.gui.topographycreator.control.attribtable.AttributeTableContainer;
+import org.vadere.gui.topographycreator.control.attribtable.ui.AttributeTableContainer;
 import org.vadere.gui.topographycreator.model.IDrawPanelModel;
 import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
 import org.vadere.simulator.projects.Scenario;

@@ -1,76 +1,107 @@
 package org.vadere.gui.topographycreator.control.attribtable.tree;
 
+import org.vadere.gui.topographycreator.control.attribtable.ModelListener;
+import org.vadere.gui.topographycreator.control.attribtable.Revalidatable;
 import org.vadere.gui.topographycreator.control.attribtable.cells.editors.EditorRegistry;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 import static org.vadere.gui.topographycreator.control.attribtable.util.ClassFields.getSuperDeclaredFields;
 
 public class AttributeTree {
     private static final EditorRegistry registry = EditorRegistry.getInstance();
     private final TreeNode rootNode;
+    private final Class rootClass;
 
-    public AttributeTree(String fieldName, Class baseClass) {
-        rootNode = parseClassTree(null, fieldName, baseClass);
+    private final Revalidatable revalidatable;
+
+    public AttributeTree(String fieldName, Class baseClass, Revalidatable revalidatable) {
+        rootNode = parseClassTree(new RootNodeWrapper(revalidatable), fieldName, baseClass);
+        this.rootClass = baseClass;
+        this.revalidatable = revalidatable;
     }
 
     public static TreeNode parseClassTree(TreeNode parent, String fieldName, Class baseClass) {
-        Field[] fields = getSuperDeclaredFields(baseClass);//baseClass.getDeclaredFields();
+        Field[] fields = getSuperDeclaredFields(baseClass);
 
         TreeNode root = new ObjectNode(parent, fieldName, baseClass);
 
-        {
-            for (var field : fields) {
-                Class type = field.getType();
-                String name = field.getName();
-                if (registry.contains(type)) {
-                    root.children.put(name, new FieldNode(root, name, type));
-                }
-                else if (isArray(type)) {
-                    root.children.put(name, new ArrayNode(root, name, type));
-                } else if (Modifier.isAbstract(type.getModifiers())) {
-                    root.children.put(name, new OptionalNode(root, name, type));
-                } else {
+        for (var field : fields) {
+            Class type = field.getType();
+            String name = field.getName();
+            switch (TYPE_OF(type)) {
+                case REGISTERED:
+                    root.children.put(name, new FieldNode(root, field));
+                    break;
+                case ARRAY:
+                    root.children.put(name, new ArrayNode(root, field));
+                    break;
+                case ABSTRACT:
+                    root.children.put(name, new ObjectNode(root, fieldName, type));
+                    break;
+                default:
                     root.children.put(name, parseClassTree(root, name, type));
-                }
             }
         }
 
         return root;
     }
 
+    private static TYPE TYPE_OF(Class clazz) {
+        if (registry.contains(clazz)) {
+            return TYPE.REGISTERED;
+        }
+        if (isArray(clazz)) {
+            return TYPE.ARRAY;
+        }
+        if (Modifier.isAbstract(clazz.getModifiers())) {
+            return TYPE.ABSTRACT;
+        }
+        return TYPE.OBJECT;
+    }
+
     private static boolean isArray(Class clazz) {
-        return clazz.isAssignableFrom(ArrayList.class);
-        //return clazz.getComponentType() != null;
+        return clazz.isAssignableFrom(List.class);
+    }
+
+    public Class getRootClass() {
+        return rootClass;
     }
 
     public TreeNode getRootNode() {
         return rootNode;
     }
 
-    public void updateModel(Object obj) throws AttributTreeException, IllegalAccessException {
+    public void updateModel(Object obj) throws TreeException, IllegalAccessException {
         if (obj.getClass() != rootNode.getFieldClass())
-            throw new AttributTreeException();
+            throw new TreeException();
         rootNode.updateModel(obj);
 
     }
 
+    private enum TYPE {
+        REGISTERED, ARRAY, ABSTRACT, OBJECT
+    }
+
     public static abstract class TreeNode {
         private TreeNode parent;
-        private final HashMap<String, TreeNode> children;
+        private final LinkedHashMap<String, TreeNode> children;
 
         private Object reference;
         private final Class clazz;
 
         private final String name;
 
-        private final ArrayList<ModelChangeListener> listeners;
+
+        private final ArrayList<ModelListener> listeners;
 
         public TreeNode(TreeNode parent, String fieldName, Class clazz) {
-            this.children = new HashMap<>();
+            this.children = new LinkedHashMap<>();
             this.clazz = clazz;
             this.name = fieldName;
             this.parent = parent;
@@ -89,10 +120,10 @@ public class AttributeTree {
             return children;
         }
 
-        public TreeNode find(String path) throws AttributTreeException {
+        public TreeNode find(String path) throws TreeException {
             String splitPath = path.substring(0, path.indexOf("."));
             if (!this.children.containsKey(splitPath)) {
-                throw new AttributTreeException();
+                throw new TreeException();
             }
             TreeNode child = this.children.get(splitPath);
             return child.find(path.substring(path.indexOf(".") + 1));
@@ -119,9 +150,7 @@ public class AttributeTree {
 
         public abstract Object get(String field);
 
-        protected void updateModel(Object obj) throws IllegalAccessException, AttributTreeException {
-            //if(getReference() == null || obj.getClass() != getReference().getClass())
-            //     parent.set(getFieldName(),parseClassTree(obj.getClass()));
+        public void updateModel(Object obj) throws IllegalAccessException, TreeException {
             if (obj != null) {
                 setReference(obj);
                 var fields = getSuperDeclaredFields(obj.getClass());
@@ -136,7 +165,7 @@ public class AttributeTree {
             }
         }
 
-        public void addChangeListener(ModelChangeListener listener) {
+        public void addChangeListener(ModelListener listener) {
             this.listeners.add(listener);
         }
 
@@ -146,7 +175,7 @@ public class AttributeTree {
             }
         }
 
-        protected abstract void revalidateObjectStructure(String field,Object object) throws NoSuchFieldException, IllegalAccessException;
+        public abstract void setParentField(String field, Object object) throws NoSuchFieldException, IllegalAccessException;
     }
 }
 

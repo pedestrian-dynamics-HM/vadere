@@ -5,7 +5,7 @@ public class ValueNode extends AttributeTree.TreeNode {
 
     public ValueNode(AttributeTree.TreeNode parent, String fieldName, Class clazz, Object value) {
         super(parent, fieldName, clazz);
-        this.setValue(value);
+        setReference(value);
     }
 
     @Override
@@ -22,12 +22,21 @@ public class ValueNode extends AttributeTree.TreeNode {
         return getReference();
     }
 
-    public void setValue(Object value) {
-        setReference(value);
+    public void setValue(Object value) throws NoSuchFieldException, IllegalAccessException {
+        if (!value.equals(getReference())) {
+            setReference(value);
+            setParentField(getFieldName(), getReference());
+        }
     }
 
     @Override
-    protected void revalidateObjectStructure(String field, Object object) throws NoSuchFieldException, IllegalAccessException {
-        getParent().revalidateObjectStructure(getFieldName(), object);
+    public void updateModel(Object obj) throws IllegalAccessException, TreeException {
+        setReference(obj);
+        notifyListeners(obj);
+    }
+
+    @Override
+    public void setParentField(String field, Object object) throws NoSuchFieldException, IllegalAccessException {
+        getParent().setParentField(getFieldName(), object);
     }
 }

@@ -1,18 +1,18 @@
 package org.vadere.gui.topographycreator.control.attribtable.cells.delegates;
 
-import org.vadere.gui.topographycreator.control.attribtable.AttributeTablePage;
-import org.vadere.gui.topographycreator.control.attribtable.AttributeTableView;
-import org.vadere.gui.topographycreator.control.attribtable.model.AbstractModel;
+import org.vadere.gui.topographycreator.control.attribtable.Revalidatable;
+import org.vadere.gui.topographycreator.control.attribtable.tree.AttributeTree;
+import org.vadere.gui.topographycreator.control.attribtable.ui.AttributeTablePage;
+import org.vadere.gui.topographycreator.control.attribtable.ui.AttributeTableView;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 
-public class ChildObjectCellEditor extends AttributeEditor {
+public class ChildObjectCellEditor extends AttributeEditor implements Revalidatable {
 
     private final JButton button;
     private GridBagConstraints gbc;
@@ -25,21 +25,18 @@ public class ChildObjectCellEditor extends AttributeEditor {
 
     protected Object objectInstance;
 
-    public ChildObjectCellEditor(
-            AbstractModel parent,
-            String id,
-            JPanel contentPanel
-    ) {
-        super(parent, id, contentPanel);
+    public ChildObjectCellEditor(AttributeTree.TreeNode model, JPanel contentPanel) {
+        super(model, contentPanel);
         this.contentPanel.setLayout(new BorderLayout());
-        this.contentPanel.setBorder(new EmptyBorder(2,2,2,2));
+        this.contentPanel.setBorder(new EmptyBorder(2, 2, 2, 2));
         this.contentPanel.setVisible(contentPaneVisible);
-        this.clazz = ((Field) parent.getElement(id)).getType();
+        this.clazz = model.getFieldClass();
         this.button = new JButton(AttributeTablePage.generateHeaderName(clazz));
         this.add(button);
         try {
             this.constructNewObject();
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+                 NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
         this.createInternalPropertyPane(objectInstance);
@@ -57,6 +54,7 @@ public class ChildObjectCellEditor extends AttributeEditor {
         initializeGridBagConstraint();
     }
 
+
     private void initializeGridBagConstraint() {
         this.gbc = new GridBagConstraints();
         this.gbc.gridwidth = GridBagConstraints.REMAINDER;
@@ -69,15 +67,14 @@ public class ChildObjectCellEditor extends AttributeEditor {
 
     @Override
     protected void initialize() {
-
+        view = new AttributeTableView(this);
     }
 
-    public void modelChanged(Object value) {
-        view.updateView(value);
+    public void onModelChanged(Object value) {
+        view.selectionChange(value);
     }
 
     protected void createInternalPropertyPane(Object newObject) {
-        view = new AttributeTableView(this);
         view.selectionChange(newObject);
         contentPanel.add(view, BorderLayout.CENTER);
     }
@@ -86,4 +83,14 @@ public class ChildObjectCellEditor extends AttributeEditor {
         objectInstance = clazz.getDeclaredConstructor(null).newInstance(null);
     }
 
+    @Override
+    public void revalidateObjectStructure(Object object) {
+        try {
+            model.getParent().setParentField(model.getFieldName(), object);
+        } catch (NoSuchFieldException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

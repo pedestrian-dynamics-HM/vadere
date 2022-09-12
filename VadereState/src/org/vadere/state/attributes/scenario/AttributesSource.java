@@ -14,8 +14,9 @@ public class AttributesSource extends AttributesVisualElement {
 	@JsonView(Views.CacheViewExclude.class)
 	private AttributesSpawner spawner = new AttributesRegularSpawner();
 
+
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
-	private ArrayList<Integer> targetIds = new ArrayList<>();
+	private List<Integer> targetIds = new ArrayList<>();
 
 	/**
 	 *  This Attribute only takes affect if a model org.vadere.simulator.models.groups.GroupModel
@@ -31,7 +32,7 @@ public class AttributesSource extends AttributesVisualElement {
   	 *  GroupSize   [  1    2    3     4     5         ] ------------------------------------------
 	 *  uniform distribution of groups of the size from 3 to 5 ------------------------------------
 	 */
-	//@VadereAttribute
+
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
 	private List<Double> groupSizeDistribution = List.of(1.0);
 
@@ -73,7 +74,7 @@ public class AttributesSource extends AttributesVisualElement {
 		return groupSizeDistribution;
 	}
 
-	public void setGroupSizeDistribution(List<Double> groupSizeDistribution) {
+	public void setGroupSizeDistribution(ArrayList<Double> groupSizeDistribution) {
 		checkSealed();
 		this.groupSizeDistribution = groupSizeDistribution;
 	}

@@ -1,13 +1,14 @@
 package org.vadere.gui.topographycreator.control.attribtable.cells.editors;
 
 import org.vadere.gui.topographycreator.control.attribtable.cells.delegates.*;
-import org.vadere.gui.topographycreator.control.attribtable.model.AbstractModel;
+import org.vadere.gui.topographycreator.control.attribtable.tree.AttributeTree;
 
 import javax.swing.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
+import java.util.List;
 
 public class EditorRegistry {
     private static EditorRegistry registry;
@@ -19,8 +20,6 @@ public class EditorRegistry {
         addTypeEditor(Integer.class, SpinnerCellEditor.class);
         addTypeEditor(Double.class, DoubleSpinnerCellEditor.class);
         addTypeEditor(Boolean.class, CheckBoxCellEditor.class);
-        //addTypeEditor(ArrayList.class, ListCellEditor.class);
-        //addTypeEditor(Object.class, EmptyEditor.class);
     }
 
     public static EditorRegistry getInstance() {
@@ -34,7 +33,7 @@ public class EditorRegistry {
         if (!this.editorConstructors.containsKey(typeClass)) {
             Constructor<? extends AttributeEditor> constructor = null;
             try {
-                constructor = editorClass.getDeclaredConstructor(AbstractModel.class, String.class, JPanel.class);
+                constructor = editorClass.getDeclaredConstructor(AttributeTree.TreeNode.class, JPanel.class);
             } catch (NoSuchMethodException e) {
                 throw new RuntimeException(e);
             }
@@ -42,18 +41,20 @@ public class EditorRegistry {
         }
     }
 
-    public AttributeEditor create(Class type, AbstractModel model, String id, JPanel contentPanel) {
+    public AttributeEditor create(Class type, AttributeTree.TreeNode model, JPanel contentPanel) {
         Constructor constructor;
         AttributeEditor component;
         try {
             if (!contains(type)) {
                 if (type.isEnum())
-                    constructor = ComboBoxCellEditor.class.getDeclaredConstructor(AbstractModel.class, String.class, JPanel.class);
+                    constructor = ComboBoxCellEditor.class.getDeclaredConstructor(AttributeTree.TreeNode.class, JPanel.class);
                     //addTypeEditor(type, ComboBoxCellEditor.class);
-                else if (Modifier.isAbstract(type.getModifiers()))
-                    constructor = AbstractTypeCellEditor.class.getDeclaredConstructor(AbstractModel.class, String.class, JPanel.class);
+                else if (type.isAssignableFrom(List.class)) {
+                    constructor = ListCellEditor.class.getDeclaredConstructor(AttributeTree.TreeNode.class, JPanel.class);
+                } else if (Modifier.isAbstract(type.getModifiers()))
+                    constructor = AbstractTypeCellEditor.class.getDeclaredConstructor(AttributeTree.TreeNode.class, JPanel.class);
                 else
-                    constructor = ChildObjectCellEditor.class.getDeclaredConstructor(AbstractModel.class, String.class, JPanel.class);
+                    constructor = ChildObjectCellEditor.class.getDeclaredConstructor(AttributeTree.TreeNode.class, JPanel.class);
             } else {
                 constructor = editorConstructors.get(type.getName());
             }
@@ -61,7 +62,7 @@ public class EditorRegistry {
             throw new IllegalArgumentException(type.getName() + ": no editor registered for such type");
         }
         try {
-            component = (AttributeEditor) constructor.newInstance(model, id, contentPanel);
+            component = (AttributeEditor) constructor.newInstance(model, contentPanel);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException(e);
         }

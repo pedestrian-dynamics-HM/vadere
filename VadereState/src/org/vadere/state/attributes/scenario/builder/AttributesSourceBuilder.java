@@ -8,7 +8,7 @@ import java.util.List;
 
 public final class AttributesSourceBuilder{
 	private ArrayList<Integer> targetIds = new ArrayList<>();
-	private List<Double> groupSizeDistribution = List.of(1.0);
+	private ArrayList<Double> groupSizeDistribution = (ArrayList<Double>) List.of(1.0);
 
 	private AttributesVisualElementBuilder visualBuilder = new AttributesVisualElementBuilder();
 	private SpawnerBuilder spawnerBuilder;
@@ -42,7 +42,7 @@ public final class AttributesSourceBuilder{
 		return this;
 	}
 
-	public AttributesSourceBuilder setGroupSizeDistribution(List<Double> groupSizeDistribution) {
+	public AttributesSourceBuilder setGroupSizeDistribution(ArrayList<Double> groupSizeDistribution) {
 		this.groupSizeDistribution = groupSizeDistribution;
 		return this;
 	}

@@ -1,7 +1,9 @@
-package org.vadere.gui.topographycreator.control.attribtable;
+package org.vadere.gui.topographycreator.control.attribtable.ui;
 
 import org.vadere.gui.components.view.ISelectScenarioElementListener;
 import org.vadere.gui.topographycreator.control.AttributeHelpView;
+import org.vadere.gui.topographycreator.control.attribtable.Revalidatable;
+import org.vadere.gui.topographycreator.control.attribtable.tree.TreeException;
 import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.scenario.ScenarioElement;
@@ -17,7 +19,7 @@ import java.util.Observer;
 
 import static org.vadere.gui.topographycreator.control.attribtable.util.Layouts.initGridBagConstraint;
 
-public class AttributeTableContainer extends JPanel implements ISelectScenarioElementListener, Observer, ViewListener {
+public class AttributeTableContainer extends JPanel implements ISelectScenarioElementListener, Observer, Revalidatable {
     AttributeTableView attrView;
     JTextPane helpView;
     private final NotifyContext ctx = new NotifyContext(this.getClass());
@@ -54,13 +56,23 @@ public class AttributeTableContainer extends JPanel implements ISelectScenarioEl
         defaultModel.addSelectScenarioElementListener(this);
         defaultModel.addObserver(this);
     }
+
+    private static boolean isAnElementSelected(ScenarioElement scenarioElement) {
+        return scenarioElement != null;
+    }
+
+    private static boolean isNoElementSelected(ScenarioElement scenarioElement) {
+        return scenarioElement == null;
+    }
+
     @Override
     public void selectionChange(ScenarioElement scenarioElement) {
         this.selectedElement = scenarioElement;
-        if (scenarioElement == null)
-            attrView.selectionChange(null);
-        else {
-            attrView.selectionChange(scenarioElement.getAttributes());
+        if (isNoElementSelected(scenarioElement))
+            attrView.clear();
+        if (isAnElementSelected(scenarioElement)) {
+            var attributes = scenarioElement.getAttributes();
+            attrView.selectionChange(attributes);
         }
     }
 
@@ -68,20 +80,25 @@ public class AttributeTableContainer extends JPanel implements ISelectScenarioEl
     public void update(Observable o, Object arg) {
         if (arg instanceof NotifyContext) {
             var ctx = (NotifyContext) arg;
-            if (!this.getClass().isAssignableFrom(ctx.getNotifyContext())) {
-                if (panelModel.getSelectedElement() != null)
-                    attrView.updateView(panelModel.getSelectedElement().getAttributes());
-                else
-                    attrView.updateView(null);
+            if (AttributeTableContainer.class.isAssignableFrom(ctx.getNotifyContext())) {
+                return;
             }
+        }
+        try {
+            if (panelModel.getSelectedElement() != null)
+                attrView.updateModel(panelModel.getSelectedElement().getAttributes());
+        } catch (TreeException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
         }
     }
 
-    public void updateModel(Object attributes) {
-        selectedElement.setAttributes((Attributes) attributes);
-        panelModel.getScenario().updateCurrentStateSerialized();
-        panelModel.setElementHasChanged(selectedElement);
+    @Override
+    public void revalidateObjectStructure(Object object) {
+        var element = panelModel.getSelectedElement();
+        element.setAttributes((Attributes) object);
+        panelModel.setElementHasChanged(element);
         panelModel.notifyObservers(ctx);
     }
-
 }

@@ -2,16 +2,15 @@ package org.vadere.gui.topographycreator.control.attribtable.cells.delegates;
 
 import org.jetbrains.annotations.NotNull;
 import org.reflections.Reflections;
-import org.vadere.gui.topographycreator.control.attribtable.AttributeTableView;
-import org.vadere.gui.topographycreator.control.attribtable.ViewListener;
-import org.vadere.gui.topographycreator.control.attribtable.model.AbstractModel;
+import org.vadere.gui.topographycreator.control.attribtable.Revalidatable;
+import org.vadere.gui.topographycreator.control.attribtable.tree.AttributeTree;
+import org.vadere.gui.topographycreator.control.attribtable.ui.AttributeTableView;
 import org.vadere.gui.topographycreator.utils.RunnableRegistry;
 import org.vadere.state.attributes.Attributes;
 
 import javax.swing.*;
 import java.awt.*;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -27,7 +26,7 @@ import java.util.Map;
 
 //TODO: add jtable to constructor for revalidation & repaint
 
-public class AbstractTypeCellEditor extends AttributeEditor implements ViewListener {
+public class AbstractTypeCellEditor extends AttributeEditor implements Revalidatable {
     public static final String STRING_NULL = "[null]";
     private JComboBox<Object> comboBox;
     private AbstractTypeCellEditor self;
@@ -37,35 +36,36 @@ public class AbstractTypeCellEditor extends AttributeEditor implements ViewListe
     private GridBagConstraints gbc;
     private String selected;
 
-    private AttributeTableView attributeTableView;
+    private AttributeTableView view;
     private Object instanceOfSelected;
 
-    public AbstractTypeCellEditor(AbstractModel parent, String id, JPanel contentPanel) {
-        super(parent, id, contentPanel);
+    public AbstractTypeCellEditor(AttributeTree.TreeNode model, JPanel contentPanel) {
+        super(model, contentPanel);
     }
 
 
     @Override
     protected void initialize() {
-        this.attributeTableView = new AttributeTableView(this);
+        view = new AttributeTableView(this);
         initializeGridBagConstraint();
         initializeRunnableRegistry();
         initializeComboBox();
         initializeSelfReference();
-        this.contentPanel.add(attributeTableView,gbc);
+        this.contentPanel.add(view, gbc);
     }
+
     @Override
-    public void modelChanged(Object value) {
-        if(value != instanceOfSelected) {
-            if(value == null){
+    public void onModelChanged(Object value) {
+        if (value != instanceOfSelected) {
+            if (value == null) {
                 this.selected = "[null]";
                 this.contentPanel.setVisible(false);
-            }else{
+            } else {
                 this.selected = getSimpleName(value.getClass());
             }
             this.instanceOfSelected = value;
             this.comboBox.getModel().setSelectedItem(this.selected);
-            this.attributeTableView.selectionChange(value);
+            view.selectionChange(value);
             this.contentPanel.setVisible(true);
             this.contentPanel.revalidate();
             this.contentPanel.repaint();
@@ -78,25 +78,29 @@ public class AbstractTypeCellEditor extends AttributeEditor implements ViewListe
     private void initializeRunnableRegistry() {
         this.runnableRegistry = new RunnableRegistry();
         this.runnableRegistry.registerAction("[null]",()->{
-            updateModel(null);
+            view.selectionChange(null);
             instanceOfSelected = null;
-            this.attributeTableView.selectionChange(instanceOfSelected);
             contentPanel.setVisible(false);
+            view.clear();
         });
-        this.runnableRegistry.registerDefault(()->{
-            selected = getSelectedItem();
-            try {
-                instanceOfSelected = classConstructorRegistry.get(selected).newInstance();
-            } catch (InstantiationException e) {
-                throw new RuntimeException(e);
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
-            } catch (InvocationTargetException e) {
-                throw new RuntimeException(e);
-            }
-            updateModel(instanceOfSelected);
-            this.attributeTableView.selectionChange(instanceOfSelected);
-            contentPanel.setVisible(true);
+        this.runnableRegistry.registerDefault(()-> {
+            SwingUtilities.invokeLater(() -> {
+                selected = getSelectedItem();
+                try {
+                    instanceOfSelected = classConstructorRegistry.get(selected).newInstance();
+                } catch (InstantiationException e) {
+                    throw new RuntimeException(e);
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                } catch (InvocationTargetException e) {
+                    throw new RuntimeException(e);
+                }
+                view.clear();
+                view.selectionChange(instanceOfSelected);
+                contentPanel.setVisible(true);
+                contentPanel.revalidate();
+                contentPanel.repaint();
+            });
         });
     }
 
@@ -106,7 +110,7 @@ public class AbstractTypeCellEditor extends AttributeEditor implements ViewListe
 
     private void initializeComboBox(){
         var reflections = new Reflections("org.vadere");
-        var subClassModel = new ArrayList(reflections.getSubTypesOf(((Field) model.getElement(id)).getType()));
+        var subClassModel = new ArrayList(reflections.getSubTypesOf(model.getFieldClass()));
 
         this.comboBox = new JComboBox<>();
         this.comboBox.setModel(initializeComboBoxModel(subClassModel));
@@ -121,8 +125,10 @@ public class AbstractTypeCellEditor extends AttributeEditor implements ViewListe
             }
             return new JLabel(value.toString());
         });
-        this.comboBox.addItemListener(e ->  {
-                this.runnableRegistry.apply(comboBox.getModel().getSelectedItem());
+        this.comboBox.addItemListener(e -> {
+            this.runnableRegistry.apply(comboBox.getModel().getSelectedItem());
+            revalidate();
+            repaint();
         });
         this.add(comboBox);
     }
@@ -164,9 +170,13 @@ public class AbstractTypeCellEditor extends AttributeEditor implements ViewListe
     }
 
     @Override
-    public void updateModel(Object attributes) {
-        this.model.updateModel(this.id, instanceOfSelected);
-        this.contentPanel.revalidate();
-        this.contentPanel.repaint();
+    public void revalidateObjectStructure(Object object) {
+        try {
+            model.getParent().setParentField(model.getFieldName(), object);
+        } catch (NoSuchFieldException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

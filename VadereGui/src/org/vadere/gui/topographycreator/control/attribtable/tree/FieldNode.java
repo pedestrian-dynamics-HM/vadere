@@ -1,10 +1,15 @@
 package org.vadere.gui.topographycreator.control.attribtable.tree;
 
+import java.lang.reflect.Field;
+
 public class FieldNode extends AttributeTree.TreeNode {
+    private final ValueNode valueNode;
+    private final Field field;
 
-
-    public FieldNode(AttributeTree.TreeNode parent, String fieldName, Class clazz) {
-        super(parent, fieldName, clazz);
+    public FieldNode(AttributeTree.TreeNode parent, Field field) {
+        super(parent, field.getName(), field.getType());
+        this.field = field;
+        this.valueNode = new ValueNode(parent, field.getName(), field.getType(), null);
     }
 
     @Override
@@ -19,13 +24,18 @@ public class FieldNode extends AttributeTree.TreeNode {
     }
 
     @Override
-    protected void updateModel(Object obj) throws IllegalAccessException {
-        this.setReference(obj);
+    public void updateModel(Object obj) throws IllegalAccessException, TreeException {
+        valueNode.updateModel(obj);
         notifyListeners(obj);
     }
 
     @Override
-    protected void revalidateObjectStructure(String unused1, Object unused2) throws NoSuchFieldException, IllegalAccessException {
-        getParent().revalidateObjectStructure(getFieldName(), getReference());
+    public void setParentField(String fieldName, Object object) throws NoSuchFieldException, IllegalAccessException {
+        getFieldClass().getDeclaredField(fieldName).set(getReference(), object);
+        getParent().setParentField(getFieldName(), getReference());
+    }
+
+    public ValueNode getValueNode() {
+        return this.valueNode;
     }
 }

@@ -1,6 +1,6 @@
 package org.vadere.gui.topographycreator.control.attribtable.cells.delegates;
 
-import org.vadere.gui.topographycreator.control.attribtable.model.AbstractModel;
+import org.vadere.gui.topographycreator.control.attribtable.tree.AttributeTree;
 
 import javax.swing.*;
 import javax.swing.text.AttributeSet;
@@ -18,10 +18,9 @@ import javax.swing.text.PlainDocument;
 public class TextEditCellEditor extends AttributeEditor {
     private JTextField textField;
 
-    public TextEditCellEditor(AbstractModel parent, String id, JPanel contentPanel) {
-        super(parent, id, contentPanel);
+    public TextEditCellEditor(AttributeTree.TreeNode model, JPanel contentPanel) {
+        super(model, contentPanel);
     }
-
 
     @Override
     protected void initialize() {
@@ -30,7 +29,7 @@ public class TextEditCellEditor extends AttributeEditor {
         ((PlainDocument) this.textField.getDocument()).setDocumentFilter(new DocumentFilter() {
             @Override
             public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
-                    try {
+                try {
                         super.replace(fb, offset, length, text, attrs);
                     } catch (BadLocationException e) {
                         throw new RuntimeException(e);
@@ -49,7 +48,8 @@ public class TextEditCellEditor extends AttributeEditor {
     }
 
     @Override
-    public void modelChanged(Object value) {
+    public void onModelChanged(Object value) {
         this.textField.setText((String) value);
+
     }
 }

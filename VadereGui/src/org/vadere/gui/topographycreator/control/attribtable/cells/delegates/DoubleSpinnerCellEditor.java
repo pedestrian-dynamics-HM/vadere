@@ -1,6 +1,6 @@
 package org.vadere.gui.topographycreator.control.attribtable.cells.delegates;
 
-import org.vadere.gui.topographycreator.control.attribtable.model.AbstractModel;
+import org.vadere.gui.topographycreator.control.attribtable.tree.AttributeTree;
 
 import javax.swing.*;
 import javax.swing.text.NumberFormatter;
@@ -8,8 +8,8 @@ import javax.swing.text.NumberFormatter;
 public class DoubleSpinnerCellEditor extends AttributeEditor {
     private JSpinner spinner;
 
-    public DoubleSpinnerCellEditor(AbstractModel parent, String id, JPanel contentPanel) {
-        super(parent, id, contentPanel);
+    public DoubleSpinnerCellEditor(AttributeTree.TreeNode model, JPanel contentPanel) {
+        super(model, contentPanel);
     }
 
 
@@ -25,7 +25,7 @@ public class DoubleSpinnerCellEditor extends AttributeEditor {
         this.spinner.addChangeListener(e -> updateModel(spinner.getValue()));
     }
 
-    public void modelChanged(Object value) {
+    public void onModelChanged(Object value) {
         this.spinner.setValue(value);
     }
 

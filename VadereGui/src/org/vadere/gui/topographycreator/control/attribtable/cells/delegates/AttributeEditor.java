@@ -1,44 +1,49 @@
 package org.vadere.gui.topographycreator.control.attribtable.cells.delegates;
 
+import org.vadere.gui.topographycreator.control.attribtable.ModelListener;
 import org.vadere.gui.topographycreator.control.attribtable.ViewListener;
-import org.vadere.gui.topographycreator.control.attribtable.model.AbstractModel;
+import org.vadere.gui.topographycreator.control.attribtable.tree.AttributeTree;
+import org.vadere.gui.topographycreator.control.attribtable.tree.FieldNode;
 
 import javax.swing.*;
 import java.awt.*;
 
-public abstract class AttributeEditor extends JPanel implements ViewListener {
+public abstract class AttributeEditor extends JPanel implements ViewListener, ModelListener {
 
-    protected final AbstractModel model;
-    protected final String id;
+    protected final AttributeTree.TreeNode model;
     protected JPanel contentPanel;
 
     Object oldValue;
     private boolean locked = false;
 
 
-    public AttributeEditor(AbstractModel parent, String id, JPanel contentPanel) {
+    public AttributeEditor(AttributeTree.TreeNode model, JPanel contentPanel) {
         super(new BorderLayout());
-        this.model = parent;
-        this.id = id;
+        this.model = model;
+        this.model.addChangeListener(this);
         this.contentPanel = contentPanel;
         disableNotify();
         initialize();
         enableNotify();
+        model.addChangeListener(this);
     }
 
     protected abstract void initialize();
 
-    protected abstract void modelChanged(Object value);
+    protected abstract void onModelChanged(Object object);
 
-    public void updateView(Object fieldValue){
-        if(oldValue!=fieldValue) {
+    public void modelChanged(Object fieldValue) {
+        if (oldValue != fieldValue) {
             oldValue = fieldValue;
             disableNotify();
-            modelChanged(fieldValue);
+            onModelChanged(fieldValue);
             enableNotify();
+            revalidate();
+            repaint();
         }
     }
-    private void disableNotify(){
+
+    private void disableNotify() {
         this.locked = true;
     }
 
@@ -46,7 +51,7 @@ public abstract class AttributeEditor extends JPanel implements ViewListener {
         this.locked = false;
     }
 
-    private boolean canUpdate(){
+    private boolean canUpdate() {
         return !locked;
     }
 
@@ -54,8 +59,14 @@ public abstract class AttributeEditor extends JPanel implements ViewListener {
         if (canUpdate()) updateModelFromValue(value);
     }
 
-    private void updateModelFromValue(Object newValue) {
-        this.model.updateModel(this.id, newValue);
+    protected void updateModelFromValue(Object newValue) {
+        try {
+            ((FieldNode) this.model).getValueNode().setValue(newValue);
+        } catch (NoSuchFieldException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }
