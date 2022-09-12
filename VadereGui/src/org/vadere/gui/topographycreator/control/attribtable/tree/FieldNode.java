@@ -2,8 +2,9 @@ package org.vadere.gui.topographycreator.control.attribtable.tree;
 
 public class FieldNode extends AttributeTree.TreeNode {
 
-    public FieldNode(String clazzName, Class clazz) {
-        super(clazzName, clazz);
+
+    public FieldNode(AttributeTree.TreeNode parent, String fieldName, Class clazz) {
+        super(parent, fieldName, clazz);
     }
 
     @Override

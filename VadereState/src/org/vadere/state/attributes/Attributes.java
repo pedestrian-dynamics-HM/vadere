@@ -1,6 +1,7 @@
 package org.vadere.state.attributes;
 
 import org.vadere.util.DefaultSealable;
+import org.vadere.util.reflection.VadereAttribute;
 
 import java.io.IOException;
 
@@ -25,7 +26,9 @@ import java.io.IOException;
  * to make a deep copy.
  * 
  */
+@VadereAttribute
 public abstract class Attributes extends DefaultSealable implements Cloneable {
+	@VadereAttribute(exclude = true)
 	/** Used for default ID values of some scenario elements. */
 	public static final int ID_NOT_SET = -1;
 

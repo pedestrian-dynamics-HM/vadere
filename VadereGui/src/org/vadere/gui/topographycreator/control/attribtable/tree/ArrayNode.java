@@ -1,11 +1,13 @@
 package org.vadere.gui.topographycreator.control.attribtable.tree;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class ArrayNode extends AttributeTree.TreeNode {
 
-    public ArrayNode(String clazzName, Class clazz) {
-        super(clazzName, clazz);
+
+    public ArrayNode(AttributeTree.TreeNode parent, String fieldName, Class clazz) {
+        super(parent, fieldName, clazz);
     }
 
     @Override
@@ -25,10 +27,17 @@ public class ArrayNode extends AttributeTree.TreeNode {
     @Override
     protected void updateModel(Object obj) throws IllegalAccessException {
         setReference(obj);
-        var array = (Object[]) obj;
-        ((HashMap) getReference()).clear();
-        for (int i = 0; i < array.length; i++) {
-            ((HashMap) getReference()).put(String.valueOf(i), array[i]);
+        var array = (ArrayList) obj;
+        var children = ((HashMap) getChildren());
+        for (int i = 0; i < array.size(); i++) {
+            var key = String.valueOf(i);
+            var value = array.get(i);
+            if (children.containsKey(key)) {
+                var node = (ValueNode) children.get(key);
+                node.setValue(array.get(i));
+            } else {
+                children.put(key, new ValueNode(this, key, value.getClass(), value));
+            }
         }
         notifyListeners(obj);
     }

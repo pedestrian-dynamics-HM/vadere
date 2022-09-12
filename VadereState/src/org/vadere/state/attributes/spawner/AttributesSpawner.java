@@ -22,9 +22,12 @@ import org.vadere.util.reflection.VadereAttribute;
         @JsonSubTypes.Type(value = AttributesTimeSeriesSpawner.class, name = "org.vadere.state.attributes.spawner.AttributesTimeSeriesSpawner")
 })
 public abstract class AttributesSpawner extends Attributes {
+
+    @VadereAttribute(exclude = true)
     public static final int NO_MAX_SPAWN_NUMBER_TOTAL = -1;
+    @VadereAttribute(exclude = true)
     public static final String CONSTANT_DISTRIBUTION = "org.vadere.state.scenario.distribution.impl.ConstantDistribution";
-    @VadereAttribute
+
     @JsonView(Views.CacheViewExclude.class)
     protected Integer constraintsElementsMax = 0;
     @VadereAttribute(group = "Time Constraints")
@@ -42,10 +45,10 @@ public abstract class AttributesSpawner extends Attributes {
     @VadereAttribute(group = "Position Constraints")
     @JsonView(Views.CacheViewExclude.class)
     protected Boolean eventPositionFreeSpace = false;
-    @VadereAttribute
+
     @JsonView(Views.CacheViewExclude.class)
     protected AttributesAgent eventElement = null;
-    @VadereAttribute
+
     @JsonView(Views.CacheViewExclude.class)
     protected AttributesDistribution distribution = null;
 

@@ -3,18 +3,19 @@ package org.vadere.gui.topographycreator.control.attribtable.tree;
 public class ObjectNode extends AttributeTree.TreeNode {
 
 
-    public ObjectNode(String clazzName, Class clazz) {
-        super(clazzName, clazz);
+    public ObjectNode(AttributeTree.TreeNode parent, String fieldName, Class clazz) {
+        super(parent, fieldName, clazz);
     }
 
     @Override
     public void set(String field, AttributeTree.TreeNode object) {
-
+        object.setParent(this);
+        getChildren().put(field, object);
     }
 
     @Override
     public Object get(String field) {
-        return null;
+        return getChildren().get(field);
     }
 
     @Override

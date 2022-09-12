@@ -2,10 +2,8 @@ package org.vadere.state.attributes;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import org.vadere.state.util.Views;
-import org.vadere.util.reflection.VadereAttribute;
 
 public abstract class AttributesScenarioElement extends Attributes {
-    @VadereAttribute
     @JsonView(Views.CacheViewExclude.class)
     protected Integer id;
 

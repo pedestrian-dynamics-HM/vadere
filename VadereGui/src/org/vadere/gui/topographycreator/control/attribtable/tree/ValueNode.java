@@ -1,8 +1,11 @@
 package org.vadere.gui.topographycreator.control.attribtable.tree;
 
 public class ValueNode extends AttributeTree.TreeNode {
-    public ValueNode(String clazzName, Class clazz) {
-        super(clazzName, clazz);
+
+
+    public ValueNode(AttributeTree.TreeNode parent, String fieldName, Class clazz, Object value) {
+        super(parent, fieldName, clazz);
+        this.setValue(value);
     }
 
     @Override

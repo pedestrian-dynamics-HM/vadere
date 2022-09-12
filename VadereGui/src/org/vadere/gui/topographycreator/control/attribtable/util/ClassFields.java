@@ -22,8 +22,20 @@ public final class ClassFields {
 
     public static Field[] getSuperDeclaredFields(Class clazz) {
         return getSuperClassHierarchy(clazz).stream()
-                .map(c -> c.getDeclaredFields())
+                .map(c -> checkVadereAttributes(c))
                 .reduce((c1, c2) -> ArrayUtils.addAll(c1, c2)).get();
+    }
+
+    public static Field[] checkVadereAttributes(Class clazz) {
+        if (clazz.getAnnotation(VadereAttribute.class) != null) {
+            return Arrays.stream(clazz.getDeclaredFields()).filter(f -> {
+                if (f.getAnnotation(VadereAttribute.class) != null) {
+                    return !f.getAnnotation(VadereAttribute.class).exclude();
+                }
+                return true;
+            }).collect(Collectors.toList()).toArray(Field[]::new);
+        }
+        return new Field[0];
     }
 
     public static Map<String, List<Field>> getFieldsGroupedBySemanticMeaning(java.util.List<Field> fieldList) {

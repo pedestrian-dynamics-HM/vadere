@@ -7,6 +7,8 @@ import org.vadere.gui.topographycreator.control.attribtable.cells.editors.FieldV
 import org.vadere.gui.topographycreator.control.attribtable.cells.renderer.FieldNameRenderer;
 import org.vadere.gui.topographycreator.control.attribtable.cells.renderer.FieldValueRenderer;
 import org.vadere.gui.topographycreator.control.attribtable.model.FieldModel;
+import org.vadere.gui.topographycreator.control.attribtable.tree.AttributTreeException;
+import org.vadere.gui.topographycreator.control.attribtable.tree.AttributeTree;
 import org.vadere.state.attributes.Attributes;
 
 import javax.swing.*;
@@ -25,7 +27,7 @@ public class AttributeTablePage extends JPanel implements ViewListener, ModelLis
     private final List<FieldModel> tablesListeners;
     Object selectedAttributesInstance;
     ViewListener parentView;
-
+    AttributeTree tree;
     public AttributeTablePage(ViewListener parentView, final Class<? extends Object> clazz) {
         super(new BorderLayout());
 
@@ -44,13 +46,7 @@ public class AttributeTablePage extends JPanel implements ViewListener, ModelLis
         parentPane.add(panel);
         this.add(new JScrollPane(parentPane));
 
-        this.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                super.mouseClicked(e);
-                System.out.print("Hi");
-            }
-        });
+        tree = new AttributeTree(null, clazz);
     }
 
     private void buildClassPanel(JPanel panel, GridBagConstraints gbc, Class c) {
@@ -61,6 +57,13 @@ public class AttributeTablePage extends JPanel implements ViewListener, ModelLis
     }
 
     public void updateView(Object object) {
+        try {
+            tree.updateModel(object);
+        } catch (AttributTreeException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
         this.selectedAttributesInstance = object;
         for (var table : tablesListeners) {
             table.updateView(object);

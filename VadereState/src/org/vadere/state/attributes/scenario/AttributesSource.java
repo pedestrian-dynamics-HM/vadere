@@ -5,21 +5,17 @@ import org.vadere.state.attributes.spawner.AttributesRegularSpawner;
 import org.vadere.state.attributes.spawner.AttributesSpawner;
 import org.vadere.state.util.Views;
 import org.vadere.util.geometry.shapes.VShape;
-import org.vadere.util.reflection.VadereAttribute;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class AttributesSource extends AttributesVisualElement {
-	@VadereAttribute
 	@JsonView(Views.CacheViewExclude.class)
 	private AttributesSpawner spawner = new AttributesRegularSpawner();
-	@VadereAttribute
+
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
 	private ArrayList<Integer> targetIds = new ArrayList<>();
-	@VadereAttribute
-	private final Integer[] somfields = new Integer[3];
 
 	/**
 	 *  This Attribute only takes affect if a model org.vadere.simulator.models.groups.GroupModel
