@@ -17,7 +17,6 @@ public class AttributeTableView extends JPanel implements Revalidatable {
     public AttributeTableView(Revalidatable revalidatable) {
         super(new BorderLayout());
         this.attributePages = new HashMap<>();
-        this.setBackground(Color.red);
         this.revalidatable = revalidatable;
     }
 

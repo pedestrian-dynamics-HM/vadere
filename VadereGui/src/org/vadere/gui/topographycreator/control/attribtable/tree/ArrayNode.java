@@ -61,10 +61,10 @@ public class ArrayNode extends AttributeTree.TreeNode {
 
     @Override
     public void updateValues(Object obj) throws IllegalAccessException {
-        if (obj.equals(getReference()))
-            return;
-        setReference(obj);
         if (obj != null) {
+            if (obj.equals(getReference()))
+                return;
+            setReference(obj);
             var array = (ArrayList) obj;
             var children = ((HashMap) getChildren());
             for (int i = 0; i < array.size(); i++) {

@@ -67,6 +67,7 @@ public class AbstractTypeCellEditor extends AttributeEditor implements Revalidat
             this.instanceOfSelected = value;
             this.comboBox.getModel().setSelectedItem(this.selected);
             view.selectionChange(value);
+
             this.contentPanel.setVisible(true);
             this.contentPanel.revalidate();
             this.contentPanel.repaint();
@@ -97,6 +98,13 @@ public class AbstractTypeCellEditor extends AttributeEditor implements Revalidat
                     throw new RuntimeException(e);
                 }
                 view.clear();
+                try {
+                    model.getParent().updateParentsFieldValue(model.getFieldName(), instanceOfSelected);
+                } catch (NoSuchFieldException e) {
+                    throw new RuntimeException(e);
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                }
                 view.selectionChange(instanceOfSelected);
                 contentPanel.setVisible(true);
                 contentPanel.revalidate();
