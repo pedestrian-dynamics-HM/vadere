@@ -1,6 +1,5 @@
 package org.vadere.state.attributes.spawner;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonView;
@@ -10,7 +9,7 @@ import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesVisualElement;
 import org.vadere.state.util.Views;
 import org.vadere.util.reflection.VadereAttribute;
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
+
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
         include = JsonTypeInfo.As.PROPERTY,
@@ -46,6 +45,7 @@ public abstract class AttributesSpawner extends Attributes {
     @JsonView(Views.CacheViewExclude.class)
     protected Boolean eventPositionFreeSpace = false;
 
+    @VadereAttribute(exclude = true)
     @JsonView(Views.CacheViewExclude.class)
     protected AttributesAgent eventElement = null;
 

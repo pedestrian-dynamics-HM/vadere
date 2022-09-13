@@ -11,8 +11,21 @@ import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ * @author Ludwig Jaeck
+ * EditorRegistry is modeled after the singleton model to have a central manager for all AttributeEditor types used
+ * while constructing the gui. This is needed since there is no monolithic gui builder used which would build the whole
+ * attribute table widget hierarchy but in every level of the attribute tree model, UI delegates are able to add sub elements
+ * themselve.
+ */
 public class EditorRegistry {
+    /**
+     * The singleton instance of the registry
+     */
     private static EditorRegistry registry;
+    /**
+     * editorConstructors holds all constructors of the registered AttributeEditors
+     */
     private final HashMap<String, Constructor<? extends AttributeEditor>> editorConstructors;
 
     private EditorRegistry() {
@@ -50,7 +63,6 @@ public class EditorRegistry {
             if (!contains(type)) {
                 if (type.isEnum())
                     constructor = ComboBoxCellEditor.class.getDeclaredConstructor(AttributeTree.TreeNode.class, JPanel.class);
-                    //addTypeEditor(type, ComboBoxCellEditor.class);
                 else if (type.isAssignableFrom(List.class)) {
                     constructor = ListCellEditor.class.getDeclaredConstructor(AttributeTree.TreeNode.class, JPanel.class);
                 } else if (Modifier.isAbstract(type.getModifiers()))
@@ -66,7 +78,7 @@ public class EditorRegistry {
         try {
             component = (AttributeEditor) constructor.newInstance(model, contentPanel);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException(e + "could not create new instance of type " + constructor);
         }
 
         return component;

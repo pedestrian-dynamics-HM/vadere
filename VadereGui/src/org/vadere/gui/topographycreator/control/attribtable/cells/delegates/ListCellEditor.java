@@ -99,9 +99,8 @@ public class ListCellEditor extends ChildObjectCellEditor {
         this.contentPanel.add(addBtn, BorderLayout.SOUTH);
     }
 
-
     @Override
     protected void constructNewObject() throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-        //super.constructNewObject();
+        //to not create an instance
     }
 }

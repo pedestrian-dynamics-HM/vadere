@@ -84,6 +84,13 @@ public class AbstractTypeCellEditor extends AttributeEditor implements Revalidat
             instanceOfSelected = null;
             contentPanel.setVisible(false);
             view.clear();
+            try {
+                model.getParent().updateParentsFieldValue(model.getFieldName(), null);
+            } catch (NoSuchFieldException e) {
+                throw new RuntimeException(e);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
         });
         this.runnableRegistry.registerDefault(()-> {
             SwingUtilities.invokeLater(() -> {
@@ -150,12 +157,12 @@ public class AbstractTypeCellEditor extends AttributeEditor implements Revalidat
         classesModel.sort(Comparator.comparing(Class::getSimpleName));
         for (var clazz : classesModel) {
             try {
-                classConstructorRegistry.put(getSimpleName(clazz), clazz.getDeclaredConstructor());
                 var simpleName = getSimpleName(clazz);
-                if (Attributes.class.isAssignableFrom(clazz)) {
-                    classNameRegistry.put(simpleName, clazz);
-                }
+                //if (Attributes.class.isAssignableFrom(clazz)) {
+                classConstructorRegistry.put(getSimpleName(clazz), clazz.getDeclaredConstructor());
+                classNameRegistry.put(simpleName, clazz);
                 comboBoxModel.addElement(simpleName);
+                //}
             } catch (NoSuchMethodException e) {
                 System.out.println(getSimpleName(clazz) + " does not implement a default constructor. will be skipped");
             }

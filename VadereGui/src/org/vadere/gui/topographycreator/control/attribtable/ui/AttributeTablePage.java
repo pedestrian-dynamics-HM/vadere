@@ -21,6 +21,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.lang.reflect.Field;
 
+import static javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER;
+
 public class AttributeTablePage extends JPanel implements ValueListener {
 
     private final JCollapsablePanel collapsablePanel;
@@ -37,7 +39,7 @@ public class AttributeTablePage extends JPanel implements ValueListener {
         collapsablePanel = new JCollapsablePanel(generateHeaderName(model.getFieldClass()), JCollapsablePanel.Style.HEADER, this);
         attributeTable = new JAttributeTable(model, new MyStyler(model));
         scrollPane = new JScrollPane(collapsablePanel);
-
+        scrollPane.setHorizontalScrollBarPolicy(HORIZONTAL_SCROLLBAR_NEVER);
         model.addChangeListener(this);
 
         collapsablePanel.add(attributeTable);

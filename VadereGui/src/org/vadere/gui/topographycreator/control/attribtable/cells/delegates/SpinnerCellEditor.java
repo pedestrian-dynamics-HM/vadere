@@ -16,18 +16,28 @@ public class SpinnerCellEditor extends AttributeEditor {
     @Override
     protected void initialize() {
         this.spinner = new JSpinner();
+        initializeSpinnerModel();
+        initializeSpinnerValue();
+        initializeSpinnerListener();
+        this.add(spinner);
+    }
+
+    private void initializeSpinnerModel() {
         JFormattedTextField txt = ((JSpinner.NumberEditor) spinner.getEditor()).getTextField();
         ((NumberFormatter) txt.getFormatter()).setAllowsInvalid(false);
+    }
+
+    private void initializeSpinnerValue() {
         var value = ((FieldNode) model).getValueNode().getValue();
         if (value != null)
             this.spinner.setValue(((FieldNode) model).getValueNode().getValue());
-        this.add(spinner);
+    }
+
+    private void initializeSpinnerListener() {
         this.spinner.addChangeListener(e -> updateModel(spinner.getValue()));
     }
 
     public void onModelChanged(Object value) {
         this.spinner.setValue(value);
-        spinner.revalidate();
-        spinner.repaint();
     }
 }

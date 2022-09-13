@@ -33,22 +33,20 @@ public class ChildObjectCellEditor extends AttributeEditor implements Revalidata
         this.clazz = model.getFieldClass();
         this.button = new JButton(AttributeTablePage.generateHeaderName(clazz));
         this.add(button);
-        try {
+        /*try {
             this.constructNewObject();
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
                  NoSuchMethodException e) {
             throw new RuntimeException(e);
-        }
+        }*/
         this.createInternalPropertyPane(objectInstance);
 
         this.button.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 //super.mouseClicked(e);
-                SwingUtilities.invokeLater(() -> {
                     contentPaneVisible = !contentPaneVisible;
                     contentPanel.setVisible(contentPaneVisible);
-                });
             }
         });
         initializeGridBagConstraint();
@@ -86,6 +84,7 @@ public class ChildObjectCellEditor extends AttributeEditor implements Revalidata
     @Override
     public void revalidateObjectStructure(Object object) {
         try {
+            model.setReference(object);
             model.getParent().updateParentsFieldValue(model.getFieldName(), object);
         } catch (NoSuchFieldException e) {
             throw new RuntimeException(e);
