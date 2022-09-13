@@ -1,26 +1,27 @@
 package org.vadere.util.geometry.shapes;
 
+import org.vadere.util.geometry.GeometryUtils;
+import org.vadere.util.reflection.VadereAttribute;
+
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.math.BigDecimal;
 
-import org.vadere.util.geometry.GeometryUtils;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * Immutable point.
  * TODO: this class should be final
- * 
  */
+@VadereAttribute
 public class VPoint implements Cloneable, IPoint {
-
+	@VadereAttribute(exclude = true)
 	public static final VPoint ZERO = new VPoint(0, 0);
 
-	public double x;
-	public double y;
+	public Double x = 0.0;
+	public Double y = 0.0;
 
-	public VPoint() {}
+	public VPoint() {
+	}
 
 	public VPoint(final IPoint point) {
 		this(point.getX(), point.getY());
@@ -45,8 +46,8 @@ public class VPoint implements Cloneable, IPoint {
 	}
 
 	public VPoint(Point copy) {
-		this.x = copy.x;
-		this.y = copy.y;
+		this.x = new Double(copy.x);
+		this.y = new Double(copy.y);
 		assert !Double.isNaN(x) && !Double.isNaN(y) && Double.isFinite(x) && Double.isFinite(y);
 	}
 
@@ -92,10 +93,7 @@ public class VPoint implements Cloneable, IPoint {
 
 		if (this.x != other.x)
 			return false;
-		if (this.y != other.y)
-			return false;
-
-		return true;
+		return this.y == other.y;
 	}
 
 	@Override
@@ -113,10 +111,7 @@ public class VPoint implements Cloneable, IPoint {
 
 		if (Math.abs(this.x - point.x) > tolerance)
 			return false;
-		if (Math.abs(this.y - point.y) > tolerance)
-			return false;
-
-		return true;
+		return !(Math.abs(this.y - point.y) > tolerance);
 	}
 
 	@Override

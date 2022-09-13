@@ -86,7 +86,7 @@ public class ChildObjectCellEditor extends AttributeEditor implements Revalidata
     @Override
     public void revalidateObjectStructure(Object object) {
         try {
-            model.getParent().setParentField(model.getFieldName(), object);
+            model.getParent().updateParentsFieldValue(model.getFieldName(), object);
         } catch (NoSuchFieldException e) {
             throw new RuntimeException(e);
         } catch (IllegalAccessException e) {

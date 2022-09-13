@@ -1,6 +1,6 @@
 package org.vadere.gui.topographycreator.control.attribtable.cells.delegates;
 
-import org.vadere.gui.topographycreator.control.attribtable.ModelListener;
+import org.vadere.gui.topographycreator.control.attribtable.ValueListener;
 import org.vadere.gui.topographycreator.control.attribtable.ViewListener;
 import org.vadere.gui.topographycreator.control.attribtable.tree.AttributeTree;
 import org.vadere.gui.topographycreator.control.attribtable.tree.FieldNode;
@@ -8,7 +8,7 @@ import org.vadere.gui.topographycreator.control.attribtable.tree.FieldNode;
 import javax.swing.*;
 import java.awt.*;
 
-public abstract class AttributeEditor extends JPanel implements ViewListener, ModelListener {
+public abstract class AttributeEditor extends JPanel implements ViewListener, ValueListener {
 
     protected final AttributeTree.TreeNode model;
     protected JPanel contentPanel;
@@ -69,4 +69,7 @@ public abstract class AttributeEditor extends JPanel implements ViewListener, Mo
         }
     }
 
+    public JPanel getContentPanel() {
+        return contentPanel;
+    }
 }

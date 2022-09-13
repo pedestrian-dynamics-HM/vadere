@@ -4,7 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.topographycreator.control.AttributeHelpView;
 import org.vadere.gui.topographycreator.control.attribtable.JAttributeTable;
 import org.vadere.gui.topographycreator.control.attribtable.JCollapsablePanel;
-import org.vadere.gui.topographycreator.control.attribtable.ModelListener;
+import org.vadere.gui.topographycreator.control.attribtable.ValueListener;
 import org.vadere.gui.topographycreator.control.attribtable.cells.delegates.AttributeEditor;
 import org.vadere.gui.topographycreator.control.attribtable.cells.editors.FieldValueEditor;
 import org.vadere.gui.topographycreator.control.attribtable.cells.renderer.FieldNameRenderer;
@@ -15,29 +15,30 @@ import org.vadere.gui.topographycreator.control.attribtable.tree.TreeException;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.lang.reflect.Field;
 
-public class AttributeTablePage extends JPanel implements ModelListener {
+public class AttributeTablePage extends JPanel implements ValueListener {
 
     private final JCollapsablePanel collapsablePanel;
     private final JScrollPane scrollPane;
     private final JAttributeTable attributeTable;
-    AttributeTree model;
+    AttributeTree.TreeNode model;
 
-    public AttributeTablePage(AttributeTree model) {
+    public AttributeTablePage(AttributeTree.TreeNode model) {
         super(new BorderLayout());
         this.setBackground(Color.white);
 
         this.model = model;
 
-        collapsablePanel = new JCollapsablePanel(generateHeaderName(model.getRootClass()), JCollapsablePanel.Style.HEADER, this);
-        attributeTable = new JAttributeTable(model.getRootNode(), new MyStyler());
+        collapsablePanel = new JCollapsablePanel(generateHeaderName(model.getFieldClass()), JCollapsablePanel.Style.HEADER, this);
+        attributeTable = new JAttributeTable(model, new MyStyler(model));
         scrollPane = new JScrollPane(collapsablePanel);
 
-        var rootNode = model.getRootNode();
-        rootNode.addChangeListener(this);
+        model.addChangeListener(this);
 
         collapsablePanel.add(attributeTable);
         this.add(scrollPane);
@@ -50,7 +51,8 @@ public class AttributeTablePage extends JPanel implements ModelListener {
     }
 
     public void updateModel(Object object) throws TreeException, IllegalAccessException {
-        model.updateModel(object);
+        model.updateStructure(object);
+        model.updateValues(object);
     }
 
     @Override
@@ -61,27 +63,29 @@ public class AttributeTablePage extends JPanel implements ModelListener {
         collapsablePanel.repaint();
     }
 
-    public AttributeTree getModel() {
+    public AttributeTree.TreeNode getModel() {
         return model;
     }
 
     public static class MyStyler extends JAttributeTable.Styler {
+        private final AttributeTree.TreeNode model;
 
-        public MyStyler() {
+        public MyStyler(AttributeTree.TreeNode model) {
+            this.model = model;
         }
 
         @Override
         public JTable rowDelegateStyle(String id, AttributeEditor editor) {
             JTable style = new JTable();
-            DefaultTableModel model = new DefaultTableModel(new Object[]{"id", "attr"}, 1);
-            //model.setValueAt(tableModel.getElement(id), 0, 0);
-            style.setModel(model);
+            DefaultTableModel tableModel = new DefaultTableModel(new Object[]{"id", "attr"}, 1);
+            tableModel.setValueAt(model.get(id).getField(), 0, 0);
+            style.setModel(tableModel);
             style.setRowHeight(28);
             style.setIntercellSpacing(new Dimension(0, 4));
             style.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             style.setBackground(UIManager.getColor("Panel.background"));
             style.getColumn("id").setCellRenderer(new FieldNameRenderer(id));
-            style.getColumn("attr").setCellRenderer(new FieldValueRenderer(editor));
+            style.getColumn("attr").setCellRenderer(new FieldValueRenderer(style, editor));
             style.getColumn("attr").setCellEditor(new FieldValueEditor(editor));
             style.addMouseListener(new MouseAdapter() {
                 @Override
@@ -91,6 +95,13 @@ public class AttributeTablePage extends JPanel implements ModelListener {
                                     (Field) style.getModel().getValueAt(style.rowAtPoint(e.getPoint()), 0)
                             )
                     );
+                }
+            });
+            style.addComponentListener(new ComponentAdapter() {
+                @Override
+                public void componentResized(ComponentEvent e) {
+                    super.componentResized(e);
+                    editor.setSize(style.getWidth() / 2, style.getRowHeight());
                 }
             });
             style.setEditingColumn(1);

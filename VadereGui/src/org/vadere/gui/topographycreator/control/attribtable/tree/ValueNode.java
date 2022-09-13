@@ -1,5 +1,7 @@
 package org.vadere.gui.topographycreator.control.attribtable.tree;
 
+import java.lang.reflect.Field;
+
 public class ValueNode extends AttributeTree.TreeNode {
 
 
@@ -9,13 +11,8 @@ public class ValueNode extends AttributeTree.TreeNode {
     }
 
     @Override
-    public void set(String field, AttributeTree.TreeNode object) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Object get(String field) {
-        throw new UnsupportedOperationException();
+    public void updateStructure(Object Object) {
+        // Do nothing
     }
 
     public Object getValue() {
@@ -23,20 +20,31 @@ public class ValueNode extends AttributeTree.TreeNode {
     }
 
     public void setValue(Object value) throws NoSuchFieldException, IllegalAccessException {
+        if (value == null) {
+            setReference(null);
+            updateParentsFieldValue(getFieldName(), getReference());
+            return;
+        }
+
         if (!value.equals(getReference())) {
             setReference(value);
-            setParentField(getFieldName(), getReference());
+            updateParentsFieldValue(getFieldName(), getReference());
         }
     }
 
     @Override
-    public void updateModel(Object obj) throws IllegalAccessException, TreeException {
+    public void updateValues(Object obj) throws IllegalAccessException, TreeException {
         setReference(obj);
-        notifyListeners(obj);
+        notifyValueListeners();
     }
 
     @Override
-    public void setParentField(String field, Object object) throws NoSuchFieldException, IllegalAccessException {
-        getParent().setParentField(getFieldName(), object);
+    public void updateParentsFieldValue(String field, Object object) throws NoSuchFieldException, IllegalAccessException {
+        getParent().updateParentsFieldValue(getFieldName(), object);
+    }
+
+    @Override
+    public Field getField() {
+        return null;
     }
 }

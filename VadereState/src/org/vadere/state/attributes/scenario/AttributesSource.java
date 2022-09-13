@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import org.vadere.state.attributes.spawner.AttributesRegularSpawner;
 import org.vadere.state.attributes.spawner.AttributesSpawner;
 import org.vadere.state.util.Views;
+import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
 
 import java.io.IOException;
@@ -11,13 +12,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AttributesSource extends AttributesVisualElement {
-	@JsonView(Views.CacheViewExclude.class)
-	private AttributesSpawner spawner = new AttributesRegularSpawner();
+	private final VPoint point = new VPoint(0, 0);
 
 
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
 	private List<Integer> targetIds = new ArrayList<>();
-
+	//@VadereAttribute(exclude = true)
+	@JsonView(Views.CacheViewExclude.class)
+	private AttributesSpawner spawner = new AttributesRegularSpawner();
 	/**
 	 *  This Attribute only takes affect if a model org.vadere.simulator.models.groups.GroupModel
 	 *  is present in the scenario. When this is the case this list defines the group size

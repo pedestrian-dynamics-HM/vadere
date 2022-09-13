@@ -2,6 +2,7 @@ package org.vadere.util.geometry.shapes;
 
 import com.github.davidmoten.rtree.geometry.Geometry;
 import com.github.davidmoten.rtree.geometry.internal.RectangleDouble;
+import org.vadere.util.reflection.VadereAttribute;
 
 import java.awt.*;
 import java.awt.geom.Area;
@@ -14,6 +15,7 @@ import java.util.Optional;
 /**
  * Geometric shape and position.
  */
+@VadereAttribute
 public interface VShape extends Shape, Cloneable, Geometry{
 
 	double BORDER_TOLERANCE = 0.1;

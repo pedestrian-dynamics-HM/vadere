@@ -51,6 +51,7 @@ public class AbstractTypeCellEditor extends AttributeEditor implements Revalidat
         initializeRunnableRegistry();
         initializeComboBox();
         initializeSelfReference();
+        this.contentPanel.setVisible(false);
         this.contentPanel.add(view, gbc);
     }
 
@@ -166,13 +167,12 @@ public class AbstractTypeCellEditor extends AttributeEditor implements Revalidat
         this.gbc.fill = GridBagConstraints.HORIZONTAL;
         this.gbc.weightx = 1;
         this.gbc.insets = new Insets(1, 1, 1, 1);
-
     }
 
     @Override
     public void revalidateObjectStructure(Object object) {
         try {
-            model.getParent().setParentField(model.getFieldName(), object);
+            model.getParent().updateParentsFieldValue(model.getFieldName(), object);
         } catch (NoSuchFieldException e) {
             throw new RuntimeException(e);
         } catch (IllegalAccessException e) {

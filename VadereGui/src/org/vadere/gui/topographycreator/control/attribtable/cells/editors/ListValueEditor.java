@@ -10,7 +10,7 @@ import javax.swing.table.TableCellEditor;
 import java.awt.*;
 import java.util.EventObject;
 
-public class ListValueEditor implements TableCellEditor {
+public class ListValueEditor extends JPanel implements TableCellEditor {
 
     private final AttributeEditor editor;
     private final String id;
@@ -47,7 +47,7 @@ public class ListValueEditor implements TableCellEditor {
 
     @Override
     public boolean stopCellEditing() {
-        return true;
+        return false;
     }
 
     @Override

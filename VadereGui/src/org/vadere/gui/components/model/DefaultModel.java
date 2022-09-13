@@ -1,10 +1,6 @@
 package org.vadere.gui.components.model;
 
-import org.vadere.gui.components.control.DefaultSelectionMode;
-import org.vadere.gui.components.control.IMode;
-import org.vadere.gui.components.control.IScaleChangeListener;
-import org.vadere.gui.components.control.IViewportChangeListener;
-import org.vadere.gui.components.control.ViewportChangeEvent;
+import org.vadere.gui.components.control.*;
 import org.vadere.gui.components.view.ISelectScenarioElementListener;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.types.ScenarioElementType;
@@ -13,24 +9,21 @@ import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.voronoi.VoronoiDiagram;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Observable;
-import java.util.Optional;
+import java.util.Queue;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-import java.util.Queue;
-import javax.swing.*;
 
 public abstract class DefaultModel<T extends DefaultConfig> extends Observable implements IDefaultModel<T> {
 	// private static final int BORDER_WIDTH = 20;
 	// private static final int BORDER_HEIGHT = 20;
 
-	private static Logger log = Logger.getLogger(DefaultModel.class);
+	private static final Logger log = Logger.getLogger(DefaultModel.class);
 
 	private IMode mouseSelectionMode;
 
@@ -58,7 +51,7 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 
 	private VoronoiDiagram voronoiDiagram;
 
-	private List<ISelectScenarioElementListener> selectScenarioElementListener;
+	private final List<ISelectScenarioElementListener> selectScenarioElementListener;
 
 	private final List<IViewportChangeListener> viewportChangeListeners;
 
@@ -67,7 +60,7 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 	private JScrollPane scrollPane;
 
 	public T config;
-	private Queue<ISelectScenarioElementListener> selectScenarioElementListenerQueue;
+	private final Queue<ISelectScenarioElementListener> selectScenarioElementListenerQueue;
 
 
 	public DefaultModel(final T config) {
@@ -436,7 +429,6 @@ public abstract class DefaultModel<T extends DefaultConfig> extends Observable i
 		this.selectedElement = selectedElement;
 		notifySelectSecenarioElementListener(selectedElement);
 		pullUpSelectScenarioElementQueue();
-		System.out.println(selectScenarioElementListener.size());
 	}
 
 	private synchronized void pullUpSelectScenarioElementQueue() {

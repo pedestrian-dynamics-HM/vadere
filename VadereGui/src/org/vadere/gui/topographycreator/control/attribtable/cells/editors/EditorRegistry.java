@@ -2,6 +2,7 @@ package org.vadere.gui.topographycreator.control.attribtable.cells.editors;
 
 import org.vadere.gui.topographycreator.control.attribtable.cells.delegates.*;
 import org.vadere.gui.topographycreator.control.attribtable.tree.AttributeTree;
+import org.vadere.util.geometry.shapes.VPoint;
 
 import javax.swing.*;
 import java.lang.reflect.Constructor;
@@ -20,6 +21,7 @@ public class EditorRegistry {
         addTypeEditor(Integer.class, SpinnerCellEditor.class);
         addTypeEditor(Double.class, DoubleSpinnerCellEditor.class);
         addTypeEditor(Boolean.class, CheckBoxCellEditor.class);
+        addTypeEditor(VPoint.class, VPointCellEditor.class);
     }
 
     public static EditorRegistry getInstance() {

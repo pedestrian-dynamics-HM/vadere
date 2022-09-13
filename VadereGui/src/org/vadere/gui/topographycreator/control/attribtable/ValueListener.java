@@ -1,5 +1,5 @@
 package org.vadere.gui.topographycreator.control.attribtable;
 
-public interface ModelListener {
+public interface ValueListener {
     void modelChanged(Object obj);
 }

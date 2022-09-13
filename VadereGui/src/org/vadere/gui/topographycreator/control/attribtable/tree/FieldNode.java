@@ -2,40 +2,47 @@ package org.vadere.gui.topographycreator.control.attribtable.tree;
 
 import java.lang.reflect.Field;
 
+/**
+ * A field node represents an object field. It additionally stores a value node.
+ */
 public class FieldNode extends AttributeTree.TreeNode {
-    private final ValueNode valueNode;
-    private final Field field;
+    private final ValueNode node;
+    private Field field;
 
     public FieldNode(AttributeTree.TreeNode parent, Field field) {
         super(parent, field.getName(), field.getType());
+        this.node = new ValueNode(getParent(), field.getName(), field.getType(), null);
         this.field = field;
-        this.valueNode = new ValueNode(parent, field.getName(), field.getType(), null);
+    }
+
+    public FieldNode(AttributeTree.TreeNode parent, String fieldName, Class fieldType, ValueNode node) {
+        super(parent, fieldName, fieldType);
+        this.node = node;
     }
 
     @Override
-    public void set(String field, AttributeTree.TreeNode object) {
-        var value = ((ValueNode) object).getValue();
-        setReference(value);
+    public void updateStructure(Object Object) {
+        //Do nothing a field
     }
 
     @Override
-    public Object get(String field) {
-        return getReference();
+    public void updateValues(Object obj) throws IllegalAccessException, TreeException {
+        setReference(obj);
+        notifyValueListeners();
     }
 
     @Override
-    public void updateModel(Object obj) throws IllegalAccessException, TreeException {
-        valueNode.updateModel(obj);
-        notifyListeners(obj);
-    }
-
-    @Override
-    public void setParentField(String fieldName, Object object) throws NoSuchFieldException, IllegalAccessException {
+    public void updateParentsFieldValue(String fieldName, Object object) throws NoSuchFieldException, IllegalAccessException {
         getFieldClass().getDeclaredField(fieldName).set(getReference(), object);
-        getParent().setParentField(getFieldName(), getReference());
+        getParent().updateParentsFieldValue(getFieldName(), getReference());
+    }
+
+    @Override
+    public Field getField() {
+        return this.field;
     }
 
     public ValueNode getValueNode() {
-        return this.valueNode;
+        return node;
     }
 }

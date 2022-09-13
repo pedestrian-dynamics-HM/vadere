@@ -2,6 +2,7 @@ package org.vadere.gui.topographycreator.control.attribtable.ui;
 
 import org.vadere.gui.topographycreator.control.attribtable.Revalidatable;
 import org.vadere.gui.topographycreator.control.attribtable.tree.AttributeTree;
+import org.vadere.gui.topographycreator.control.attribtable.tree.TreeAdapter;
 import org.vadere.gui.topographycreator.control.attribtable.tree.TreeException;
 
 import javax.swing.*;
@@ -21,6 +22,10 @@ public class AttributeTableView extends JPanel implements Revalidatable {
     }
 
     public void selectionChange(Object object) {
+        if (object == null) {
+            return;
+        }
+        setVisible(true);
         var objectClass = object.getClass();
         createClassPageIfNotExisting(objectClass);
         setClassPageActive(objectClass);
@@ -44,7 +49,8 @@ public class AttributeTableView extends JPanel implements Revalidatable {
 
     private void createClassPageIfNotExisting(Class clazz) {
         if (!attributePages.containsKey(clazz)) {
-            var tree = new AttributeTree(null, clazz, revalidatable);
+            var tree = AttributeTree.parseClassTree(null, null, clazz);
+            tree.setParent(new TreeAdapter(this));
             var attributePage = new AttributeTablePage(tree);
             this.attributePages.put(clazz, attributePage);
         }

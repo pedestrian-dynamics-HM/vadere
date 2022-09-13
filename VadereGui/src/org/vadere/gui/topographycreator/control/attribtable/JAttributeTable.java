@@ -3,6 +3,7 @@ package org.vadere.gui.topographycreator.control.attribtable;
 import org.vadere.gui.topographycreator.control.attribtable.cells.delegates.AttributeEditor;
 import org.vadere.gui.topographycreator.control.attribtable.cells.editors.EditorRegistry;
 import org.vadere.gui.topographycreator.control.attribtable.tree.AttributeTree;
+import org.vadere.gui.topographycreator.control.attribtable.tree.StructureListener;
 import org.vadere.gui.topographycreator.control.attribtable.util.Layouts;
 
 import javax.swing.*;
@@ -10,7 +11,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class JAttributeTable extends JPanel implements ModelListener {
+public class JAttributeTable extends JPanel implements ValueListener, StructureListener {
 
     private final List<JComponent> renderOrderModel;
     private final GridBagConstraints gbc = Layouts.initGridBagConstraint(1.0);
@@ -25,6 +26,7 @@ public class JAttributeTable extends JPanel implements ModelListener {
         this.rowDelegate = rowDelegateStyler;
         this.model = model;
         model.addChangeListener(this);
+        model.addStructureListener(this);
         this.setVisible(true);
         setModel(model);
     }
@@ -35,8 +37,8 @@ public class JAttributeTable extends JPanel implements ModelListener {
             this.renderOrderModel.clear();
             var children = model.getChildren();
             for (var key : children.keySet()) {
-                var clazz = children.get(key).getFieldClass();
-                var subModel = children.get(key);
+                var clazz = children.get(key).getSecond().getFieldClass();
+                var subModel = children.get(key).getSecond();
 
                 var subPanel = new JPanel(new GridBagLayout());
                 subPanel.setBackground(UIManager.getColor("Table.selectionBackground").brighter());
@@ -59,6 +61,13 @@ public class JAttributeTable extends JPanel implements ModelListener {
     public void modelChanged(Object obj) {
         revalidate();
         repaint();
+    }
+
+    @Override
+    public void structureChanged(AttributeTree.TreeNode node) {
+        this.removeAll();
+        this.renderOrderModel.clear();
+        this.setModel(node);
     }
 
     public static abstract class Styler {

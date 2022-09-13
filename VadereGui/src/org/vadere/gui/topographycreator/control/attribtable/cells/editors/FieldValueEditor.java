@@ -9,7 +9,7 @@ import javax.swing.table.TableCellEditor;
 import java.awt.*;
 import java.util.EventObject;
 
-public class FieldValueEditor implements TableCellEditor {
+public class FieldValueEditor extends JPanel implements TableCellEditor {
 
     private AttributeEditor editor;
 
@@ -40,7 +40,7 @@ public class FieldValueEditor implements TableCellEditor {
 
     @Override
     public boolean shouldSelectCell(EventObject anEvent) {
-        return true;
+        return false;
     }
 
     @Override
