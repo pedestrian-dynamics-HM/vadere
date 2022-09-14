@@ -30,7 +30,7 @@ public class EmpiricalDistribution extends VDistribution<AttributesEmpiricalDist
 		this.empiricalAttributes = parameter;
 	}
 	@Override
-	public double getNextSpawnTime(double timeCurrentEvent) {
+	public double getNextSample(double timeCurrentEvent) {
 		return timeCurrentEvent + distribution.sample();
 	}
 

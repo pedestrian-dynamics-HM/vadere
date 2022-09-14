@@ -1,4 +1,4 @@
-package org.vadere.gui.topographycreator.control.attribtable.cells.editors;
+package org.vadere.gui.topographycreator.control.attribtable.cells;
 
 import org.vadere.gui.topographycreator.control.attribtable.cells.delegates.*;
 import org.vadere.gui.topographycreator.control.attribtable.tree.AttributeTree;
@@ -48,7 +48,7 @@ public class EditorRegistry {
         if (!this.editorConstructors.containsKey(typeClass)) {
             Constructor<? extends AttributeEditor> constructor = null;
             try {
-                constructor = editorClass.getDeclaredConstructor(AttributeTree.TreeNode.class, JPanel.class);
+                constructor = editorClass.getDeclaredConstructor(AttributeTree.TreeNode.class, JPanel.class,Object.class);
             } catch (NoSuchMethodException e) {
                 throw new RuntimeException(e);
             }
@@ -56,19 +56,19 @@ public class EditorRegistry {
         }
     }
 
-    public AttributeEditor create(Class type, AttributeTree.TreeNode model, JPanel contentPanel) {
+    public AttributeEditor create(Class type, AttributeTree.TreeNode model, JPanel contentPanel,Object initialValue) {
         Constructor constructor;
         AttributeEditor component;
         try {
             if (!contains(type)) {
                 if (type.isEnum())
-                    constructor = ComboBoxCellEditor.class.getDeclaredConstructor(AttributeTree.TreeNode.class, JPanel.class);
+                    constructor = ComboBoxCellEditor.class.getDeclaredConstructor(AttributeTree.TreeNode.class, JPanel.class,Object.class);
                 else if (type.isAssignableFrom(List.class)) {
-                    constructor = ListCellEditor.class.getDeclaredConstructor(AttributeTree.TreeNode.class, JPanel.class);
+                    constructor = ListCellEditor.class.getDeclaredConstructor(AttributeTree.TreeNode.class, JPanel.class,Object.class);
                 } else if (Modifier.isAbstract(type.getModifiers()))
-                    constructor = AbstractTypeCellEditor.class.getDeclaredConstructor(AttributeTree.TreeNode.class, JPanel.class);
+                    constructor = AbstractTypeCellEditor.class.getDeclaredConstructor(AttributeTree.TreeNode.class, JPanel.class,Object.class);
                 else
-                    constructor = ChildObjectCellEditor.class.getDeclaredConstructor(AttributeTree.TreeNode.class, JPanel.class);
+                    constructor = ChildObjectCellEditor.class.getDeclaredConstructor(AttributeTree.TreeNode.class, JPanel.class,Object.class);
             } else {
                 constructor = editorConstructors.get(type.getName());
             }
@@ -76,7 +76,7 @@ public class EditorRegistry {
             throw new IllegalArgumentException(type.getName() + ": no editor registered for such type");
         }
         try {
-            component = (AttributeEditor) constructor.newInstance(model, contentPanel);
+            component = (AttributeEditor) constructor.newInstance(model, contentPanel,initialValue);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException(e + "could not create new instance of type " + constructor);
         }

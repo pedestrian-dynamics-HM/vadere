@@ -1,8 +1,9 @@
 package org.vadere.gui.topographycreator.control.attribtable;
 
+import org.vadere.gui.topographycreator.control.attribtable.cells.EditorRegistry;
 import org.vadere.gui.topographycreator.control.attribtable.cells.delegates.AttributeEditor;
-import org.vadere.gui.topographycreator.control.attribtable.cells.editors.EditorRegistry;
 import org.vadere.gui.topographycreator.control.attribtable.tree.AttributeTree;
+import org.vadere.gui.topographycreator.control.attribtable.tree.FieldNode;
 import org.vadere.gui.topographycreator.control.attribtable.tree.StructureListener;
 import org.vadere.gui.topographycreator.control.attribtable.util.Layouts;
 
@@ -42,8 +43,13 @@ public class JAttributeTable extends JPanel implements ValueListener, StructureL
 
                 var subPanel = new JPanel(new GridBagLayout());
                 subPanel.setBackground(UIManager.getColor("Table.selectionBackground").brighter());
+                AttributeEditor editor = null;
+                if(subModel instanceof FieldNode){
+                    editor = registry.create(clazz, subModel, subPanel,((FieldNode)subModel).getValueNode().getValue());
+                }else{
+                    editor = registry.create(clazz, subModel, subPanel,null);
+                }
 
-                var editor = registry.create(clazz, subModel, subPanel);
                 var delegate = this.rowDelegate.rowDelegateStyle(key, editor);
 
                 renderOrderModel.add(delegate);

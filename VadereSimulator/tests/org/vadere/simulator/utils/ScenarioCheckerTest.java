@@ -22,7 +22,10 @@ import org.vadere.util.geometry.shapes.VShape;
 
 import java.awt.geom.Area;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.PriorityQueue;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
@@ -131,8 +134,8 @@ public class ScenarioCheckerTest implements TestResourceHandlerScenario {
 		AttributesSourceBuilder attrSourceB = AttributesSourceBuilder.anAttributesSource();
 		AttributesTargetBuilder attrTargetB = AttributesTargetBuilder.anAttributesTarget();
 		builder.addSource(attrSourceB
-				.setTargetIds(Collections.singletonList(4)) // id not found !
-				.build()
+				.setTargetIds((ArrayList<Integer>) List.of(4)) // id not found !
+				.build(new AttributesSource())
 		);
 		builder.addTarget(attrTargetB
 				.id(1)
@@ -180,8 +183,8 @@ public class ScenarioCheckerTest implements TestResourceHandlerScenario {
 		AttributesSourceBuilder attrSourceB = AttributesSourceBuilder.anAttributesSource();
 		AttributesTargetBuilder attrTargetB = AttributesTargetBuilder.anAttributesTarget();
 		builder.addSource(attrSourceB
-				.setTargetIds(Collections.singletonList(1))
-				.build()
+				.setTargetIds((ArrayList<Integer>) List.of(1))
+				.build(new AttributesSource())
 		);
 		builder.addTarget(attrTargetB
 				.id(1)

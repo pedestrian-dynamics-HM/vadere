@@ -18,7 +18,7 @@ public class DistributionStub extends VDistribution<Object> {
 		return 0;
 	}
 
-	public double getNextSpawnTime(double timeCurrentEvent) {
+	public double getNextSample(double timeCurrentEvent) {
 		return 0;
 	}
 

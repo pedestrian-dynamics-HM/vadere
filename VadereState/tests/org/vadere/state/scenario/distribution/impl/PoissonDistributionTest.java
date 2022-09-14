@@ -1,7 +1,5 @@
 package org.vadere.state.scenario.distribution.impl;
 
-import static org.junit.Assert.*;
-
 import org.apache.commons.math3.distribution.ExponentialDistribution;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.junit.runner.RunWith;
@@ -10,9 +8,11 @@ import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.vadere.state.attributes.distributions.AttributesPoissonDistribution;
 import org.vadere.state.scenario.distribution.VDistribution;
 import org.vadere.state.scenario.distribution.VDistributionTest;
-import org.vadere.state.attributes.distributions.AttributesPoissonDistribution;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Aleksandar Ivanov(ivanov0@hm.edu)
@@ -48,7 +48,7 @@ public class PoissonDistributionTest extends VDistributionTest {
 		double timeCurrentEvent = 1;
 
 		VDistribution<?> dist = getDistributionUnderTest();
-		double actual = dist.getNextSpawnTime(timeCurrentEvent);
+		double actual = dist.getNextSample(timeCurrentEvent);
 
 		assertEquals(sample + timeCurrentEvent, actual, 0);
 		Mockito.verify(distMock).sample();

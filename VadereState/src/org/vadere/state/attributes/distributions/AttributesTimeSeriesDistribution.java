@@ -1,8 +1,7 @@
 package org.vadere.state.attributes.distributions;
 
-import org.vadere.state.attributes.distributions.AttributesDistribution;
-
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This is the parameter structure used with a time series distribution.
@@ -11,8 +10,8 @@ import java.util.ArrayList;
 
 public class AttributesTimeSeriesDistribution extends AttributesDistribution {
 
-	Double intervalLength;
-	ArrayList<Integer> spawnsPerInterval;
+	Double intervalLength = 0.0;
+	List<Integer> spawnsPerInterval = new ArrayList<>();
 
 	public double getIntervalLength() {
 		return intervalLength;
@@ -22,7 +21,7 @@ public class AttributesTimeSeriesDistribution extends AttributesDistribution {
 		this.intervalLength = intervalLength;
 	}
 
-	public ArrayList<Integer> getSpawnsPerInterval() {
+	public List<Integer> getSpawnsPerInterval() {
 		return spawnsPerInterval;
 	}
 

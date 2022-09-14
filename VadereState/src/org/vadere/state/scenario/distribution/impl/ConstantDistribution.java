@@ -29,7 +29,7 @@ public class ConstantDistribution extends VDistribution<AttributesConstantDistri
 	}
 
 	@Override
-	public double getNextSpawnTime(double timeCurrentEvent) {
+	public double getNextSample(double timeCurrentEvent) {
 		// always add a constant value to the 'value'
 		var attribs = (AttributesConstantDistribution)this.getAttributes();
 		return timeCurrentEvent + attribs.getUpdateFrequency();

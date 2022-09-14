@@ -4,8 +4,9 @@ import org.apache.commons.math3.util.Pair;
 
 import java.lang.reflect.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class ArrayNode extends AttributeTree.TreeNode {
 
@@ -46,17 +47,19 @@ public class ArrayNode extends AttributeTree.TreeNode {
     }
 
     private void shiftMapKeys(String field, int idx) {
-        ((HashMap) getChildren()).remove(field);
-        while (getChildren().containsKey(String.valueOf(++idx))) {
-            getChildren().put(String.valueOf(idx - 1), getChildren().get(String.valueOf(idx)));
+        var children = super.getChildren();
+        children.remove(field);
+        while (children.containsKey(String.valueOf(++idx))) {
+            children.put(String.valueOf(idx - 1), children.get(String.valueOf(idx)));
         }
-        ((HashMap) getChildren()).remove(String.valueOf(idx - 1));
+        children.remove(String.valueOf(idx - 1));
     }
 
 
     @Override
     public void updateStructure(Object Object) {
-
+        notifyStructureListeners();
+        notifyValueListeners();
     }
 
     @Override
@@ -65,21 +68,27 @@ public class ArrayNode extends AttributeTree.TreeNode {
             if (obj.equals(getReference()))
                 return;
             setReference(obj);
-            var array = (ArrayList) obj;
-            var children = ((HashMap) getChildren());
+            var array = (ArrayList)obj;
+            var children = super.getChildren();
+            if(children.size() > array.size()){
+                for(int i = array.size(); i <= children.size(); i++){
+                    children.remove(String.valueOf(i));
+                }
+            }
             for (int i = 0; i < array.size(); i++) {
                 var key = String.valueOf(i);
                 var value = array.get(i);
                 if (children.containsKey(key)) {
                     var node = ((FieldNode) ((Pair) children.get(key)).getSecond());
-                    try {
-                        node.getValueNode().setValue(array.get(i));
-                    } catch (NoSuchFieldException e) {
-                        throw new RuntimeException(e);
-                    }
+                    node.setValueNode(new ValueNode(this, key, value.getClass(), value));
                 } else {
                     var newNode = new FieldNode(this, key, value.getClass(), new ValueNode(this, key, value.getClass(), value));
                     children.put(key, new Pair(null, newNode));//new ValueNode(this, key, value.getClass(), value)
+                }
+            }
+            if(children.size() > array.size()){
+                for(int i = array.size(); i < children.size(); i++){
+                    children.remove(String.valueOf(i));
                 }
             }
         }
@@ -91,6 +100,7 @@ public class ArrayNode extends AttributeTree.TreeNode {
     public void updateParentsFieldValue(String fieldName, Object object) throws NoSuchFieldException, IllegalAccessException {
         var array = (ArrayList) getReference();
         var idx = Integer.parseInt(fieldName);
+        ((FieldNode)super.getChildren().get(fieldName).getSecond()).setValueNode(new ValueNode(getParent(),fieldName,internalType,object));
         array.set(idx, object);
         getParent().updateParentsFieldValue(getFieldName(), array);
     }
@@ -101,7 +111,7 @@ public class ArrayNode extends AttributeTree.TreeNode {
     }
 
     public void addElement() throws InvocationTargetException, InstantiationException, IllegalAccessException {
-        String key = String.valueOf(getChildren().size());
+        String key = String.valueOf(super.getChildren().size());
         Object newInstance = null;
         if (Modifier.isAbstract(internalType.getModifiers())) {
             newInstance = null;
@@ -113,7 +123,7 @@ public class ArrayNode extends AttributeTree.TreeNode {
             newInstance = internalDefaultConstructor.newInstance(null);
         }
         var newNode = new FieldNode(this, key, internalType, new ValueNode(this, key, internalType, newInstance));
-        getChildren().put(key, new Pair(null, newNode));
+        super.getChildren().put(key, new Pair(null, newNode));
         ((ArrayList) getReference()).add(newInstance);
 
         try {
@@ -123,5 +133,10 @@ public class ArrayNode extends AttributeTree.TreeNode {
         }
         notifyStructureListeners();
         notifyValueListeners();
+    }
+
+    @Override
+    public Map<String, Pair<Field, AttributeTree.TreeNode>> getChildren() {
+        return new TreeMap(super.getChildren());
     }
 }

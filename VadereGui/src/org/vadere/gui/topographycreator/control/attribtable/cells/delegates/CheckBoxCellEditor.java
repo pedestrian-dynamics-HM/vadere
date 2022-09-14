@@ -10,14 +10,16 @@ import javax.swing.*;
 public class CheckBoxCellEditor extends AttributeEditor {
     private JCheckBox checkBox;
 
-    public CheckBoxCellEditor(AttributeTree.TreeNode model, JPanel contentPanel) {
-        super(model, contentPanel);
+    public CheckBoxCellEditor(AttributeTree.TreeNode model, JPanel contentPanel,Object initialValue) {
+        super(model, contentPanel,initialValue);
     }
 
 
     @Override
-    protected void initialize() {
+    protected void initialize(Object initialValue) {
         this.checkBox = new JCheckBox();
+        if(initialValue!=null)
+            this.checkBox.setSelected((Boolean) initialValue);
         initializeCheckBoxListener();
         this.add(checkBox);
     }

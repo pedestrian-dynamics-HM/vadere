@@ -1,30 +1,28 @@
-package org.vadere.gui.topographycreator.control.attribtable.cells.editors;
-
+package org.vadere.gui.topographycreator.control.attribtable.cells;
 
 import org.vadere.gui.topographycreator.control.attribtable.cells.delegates.AttributeEditor;
 
 import javax.swing.*;
 import javax.swing.event.CellEditorListener;
 import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 import java.util.EventObject;
 
-public class FieldValueEditor extends JPanel implements TableCellEditor {
-
-    private AttributeEditor editor;
-
-    public FieldValueEditor(AttributeEditor editor) {
+public class CellValueDelegateWarpper extends JPanel implements TableCellRenderer, TableCellEditor {
+    private final AttributeEditor editor;
+    public CellValueDelegateWarpper(AttributeEditor editor) {
         super();
-        this.editor = editor;
-    }
-
-
-    public void setEditor(AttributeEditor editor) {
         this.editor = editor;
     }
 
     @Override
     public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
+        return editor;
+    }
+
+    @Override
+    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         return editor;
     }
 
@@ -40,7 +38,7 @@ public class FieldValueEditor extends JPanel implements TableCellEditor {
 
     @Override
     public boolean shouldSelectCell(EventObject anEvent) {
-        return false;
+        return true;
     }
 
     @Override

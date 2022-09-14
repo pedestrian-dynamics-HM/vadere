@@ -21,19 +21,20 @@ public class AttributeTableView extends JPanel implements Revalidatable {
     }
 
     public void selectionChange(Object object) {
-        if (object == null) {
-            return;
+        if(object!= null) {
+            var objectClass = object.getClass();
+            createClassPageIfNotExisting(object);
+            setClassPageActive(object);
+            updateClassPageModel(object);
+            this.add(activePage, BorderLayout.NORTH);
+        }else{
+            clear();
         }
-        setVisible(true);
-        var objectClass = object.getClass();
-        createClassPageIfNotExisting(objectClass);
-        setClassPageActive(objectClass);
-        updateClassPageModel(object);
         repaintPage();
     }
 
     private void repaintPage() {
-        this.add(activePage, BorderLayout.NORTH);
+
         this.revalidate();
         this.repaint();
     }
@@ -46,17 +47,26 @@ public class AttributeTableView extends JPanel implements Revalidatable {
         }
     }
 
-    private void createClassPageIfNotExisting(Class clazz) {
+    private void createClassPageIfNotExisting(Object object) {
+        Class clazz = object.getClass();
         if (!attributePages.containsKey(clazz)) {
             var tree = AttributeTree.parseClassTree(null, null, clazz);
             tree.setParent(new TreeAdapter(this));
             var attributePage = new AttributeTablePage(tree);
             this.attributePages.put(clazz, attributePage);
+            try {
+                attributePage.updateModel(object);
+            } catch (TreeException e) {
+                throw new RuntimeException(e);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
-    public void setClassPageActive(Class clazz) {
-        activePage = attributePages.get(clazz);
+    public void setClassPageActive(Object object) {
+        createClassPageIfNotExisting(object);
+        activePage = attributePages.get(object.getClass());
     }
 
     public void updateModel(Object object) throws TreeException, IllegalAccessException {
@@ -74,5 +84,6 @@ public class AttributeTableView extends JPanel implements Revalidatable {
 
     public void clear() {
         this.removeAll();
+        repaintPage();
     }
 }

@@ -7,14 +7,12 @@ import org.vadere.simulator.models.DynamicElementFactory;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesDynamicElement;
 import org.vadere.state.attributes.scenario.AttributesSource;
-import org.vadere.state.attributes.spawner.AttributesRegularSpawner;
 import org.vadere.state.attributes.spawner.AttributesSpawner;
 import org.vadere.state.scenario.*;
 import org.vadere.state.scenario.distribution.DistributionFactory;
 import org.vadere.state.scenario.distribution.VDistribution;
 import org.vadere.state.scenario.distribution.impl.MixedDistribution;
 import org.vadere.state.scenario.spawner.VSpawner;
-import org.vadere.state.scenario.spawner.impl.RegularSpawner;
 import org.vadere.util.geometry.LinkedCellsGrid;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -57,6 +55,7 @@ public abstract class SourceController extends ScenarioElementController impleme
                             Random random) {
         this.source = source;
         this.sourceAttributes = source.getAttributes();
+        this.spawner = SpawnerFactory.create(this.sourceAttributes.getSpawnerAttributes(), random);
 
         this.attributesDynamicElement = attributesDynamicElement;
         this.dynamicElementFactory = dynamicElementFactory;
@@ -69,7 +68,7 @@ public abstract class SourceController extends ScenarioElementController impleme
             distribution = DistributionFactory.create(
                     spawnerAttributes.getDistributionAttributes(), new JDKRandomGenerator(random.nextInt())
             );
-            spawner = new RegularSpawner((AttributesRegularSpawner) spawnerAttributes);
+            spawner = SpawnerFactory.create(spawnerAttributes,random);
         } catch (Exception e) {
             throw new IllegalArgumentException("Problem with scenario parameters for source: "
                     + "interSpawnTimeDistribution and/or distributionParameters. See causing Excepion herefafter.", e);
@@ -97,7 +96,7 @@ public abstract class SourceController extends ScenarioElementController impleme
             return true;
         }
         if (isSourceWithOneSingleSpawnEvent()) {
-            return dynamicElementsCreatedTotal == spawner.getEventElementCount(simTimeInSec);//sourceAttributes.getSpawnNumber();
+            return dynamicElementsCreatedTotal == spawner.getEventElementCount(simTimeInSec);
         }
         return isAfterSourceEndTime(simTimeInSec) && isQueueEmpty();
     }
@@ -142,7 +141,7 @@ public abstract class SourceController extends ScenarioElementController impleme
         }
 
         // Read: timeOfNextEvent == timeOfCurrentEvent for this call
-        double newTimeOfNextEvent = distribution.getNextSpawnTime(timeOfNextEvent);
+        double newTimeOfNextEvent = spawner.getNextSpawnTime(timeOfNextEvent);
 
         if (newTimeOfNextEvent < timeOfNextEvent) { //TODO mit Herr Lehmberg reden wg. < vs <=
             String distributionName;

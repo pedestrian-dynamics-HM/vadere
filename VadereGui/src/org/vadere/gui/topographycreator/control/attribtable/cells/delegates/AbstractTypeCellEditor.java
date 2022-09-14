@@ -39,19 +39,26 @@ public class AbstractTypeCellEditor extends AttributeEditor implements Revalidat
     private AttributeTableView view;
     private Object instanceOfSelected;
 
-    public AbstractTypeCellEditor(AttributeTree.TreeNode model, JPanel contentPanel) {
-        super(model, contentPanel);
+    public AbstractTypeCellEditor(AttributeTree.TreeNode model, JPanel contentPanel,Object initialValue) {
+        super(model, contentPanel,initialValue);
     }
 
 
     @Override
-    protected void initialize() {
+    protected void initialize(Object initialValue) {
         view = new AttributeTableView(this);
         initializeGridBagConstraint();
         initializeRunnableRegistry();
         initializeComboBox();
+        if(initialValue == null){
+            this.contentPanel.setVisible(false);
+        }else{
+            this.contentPanel.setVisible(true);
+            //view.setClassPageActive(initialValue.getClass());
+            onModelChanged(initialValue);
+        }
+
         initializeSelfReference();
-        this.contentPanel.setVisible(false);
         this.contentPanel.add(view, gbc);
     }
 

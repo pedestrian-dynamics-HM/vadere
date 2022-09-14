@@ -1,7 +1,6 @@
 package org.vadere.gui.topographycreator.control.attribtable.cells.delegates;
 
 import org.vadere.gui.topographycreator.control.attribtable.tree.AttributeTree;
-import org.vadere.gui.topographycreator.control.attribtable.tree.FieldNode;
 import org.vadere.util.geometry.shapes.VPoint;
 
 import javax.swing.*;
@@ -17,12 +16,12 @@ public class VPointCellEditor extends AttributeEditor {
     private JSpinner ySpinner;
     private VPoint pointBuffer;
 
-    public VPointCellEditor(AttributeTree.TreeNode model, JPanel contentPanel) {
-        super(model, contentPanel);
+    public VPointCellEditor(AttributeTree.TreeNode model, JPanel contentPanel,Object initialValue) {
+        super(model, contentPanel,initialValue);
     }
 
     @Override
-    protected void initialize() {
+    protected void initialize(Object initialValue) {
         pointBuffer = new VPoint(0.0, 0.0);
         this.xSpinner = new JSpinner();
         this.ySpinner = new JSpinner();
@@ -34,10 +33,10 @@ public class VPointCellEditor extends AttributeEditor {
         ((NumberFormatter) xtxt.getFormatter()).setAllowsInvalid(false);
         JFormattedTextField ytxt = ((JSpinner.NumberEditor) ySpinner.getEditor()).getTextField();
         ((NumberFormatter) ytxt.getFormatter()).setAllowsInvalid(false);
-
-        var value = ((FieldNode) model).getValueNode().getValue();
-        if (value != null)
-            this.xSpinner.setValue(((FieldNode) model).getValueNode().getValue());
+        if(initialValue!=null) {
+            this.xSpinner.setValue(((VPoint) initialValue).getX());
+            this.ySpinner.setValue(((VPoint) initialValue).getY());
+        }
         var xContentPanel = new JPanel(new BorderLayout());
         var yContentPanel = new JPanel(new BorderLayout());
         var xLable = new JLabel("x");

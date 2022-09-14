@@ -3,14 +3,14 @@ package org.vadere.gui.topographycreator.control.attribtable.tree;
 import org.apache.commons.math3.util.Pair;
 import org.vadere.gui.topographycreator.control.attribtable.Revalidatable;
 import org.vadere.gui.topographycreator.control.attribtable.ValueListener;
-import org.vadere.gui.topographycreator.control.attribtable.cells.editors.EditorRegistry;
+import org.vadere.gui.topographycreator.control.attribtable.cells.EditorRegistry;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.vadere.gui.topographycreator.control.attribtable.util.ClassFields.getSuperDeclaredFields;
 
@@ -145,7 +145,7 @@ public class AttributeTree {
             this.parent = parent;
         }
 
-        public HashMap<String, Pair<Field, TreeNode>> getChildren() {
+        public Map<String, Pair<Field, TreeNode>> getChildren() {
             return children;
         }
 

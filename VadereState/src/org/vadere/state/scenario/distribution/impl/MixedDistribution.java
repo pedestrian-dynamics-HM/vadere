@@ -2,13 +2,14 @@ package org.vadere.state.scenario.distribution.impl;
 
 import org.apache.commons.math3.random.RandomGenerator;
 import org.vadere.state.attributes.Attributes;
+import org.vadere.state.attributes.distributions.AttributesDistribution;
 import org.vadere.state.attributes.distributions.AttributesMixedDistribution;
 import org.vadere.state.scenario.distribution.DistributionFactory;
 import org.vadere.state.scenario.distribution.VDistribution;
-import org.vadere.state.scenario.distribution.parameter.MixedParameterDistribution;
 import org.vadere.state.scenario.distribution.registry.RegisterDistribution;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Aleksandar Ivanov(ivanov0@hm.edu), Lukas Gradl (lgradl@hm.edu)
@@ -16,8 +17,8 @@ import java.util.ArrayList;
 @RegisterDistribution(name = "mixed", parameter = AttributesMixedDistribution.class)
 public class MixedDistribution extends VDistribution<AttributesMixedDistribution> {
 	private Attributes mixedAttributes;
-	ArrayList<Double> switchPoints;
-	ArrayList<VDistribution<?>> distributions;
+	List<Double> switchPoints;
+	List<VDistribution<?>> distributions;
 	private int currentInterval = 0;
 
 	public  MixedDistribution(){
@@ -45,14 +46,14 @@ public class MixedDistribution extends VDistribution<AttributesMixedDistribution
 
 	}
 
-	private void setDistributions(ArrayList<MixedParameterDistribution> distributions,
+	private void setDistributions(List<AttributesDistribution> distributions,
 	        RandomGenerator randomGenerator) throws Exception {
 		this.distributions = new ArrayList<>();
 
-		for (MixedParameterDistribution distribution : distributions) {
+		for (AttributesDistribution distribution : distributions) {
 			VDistribution<?> dist = DistributionFactory
 					.create(
-							getAttributes(),
+							distribution,
 							randomGenerator
 					);
 			this.distributions.add(dist);
@@ -60,9 +61,9 @@ public class MixedDistribution extends VDistribution<AttributesMixedDistribution
 	}
 
 	@Override
-	public double getNextSpawnTime(double timeCurrentEvent) {
+	public double getNextSample(double timeCurrentEvent) {
 		return getDistributionByTime(timeCurrentEvent)
-				.getNextSpawnTime(timeCurrentEvent);
+				.getNextSample(timeCurrentEvent);
 	}
 
 	private VDistribution<?> getDistributionByTime(double timeCurrentEvent) {

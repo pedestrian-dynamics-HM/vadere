@@ -2,17 +2,9 @@ package org.vadere.simulator.control.scenarioelements;
 
 import org.apache.commons.math3.random.JDKRandomGenerator;
 import org.vadere.state.attributes.scenario.AttributesTarget;
-import org.vadere.state.scenario.Agent;
-import org.vadere.state.scenario.Car;
-import org.vadere.state.scenario.DynamicElement;
-import org.vadere.state.scenario.Pedestrian;
-import org.vadere.state.scenario.Target;
-import org.vadere.state.scenario.TargetListener;
-import org.vadere.state.scenario.Topography;
+import org.vadere.state.scenario.*;
 import org.vadere.state.scenario.distribution.DistributionFactory;
-
 import org.vadere.state.scenario.distribution.VDistribution;
-import org.vadere.state.types.TrafficLightPhase;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.logging.Logger;
@@ -27,7 +19,7 @@ public class TargetController extends ScenarioElementController {
 	private final AttributesTarget targetAttributes;
 
 	public final Target target;
-	private Topography topography;
+	private final Topography topography;
 
 
 	public TargetController(Topography topography, Target target,Random random) {
@@ -133,7 +125,7 @@ public class TargetController extends ScenarioElementController {
 				leavingTimes.size() < waitingSpots);
 		if (targetHasFreeWaitingSpots) {
 			// TODO: Refractor VadereDistributions method name
-			leavingTimes.put(agentId, this.distribution.getNextSpawnTime(simTimeInSec));
+			leavingTimes.put(agentId, this.distribution.getNextSample(simTimeInSec));
 		}
 	}
 

@@ -2,7 +2,6 @@ package org.vadere.state.attributes.distributions;
 
 
 import org.vadere.state.attributes.VadereAttributeClass;
-import org.vadere.state.attributes.distributions.AttributesDistribution;
 import org.vadere.util.reflection.VadereAttribute;
 
 /**
@@ -13,9 +12,9 @@ import org.vadere.util.reflection.VadereAttribute;
 @VadereAttributeClass(includeAll = true)
 public class AttributesBinomialDistribution extends AttributesDistribution {
 	@VadereAttribute
-	private Integer trials;
+	private Integer trials = 0;
 	@VadereAttribute
-	private Double p;
+	private Double p = 0.0;
 
 	public int getTrials() {
 		return trials;

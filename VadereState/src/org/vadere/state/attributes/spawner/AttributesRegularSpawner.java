@@ -1,21 +1,27 @@
 package org.vadere.state.attributes.spawner;
 
-import org.vadere.util.reflection.VadereAttribute;
+import com.fasterxml.jackson.annotation.JsonView;
+import org.vadere.state.attributes.distributions.AttributesConstantDistribution;
+import org.vadere.state.attributes.distributions.AttributesDistribution;
+import org.vadere.state.util.Views;
 
 public class AttributesRegularSpawner extends AttributesSpawner{
-    @VadereAttribute
-    protected Integer eventElementCount = 0;
 
+    @JsonView(Views.CacheViewExclude.class)
+    protected AttributesDistribution distribution = null;
     public AttributesRegularSpawner(){
-        super();
+        super(new AttributesConstantDistribution());
     }
 
-    public Integer getEventElementCount() {
-        return eventElementCount;
+    @Override
+    public AttributesDistribution getDistributionAttributes() {
+        return distribution;
     }
 
-    public void setEventElementCount(Integer eventElementCount) {
+    @Override
+    public void setDistributionAttributes(AttributesDistribution distribution) {
         checkSealed();
-        this.eventElementCount = eventElementCount;
+        this.distribution = distribution;
     }
+
 }

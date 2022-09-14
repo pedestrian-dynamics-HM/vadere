@@ -13,8 +13,8 @@ public class LERPSpawner extends VSpawner<AttributesLerpSpawner> {
     private final TruncatedNormalDistribution truncNormalDist;
     private final PolynomialSplineFunction interpolator;
 
-    public LERPSpawner(AttributesLerpSpawner attributes) {
-        super(attributes);
+    public LERPSpawner(AttributesLerpSpawner attributes,Random random) {
+        super(attributes,random);
 
         double[] xValues = {0, 200, 400, 600, 800, 1000, 1200, 1400, 1600, 1800, 2000, 2200, 2400};
         double[] yValues = {-1., 8., -1., 8., -1.0, 8., -1, 8, -1, 8, -1, 8, -1};
@@ -51,13 +51,10 @@ public class LERPSpawner extends VSpawner<AttributesLerpSpawner> {
         // do nothing
     }
 
-    @Override
-    public void update(double simTimeInSec) {
-
-    }
 
     @Override
     protected boolean isQueueEmpty() {
         return false;
     }
+
 }

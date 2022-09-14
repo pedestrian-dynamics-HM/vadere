@@ -3,18 +3,14 @@ package org.vadere.state.scenario.spawner.impl;
 import org.vadere.state.attributes.spawner.AttributesTimeSeriesSpawner;
 import org.vadere.state.scenario.spawner.VSpawner;
 
-import java.util.ArrayList;
+import java.util.Random;
 
 public class TimeSeriesSpawner extends VSpawner<AttributesTimeSeriesSpawner> {
 
-    Double[] switchpoints;
-    private final int currentInterval = 0;
-    ArrayList<VSpawner> spawners;
-
     private MixedSpawner spawner;
 
-    protected TimeSeriesSpawner(AttributesTimeSeriesSpawner attributes) {
-        super(attributes);
+    public TimeSeriesSpawner(AttributesTimeSeriesSpawner attributes, Random random) {
+        super(attributes,random);
 
     }
 
@@ -31,11 +27,6 @@ public class TimeSeriesSpawner extends VSpawner<AttributesTimeSeriesSpawner> {
     @Override
     public void setRemainingSpawnAgents(int remainingAgents) {
         spawner.setRemainingSpawnAgents(remainingAgents);
-    }
-
-    @Override
-    public void update(double simTimeInSec) {
-
     }
 
     @Override

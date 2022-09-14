@@ -36,7 +36,7 @@ public class AttributesSource extends AttributesVisualElement {
 	 */
 
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
-	private List<Double> groupSizeDistribution = List.of(1.0);
+	private List<Double> groupSizeDistribution = new ArrayList<>( List.of(1.0));
 
 	public AttributesSource() {
 		super();

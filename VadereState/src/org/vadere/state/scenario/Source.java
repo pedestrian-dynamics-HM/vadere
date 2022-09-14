@@ -10,6 +10,7 @@ public class Source extends ScenarioElement<AttributesSource> {
 		this.attributes = attributes;
 	}
 
+
 	@Override
 	public void setShape(VShape newShape) {
 		attributes.setShape(newShape);

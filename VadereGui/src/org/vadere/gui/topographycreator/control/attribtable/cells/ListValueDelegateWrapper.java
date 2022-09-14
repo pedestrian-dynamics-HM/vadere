@@ -1,5 +1,4 @@
-package org.vadere.gui.topographycreator.control.attribtable.cells.editors;
-
+package org.vadere.gui.topographycreator.control.attribtable.cells;
 
 import org.vadere.gui.topographycreator.control.attribtable.cells.delegates.AttributeEditor;
 
@@ -7,18 +6,20 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.CellEditorListener;
 import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 import java.util.EventObject;
 
-public class ListValueEditor extends JPanel implements TableCellEditor {
+public class ListValueDelegateWrapper extends JPanel implements TableCellRenderer, TableCellEditor {
 
     private final AttributeEditor editor;
     private final String id;
 
-    public ListValueEditor(AttributeEditor editor, String id) {
+    public ListValueDelegateWrapper(AttributeEditor editor, String id) {
         this.editor = editor;
         this.id = id;
     }
+
 
     @Override
     public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
@@ -27,7 +28,13 @@ public class ListValueEditor extends JPanel implements TableCellEditor {
         lable.setBorder(new EmptyBorder(0, 8, 0, 8));
         panel.add(lable, BorderLayout.WEST);
         panel.add(editor);
+        panel.setVisible(true);
         return panel;
+    }
+
+    @Override
+    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+        return getTableCellEditorComponent(table,value,isSelected,row,column);
     }
 
     @Override
@@ -42,7 +49,7 @@ public class ListValueEditor extends JPanel implements TableCellEditor {
 
     @Override
     public boolean shouldSelectCell(EventObject anEvent) {
-        return false;
+        return true;
     }
 
     @Override

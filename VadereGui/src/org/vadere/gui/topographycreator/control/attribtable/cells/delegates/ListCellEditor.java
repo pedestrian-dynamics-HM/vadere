@@ -1,12 +1,10 @@
 package org.vadere.gui.topographycreator.control.attribtable.cells.delegates;
 
 import org.vadere.gui.topographycreator.control.attribtable.JAttributeTable;
-import org.vadere.gui.topographycreator.control.attribtable.cells.editors.ListValueEditor;
-import org.vadere.gui.topographycreator.control.attribtable.cells.renderer.ButtonColumnRenderer;
-import org.vadere.gui.topographycreator.control.attribtable.cells.renderer.ListValueRenderer;
+import org.vadere.gui.topographycreator.control.attribtable.cells.ButtonColumnRenderer;
+import org.vadere.gui.topographycreator.control.attribtable.cells.ListValueDelegateWrapper;
 import org.vadere.gui.topographycreator.control.attribtable.tree.ArrayNode;
 import org.vadere.gui.topographycreator.control.attribtable.tree.AttributeTree;
-import org.vadere.gui.topographycreator.control.attribtable.ui.AttributeTableView;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -23,8 +21,8 @@ public class ListCellEditor extends ChildObjectCellEditor {
 
     private Object instanceOfSelected;
 
-    public ListCellEditor(AttributeTree.TreeNode model, JPanel contentPanel) {
-        super(model, contentPanel);
+    public ListCellEditor(AttributeTree.TreeNode model, JPanel contentPanel,Object initialValue) {
+        super(model, contentPanel,initialValue);
     }
 
 
@@ -35,17 +33,25 @@ public class ListCellEditor extends ChildObjectCellEditor {
             @Override
             public JTable rowDelegateStyle(String id, AttributeEditor editor) {
                 JTable style = new JTable();
-                DefaultTableModel modelt = new DefaultTableModel(new Object[]{"attr", "btn"}, 1);
-                //modelt.setValueAt(valueModel.getElement(id), 0, 0);
+                DefaultTableModel modelt = new DefaultTableModel(new Object[]{"attr", "btn"}, 1){
+                    @Override
+                    public boolean isCellEditable(int row, int column) {
+                        return column != 1;
+                    }
+                };
                 style.setModel(modelt);
                 style.setRowHeight(28);
                 style.setIntercellSpacing(new Dimension(0, 4));
                 style.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                 style.setBackground(UIManager.getColor("Panel.background"));
-                style.getColumn("attr").setCellRenderer(new ListValueRenderer(editor, id));
-                style.getColumn("attr").setCellEditor(new ListValueEditor(editor, id));
+
+                var attrDelegate = new ListValueDelegateWrapper(editor,id);
+
+                style.getColumn("attr").setCellRenderer(attrDelegate);
+                style.getColumn("attr").setCellEditor(attrDelegate);
                 style.getColumn("btn").setCellRenderer(new ButtonColumnRenderer());
-                style.getColumn("btn").setPreferredWidth(10);
+                style.getColumn("btn").setPreferredWidth(30);
+
                 style.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
@@ -58,7 +64,7 @@ public class ListCellEditor extends ChildObjectCellEditor {
                             }
                         } else {
                             contentVisible = !contentVisible;
-                            editor.getContentPanel().setVisible(contentVisible && !(editor.getContentPanel().getComponents()[0] instanceof AttributeTableView));
+                            editor.getContentPanel().setVisible(contentVisible );
                         }
 
                     }
@@ -73,7 +79,7 @@ public class ListCellEditor extends ChildObjectCellEditor {
                     }
                 });
 
-                style.setEditingColumn(1);
+                style.setEditingColumn(0);
                 table.setVisible(true);
                 return style;
             }
@@ -81,6 +87,7 @@ public class ListCellEditor extends ChildObjectCellEditor {
 
         this.contentPanel.add(table, BorderLayout.CENTER);
         var addBtn = new JButton("+");
+        addBtn.setPreferredSize(new Dimension(20,20));
         addBtn.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {

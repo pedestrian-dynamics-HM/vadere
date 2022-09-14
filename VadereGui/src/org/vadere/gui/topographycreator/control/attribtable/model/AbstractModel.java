@@ -1,8 +1,8 @@
 package org.vadere.gui.topographycreator.control.attribtable.model;
 
 import org.vadere.gui.topographycreator.control.attribtable.ViewListener;
+import org.vadere.gui.topographycreator.control.attribtable.cells.EditorRegistry;
 import org.vadere.gui.topographycreator.control.attribtable.cells.delegates.AttributeEditor;
-import org.vadere.gui.topographycreator.control.attribtable.cells.editors.EditorRegistry;
 
 import javax.swing.*;
 import java.awt.*;

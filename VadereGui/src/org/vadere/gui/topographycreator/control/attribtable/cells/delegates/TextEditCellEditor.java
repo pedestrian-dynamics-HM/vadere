@@ -16,13 +16,15 @@ import javax.swing.text.PlainDocument;
 public class TextEditCellEditor extends AttributeEditor {
     private JTextField textField;
 
-    public TextEditCellEditor(AttributeTree.TreeNode model, JPanel contentPanel) {
-        super(model, contentPanel);
+    public TextEditCellEditor(AttributeTree.TreeNode model, JPanel contentPanel,Object initialValue) {
+        super(model, contentPanel,initialValue);
     }
 
     @Override
-    protected void initialize() {
+    protected void initialize(Object initialValue) {
         this.textField = new JTextField();
+        if(initialValue!=null)
+            this.textField.setText((String) initialValue);
         initializeTextFieldListener();
         this.add(textField);
     }

@@ -1,21 +1,20 @@
 package org.vadere.state.attributes.distributions;
 
-import org.vadere.state.attributes.distributions.AttributesDistribution;
-
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Lukas Gradl (lgradl@hm.edu)
  */
 
 public class AttributesEmpiricalDistribution extends AttributesDistribution {
-	Double[] values;
+	List<Double> values = new ArrayList<>();
 
-	public Double[] getValues() {
+	public List<Double> getValues() {
 		return values;
 	}
 
-	public void setValues(Double[] values) {
+	public void setValues(List<Double> values) {
 		this.values = values;
 	}
 }

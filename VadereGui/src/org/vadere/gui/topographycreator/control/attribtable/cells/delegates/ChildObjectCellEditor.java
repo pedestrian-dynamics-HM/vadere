@@ -25,8 +25,8 @@ public class ChildObjectCellEditor extends AttributeEditor implements Revalidata
 
     protected Object objectInstance;
 
-    public ChildObjectCellEditor(AttributeTree.TreeNode model, JPanel contentPanel) {
-        super(model, contentPanel);
+    public ChildObjectCellEditor(AttributeTree.TreeNode model, JPanel contentPanel,Object initialValue) {
+        super(model, contentPanel,initialValue);
         this.contentPanel.setLayout(new BorderLayout());
         this.contentPanel.setBorder(new EmptyBorder(2, 2, 2, 2));
         this.contentPanel.setVisible(contentPaneVisible);
@@ -64,8 +64,9 @@ public class ChildObjectCellEditor extends AttributeEditor implements Revalidata
     }
 
     @Override
-    protected void initialize() {
+    protected void initialize(Object initialValue) {
         view = new AttributeTableView(this);
+        view.selectionChange(initialValue);
     }
 
     public void onModelChanged(Object value) {

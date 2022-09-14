@@ -6,7 +6,7 @@ import java.lang.reflect.Field;
  * A field node represents an object field. It additionally stores a value node.
  */
 public class FieldNode extends AttributeTree.TreeNode {
-    private final ValueNode node;
+    private ValueNode node;
     private Field field;
 
     public FieldNode(AttributeTree.TreeNode parent, Field field) {
@@ -45,4 +45,6 @@ public class FieldNode extends AttributeTree.TreeNode {
     public ValueNode getValueNode() {
         return node;
     }
+
+    public void setValueNode(ValueNode node){ this.node = node;}
 }

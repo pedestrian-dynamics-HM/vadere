@@ -1,13 +1,13 @@
 package org.vadere.state.scenario.distribution.impl;
 
-import static org.junit.Assert.*;
-
 import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.vadere.state.attributes.distributions.AttributesConstantDistribution;
 import org.vadere.state.scenario.distribution.VDistribution;
 import org.vadere.state.scenario.distribution.VDistributionTest;
-import org.vadere.state.attributes.distributions.AttributesConstantDistribution;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Aleksandar Ivanov(ivanov0@hm.edu)
@@ -16,7 +16,7 @@ import org.vadere.state.attributes.distributions.AttributesConstantDistribution;
 @PrepareForTest({ ConstantDistribution.class })
 public class ConstantDistributionTest extends VDistributionTest {
 
-	private double updateFrequency = 1;
+	private final double updateFrequency = 1;
 
 	@Override
 	protected VDistribution<?> getDistributionUnderTest() throws Exception {
@@ -32,7 +32,7 @@ public class ConstantDistributionTest extends VDistributionTest {
 	public void testGetNextSpawnTime() throws Exception {
 		double timeCurrentEvent = 1;
 		VDistribution<?> dist = getDistributionUnderTest();
-		double actual = dist.getNextSpawnTime(timeCurrentEvent);
+		double actual = dist.getNextSample(timeCurrentEvent);
 		assertEquals(updateFrequency + timeCurrentEvent, actual, 0);
 	}
 

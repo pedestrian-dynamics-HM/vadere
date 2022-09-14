@@ -1,8 +1,6 @@
 package org.vadere.state.attributes.distributions;
 
 
-import org.vadere.state.attributes.distributions.AttributesDistribution;
-
 /**
  * This is the parameter structure used with an normal distribution.
  * @author Lukas Gradl (lgradl@hm.edu), Ludwig Jaeck
@@ -17,7 +15,7 @@ public class AttributesNormalDistribution extends AttributesDistribution {
 		this.mean = mean;
 	}
 
-	Double mean;
+	Double mean = 0.0;
 
 	public double getSd() {
 		return sd;
@@ -27,5 +25,5 @@ public class AttributesNormalDistribution extends AttributesDistribution {
 		this.sd = sd;
 	}
 
-	Double sd;
+	Double sd  = 0.0;
 }

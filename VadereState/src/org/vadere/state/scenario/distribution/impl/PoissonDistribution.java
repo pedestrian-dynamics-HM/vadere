@@ -2,10 +2,10 @@ package org.vadere.state.scenario.distribution.impl;
 
 import org.apache.commons.math3.distribution.ExponentialDistribution;
 import org.apache.commons.math3.random.RandomGenerator;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.distributions.AttributesPoissonDistribution;
 import org.vadere.state.scenario.distribution.VDistribution;
 import org.vadere.state.scenario.distribution.registry.RegisterDistribution;
-import org.vadere.state.attributes.Attributes;
 
 /**
  * @author Aleksandar Ivanov(ivanov0@hm.edu), Lukas Gradl (lgradl@hm.edu)
@@ -33,7 +33,7 @@ public class PoissonDistribution extends VDistribution<AttributesPoissonDistribu
 	}
 
 	@Override
-	public double getNextSpawnTime(double timeCurrentEvent) {
+	public double getNextSample(double timeCurrentEvent) {
 		return timeCurrentEvent + distribution.sample();
 	}
 

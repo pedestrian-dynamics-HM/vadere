@@ -17,18 +17,18 @@ public abstract class AttributeEditor extends JPanel implements ViewListener, Va
     private boolean locked = false;
 
 
-    public AttributeEditor(AttributeTree.TreeNode model, JPanel contentPanel) {
+    public AttributeEditor(AttributeTree.TreeNode model, JPanel contentPanel,Object initialValue) {
         super(new BorderLayout());
         this.model = model;
         this.model.addChangeListener(this);
         this.contentPanel = contentPanel;
         disableNotify();
-        initialize();
+        initialize(initialValue);
         enableNotify();
         model.addChangeListener(this);
     }
 
-    protected abstract void initialize();
+    protected abstract void initialize(Object initialValue);
 
     protected abstract void onModelChanged(Object object);
 

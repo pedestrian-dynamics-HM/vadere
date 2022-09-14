@@ -1,9 +1,7 @@
 package org.vadere.state.attributes.distributions;
 
-import org.vadere.state.attributes.distributions.AttributesDistribution;
-import org.vadere.state.scenario.distribution.parameter.MixedParameterDistribution;
-
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This is the parameter structure used with a mixed distribution.
@@ -11,10 +9,10 @@ import java.util.ArrayList;
  */
 
 public class AttributesMixedDistribution extends AttributesDistribution {
-	private ArrayList<Double> switchpoints;
-	private ArrayList<MixedParameterDistribution> distributions;
+	private List<Double> switchpoints = new ArrayList<>();
+	private List<AttributesDistribution> distributions = new ArrayList<>();
 
-	public ArrayList<Double> getSwitchpoints() {
+	public List<Double> getSwitchpoints() {
 		return switchpoints;
 	}
 
@@ -22,11 +20,11 @@ public class AttributesMixedDistribution extends AttributesDistribution {
 		this.switchpoints = switchpoints;
 	}
 
-	public ArrayList<MixedParameterDistribution> getDistributions() {
+	public List<AttributesDistribution> getDistributions() {
 		return distributions;
 	}
 
-	public void setDistributions(ArrayList<MixedParameterDistribution> distributions) {
+	public void setDistributions(List<AttributesDistribution> distributions) {
 		this.distributions = distributions;
 	}
 }

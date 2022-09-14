@@ -33,7 +33,7 @@ public class NegativeExponentialDistribution extends VDistribution<AttributesNeg
 	}
 
 	@Override
-	public double getNextSpawnTime(double timeCurrentEvent) {
+	public double getNextSample(double timeCurrentEvent) {
 		return timeCurrentEvent + distribution.sample();
 	}
 

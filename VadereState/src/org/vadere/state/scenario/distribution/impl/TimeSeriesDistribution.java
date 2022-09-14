@@ -1,18 +1,14 @@
 package org.vadere.state.scenario.distribution.impl;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.math3.random.RandomGenerator;
-import org.vadere.state.attributes.distributions.AttributesConstantDistribution;
-import org.vadere.state.attributes.distributions.AttributesMixedDistribution;
-import org.vadere.state.attributes.distributions.AttributesSingleSpawnDistribution;
-import org.vadere.state.attributes.distributions.AttributesTimeSeriesDistribution;
-import org.vadere.state.scenario.distribution.VDistribution;
-import org.vadere.state.scenario.distribution.parameter.MixedParameterDistribution;
-import org.vadere.state.scenario.distribution.registry.RegisterDistribution;
 import org.vadere.state.attributes.Attributes;
+import org.vadere.state.attributes.distributions.*;
+import org.vadere.state.scenario.distribution.VDistribution;
+import org.vadere.state.scenario.distribution.registry.RegisterDistribution;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Aleksandar Ivanov(ivanov0@hm.edu), Lukas Gradl (lgradl@hm.edu)
@@ -39,8 +35,8 @@ public class TimeSeriesDistribution extends VDistribution<AttributesTimeSeriesDi
 	}
 */
 	@Override
-	public double getNextSpawnTime(double timeCurrentEvent) {
-		return distribution.getNextSpawnTime(timeCurrentEvent);
+	public double getNextSample(double timeCurrentEvent) {
+		return distribution.getNextSample(timeCurrentEvent);
 	}
 /*
 	@Override
@@ -55,9 +51,9 @@ public class TimeSeriesDistribution extends VDistribution<AttributesTimeSeriesDi
 */
 	@Override
 	protected void setValues(AttributesTimeSeriesDistribution parameter,RandomGenerator unused2) throws Exception {
-		ArrayList<Integer> spawnsPerInterval = parameter.getSpawnsPerInterval();
+		ArrayList<Integer> spawnsPerInterval =(ArrayList<Integer>) parameter.getSpawnsPerInterval();
 		ArrayList<Double> switchpoints = new ArrayList<>();
-		ArrayList<MixedParameterDistribution> distributions = new ArrayList<>();
+		List<AttributesDistribution> distributions = new ArrayList<>();
 
 		ObjectMapper mapper = new ObjectMapper();
 
@@ -75,8 +71,8 @@ public class TimeSeriesDistribution extends VDistribution<AttributesTimeSeriesDi
 
 	}
 
-	private static double addNewDistribution(ArrayList<Integer> spawnsPerInterval, double intervalLength, ObjectMapper mapper, ArrayList<Double> switchpoints, ArrayList<MixedParameterDistribution> distributions, double currentTime, int i) {
-		MixedParameterDistribution dist = new MixedParameterDistribution();
+	private static double addNewDistribution(ArrayList<Integer> spawnsPerInterval, double intervalLength, ObjectMapper mapper, ArrayList<Double> switchpoints, List<AttributesDistribution> distributions, double currentTime, int i) {
+		AttributesDistribution dist;
 
 		currentTime = addSwitchpointIfNotLastInterval(spawnsPerInterval, intervalLength, switchpoints, currentTime, i);
 
@@ -84,15 +80,15 @@ public class TimeSeriesDistribution extends VDistribution<AttributesTimeSeriesDi
 		final boolean spawnsSetToRepeat = spawns > 0;
 
 		if (spawnsSetToRepeat) {
-			initAsConstantDistribution(intervalLength, mapper, spawns, dist);
+			dist = initAsConstantDistribution(intervalLength,spawns);
 		} else {
-			initAsSingleEventDistribution(spawnsPerInterval, intervalLength, mapper, currentTime, i, dist);
+			dist = initAsSingleEventDistribution(spawnsPerInterval, intervalLength, currentTime, i);
 		}
 		distributions.add(dist);
 		return currentTime;
 	}
 
-	private static void initAsSingleEventDistribution(ArrayList<Integer> spawnsPerInterval, double intervalLength, ObjectMapper mapper, double currentTime, int i, MixedParameterDistribution dist) {
+	private static AttributesSingleSpawnDistribution initAsSingleEventDistribution(ArrayList<Integer> spawnsPerInterval, double intervalLength,double currentTime, int i) {
 		AttributesSingleSpawnDistribution singleP = new AttributesSingleSpawnDistribution();
 		final boolean iterIsAtLastPos = i == spawnsPerInterval.size() - 1;
 		if (iterIsAtLastPos) {
@@ -100,17 +96,13 @@ public class TimeSeriesDistribution extends VDistribution<AttributesTimeSeriesDi
 		} else {
 			singleP.setSpawnTime(currentTime - intervalLength);
 		}
-		JsonNode node = mapper.convertValue(singleP, JsonNode.class);
-		dist.setInterSpawnTimeDistribution("singleSpawn");
-		dist.setDistributionParameters(node);
+		return singleP;
 	}
 
-	private static void initAsConstantDistribution(double intervalLength, ObjectMapper mapper, int spawns, MixedParameterDistribution dist) {
+	private static AttributesConstantDistribution initAsConstantDistribution(double intervalLength,int spawns) {
 		AttributesConstantDistribution constantP = new AttributesConstantDistribution();
 		constantP.setUpdateFrequency(intervalLength / spawns);
-		JsonNode node = mapper.convertValue(constantP, JsonNode.class);
-		dist.setInterSpawnTimeDistribution("constant");
-		dist.setDistributionParameters(node);
+		return constantP;
 	}
 
 	private static double addSwitchpointIfNotLastInterval(ArrayList<Integer> spawnsPerIntveral, double intervalLength, ArrayList<Double> switchpoints, double currentTime, int i) {

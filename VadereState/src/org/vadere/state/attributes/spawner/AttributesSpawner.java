@@ -21,7 +21,6 @@ import org.vadere.util.reflection.VadereAttribute;
         @JsonSubTypes.Type(value = AttributesTimeSeriesSpawner.class, name = "org.vadere.state.attributes.spawner.AttributesTimeSeriesSpawner")
 })
 public abstract class AttributesSpawner extends Attributes {
-
     @VadereAttribute(exclude = true)
     public static final int NO_MAX_SPAWN_NUMBER_TOTAL = -1;
     @VadereAttribute(exclude = true)
@@ -45,14 +44,20 @@ public abstract class AttributesSpawner extends Attributes {
     @JsonView(Views.CacheViewExclude.class)
     protected Boolean eventPositionFreeSpace = false;
 
+    @VadereAttribute
+    protected Integer eventElementCount = 0;
+
     @VadereAttribute(exclude = true)
     @JsonView(Views.CacheViewExclude.class)
     protected AttributesAgent eventElement = null;
 
-    @JsonView(Views.CacheViewExclude.class)
-    protected AttributesDistribution distribution = null;
+
 
     public AttributesSpawner(){
+    }
+
+    public AttributesSpawner(AttributesDistribution distribution){
+        setDistributionAttributes(distribution);
     }
     public Integer getConstraintsElementsMax() {
         return constraintsElementsMax;
@@ -116,17 +121,16 @@ public abstract class AttributesSpawner extends Attributes {
         this.eventElement = eventElement;
     }
 
-    public AttributesDistribution getDistributionAttributes() {
-        return distribution;
-    }
-
-    public void setDistributionAttributes(AttributesDistribution distribution) {
+    public void setEventElementCount(Integer eventElementCount){
         checkSealed();
-        this.distribution = distribution;
+        this.eventElementCount = eventElementCount;
+    }
+    public Integer getEventElementCount() {
+        return eventElementCount;
     }
 
-    public Integer getEventElementCount() {
-        System.out.println("getEventElementCount() NOT IMPLEMENTED");
-        return 0;
-    }
+    public abstract AttributesDistribution getDistributionAttributes();
+
+    public abstract void setDistributionAttributes(AttributesDistribution distribution);
+
 }

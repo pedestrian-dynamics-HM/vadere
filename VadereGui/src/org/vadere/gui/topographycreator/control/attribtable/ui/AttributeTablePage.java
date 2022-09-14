@@ -5,10 +5,9 @@ import org.vadere.gui.topographycreator.control.AttributeHelpView;
 import org.vadere.gui.topographycreator.control.attribtable.JAttributeTable;
 import org.vadere.gui.topographycreator.control.attribtable.JCollapsablePanel;
 import org.vadere.gui.topographycreator.control.attribtable.ValueListener;
+import org.vadere.gui.topographycreator.control.attribtable.cells.CellNameDelegateWrapper;
+import org.vadere.gui.topographycreator.control.attribtable.cells.CellValueDelegateWarpper;
 import org.vadere.gui.topographycreator.control.attribtable.cells.delegates.AttributeEditor;
-import org.vadere.gui.topographycreator.control.attribtable.cells.editors.FieldValueEditor;
-import org.vadere.gui.topographycreator.control.attribtable.cells.renderer.FieldNameRenderer;
-import org.vadere.gui.topographycreator.control.attribtable.cells.renderer.FieldValueRenderer;
 import org.vadere.gui.topographycreator.control.attribtable.tree.AttributeTree;
 import org.vadere.gui.topographycreator.control.attribtable.tree.TreeException;
 
@@ -21,13 +20,19 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.lang.reflect.Field;
 
-import static javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER;
 
+/** This class is supposed to be used as the gui container for on single class archetype **/
 public class AttributeTablePage extends JPanel implements ValueListener {
 
-    private final JCollapsablePanel collapsablePanel;
-    private final JScrollPane scrollPane;
-    private final JAttributeTable attributeTable;
+    /** container is used as a parent container for the class attribute table.
+     * All attributes can be hidden when the user clicks on the header of the panel.
+     * It displays the classes simple name in the header.
+    **/
+    private final JCollapsablePanel container;
+    /**
+     * view is the view in the MVC pattern
+     */
+    private final JAttributeTable view;
     AttributeTree.TreeNode model;
 
     public AttributeTablePage(AttributeTree.TreeNode model) {
@@ -36,14 +41,15 @@ public class AttributeTablePage extends JPanel implements ValueListener {
 
         this.model = model;
 
-        collapsablePanel = new JCollapsablePanel(generateHeaderName(model.getFieldClass()), JCollapsablePanel.Style.HEADER, this);
-        attributeTable = new JAttributeTable(model, new MyStyler(model));
-        scrollPane = new JScrollPane(collapsablePanel);
-        scrollPane.setHorizontalScrollBarPolicy(HORIZONTAL_SCROLLBAR_NEVER);
-        model.addChangeListener(this);
+        container = new JCollapsablePanel(
+                generateHeaderName(model.getFieldClass()),
+                JCollapsablePanel.Style.HEADER
+        );
+        view = new JAttributeTable(model, new TableStyler(model));
+        container.add(view);
 
-        collapsablePanel.add(attributeTable);
-        this.add(scrollPane);
+        this.add(container);
+        model.addChangeListener(this);
     }
 
 
@@ -59,46 +65,75 @@ public class AttributeTablePage extends JPanel implements ValueListener {
 
     @Override
     public void modelChanged(Object obj) {
-        scrollPane.revalidate();
-        scrollPane.repaint();
-        collapsablePanel.revalidate();
-        collapsablePanel.repaint();
+        container.revalidate();
+        container.repaint();
     }
 
     public AttributeTree.TreeNode getModel() {
         return model;
     }
 
-    public static class MyStyler extends JAttributeTable.Styler {
+
+    /**
+     * TableStyler is an implementation of a JAttributeTable to display every
+     * field in the model in a  | name | editor | structure.
+     *                          ----------------
+     *                          | name | editor |
+     */
+    public static class TableStyler extends JAttributeTable.Styler {
         private final AttributeTree.TreeNode model;
 
-        public MyStyler(AttributeTree.TreeNode model) {
+        public TableStyler(AttributeTree.TreeNode model) {
             this.model = model;
         }
 
         @Override
         public JTable rowDelegateStyle(String id, AttributeEditor editor) {
             JTable style = new JTable();
-            DefaultTableModel tableModel = new DefaultTableModel(new Object[]{"id", "attr"}, 1);
+
+            /** custom table model wich disallows the editing of the name column **/
+            DefaultTableModel tableModel = new DefaultTableModel(new Object[]{"id", "attr"}, 1){
+                @Override
+                public boolean isCellEditable(int row, int column) {
+                    return column != 0;
+                }
+            };
+
+            /** JAttributeTable does not use fields this field. The field is only used for the
+             *  AttributeHelpView so that we are aware of the field that correspons to the cell
+             *  clicked on **/
             tableModel.setValueAt(model.get(id).getField(), 0, 0);
+
+            /** some styling */
             style.setModel(tableModel);
             style.setRowHeight(28);
             style.setIntercellSpacing(new Dimension(0, 4));
             style.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             style.setBackground(UIManager.getColor("Panel.background"));
-            style.getColumn("id").setCellRenderer(new FieldNameRenderer(id));
-            style.getColumn("attr").setCellRenderer(new FieldValueRenderer(style, editor));
-            style.getColumn("attr").setCellEditor(new FieldValueEditor(editor));
+
+            /** initialization of the cell delegates **/
+            var idDelegate = new CellNameDelegateWrapper(id);
+            var attrEdlegate = new CellValueDelegateWarpper(editor);
+
+            style.getColumn("id").setCellRenderer(idDelegate);
+            style.getColumn("id").setCellRenderer(idDelegate);
+            style.getColumn("attr").setCellRenderer(attrEdlegate);
+            style.getColumn("attr").setCellEditor(attrEdlegate);
+            style.setEditingColumn(1);
+
+            /** initialize the listener to update the AttributeHelpView**/
             style.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    SwingUtilities.invokeLater(() ->
-                            AttributeHelpView.getInstance().loadHelpFromField(
-                                    (Field) style.getModel().getValueAt(style.rowAtPoint(e.getPoint()), 0)
-                            )
-                    );
+                    SwingUtilities.invokeLater(() -> {
+                        var field = (Field) style.getModel().getValueAt(style.rowAtPoint(e.getPoint()), 0);
+                        if(field!=null)
+                            AttributeHelpView.getInstance().loadHelpFromField(field);
+                    });
                 }
             });
+
+            /** this section is supposed enable the resizing of the editor cells**/
             style.addComponentListener(new ComponentAdapter() {
                 @Override
                 public void componentResized(ComponentEvent e) {
@@ -106,7 +141,8 @@ public class AttributeTablePage extends JPanel implements ValueListener {
                     editor.setSize(style.getWidth() / 2, style.getRowHeight());
                 }
             });
-            style.setEditingColumn(1);
+
+
             return style;
         }
     }

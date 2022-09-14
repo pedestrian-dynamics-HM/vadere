@@ -40,7 +40,7 @@ public class LinearInterpolationDistribution extends VDistribution<AttributesLin
 		}
 	}
 	@Override
-	public double getNextSpawnTime(double timeCurrentEvent) {
+	public double getNextSample(double timeCurrentEvent) {
 		var attribs = (AttributesLinearInterpolationDistribution)getAttributes();
 		return timeCurrentEvent + attribs.getSpawnFrequency();
 	}

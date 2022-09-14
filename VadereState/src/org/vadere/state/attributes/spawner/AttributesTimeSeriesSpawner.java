@@ -1,26 +1,26 @@
 package org.vadere.state.attributes.spawner;
 
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonView;
+import org.vadere.state.attributes.distributions.AttributesDistribution;
+import org.vadere.state.attributes.distributions.AttributesTimeSeriesDistribution;
+import org.vadere.state.util.Views;
 
 public class AttributesTimeSeriesSpawner extends AttributesSpawner {
 
-    Double intervalLength;
-
-    List<Integer> spawnsPerInterval;
-
-    public Double getIntervalLength() {
-        return intervalLength;
+    @JsonView(Views.CacheViewExclude.class)
+    protected AttributesTimeSeriesDistribution distribution = new AttributesTimeSeriesDistribution();
+    public AttributesTimeSeriesSpawner(){
+        super(new AttributesTimeSeriesDistribution());
     }
 
-    public void setIntervalLength(Double intervalLength) {
-        this.intervalLength = intervalLength;
+    @Override
+    public AttributesDistribution getDistributionAttributes() {
+        return distribution;
     }
 
-    public List<Integer> getSpawnsPerInterval() {
-        return spawnsPerInterval;
-    }
-
-    public void setSpawnsPerInterval(List<Integer> spawnsPerInterval) {
-        this.spawnsPerInterval = spawnsPerInterval;
+    @Override
+    public void setDistributionAttributes(AttributesDistribution distribution) {
+        checkSealed();
+        this.distribution = (AttributesTimeSeriesDistribution) distribution;
     }
 }

@@ -25,7 +25,6 @@ public class JCollapsablePanel extends JPanel implements Observer {
     private final JLabel head;
     private GridBagConstraints gbc;
 
-    private final JComponent mouseBubbler;
 
     /**
      * hidden is storing the visibility state of the contentPanel container
@@ -38,12 +37,12 @@ public class JCollapsablePanel extends JPanel implements Observer {
 
     private final Observable observable;
 
-    public JCollapsablePanel(String title, Style panelStyle, JComponent mouseBubbler) {
+    public JCollapsablePanel(String title, Style panelStyle) {
         super(new GridBagLayout());
         this.observable = new Observable();
         contentPanel = new JPanel(new GridBagLayout());
         head = new JLabel(title);
-        this.mouseBubbler = mouseBubbler;
+
 
         initializeGridBagConstraint();
 
@@ -127,10 +126,7 @@ public class JCollapsablePanel extends JPanel implements Observer {
                 contentPanel.setVisible(false);
                 hidden = true;
             }
-            revalidate();
-            repaint();
-            mouseBubbler.revalidate();
-            mouseBubbler.repaint();
+            getParent().invalidate();
         }
     }
 
@@ -163,8 +159,7 @@ public class JCollapsablePanel extends JPanel implements Observer {
             }
             revalidate();
             repaint();
-            mouseBubbler.revalidate();
-            mouseBubbler.repaint();
+            getParent().validate();
         }
     }
 }

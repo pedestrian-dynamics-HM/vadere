@@ -15,6 +15,6 @@ public abstract class VDistribution<T extends AttributesDistribution> extends At
     public VDistribution() {}
     abstract protected void setValues(T parameter,RandomGenerator randomGenerator) throws Exception;
 
-	abstract public double getNextSpawnTime(double timeCurrentEvent);
+	abstract public double getNextSample(double timeCurrentEvent);
 
 }

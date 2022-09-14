@@ -4,6 +4,7 @@ import org.vadere.state.attributes.spawner.AttributesMixedSpawner;
 import org.vadere.state.scenario.spawner.VSpawner;
 
 import java.util.List;
+import java.util.Random;
 
 public class MixedSpawner extends VSpawner<AttributesMixedSpawner> {
 
@@ -12,6 +13,9 @@ public class MixedSpawner extends VSpawner<AttributesMixedSpawner> {
 
     private int currentInterval = 0;
 
+    public MixedSpawner(AttributesMixedSpawner attributesMixedSpawner, Random random){
+        super(attributesMixedSpawner,random);
+    }
     @Override
     public int getEventElementCount(double timeCurrentEvent) {
         return getSpawnerByTime(timeCurrentEvent).getEventElementCount(timeCurrentEvent);
@@ -27,10 +31,6 @@ public class MixedSpawner extends VSpawner<AttributesMixedSpawner> {
         spawners.get(currentInterval).setRemainingSpawnAgents(remainingAgents);
     }
 
-    @Override
-    public void update(double simTimeInSec) {
-
-    }
 
     @Override
     protected boolean isQueueEmpty() {

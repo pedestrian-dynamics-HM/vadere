@@ -8,7 +8,7 @@ import org.vadere.util.reflection.VadereAttribute;
 
 public class AttributesConstantDistribution extends AttributesDistribution {
 	@VadereAttribute
-	Double updateFrequency;
+	Double updateFrequency = 0.0;
 
 	public AttributesConstantDistribution(){
 		this(0.0);

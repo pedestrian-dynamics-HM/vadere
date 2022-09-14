@@ -13,11 +13,12 @@ import org.vadere.state.scenario.distribution.registry.RegisterDistribution;
 public class BinomialDistribution extends VDistribution<AttributesBinomialDistribution> {
 	private Attributes binomialAttributes;
 	private org.apache.commons.math3.distribution.BinomialDistribution distribution;
+
 	public BinomialDistribution(){
-		// Do not remove this constructor. It is us used through reflection.
 		super();
 		this.binomialAttributes = new AttributesBinomialDistribution();
 	}
+
 	public BinomialDistribution(AttributesBinomialDistribution parameter,RandomGenerator randomGenerator)
 			throws Exception {
 		super(parameter,randomGenerator);
@@ -29,7 +30,7 @@ public class BinomialDistribution extends VDistribution<AttributesBinomialDistri
 		this.binomialAttributes = parameter;
 	}
 	@Override
-	public double getNextSpawnTime(double timeCurrentEvent) {
+	public double getNextSample(double timeCurrentEvent) {
 		return timeCurrentEvent + distribution.sample();
 	}
 

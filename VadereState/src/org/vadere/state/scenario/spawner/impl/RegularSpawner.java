@@ -1,21 +1,17 @@
 package org.vadere.state.scenario.spawner.impl;
 
 import org.vadere.state.attributes.spawner.AttributesRegularSpawner;
-import org.vadere.state.scenario.distribution.VDistribution;
 import org.vadere.state.scenario.spawner.VSpawner;
+
+import java.util.Random;
 
 public class RegularSpawner extends VSpawner<AttributesRegularSpawner> {
 
     private int remainingSpawnAgents;
     private int spawnNumber;
 
-    protected VDistribution distribution;
-
-    public RegularSpawner(){
-        super(new AttributesRegularSpawner());
-    }
-    public RegularSpawner(AttributesRegularSpawner attributes) {
-        super(attributes);
+    public RegularSpawner(AttributesRegularSpawner attributes, Random random) {
+        super(attributes,random);
     }
 
     @Override
@@ -38,7 +34,4 @@ public class RegularSpawner extends VSpawner<AttributesRegularSpawner> {
         return false;
     }
 
-    @Override
-    public void update(double simTimeInSec) {
-    }
 }

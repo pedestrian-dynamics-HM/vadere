@@ -1,29 +1,25 @@
 package org.vadere.state.attributes.spawner;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import org.vadere.state.attributes.distributions.AttributesDistribution;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.vadere.state.attributes.distributions.AttributesMixedDistribution;
+import org.vadere.state.util.Views;
 
 public class AttributesMixedSpawner extends AttributesSpawner {
-
-    private List<Double> switchpoints;
-    private List<AttributesDistribution> distributions;
-
-    public List<Double> getSwitchpoints() {
-        return switchpoints;
+    @JsonView(Views.CacheViewExclude.class)
+    protected AttributesMixedDistribution distribution = new AttributesMixedDistribution();
+    public AttributesMixedSpawner(){
+        super(new AttributesMixedDistribution());
     }
 
-    public void setSwitchpoints(List<Double> switchpoints) {
-        this.switchpoints = switchpoints;
+    @Override
+    public AttributesDistribution getDistributionAttributes() {
+        return distribution;
     }
 
-    public List<AttributesDistribution> getDistributions() {
-        return distributions;
+    @Override
+    public void setDistributionAttributes(AttributesDistribution distribution) {
+        checkSealed();
+        this.distribution = (AttributesMixedDistribution) distribution;
     }
-
-    public void setDistributions(ArrayList<AttributesDistribution> distributions) {
-        this.distributions = distributions;
-    }
-
 }

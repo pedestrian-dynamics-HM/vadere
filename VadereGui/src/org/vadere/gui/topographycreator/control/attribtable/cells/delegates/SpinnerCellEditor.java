@@ -9,14 +9,16 @@ import javax.swing.text.NumberFormatter;
 public class SpinnerCellEditor extends AttributeEditor {
     private JSpinner spinner;
 
-    public SpinnerCellEditor(AttributeTree.TreeNode model, JPanel contentPanel) {
-        super(model, contentPanel);
+    public SpinnerCellEditor(AttributeTree.TreeNode model, JPanel contentPanel,Object initialValue) {
+        super(model, contentPanel,initialValue);
     }
 
     @Override
-    protected void initialize() {
+    protected void initialize(Object initialValue) {
         this.spinner = new JSpinner();
         initializeSpinnerModel();
+        if(initialValue!=null)
+            this.spinner.setValue(initialValue);
         initializeSpinnerValue();
         initializeSpinnerListener();
         this.add(spinner);
