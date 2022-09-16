@@ -528,9 +528,11 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		buildOutputTable(outputTableRenderer);
 
 		JSplitPane splitPane = new JSplitPane();
-		splitPane.setResizeWeight(0.6);
+		JPanel panelContainer = new JPanel(new BorderLayout());
+		panelContainer.add(splitPane);
+		splitPane.setResizeWeight(0.7);
 		splitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
-		panel_1.add(splitPane, BorderLayout.WEST);
+		panel_1.add(splitPane, BorderLayout.CENTER);
 
 		JScrollPane scrollPanel = new JScrollPane(scenarioTable);
 		splitPane.setLeftComponent(scrollPanel);
@@ -552,13 +554,13 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 				}
 			}
 		});
-		mainSplitPanel.setResizeWeight(0.4);
+		mainSplitPanel.setResizeWeight(0.2);
 		mainSplitPanel.setOrientation(JSplitPane.HORIZONTAL_SPLIT);
 		JScrollPane panel_1_scroll = new JScrollPane(panel_1);
 		panel_1_scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
 		panel_1.setMinimumSize(new Dimension(1, 1));
 		panel_2.setMinimumSize(new Dimension(1, 1));
-		mainSplitPanel.setLeftComponent(panel_1_scroll);
+		mainSplitPanel.setLeftComponent(panel_1);
 		mainSplitPanel.setRightComponent(panel_2);
 		mainSplitPanel.resetToPreferredSizes();
 		contentPane.add(mainSplitPanel, BorderLayout.CENTER);
