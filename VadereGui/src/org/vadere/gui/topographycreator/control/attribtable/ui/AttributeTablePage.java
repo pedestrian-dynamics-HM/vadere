@@ -9,6 +9,7 @@ import org.vadere.gui.topographycreator.control.attribtable.cells.CellNameDelega
 import org.vadere.gui.topographycreator.control.attribtable.cells.CellValueDelegateWarpper;
 import org.vadere.gui.topographycreator.control.attribtable.cells.delegates.AttributeEditor;
 import org.vadere.gui.topographycreator.control.attribtable.tree.AttributeTree;
+import org.vadere.gui.topographycreator.control.attribtable.tree.ObjectNode;
 import org.vadere.gui.topographycreator.control.attribtable.tree.TreeException;
 
 import javax.swing.*;
@@ -35,14 +36,14 @@ public class AttributeTablePage extends JPanel implements ValueListener {
     private final JAttributeTable view;
     AttributeTree.TreeNode model;
 
-    public AttributeTablePage(AttributeTree.TreeNode model) {
+    public AttributeTablePage(ObjectNode model) {
         super(new BorderLayout());
         this.setBackground(Color.white);
 
         this.model = model;
 
         container = new JCollapsablePanel(
-                generateHeaderName(model.getFieldClass()),
+                generateHeaderName(model.getFieldType()),
                 JCollapsablePanel.Style.HEADER
         );
         view = new JAttributeTable(model, new TableStyler(model));

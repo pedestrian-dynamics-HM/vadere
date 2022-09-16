@@ -2,6 +2,7 @@ package org.vadere.gui.topographycreator.control.attribtable.cells.delegates;
 
 import org.vadere.gui.topographycreator.control.attribtable.Revalidatable;
 import org.vadere.gui.topographycreator.control.attribtable.tree.AttributeTree;
+import org.vadere.gui.topographycreator.control.attribtable.tree.ObjectNode;
 import org.vadere.gui.topographycreator.control.attribtable.ui.AttributeTablePage;
 import org.vadere.gui.topographycreator.control.attribtable.ui.AttributeTableView;
 
@@ -30,7 +31,7 @@ public class ChildObjectCellEditor extends AttributeEditor implements Revalidata
         this.contentPanel.setLayout(new BorderLayout());
         this.contentPanel.setBorder(new EmptyBorder(2, 2, 2, 2));
         this.contentPanel.setVisible(contentPaneVisible);
-        this.clazz = model.getFieldClass();
+        this.clazz = model.getFieldType();
         this.button = new JButton(AttributeTablePage.generateHeaderName(clazz));
         this.add(button);
         /*try {
@@ -85,8 +86,7 @@ public class ChildObjectCellEditor extends AttributeEditor implements Revalidata
     @Override
     public void revalidateObjectStructure(Object object) {
         try {
-            model.setReference(object);
-            model.getParent().updateParentsFieldValue(model.getFieldName(), object);
+            ((ObjectNode) model).getValueNode().setValue(object);
         } catch (NoSuchFieldException e) {
             throw new RuntimeException(e);
         } catch (IllegalAccessException e) {

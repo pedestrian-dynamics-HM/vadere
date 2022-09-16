@@ -38,7 +38,7 @@ public class JAttributeTable extends JPanel implements ValueListener, StructureL
             this.renderOrderModel.clear();
             var children = model.getChildren();
             for (var key : children.keySet()) {
-                var clazz = children.get(key).getSecond().getFieldClass();
+                var clazz = children.get(key).getSecond().getFieldType();
                 var subModel = children.get(key).getSecond();
 
                 var subPanel = new JPanel(new GridBagLayout());

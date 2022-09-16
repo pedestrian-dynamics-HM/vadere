@@ -27,13 +27,14 @@ public class AttributeTree {
         this.revalidatable = revalidatable;
     }
 
-    public static TreeNode parseClassTree(TreeNode parent, String fieldName, Class baseClass) {
-        Field[] fields = getSuperDeclaredFields(baseClass);
+    public static TreeNode parseClassTree(TreeNode parent, String fieldName, Object object) {
+        Field[] fields = getSuperDeclaredFields(object.getClass());
 
-        TreeNode root = new ObjectNode(parent, fieldName, baseClass);
+        TreeNode root = new ObjectNode(parent, null);
 
         for (var field : fields) {
-            Class type = field.getType();
+            var type = field.getType();
+
             String name = field.getName();
             switch (TYPE_OF(type)) {
                 case REGISTERED:
@@ -43,35 +44,18 @@ public class AttributeTree {
                     root.children.put(name, new Pair<>(field, new ArrayNode(root, field)));
                     break;
                 case ABSTRACT:
-                    root.children.put(name, new Pair<>(field, new FieldNode(root, field)));
+                    root.children.put(name, new Pair<>(field, new AbstrNode(root, field)));
                     break;
+                case ABSTRACT_CHILD: {
+                    root.children.put(name, new Pair<>(field, new AbstrNode(root, field, true)));
+                    break;
+                }
                 default:
-                    root.children.put(name, new Pair<>(field, parseClassTree(root, name, type)));
+                    root.children.put(name, new Pair<>(field, parseClassTree(root, name, type.getGenericSuperclass().getClass())));
             }
         }
 
         return root;
-    }
-
-    public static TreeNode parseClassTree2(TreeNode parent, Field field) {
-        var fieldName = field.getName();
-        var type = field.getType();
-        TreeNode newNode = null;
-        switch (TYPE_OF(type)) {
-            case REGISTERED:
-                newNode = new FieldNode(parent, field);
-                break;
-            case ARRAY:
-                newNode = new ArrayNode(parent, field);
-                break;
-            case ABSTRACT:
-                newNode = new AbstrNode(parent, fieldName, type);
-                break;
-            default:
-                newNode = parseClassTree(parent, fieldName, type);
-        }
-        parent.children.put(fieldName, new Pair<>(field, newNode));
-        return parent;
     }
 
     private static TYPE TYPE_OF(Class clazz) {
@@ -83,6 +67,12 @@ public class AttributeTree {
         }
         if (Modifier.isAbstract(clazz.getModifiers())) {
             return TYPE.ABSTRACT;
+        }
+        var superClass = clazz.getSuperclass();
+        if (superClass != null) {
+            if (Modifier.isAbstract(superClass.getModifiers())) {
+                return TYPE.ABSTRACT_CHILD;
+            }
         }
         return TYPE.OBJECT;
     }
@@ -100,27 +90,25 @@ public class AttributeTree {
     }
 
     public void updateModel(Object obj) throws TreeException, IllegalAccessException {
-        if (obj.getClass() != rootNode.getFieldClass())
+        if (obj.getClass() != rootNode.getFieldType())
             throw new TreeException();
         rootNode.updateValues(obj);
 
     }
 
     private enum TYPE {
-        REGISTERED, ARRAY, ABSTRACT, OBJECT
+        REGISTERED, ARRAY, ABSTRACT, ABSTRACT_CHILD, OBJECT
     }
 
     public static abstract class TreeNode {
+        private final String fieldName;
+        private final Class fieldType;
         private TreeNode parent;
         private final LinkedHashMap<String, Pair<Field, TreeNode>> children;
         /**
          * the type which a node represents
          */
-        private final Class clazz;
-        /**
-         * the name of the field a node represents
-         */
-        private final String name;
+        private final Field field;
         private final ArrayList<ValueListener> valueListeners;
         private final ArrayList<StructureListener> structureListeners;
         /**
@@ -128,10 +116,25 @@ public class AttributeTree {
          */
         private Object reference;
 
-        public TreeNode(TreeNode parent, String fieldName, Class clazz) {
+        public TreeNode(TreeNode parent) {
+            this(parent, null);
+        }
+
+        public TreeNode(TreeNode parent, Field field) {
             this.children = new LinkedHashMap<>();
-            this.clazz = clazz;
-            this.name = fieldName;
+            this.field = field;
+            this.fieldType = field == null ? null : field.getType();
+            this.fieldName = field == null ? "" : field.getName();
+            this.parent = parent;
+            this.valueListeners = new ArrayList<>();
+            this.structureListeners = new ArrayList<>();
+        }
+
+        public TreeNode(TreeNode parent, String fieldName, Class fieldType) {
+            this.children = new LinkedHashMap<>();
+            this.field = null;
+            this.fieldName = fieldName;
+            this.fieldType = fieldType;
             this.parent = parent;
             this.valueListeners = new ArrayList<>();
             this.structureListeners = new ArrayList<>();
@@ -162,16 +165,16 @@ public class AttributeTree {
             return reference;
         }
 
-        public void setReference(Object reference) {
+        protected void setReference(Object reference) {
             this.reference = reference;
         }
 
-        public Class getFieldClass() {
-            return clazz;
+        public Class getFieldType() {
+            return fieldType;
         }
 
         public String getFieldName() {
-            return name;
+            return fieldName;
         }
 
 
@@ -183,7 +186,7 @@ public class AttributeTree {
          * Sends a structure update through the attribute tree. These updates are necessary for
          * abstract types to update their children. After a structure update the editors need to be recreated.
          *
-         * @param Object
+         * @param
          */
         public void updateStructure(Object object) throws IllegalAccessException {
         }
@@ -238,9 +241,12 @@ public class AttributeTree {
             return children.get(field).getSecond();
         }
 
+        public Field getField() {
+            return this.field;
+        }
+
         public abstract void updateParentsFieldValue(String field, Object object) throws NoSuchFieldException, IllegalAccessException;
 
-        public abstract Field getField();
     }
 }
 

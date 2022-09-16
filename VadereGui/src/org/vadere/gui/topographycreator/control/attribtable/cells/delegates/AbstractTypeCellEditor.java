@@ -133,7 +133,7 @@ public class AbstractTypeCellEditor extends AttributeEditor implements Revalidat
 
     private void initializeComboBox(){
         var reflections = new Reflections("org.vadere");
-        var subClassModel = new ArrayList(reflections.getSubTypesOf(model.getFieldClass()));
+        var subClassModel = new ArrayList(reflections.getSubTypesOf(model.getFieldType()));
 
         this.comboBox = new JComboBox<>();
         this.comboBox.setModel(initializeComboBoxModel(subClassModel));

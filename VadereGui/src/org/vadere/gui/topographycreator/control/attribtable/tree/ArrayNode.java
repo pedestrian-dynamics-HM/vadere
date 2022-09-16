@@ -12,13 +12,11 @@ public class ArrayNode extends AttributeTree.TreeNode {
 
     private final Class internalType;
 
-    private final Field field;
     private Constructor internalDefaultConstructor;
     private List dummy;
 
     public ArrayNode(AttributeTree.TreeNode parent, Field field) {
-        super(parent, field.getName(), field.getType());
-        this.field = field;
+        super(parent, field);
         internalType = (Class) (((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0]);
 
         try {
@@ -80,9 +78,9 @@ public class ArrayNode extends AttributeTree.TreeNode {
                 var value = array.get(i);
                 if (children.containsKey(key)) {
                     var node = ((FieldNode) ((Pair) children.get(key)).getSecond());
-                    node.setValueNode(new ValueNode(this, key, value.getClass(), value));
+                    node.setValueNode(new ValueNode(this, key, internalType, value));
                 } else {
-                    var newNode = new FieldNode(this, key, value.getClass(), new ValueNode(this, key, value.getClass(), value));
+                    var newNode = new FieldNode(this, key, internalType, new ValueNode(this, key, internalType, value));
                     children.put(key, new Pair(null, newNode));//new ValueNode(this, key, value.getClass(), value)
                 }
             }
@@ -103,11 +101,6 @@ public class ArrayNode extends AttributeTree.TreeNode {
         ((FieldNode)super.getChildren().get(fieldName).getSecond()).setValueNode(new ValueNode(getParent(),fieldName,internalType,object));
         array.set(idx, object);
         getParent().updateParentsFieldValue(getFieldName(), array);
-    }
-
-    @Override
-    public Field getField() {
-        return this.field;
     }
 
     public void addElement() throws InvocationTargetException, InstantiationException, IllegalAccessException {

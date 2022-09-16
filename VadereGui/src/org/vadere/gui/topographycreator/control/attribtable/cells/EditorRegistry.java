@@ -1,5 +1,6 @@
 package org.vadere.gui.topographycreator.control.attribtable.cells;
 
+import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.topographycreator.control.attribtable.cells.delegates.*;
 import org.vadere.gui.topographycreator.control.attribtable.tree.AttributeTree;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -56,17 +57,17 @@ public class EditorRegistry {
         }
     }
 
-    public AttributeEditor create(Class type, AttributeTree.TreeNode model, JPanel contentPanel,Object initialValue) {
+    public AttributeEditor create(@NotNull Class type, @NotNull AttributeTree.TreeNode model, @NotNull JPanel contentPanel, Object initialValue) {
         Constructor constructor;
         AttributeEditor component;
         try {
             if (!contains(type)) {
                 if (type.isEnum())
-                    constructor = ComboBoxCellEditor.class.getDeclaredConstructor(AttributeTree.TreeNode.class, JPanel.class,Object.class);
+                    constructor = ComboBoxCellEditor.class.getDeclaredConstructor(AttributeTree.TreeNode.class, JPanel.class, Object.class);
                 else if (type.isAssignableFrom(List.class)) {
-                    constructor = ListCellEditor.class.getDeclaredConstructor(AttributeTree.TreeNode.class, JPanel.class,Object.class);
+                    constructor = ListCellEditor.class.getDeclaredConstructor(AttributeTree.TreeNode.class, JPanel.class, Object.class);
                 } else if (Modifier.isAbstract(type.getModifiers()))
-                    constructor = AbstractTypeCellEditor.class.getDeclaredConstructor(AttributeTree.TreeNode.class, JPanel.class,Object.class);
+                    constructor = AbstractTypeCellEditor.class.getDeclaredConstructor(AttributeTree.TreeNode.class, JPanel.class, Object.class);
                 else
                     constructor = ChildObjectCellEditor.class.getDeclaredConstructor(AttributeTree.TreeNode.class, JPanel.class,Object.class);
             } else {

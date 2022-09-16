@@ -10,11 +10,12 @@ public class FieldNode extends AttributeTree.TreeNode {
     private Field field;
 
     public FieldNode(AttributeTree.TreeNode parent, Field field) {
-        super(parent, field.getName(), field.getType());
+        super(parent, field);
         this.node = new ValueNode(getParent(), field.getName(), field.getType(), null);
         this.field = field;
     }
 
+    //This constructor is used for ArrayNodes to construct custom named FieldNodes e.g "0","1",...
     public FieldNode(AttributeTree.TreeNode parent, String fieldName, Class fieldType, ValueNode node) {
         super(parent, fieldName, fieldType);
         this.node = node;
@@ -33,11 +34,12 @@ public class FieldNode extends AttributeTree.TreeNode {
 
     @Override
     public void updateParentsFieldValue(String fieldName, Object object) throws NoSuchFieldException, IllegalAccessException {
-        getFieldClass().getDeclaredField(fieldName).set(getReference(), object);
+        // should it be called ?
+        getFieldType().getDeclaredField(fieldName).set(getReference(), object);
         getParent().updateParentsFieldValue(getFieldName(), getReference());
+        throw new UnsupportedOperationException();
     }
 
-    @Override
     public Field getField() {
         return this.field;
     }

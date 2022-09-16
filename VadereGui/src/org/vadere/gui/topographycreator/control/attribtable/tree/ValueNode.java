@@ -1,12 +1,10 @@
 package org.vadere.gui.topographycreator.control.attribtable.tree;
 
-import java.lang.reflect.Field;
-
 public class ValueNode extends AttributeTree.TreeNode {
 
 
-    public ValueNode(AttributeTree.TreeNode parent, String fieldName, Class clazz, Object value) {
-        super(parent, fieldName, clazz);
+    public ValueNode(AttributeTree.TreeNode parent, String fieldName, Class fieldType, Object value) {
+        super(parent, fieldName, fieldType);
         setReference(value);
     }
 
@@ -41,10 +39,5 @@ public class ValueNode extends AttributeTree.TreeNode {
     @Override
     public void updateParentsFieldValue(String field, Object object) throws NoSuchFieldException, IllegalAccessException {
         getParent().updateParentsFieldValue(getFieldName(), object);
-    }
-
-    @Override
-    public Field getField() {
-        return null;
     }
 }

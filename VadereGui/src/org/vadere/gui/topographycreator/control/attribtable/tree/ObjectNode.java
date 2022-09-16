@@ -3,9 +3,11 @@ package org.vadere.gui.topographycreator.control.attribtable.tree;
 import java.lang.reflect.Field;
 
 public class ObjectNode extends AttributeTree.TreeNode {
+    private final ValueNode node;
 
-    public ObjectNode(AttributeTree.TreeNode parent, String fieldName, Class clazz) {
-        super(parent, fieldName, clazz);
+    public ObjectNode(AttributeTree.TreeNode parent, Field field) {
+        super(parent, field);
+        this.node = new ValueNode(parent, field == null ? "" : field.getName(), field == null ? null : field.getType(), null);
     }
 
 
@@ -18,8 +20,8 @@ public class ObjectNode extends AttributeTree.TreeNode {
         getParent().updateParentsFieldValue(getFieldName(), getReference());
     }
 
-    @Override
-    public Field getField() {
-        return null;
+    public ValueNode getValueNode() {
+        return this.node;
     }
+
 }
