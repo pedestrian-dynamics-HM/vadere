@@ -551,8 +551,6 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		});
 		mainSplitPanel.setResizeWeight(0.2);
 		mainSplitPanel.setOrientation(JSplitPane.HORIZONTAL_SPLIT);
-		JScrollPane panel_1_scroll = new JScrollPane(panel_1);
-		panel_1_scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
 		panel_1.setMinimumSize(new Dimension(1, 1));
 		panel_2.setMinimumSize(new Dimension(1, 1));
 		mainSplitPanel.setLeftComponent(panel_1);
