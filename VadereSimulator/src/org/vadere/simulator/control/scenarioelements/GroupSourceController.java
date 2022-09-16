@@ -48,7 +48,7 @@ public class GroupSourceController extends SourceController {
 
 	@Override
 	public void update(double simTimeInSec) {
-		if (!isSourceFinished(simTimeInSec)) {
+		if (!spawner.isFinished(simTimeInSec, () -> isQueueEmpty())) {
 			if (simTimeInSec >= timeOfNextEvent || !groupsToSpawn.isEmpty()) {
 				determineNumberOfSpawnsAndNextEvent(simTimeInSec);
 
@@ -212,9 +212,9 @@ public class GroupSourceController extends SourceController {
 	}
 
 	private void addElementToScenario(List<VPoint> group, double simTimeInSec) {
-		if (!group.isEmpty() && !isMaximumNumberOfSpawnedElementsReached()) {
+		if (!group.isEmpty() && !spawner.isMaximumNumberOfSpawnedElementsReached()) {
 			addNewAgentToScenario(group, simTimeInSec);
-			dynamicElementsCreatedTotal += group.size();
+			spawner.incrementElementsCreatedTotal(group.size());
 		}
 	}
 

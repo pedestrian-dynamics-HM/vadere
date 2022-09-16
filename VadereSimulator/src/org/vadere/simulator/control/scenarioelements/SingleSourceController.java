@@ -44,7 +44,7 @@ public class SingleSourceController extends SourceController {
 
 	@Override
 	public void update(double simTimeInSec) {
-		if (!this.spawner.isSpawnerFinished(simTimeInSec)) {
+		if (!this.spawner.isFinished(simTimeInSec, () -> isQueueEmpty())) {
 			determineNumberOfSpawnsAndNextEvent(simTimeInSec);
 
 			if (numberToSpawn > 0) {
@@ -52,7 +52,7 @@ public class SingleSourceController extends SourceController {
 
 				if (spawnerAttributes.isEventPositionRandom()) {
 
-					if(!spawnerAttributes.isEventPositionGridCA()) {
+					if (!spawnerAttributes.isEventPositionGridCA()) {
 
 						spawnPoints = getRealRandomPositions(
 								numberToSpawn,
@@ -105,7 +105,7 @@ public class SingleSourceController extends SourceController {
 				for (VPoint spawnPoint : spawnPoints) {
 					if (!spawner.isMaximumNumberOfSpawnedElementsReached()) {
 						addNewAgentToScenario(spawnPoint, simTimeInSec);
-						dynamicElementsCreatedTotal++;
+						spawner.incrementElementsCreatedTotal(1);
 					}
 				}
 			}

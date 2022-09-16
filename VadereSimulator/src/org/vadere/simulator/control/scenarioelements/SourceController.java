@@ -1,6 +1,5 @@
 package org.vadere.simulator.control.scenarioelements;
 
-import org.apache.commons.math3.random.JDKRandomGenerator;
 import org.vadere.simulator.control.scenarioelements.listener.ControllerEventListener;
 import org.vadere.simulator.control.scenarioelements.listener.ControllerEventProvider;
 import org.vadere.simulator.models.DynamicElementFactory;
@@ -9,8 +8,6 @@ import org.vadere.state.attributes.scenario.AttributesDynamicElement;
 import org.vadere.state.attributes.scenario.AttributesSource;
 import org.vadere.state.attributes.spawner.AttributesSpawner;
 import org.vadere.state.scenario.*;
-import org.vadere.state.scenario.distribution.DistributionFactory;
-import org.vadere.state.scenario.distribution.VDistribution;
 import org.vadere.state.scenario.distribution.impl.MixedDistribution;
 import org.vadere.state.scenario.spawner.VSpawner;
 import org.vadere.util.geometry.LinkedCellsGrid;
@@ -45,9 +42,7 @@ public abstract class SourceController extends ScenarioElementController impleme
 	 * <code>null</code>, if there is no next event.
 	 */
 	protected Double timeOfNextEvent;
-	protected VDistribution distribution;
     protected VSpawner spawner;
-	protected int dynamicElementsCreatedTotal;
 
     public SourceController(Topography scenario, Source source,
                             DynamicElementFactory dynamicElementFactory,
@@ -64,15 +59,7 @@ public abstract class SourceController extends ScenarioElementController impleme
         this.spawnerAttributes = sourceAttributes.getSpawnerAttributes();
         this.eventListener = new ArrayList<>();
         timeOfNextEvent = spawnerAttributes.getConstraintsTimeStart();
-        try {
-            distribution = DistributionFactory.create(
-                    spawnerAttributes.getDistributionAttributes(), new JDKRandomGenerator(random.nextInt())
-            );
-            spawner = SpawnerFactory.create(spawnerAttributes,random);
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Problem with scenario parameters for source: "
-                    + "interSpawnTimeDistribution and/or distributionParameters. See causing Excepion herefafter.", e);
-        }
+        spawner = SpawnerFactory.create(spawnerAttributes, random);
 
     }
 
@@ -91,29 +78,6 @@ public abstract class SourceController extends ScenarioElementController impleme
 
     abstract public void update(double simTimeInSec);
 
-    public boolean isSourceFinished(double simTimeInSec) {
-        if (isMaximumNumberOfSpawnedElementsReached()) {
-            return true;
-        }
-        if (isSourceWithOneSingleSpawnEvent()) {
-            return dynamicElementsCreatedTotal == spawner.getEventElementCount(simTimeInSec);
-        }
-        return isAfterSourceEndTime(simTimeInSec) && isQueueEmpty();
-    }
-
-    protected boolean isSourceWithOneSingleSpawnEvent() {
-        return spawnerAttributes.getConstraintsTimeStart() == spawnerAttributes.getConstraintsTimeEnd();
-    }
-
-    protected boolean isAfterSourceEndTime(double simTimeInSec) {
-        return simTimeInSec > spawnerAttributes.getConstraintsTimeEnd();
-    }
-
-    protected boolean isMaximumNumberOfSpawnedElementsReached() {
-        final int maxNumber = spawnerAttributes.getConstraintsElementsMax();
-        return maxNumber != AttributesSpawner.NO_MAX_SPAWN_NUMBER_TOTAL
-                && dynamicElementsCreatedTotal >= maxNumber;
-    }
 
     protected boolean testFreeSpace(final VShape freeSpace, final List<VShape> blockPedestrianShapes) {
         VShape freeSpaceCA = new VCircle(((VCircle) freeSpace).getCenter(), ((VCircle) freeSpace).getRadius() - BUFFER_CA);
@@ -135,7 +99,7 @@ public abstract class SourceController extends ScenarioElementController impleme
     }
 
     protected void createNextEvent() {
-        if (isSourceWithOneSingleSpawnEvent()) {
+        if (spawner.isSpawnerWithOneSingleSpawnEvent()) {
             timeOfNextEvent = NO_EVENT;
             return;
         }
@@ -145,6 +109,7 @@ public abstract class SourceController extends ScenarioElementController impleme
 
         if (newTimeOfNextEvent < timeOfNextEvent) { //TODO mit Herr Lehmberg reden wg. < vs <=
             String distributionName;
+            var distribution = spawner.getDistribution();
             if (distribution instanceof MixedDistribution) {
                 distributionName = ((MixedDistribution) distribution).
                         getCurrentDistribution().getClass().getSimpleName();
@@ -158,7 +123,7 @@ public abstract class SourceController extends ScenarioElementController impleme
             timeOfNextEvent = newTimeOfNextEvent;
         }
 
-        if (isAfterSourceEndTime(timeOfNextEvent)) {
+        if (spawner.isAfterSpawnerEndTime(timeOfNextEvent)) {
             timeOfNextEvent = NO_EVENT;
         }
 
@@ -220,14 +185,20 @@ public abstract class SourceController extends ScenarioElementController impleme
 
 	@Override
 	public void unregister(ControllerEventListener<Agent, SourceController> listener) {
-		eventListener.remove(listener);
-	}
+        eventListener.remove(listener);
+    }
 
-	protected void notifyListeners(double simTimeInSec, Agent pedestrian){
-		for (var listener: eventListener){
-			listener.notify(this, simTimeInSec, pedestrian);
-		}
-	}
+    protected void notifyListeners(double simTimeInSec, Agent pedestrian) {
+        for (var listener : eventListener) {
+            listener.notify(this, simTimeInSec, pedestrian);
+        }
+    }
 
-	public int getSourceId() { return source.getId(); }
+    public int getSourceId() {
+        return source.getId();
+    }
+
+    public boolean isSourceFinished(double simTimeInSec) {
+        return spawner.isFinished(simTimeInSec, () -> isQueueEmpty());
+    }
 }

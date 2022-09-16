@@ -13,6 +13,7 @@ import org.vadere.state.scenario.spawner.impl.RegularSpawner;
 import org.vadere.state.scenario.spawner.impl.TimeSeriesSpawner;
 
 import java.util.Random;
+import java.util.function.Supplier;
 
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
@@ -44,14 +45,14 @@ public abstract class VSpawner<T extends AttributesSpawner>  extends AttributesA
 
     public abstract void setRemainingSpawnAgents(int remainingAgents);
 
-    public boolean isSpawnerFinished(double simTimeInSec) {
+    public boolean isFinished(double simTimeInSec, Supplier<Boolean> isQueueEmpty) {
         if (isMaximumNumberOfSpawnedElementsReached()) {
             return true;
         }
         if (isSpawnerWithOneSingleSpawnEvent()) {
             return dynamicElementsCreatedTotal == getEventElementCount(simTimeInSec);
         }
-        return isAfterSpawnerEndTime(simTimeInSec) && isQueueEmpty();
+        return isAfterSpawnerEndTime(simTimeInSec) && isQueueEmpty.get();
     }
 
     public boolean isMaximumNumberOfSpawnedElementsReached() {
@@ -60,23 +61,39 @@ public abstract class VSpawner<T extends AttributesSpawner>  extends AttributesA
                 && dynamicElementsCreatedTotal >= maxNumber;
     }
 
-    protected boolean isAfterSpawnerEndTime(double simTimeInSec) {
-        return simTimeInSec > attributes.getConstraintsTimeStart();
+    public boolean isAfterSpawnerEndTime(double simTimeInSec) {
+        return simTimeInSec > attributes.getConstraintsTimeEnd();
     }
 
-    protected boolean isSpawnerWithOneSingleSpawnEvent() {
+    public boolean isSpawnerWithOneSingleSpawnEvent() {
         return attributes.getConstraintsTimeEnd() == attributes.getConstraintsTimeStart();
     }
 
     abstract protected boolean isQueueEmpty();
-    @Override
-    public T getAttributes(){return attributes;}
 
     @Override
-    public void setAttributes(T attributes){this.attributes = attributes;}
-
-    public double getNextSpawnTime(double timeCurrentEvent){
-       return distribution.getNextSample(timeCurrentEvent);
+    public T getAttributes() {
+        return attributes;
     }
 
+    @Override
+    public void setAttributes(T attributes) {
+        this.attributes = attributes;
+    }
+
+    public double getNextSpawnTime(double timeCurrentEvent) {
+        return distribution.getNextSample(timeCurrentEvent);
+    }
+
+    public int getDynamicElementsCreatedTotal() {
+        return dynamicElementsCreatedTotal;
+    }
+
+    public void incrementElementsCreatedTotal(int count) {
+        dynamicElementsCreatedTotal += count;
+    }
+
+    public VDistribution getDistribution() {
+        return distribution;
+    }
 }
