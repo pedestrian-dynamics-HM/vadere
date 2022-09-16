@@ -5,14 +5,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import org.vadere.util.version.Version;
 import org.vadere.simulator.projects.migration.MigrationException;
 import org.vadere.simulator.projects.migration.incident.helper.JsonFilterIterator;
 import org.vadere.state.attributes.scenario.AttributesMeasurementArea;
 import org.vadere.state.scenario.MeasurementArea;
 import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.util.version.Version;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -180,7 +179,7 @@ public interface JsonNodeExplorer {
 	}
 
 	default Iterator<JsonNode> iteratorSources(JsonNode node) throws MigrationException{
-		JsonNode tChanger = pathMustExist(node, "scenario/sources");
+		JsonNode tChanger = pathMustExist(node, "scenario/topography/sources");
 		return new JsonFilterIterator(tChanger, n->true);
 	}
 	default Iterator<JsonNode> iteratorTargets(JsonNode node) throws MigrationException{

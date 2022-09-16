@@ -2,16 +2,9 @@ package org.vadere.simulator.control.scenarioelements;
 
 import org.apache.commons.math3.random.JDKRandomGenerator;
 import org.vadere.state.attributes.scenario.AttributesTarget;
-import org.vadere.state.scenario.Agent;
-import org.vadere.state.scenario.Car;
-import org.vadere.state.scenario.DynamicElement;
-import org.vadere.state.scenario.Pedestrian;
-import org.vadere.state.scenario.Target;
-import org.vadere.state.scenario.TargetListener;
-import org.vadere.state.scenario.Topography;
+import org.vadere.state.scenario.*;
 import org.vadere.state.scenario.distribution.DistributionFactory;
-import org.vadere.state.scenario.distribution.VadereDistribution;
-import org.vadere.state.types.TrafficLightPhase;
+import org.vadere.state.scenario.distribution.VDistribution;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.logging.Logger;
@@ -21,35 +14,23 @@ import java.util.*;
 
 public class TargetController extends ScenarioElementController {
 
-
-	private final Target.WaitingBehaviour waitingBehaviour;
 	private static final Logger log = Logger.getLogger(TargetController.class);
-	private VadereDistribution distribution = null;
+	private VDistribution distribution = null;
 	private final AttributesTarget targetAttributes;
 
-	private double phaseLength = 0;
-
 	public final Target target;
-	private Topography topography;
+	private final Topography topography;
 
-	public TrafficLightPhase phase;
 
 	public TargetController(Topography topography, Target target,Random random) {
 		this.target = target;
 		this.targetAttributes = target.getAttributes();
 		this.topography = topography;
 
-		if (this.target.isStartingWithRedLight()) {
-			phase = TrafficLightPhase.RED;
-		} else {
-			phase = TrafficLightPhase.GREEN;
-		}
-		if (!targetAttributes.getWaitingBehaviour().equals(Target.WaitingBehaviour.NO_WAITING)) {
+		if (targetAttributes.isWaiting()) {
 			try {
 				distribution = DistributionFactory.create(
-						targetAttributes.getWaitingTimeDistribution(),
-						targetAttributes.getDistributionParameters(),
-						0,
+						targetAttributes.getWaiterAttributes().getDistribution(),
 						new JDKRandomGenerator(random.nextInt())
 				);
 
@@ -58,9 +39,7 @@ public class TargetController extends ScenarioElementController {
 						+ "waitingTimeDistribution and/or distributionParameters. See causing Excepion herefafter.", e);
 			}
 
-			this.phaseLength = this.distribution.getNextSpawnTime(0);
 		}
-		this.waitingBehaviour = target.getWaitingBehaviour();
 	}
 
 	public void update(double simTimeInSec) {
@@ -105,7 +84,7 @@ public class TargetController extends ScenarioElementController {
 	}
 
 	private Collection<DynamicElement> getPrefilteredDynamicElements() {
-		final double reachedDistance = target.getAttributes().getDeletionDistance();
+		final double reachedDistance = target.getAttributes().getAbsorberAttributes().getDeletionDistance();
 
 		final Rectangle2D bounds = target.getShape().getBounds2D();
 		final VPoint center = new VPoint(bounds.getCenterX(), bounds.getCenterY());
@@ -119,27 +98,9 @@ public class TargetController extends ScenarioElementController {
 	}
 
 	private void waitingBehavior(final Agent agent, double simTimeInSec) {
-		// individual waiting behaviour, as opposed to waiting at a traffic light
-		switch (waitingBehaviour){
-			case INDIVIDUAL: {
-				waitIndividually(agent, simTimeInSec);
-				break;
-			}
-			case TRAFFIC_LIGHT: {
-				waitTrafficLight(agent,simTimeInSec);
-				break;
-			}
-			case NO_WAITING:{
-				checkRemove(agent);
-				break;
-			}
-		}
-	}
-
-	private void waitTrafficLight(Agent agent, double simTimeInSec) {
-		// traffic light switching based on waiting time. Light starts green.
-		phase = getCurrentTrafficLightPhase(simTimeInSec);
-		if (phase == TrafficLightPhase.GREEN) {
+		if(targetAttributes.isWaiting()){
+			waitIndividually(agent, simTimeInSec);
+		}else if (target.isAbsorbing()){
 			checkRemove(agent);
 		}
 	}
@@ -164,7 +125,7 @@ public class TargetController extends ScenarioElementController {
 				leavingTimes.size() < waitingSpots);
 		if (targetHasFreeWaitingSpots) {
 			// TODO: Refractor VadereDistributions method name
-			leavingTimes.put(agentId, this.distribution.getNextSpawnTime(simTimeInSec));
+			leavingTimes.put(agentId, this.distribution.getNextSample(simTimeInSec));
 		}
 	}
 
@@ -183,35 +144,12 @@ public class TargetController extends ScenarioElementController {
 	}
 
 	private boolean hasAgentReachedThisTarget(Agent agent) {
-		final double reachedDistance = target.getAttributes().getDeletionDistance();
+		final double reachedDistance = target.getAttributes().getAbsorberAttributes().getDeletionDistance();
 		final VPoint agentPosition = agent.getPosition();
 		final VShape targetShape = target.getShape();
 
 		return targetShape.contains(agentPosition)
 				|| targetShape.distance(agentPosition) < reachedDistance;
-	}
-
-	private TrafficLightPhase getCurrentTrafficLightPhase(double simTimeInSec) {
-		double phaseSecond = simTimeInSec % (this.phaseLength * 2 + target.getWaitingTimeYellowPhase() * 2);
-
-		if (target.isStartingWithRedLight()) {
-			if (phaseSecond < this.phaseLength)
-				return TrafficLightPhase.RED;
-			if (phaseSecond < this.phaseLength + target.getWaitingTimeYellowPhase())
-				return TrafficLightPhase.YELLOW;
-			if (phaseSecond < this.phaseLength * 2 + target.getWaitingTimeYellowPhase())
-				return TrafficLightPhase.GREEN;
-
-		} else {
-			if (phaseSecond < this.phaseLength)
-				return TrafficLightPhase.GREEN;
-			if (phaseSecond < this.phaseLength + target.getWaitingTimeYellowPhase())
-				return TrafficLightPhase.YELLOW;
-			if (phaseSecond < this.phaseLength * 2 + target.getWaitingTimeYellowPhase())
-				return TrafficLightPhase.RED;
-
-		}
-		return TrafficLightPhase.YELLOW;
 	}
 
 	private boolean isNextTargetForAgent(Agent agent) {
@@ -231,7 +169,7 @@ public class TargetController extends ScenarioElementController {
 			changeTargetOfFollowers(agent);
 			topography.removeElement(agent);
 		} else {
-			agent.checkNextTarget(target.getNextSpeed());
+			agent.checkNextTarget(target.getAttributes().getLeavingSpeed());
 		}
 	}
 

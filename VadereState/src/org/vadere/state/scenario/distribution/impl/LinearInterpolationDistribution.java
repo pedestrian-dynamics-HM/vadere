@@ -1,31 +1,31 @@
 package org.vadere.state.scenario.distribution.impl;
 
-import org.apache.commons.math3.analysis.interpolation.LinearInterpolator;
-import org.apache.commons.math3.analysis.polynomials.PolynomialSplineFunction;
 import org.apache.commons.math3.random.RandomGenerator;
-import org.vadere.state.scenario.distribution.VadereDistribution;
-import org.vadere.state.scenario.distribution.parameter.LinearInterpolationParameter;
+import org.vadere.state.attributes.Attributes;
+import org.vadere.state.attributes.distributions.AttributesLinearInterpolationDistribution;
+import org.vadere.state.scenario.distribution.VDistribution;
 import org.vadere.state.scenario.distribution.registry.RegisterDistribution;
-import org.vadere.util.math.TruncatedNormalDistribution;
 
 /**
  * @author Aleksandar Ivanov(ivanov0@hm.edu), Lukas Gradl (lgradl@hm.edu),
  *         Daniel Lehmberg
  */
-@RegisterDistribution(name = "linearInterpolation", parameter = LinearInterpolationParameter.class)
-public class LinearInterpolationDistribution extends VadereDistribution<LinearInterpolationParameter> {
+@RegisterDistribution(name = "linearInterpolation", parameter = AttributesLinearInterpolationDistribution.class)
+public class LinearInterpolationDistribution extends VDistribution<AttributesLinearInterpolationDistribution> {
+	private Attributes lerpAttributes;
 
-	private PolynomialSplineFunction interpolator;
-	private double spawnFrequency;
-	private TruncatedNormalDistribution truncNormalDist;
-
-	public LinearInterpolationDistribution(LinearInterpolationParameter parameter, int spawnNumber,
-	        RandomGenerator randomGenerator) throws Exception {
-		super(parameter, spawnNumber, randomGenerator);
+	public LinearInterpolationDistribution(){
+		// Do not remove this constructor. It is us used through reflection.
+		super();
+		this.lerpAttributes = new AttributesLinearInterpolationDistribution();
+	}
+	public LinearInterpolationDistribution(AttributesLinearInterpolationDistribution parameter,
+										   RandomGenerator randomGenerator) throws Exception {
+		super(parameter, randomGenerator);
 	}
 
 	@Override
-	protected void setValues(LinearInterpolationParameter parameter, int unused, RandomGenerator randomGenerator) {
+	protected void setValues(AttributesLinearInterpolationDistribution parameter, RandomGenerator randomGenerator) {
 		// Most correctness is checked in LinearInterpolator
 		// double[] xValues = {0., 200., 400, 600, 700, 800};
 		// double[] yValues = {3., 8., 2., 10, 0, 0};
@@ -38,37 +38,11 @@ public class LinearInterpolationDistribution extends VadereDistribution<LinearIn
 				throw new IllegalArgumentException("No negative values are allowed for yValues. Got " + d);
 			}
 		}
-
-		this.spawnFrequency = parameter.getSpawnFrequency();
-		this.interpolator = new LinearInterpolator().interpolate(xValues, yValues);
-
-		// https://www.wolframalpha.com/input/?i=normal+distribution%2C+mean%3D0%2C+sd%3D3+from+-4+to+4
-		this.truncNormalDist = new TruncatedNormalDistribution(randomGenerator, 0, 3, -4, 4, 1000);
-
 	}
-
 	@Override
-	public int getSpawnNumber(double timeCurrentEvent) {
-		int spawnNumber = (int) Math.round(this.interpolator.value(timeCurrentEvent) + this.truncNormalDist.sample());
-		spawnNumber = Math.max(0, spawnNumber);
-		return spawnNumber;
-	}
-
-	@Override
-	public int getRemainingSpawnAgents() {
-		// Agents that could not be spawned (e.g. because the source is too small) are
-		// not taken to the next update
-		return 0;
-	}
-
-	@Override
-	public double getNextSpawnTime(double timeCurrentEvent) {
-		return timeCurrentEvent + spawnFrequency;
-	}
-
-	@Override
-	public void setRemainingSpawnAgents(int remainingAgents) {
-		// do nothing
+	public double getNextSample(double timeCurrentEvent) {
+		var attribs = (AttributesLinearInterpolationDistribution)getAttributes();
+		return timeCurrentEvent + attribs.getSpawnFrequency();
 	}
 
 }

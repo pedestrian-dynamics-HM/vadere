@@ -1,4 +1,4 @@
-package org.vadere.state.scenario.distribution.parameter;
+package org.vadere.state.attributes.distributions;
 
 
 /**
@@ -6,7 +6,7 @@ package org.vadere.state.scenario.distribution.parameter;
  * @author Lukas Gradl (lgradl@hm.edu), Ludwig Jaeck
  */
 
-public class NormalParameter {
+public class AttributesNormalDistribution extends AttributesDistribution {
 	public double getMean() {
 		return mean;
 	}
@@ -15,7 +15,7 @@ public class NormalParameter {
 		this.mean = mean;
 	}
 
-	double mean;
+	Double mean = 0.0;
 
 	public double getSd() {
 		return sd;
@@ -25,5 +25,5 @@ public class NormalParameter {
 		this.sd = sd;
 	}
 
-	double sd;
+	Double sd  = 0.0;
 }

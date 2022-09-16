@@ -23,7 +23,7 @@ public class ValidTargetsInSourceCheck extends AbstractScenarioCheck implements 
 
 		for (Source s : topography.getSources()) {
 			if (s.getAttributes().getTargetIds().size() == 0) {
-				if (s.getAttributes().getSpawnNumber() == 0) {
+				if (s.getAttributes().getSpawnerAttributes().getEventElementCount() == 0) {
 					ret.add(msgBuilder
 							.topographyWarning()
 							.target(s)

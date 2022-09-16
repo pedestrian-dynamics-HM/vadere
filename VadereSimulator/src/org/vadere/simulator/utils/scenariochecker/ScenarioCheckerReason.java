@@ -16,6 +16,9 @@ public enum ScenarioCheckerReason {
 	SOURCE_SPAWN_RND_POS_NOT_FREE_SPACE("ScenarioChecker.source.spawnAtRandomButNotAtFreeSpace"),
 	SOURCE_TO_SMALL("ScenarioChecker.source.toSmall"),
 	SOURCE_SPAWN_USE_NOT_FREE_SPACE("ScenarioChecker.source.spawnUseNotAtFreeSpace"),
+
+	SOURCE_NEEDS_SPAWNER("ScenarioChecker.source.needsSpawner"),
+
 	STAIRS_TREAD_DIM_WRONG("ScenarioChecker.stairs.wrongTreadDim"),
 	TOPOGRAPHY_OFFSET("ScenarioChecker.topography.offset"),
 
@@ -68,7 +71,7 @@ public enum ScenarioCheckerReason {
 
 
 
-	private String msgId;
+	private final String msgId;
 
 	ScenarioCheckerReason(String msgId) {
 		this.msgId = msgId;

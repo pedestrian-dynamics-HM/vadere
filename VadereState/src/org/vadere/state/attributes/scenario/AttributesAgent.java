@@ -1,59 +1,33 @@
 package org.vadere.state.attributes.scenario;
 
+import org.vadere.util.reflection.VadereAttribute;
+
 /**
  * Provides attributes for an agent, like body radius, ...
  * 
  * TODO [priority=low] Create two Attributes for better performance: Common
  * Attributes and individual Attributes for pedestrians.
- * 
- * 
  */
 public class AttributesAgent extends AttributesDynamicElement {
 
-	// Calculate agent's walking direction by using different strategies.
-	// "BY_GRADIENT" can only be used in conjunction with locomotion models
-	// which uses a floor field (which provides a gradient). "BY_TARGET_CENTER"
-	// and "BY_TARGET_CLOSEST_POINT" is supported by all locomotion models.
-	public enum WalkingDirectionCalculation {
-		BY_GRADIENT,
-		BY_TARGET_CENTER,
-		BY_TARGET_CLOSEST_POINT
-	};
-
 	// from weidmann-1992 page 18, deviates in seitz-2016c page 2 (Methods): 2.0
-	private double radius = 0.2;
-
+	private Double radius = 0.2;
 	// use a weidmann speed adjuster, this is not implemented jet => only densityDependentSpeed = false works.
-	private boolean densityDependentSpeed = false;
-
+	private Boolean densityDependentSpeed = false;
 	// from weidmann-1992 page 18, seitz-2016c page 2 (Methods)
-	private double speedDistributionMean = 1.34;
-
+	private Double speedDistributionMean = 1.34;
 	// from weidmann-1992 page 18, seitz-2016c page 2 (Methods)
-	private double speedDistributionStandardDeviation = 0.26;
-
+	private Double speedDistributionStandardDeviation = 0.26;
 	// from weidmann-1992 page 18, seitz-2016c page 2 (Methods)
-	private double minimumSpeed = 0.5;
-
+	private Double minimumSpeed = 0.5;
 	// from weidmann-1992 page 18, deviates in seitz-2016c page 2 (Methods): 2.0
-	private double maximumSpeed = 2.2;
-
+	private Double maximumSpeed = 2.2;
 	// only used for the GNM and SFM
-	private double acceleration = 2.0;
-
+	private Double acceleration = 2.0;
 	// store n last foot steps for speed calculation
-	private int footstepHistorySize = 4;
-
+	private Integer footstepHistorySize = 4;
 	// agents search for other scenario elements (e.g., other agents) within this radius
-	private double searchRadius = 1.0;
-
-	// Use "BY_TARGET_CENTER" as default because it is supported by all locomotion models.
-	// "BY_TARGET_CLOSEST_POINT" might be a fragile solution because the closest point between
-	// the agent and the target varies while the agent moves.
-	// "BY_GRADIENT" should be the most realistic configuration because it represents the
-	// instantaneous walking direction.
-	private WalkingDirectionCalculation walkingDirectionCalculation = WalkingDirectionCalculation.BY_TARGET_CENTER;
-
+	private Double searchRadius = 1.0;
 	/* angle3D in degree which is used to decide if two pedestrians move into the same direction, for instance:
 	 *
 	 * <pre>
@@ -74,7 +48,28 @@ public class AttributesAgent extends AttributesDynamicElement {
 	 * If the calculated angle3D "a" is equal or below this threshold, it is assumed that both pedestrians move into
 	 * the same direction and both cannot be swapped.
 	 */
-	private double walkingDirectionSameIfAngleLessOrEqual = 45.0;
+	private Double walkingDirectionSameIfAngleLessOrEqual = 45.0;
+
+	// Use "BY_TARGET_CENTER" as default because it is supported by all locomotion models.
+	// "BY_TARGET_CLOSEST_POINT" might be a fragile solution because the closest point between
+	// the agent and the target varies while the agent moves.
+	// "BY_GRADIENT" should be the most realistic configuration because it represents the
+	// instantaneous walking direction.
+	private WalkingDirectionCalculation walkingDirectionCalculation = WalkingDirectionCalculation.BY_TARGET_CENTER;
+
+	// Calculate agent's walking direction by using different strategies.
+	// "BY_GRADIENT" can only be used in conjunction with locomotion models
+	// which uses a floor field (which provides a gradient). "BY_TARGET_CENTER"
+	// and "BY_TARGET_CLOSEST_POINT" is supported by all locomotion models.
+	@VadereAttribute(exclude = true)
+	public enum WalkingDirectionCalculation {
+		@VadereAttribute(exclude = true)
+		BY_GRADIENT,
+		@VadereAttribute(exclude = true)
+		BY_TARGET_CENTER,
+		@VadereAttribute(exclude = true)
+		BY_TARGET_CLOSEST_POINT
+	}
 
 	public AttributesAgent() {
 		this(-1);

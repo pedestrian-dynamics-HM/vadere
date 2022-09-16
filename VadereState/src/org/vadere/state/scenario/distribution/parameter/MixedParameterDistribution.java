@@ -1,12 +1,13 @@
 package org.vadere.state.scenario.distribution.parameter;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.vadere.state.attributes.Attributes;
 
 /**
  * @author Aleksandar Ivanov
  */
 
-public class MixedParameterDistribution {
+public class MixedParameterDistribution extends Attributes {
 	private String interSpawnTimeDistribution;
 	private JsonNode distributionParameters;
 

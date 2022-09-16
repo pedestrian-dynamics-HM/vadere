@@ -42,7 +42,7 @@ public class GroupSourceController extends SourceController {
 				new VRectangle(0, 0, elementBound.getWidth(), elementBound.getHeight()),
 				dynamicElementFactory::getDynamicElementRequiredPlace,
 				this::testFreeSpace,
-				source.getAttributes());
+				source.getAttributes().getSpawnerAttributes());
 
 	}
 
@@ -52,9 +52,9 @@ public class GroupSourceController extends SourceController {
 			if (simTimeInSec >= timeOfNextEvent || !groupsToSpawn.isEmpty()) {
 				determineNumberOfSpawnsAndNextEvent(simTimeInSec);
 
-				if (sourceAttributes.isSpawnAtRandomPositions()) {
+				if (spawnerAttributes.isEventPositionRandom()) {
 
-					if (sourceAttributes.isUseFreeSpaceOnly()) {
+					if (spawnerAttributes.isEventPositionFreeSpace()) {
 						Iterator<Integer> iter = groupsToSpawn.iterator();
 						while (iter.hasNext()) {
 							int groupSize = iter.next();
@@ -98,7 +98,7 @@ public class GroupSourceController extends SourceController {
 
 				} else {
 
-					if (sourceAttributes.isUseFreeSpaceOnly()) {
+					if (spawnerAttributes.isEventPositionFreeSpace()) {
 						Iterator<Integer> iter = groupsToSpawn.iterator();
 						while (iter.hasNext()) {
 							int groupSize = iter.next();
@@ -219,7 +219,7 @@ public class GroupSourceController extends SourceController {
 	}
 
 	private void getNewGroupSizeFromModel() {
-		for (int i = 0; i < sourceAttributes.getSpawnNumber(); i++) {
+		for (int i = 0; i < spawnerAttributes.getEventElementCount(); i++) {
 			int groupSize = groupModel.nextGroupForSource(this.source.getId());
 			groupsToSpawn.add(groupSize);
 		}

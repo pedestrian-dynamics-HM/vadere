@@ -5,11 +5,7 @@ import org.vadere.state.attributes.scenario.AttributesTarget;
 import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.geometry.shapes.VShape;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.*;
 
 public class Target extends ScenarioElement implements Comparable<Target> {
 
@@ -45,25 +41,8 @@ public class Target extends ScenarioElement implements Comparable<Target> {
 		return attributes.isAbsorbing();
 	}
 
-
-	public double getWaitingTimeYellowPhase() {
-		return attributes.getWaitingTimeYellowPhase();
-	}
-
 	public int getParallelWaiters() {
 		return attributes.getParallelWaiters();
-	}
-
-	public boolean isStartingWithRedLight() {
-		return attributes.isStartingWithRedLight();
-	}
-
-	public WaitingBehaviour getWaitingBehaviour(){
-		return attributes.getWaitingBehaviour();
-	}
-
-	public double getNextSpeed() {
-		return attributes.getNextSpeed();
 	}
 
 	public Map<Integer, Double> getEnteringTimes() {

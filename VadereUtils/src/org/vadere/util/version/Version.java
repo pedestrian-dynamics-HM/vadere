@@ -52,15 +52,16 @@ public enum Version {
 	V2_1(2,1),
 	V2_2(2,2),
 	V2_3(2,3),
+	V2_5(2,5),
 	;
 
 
-	private static Logger logger = Logger.getLogger(Version.class);
+	private static final Logger logger = Logger.getLogger(Version.class);
 	private static final String VERSION_CONTROL_INFO_FILE = "/current_commit_hash.txt";
 
-	private String label;
-	private int major;
-	private int minor;
+	private final String label;
+	private final int major;
+	private final int minor;
 
 	Version(String label) {
 		this.major = -1;

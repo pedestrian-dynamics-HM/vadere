@@ -1,18 +1,12 @@
 package org.vadere.simulator.control.util;
 
 import org.jetbrains.annotations.NotNull;
-import org.vadere.state.attributes.scenario.AttributesSource;
+import org.vadere.state.attributes.spawner.AttributesSpawner;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Random;
+import java.util.*;
 import java.util.function.Function;
 
 /**
@@ -52,16 +46,16 @@ public class GroupSpawnArray extends SpawnArray {
 	// not an index put a way to calculate the index 1..n where n is the number of possible ways to place a given group
 	// key: groupSize
 	// value: number of next group.
-	private HashMap<Integer, Integer> nextGroupPos;
-	private HashMap<Integer, GroupPlacementHelper> groupPlacementHelpers;
+	private final HashMap<Integer, Integer> nextGroupPos;
+	private final HashMap<Integer, GroupPlacementHelper> groupPlacementHelpers;
 
 
 	public GroupSpawnArray(final VShape boundShape,
 						   final VRectangle spawnElementBound,
 						   Function<VPoint, VShape> shapeProducer,
 						   SpawnOverlapCheck testFreeSpace,
-						   AttributesSource sourceAttributes) {
-		super(boundShape, spawnElementBound, shapeProducer, testFreeSpace, sourceAttributes);
+						   AttributesSpawner spawnerAttributes) {
+		super(boundShape, spawnElementBound, shapeProducer, testFreeSpace, spawnerAttributes);
 
 		nextGroupPos = new HashMap<>();
 		groupPlacementHelpers = new HashMap<>();

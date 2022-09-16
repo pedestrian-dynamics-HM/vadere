@@ -37,7 +37,7 @@ public class CellularAutomatonSetupCheck extends AbstractScenarioCheck {
 
 
             for (Source source : sourceList) {
-                if (!source.getAttributes().isSpawnAtGridPositionsCA()) {
+                if (!source.getAttributes().getSpawnerAttributes().isEventPositionGridCA()) {
                     messages.add(msgBuilder.simulationAttrError().target(source)
                             .reason(ScenarioCheckerReason.CA_SPAWNING, "If the cellular automaton model is used, the CA spawning should be activated. Otherwise agents will not be placed on a well-defined grid.")
                             .build());
