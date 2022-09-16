@@ -71,7 +71,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 	 * different methods, maybe only store these as members?
 	 */
 	private final JPanel contentPane = new JPanel();
-	private final JPanel controlPanel = new JPanel();
+	private final JPanel controlPanel = new JPanel(new GridBagLayout());
 	private JSplitPane mainSplitPanel = new JSplitPane();
 	private VTable scenarioTable;
 	private VTable outputTable;
@@ -541,9 +541,6 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		scrollPanel_output.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
 		panel_1.add(controlPanel, BorderLayout.NORTH);
-		FlowLayout fl_controlPanel = (FlowLayout) controlPanel.getLayout();
-		fl_controlPanel.setAlignment(FlowLayout.LEFT);
-
 		JPanel panel_2 = buildRightSidePanel();
 
 		mainSplitPanel = new JSplitPane();
@@ -731,7 +728,8 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 
 	private void buildToolBar() {
 		JToolBar toolBar = new JToolBar();
-		controlPanel.add(toolBar);
+		toolBar.setLayout(new FlowLayout(FlowLayout.CENTER));
+		controlPanel.add(toolBar,initializeConstraints());
 
 		ButtonGroup mainButtonsGroup = new ButtonGroup();
 
@@ -740,6 +738,8 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		runAllScenariosAction.putValue(Action.LARGE_ICON_KEY,
 				new ImageIcon(ProjectView.class.getResource("/icons/greenarrows_right_small.png")));
 		btnRunAllScenarios = new JButton(runAllScenariosAction);
+		btnRunAllScenarios.setVerticalTextPosition(SwingConstants.BOTTOM);
+		btnRunAllScenarios.setHorizontalTextPosition(SwingConstants.CENTER);
 		toolBar.add(btnRunAllScenarios);
 		addToProjectSpecificActions(runAllScenariosAction);
 		mainButtonsGroup.add(btnRunAllScenarios);
@@ -751,6 +751,8 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		runSelectedScenarios.putValue(Action.LARGE_ICON_KEY,
 				new ImageIcon(ProjectView.class.getResource("/icons/greenarrow_right_small.png")));
 		btnRunSelectedScenario = new JButton(runSelectedScenarios);
+		btnRunSelectedScenario.setVerticalTextPosition(SwingConstants.BOTTOM);
+		btnRunSelectedScenario.setHorizontalTextPosition(SwingConstants.CENTER);
 		toolBar.add(btnRunSelectedScenario);
 		addToProjectSpecificActions(runSelectedScenarios);
 		mainButtonsGroup.add(btnRunSelectedScenario);
@@ -762,6 +764,8 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		runRepeatedlyScenarios.putValue(Action.LARGE_ICON_KEY,
 				new ImageIcon(ProjectView.class.getResource("/icons/greenarrow_right_small.png")));
 		btnRunRepeatedlyScenario = new JButton(runRepeatedlyScenarios);
+		btnRunRepeatedlyScenario.setVerticalTextPosition(SwingConstants.BOTTOM);
+		btnRunRepeatedlyScenario.setHorizontalTextPosition(SwingConstants.CENTER);
 		toolBar.add(btnRunRepeatedlyScenario);
 		addToProjectSpecificActions(runRepeatedlyScenarios);
 		mainButtonsGroup.add(btnRunRepeatedlyScenario);
@@ -870,5 +874,15 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		if (mainSplitPanel.getDividerLocation() > max_div) {
 			mainSplitPanel.setDividerLocation(max_div);
 		}
+	}
+
+	private static GridBagConstraints initializeConstraints() {
+		var gbc = new GridBagConstraints();
+		gbc.gridwidth = GridBagConstraints.REMAINDER;
+		gbc.gridheight = GridBagConstraints.REMAINDER;
+		gbc.anchor = GridBagConstraints.PAGE_START;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.weightx = 1;
+		return gbc;
 	}
 }
