@@ -23,23 +23,18 @@ import org.vadere.util.io.IOUtils;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.opencl.CLUtils;
 
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.*;
-import java.util.List;
-
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.*;
 
 /**
  * Main view of the Vadere GUI.
@@ -699,7 +694,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		ActionDeleteScenarios deleteScenariosAction =
 				new ActionDeleteScenarios(Messages.getString("ProjectView.mntmDelete.text"), model, scenarioTable);
 		ActionRunSelectedScenarios runSelectedScenarios = new ActionRunSelectedScenarios(
-				Messages.getString("ProjectView.mntmRunSelectetTests.text"), model, scenarioTable);
+				Messages.getString("ProjectView.mntmRunSelectedTests.text"), model, scenarioTable);
 		ActionRunRepeatedlyScenarios runRepeatedlyScenarios = new ActionRunRepeatedlyScenarios(
 				Messages.getString("ProjectView.mntmRunRepeatedlyTests.text"), model, scenarioTable, n_repetitions);
 		ActionSeeDiscardChanges seeDiscardChangesAction = new ActionSeeDiscardChanges(

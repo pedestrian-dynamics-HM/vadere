@@ -1,16 +1,13 @@
 package org.vadere.gui.topographycreator.control;
 
-import java.awt.event.ActionEvent;
-import java.io.File;
-
-import javax.swing.ImageIcon;
-import javax.swing.JFileChooser;
-
 import org.apache.commons.configuration2.Configuration;
-import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.topographycreator.model.IDrawPanelModel;
 import org.vadere.gui.topographycreator.utils.TopographyJsonWriter;
 import org.vadere.util.config.VadereConfig;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.io.File;
 
 /**
  * Action: save the topography to the current file (last_save_point).
@@ -22,8 +19,8 @@ public class ActionQuickSaveTopography extends TopographyAction {
 	private static final long serialVersionUID = -6802761549259354252L;
 	private static final Configuration CONFIG = VadereConfig.getConfig();
 
-	public ActionQuickSaveTopography(String name, ImageIcon icon, IDrawPanelModel panelModel) {
-		super(name, icon, panelModel);
+	public ActionQuickSaveTopography(String name, String iconPath,String shortDescription, IDrawPanelModel panelModel) {
+		super(name, iconPath, shortDescription, panelModel);
 	}
 
 	/**

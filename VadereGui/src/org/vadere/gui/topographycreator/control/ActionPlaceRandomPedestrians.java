@@ -21,7 +21,6 @@ import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.random.SimpleReachablePointProvider;
 
-import javax.swing.*;
 import javax.swing.undo.UndoableEditSupport;
 import java.awt.event.ActionEvent;
 import java.awt.geom.Rectangle2D;
@@ -31,12 +30,12 @@ import java.util.Random;
 
 public class ActionPlaceRandomPedestrians extends TopographyAction {
 
-	private static Logger logger = Logger.getLogger(ActionPlaceRandomPedestrians.class);
+	private static final Logger logger = Logger.getLogger(ActionPlaceRandomPedestrians.class);
 	private static final int BINOMIAL_DISTRIBUTION_SUCCESS_VALUE = 1;
 
 	private final double agentRadius;
 
-	public ActionPlaceRandomPedestrians(String name, ImageIcon icon, IDrawPanelModel panelModel,
+	public ActionPlaceRandomPedestrians(String name, String icon, IDrawPanelModel panelModel,
 										 UndoableEditSupport undoSupport) {
 		super(name, icon, panelModel);
 		this.agentRadius = new AttributesAgent().getRadius();
@@ -64,7 +63,7 @@ public class ActionPlaceRandomPedestrians extends TopographyAction {
 				IPoint point = pointProvider.stream(dist ->  dist > 0.25).findFirst().get();
 				VCircle newPosition = new VCircle(point.getX(), point.getY(), this.agentRadius);
 
-				if (checkOverlap(newPosition) == false) {
+				if (!checkOverlap(newPosition)) {
 					int pedId = firstPedId + i;
 					Pedestrian pedestrian = createPedestrian(dialog, topography, random, binomialDistribution, point, pedId);
 					addPedestrianToTopography(pedestrian);
