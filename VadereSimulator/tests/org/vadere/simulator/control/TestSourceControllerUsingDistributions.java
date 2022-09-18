@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesSource;
 import org.vadere.state.attributes.scenario.SourceTestAttributesBuilder;
+import org.vadere.state.attributes.spawner.AttributesSpawner;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
@@ -160,7 +161,7 @@ public class TestSourceControllerUsingDistributions extends TestSourceController
 	@Test
 	public void testMaxSpawnNumberTotalNotSet() throws IOException {
 		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
-				.setMaxSpawnNumberTotal(AttributesSource.NO_MAX_SPAWN_NUMBER_TOTAL); // <-- maximum not set
+				.setMaxSpawnNumberTotal(AttributesSpawner.NO_MAX_SPAWN_NUMBER_TOTAL); // <-- maximum not set
 		initialize(builder);
 
 		first().sourceController.update(1);

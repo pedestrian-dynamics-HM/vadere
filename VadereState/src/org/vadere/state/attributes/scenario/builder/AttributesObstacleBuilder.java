@@ -7,12 +7,15 @@ public final class AttributesObstacleBuilder {
 	private VShape shape;
 	private int id;
 
+	private AttributesVisualElementBuilder visualElementBuilder;
+
 	private AttributesObstacleBuilder() {
 	}
 
 	public static AttributesObstacleBuilder anAttributesObstacle() {
 		return new AttributesObstacleBuilder();
 	}
+
 
 	public AttributesObstacleBuilder shape(VShape shape) {
 		this.shape = shape;
@@ -30,4 +33,5 @@ public final class AttributesObstacleBuilder {
 		attributesObstacle.setShape(shape);
 		return attributesObstacle;
 	}
+
 }

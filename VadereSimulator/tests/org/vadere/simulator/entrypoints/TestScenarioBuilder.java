@@ -12,6 +12,7 @@ import org.vadere.util.io.IOUtils;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 
 import static junit.framework.TestCase.assertTrue;
 
@@ -52,9 +53,9 @@ public class TestScenarioBuilder {
         assertTrue(scenario.getTopography().getBounds().equals(new VRectangle(10, 10, 100, 100)));
 
         // 5. change sourceAttributes
-        builder.setSourceField("spawnNumber", 1, 400);
+        builder.setSourceField("targetIds", 1, new ArrayList<>(){{new Integer(1);}});
         scenario = builder.build();
-        assertTrue(scenario.getTopography().getSources().get(0).getAttributes().getSpawnNumber() == 400);
+        assertTrue(scenario.getTopography().getSources().get(0).getAttributes().getTargetIds().get(0) == 1);
     }
 
 }

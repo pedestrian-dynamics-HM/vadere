@@ -19,6 +19,7 @@ import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesDynamicElement;
 import org.vadere.state.attributes.scenario.AttributesSource;
 import org.vadere.state.attributes.scenario.SourceTestAttributesBuilder;
+import org.vadere.state.attributes.spawner.AttributesSpawner;
 import org.vadere.state.scenario.*;
 import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.geometry.LinkedCellsGrid;
@@ -389,7 +390,7 @@ public class GroupSourceControllerTest extends TestSourceControllerUsingConstant
 	@Test
 	public void testMaxSpawnNumberTotalNotSet() {
 		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
-				.setMaxSpawnNumberTotal(AttributesSource.NO_MAX_SPAWN_NUMBER_TOTAL) // <-- maximum not set
+				.setMaxSpawnNumberTotal(AttributesSpawner.NO_MAX_SPAWN_NUMBER_TOTAL) // <-- maximum not set
 				.setEndTime(2)
 				.setSourceDim(5.0, 5.0)
 				.setGroupSizeDistribution(0.0, 0.0, 0.25, 0.75)

@@ -59,6 +59,10 @@ public class AttributesTarget extends AttributesVisualElement {
 		this.shape = shape;
 		this.id = id;
 	}
+	public AttributesTarget(final VShape shape, final int id,boolean absorbing) {
+		this(shape,id);
+		setAbsorbing(true);
+	}
 
 	public AttributesTarget(Pedestrian pedestrian) {
 		this.shape = pedestrian.getShape();

@@ -53,4 +53,8 @@ public final class AttributesSourceBuilder{
 		attributesSource.setGroupSizeDistribution(this.groupSizeDistribution);
 		return attributesSource;
 	}
+
+	public AttributesSource build(){
+		return build(new AttributesSource());
+	}
 }
