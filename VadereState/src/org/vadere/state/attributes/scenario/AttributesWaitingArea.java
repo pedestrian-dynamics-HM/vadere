@@ -9,7 +9,7 @@ import org.vadere.util.reflection.VadereAttribute;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class AttributesWaitingArea extends AttributesVisualElement {
     @VadereAttribute
-    private final AttributesWaiter waiter = new AttributesWaiter();
+    private AttributesWaiter waiter = new AttributesWaiter();
 
     AttributesWaitingArea(){
         super();
