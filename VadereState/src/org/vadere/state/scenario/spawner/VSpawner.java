@@ -69,7 +69,6 @@ public abstract class VSpawner<T extends AttributesSpawner>  extends AttributesA
         return attributes.getConstraintsTimeEnd() == attributes.getConstraintsTimeStart();
     }
 
-    abstract protected boolean isQueueEmpty();
 
     @Override
     public T getAttributes() {

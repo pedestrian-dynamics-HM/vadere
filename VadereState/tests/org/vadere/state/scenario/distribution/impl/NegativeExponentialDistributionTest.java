@@ -1,7 +1,5 @@
 package org.vadere.state.scenario.distribution.impl;
 
-import static org.junit.Assert.*;
-
 import org.apache.commons.math3.distribution.ExponentialDistribution;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.junit.runner.RunWith;
@@ -10,9 +8,11 @@ import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
-import org.vadere.state.scenario.distribution.VadereDistribution;
+import org.vadere.state.attributes.distributions.AttributesNegativeExponentialDistribution;
+import org.vadere.state.scenario.distribution.VDistribution;
 import org.vadere.state.scenario.distribution.VadereDistributionTest;
-import org.vadere.state.scenario.distribution.parameter.NegativeExponentialParameter;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Aleksandar Ivanov(ivanov0@hm.edu)
@@ -25,15 +25,15 @@ public class NegativeExponentialDistributionTest extends VadereDistributionTest 
 	ExponentialDistribution distMock;
 
 	@Override
-	protected VadereDistribution<?> getDistributionUnderTest() throws Exception {
-		NegativeExponentialParameter parameter = new NegativeExponentialParameter();
+	protected VDistribution<?> getDistributionUnderTest() throws Exception {
+		AttributesNegativeExponentialDistribution parameter = new AttributesNegativeExponentialDistribution();
 		parameter.setMean(0);
 
 		RandomGenerator randomGenerator = null;
 
 		PowerMockito.whenNew(ExponentialDistribution.class).withAnyArguments().thenReturn(distMock);
 
-		NegativeExponentialDistribution dist = new NegativeExponentialDistribution(parameter, spawnNumber,
+		NegativeExponentialDistribution dist = new NegativeExponentialDistribution(parameter,
 		        randomGenerator);
 
 		PowerMockito.verifyNew(ExponentialDistribution.class).withArguments(randomGenerator, parameter.getMean());
@@ -42,13 +42,13 @@ public class NegativeExponentialDistributionTest extends VadereDistributionTest 
 	}
 
 	@Override
-	public void testGetNextSpawnTime() throws Exception {
+	public void testGetNextSample() throws Exception {
 		double sample = 5;
 		Mockito.when(distMock.sample()).thenReturn(sample);
 		double timeCurrentEvent = 1;
 
-		VadereDistribution<?> dist = getDistributionUnderTest();
-		double actual = dist.getNextSpawnTime(timeCurrentEvent);
+		VDistribution<?> dist = getDistributionUnderTest();
+		double actual = dist.getNextSample(timeCurrentEvent);
 
 		assertEquals(sample + timeCurrentEvent, actual, 0);
 		Mockito.verify(distMock).sample();

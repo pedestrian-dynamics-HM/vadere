@@ -1,10 +1,11 @@
 package org.vadere.state.attributes.scenario;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
+import org.vadere.state.attributes.distributions.AttributesConstantDistribution;
 
 import java.io.IOException;
 
-import org.junit.Test;
+import static org.junit.Assert.assertTrue;
 
 public class TestAttributesSource {
 
@@ -17,7 +18,7 @@ public class TestAttributesSource {
 	@Test
 	public void testGetInterSpawnTimeDistribution() throws Exception {
 		createAttributes(new SourceTestAttributesBuilder());
-		assertEquals("constant", attributes.getInterSpawnTimeDistribution());
+		assertTrue(AttributesConstantDistribution.class.isAssignableFrom(attributes.getSpawnerAttributes().getDistributionAttributes().getClass()));
 	}
 
 	// TODO

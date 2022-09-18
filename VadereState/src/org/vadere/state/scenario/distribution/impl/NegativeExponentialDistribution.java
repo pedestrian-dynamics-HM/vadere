@@ -2,7 +2,6 @@ package org.vadere.state.scenario.distribution.impl;
 
 import org.apache.commons.math3.distribution.ExponentialDistribution;
 import org.apache.commons.math3.random.RandomGenerator;
-import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.distributions.AttributesNegativeExponentialDistribution;
 import org.vadere.state.scenario.distribution.VDistribution;
 import org.vadere.state.scenario.distribution.registry.RegisterDistribution;
@@ -12,14 +11,8 @@ import org.vadere.state.scenario.distribution.registry.RegisterDistribution;
  */
 @RegisterDistribution(name = "negativeExponential", parameter = AttributesNegativeExponentialDistribution.class)
 public class NegativeExponentialDistribution extends VDistribution<AttributesNegativeExponentialDistribution> {
-	private Attributes exponAttributes;
 	private ExponentialDistribution distribution;
 
-	public NegativeExponentialDistribution(){
-		// Do not remove this constructor. It is us used through reflection.
-		super();
-		this.exponAttributes = new AttributesNegativeExponentialDistribution();
-	}
 	public NegativeExponentialDistribution(AttributesNegativeExponentialDistribution parameter,
 										   RandomGenerator randomGenerator) throws Exception {
 		super(parameter, randomGenerator);
@@ -29,7 +22,6 @@ public class NegativeExponentialDistribution extends VDistribution<AttributesNeg
 	protected void setValues(AttributesNegativeExponentialDistribution parameter, RandomGenerator randomGenerator)
 	        throws Exception {
 		this.distribution = new ExponentialDistribution(randomGenerator, parameter.getMean());
-		this.exponAttributes = parameter;
 	}
 
 	@Override

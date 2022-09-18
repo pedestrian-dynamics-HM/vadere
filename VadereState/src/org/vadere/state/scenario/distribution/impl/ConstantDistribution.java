@@ -13,12 +13,6 @@ import org.vadere.state.scenario.distribution.registry.RegisterDistribution;
 public class ConstantDistribution extends VDistribution<AttributesConstantDistribution> {
 
 
-	public ConstantDistribution(){
-		// Do not remove this constructor. It is us used through reflection.
-		super();
-		this.attributes = new AttributesConstantDistribution();
-	}
-
 	@Override
 	protected void setValues(AttributesConstantDistribution parameter, RandomGenerator unused) throws Exception {
 		this.attributes = parameter;

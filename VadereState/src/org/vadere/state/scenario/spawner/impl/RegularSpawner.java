@@ -29,9 +29,4 @@ public class RegularSpawner extends VSpawner<AttributesRegularSpawner> {
         this.remainingSpawnAgents = remainingAgents;
     }
 
-    @Override
-    protected boolean isQueueEmpty() {
-        return false;
-    }
-
 }

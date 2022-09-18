@@ -50,11 +50,4 @@ public class LERPSpawner extends VSpawner<AttributesLerpSpawner> {
     public void setRemainingSpawnAgents(int remainingAgents) {
         // do nothing
     }
-
-
-    @Override
-    protected boolean isQueueEmpty() {
-        return false;
-    }
-
 }

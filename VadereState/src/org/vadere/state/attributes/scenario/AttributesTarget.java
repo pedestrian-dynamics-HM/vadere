@@ -14,10 +14,13 @@ import org.vadere.util.reflection.VadereAttribute;
  */
 public class AttributesTarget extends AttributesVisualElement {
 	@VadereAttribute
+	@JsonView(Views.CacheViewExclude.class)
 	private AttributesAbsorber absorber = new AttributesAbsorber();
 	@VadereAttribute
+	@JsonView(Views.CacheViewExclude.class)
 	private AttributesWaiter waiter = new AttributesWaiter();
 	@VadereAttribute
+	@JsonView(Views.CacheViewExclude.class)
 	private Double leavingSpeed = 0.0;
 
 	@VadereAttribute

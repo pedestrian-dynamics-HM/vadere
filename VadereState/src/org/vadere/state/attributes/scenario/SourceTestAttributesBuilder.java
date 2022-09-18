@@ -189,22 +189,30 @@ public class SourceTestAttributesBuilder {
 		}
 
 
-		return "{  \"id\" : " + id + "," +
-				"\"shape\": {\"type\": \"POLYGON\",\"points\":"
-				+ "[{\"x\": 0.0,\"y\": 0.0}"
-				+ ",{\"x\": " + x1 + ",\"y\": " + y1 + "}"
-				+ ",{\"x\": " + x2 + ",\"y\": " + y2 + "}"
-				+ ",{\"x\": " + x3 + ",\"y\": " + y3 + "}]}"
-				+ ",\"spawnNumber\":  " + spawnNumber
-				+ ",\"maxSpawnNumberTotal\":  " + maxSpawnNumberTotal
-				+ ",\"interSpawnTimeDistribution\": \"" + distributionName + "\""
-				+ ",\"distributionParameters\": " + paramString
-				+ ",\"startTime\": " + startTime
-				+ ",\"endTime\": " + endTime
-				+ ",\"spawnAtRandomPositions\": " + spawnAtRandomPositions
-				+ ",\"useFreeSpaceOnly\": " + useFreeSpaceOnly
-				+ ",\"groupSizeDistribution\" : " + groupSizeDistribution() + "\n"
-				+ ",\"targetIds\": [1]}";
+		return "{  \"id\" : " + id + ","
+				+ "\"shape\": {"
+				+ 	"\"type\": \"POLYGON\""
+				+	",\"points\": ["
+				+		"{\"x\": 0.0,\"y\": 0.0}"
+				+ 		",{\"x\": " + x1 + ",\"y\": " + y1 + "}"
+				+ 		",{\"x\": " + x2 + ",\"y\": " + y2 + "}"
+				+ 		",{\"x\": " + x3 + ",\"y\": " + y3 + "}"
+				+	"]}"
+				+ ",\"targetIds\": [1]"
+				+ ",\"spawner\" : {"
+				+ 	"\"type\" : \"org.vadere.state.attributes.spawner.AttributesRegularSpawner\""
+				+ 	",\"constraintsElementsMax\" : " + maxSpawnNumberTotal
+				+ 	",\"constraintsTimeStart\" : " + startTime
+				+ 	",\"constraintsTimeEnd\" : " +endTime
+				+ 	",\"eventPositionRandom\" : " +spawnAtRandomPositions
+				+ 	",\"eventPositionGridCA\" : false"
+				+ 	",\"eventPositionFreeSpace\" : " +useFreeSpaceOnly
+				+ 	",\"eventElementCount\" : "+spawnNumber
+				+ 	",\"eventElement\" : null"
+				+ 	",\"distribution\" : "+ paramString
+				+ 	"},"
+				+ "\"groupSizeDistribution\" : " +groupSizeDistribution()
+				+ "}";
 	}
 
 }

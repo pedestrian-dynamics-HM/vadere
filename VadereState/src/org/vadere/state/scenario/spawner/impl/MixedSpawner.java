@@ -31,13 +31,6 @@ public class MixedSpawner extends VSpawner<AttributesMixedSpawner> {
         spawners.get(currentInterval).setRemainingSpawnAgents(remainingAgents);
     }
 
-
-    @Override
-    protected boolean isQueueEmpty() {
-        return false;
-    }
-
-
     private VSpawner<?> getSpawnerByTime(double timeCurrentEvent) {
         while (!(currentInterval > switchpoints.size() - 1) && timeCurrentEvent >= switchpoints.get(currentInterval)
                 && !(timeCurrentEvent > switchpoints.get(switchpoints.size() - 1))) {

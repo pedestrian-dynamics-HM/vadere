@@ -17,12 +17,7 @@ public class DistributionRegistry {
 
 	public static RegisteredDistribution get(AttributesDistribution parameters) throws Exception {
 		String name = parameters.getClass().getName();
-		if (!REGISTRY.containsKey(name)){
-			throw new Exception(
-			        "There is no distribution with name " + name + ". Possible options are " + getRegisteredNames());
-		}
-
-		return REGISTRY.get(name);
+		return get(name);
 	}
 
 	public static RegisteredDistribution get(String name) throws Exception {

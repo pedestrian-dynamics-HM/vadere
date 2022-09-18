@@ -2,9 +2,9 @@ package org.vadere.state.util;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
+import org.vadere.state.attributes.distributions.AttributesBinomialDistribution;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.scenario.AttributesObstacle;
 import org.vadere.state.attributes.scenario.AttributesTarget;
@@ -21,7 +21,8 @@ import org.vadere.util.geometry.shapes.VRectangle;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 public class StateJsonConverterTest {
 
@@ -124,7 +125,7 @@ public class StateJsonConverterTest {
         Topography topography = new Topography();
         topography.addObstacle(new Obstacle(new AttributesObstacle(3, new VRectangle(1,1,3,3))));
         AttributesFloorField attr = new AttributesFloorField();
-        AttributesTarget attrTarget = new AttributesTarget(new VRectangle(1,1,1,1));
+        AttributesTarget attrTarget = new AttributesTarget(-1,new VRectangle(1,1,1,1));
         Target t = new Target(attrTarget);
         topography.addTarget(t);
         String hash1 = StateJsonConverter.getFloorFieldHash(topography, attr);
@@ -132,13 +133,13 @@ public class StateJsonConverterTest {
         // changes must NOT change the floor field hash
         attrTarget.setId(33);
         attrTarget.setAbsorbing(false);
-        attrTarget.setWaitingBehaviour(Target.WaitingBehaviour.TRAFFIC_LIGHT);
-        attrTarget.setWaitingTimeYellowPhase(2);
+        //attrTarget.setWaitingBehaviour(Target.WaitingBehaviour.TRAFFIC_LIGHT);
+        //attrTarget.setWaitingTimeYellowPhase(2);
         attrTarget.setParallelWaiters(1);
-        attrTarget.setWaitingTimeDistribution("binomial");
-        attrTarget.setDeletionDistance(0.4);
-        attrTarget.setStartingWithRedLight(true);
-        attrTarget.setNextSpeed(1);
+        attrTarget.getWaiterAttributes().setDistribution(new AttributesBinomialDistribution());
+        attrTarget.getAbsorberAttributes().setDeletionDistance(0.4);
+        //attrTarget.setStartingWithRedLight(true);
+        attrTarget.setLeavingSpeed(1.0);
         String hash2 = StateJsonConverter.getFloorFieldHash(topography, attr);
 
         assertEquals("Hashes must differ",hash1, hash2);

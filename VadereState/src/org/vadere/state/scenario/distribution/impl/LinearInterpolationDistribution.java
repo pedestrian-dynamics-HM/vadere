@@ -1,7 +1,6 @@
 package org.vadere.state.scenario.distribution.impl;
 
 import org.apache.commons.math3.random.RandomGenerator;
-import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.distributions.AttributesLinearInterpolationDistribution;
 import org.vadere.state.scenario.distribution.VDistribution;
 import org.vadere.state.scenario.distribution.registry.RegisterDistribution;
@@ -12,13 +11,7 @@ import org.vadere.state.scenario.distribution.registry.RegisterDistribution;
  */
 @RegisterDistribution(name = "linearInterpolation", parameter = AttributesLinearInterpolationDistribution.class)
 public class LinearInterpolationDistribution extends VDistribution<AttributesLinearInterpolationDistribution> {
-	private Attributes lerpAttributes;
 
-	public LinearInterpolationDistribution(){
-		// Do not remove this constructor. It is us used through reflection.
-		super();
-		this.lerpAttributes = new AttributesLinearInterpolationDistribution();
-	}
 	public LinearInterpolationDistribution(AttributesLinearInterpolationDistribution parameter,
 										   RandomGenerator randomGenerator) throws Exception {
 		super(parameter, randomGenerator);

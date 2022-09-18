@@ -10,9 +10,9 @@ import org.vadere.state.scenario.AttributesAttached;
 public abstract class VDistribution<T extends AttributesDistribution> extends AttributesAttached<T>{
 
 	public VDistribution(T parameter,RandomGenerator randomGenerator) throws Exception {
+		setAttributes(parameter);
 		setValues(parameter, randomGenerator);
 	}
-    public VDistribution() {}
     abstract protected void setValues(T parameter,RandomGenerator randomGenerator) throws Exception;
 
 	abstract public double getNextSample(double timeCurrentEvent);

@@ -29,9 +29,4 @@ public class TimeSeriesSpawner extends VSpawner<AttributesTimeSeriesSpawner> {
         spawner.setRemainingSpawnAgents(remainingAgents);
     }
 
-    @Override
-    protected boolean isQueueEmpty() {
-        return false;
-    }
-
 }

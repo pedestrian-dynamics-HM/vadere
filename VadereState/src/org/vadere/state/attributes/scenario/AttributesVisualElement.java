@@ -5,11 +5,8 @@ import org.vadere.state.attributes.AttributesScenarioElement;
 import org.vadere.state.util.Views;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
-import org.vadere.util.reflection.VadereAttribute;
 
 public class AttributesVisualElement extends AttributesScenarioElement {
-    @VadereAttribute(exclude = true)
-    @JsonView(Views.CacheViewExclude.class)
     protected VShape shape;
     @JsonView(Views.CacheViewExclude.class)
     protected Boolean visible;

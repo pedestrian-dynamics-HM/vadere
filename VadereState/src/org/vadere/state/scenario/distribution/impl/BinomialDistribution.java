@@ -1,7 +1,6 @@
 package org.vadere.state.scenario.distribution.impl;
 
 import org.apache.commons.math3.random.RandomGenerator;
-import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.distributions.AttributesBinomialDistribution;
 import org.vadere.state.scenario.distribution.VDistribution;
 import org.vadere.state.scenario.distribution.registry.RegisterDistribution;
@@ -11,13 +10,7 @@ import org.vadere.state.scenario.distribution.registry.RegisterDistribution;
  */
 @RegisterDistribution(name = "binomial", parameter = AttributesBinomialDistribution.class)
 public class BinomialDistribution extends VDistribution<AttributesBinomialDistribution> {
-	private Attributes binomialAttributes;
 	private org.apache.commons.math3.distribution.BinomialDistribution distribution;
-
-	public BinomialDistribution(){
-		super();
-		this.binomialAttributes = new AttributesBinomialDistribution();
-	}
 
 	public BinomialDistribution(AttributesBinomialDistribution parameter,RandomGenerator randomGenerator)
 			throws Exception {
@@ -27,7 +20,6 @@ public class BinomialDistribution extends VDistribution<AttributesBinomialDistri
 	protected void setValues(AttributesBinomialDistribution parameter, RandomGenerator randomGenerator) {
 		this.distribution = new org.apache.commons.math3.distribution.BinomialDistribution(randomGenerator,
 				parameter.getTrials(), parameter.getP());
-		this.binomialAttributes = parameter;
 	}
 	@Override
 	public double getNextSample(double timeCurrentEvent) {

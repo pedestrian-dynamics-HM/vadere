@@ -19,36 +19,16 @@ public class TimeSeriesDistribution extends VDistribution<AttributesTimeSeriesDi
 	private Attributes timeSeriesAttributes;
 	private MixedDistribution distribution;
 
-	public TimeSeriesDistribution(){
-		// Do not remove this contructor. It is us used through reflection.
-		super();
-		this.timeSeriesAttributes = new AttributesTimeSeriesDistribution();
-	}
 	public TimeSeriesDistribution(AttributesTimeSeriesDistribution parameter, RandomGenerator unused)
 	        throws Exception {
 		super(parameter,unused);
 	}
-/*
-	@Override
-	public int getSpawnNumber(double timeCurrentEvent) {
-		return distribution.getSpawnNumber(timeCurrentEvent);
-	}
-*/
+
 	@Override
 	public double getNextSample(double timeCurrentEvent) {
 		return distribution.getNextSample(timeCurrentEvent);
 	}
-/*
-	@Override
-	public int getRemainingSpawnAgents() {
-		return distribution.getRemainingSpawnAgents();
-	}
 
-	@Override
-	public void setRemainingSpawnAgents(int remainingAgents) {
-		distribution.setRemainingSpawnAgents(remainingAgents);
-	}
-*/
 	@Override
 	protected void setValues(AttributesTimeSeriesDistribution parameter,RandomGenerator unused2) throws Exception {
 		ArrayList<Integer> spawnsPerInterval =(ArrayList<Integer>) parameter.getSpawnsPerInterval();

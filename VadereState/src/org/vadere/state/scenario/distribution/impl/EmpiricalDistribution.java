@@ -1,7 +1,6 @@
 package org.vadere.state.scenario.distribution.impl;
 
 import org.apache.commons.math3.random.RandomGenerator;
-import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.distributions.AttributesEmpiricalDistribution;
 import org.vadere.state.scenario.distribution.VDistribution;
 import org.vadere.state.scenario.distribution.registry.RegisterDistribution;
@@ -11,14 +10,8 @@ import org.vadere.state.scenario.distribution.registry.RegisterDistribution;
  */
 @RegisterDistribution(name = "empirical", parameter = AttributesEmpiricalDistribution.class)
 public class EmpiricalDistribution extends VDistribution<AttributesEmpiricalDistribution> {
-	private Attributes empiricalAttributes;
 	private org.apache.commons.math3.random.EmpiricalDistribution distribution;
 
-	public EmpiricalDistribution(){
-		// Do not remove this constructor. It is us used through reflection.
-		super();
-		this.empiricalAttributes = new AttributesEmpiricalDistribution();
-	}
 	public EmpiricalDistribution(AttributesEmpiricalDistribution parameter,RandomGenerator randomGenerator)
 	        throws Exception {
 		super(parameter, randomGenerator);
@@ -27,7 +20,6 @@ public class EmpiricalDistribution extends VDistribution<AttributesEmpiricalDist
 	@Override
 	protected void setValues(AttributesEmpiricalDistribution parameter, RandomGenerator randomGenerator) {
 		distribution = new org.apache.commons.math3.random.EmpiricalDistribution(randomGenerator);
-		this.empiricalAttributes = parameter;
 	}
 	@Override
 	public double getNextSample(double timeCurrentEvent) {

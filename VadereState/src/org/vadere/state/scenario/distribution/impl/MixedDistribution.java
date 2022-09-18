@@ -1,7 +1,6 @@
 package org.vadere.state.scenario.distribution.impl;
 
 import org.apache.commons.math3.random.RandomGenerator;
-import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.distributions.AttributesDistribution;
 import org.vadere.state.attributes.distributions.AttributesMixedDistribution;
 import org.vadere.state.scenario.distribution.DistributionFactory;
@@ -16,16 +15,10 @@ import java.util.List;
  */
 @RegisterDistribution(name = "mixed", parameter = AttributesMixedDistribution.class)
 public class MixedDistribution extends VDistribution<AttributesMixedDistribution> {
-	private Attributes mixedAttributes;
 	List<Double> switchPoints;
 	List<VDistribution<?>> distributions;
 	private int currentInterval = 0;
 
-	public  MixedDistribution(){
-		// Do not remove this constructor. It is us used through reflection.
-		super();
-		this.mixedAttributes = new AttributesMixedDistribution();
-	}
 	public MixedDistribution(AttributesMixedDistribution parameter,RandomGenerator randomGenerator)
 	        throws Exception {
 		super(parameter, randomGenerator);

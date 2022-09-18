@@ -15,11 +15,7 @@ public class PoissonDistribution extends VDistribution<AttributesPoissonDistribu
 	private ExponentialDistribution distribution;
 
 	private Attributes poissonAttributes;
-	public PoissonDistribution(){
-		// Do not remove this constructor. It is us used through reflection.
-		super();
-		this.poissonAttributes = new AttributesPoissonDistribution();
-	}
+
 	public PoissonDistribution(AttributesPoissonDistribution parameter, RandomGenerator randomGenerator)
 	        throws Exception {
 		super(parameter, randomGenerator);
