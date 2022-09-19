@@ -60,8 +60,7 @@ public class TargetVersionV2_5 extends SimpleJsonTransformation {
         addPostHookLast(this::moveAndRenameSourceFields);
         addPostHookLast(this::createNewNodesInTargets);
         addPostHookLast(this::moveAndRenameTargetFields);
-        /* rearange nodes of distributions */
-        addPostHookLast(this::sort);
+        //addPostHookLast(this::sort);
     }
 
     private JsonNode createNewNodesInTargets(JsonNode node) throws MigrationException{

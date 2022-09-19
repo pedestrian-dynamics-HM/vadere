@@ -66,6 +66,9 @@ public class TargetVersionV2_3 extends SimpleJsonTransformation {
                 if (!path(target, "waitingTime").isMissingNode()) {
                     double waitingTime = target.get("waitingTime").asDouble();
                     if (waitingTime == 0.0){
+                        ObjectNode objectNode = (ObjectNode) target;
+                        objectNode.put("waitingTimeDistribution", "null");
+                        objectNode.put("distributionParameters", "null");
                         addStringField(target,"waitingBehaviour", Target.WaitingBehaviour.NO_WAITING.toString());
                     }else{
                         ObjectNode objectNode = (ObjectNode) target;

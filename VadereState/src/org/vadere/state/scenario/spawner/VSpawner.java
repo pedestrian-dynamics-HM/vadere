@@ -66,7 +66,7 @@ public abstract class VSpawner<T extends AttributesSpawner>  extends AttributesA
     }
 
     public boolean isSpawnerWithOneSingleSpawnEvent() {
-        return attributes.getConstraintsTimeEnd() == attributes.getConstraintsTimeStart();
+        return attributes.getConstraintsTimeEnd().equals(attributes.getConstraintsTimeStart());
     }
 
 

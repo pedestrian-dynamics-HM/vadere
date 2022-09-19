@@ -53,7 +53,10 @@ public class TestScenarioBuilder {
         assertTrue(scenario.getTopography().getBounds().equals(new VRectangle(10, 10, 100, 100)));
 
         // 5. change sourceAttributes
-        builder.setSourceField("targetIds", 1, new ArrayList<>(){{new Integer(1);}});
+        var array = new ArrayList<Integer>(){{
+            add(1);
+        }};
+        builder.setSourceField("targetIds", 1,array);
         scenario = builder.build();
         assertTrue(scenario.getTopography().getSources().get(0).getAttributes().getTargetIds().get(0) == 1);
     }

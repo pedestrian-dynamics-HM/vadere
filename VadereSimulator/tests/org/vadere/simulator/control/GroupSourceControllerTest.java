@@ -521,18 +521,7 @@ public class GroupSourceControllerTest extends TestSourceControllerUsingConstant
 			"      \"x\" : 506.2999999999993,\n" +
 			"      \"y\" : 508.7000000000007\n" +
 			"    } ]\n" +
-			"  },\n" +
-			"  \"interSpawnTimeDistribution\" : \"org.vadere.state.scenario.ConstantDistribution\",\n" +
-			"  \"distributionParameters\" : [ 1.0 ],\n" +
-			"  \"spawnNumber\" : 35,\n" +
-			"  \"maxSpawnNumberTotal\" : -1,\n" +
-			"  \"startTime\" : 0.0,\n" +
-			"  \"endTime\" : 0.0,\n" +
-			"  \"spawnAtRandomPositions\" : true,\n" +
-			"  \"useFreeSpaceOnly\" : true,\n" +
-			"  \"targetIds\" : [ 1 ],\n" +
-			"  \"groupSizeDistribution\" : [ 0.1, 0.1, 0.1, 0.1, 0.6 ],\n" +
-			"  \"dynamicElementType\" : \"PEDESTRIAN\"\n" +
+			"  }\n" +
 			"}";
 
 

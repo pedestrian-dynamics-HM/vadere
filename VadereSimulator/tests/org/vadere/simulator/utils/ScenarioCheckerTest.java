@@ -131,7 +131,7 @@ public class ScenarioCheckerTest implements TestResourceHandlerScenario {
 		AttributesSourceBuilder attrSourceB = AttributesSourceBuilder.anAttributesSource();
 		AttributesTargetBuilder attrTargetB = AttributesTargetBuilder.anAttributesTarget();
 		builder.addSource(attrSourceB
-				.setTargetIds(new ArrayList<>(){{new Integer(4);}}) // id not found !
+				.setTargetIds(new ArrayList<>(){{add(4);}}) // id not found !
 				.build()
 		);
 		builder.addTarget(attrTargetB
@@ -153,7 +153,7 @@ public class ScenarioCheckerTest implements TestResourceHandlerScenario {
 		AttributesSourceBuilder attrSourceB = AttributesSourceBuilder.anAttributesSource();
 		AttributesTargetBuilder attrTargetB = AttributesTargetBuilder.anAttributesTarget();
 		builder.addSource(attrSourceB
-				.setTargetIds(new ArrayList<>(){{new Integer(1);new Integer(2);new Integer(3);}}) // id 3 not found !
+				.setTargetIds(new ArrayList<>(){{add(1);add(2);add(3);}}) // id 3 not found !
 				.build()
 		);
 		builder.addTarget(attrTargetB
@@ -180,7 +180,7 @@ public class ScenarioCheckerTest implements TestResourceHandlerScenario {
 		AttributesSourceBuilder attrSourceB = AttributesSourceBuilder.anAttributesSource();
 		AttributesTargetBuilder attrTargetB = AttributesTargetBuilder.anAttributesTarget();
 		builder.addSource(attrSourceB
-				.setTargetIds(new ArrayList<>(){{new Integer(1);}})
+				.setTargetIds(new ArrayList<>(){{add(1);}})
 				.build()
 		);
 		builder.addTarget(attrTargetB
