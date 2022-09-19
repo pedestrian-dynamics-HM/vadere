@@ -1,6 +1,5 @@
 package org.vadere.state.attributes.scenario;
 
-import org.vadere.state.attributes.AttributesEmbedShape;
 import org.vadere.state.scenario.TargetChangerAlgorithmType;
 import org.vadere.util.geometry.shapes.VShape;
 
@@ -10,7 +9,7 @@ import java.util.LinkedList;
 /**
  * Attributes of "TargetChanger" object, used by "TargetChangerController" during simulation.
  */
-public class AttributesTargetChanger extends AttributesEmbedShape {
+public class AttributesTargetChanger extends AttributesVisualElement {
 
     // Variables
     private int id = ID_NOT_SET;

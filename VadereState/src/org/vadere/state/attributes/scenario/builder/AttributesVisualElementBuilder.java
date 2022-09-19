@@ -1,12 +1,13 @@
 package org.vadere.state.attributes.scenario.builder;
 
 import org.vadere.state.attributes.scenario.AttributesVisualElement;
+import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 
 public final class AttributesVisualElementBuilder {
-    private VShape shape;
-    private Boolean visible;
-    private AttributesScenarioElementBuilder scenarioElementBuilder;
+    private VShape shape = new VRectangle(0,0,1,1);
+    private Boolean visible = true;
+    private AttributesScenarioElementBuilder scenarioElementBuilder = new AttributesScenarioElementBuilder();
 
     public AttributesVisualElementBuilder setScenarioElementBuilder(AttributesScenarioElementBuilder scenarioElementBuilder) {
         this.scenarioElementBuilder = scenarioElementBuilder;

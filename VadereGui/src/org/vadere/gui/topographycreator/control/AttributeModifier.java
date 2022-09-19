@@ -1,7 +1,7 @@
 package org.vadere.gui.topographycreator.control;
 
 import org.vadere.gui.topographycreator.model.AgentWrapper;
-import org.vadere.state.attributes.AttributesEmbedShape;
+import org.vadere.state.attributes.scenario.AttributesVisualElement;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
@@ -27,7 +27,7 @@ public class AttributeModifier {
 				double y = shape.getBounds2D().getCenterY();
 				((AgentWrapper) element).getAgentInitialStore().setPosition(new VPoint(x, y));
 			} else {
-				AttributesEmbedShape attributes = (AttributesEmbedShape) element.getAttributes();
+				AttributesVisualElement attributes = (AttributesVisualElement) element.getAttributes();
 				attributes.setShape(shape);
 			}
 		} catch (ClassCastException e) {

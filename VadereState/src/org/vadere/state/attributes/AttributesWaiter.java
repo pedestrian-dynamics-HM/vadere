@@ -10,6 +10,7 @@ public class AttributesWaiter extends AttributesEnabled {
     @JsonView(Views.CacheViewExclude.class)
     private AttributesDistribution distribution;
 
+
     public AttributesWaiter(){
         super();
     }

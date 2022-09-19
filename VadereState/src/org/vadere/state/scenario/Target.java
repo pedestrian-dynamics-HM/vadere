@@ -42,7 +42,7 @@ public class Target extends ScenarioElement implements Comparable<Target> {
 	}
 
 	public int getParallelWaiters() {
-		return attributes.getParallelWaiters();
+		return attributes.getParallelEvents();
 	}
 
 	public Map<Integer, Double> getEnteringTimes() {

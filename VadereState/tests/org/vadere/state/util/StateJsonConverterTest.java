@@ -135,7 +135,7 @@ public class StateJsonConverterTest {
         attrTarget.setAbsorbing(false);
         //attrTarget.setWaitingBehaviour(Target.WaitingBehaviour.TRAFFIC_LIGHT);
         //attrTarget.setWaitingTimeYellowPhase(2);
-        attrTarget.setParallelWaiters(1);
+        attrTarget.setParallelEvents(1);
         attrTarget.getWaiterAttributes().setDistribution(new AttributesBinomialDistribution());
         attrTarget.getAbsorberAttributes().setDeletionDistance(0.4);
         //attrTarget.setStartingWithRedLight(true);

@@ -15,6 +15,7 @@ import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Source;
 import org.vadere.state.scenario.Topography;
 import org.vadere.simulator.utils.reflection.TestResourceHandlerScenario;
+import org.vadere.state.scenario.spawner.impl.RegularSpawner;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
@@ -97,6 +98,7 @@ public class ScenarioCheckerTest implements TestResourceHandlerScenario {
 		AttributesSourceBuilder attrBuilder = AttributesSourceBuilder.anAttributesSource();
 		builder.addSource(attrBuilder
 				.setTargetIds(new ArrayList<>())
+						.setSpawnerAttributes(new AttributesSpawnerBuilder().build(RegularSpawner.class))
 				.build()
 		);
 		Topography topography = builder.build();
@@ -113,6 +115,7 @@ public class ScenarioCheckerTest implements TestResourceHandlerScenario {
 		AttributesSourceBuilder attrBuilder = AttributesSourceBuilder.anAttributesSource();
 		builder.addSource(attrBuilder
 				.setTargetIds(new ArrayList<>())
+						.setSpawnerAttributes(new AttributesSpawnerBuilder().setEventElementCount(5).build(RegularSpawner.class))
 				.build()
 		);
 		Topography topography = builder.build();

@@ -5,7 +5,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.vadere.annotation.factories.migrationassistant.MigrationTransformation;
 import org.vadere.simulator.projects.migration.MigrationException;
 import org.vadere.simulator.projects.migration.jsontranformation.SimpleJsonTransformation;
+import org.vadere.state.attributes.distributions.AttributesLinearInterpolationDistribution;
+import org.vadere.state.attributes.spawner.AttributesMixedSpawner;
 import org.vadere.state.attributes.spawner.AttributesRegularSpawner;
+import org.vadere.state.attributes.spawner.AttributesTimeSeriesSpawner;
 import org.vadere.util.version.Version;
 
 import java.util.HashMap;
@@ -82,12 +85,12 @@ public class TargetVersionV2_5 extends SimpleJsonTransformation {
                 var nd = (ObjectNode) iter.next();
                 moveRenameField(nd,"deletionDistance","deletionDistance",ABSORBER);
                 moveRenameField(nd,"enabled","absorbing",ABSORBER);
-                moveRenameField(nd,"parallelEvents","parallelWaiters","");
-                moveRenameField(nd,"leavingSpeed","nextSpeed","");
+                renameField(nd,"parallelWaiters","parallelEvents");
+                renameField(nd,"nextSpeed","leavingSpeed");
 
                 moveRenameField(nd,DIST_FIELD_NEW,DIST_FIELD_TRG,WAITER);
                 if(nd.get("waitingBehaviour").asText().equals("NO_WAITING")){
-                    //((ObjectNode)nd.path(WAITER)).put("enabled",false);
+                    ((ObjectNode)nd.path(WAITER)).put("enabled",false);
                 }else{
                     ((ObjectNode)nd.path(WAITER)).put("enabled",true);
                 }
@@ -112,15 +115,25 @@ public class TargetVersionV2_5 extends SimpleJsonTransformation {
                 moveRenameField(nd,"eventPositionGridCA","spawnAtGridPositionsCA",SPAWNER_FIELD);
                 moveRenameField(nd,"eventPositionFreeSpace","useFreeSpaceOnly",SPAWNER_FIELD);
                 moveRenameField(nd,"eventElement","attributesPedestrian",SPAWNER_FIELD);
-                moveRenameField(nd,"type","dynamicElementType",SPAWNER_FIELD+"eventElement");
+
+
+                var ndTrg = nd.path(SPAWNER_FIELD).path("eventElement");
+                if(ndTrg.asText() != "null") {
+                    ((ObjectNode) ndTrg).put("type", nd.path("dynamicElementType"));
+                }
+                remove(nd,"dynamicElementType");
                 moveRenameField(nd,DIST_FIELD_NEW,DIST_FIELD_SRC,SPAWNER_FIELD);
+
+
                 var distTypeNode = nd.findPath(SPAWNER_FIELD).findPath("type");
                 var spawnNode =(ObjectNode) nd.findPath(SPAWNER_FIELD);
                 String typeName = distTypeNode.asText();
-                if(typeName.equals("timeSeries") ){
-                    spawnNode.put(TYPE_STRING,"TIME_SERIES");
-                }else if( typeName.equals("mixed")){
-                    spawnNode.put(TYPE_STRING,"MIXED");
+                if(typeName.equals(map.get("timeSeries")) ){
+                    spawnNode.put(TYPE_STRING, AttributesTimeSeriesSpawner.class.getName());
+                }else if( typeName.equals(map.get("mixed"))){
+                    spawnNode.put(TYPE_STRING, AttributesMixedSpawner.class.getName());
+                }else if (typeName.equals(map.get("linearInterpolation"))){
+                    spawnNode.put(TYPE_STRING, AttributesLinearInterpolationDistribution.class.getName());
                 }else{
                     spawnNode.put(TYPE_STRING, AttributesRegularSpawner.class.getName());
                 }
@@ -169,9 +182,13 @@ public class TargetVersionV2_5 extends SimpleJsonTransformation {
     private void moveRenameField(JsonNode node,String newName, String fieldName, String newParent)throws MigrationException{
         var ndSrc = node.path(fieldName);
         var ndTrg = node.path(newParent);
-        if(!ndSrc.isMissingNode() && !ndTrg.isMissingNode()){
-            ((ObjectNode)ndTrg).put(newName,ndSrc.deepCopy());
+        if(ndTrg.isMissingNode())
+            throw new MigrationException("target "+ndTrg.asText()+ "node does not exist");
+        if(ndSrc.isMissingNode()){
+            ((ObjectNode)ndTrg).set(newName,(JsonNode) null);
+        }else{
+            ((ObjectNode)ndTrg).set(newName,ndSrc.deepCopy());
+            remove(node,fieldName);
         }
-        remove(node,fieldName);
     }
 }

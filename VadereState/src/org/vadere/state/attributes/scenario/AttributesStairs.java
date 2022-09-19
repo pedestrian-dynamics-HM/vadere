@@ -1,6 +1,5 @@
 package org.vadere.state.attributes.scenario;
 
-import org.vadere.state.attributes.AttributesEmbedShape;
 import org.vadere.state.scenario.Stairs;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.geometry.shapes.Vector2D;
@@ -16,7 +15,7 @@ import org.vadere.util.logging.Logger;
  * 
  *
  */
-public class AttributesStairs extends AttributesEmbedShape {
+public class AttributesStairs extends AttributesVisualElement {
 
 	private VShape shape = null;
 	private int id = ID_NOT_SET;

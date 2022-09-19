@@ -25,7 +25,7 @@ public class AttributesTarget extends AttributesVisualElement {
 
 	@VadereAttribute
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
-	private Integer parallelWaiters = 0;
+	private Integer parallelEvents = 0;
 
 
 	// TODO should be "reachedDistance"; agents do not necessarily get deleted/absorbed
@@ -67,7 +67,6 @@ public class AttributesTarget extends AttributesVisualElement {
 	public AttributesTarget(Pedestrian pedestrian) {
 		this.shape = pedestrian.getShape();
 		this.id = pedestrian.getIdAsTarget();
-		this.parallelWaiters = 0;
 	}
 
 	// Getters...
@@ -79,15 +78,6 @@ public class AttributesTarget extends AttributesVisualElement {
 	public void setAbsorbing(boolean absorbing) {
 		checkSealed();
 		this.absorber.setEnabled(absorbing);
-	}
-
-	public int getParallelWaiters() {
-		return parallelWaiters;
-	}
-
-	public void setParallelWaiters(int parallelWaiters) {
-		checkSealed();
-		this.parallelWaiters = parallelWaiters;
 	}
 
 	public AttributesAbsorber getAbsorberAttributes() {
@@ -123,5 +113,14 @@ public class AttributesTarget extends AttributesVisualElement {
 	public void setLeavingSpeed(Double leavingSpeed) {
 		checkSealed();
 		this.leavingSpeed = leavingSpeed;
+	}
+
+	public Integer getParallelEvents() {
+		return parallelEvents;
+	}
+
+	public void setParallelEvents(Integer parallelEvents) {
+		checkSealed();
+		this.parallelEvents = parallelEvents;
 	}
 }

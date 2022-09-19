@@ -7,7 +7,8 @@ import org.vadere.state.scenario.distribution.impl.SingleSpawnDistribution;
 
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
-        property = "type"//,defaultImpl = AttributesNoDistribution.class
+        property = "type",
+        defaultImpl = Void.class
         )
 @JsonSubTypes({
         @JsonSubTypes.Type(value = AttributesBinomialDistribution.class, name = "org.vadere.state.attributes.distributions.AttributesBinomialDistribution"),
@@ -19,7 +20,7 @@ import org.vadere.state.scenario.distribution.impl.SingleSpawnDistribution;
         @JsonSubTypes.Type(value = AttributesNormalDistribution.class, name = "org.vadere.state.attributes.distributions.AttributesNormalDistribution"),
         @JsonSubTypes.Type(value = AttributesPoissonDistribution.class, name = "org.vadere.state.attributes.distributions.AttributesPoissonDistribution"),
         @JsonSubTypes.Type(value = SingleSpawnDistribution.class, name = "org.vadere.state.attributes.distributions.AttributesSingleSpawnDistribution"),
-        @JsonSubTypes.Type(value = AttributesBinomialDistribution.class, name = "org.vadere.state.attributes.distributions.AttributesTimeSeriesDistribution"),
+        @JsonSubTypes.Type(value = AttributesTimeSeriesDistribution.class, name = "org.vadere.state.attributes.distributions.AttributesTimeSeriesDistribution"),
 })
 public abstract class AttributesDistribution extends Attributes {
 }

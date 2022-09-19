@@ -1,11 +1,8 @@
 package org.vadere.state.attributes.scenario;
 
-import org.vadere.state.attributes.AttributesEmbedShape;
 import org.vadere.util.geometry.shapes.VShape;
 
-import java.util.Objects;
-
-public class AttributesMeasurementArea extends AttributesEmbedShape {
+public class AttributesMeasurementArea extends AttributesVisualElement {
 
 	private VShape shape;
 	private int id;
