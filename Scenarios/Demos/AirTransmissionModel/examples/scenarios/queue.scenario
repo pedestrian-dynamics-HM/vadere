@@ -2,7 +2,7 @@
   "name" : "queue",
   "description" : "",
   "release" : "2.5",
-  "commithash" : "890c9b42d8c51ee1d7d677b6972b454d1cb691ba",
+  "commithash" : "37d5cea029114cfbc5ced38fb76c86834cb50304",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -315,8 +315,8 @@
             "updateFrequency" : 120.0
           }
         },
-        "leavingSpeed" : 0.0,
-        "parallelWaiters" : 0
+        "leavingSpeed" : -1.0,
+        "parallelEvents" : 0
       } ],
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],

@@ -118,9 +118,9 @@ public class TargetVersionV2_5 extends SimpleJsonTransformation {
 
 
                 var ndTrg = nd.path(SPAWNER_FIELD).path("eventElement");
-                if(ndTrg.asText() != "null") {
+                /*if(ndTrg.asText() != "null") {
                     ((ObjectNode) ndTrg).put("type", nd.path("dynamicElementType"));
-                }
+                }*/
                 remove(nd,"dynamicElementType");
                 moveRenameField(nd,DIST_FIELD_NEW,DIST_FIELD_SRC,SPAWNER_FIELD);
 

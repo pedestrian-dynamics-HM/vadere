@@ -1,8 +1,8 @@
 {
   "name" : "mf_001",
   "description" : "",
-  "release" : "2.3",
-  "commithash" : "ff5b381ea8f959e7e0d65a1b13bcdde1e13782cf",
+  "release" : "2.5",
+  "commithash" : "37d5cea029114cfbc5ced38fb76c86834cb50304",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
@@ -143,6 +143,7 @@
         "referenceCoordinateSystem" : null
       },
       "obstacles" : [ {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -162,8 +163,9 @@
             "y" : 422.7131054094061
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -195,8 +197,9 @@
             "y" : 511.92338558100164
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -234,8 +237,9 @@
             "y" : 48.97548953909427
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -252,8 +256,9 @@
             "y" : 40.35653116740286
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -276,8 +281,9 @@
             "y" : 516.2888004183769
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -309,8 +315,9 @@
             "y" : 69.94537084270269
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -351,8 +358,9 @@
             "y" : 430.854662806727
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -369,8 +377,9 @@
             "y" : 21.67552557401359
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -387,8 +396,9 @@
             "y" : 306.6872815322131
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -405,8 +415,9 @@
             "y" : 421.60265097301453
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -423,8 +434,9 @@
             "y" : 468.82864469010383
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -498,8 +510,9 @@
             "y" : 331.56667243968695
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -564,8 +577,9 @@
             "y" : 492.12532855477184
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -630,8 +644,9 @@
             "y" : 533.8747273674235
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -651,8 +666,9 @@
             "y" : 453.70977318286896
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -672,8 +688,9 @@
             "y" : 545.1606202404946
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -702,8 +719,9 @@
             "y" : 159.07243407238275
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -735,8 +753,9 @@
             "y" : 342.931442188099
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -753,8 +772,9 @@
             "y" : 498.24894077144563
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -771,8 +791,9 @@
             "y" : 87.13182304147631
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -789,8 +810,9 @@
             "y" : 521.6217382280156
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -810,8 +832,9 @@
             "y" : 201.06961817853153
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -828,8 +851,9 @@
             "y" : 265.6783099286258
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -846,8 +870,9 @@
             "y" : 205.5002043163404
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -870,8 +895,9 @@
             "y" : 544.7211866499856
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -912,8 +938,9 @@
             "y" : 565.0100804977119
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -936,8 +963,9 @@
             "y" : 557.8419920215383
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -1014,8 +1042,9 @@
             "y" : 486.51500128302723
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -1050,8 +1079,9 @@
             "y" : 135.93572835810483
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -1068,8 +1098,9 @@
             "y" : 505.10381740517914
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -1113,8 +1144,9 @@
             "y" : 311.4439243329689
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -1152,8 +1184,9 @@
             "y" : 225.39584306720644
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -1191,8 +1224,9 @@
             "y" : 258.4046472944319
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -1209,8 +1243,9 @@
             "y" : 305.4272002065554
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -1251,8 +1286,9 @@
             "y" : 194.63456889986992
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -1290,8 +1326,9 @@
             "y" : 460.28918070252985
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -1311,8 +1348,9 @@
             "y" : 50.29088102839887
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -1335,8 +1373,9 @@
             "y" : 195.54022343736142
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -1353,8 +1392,9 @@
             "y" : 257.2698888350278
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -1395,8 +1435,9 @@
             "y" : 205.84239491261542
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -1413,8 +1454,9 @@
             "y" : 172.71522911917418
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -1431,8 +1473,9 @@
             "y" : 41.34196496382356
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -1455,8 +1498,9 @@
             "y" : 91.1830583550036
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -1476,8 +1520,9 @@
             "y" : 154.80356066394597
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -1500,8 +1545,9 @@
             "y" : 48.23581160325557
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -1518,8 +1564,9 @@
             "y" : 163.39744580257684
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -1536,8 +1583,9 @@
             "y" : 81.37608813866973
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -1560,8 +1608,9 @@
             "y" : 39.64422111213207
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -1581,8 +1630,9 @@
             "y" : 86.3493977561593
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -1602,8 +1652,9 @@
             "y" : 143.18148447480053
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -1620,8 +1671,9 @@
             "y" : 45.05786400381476
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -1638,8 +1690,9 @@
             "y" : 56.13940835557878
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -1656,8 +1709,9 @@
             "y" : 74.53541631251574
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -1683,8 +1737,9 @@
             "y" : 53.55440693348646
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -1701,8 +1756,9 @@
             "y" : 513.2809328399599
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -1719,8 +1775,9 @@
             "y" : 265.01574270706624
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -1755,8 +1812,9 @@
             "y" : 486.47013669647276
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -1773,8 +1831,9 @@
             "y" : 299.78439700230956
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -1797,8 +1856,9 @@
             "y" : 234.28267452307045
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -1821,8 +1881,9 @@
             "y" : 482.5330781927332
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -1851,8 +1912,9 @@
             "y" : 478.5101922964677
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -1869,8 +1931,9 @@
             "y" : 276.90915594249964
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -1902,8 +1965,9 @@
             "y" : 284.2351709520444
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -1920,8 +1984,9 @@
             "y" : 179.93294412177056
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -1938,8 +2003,9 @@
             "y" : 394.28575388900936
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -1956,8 +2022,9 @@
             "y" : 108.01575154066086
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -1974,8 +2041,9 @@
             "y" : 57.9694919269532
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -2001,8 +2069,9 @@
             "y" : 70.6693005412817
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -2019,8 +2088,9 @@
             "y" : 510.8062473293394
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -2043,8 +2113,9 @@
             "y" : 119.26982641592622
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -2064,8 +2135,9 @@
             "y" : 470.25887215696275
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -2115,8 +2187,9 @@
             "y" : 363.7828469388187
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -2133,8 +2206,9 @@
             "y" : 472.3421019082889
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -2151,8 +2225,9 @@
             "y" : 515.4364190371707
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -2184,8 +2259,9 @@
             "y" : 351.9356309296563
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -2214,8 +2290,9 @@
             "y" : 339.3861181512475
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -2232,8 +2309,9 @@
             "y" : 442.6274226466194
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -2250,8 +2328,9 @@
             "y" : 54.11117702815682
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -2268,8 +2347,9 @@
             "y" : 84.41195614542812
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -2286,8 +2366,9 @@
             "y" : 92.72632414568216
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -2304,8 +2385,9 @@
             "y" : 96.75062617100775
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -2322,8 +2404,9 @@
             "y" : 67.6722867693752
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -2340,8 +2423,9 @@
             "y" : 103.70597955584526
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -2358,8 +2442,9 @@
             "y" : 59.4789174022153
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -2376,8 +2461,9 @@
             "y" : 78.16524235345423
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -2394,8 +2480,9 @@
             "y" : 102.21353813726455
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -2412,8 +2499,9 @@
             "y" : 93.23313997499645
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -2436,8 +2524,9 @@
             "y" : 74.89875042438507
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -2478,8 +2567,9 @@
             "y" : 484.61644693277776
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -2517,8 +2607,9 @@
             "y" : 388.61814347375184
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -2799,8 +2890,9 @@
             "y" : 267.1123864715919
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -2844,8 +2936,9 @@
             "y" : 323.74677012488246
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -2883,8 +2976,9 @@
             "y" : 394.265563338995
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -2964,8 +3058,9 @@
             "y" : 404.5147722447291
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -3030,8 +3125,9 @@
             "y" : 339.796026407741
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -3084,8 +3180,9 @@
             "y" : 456.16151477675885
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -3129,8 +3226,9 @@
             "y" : 400.3790111616254
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -3159,8 +3257,9 @@
             "y" : 277.6435008943081
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -3222,8 +3321,9 @@
             "y" : 289.69469448924065
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -3264,8 +3364,9 @@
             "y" : 347.11372385080904
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -3327,8 +3428,9 @@
             "y" : 52.805375658906996
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -3393,8 +3495,9 @@
             "y" : 28.979665282182395
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -3423,8 +3526,9 @@
             "y" : 554.8127090232447
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -3462,8 +3566,9 @@
             "y" : 527.744437392801
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -3516,8 +3621,9 @@
             "y" : 280.01674961671233
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -3576,8 +3682,9 @@
             "y" : 87.87697314098477
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -3615,8 +3722,9 @@
             "y" : 235.7096520010382
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -3642,8 +3750,9 @@
             "y" : 309.44885993376374
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -3690,8 +3799,9 @@
             "y" : 390.58023703377694
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -3783,8 +3893,9 @@
             "y" : 259.811674490571
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -3822,8 +3933,9 @@
             "y" : 222.12640532385558
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -3864,8 +3976,9 @@
             "y" : 221.72919982206076
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -4005,8 +4118,9 @@
             "y" : 261.3925919830799
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -4044,8 +4158,9 @@
             "y" : 38.513854248449206
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -4074,8 +4189,9 @@
             "y" : 214.12133261188865
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -4107,8 +4223,9 @@
             "y" : 225.3288897126913
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -4140,8 +4257,9 @@
             "y" : 187.52965094149113
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -4170,8 +4288,9 @@
             "y" : 215.11116113699973
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -4200,8 +4319,9 @@
             "y" : 207.33619192242622
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -4287,8 +4407,9 @@
             "y" : 478.81150802318007
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -4329,8 +4450,9 @@
             "y" : 518.795059889555
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -4368,8 +4490,9 @@
             "y" : 488.3063512649387
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -4413,8 +4536,9 @@
             "y" : 166.33954545482993
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -4455,8 +4579,9 @@
             "y" : 46.61156403645873
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -4509,8 +4634,9 @@
             "y" : 115.29353175032884
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -4539,8 +4665,9 @@
             "y" : 129.07654312066734
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -4575,8 +4702,9 @@
             "y" : 79.99396759923548
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -4611,8 +4739,9 @@
             "y" : 249.98966004047543
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -4641,8 +4770,9 @@
             "y" : 136.0307448450476
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -4722,8 +4852,9 @@
             "y" : 306.2978512374684
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -4758,8 +4889,9 @@
             "y" : 81.51497857738286
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -4815,8 +4947,9 @@
             "y" : 137.19504432938993
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -4845,8 +4978,9 @@
             "y" : 126.46752262301743
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -4902,8 +5036,9 @@
             "y" : 88.23653956595808
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -4950,8 +5085,9 @@
             "y" : 24.908003002405167
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -4986,8 +5122,9 @@
             "y" : 163.17020115535706
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -5052,8 +5189,9 @@
             "y" : 352.6648847833276
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -5088,8 +5226,9 @@
             "y" : 500.379761072807
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -5118,8 +5257,9 @@
             "y" : 399.00826093554497
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -5148,8 +5288,9 @@
             "y" : 146.2525734640658
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -5178,8 +5319,9 @@
             "y" : 165.03151569329202
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -5208,8 +5350,9 @@
             "y" : 341.9736652635038
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -5238,8 +5381,9 @@
             "y" : 57.338068715296686
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -5289,8 +5433,9 @@
             "y" : 98.67468009982258
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -5373,8 +5518,9 @@
             "y" : 238.8843424320221
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -5409,8 +5555,9 @@
             "y" : 293.68509278073907
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -5442,8 +5589,9 @@
             "y" : 146.51730036828667
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -5502,8 +5650,9 @@
             "y" : 86.05346729978919
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -5562,8 +5711,9 @@
             "y" : 216.93219482526183
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -5679,8 +5829,9 @@
             "y" : 324.44913422875106
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -5733,8 +5884,9 @@
             "y" : 426.0796527583152
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -5787,8 +5939,9 @@
             "y" : 302.755598384887
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -5832,8 +5985,9 @@
             "y" : 467.56208019703627
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -5892,8 +6046,9 @@
             "y" : 405.27429520431906
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -5988,8 +6143,9 @@
             "y" : 537.1004428695887
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -6051,8 +6207,9 @@
             "y" : 297.205598349683
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -6114,8 +6271,9 @@
             "y" : 98.37870169896632
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -6279,8 +6437,9 @@
             "y" : 405.0767093654722
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -6348,8 +6507,9 @@
             "y" : 102.79870188888162
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -6417,8 +6577,9 @@
             "y" : 515.2002796567976
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -6522,8 +6683,9 @@
             "y" : 366.47561774775386
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -6609,8 +6771,9 @@
             "y" : 277.74430827982724
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -6687,8 +6850,9 @@
             "y" : 394.8502347525209
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -6810,8 +6974,9 @@
             "y" : 502.0289211347699
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -6864,8 +7029,9 @@
             "y" : 242.22252059355378
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -6936,8 +7102,9 @@
             "y" : 237.49328591674566
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -7005,8 +7172,9 @@
             "y" : 48.92165426257998
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -7092,8 +7260,9 @@
             "y" : 122.5474460395053
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -7173,8 +7342,9 @@
             "y" : 173.2543186293915
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -7245,8 +7415,9 @@
             "y" : 231.99118083249778
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -7305,8 +7476,9 @@
             "y" : 53.92430779431015
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -7377,8 +7549,9 @@
             "y" : 57.708552666939795
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -7494,8 +7667,9 @@
             "y" : 58.41178737953305
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -7578,8 +7752,9 @@
             "y" : 176.27171977981925
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -7668,8 +7843,9 @@
             "y" : 207.245321162045
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -7782,8 +7958,9 @@
             "y" : 125.27766549028456
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -7890,8 +8067,9 @@
             "y" : 195.16831812728196
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -7956,8 +8134,9 @@
             "y" : 485.3982745781541
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -8157,8 +8336,9 @@
             "y" : 311.6037026476115
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -8304,8 +8484,9 @@
             "y" : 501.53138175047934
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -8412,8 +8593,9 @@
             "y" : 337.49261794704944
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -8652,8 +8834,9 @@
             "y" : 402.64517798181623
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -8805,8 +8988,9 @@
             "y" : 503.5725031848997
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -8955,8 +9139,9 @@
             "y" : 378.0906695816666
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -9102,8 +9287,9 @@
             "y" : 388.06048586405814
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -9243,8 +9429,9 @@
             "y" : 146.0307314740494
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -9372,8 +9559,9 @@
             "y" : 195.31105465535074
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -9414,8 +9602,9 @@
             "y" : 149.72386556025594
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -9636,8 +9825,9 @@
             "y" : 125.49773042462766
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -9762,8 +9952,9 @@
             "y" : 83.22198748216033
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -9930,8 +10121,9 @@
             "y" : 216.49783485382795
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -10062,8 +10254,9 @@
             "y" : 191.6963262045756
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -10230,8 +10423,9 @@
             "y" : 496.45037901215255
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -10521,8 +10715,9 @@
             "y" : 484.1187166357413
           } ]
         },
-        "id" : -1
+        "visible" : true
       }, {
+        "id" : -1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -10782,7 +10977,7 @@
             "y" : 317.0991692477837
           } ]
         },
-        "id" : -1
+        "visible" : true
       } ],
       "measurementAreas" : [ ],
       "stairs" : [ ],
@@ -10794,6 +10989,14 @@
       "sources" : [ ],
       "dynamicElements" : [ ],
       "attributesPedestrian" : {
+        "shape" : {
+          "x" : 0.0,
+          "y" : 0.0,
+          "width" : 1.0,
+          "height" : 1.0,
+          "type" : "RECTANGLE"
+        },
+        "visible" : true,
         "radius" : 0.195,
         "densityDependentSpeed" : false,
         "speedDistributionMean" : 1.34,
@@ -10803,8 +11006,8 @@
         "acceleration" : 2.0,
         "footstepHistorySize" : 4,
         "searchRadius" : 1.0,
-        "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-        "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+        "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+        "walkingDirectionCalculation" : "BY_TARGET_CENTER"
       },
       "teleporter" : null,
       "attributesCar" : null
