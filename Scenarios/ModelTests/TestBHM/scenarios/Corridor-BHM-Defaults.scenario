@@ -2,7 +2,6 @@
   "name" : "Corridor-BHM-Defaults",
   "description" : "",
   "release" : "2.5",
-  "commithash" : "37d5cea029114cfbc5ced38fb76c86834cb50304",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",

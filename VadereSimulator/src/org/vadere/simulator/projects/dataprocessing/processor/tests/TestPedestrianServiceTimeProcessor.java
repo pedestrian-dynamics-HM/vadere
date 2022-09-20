@@ -72,7 +72,7 @@ public class TestPedestrianServiceTimeProcessor extends TestProcessor {
         var upperbound = attrib.getUpperBound();
         var actualval = numberPedsPerSec*liveavg;
         handleAssertion(actualval > lowerbound
-        && actualval < upperbound);
+        && actualval < upperbound,"lowerbound "+lowerbound+", upperbound "+upperbound+",actual value "+actualval);
 
     }
 

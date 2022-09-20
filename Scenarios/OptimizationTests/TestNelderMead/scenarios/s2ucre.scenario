@@ -2,7 +2,6 @@
   "name" : "s2ucre",
   "description" : "",
   "release" : "2.5",
-  "commithash" : "37d5cea029114cfbc5ced38fb76c86834cb50304",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ {
@@ -13,14 +12,14 @@
         "expectedResult" : "SUCCESS",
         "optimizationMetricProcessorId" : 2,
         "testEvacuationProcessorId" : 3,
-        "maxMeanPointDistance" : 0.0899909260756839,
-        "maxMeanDifferenceFuncValue" : 0.02454599248184318,
-        "infoMinPointDistanceL2" : 0.00486214225177224,
-        "infoMaxPointDistanceL2" : 0.5618698000962584,
-        "infoMinFuncDifference" : 1.8282880538400548E-4,
-        "infoMaxFuncDifference" : 0.115304814384805,
-        "infoStddevPointDistance" : 0.07170356699761087,
-        "infoStddevDifferenceFuncValue" : 0.01275342857630046
+        "maxMeanPointDistance" : 0.10039696729806116,
+        "maxMeanDifferenceFuncValue" : 0.023776539734733322,
+        "infoMinPointDistanceL2" : 0.01537797056353981,
+        "infoMaxPointDistanceL2" : 0.48914253480779896,
+        "infoMinFuncDifference" : 0.0013550135375233197,
+        "infoMaxFuncDifference" : 0.14354267102941698,
+        "infoStddevPointDistance" : 0.07087092091440919,
+        "infoStddevDifferenceFuncValue" : 0.015227670552427082
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianMetricOptimizationProcessor",
