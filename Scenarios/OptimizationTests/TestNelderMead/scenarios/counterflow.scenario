@@ -13,7 +13,7 @@
         "optimizationMetricProcessorId" : 2,
         "testEvacuationProcessorId" : 3,
         "maxMeanPointDistance" : 0.08040561762371691,
-        "maxMeanDifferenceFuncValue" : 0.024783160079387002,
+        "maxMeanDifferenceFuncValue" : 0.025816523634581184,
         "infoMinPointDistanceL2" : 0.0,
         "infoMaxPointDistanceL2" : 1.1035071661968199,
         "infoMinFuncDifference" : -8.170203869894976E-6,
