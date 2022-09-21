@@ -2,7 +2,7 @@ package org.vadere.gui.topographycreator.control.attribtable.cells;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.topographycreator.control.attribtable.cells.delegates.*;
-import org.vadere.gui.topographycreator.control.attribtable.tree.AttributeTree;
+import org.vadere.gui.topographycreator.control.attribtable.tree.AttributeTreeModel;
 import org.vadere.util.geometry.shapes.VPoint;
 
 import javax.swing.*;
@@ -49,7 +49,7 @@ public class EditorRegistry {
         if (!this.editorConstructors.containsKey(typeClass)) {
             Constructor<? extends AttributeEditor> constructor = null;
             try {
-                constructor = editorClass.getDeclaredConstructor(AttributeTree.TreeNode.class, JPanel.class,Object.class);
+                constructor = editorClass.getDeclaredConstructor(AttributeTreeModel.TreeNode.class, JPanel.class,Object.class);
             } catch (NoSuchMethodException e) {
                 throw new RuntimeException(e);
             }
@@ -57,19 +57,19 @@ public class EditorRegistry {
         }
     }
 
-    public AttributeEditor create(@NotNull Class type, @NotNull AttributeTree.TreeNode model, @NotNull JPanel contentPanel, Object initialValue) {
+    public AttributeEditor create(@NotNull Class type, @NotNull AttributeTreeModel.TreeNode model, @NotNull JPanel contentPanel, Object initialValue) {
         Constructor constructor;
         AttributeEditor component;
         try {
             if (!contains(type)) {
                 if (type.isEnum())
-                    constructor = ComboBoxCellEditor.class.getDeclaredConstructor(AttributeTree.TreeNode.class, JPanel.class, Object.class);
+                    constructor = ComboBoxCellEditor.class.getDeclaredConstructor(AttributeTreeModel.TreeNode.class, JPanel.class, Object.class);
                 else if (type.isAssignableFrom(List.class)) {
-                    constructor = ListCellEditor.class.getDeclaredConstructor(AttributeTree.TreeNode.class, JPanel.class, Object.class);
+                    constructor = ListCellEditor.class.getDeclaredConstructor(AttributeTreeModel.TreeNode.class, JPanel.class, Object.class);
                 } else if (Modifier.isAbstract(type.getModifiers()))
-                    constructor = AbstractTypeCellEditor.class.getDeclaredConstructor(AttributeTree.TreeNode.class, JPanel.class, Object.class);
+                    constructor = AbstractTypeCellEditor.class.getDeclaredConstructor(AttributeTreeModel.TreeNode.class, JPanel.class, Object.class);
                 else
-                    constructor = ChildObjectCellEditor.class.getDeclaredConstructor(AttributeTree.TreeNode.class, JPanel.class,Object.class);
+                    constructor = ChildObjectCellEditor.class.getDeclaredConstructor(AttributeTreeModel.TreeNode.class, JPanel.class,Object.class);
             } else {
                 constructor = editorConstructors.get(type.getName());
             }

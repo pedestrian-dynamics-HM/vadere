@@ -4,8 +4,7 @@ import org.vadere.gui.topographycreator.control.attribtable.JAttributeTable;
 import org.vadere.gui.topographycreator.control.attribtable.cells.ButtonColumnRenderer;
 import org.vadere.gui.topographycreator.control.attribtable.cells.ListValueDelegateWrapper;
 import org.vadere.gui.topographycreator.control.attribtable.tree.ArrayNode;
-import org.vadere.gui.topographycreator.control.attribtable.tree.AttributeTree;
-import org.vadere.gui.topographycreator.control.attribtable.tree.ObjectNode;
+import org.vadere.gui.topographycreator.control.attribtable.tree.AttributeTreeModel;
 import org.vadere.gui.topographycreator.control.attribtable.ui.AttributeTablePage;
 
 import javax.swing.*;
@@ -18,9 +17,7 @@ import java.awt.event.MouseEvent;
 import java.lang.reflect.InvocationTargetException;
 
 public class ListCellEditor extends ChildObjectCellEditor {
-    private JAttributeTable table;
-
-    public ListCellEditor(AttributeTree.TreeNode model, JPanel contentPanel,Object initialValue) {
+    public ListCellEditor(AttributeTreeModel.TreeNode model, JPanel contentPanel, Object initialValue) {
         super(model, contentPanel,initialValue);
     }
 

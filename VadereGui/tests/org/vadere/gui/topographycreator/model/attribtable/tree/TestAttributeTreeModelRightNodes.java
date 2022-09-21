@@ -11,11 +11,11 @@ import java.util.List;
 /**
  * these tests check if AttributeTree.parseClassTree(..) creates the right nodes types for the given tested class types
  */
-public class TestAttributeTreeRightNodes {
+public class TestAttributeTreeModelRightNodes {
     @Test
     public void testClassWithRegisteredAttribute(){
         TestClassA testClass = new TestClassA();
-        var tree = AttributeTree.parseClassTree(null,null,testClass.getClass());
+        var tree = AttributeTreeModel.parseClassTree(null,null,testClass.getClass());
 
         /**
          * We require the class to be registered before testing the tree children
@@ -28,7 +28,7 @@ public class TestAttributeTreeRightNodes {
     @Test
     public void testClassWithListType(){
         TestClassB testClass = new TestClassB();
-        var tree = AttributeTree.parseClassTree(null,null,testClass.getClass());
+        var tree = AttributeTreeModel.parseClassTree(null,null,testClass.getClass());
 
         Assert.assertTrue(tree.getChildren().get("myInteger").getSecond().getClass().isAssignableFrom(ArrayNode.class));
     }
@@ -36,7 +36,7 @@ public class TestAttributeTreeRightNodes {
     @Test
     public void testClassWithUnregisteredObject(){
         TestClassC testClass = new TestClassC();
-        var tree = AttributeTree.parseClassTree(null,null,testClass.getClass());
+        var tree = AttributeTreeModel.parseClassTree(null,null,testClass.getClass());
 
 
         Assert.assertTrue(tree.getChildren().get("myInteger").getSecond().getClass().isAssignableFrom(ObjectNode.class));
@@ -45,7 +45,7 @@ public class TestAttributeTreeRightNodes {
     @Test
     public void testClassWithAbstractType(){
         TestClassD testClass = new TestClassD();
-        var tree = AttributeTree.parseClassTree(null,null,testClass.getClass());
+        var tree = AttributeTreeModel.parseClassTree(null,null,testClass.getClass());
 
 
         Assert.assertTrue(tree.getChildren().get("myInteger").getSecond().getClass().isAssignableFrom(AbstrNode.class));

@@ -4,12 +4,10 @@ import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.topographycreator.control.AttributeHelpView;
 import org.vadere.gui.topographycreator.control.attribtable.JAttributeTable;
 import org.vadere.gui.topographycreator.control.attribtable.JCollapsablePanel;
-import org.vadere.gui.topographycreator.control.attribtable.ValueListener;
 import org.vadere.gui.topographycreator.control.attribtable.cells.CellNameDelegateWrapper;
 import org.vadere.gui.topographycreator.control.attribtable.cells.CellValueDelegateWarpper;
 import org.vadere.gui.topographycreator.control.attribtable.cells.delegates.AttributeEditor;
-import org.vadere.gui.topographycreator.control.attribtable.tree.AttributeTree;
-import org.vadere.gui.topographycreator.control.attribtable.tree.ObjectNode;
+import org.vadere.gui.topographycreator.control.attribtable.tree.AttributeTreeModel;
 import org.vadere.gui.topographycreator.control.attribtable.tree.TreeException;
 
 import javax.swing.*;
@@ -23,7 +21,7 @@ import java.lang.reflect.Field;
 
 
 /** This class is supposed to be used as the gui container for on single class archetype **/
-public class AttributeTablePage extends JPanel implements ValueListener {
+public class AttributeTablePage extends JPanel implements AttributeTreeModel.ValueListener {
 
     /** container is used as a parent container for the class attribute table.
      * All attributes can be hidden when the user clicks on the header of the panel.
@@ -34,9 +32,9 @@ public class AttributeTablePage extends JPanel implements ValueListener {
      * view is the view in the MVC pattern
      */
     private final JAttributeTable view;
-    AttributeTree.TreeNode model;
+    AttributeTreeModel.TreeNode model;
 
-    public AttributeTablePage(AttributeTree.TreeNode model, String title, JAttributeTable.Styler pageStyler) {
+    public AttributeTablePage(AttributeTreeModel.TreeNode model, String title, JAttributeTable.Styler pageStyler) {
         super(new BorderLayout());
         this.setBackground(Color.white);
 
@@ -68,7 +66,7 @@ public class AttributeTablePage extends JPanel implements ValueListener {
         container.repaint();
     }
 
-    public AttributeTree.TreeNode getModel() {
+    public AttributeTreeModel.TreeNode getModel() {
         return model;
     }
 
@@ -80,9 +78,9 @@ public class AttributeTablePage extends JPanel implements ValueListener {
      *                          | name | editor |
      */
     public static class TableStyler extends JAttributeTable.Styler {
-        private final AttributeTree.TreeNode model;
+        private final AttributeTreeModel.TreeNode model;
 
-        public TableStyler(AttributeTree.TreeNode model) {
+        public TableStyler(AttributeTreeModel.TreeNode model) {
             this.model = model;
         }
 

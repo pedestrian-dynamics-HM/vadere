@@ -2,7 +2,7 @@ package org.vadere.gui.topographycreator.control.attribtable.ui;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.topographycreator.control.attribtable.Revalidatable;
-import org.vadere.gui.topographycreator.control.attribtable.tree.AttributeTree;
+import org.vadere.gui.topographycreator.control.attribtable.tree.AttributeTreeModel;
 import org.vadere.gui.topographycreator.control.attribtable.tree.ObjectNode;
 import org.vadere.gui.topographycreator.control.attribtable.tree.TreeAdapter;
 import org.vadere.gui.topographycreator.control.attribtable.tree.TreeException;
@@ -56,12 +56,12 @@ public class AttributeTableView extends JPanel implements Revalidatable {
      * @param clazz
      */
     public void buildPageFor(Class clazz){
-        var tree = AttributeTree.parseClassTree(new TreeAdapter(this), null, clazz);
+        var tree = AttributeTreeModel.parseClassTree(new TreeAdapter(this), null, clazz);
         var page = new AttributeTablePage((ObjectNode) tree,AttributeTablePage.generateHeaderName(clazz),new AttributeTablePage.TableStyler(tree));
         this.pages.put(clazz, page);
     }
 
-    public void buildPageFor(AttributeTree.TreeNode tree){
+    public void buildPageFor(AttributeTreeModel.TreeNode tree){
         var page = new AttributeTablePage((ObjectNode) tree,AttributeTablePage.generateHeaderName(tree.getFieldType()),new AttributeTablePage.TableStyler(tree));
         this.pages.put(tree.getFieldType(), page);
     }

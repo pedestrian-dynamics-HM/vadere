@@ -1,6 +1,6 @@
 package org.vadere.gui.topographycreator.control.attribtable.cells.delegates;
 
-import org.vadere.gui.topographycreator.control.attribtable.tree.AttributeTree;
+import org.vadere.gui.topographycreator.control.attribtable.tree.AttributeTreeModel;
 import org.vadere.util.geometry.shapes.VPoint;
 
 import javax.swing.*;
@@ -16,7 +16,7 @@ public class VPointCellEditor extends AttributeEditor {
     private JSpinner ySpinner;
     private VPoint pointBuffer;
 
-    public VPointCellEditor(AttributeTree.TreeNode model, JPanel contentPanel,Object initialValue) {
+    public VPointCellEditor(AttributeTreeModel.TreeNode model, JPanel contentPanel, Object initialValue) {
         super(model, contentPanel,initialValue);
     }
 

@@ -1,13 +1,13 @@
 package org.vadere.gui.topographycreator.control.attribtable.cells.delegates;
 
-import org.vadere.gui.topographycreator.control.attribtable.tree.AttributeTree;
+import org.vadere.gui.topographycreator.control.attribtable.tree.AttributeTreeModel;
 
 import javax.swing.*;
 
 public class ComboBoxCellEditor extends AttributeEditor {
     private JComboBox comboBox;
 
-    public ComboBoxCellEditor(AttributeTree.TreeNode model, JPanel contentPanel,Object initialValue) {
+    public ComboBoxCellEditor(AttributeTreeModel.TreeNode model, JPanel contentPanel, Object initialValue) {
         super(model, contentPanel,initialValue);
     }
 

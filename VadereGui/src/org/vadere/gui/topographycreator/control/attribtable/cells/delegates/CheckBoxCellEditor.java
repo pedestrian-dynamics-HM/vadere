@@ -1,6 +1,6 @@
 package org.vadere.gui.topographycreator.control.attribtable.cells.delegates;
 
-import org.vadere.gui.topographycreator.control.attribtable.tree.AttributeTree;
+import org.vadere.gui.topographycreator.control.attribtable.tree.AttributeTreeModel;
 
 import javax.swing.*;
 /**
@@ -10,7 +10,7 @@ import javax.swing.*;
 public class CheckBoxCellEditor extends AttributeEditor {
     private JCheckBox checkBox;
 
-    public CheckBoxCellEditor(AttributeTree.TreeNode model, JPanel contentPanel,Object initialValue) {
+    public CheckBoxCellEditor(AttributeTreeModel.TreeNode model, JPanel contentPanel, Object initialValue) {
         super(model, contentPanel,initialValue);
     }
 

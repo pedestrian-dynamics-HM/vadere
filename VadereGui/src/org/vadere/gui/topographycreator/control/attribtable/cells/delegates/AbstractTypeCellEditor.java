@@ -2,9 +2,8 @@ package org.vadere.gui.topographycreator.control.attribtable.cells.delegates;
 
 import org.jetbrains.annotations.NotNull;
 import org.reflections.Reflections;
-import org.vadere.gui.topographycreator.control.attribtable.Revalidatable;
 import org.vadere.gui.topographycreator.control.attribtable.tree.AbstrNode;
-import org.vadere.gui.topographycreator.control.attribtable.tree.AttributeTree;
+import org.vadere.gui.topographycreator.control.attribtable.tree.AttributeTreeModel;
 import org.vadere.gui.topographycreator.control.attribtable.ui.AttributeTableView;
 import org.vadere.gui.topographycreator.utils.RunnableRegistry;
 import org.vadere.state.attributes.Attributes;
@@ -27,7 +26,7 @@ import java.util.Map;
 
 //TODO: add jtable to constructor for revalidation & repaint
 
-public class AbstractTypeCellEditor extends AttributeEditor implements Revalidatable {
+public class AbstractTypeCellEditor extends AttributeEditor{
     public static final String STRING_NULL = "[null]";
     private JComboBox<Object> comboBox;
     private AbstractTypeCellEditor self;
@@ -40,14 +39,14 @@ public class AbstractTypeCellEditor extends AttributeEditor implements Revalidat
     private AttributeTableView view;
     private Object instanceOfSelected;
 
-    public AbstractTypeCellEditor(AttributeTree.TreeNode model, JPanel contentPanel,Object initialValue) {
+    public AbstractTypeCellEditor(AttributeTreeModel.TreeNode model, JPanel contentPanel, Object initialValue) {
         super(model, contentPanel,initialValue);
     }
 
 
     @Override
     protected void initialize(Object initialValue) {
-        view = new AttributeTableView(this);
+        view = new AttributeTableView(null);
         var models = ((AbstrNode)model).getSubClassModels();
         for(var model : models.values()){
             view.buildPageFor(model);
@@ -90,7 +89,7 @@ public class AbstractTypeCellEditor extends AttributeEditor implements Revalidat
             contentPanel.setVisible(false);
             view.clear();
             try {
-                model.getParent().updateParentsFieldValue(model.getFieldName(), null);
+                ((AbstrNode)model).getValueNode().setValue(null);
             } catch (NoSuchFieldException e) {
                 throw new RuntimeException(e);
             } catch (IllegalAccessException e) {
@@ -112,7 +111,7 @@ public class AbstractTypeCellEditor extends AttributeEditor implements Revalidat
                 }
                 view.clear();
                 try {
-                    ((AbstrNode)model).getValueNode().setValue(instanceOfSelected);
+                    (model).getValueNode().setValue(instanceOfSelected);
                 } catch (NoSuchFieldException e) {
                     throw new RuntimeException(e);
                 } catch (IllegalAccessException e) {
@@ -163,11 +162,9 @@ public class AbstractTypeCellEditor extends AttributeEditor implements Revalidat
         for (var clazz : classesModel) {
             try {
                 var simpleName = getSimpleName(clazz);
-                //if (Attributes.class.isAssignableFrom(clazz)) {
                 classConstructorRegistry.put(getSimpleName(clazz), clazz.getDeclaredConstructor());
                 classNameRegistry.put(simpleName, clazz);
                 comboBoxModel.addElement(simpleName);
-                //}
             } catch (NoSuchMethodException e) {
                 System.out.println(getSimpleName(clazz) + " does not implement a default constructor. will be skipped");
             }
@@ -189,14 +186,4 @@ public class AbstractTypeCellEditor extends AttributeEditor implements Revalidat
         this.gbc.insets = new Insets(1, 1, 1, 1);
     }
 
-    @Override
-    public void revalidateObjectStructure(Object object) {
-        try {
-            model.getParent().updateParentsFieldValue(model.getFieldName(), object);
-        } catch (NoSuchFieldException e) {
-            throw new RuntimeException(e);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
-    }
 }

@@ -1,29 +1,39 @@
 package org.vadere.gui.topographycreator.control.attribtable.tree;
 
 import org.reflections.Reflections;
-
 import java.lang.reflect.Field;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
-public class AbstrNode extends AttributeTree.TreeNode {
-
-    private final Map<Class<?>,AttributeTree.TreeNode> classRegistry;
+/**
+ *  AbstrNode represents an object field which can hold an instance of a subtype of the given field type.
+ *  The AbstrNode does not notify structure listeners but value listeners if the object instance changes
+ *  to a different class structure.
+ */
+public class AbstrNode extends AttributeTreeModel.TreeNode {
+    private final Map<Class<?>, AttributeTreeModel.TreeNode> classRegistry;
     private ObjectNode node;
 
-    private ValueNode valueNode;
-    public AbstrNode(AttributeTree.TreeNode parent, Field field) {
-        super(parent, field.getName(), field.getType());
-        node  = new ObjectNode(getParent(), field);
-        valueNode = new ValueNode(this,field.getName(), field.getType(),null);
-        this.classRegistry = new Reflections("org.vadere")
-                .getSubTypesOf(field.getType())
+    public AbstrNode(AttributeTreeModel.TreeNode parent, Field field) {
+        this(parent,field.getName(),field.getType());
+    }
+
+    public AbstrNode(AttributeTreeModel.TreeNode parent,String fieldName,Class fieldType){
+        super(parent,fieldName,fieldType);
+        node  = new ObjectNode(getParent(), fieldName,fieldType);
+        setValueNode(new ValueNode(this,fieldName, fieldType,null));
+        this.classRegistry = (Map<Class<?>, AttributeTreeModel.TreeNode>) new Reflections("org.vadere")
+                .getSubTypesOf(fieldType)
                 .stream()
                 .collect(Collectors.toMap(
                         aClass -> aClass,
-                        aClass -> AttributeTree.parseClassTree(getParent(),field.getName(),aClass)));
+                        aClass -> AttributeTreeModel.parseClassTree(getParent(),fieldName,(Class)aClass)));
+    }
+
+    @Override
+    public void setValueNode(ValueNode valueNode) {
+        updateValues(valueNode.getReference());
+        super.setValueNode(valueNode);
     }
 
     @Override
@@ -47,27 +57,23 @@ public class AbstrNode extends AttributeTree.TreeNode {
 
     @Override
     public void updateParentsFieldValue(String field, Object object) throws NoSuchFieldException, IllegalAccessException {
-        var nextNode = classRegistry.get(object.getClass());
-        if(nextNode == null){
-            throw  new RuntimeException("the object "+ object+" which was tried to be assigned to AbstrNode is not a subclass of "+getFieldType());
-        }
-        node = (ObjectNode) nextNode;
-        try {
-            node.updateValues(object);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        } catch (TreeException e) {
-            throw new RuntimeException(e);
+        if(object !=null) {
+            var nextNode = classRegistry.get(object.getClass());
+            if (nextNode == null) {
+                throw new RuntimeException("the object " + object + " which was tried to be assigned to AbstrNode is not a subclass of " + getFieldType());
+            }
+            node = (ObjectNode) nextNode;
+            try {
+                node.updateValues(object);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            } catch (TreeException e) {
+                throw new RuntimeException(e);
+            }
         }
         getParent().updateParentsFieldValue(field,object);
     }
-
-    public Map<Class<?>,AttributeTree.TreeNode>getSubClassModels(){
+    public Map<Class<?>, AttributeTreeModel.TreeNode>getSubClassModels(){
         return this.classRegistry;
     }
-
-    public ValueNode getValueNode(){
-        return valueNode;
-    }
-
 }

@@ -2,17 +2,16 @@ package org.vadere.gui.topographycreator.control.attribtable.tree;
 
 import java.lang.reflect.Field;
 
-public class ObjectNode extends AttributeTree.TreeNode {
-    private final ValueNode node;
+public class ObjectNode extends AttributeTreeModel.TreeNode {
 
-    public ObjectNode(AttributeTree.TreeNode parent, Field field) {
+    public ObjectNode(AttributeTreeModel.TreeNode parent, Field field) {
         super(parent, field);
-        this.node = new ValueNode(parent, field == null ? "" : field.getName(), field == null ? null : field.getType(), null);
+        setValueNode(new ValueNode(parent, field == null ? "" : field.getName(), field == null ? null : field.getType(), null));
     }
 
-    public ObjectNode(AttributeTree.TreeNode parent, String fieldName,Class fieldType) {
+    public ObjectNode(AttributeTreeModel.TreeNode parent, String fieldName, Class fieldType) {
         super(parent, fieldName,fieldType);
-        this.node = new ValueNode(parent, fieldName, fieldType, null);
+        setValueNode(new ValueNode(parent, fieldName, fieldType, null));
     }
 
 
@@ -23,10 +22,6 @@ public class ObjectNode extends AttributeTree.TreeNode {
         field.set(getReference(), object);
         field.setAccessible(false);
         getParent().updateParentsFieldValue(getFieldName(), getReference());
-    }
-
-    public ValueNode getValueNode() {
-        return this.node;
     }
 
 }

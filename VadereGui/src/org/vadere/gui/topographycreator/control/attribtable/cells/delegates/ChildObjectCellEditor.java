@@ -1,10 +1,9 @@
 package org.vadere.gui.topographycreator.control.attribtable.cells.delegates;
 
 import org.vadere.gui.topographycreator.control.attribtable.Revalidatable;
-import org.vadere.gui.topographycreator.control.attribtable.tree.AttributeTree;
+import org.vadere.gui.topographycreator.control.attribtable.tree.AttributeTreeModel;
 import org.vadere.gui.topographycreator.control.attribtable.tree.ObjectNode;
 import org.vadere.gui.topographycreator.control.attribtable.ui.AttributeTablePage;
-import org.vadere.gui.topographycreator.control.attribtable.ui.AttributeTableView;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -12,9 +11,15 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-public class ChildObjectCellEditor extends AttributeEditor implements Revalidatable {
+/**
+ * ChildObjectCellEditor is an editor used for any Object not registered and not abstract.
+ * It displays all fields of the model inside a AttributeTablePage  displayed inside the contentPanel
+ * inherited by AttributeEditor. If the user clicks on the button displaying the object class type the contentPanel will
+ * be displayed/hidden.
+ */
+public class ChildObjectCellEditor extends AttributeEditor  {
 
-    private final JButton button;
+    private JButton button;
     private GridBagConstraints gbc;
 
     private final Class clazz;
@@ -25,13 +30,22 @@ public class ChildObjectCellEditor extends AttributeEditor implements Revalidata
 
     protected Object objectInstance;
 
-    public ChildObjectCellEditor(AttributeTree.TreeNode model, JPanel contentPanel,Object initialValue) {
+    public ChildObjectCellEditor(AttributeTreeModel.TreeNode model, JPanel contentPanel, Object initialValue) {
         super(model, contentPanel,initialValue);
-
         this.clazz = model.getFieldType();
+        initializeButton(contentPanel);
+    }
+    @Override
+    protected void initialize(Object initialValue) {
+        this.contentPanel.setLayout(new BorderLayout());
+        this.contentPanel.setBorder(new EmptyBorder(2, 2, 2, 2));
+        this.page = createInternalPropertyPane(objectInstance);
+        this.contentPanel.setVisible(contentPaneVisible);
+        contentPanel.add(page, BorderLayout.CENTER);
+        initializeGridBagConstraint();
+    }
+    private void initializeButton(JPanel contentPanel) {
         this.button = new JButton(AttributeTablePage.generateHeaderName(clazz));
-        this.add(button);
-
         this.button.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -40,9 +54,8 @@ public class ChildObjectCellEditor extends AttributeEditor implements Revalidata
                     contentPanel.setVisible(contentPaneVisible);
             }
         });
-        initializeGridBagConstraint();
+        this.add(button);
     }
-
 
     private void initializeGridBagConstraint() {
         this.gbc = new GridBagConstraints();
@@ -55,30 +68,11 @@ public class ChildObjectCellEditor extends AttributeEditor implements Revalidata
     }
 
     @Override
-    protected void initialize(Object initialValue) {
-        this.contentPanel.setLayout(new BorderLayout());
-        this.contentPanel.setBorder(new EmptyBorder(2, 2, 2, 2));
-        this.page = createInternalPropertyPane(objectInstance);
-        this.contentPanel.setVisible(contentPaneVisible);
-        contentPanel.add(page, BorderLayout.CENTER);
-    }
-
-    @Override
     protected void onModelChanged(Object object) {
-
+        // since this editor is just a container ... do nothing
     }
 
     protected AttributeTablePage createInternalPropertyPane(Object newObject) {
-        return new AttributeTablePage((ObjectNode) model,AttributeTablePage.generateHeaderName(model.getFieldType()),new AttributeTablePage.TableStyler(model));
-    }
-    @Override
-    public void revalidateObjectStructure(Object object) {
-        try {
-            ((ObjectNode) model).getValueNode().setValue(object);
-        } catch (NoSuchFieldException e) {
-            throw new RuntimeException(e);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
+        return new AttributeTablePage(model,AttributeTablePage.generateHeaderName(model.getFieldType()),new AttributeTablePage.TableStyler(model));
     }
 }

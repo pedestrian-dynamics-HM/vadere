@@ -4,16 +4,15 @@ import org.apache.commons.math3.util.Pair;
 
 import java.lang.reflect.*;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class ArrayNode extends AttributeTree.TreeNode {
+public class ArrayNode extends AttributeTreeModel.TreeNode {
 
     private final Class genericType;
     private Constructor internalDefaultConstructor;
 
-    public ArrayNode(AttributeTree.TreeNode parent, Field field) {
+    public ArrayNode(AttributeTreeModel.TreeNode parent, Field field) {
         super(parent, field);
         genericType = (Class) (((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0]);
 
@@ -69,10 +68,16 @@ public class ArrayNode extends AttributeTree.TreeNode {
                 var key = String.valueOf(i);
                 var value = array.get(i);
                 if (children.containsKey(key)) {
-                    var node = ((FieldNode) ((Pair) children.get(key)).getSecond());
+                    var node = ((AttributeTreeModel.TreeNode)((Pair) children.get(key)).getSecond());
                     node.setValueNode(new ValueNode(this, key, genericType, value));
                 } else {
-                    var newNode = new FieldNode(this, key, genericType, new ValueNode(this, key, genericType, value));
+                    AttributeTreeModel.TreeNode newNode = null;
+                    if(Modifier.isAbstract(genericType.getModifiers())){
+                        newNode = new AbstrNode(this,key,genericType);
+                    }else{
+                        newNode = new FieldNode(this, key, genericType, new ValueNode(this, key, genericType, value));
+                    }
+
                     children.put(key, new Pair(null, newNode));//new ValueNode(this, key, value.getClass(), value)
                 }
             }
@@ -90,7 +95,7 @@ public class ArrayNode extends AttributeTree.TreeNode {
     public void updateParentsFieldValue(String fieldName, Object object) throws NoSuchFieldException, IllegalAccessException {
         var array = (ArrayList) getReference();
         var idx = Integer.parseInt(fieldName);
-        ((FieldNode)super.getChildren().get(fieldName).getSecond()).setValueNode(new ValueNode(this,fieldName, genericType,object));
+        (super.getChildren().get(fieldName).getSecond()).setValueNode(new ValueNode(this,fieldName, genericType,object));
         array.set(idx, object);
         getParent().updateParentsFieldValue(getFieldName(), array);
     }
@@ -98,16 +103,20 @@ public class ArrayNode extends AttributeTree.TreeNode {
     public void addElement() throws InvocationTargetException, InstantiationException, IllegalAccessException {
         String key = String.valueOf(super.getChildren().size());
         Object newInstance = null;
+        AttributeTreeModel.TreeNode newNode;
         if (Modifier.isAbstract(genericType.getModifiers())) {
             newInstance = null;
-        } else if (genericType.equals(Integer.class)) {
-            newInstance = Integer.valueOf(0);
-        } else if (genericType.equals(Double.class)) {
-            newInstance = new Double(0.0);
+            newNode = new AbstrNode(this,key,getGenericType());
         } else {
-            newInstance = internalDefaultConstructor.newInstance(null);
+            if (genericType.equals(Integer.class)) {
+                newInstance = Integer.valueOf(0);
+            } else if (genericType.equals(Double.class)) {
+                newInstance = new Double(0.0);
+            } else {
+                newInstance = internalDefaultConstructor.newInstance(null);
+            }
+            newNode = new FieldNode(this, key, genericType, new ValueNode(this, key, genericType, newInstance));
         }
-        var newNode = new FieldNode(this, key, genericType, new ValueNode(this, key, genericType, newInstance));
         super.getChildren().put(key, new Pair(null, newNode));
         ((ArrayList) getReference()).add(newInstance);
 
@@ -125,7 +134,7 @@ public class ArrayNode extends AttributeTree.TreeNode {
     }
 
     @Override
-    public Map<String, Pair<Field, AttributeTree.TreeNode>> getChildren() {
+    public Map<String, Pair<Field, AttributeTreeModel.TreeNode>> getChildren() {
         return new TreeMap(super.getChildren());
     }
 }

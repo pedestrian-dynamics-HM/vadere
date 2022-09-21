@@ -1,6 +1,6 @@
 package org.vadere.gui.topographycreator.control.attribtable.cells.delegates;
 
-import org.vadere.gui.topographycreator.control.attribtable.tree.AttributeTree;
+import org.vadere.gui.topographycreator.control.attribtable.tree.AttributeTreeModel;
 
 import javax.swing.*;
 import javax.swing.text.AttributeSet;
@@ -16,7 +16,7 @@ import javax.swing.text.PlainDocument;
 public class TextEditCellEditor extends AttributeEditor {
     private JTextField textField;
 
-    public TextEditCellEditor(AttributeTree.TreeNode model, JPanel contentPanel,Object initialValue) {
+    public TextEditCellEditor(AttributeTreeModel.TreeNode model, JPanel contentPanel, Object initialValue) {
         super(model, contentPanel,initialValue);
     }
 

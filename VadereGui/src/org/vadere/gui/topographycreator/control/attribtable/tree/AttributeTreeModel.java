@@ -2,7 +2,6 @@ package org.vadere.gui.topographycreator.control.attribtable.tree;
 
 import org.apache.commons.math3.util.Pair;
 import org.vadere.gui.topographycreator.control.attribtable.Revalidatable;
-import org.vadere.gui.topographycreator.control.attribtable.ValueListener;
 import org.vadere.gui.topographycreator.control.attribtable.cells.EditorRegistry;
 
 import java.lang.reflect.Field;
@@ -15,18 +14,8 @@ import java.util.Map;
 import static org.vadere.util.reflection.ClassFields.getSuperDeclaredFields;
 
 
-public class AttributeTree {
+public class AttributeTreeModel {
     private static final EditorRegistry registry = EditorRegistry.getInstance();
-    private final TreeNode rootNode;
-    private final Class rootClass;
-
-    private final Revalidatable revalidatable;
-
-    public AttributeTree(String fieldName, Class baseClass, Revalidatable revalidatable) {
-        rootNode = parseClassTree(new TreeAdapter(revalidatable), fieldName, baseClass);
-        this.rootClass = baseClass;
-        this.revalidatable = revalidatable;
-    }
 
     /**
      * Builds a Tree model of class fields with no values assigned / listeners attached
@@ -82,23 +71,9 @@ public class AttributeTree {
         return TYPE.OBJECT;
     }
 
+
     private static boolean isArray(Class clazz) {
         return clazz.isAssignableFrom(List.class);
-    }
-
-    public Class getRootClass() {
-        return rootClass;
-    }
-
-    public TreeNode getRootNode() {
-        return rootNode;
-    }
-
-    public void updateModel(Object obj) throws TreeException, IllegalAccessException {
-        if (obj.getClass() != rootNode.getFieldType())
-            throw new TreeException();
-        rootNode.updateValues(obj);
-
     }
 
     private enum TYPE {
@@ -109,6 +84,8 @@ public class AttributeTree {
         private final String fieldName;
         private final Class fieldType;
         private TreeNode parent;
+
+        private ValueNode valueNode;
         private final LinkedHashMap<String, Pair<Field, TreeNode>> children;
         /**
          * the type which a node represents
@@ -234,6 +211,31 @@ public class AttributeTree {
 
         public abstract void updateParentsFieldValue(String field, Object object) throws NoSuchFieldException, IllegalAccessException;
 
+        public ValueNode getValueNode(){
+            return valueNode;
+        }
+
+        public void setValueNode(ValueNode valueNode){
+            this.valueNode = valueNode;
+        }
     }
+
+    /**
+     * A ValueListener is an Object (presumably an AttributeEditor) which gets notified by a TreeNode
+     * if that TreeNode got notified by a parent TreeNode via the updateModel(..) method.
+     */
+    public interface ValueListener {
+        void modelChanged(Object obj);
+    }
+
+    /**
+     * A ViewListener is an Object (presumably an AttributeEditor) which can update a model
+     * subclasses of AttributeEditor only need to call this methode with the current value
+     * of the editor as the parameter.
+     */
+    public interface ViewListener {
+        void updateModel(Object attributes);
+    }
+
 }
 

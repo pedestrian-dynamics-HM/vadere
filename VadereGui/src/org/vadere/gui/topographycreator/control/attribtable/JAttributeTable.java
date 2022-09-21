@@ -10,16 +10,16 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class JAttributeTable extends JPanel implements ValueListener, StructureListener {
+public class JAttributeTable extends JPanel implements AttributeTreeModel.ValueListener, StructureListener {
 
     private final List<JComponent> renderOrderModel;
     private final GridBagConstraints gbc = Layouts.initGridBagConstraint(1.0);
     Styler rowDelegate;
 
     private final EditorRegistry registry = EditorRegistry.getInstance();
-    AttributeTree.TreeNode model;
+    AttributeTreeModel.TreeNode model;
 
-    public JAttributeTable(AttributeTree.TreeNode model, Styler rowDelegateStyler) {
+    public JAttributeTable(AttributeTreeModel.TreeNode model, Styler rowDelegateStyler) {
         super(new GridBagLayout());
         this.renderOrderModel = new ArrayList<>();
         this.rowDelegate = rowDelegateStyler;
@@ -32,7 +32,7 @@ public class JAttributeTable extends JPanel implements ValueListener, StructureL
         buildTable(model);
     }
 
-    public void buildTable(AttributeTree.TreeNode model) {
+    public void buildTable(AttributeTreeModel.TreeNode model) {
         this.removeAll();
         if (model != null) {
             this.renderOrderModel.clear();
@@ -43,23 +43,7 @@ public class JAttributeTable extends JPanel implements ValueListener, StructureL
 
                 var subPanel = new JPanel(new GridBagLayout());
                 subPanel.setBackground(UIManager.getColor("Table.selectionBackground").brighter());
-
-                AttributeEditor editor = null;
-                if(subModel instanceof FieldNode ){
-                    editor = registry.create(clazz, subModel, subPanel,((FieldNode)subModel).getValueNode().getValue());
-                }else if(subModel instanceof ObjectNode){
-                    editor = registry.create(clazz, subModel, subPanel,((ObjectNode)subModel).getValueNode().getValue());
-                }else if(subModel instanceof AbstrNode){
-                    editor = registry.create(clazz, subModel, subPanel,null);
-                }
-                else if(subModel instanceof ArrayNode){
-                    editor = registry.create(clazz, subModel, subPanel,null);
-                }
-                else{
-                    continue;
-                    //editor = registry.create(clazz, subModel, subPanel,null);
-                }
-
+                var editor = registry.create(clazz, subModel, subPanel,null);
                 var delegate = this.rowDelegate.rowDelegateStyle(key, editor);
 
                 renderOrderModel.add(delegate);
@@ -80,7 +64,7 @@ public class JAttributeTable extends JPanel implements ValueListener, StructureL
     }
 
     @Override
-    public void structureChanged(AttributeTree.TreeNode node) {
+    public void structureChanged(AttributeTreeModel.TreeNode node) {
         this.removeAll();
         this.renderOrderModel.clear();
         this.buildTable(node);

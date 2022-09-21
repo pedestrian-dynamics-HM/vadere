@@ -1,23 +1,21 @@
 package org.vadere.gui.topographycreator.control.attribtable.cells.delegates;
 
-import org.vadere.gui.topographycreator.control.attribtable.ValueListener;
-import org.vadere.gui.topographycreator.control.attribtable.ViewListener;
-import org.vadere.gui.topographycreator.control.attribtable.tree.AttributeTree;
+import org.vadere.gui.topographycreator.control.attribtable.tree.AttributeTreeModel;
 import org.vadere.gui.topographycreator.control.attribtable.tree.FieldNode;
 
 import javax.swing.*;
 import java.awt.*;
 
-public abstract class AttributeEditor extends JPanel implements ViewListener, ValueListener {
+public abstract class AttributeEditor extends JPanel implements AttributeTreeModel.ViewListener, AttributeTreeModel.ValueListener {
 
-    protected final AttributeTree.TreeNode model;
+    protected final AttributeTreeModel.TreeNode model;
     protected JPanel contentPanel;
 
     Object oldValue;
     private boolean locked = false;
 
 
-    public AttributeEditor(AttributeTree.TreeNode model, JPanel contentPanel,Object initialValue) {
+    public AttributeEditor(AttributeTreeModel.TreeNode model, JPanel contentPanel, Object initialValue) {
         super(new BorderLayout());
         this.model = model;
         this.model.addChangeListener(this);

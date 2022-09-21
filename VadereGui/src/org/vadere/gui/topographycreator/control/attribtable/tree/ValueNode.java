@@ -1,13 +1,11 @@
 package org.vadere.gui.topographycreator.control.attribtable.tree;
 
-public class ValueNode extends AttributeTree.TreeNode {
+public class ValueNode extends AttributeTreeModel.TreeNode {
 
-
-    public ValueNode(AttributeTree.TreeNode parent, String fieldName, Class fieldType, Object value) {
+    public ValueNode(AttributeTreeModel.TreeNode parent, String fieldName, Class fieldType, Object value) {
         super(parent, fieldName, fieldType);
         setReference(value);
     }
-
 
     public Object getValue() {
         return getReference();
@@ -25,13 +23,11 @@ public class ValueNode extends AttributeTree.TreeNode {
             updateParentsFieldValue(getFieldName(), getReference());
         }
     }
-
     @Override
-    public void updateValues(Object obj) throws IllegalAccessException, TreeException {
+    public void updateValues(Object obj)  {
         setReference(obj);
         notifyValueListeners();
     }
-
     @Override
     public void updateParentsFieldValue(String field, Object object) throws NoSuchFieldException, IllegalAccessException {
         getParent().updateParentsFieldValue(getFieldName(), object);
