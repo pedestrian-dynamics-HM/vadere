@@ -11,6 +11,7 @@ import org.vadere.gui.components.model.IDefaultModel;
 import org.vadere.gui.projectview.view.JsonValidIndicator;
 import org.vadere.gui.projectview.view.ProjectView;
 import org.vadere.gui.projectview.view.ScenarioPanel;
+import org.vadere.gui.topographycreator.control.attribtable.ui.AttributeTableContainer;
 import org.vadere.gui.topographycreator.model.AgentWrapper;
 import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
 import org.vadere.state.attributes.Attributes;
@@ -18,27 +19,32 @@ import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.logging.Logger;
-
-import java.awt.*;
-import java.io.IOException;
-import java.io.InputStream;
+import org.vadere.util.observer.NotifyContext;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import java.awt.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Observable;
+import java.util.Observer;
 
 /**
  * The ScenarioElementView display's a ScenarioElement in JSON-Format.
  */
-public class ScenarioElementView extends JPanel implements ISelectScenarioElementListener {
+public class ScenarioElementView extends JPanel implements ISelectScenarioElementListener,Observer {
 
 	private static final long serialVersionUID = -1567362675580536991L;
-	private static Logger logger = Logger.getLogger(ScenarioElementView.class);
-	private RSyntaxTextArea txtrTextfiletextarea;
-	private IDefaultModel panelModel;
-	private DocumentListener documentListener;
+	private static final Logger logger = Logger.getLogger(ScenarioElementView.class);
+	private final RSyntaxTextArea txtrTextfiletextarea;
+	private final IDefaultModel panelModel;
+	private final DocumentListener documentListener;
 
-	private JsonValidIndicator jsonValidIndicator;
+	private final JsonValidIndicator jsonValidIndicator;
+
+	private boolean updateFromOutside = false;
+
 
 	public ScenarioElementView(final IDefaultModel defaultModel) {
 		this(defaultModel,null, null);
@@ -94,7 +100,8 @@ public class ScenarioElementView extends JPanel implements ISelectScenarioElemen
 		documentListener = new DocumentListener() {
 			@Override
 			public void insertUpdate(DocumentEvent e) {
-				updateModel();
+				if (!updateFromOutside)
+					updateModel();
 			}
 
 			@Override
@@ -104,8 +111,8 @@ public class ScenarioElementView extends JPanel implements ISelectScenarioElemen
 
 			@Override
 			public void changedUpdate(DocumentEvent e) {
-
-				updateModel();
+				if (!updateFromOutside)
+					updateModel();
 			}
 		};
 
@@ -152,7 +159,7 @@ public class ScenarioElementView extends JPanel implements ISelectScenarioElemen
 				}
 			}
 			panelModel.setElementHasChanged(element);
-			panelModel.notifyObservers();
+			panelModel.notifyObservers(new NotifyContext(this.getClass()));
 		}
 	}
 
@@ -168,24 +175,39 @@ public class ScenarioElementView extends JPanel implements ISelectScenarioElemen
 	}
 
 	@Override
-	public void selectionChange(final ScenarioElement scenarioElement) {
+	public void selectionChange(final ScenarioElement element) {
+		this.updateFromOutside = true;
 		synchronized (txtrTextfiletextarea) {
-			if (scenarioElement == null) {
+			if(element != null){
+				if (element instanceof AgentWrapper) {
+					this.txtrTextfiletextarea.setText(
+							StateJsonConverter.serializeObjectPretty(((AgentWrapper) element).getAgentInitialStore()));
+				} else if (element instanceof Pedestrian) {
+					this.txtrTextfiletextarea.setText(StateJsonConverter.serializeObjectPretty(element));
+				} else {
+					this.txtrTextfiletextarea.setText(StateJsonConverter
+							.serializeObjectPretty(element.getAttributes()));
+				}
+
+			}else{
 				this.txtrTextfiletextarea.setText("");
 				if(jsonValidIndicator != null) {
 					jsonValidIndicator.hide();
 				}
-			} else {
-				if (scenarioElement instanceof AgentWrapper) {
-					this.txtrTextfiletextarea.setText(
-							StateJsonConverter.serializeObjectPretty(((AgentWrapper) scenarioElement).getAgentInitialStore()));
-				} else if (scenarioElement instanceof Pedestrian) {
-					this.txtrTextfiletextarea.setText(StateJsonConverter.serializeObjectPretty(scenarioElement));
-				} else {
-					this.txtrTextfiletextarea.setText(StateJsonConverter
-							.serializeObjectPretty(scenarioElement.getAttributes()));
-				}
 			}
 		}
+	}
+
+	@Override
+	public void update(Observable o, Object arg) {
+		if (arg instanceof NotifyContext) {
+			var ctx = (NotifyContext) arg;
+			if (AttributeTableContainer.class.isAssignableFrom(ctx.getNotifyContext())) {
+				this.updateFromOutside = true;
+				selectionChange(panelModel.getSelectedElement());
+				this.updateFromOutside = false;
+			}
+		}
+
 	}
 }

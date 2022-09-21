@@ -5,6 +5,7 @@ import org.vadere.state.attributes.spawner.AttributesRegularSpawner;
 import org.vadere.state.attributes.spawner.AttributesSpawner;
 import org.vadere.state.util.Views;
 import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.util.reflection.VadereAttribute;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -12,11 +13,12 @@ import java.util.List;
 
 public class AttributesSource extends AttributesVisualElement {
 	@Deprecated
+	@VadereAttribute(exclude = true)
 	public static final String CONSTANT_DISTRIBUTION = "constant";
 
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
 	private List<Integer> targetIds = new ArrayList<>();
-	//@VadereAttribute(exclude = true)
+
 	@JsonView(Views.CacheViewExclude.class)
 	private AttributesSpawner spawner = new AttributesRegularSpawner();
 	/**

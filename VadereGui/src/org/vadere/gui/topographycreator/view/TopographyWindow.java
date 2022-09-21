@@ -15,6 +15,7 @@ import org.vadere.gui.projectview.control.ActionDeselect;
 import org.vadere.gui.projectview.model.ProjectViewModel;
 import org.vadere.gui.projectview.view.JsonValidIndicator;
 import org.vadere.gui.topographycreator.control.*;
+import org.vadere.gui.topographycreator.control.attribtable.ui.AttributeTableContainer;
 import org.vadere.gui.topographycreator.model.IDrawPanelModel;
 import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
 import org.vadere.simulator.projects.Scenario;
@@ -70,17 +71,20 @@ public class TopographyWindow extends JPanel {
 
 		JsonValidIndicator jsonValidIndicator = new JsonValidIndicator();
 		ScenarioElementView scenarioElementView = new ScenarioElementView(panelModel, jsonValidIndicator, selectedElementLabel);
+		AttributeTableContainer attributeTableContainer = new AttributeTableContainer(panelModel);
 		TopographyTreeView topographyTreeView = new TopographyTreeView(panelModel);
 
+		panelModel.addObserver(scenarioElementView);
 		final JPanel thisPanel = this;
 
 		// TabbedPane
 		tabbedInfoPanel = new JTabbedPane(SwingConstants.TOP);
-		tabbedInfoPanel.addTab("SelectedElment", scenarioElementView);
+		tabbedInfoPanel.addTab("SelectedElement", scenarioElementView);
+		tabbedInfoPanel.addTab("Attribute Table", attributeTableContainer);
 		tabbedInfoPanel.addTab("ElementTree", topographyTreeView);
 		tabbedInfoPanel.addChangeListener(e ->{
 			int index = tabbedInfoPanel.getSelectedIndex();
-			if (index == 1){
+			if (index == tabbedInfoPanel.indexOfComponent(scenarioElementView)){
 				topographyTreeView.update(null, null);
 			}
 

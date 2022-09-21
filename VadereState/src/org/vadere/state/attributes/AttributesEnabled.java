@@ -7,7 +7,6 @@ import org.vadere.util.reflection.VadereAttribute;
 
 
 public class AttributesEnabled extends Attributes {
-    @VadereAttribute
     @JsonView(Views.CacheViewExclude.class)
     protected Boolean enabled = false;
 
