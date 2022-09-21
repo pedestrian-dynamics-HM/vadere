@@ -1,9 +1,10 @@
 package org.vadere.gui.components.view;
 
+import javax.swing.JToolBar;
+
 import org.vadere.gui.topographycreator.control.ActionOpenDrawOptionMenu;
 import org.vadere.util.config.VadereConfig;
 
-import javax.swing.*;
 import java.awt.*;
 
 /**
