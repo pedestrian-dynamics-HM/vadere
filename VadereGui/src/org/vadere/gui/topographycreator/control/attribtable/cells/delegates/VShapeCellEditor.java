@@ -19,6 +19,9 @@ import java.awt.event.MouseEvent;
 public class VShapeCellEditor extends AttributeEditor implements ViewListener {
 
     private static Resources resources = Resources.getInstance("global");
+    private final JToggleButton rectButton;
+    private final JToggleButton polyButton;
+    private final JToggleButton circButton;
     private AttributeTableView view;
 
     private GridBagConstraints gbc;
@@ -36,7 +39,7 @@ public class VShapeCellEditor extends AttributeEditor implements ViewListener {
         var border = new LineBorder(color,1);
         toolBar.setBorder(border);
         var group = new ButtonGroup();
-        var rectButton = new JToggleButton(resources.getIcon("vshape_rect.png",16,16));
+        rectButton = new JToggleButton(resources.getIcon("vshape_rect.png",16,16));
         rectButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -52,7 +55,7 @@ public class VShapeCellEditor extends AttributeEditor implements ViewListener {
                 }
             }
         });
-        var polyButton = new JToggleButton(resources.getIcon("vshape_poly.png",16,16));
+        polyButton = new JToggleButton(resources.getIcon("vshape_poly.png",16,16));
 
         polyButton.addMouseListener(new MouseAdapter() {
             @Override
@@ -70,7 +73,7 @@ public class VShapeCellEditor extends AttributeEditor implements ViewListener {
             }
         });
 
-        var circButton = new JToggleButton(resources.getIcon("vshape_circ.png",16,16));
+        circButton = new JToggleButton(resources.getIcon("vshape_circ.png",16,16));
 
         circButton.addMouseListener(new MouseAdapter() {
             @Override
@@ -107,12 +110,15 @@ public class VShapeCellEditor extends AttributeEditor implements ViewListener {
         Object wrapper = null;
        if(object.getClass().isAssignableFrom(VRectangle.class)){
            wrapper = new JacksonObjectMapper.VRectangleStore((VRectangle)object);
+           rectButton.setSelected(true);
        }
        else if(object.getClass().isAssignableFrom(VCircle.class)){
            wrapper = new JacksonObjectMapper.VCircleStore((VCircle)object);
+           circButton.setSelected(true);
        }
        else if(object.getClass().isAssignableFrom(VPolygon.class)){
            wrapper = new JacksonObjectMapper.VPolygon2DStore((VPolygon) object);
+           polyButton.setSelected(true);
 
        }else {
            throw new RuntimeException(object+ " not editable with VShapeCellEditor.");
