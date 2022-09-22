@@ -1,5 +1,6 @@
 package org.vadere.gui.topographycreator.control.attribtable;
 
+import org.apache.commons.math3.util.Pair;
 import org.vadere.gui.topographycreator.control.attribtable.cells.EditorRegistry;
 import org.vadere.gui.topographycreator.control.attribtable.cells.delegates.AttributeEditor;
 import org.vadere.gui.topographycreator.control.attribtable.tree.*;
@@ -8,11 +9,14 @@ import org.vadere.gui.topographycreator.control.attribtable.util.Layouts;
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class JAttributeTable extends JPanel implements AttributeTreeModel.ValueListener, StructureListener {
 
     private final List<JComponent> renderOrderModel;
+
+    private final HashMap<AttributeTreeModel.TreeNode, Pair<AttributeEditor,JComponent>> editors;
     private final GridBagConstraints gbc = Layouts.initGridBagConstraint(1.0);
     Styler rowDelegate;
 
@@ -24,6 +28,7 @@ public class JAttributeTable extends JPanel implements AttributeTreeModel.ValueL
         this.renderOrderModel = new ArrayList<>();
         this.rowDelegate = rowDelegateStyler;
         this.model = model;
+        editors =  new HashMap<>();
 
         model.addChangeListener(this);
         model.addStructureListener(this);
@@ -40,13 +45,16 @@ public class JAttributeTable extends JPanel implements AttributeTreeModel.ValueL
             for (var key : children.keySet()) {
                 var clazz = children.get(key).getSecond().getFieldType();
                 var subModel = children.get(key).getSecond();
-
-                var subPanel = new JPanel(new GridBagLayout());
-                subPanel.setBackground(UIManager.getColor("Table.selectionBackground").brighter());
-                var editor = registry.create(clazz, subModel, subPanel,null);
-                var delegate = this.rowDelegate.rowDelegateStyle(key, editor);
-
-                renderOrderModel.add(delegate);
+                if(!editors.containsKey(subModel)){
+                    var subPanel = new JPanel(new GridBagLayout());
+                    subPanel.setBackground(UIManager.getColor("Table.selectionBackground").brighter());
+                    var editor = registry.create(clazz, subModel, subPanel,subModel.getValueNode().getReference());
+                    editors.put(subModel,new Pair(editor,subPanel));
+                }
+                var delegates = editors.get(subModel);
+                var editor = delegates.getFirst();
+                var subPanel = delegates.getSecond();
+                renderOrderModel.add(this.rowDelegate.rowDelegateStyle(key, editor));
                 if (subPanel.getComponentCount() > 0) {
                     renderOrderModel.add(subPanel);
                 }

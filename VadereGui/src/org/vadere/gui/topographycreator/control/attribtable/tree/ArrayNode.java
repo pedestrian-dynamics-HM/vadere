@@ -2,6 +2,7 @@ package org.vadere.gui.topographycreator.control.attribtable.tree;
 
 import org.apache.commons.math3.util.Pair;
 
+import javax.swing.*;
 import java.lang.reflect.*;
 import java.util.ArrayList;
 import java.util.Map;
@@ -24,6 +25,7 @@ public class ArrayNode extends AttributeTreeModel.TreeNode {
         } catch (NoSuchMethodException e) {
             throw new RuntimeException("Could not find a default constructor for class " + genericType + "when creating ArrayNode");
         }
+        setValueNode(new ValueNode(getParent(),getFieldName(), getFieldType(),null));
     }
 
 
@@ -31,6 +33,7 @@ public class ArrayNode extends AttributeTreeModel.TreeNode {
         var array = (ArrayList) getReference();
         var idx = Integer.parseInt(field);
         array.remove(Integer.parseInt(field));
+        getValueNode().setReference(getReference());
         shiftMapKeys(field, idx);
         try {
             getParent().updateParentsFieldValue(getFieldName(), getReference());
@@ -57,6 +60,7 @@ public class ArrayNode extends AttributeTreeModel.TreeNode {
             if (obj.equals(getReference()))
                 return;
             setReference(obj);
+            getValueNode().setReference(obj);
             var array = (ArrayList)obj;
             var children = super.getChildren();
             if(children.size() > array.size()){
@@ -93,17 +97,26 @@ public class ArrayNode extends AttributeTreeModel.TreeNode {
 
     @Override
     public void updateParentsFieldValue(String fieldName, Object object) throws NoSuchFieldException, IllegalAccessException {
+        SwingUtilities.invokeLater(()->{
         var array = (ArrayList) getReference();
         var idx = Integer.parseInt(fieldName);
         (super.getChildren().get(fieldName).getSecond()).setValueNode(new ValueNode(this,fieldName, genericType,object));
         array.set(idx, object);
-        getParent().updateParentsFieldValue(getFieldName(), array);
+            try {
+                getParent().updateParentsFieldValue(getFieldName(), array);
+            } catch (NoSuchFieldException e) {
+                throw new RuntimeException(e);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     public void addElement() throws InvocationTargetException, InstantiationException, IllegalAccessException {
         String key = String.valueOf(super.getChildren().size());
         Object newInstance = null;
         AttributeTreeModel.TreeNode newNode;
+        getValueNode().setReference(getReference());
         if (Modifier.isAbstract(genericType.getModifiers())) {
             newInstance = null;
             newNode = new AbstrNode(this,key,getGenericType());

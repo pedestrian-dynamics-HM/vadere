@@ -58,6 +58,7 @@ public class AbstractTypeCellEditor extends AttributeEditor{
             this.contentPanel.setVisible(false);
         }else{
             this.contentPanel.setVisible(true);
+            //view.selectionChange(initialValue);
             //view.setClassPageActive(initialValue.getClass());
             onModelChanged(initialValue);
         }
@@ -101,6 +102,13 @@ public class AbstractTypeCellEditor extends AttributeEditor{
                 if(canUpdate()) {
                     try {
                         instanceOfSelected = classConstructorRegistry.get(selected).newInstance();
+                        try {
+                            (model).getValueNode().setValue(instanceOfSelected);
+                        } catch (NoSuchFieldException e) {
+                            throw new RuntimeException(e);
+                        } catch (IllegalAccessException e) {
+                            throw new RuntimeException(e);
+                        }
                     } catch (InstantiationException e) {
                         throw new RuntimeException(e);
                     } catch (IllegalAccessException e) {
@@ -110,13 +118,7 @@ public class AbstractTypeCellEditor extends AttributeEditor{
                     }
                 }
                 view.clear();
-                try {
-                    (model).getValueNode().setValue(instanceOfSelected);
-                } catch (NoSuchFieldException e) {
-                    throw new RuntimeException(e);
-                } catch (IllegalAccessException e) {
-                    throw new RuntimeException(e);
-                }
+
                 view.selectionChange(instanceOfSelected);
                 contentPanel.setVisible(true);
                 contentPanel.revalidate();
