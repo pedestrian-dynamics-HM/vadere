@@ -23,6 +23,7 @@ import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.config.VadereConfig;
 
 import javax.swing.*;
+import javax.swing.border.LineBorder;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 import javax.swing.undo.UndoManager;
 import javax.swing.undo.UndoableEditSupport;
@@ -204,7 +205,6 @@ public class TopographyWindow extends JPanel {
 
 		splitPane.setResizeWeight(0.8);
 		splitPane.resetToPreferredSizes();
-		splitPane.setLeftComponent(scrollPane);
 		splitPane.setRightComponent(tabbedInfoPanel);
 
 		thisPanel.add(toolbar, cc.xyw(2, 2, 4));
@@ -445,7 +445,7 @@ public class TopographyWindow extends JPanel {
 				ResourceStrings.TOPOGRAPHY_CREATOR_BTN_GENERATE_MESH_TOOLTIP,
 				model);
 
-		AbstractAction easeMode = new ActionSwitchSelectionMode(
+		AbstractAction eraseMode = new ActionSwitchSelectionMode(
 				"erase mode",
 				ResourceStrings.ICONS_ERASER_ICON_PNG,
 				ResourceStrings.TOPOGRAPHY_CREATOR_BTN_ERASE_TOOLTIP,
@@ -453,38 +453,59 @@ public class TopographyWindow extends JPanel {
 				new EraserMode(panelModel, undoSupport),
 				basicAction);
 
+		JPanel pane = new JPanel(){
+			@Override
+			public boolean isOptimizedDrawingEnabled() {
+				return false;
+			}
+		};
+		pane.setLayout(new OverlayLayout(pane));
+		var overlayToolBar = new ScenarioToolBar("");
+		overlayToolBar.setOrientation(SwingConstants.VERTICAL);
+		overlayToolBar.addSections( new ScenarioToolBarSection(selectShape,eraseMode),new ScenarioToolBarSection(zoomInAction,zoomOutAction,maximizeAction));
+		var color = UIManager.getColor("Component.borderColor");
+		var border = new LineBorder(color,1);
+		overlayToolBar.setBorder(border);
+		overlayToolBar.setOpaque(false);
+		pane.add(overlayToolBar);
+		overlayToolBar.setAlignmentX(0.98f);
+		overlayToolBar.setAlignmentY(0.02f);
 
-		var sectionA = new ScenarioToolBarSection(selectShape,easeMode);
+		pane.add(scrollPane);
+
+
+		splitPane.setLeftComponent(pane);
+
+
 		var sectionB = new ScenarioToolBarSection(openSourceDialog,openTargetDialog);
 		var sectionC = new ScenarioToolBarSection(
 				openTargetChangerDialog,
-				openObstacleDialog,
 				openAbsorbingAreaDialog,
-				openPedestrianDialog,
+				openMeasurementAreaDialog,
+				openObstacleDialog,
 				openStairsDialog,
-				openMeasurementAreaDialog
-		);
+				openPedestrianDialog
+				);
 		var sectionD = new ScenarioToolBarSection(
 				mergeObstaclesAction,
-				maximizeAction,
-				resizeTopographyBound,
 				simplifyObstacle,
+				resizeTopographyBound,
 				translateTopography,
-				translateElements
+				translateElements,
+				actionTopographyMakroMenu
 		);
 		var sectionE = new ScenarioToolBarSection(
 				resetScenarioAction,
 				saveScenarioAction,
-				selectCutAction,
-				polyImg,
-				generateMesh
+				selectCutAction
 		);
 		var sectionF = new ScenarioToolBarSection(
 				undoAction,
-				redoAction,
-				zoomInAction,
-				zoomOutAction,
-				actionTopographyMakroMenu
+				redoAction
+		);
+		var sectionA = new ScenarioToolBarSection(
+				polyImg,
+				generateMesh
 		);
 		toolbar.addSections(sectionE,sectionF,sectionA,sectionB,sectionC,sectionD);
 

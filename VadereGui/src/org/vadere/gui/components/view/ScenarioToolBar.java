@@ -1,6 +1,6 @@
 package org.vadere.gui.components.view;
 
-import javax.swing.JToolBar;
+import javax.swing.*;
 
 import org.vadere.gui.topographycreator.control.ActionOpenDrawOptionMenu;
 import org.vadere.util.config.VadereConfig;
@@ -26,13 +26,18 @@ public class ScenarioToolBar extends JToolBar implements IActionContainer {
 		//toolbar.setPreferredSize(prefSize);
 		setBorderPainted(true);
 		setFloatable(true);
+		setFloatable(false);
 		setAlignmentX(Component.LEFT_ALIGNMENT);
 		setAlignmentY(Component.TOP_ALIGNMENT);
 	}
 
 	public void addSection(ScenarioToolBarSection section){
 		if(!initialized){
-			addSeparator(new Dimension(5, 50));
+			if(getOrientation() == SwingConstants.VERTICAL){
+				addSeparator(new Dimension(36, 5));
+			}else {
+				addSeparator(new Dimension(5, 36));
+			}
 		}
 		for(var action : section.getActions()){
 			var btn = add(action);
