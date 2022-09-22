@@ -1,11 +1,11 @@
 package org.vadere.gui.topographycreator.control.attribtable.tree;
 
-import org.vadere.gui.topographycreator.control.attribtable.Revalidatable;
+import org.vadere.gui.topographycreator.control.attribtable.ViewListener;
 
 public class TreeAdapter extends AttributeTreeModel.TreeNode {
-    private final Revalidatable rev;
+    private final ViewListener rev;
 
-    public TreeAdapter(Revalidatable rev) {
+    public TreeAdapter(ViewListener rev) {
         super(null, null);
         this.rev = rev;
     }
@@ -15,7 +15,7 @@ public class TreeAdapter extends AttributeTreeModel.TreeNode {
     }
     @Override
     public void updateParentsFieldValue(String fieldName, Object object) {
-        rev.revalidateObjectStructure(object);
+        rev.viewChanged(object);
     }
 
 }

@@ -1,7 +1,6 @@
 package org.vadere.gui.topographycreator.control.attribtable.tree;
 
 import org.apache.commons.math3.util.Pair;
-import org.vadere.gui.topographycreator.control.attribtable.Revalidatable;
 import org.vadere.gui.topographycreator.control.attribtable.cells.EditorRegistry;
 
 import java.lang.reflect.Field;

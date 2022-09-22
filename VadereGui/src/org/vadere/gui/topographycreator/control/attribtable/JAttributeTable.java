@@ -15,7 +15,6 @@ import java.util.List;
 public class JAttributeTable extends JPanel implements AttributeTreeModel.ValueListener, StructureListener {
 
     private final List<JComponent> renderOrderModel;
-
     private final HashMap<AttributeTreeModel.TreeNode, Pair<AttributeEditor,JComponent>> editors;
     private final GridBagConstraints gbc = Layouts.initGridBagConstraint(1.0);
     Styler rowDelegate;
@@ -34,17 +33,17 @@ public class JAttributeTable extends JPanel implements AttributeTreeModel.ValueL
         model.addStructureListener(this);
 
         this.setVisible(true);
-        buildTable(model);
+        refreshUI(model);
     }
 
-    public void buildTable(AttributeTreeModel.TreeNode model) {
+    public void refreshUI(AttributeTreeModel.TreeNode model) {
         this.removeAll();
         if (model != null) {
             this.renderOrderModel.clear();
             var children = model.getChildren();
             for (var key : children.keySet()) {
-                var clazz = children.get(key).getSecond().getFieldType();
                 var subModel = children.get(key).getSecond();
+                var clazz = subModel.getFieldType();
                 if(!editors.containsKey(subModel)){
                     var subPanel = new JPanel(new GridBagLayout());
                     subPanel.setBackground(UIManager.getColor("Table.selectionBackground").brighter());
@@ -75,7 +74,7 @@ public class JAttributeTable extends JPanel implements AttributeTreeModel.ValueL
     public void structureChanged(AttributeTreeModel.TreeNode node) {
         this.removeAll();
         this.renderOrderModel.clear();
-        this.buildTable(node);
+        this.refreshUI(node);
     }
 
     public static abstract class Styler {

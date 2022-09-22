@@ -1,9 +1,8 @@
 package org.vadere.gui.topographycreator.control.attribtable.ui;
 
 import org.jetbrains.annotations.NotNull;
-import org.vadere.gui.topographycreator.control.attribtable.Revalidatable;
+import org.vadere.gui.topographycreator.control.attribtable.ViewListener;
 import org.vadere.gui.topographycreator.control.attribtable.tree.AttributeTreeModel;
-import org.vadere.gui.topographycreator.control.attribtable.tree.ObjectNode;
 import org.vadere.gui.topographycreator.control.attribtable.tree.TreeAdapter;
 import org.vadere.gui.topographycreator.control.attribtable.tree.TreeException;
 
@@ -11,15 +10,15 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.HashMap;
 
-public class AttributeTableView extends JPanel implements Revalidatable {
+public class AttributeTableView extends JPanel implements ViewListener {
     HashMap<Class, AttributeTablePage> pages;
     AttributeTablePage activePage;
-    Revalidatable revalidatable;
+    ViewListener viewListener;
 
-    public AttributeTableView(Revalidatable revalidatable) {
+    public AttributeTableView(ViewListener viewListener) {
         super(new BorderLayout());
         this.pages = new HashMap<>();
-        this.revalidatable = revalidatable;
+        this.viewListener = viewListener;
 
     }
     public void selectionChange(@NotNull Object object) {
@@ -41,9 +40,9 @@ public class AttributeTableView extends JPanel implements Revalidatable {
         activePage.updateModel(object);
     }
 
-    public void revalidateObjectStructure(Object object) {
-        if (revalidatable != null)
-            revalidatable.revalidateObjectStructure(object);
+    public void viewChanged(Object object) {
+        if (viewListener != null)
+            viewListener.viewChanged(object);
     }
 
     public void clear() {
@@ -57,12 +56,12 @@ public class AttributeTableView extends JPanel implements Revalidatable {
      */
     public void buildPageFor(Class clazz){
         var tree = AttributeTreeModel.parseClassTree(new TreeAdapter(this), null, clazz);
-        var page = new AttributeTablePage((ObjectNode) tree,AttributeTablePage.generateHeaderName(clazz),new AttributeTablePage.TableStyler(tree));
+        var page = new AttributeTablePage(tree,AttributeTablePage.generateHeaderName(clazz),new AttributeTablePage.TableStyler(tree));
         this.pages.put(clazz, page);
     }
 
     public void buildPageFor(AttributeTreeModel.TreeNode tree){
-        var page = new AttributeTablePage((ObjectNode) tree,AttributeTablePage.generateHeaderName(tree.getFieldType()),new AttributeTablePage.TableStyler(tree));
+        var page = new AttributeTablePage(tree,AttributeTablePage.generateHeaderName(tree.getFieldType()),new AttributeTablePage.TableStyler(tree));
         this.pages.put(tree.getFieldType(), page);
     }
 }

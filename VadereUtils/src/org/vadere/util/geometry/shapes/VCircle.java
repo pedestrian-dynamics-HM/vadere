@@ -43,6 +43,10 @@ public class VCircle implements VShape, ICircleSector {
 		assert radius > 0.0;
 	}
 
+	public VCircle(){
+		this(0,0,1);
+	}
+
 	public double getRadius() {
 		return this.radius;
 	}

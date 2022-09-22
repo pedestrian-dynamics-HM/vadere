@@ -34,7 +34,7 @@ public class VPolygon extends Path2D.Double implements VShape {
 	}
 
 	public VPolygon() {
-		this(new Path2D.Double());
+		this(new Path2D.Double(new VRectangle()));
 	}
 
 	public VPolygon(Shape shape) {

@@ -3,7 +3,11 @@ package org.vadere.gui.topographycreator.control.attribtable.cells;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.topographycreator.control.attribtable.cells.delegates.*;
 import org.vadere.gui.topographycreator.control.attribtable.tree.AttributeTreeModel;
+import org.vadere.state.util.JacksonObjectMapper;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VPolygon;
+import org.vadere.util.geometry.shapes.VRectangle;
+import org.vadere.util.geometry.shapes.VShape;
 
 import javax.swing.*;
 import java.lang.reflect.Constructor;
@@ -36,6 +40,7 @@ public class EditorRegistry {
         addTypeEditor(Double.class, DoubleSpinnerCellEditor.class);
         addTypeEditor(Boolean.class, CheckBoxCellEditor.class);
         addTypeEditor(VPoint.class, VPointCellEditor.class);
+        addTypeEditor(VShape.class, VShapeCellEditor.class);
     }
 
     public static EditorRegistry getInstance() {

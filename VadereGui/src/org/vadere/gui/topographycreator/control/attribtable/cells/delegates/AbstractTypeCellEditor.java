@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * This AttributeEditor Class is used by JAttributeTable as the default fallback for
@@ -28,7 +29,7 @@ import java.util.Map;
 
 public class AbstractTypeCellEditor extends AttributeEditor{
     public static final String STRING_NULL = "[null]";
-    private JComboBox<Object> comboBox;
+    protected JComboBox<Object> comboBox;
     private AbstractTypeCellEditor self;
     private RunnableRegistry runnableRegistry;
     private Map<String, Constructor<?>> classConstructorRegistry;
@@ -36,7 +37,7 @@ public class AbstractTypeCellEditor extends AttributeEditor{
     private GridBagConstraints gbc;
     private String selected;
 
-    private AttributeTableView view;
+    protected AttributeTableView view;
     private Object instanceOfSelected;
 
     public AbstractTypeCellEditor(AttributeTreeModel.TreeNode model, JPanel contentPanel, Object initialValue) {
@@ -47,10 +48,7 @@ public class AbstractTypeCellEditor extends AttributeEditor{
     @Override
     protected void initialize(Object initialValue) {
         view = new AttributeTableView(null);
-        var models = ((AbstrNode)model).getSubClassModels();
-        for(var model : models.values()){
-            view.buildPageFor(model);
-        }
+        buildSubPages();
         initializeGridBagConstraint();
         initializeRunnableRegistry();
         initializeComboBox();
@@ -58,13 +56,18 @@ public class AbstractTypeCellEditor extends AttributeEditor{
             this.contentPanel.setVisible(false);
         }else{
             this.contentPanel.setVisible(true);
-            //view.selectionChange(initialValue);
-            //view.setClassPageActive(initialValue.getClass());
             onModelChanged(initialValue);
         }
 
         initializeSelfReference();
         this.contentPanel.add(view, gbc);
+    }
+
+    protected void buildSubPages() {
+        var models = ((AbstrNode)model).getSubClassModels();
+        for(var model : models.values()){
+            view.buildPageFor(model);
+        }
     }
 
     @Override
@@ -90,7 +93,7 @@ public class AbstractTypeCellEditor extends AttributeEditor{
             contentPanel.setVisible(false);
             view.clear();
             try {
-                ((AbstrNode)model).getValueNode().setValue(null);
+                (model).getValueNode().setValue(null);
             } catch (NoSuchFieldException e) {
                 throw new RuntimeException(e);
             } catch (IllegalAccessException e) {
@@ -126,13 +129,12 @@ public class AbstractTypeCellEditor extends AttributeEditor{
         });
     }
 
-    private String getSelectedItem() {
+    protected String getSelectedItem() {
         return (String) comboBox.getModel().getSelectedItem();
     }
 
     private void initializeComboBox(){
-        var reflections = new Reflections("org.vadere");
-        var subClassModel = new ArrayList(reflections.getSubTypesOf(model.getFieldType()));
+        ArrayList subClassModel = getReflectionModel();
 
         this.comboBox = new JComboBox<>();
         this.comboBox.setModel(initializeComboBoxModel(subClassModel));
@@ -153,6 +155,11 @@ public class AbstractTypeCellEditor extends AttributeEditor{
             repaint();
         });
         this.add(comboBox);
+    }
+
+    @NotNull
+    protected ArrayList getReflectionModel() {
+        return (ArrayList) ((AbstrNode)model).getSubClassModels().values().stream().map(n -> n.getFieldType()).collect(Collectors.toList());
     }
 
     private DefaultComboBoxModel<Object> initializeComboBoxModel(ArrayList<Class<?>> classesModel){

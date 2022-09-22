@@ -3,7 +3,7 @@ package org.vadere.gui.topographycreator.control.attribtable.ui;
 import org.reflections.Reflections;
 import org.vadere.gui.components.view.ISelectScenarioElementListener;
 import org.vadere.gui.topographycreator.control.AttributeHelpView;
-import org.vadere.gui.topographycreator.control.attribtable.Revalidatable;
+import org.vadere.gui.topographycreator.control.attribtable.ViewListener;
 import org.vadere.gui.topographycreator.control.attribtable.tree.TreeException;
 import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
 import org.vadere.state.attributes.Attributes;
@@ -31,7 +31,7 @@ import static org.vadere.gui.topographycreator.control.attribtable.util.Layouts.
  * for the currently selected ScenarioElement received from the TopographyCreatorModel and a JTextPane which displays the help text
  * for the currently selected attribute in the UI
  */
-public class AttributeTableContainer extends JPanel implements ISelectScenarioElementListener, Observer, Revalidatable {
+public class AttributeTableContainer extends JPanel implements ISelectScenarioElementListener, Observer, ViewListener {
     AttributeTableView attrView;
     JTextPane helpView;
     private final NotifyContext ctx = new NotifyContext(this.getClass());
@@ -75,7 +75,6 @@ public class AttributeTableContainer extends JPanel implements ISelectScenarioEl
         for(var clazz : registeredClasses){
             attrView.buildPageFor(clazz);
         }
-
 
 
         defaultModel.addSelectScenarioElementListener(this);
@@ -135,7 +134,7 @@ public class AttributeTableContainer extends JPanel implements ISelectScenarioEl
      * was called on it from a child node.
      */
     @Override
-    public void revalidateObjectStructure(Object object) {
+    public void viewChanged(Object object) {
         var element = panelModel.getSelectedElement();
         element.setAttributes((Attributes) object);
         panelModel.setElementHasChanged(element);
