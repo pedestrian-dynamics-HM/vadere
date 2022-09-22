@@ -16,9 +16,14 @@ public class AttributesSource extends AttributesVisualElement {
 	@VadereAttribute(exclude = true)
 	public static final String CONSTANT_DISTRIBUTION = "constant";
 
+	/**
+	 * This list stores all target ids where agents spawned at this source can travel to.
+	 */
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
 	private List<Integer> targetIds = new ArrayList<>();
-
+	/**
+	 * This attribute stores the spawner which controls the type of spawning behaviour of this source.
+	 */
 	@JsonView(Views.CacheViewExclude.class)
 	private AttributesSpawner spawner = new AttributesRegularSpawner();
 	/**

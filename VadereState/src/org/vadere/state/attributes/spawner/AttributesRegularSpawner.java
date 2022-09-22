@@ -6,7 +6,9 @@ import org.vadere.state.attributes.distributions.AttributesDistribution;
 import org.vadere.state.util.Views;
 
 public class AttributesRegularSpawner extends AttributesSpawner{
-
+    /**
+     * This attribute controls the event times at which agents can be spawned.
+     */
     @JsonView(Views.CacheViewExclude.class)
     protected AttributesDistribution distribution = null;
     public AttributesRegularSpawner(){

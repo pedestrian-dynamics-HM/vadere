@@ -9,7 +9,13 @@ import java.util.List;
  */
 
 public class AttributesMixedDistribution extends AttributesDistribution {
+	/**
+	 * This list stores the event time points at which the MixedDistribution uses a different model
+	 */
 	private List<Double> switchpoints = new ArrayList<>();
+	/**
+	 * This list stores all the distribution models corresponding for each switchpoint
+	 */
 	private List<AttributesDistribution> distributions = new ArrayList<>();
 
 	public List<Double> getSwitchpoints() {

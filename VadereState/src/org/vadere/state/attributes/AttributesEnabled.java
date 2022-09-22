@@ -7,6 +7,9 @@ import org.vadere.util.reflection.VadereAttribute;
 
 
 public class AttributesEnabled extends Attributes {
+    /**
+     * This attribute stores the active state of its component
+     */
     @JsonView(Views.CacheViewExclude.class)
     protected Boolean enabled = false;
 

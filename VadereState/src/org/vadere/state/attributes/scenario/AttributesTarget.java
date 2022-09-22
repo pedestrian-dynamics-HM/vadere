@@ -13,39 +13,30 @@ import org.vadere.util.reflection.VadereAttribute;
  * @author Ludwig Jaeck
  */
 public class AttributesTarget extends AttributesVisualElement {
+	/**
+	 * This component controls the absorbing behaviour of this target.
+	 */
 	@VadereAttribute
 	@JsonView(Views.CacheViewExclude.class)
 	private AttributesAbsorber absorber = new AttributesAbsorber();
+
 	@VadereAttribute
 	@JsonView(Views.CacheViewExclude.class)
 	private AttributesWaiter waiter = new AttributesWaiter();
+	/**
+	 * This attribute stores the speed an agent has after leaving this target
+	 */
 	@VadereAttribute
 	@JsonView(Views.CacheViewExclude.class)
 	private Double leavingSpeed = 0.0;
-
+	/**
+	 * This attributes stores the number of agents the target can process at the same time.<br>
+	 * <b>NOTE:</b> If set to zero the target can process any number of agents at the same time.
+	 */
 	@VadereAttribute
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
 	private Integer parallelEvents = 0;
 
-
-	// TODO should be "reachedDistance"; agents do not necessarily get deleted/absorbed
-
-
-	/**
-	 *  Distribution types:<br>
-	 *  <ul>
-	 *  <li>"binomial"
-	 *  <li>"constant"
-	 *  <li>"empirical"
-	 *  <li>"linearInterpolation"
-	 *  <li>"mixed"
-	 *  <li>"negativeExponential"
-	 *  <li>"normal"
-	 *  <li>"poisson"
-	 *  <li>"singleSpawn"
-	 *  <li>"timeSeries"
-	 *  </ul>
-	 */
 	public AttributesTarget() {
 		super();
 	}

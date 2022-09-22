@@ -8,8 +8,15 @@ import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.reflection.VadereAttribute;
 
 public class AttributesVisualElement extends AttributesScenarioElement {
+    /**
+     * This attribute stores the shape of a scenario element.<br>
+     * Possible types are: <i>Rectangle,Polygon,Circle</i>
+     */
     protected VShape shape;
-
+    /**
+     * This attribute stores the visibility state of a scenario element. It is only used for the
+     * topography editor and won't influence a simulation result.
+     */
     @JsonView(Views.CacheViewExclude.class)
     protected Boolean visible;
 

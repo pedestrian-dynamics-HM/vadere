@@ -25,12 +25,20 @@ public abstract class AttributesSpawner extends Attributes {
     public static final int NO_MAX_SPAWN_NUMBER_TOTAL = -1;
     @VadereAttribute(exclude = true)
     public static final String CONSTANT_DISTRIBUTION = "org.vadere.state.scenario.distribution.impl.ConstantDistribution";
-
+    /**
+     * This attribute stores the maximum number of agents that can be spawned by this spawner.
+     */
     @JsonView(Views.CacheViewExclude.class)
     protected Integer constraintsElementsMax = 0;
+    /**
+     * This attribute stores the starting time of a spawner after which agents can be spawned.
+     */
     @VadereAttribute(group = "Time Constraints")
     @JsonView(Views.CacheViewExclude.class)
     protected Double constraintsTimeStart = 0.0;
+    /**
+     * This attribute stores the ending time of a spawner after which no agents can be spawned anymore.
+     */
     @VadereAttribute(group = "Time Constraints")
     @JsonView(Views.CacheViewExclude.class)
     protected Double constraintsTimeEnd = 0.0;
@@ -43,7 +51,10 @@ public abstract class AttributesSpawner extends Attributes {
     @VadereAttribute(group = "Position Constraints")
     @JsonView(Views.CacheViewExclude.class)
     protected Boolean eventPositionFreeSpace = false;
-
+    /**
+     * This attribute stores the number of agents that can be spawned maximum in every spawn event
+     * triggered by the distribution.
+     */
     @VadereAttribute
     protected Integer eventElementCount = 0;
 

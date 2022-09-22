@@ -164,7 +164,7 @@ public class HelpTextAnnotationProcessor extends AbstractProcessor {
 				typeString = String.format("<a href='%s' class='class_link'>%s</a>",findFullPath(getTypeString(e)),strippedTypeString(e));
 			}
 			String comment = processingEnv.getElementUtils().getDocComment(e);
-			w.println("<b>" + e.getSimpleName() + " [" + typeString + "]:</b><br>+" + comment);
+			w.println("<b>" + e.getSimpleName() + " [" + typeString + "]:</b><br>" + comment);
 	}
 
 	private boolean isPrimitiveType(Element field){

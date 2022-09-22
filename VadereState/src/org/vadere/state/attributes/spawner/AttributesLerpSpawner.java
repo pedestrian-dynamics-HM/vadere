@@ -9,7 +9,9 @@ public class AttributesLerpSpawner extends AttributesSpawner {
     public AttributesLerpSpawner(){
         super(new AttributesLinearInterpolationDistribution());
     }
-
+    /**
+     * This attribute controls the event times at which agents can be spawned.
+     */
     @JsonView(Views.CacheViewExclude.class)
     protected AttributesLinearInterpolationDistribution distribution = new AttributesLinearInterpolationDistribution();
     @Override

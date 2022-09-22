@@ -149,9 +149,23 @@ public class JacksonObjectMapper extends ObjectMapper {
 
 	@SuppressWarnings("unused")
     public static class VRectangleStore extends VShapeStore{
+		/**
+		 * This attribute stores the x coordinate of the origin point
+		 */
 		public Double x;
+		/**
+		 * This attribute stores the x coordinate of the origin point
+		 */
 		public Double y;
+		/**
+		 * This attribute stores the width of the rectangle.<br>
+		 * It cannot be less or equals zero.
+		 */
 		public Double width;
+		/**
+		 * This attribute stores the height of the rectangle.<br>
+		 * It cannot be less or equals zero.
+		 */
 		public Double height;
 		@VadereAttribute(exclude = true)
 		public ShapeType type = ShapeType.RECTANGLE;
@@ -179,6 +193,10 @@ public class JacksonObjectMapper extends ObjectMapper {
 	public static class VPolygon2DStore extends VShapeStore{
 		@VadereAttribute(exclude = true)
 		public ShapeType type = ShapeType.POLYGON;
+		/**
+		 * This list is a collection of all point that make up the polygon.
+		 * The points are lay out clockwise.
+		 */
 		public List<VPoint> points;
 
 		public VPolygon2DStore() {}
@@ -194,7 +212,14 @@ public class JacksonObjectMapper extends ObjectMapper {
 
 	@SuppressWarnings("unused")
 	public static class VCircleStore extends VShapeStore{
+		/**
+		 * This attribute stores the radius of the circle.<br>
+		 * It cannot be less or equals zero.
+		 */
 		public Double radius;
+		/**
+		 * This attribute stores the center origin point of the circle.
+		 */
 		public VPoint center;
 		@VadereAttribute(exclude = true)
 		public ShapeType type = ShapeType.CIRCLE;
