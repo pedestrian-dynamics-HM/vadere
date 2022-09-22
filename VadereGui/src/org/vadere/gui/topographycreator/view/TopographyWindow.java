@@ -453,6 +453,7 @@ public class TopographyWindow extends JPanel {
 				new EraserMode(panelModel, undoSupport),
 				basicAction);
 
+		// overlay toolbar
 		JPanel pane = new JPanel(){
 			@Override
 			public boolean isOptimizedDrawingEnabled() {
@@ -468,8 +469,8 @@ public class TopographyWindow extends JPanel {
 		overlayToolBar.setBorder(border);
 		overlayToolBar.setOpaque(false);
 		pane.add(overlayToolBar);
-		overlayToolBar.setAlignmentX(0.98f);
-		overlayToolBar.setAlignmentY(0.02f);
+		overlayToolBar.setAlignmentX(0.99f);
+		overlayToolBar.setAlignmentY(0.05f);
 
 		pane.add(scrollPane);
 

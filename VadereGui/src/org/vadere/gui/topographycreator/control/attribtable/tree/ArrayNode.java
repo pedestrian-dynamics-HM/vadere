@@ -4,7 +4,7 @@ import org.apache.commons.math3.util.Pair;
 
 import javax.swing.*;
 import java.lang.reflect.*;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -30,7 +30,7 @@ public class ArrayNode extends AttributeTreeModel.TreeNode {
 
 
     public void remove(String field) throws IllegalAccessException {
-        var array = (ArrayList) getReference();
+        var array = (List) getReference();
         var idx = Integer.parseInt(field);
         array.remove(Integer.parseInt(field));
         getValueNode().setReference(getReference());
@@ -61,7 +61,7 @@ public class ArrayNode extends AttributeTreeModel.TreeNode {
                 return;
             setReference(obj);
             getValueNode().setReference(obj);
-            var array = (ArrayList)obj;
+            var array = (List)obj;
             var children = super.getChildren();
             if(children.size() > array.size()){
                 for(int i = array.size(); i <= children.size(); i++){
@@ -98,7 +98,7 @@ public class ArrayNode extends AttributeTreeModel.TreeNode {
     @Override
     public void updateParentsFieldValue(String fieldName, Object object) throws NoSuchFieldException, IllegalAccessException {
         SwingUtilities.invokeLater(()->{
-        var array = (ArrayList) getReference();
+        var array = (List) getReference();
         var idx = Integer.parseInt(fieldName);
         (super.getChildren().get(fieldName).getSecond()).setValueNode(new ValueNode(this,fieldName, genericType,object));
         array.set(idx, object);
@@ -131,7 +131,7 @@ public class ArrayNode extends AttributeTreeModel.TreeNode {
             newNode = new FieldNode(this, key, genericType, new ValueNode(this, key, genericType, newInstance));
         }
         super.getChildren().put(key, new Pair(null, newNode));
-        ((ArrayList) getReference()).add(newInstance);
+        ((List) getReference()).add(newInstance);
 
         try {
             getParent().updateParentsFieldValue(getFieldName(), getReference());

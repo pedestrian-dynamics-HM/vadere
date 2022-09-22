@@ -3,10 +3,6 @@ package org.vadere.state.attributes.scenario;
 import org.vadere.util.geometry.shapes.VShape;
 
 public class AttributesMeasurementArea extends AttributesVisualElement {
-
-	private VShape shape;
-	private int id;
-
 	public AttributesMeasurementArea(){};
 
 	public AttributesMeasurementArea(int id) {
@@ -17,26 +13,6 @@ public class AttributesMeasurementArea extends AttributesVisualElement {
 		this.shape = shape;
 		this.id = id;
 	}
-
-	@Override
-	public void setShape(VShape shape) {
-		this.shape = shape;
-	}
-
-	@Override
-	public VShape getShape() {
-		return shape;
-	}
-
-	public int getId() {
-		checkSealed();
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
-
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;

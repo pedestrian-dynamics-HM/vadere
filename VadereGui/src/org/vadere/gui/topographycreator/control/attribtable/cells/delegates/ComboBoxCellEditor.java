@@ -14,9 +14,9 @@ public class ComboBoxCellEditor extends AttributeEditor {
     @Override
     protected void initialize(Object initialValue) {
         this.comboBox = new JComboBox();
+        this.comboBox.setModel(new DefaultComboBoxModel(model.getFieldType().getEnumConstants()));
         this.comboBox.setSelectedItem(initialValue);
-        if(initialValue!=null)
-            this.add(comboBox);
+        this.add(comboBox);
         this.comboBox.addItemListener(e -> updateModel(comboBox.getSelectedItem()));
     }
 

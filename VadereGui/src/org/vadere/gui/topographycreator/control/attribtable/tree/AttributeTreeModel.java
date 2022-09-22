@@ -35,6 +35,7 @@ public class AttributeTreeModel {
             String name = field.getName();
             switch (TYPE_OF(type)) {
                 case REGISTERED:
+                case ENUM:
                     root.children.put(name, new Pair<>(field, new FieldNode(root, field)));
                     break;
                 case ARRAY:
@@ -67,6 +68,9 @@ public class AttributeTreeModel {
         if (Modifier.isAbstract(clazz.getModifiers())) {
             return TYPE.ABSTRACT;
         }
+        if(clazz.isEnum()){
+            return TYPE.ENUM;
+        }
         return TYPE.OBJECT;
     }
 
@@ -76,7 +80,7 @@ public class AttributeTreeModel {
     }
 
     private enum TYPE {
-        REGISTERED, ARRAY, ABSTRACT, ABSTRACT_CHILD, OBJECT
+        REGISTERED, ARRAY, ABSTRACT, ENUM, OBJECT
     }
 
     public static abstract class TreeNode {
