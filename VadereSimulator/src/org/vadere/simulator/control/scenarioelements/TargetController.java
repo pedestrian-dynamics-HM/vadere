@@ -63,7 +63,7 @@ public class TargetController extends ScenarioElementController {
 			if (agentHasReachedThisTarget){
 				notifyListenersTargetReached(agent);
 			}
-			if (agentHasReachedThisTarget && agentWaitingPeriodEnds){
+			if (agentHasReachedThisTarget && !targetAttributes.isWaiting()){
 				checkRemove(agent);
 			}
 			if (agentHasReachedThisTarget && !agentWaitingPeriodEnds){
@@ -98,21 +98,11 @@ public class TargetController extends ScenarioElementController {
 	}
 
 	private void waitingBehavior(final Agent agent, double simTimeInSec) {
-		if(targetAttributes.isWaiting()){
-			waitIndividually(agent, simTimeInSec);
-		}else if (target.isAbsorbing()){
-			checkRemove(agent);
-		}
-	}
-
-	private void waitIndividually(Agent agent, double simTimeInSec) {
 		final int agentId = agent.getId();
 		final Map<Integer, Double> leavingTimes = target.getLeavingTimes();
 
 		final boolean agentIsWaiting = leavingTimes.containsKey(agentId);
-		if (agentIsWaiting) {
-			handleWaitingAgent(agent, simTimeInSec, leavingTimes);
-		} else {
+		if (!agentIsWaiting) {
 			handleArrivingAgent(agent, simTimeInSec, leavingTimes);
 		}
 	}
@@ -125,17 +115,11 @@ public class TargetController extends ScenarioElementController {
 				leavingTimes.size() < waitingSpots);
 		if (targetHasFreeWaitingSpots) {
 			// TODO: Refractor VadereDistributions method name
-			leavingTimes.put(agentId, this.distribution.getNextSample(simTimeInSec));
-		}
-	}
-
-	private void handleWaitingAgent(Agent agent, double simTimeInSec, Map<Integer, Double> leavingTimes) {
-		final int agentId = agent.getId();
-		final boolean agentWaitingTimeIsOver = simTimeInSec > leavingTimes.get(agentId);
-
-		if (agentWaitingTimeIsOver) {
-			leavingTimes.remove(agentId);
-			checkRemove(agent);
+			if(targetAttributes.isWaiting()){
+				leavingTimes.put(agentId,this.distribution.getNextSample(simTimeInSec));
+			}else{
+				leavingTimes.put(agentId,simTimeInSec);
+			}
 		}
 	}
 
@@ -169,6 +153,7 @@ public class TargetController extends ScenarioElementController {
 			changeTargetOfFollowers(agent);
 			topography.removeElement(agent);
 		} else {
+			target.getLeavingTimes().remove(agent.getId());
 			agent.checkNextTarget(target.getAttributes().getLeavingSpeed());
 		}
 	}
