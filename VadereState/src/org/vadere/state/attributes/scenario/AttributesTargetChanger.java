@@ -51,7 +51,7 @@ public class AttributesTargetChanger extends AttributesVisualElement {
      * Change target of a given pedestrian only with a certain probability between
      * 0 and 1.
      */
-    private List<Double> probabilityToChangeTarget = new LinkedList<Double>(Arrays.asList(1.0));
+    private List<Double> probabilityToChangeTarget = new LinkedList<>(Arrays.asList(1.0));
 
 
 
@@ -90,10 +90,16 @@ public class AttributesTargetChanger extends AttributesVisualElement {
     }
 
     public LinkedList<Integer> getNextTarget() {
+        if(!nextTarget.getClass().isAssignableFrom(LinkedList.class)){
+            nextTarget = new LinkedList<>(nextTarget);
+        }
         return (LinkedList<Integer>) nextTarget;
     }
 
     public LinkedList<Double> getProbabilitiesToChangeTarget() {
+        if(!probabilityToChangeTarget.getClass().isAssignableFrom(LinkedList.class)){
+            probabilityToChangeTarget = new LinkedList<>(probabilityToChangeTarget);
+        }
         return (LinkedList<Double>) probabilityToChangeTarget;
     }
 

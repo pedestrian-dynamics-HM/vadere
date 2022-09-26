@@ -15,10 +15,9 @@ import java.util.Map;
  * An area with an arbitrary shape that changes the target of an agent.
  * Either to another static target or to another agent.
  */
-public class TargetChanger extends ScenarioElement implements Comparable<TargetChanger> {
+public class TargetChanger extends ScenarioElement<AttributesTargetChanger> implements Comparable<TargetChanger> {
 
     // Member Variables
-    private AttributesTargetChanger attributes;
     private final Map<Integer, Double> enteringTimes;
     /**
      * Collection of listeners - unordered because it's order is not predictable
@@ -61,10 +60,7 @@ public class TargetChanger extends ScenarioElement implements Comparable<TargetC
         return ScenarioElementType.TARGET_CHANGER;
     }
 
-    @Override
-    public AttributesTargetChanger getAttributes() {
-        return attributes;
-    }
+
 
     // Setters
     @Override
@@ -73,8 +69,8 @@ public class TargetChanger extends ScenarioElement implements Comparable<TargetC
     }
 
     @Override
-    public void setAttributes(Attributes attributes) {
-        this.attributes = (AttributesTargetChanger) attributes;
+    public void setAttributes(AttributesTargetChanger attributes) {
+        this.attributes =  attributes;
     }
 
     // Other Methods
