@@ -44,7 +44,7 @@ public class AttributeHelpView extends JTextPane {
     }
 
     public void loadHelpFromField(Field field){
-        loadHelpText("/helpText/" + field.getDeclaringClass().getName()+"#"+field.getName() + ".html");
+        loadHelpText("/helpText/" + field.getDeclaringClass().getName()+"VVV"+field.getName() + ".html");
     }
 
     public void loadHelpText(String helpTextId){

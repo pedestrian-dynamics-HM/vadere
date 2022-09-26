@@ -50,7 +50,7 @@ public class HelpTextAnnotationProcessor extends AbstractProcessor {
 							//String comment = processingEnv.getElementUtils().getDocComment(e);
 							//String relname = buildHelpTextPath(e.asType().toString());
 							String comment = processingEnv.getElementUtils().getDocComment(f);
-							String relname = buildHelpTextPath(e.asType().toString()+"#"+f.getSimpleName());
+							String relname = buildHelpTextPath(e.asType().toString()+"VVV"+f.getSimpleName());
 							FileObject file = processingEnv.getFiler().createResource(StandardLocation.CLASS_OUTPUT, "", relname);
 							try (PrintWriter w = new PrintWriter(file.openWriter())) {
 								printSingleMemberString(f,w);
