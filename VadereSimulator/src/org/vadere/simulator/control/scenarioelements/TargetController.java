@@ -62,12 +62,10 @@ public class TargetController extends ScenarioElementController {
 
 			if (agentHasReachedThisTarget){
 				notifyListenersTargetReached(agent);
+				handleArrivingAgent(agent,simTimeInSec,target.getLeavingTimes());
 			}
-			if (agentHasReachedThisTarget && !targetAttributes.isWaiting()){
+			if (agentHasReachedThisTarget && agentWaitingPeriodEnds){
 				checkRemove(agent);
-			}
-			if (agentHasReachedThisTarget && !agentWaitingPeriodEnds){
-				waitingBehavior(agent, simTimeInSec);
 			}
 		}
 	}
@@ -149,11 +147,11 @@ public class TargetController extends ScenarioElementController {
 	}
 
 	private void checkRemove(Agent agent) {
+		target.getLeavingTimes().remove(agent.getId());
 		if (target.isAbsorbing()) {
 			changeTargetOfFollowers(agent);
 			topography.removeElement(agent);
 		} else {
-			target.getLeavingTimes().remove(agent.getId());
 			agent.checkNextTarget(target.getAttributes().getLeavingSpeed());
 		}
 	}
