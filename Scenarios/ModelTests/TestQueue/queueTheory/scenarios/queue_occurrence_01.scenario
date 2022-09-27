@@ -1,7 +1,7 @@
 {
   "name" : "queue_occurrence_01",
   "description" : "",
-  "release" : "2.5",
+  "release" : "2.4",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",

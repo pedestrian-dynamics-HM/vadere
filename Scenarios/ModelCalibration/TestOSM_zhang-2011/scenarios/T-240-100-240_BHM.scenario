@@ -1,7 +1,7 @@
 {
   "name" : "T-240-100-240_BHM",
   "description" : "",
-  "release" : "2.5",
+  "release" : "2.4",
   "commithash" : "37d5cea029114cfbc5ced38fb76c86834cb50304",
   "processWriters" : {
     "files" : [ {

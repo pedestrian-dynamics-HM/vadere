@@ -15,8 +15,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 
-@MigrationTransformation(targetVersionLabel = "2.5")
-public class TargetVersionV2_5 extends SimpleJsonTransformation {
+@MigrationTransformation(targetVersionLabel = "2.4")
+public class TargetVersionV2_4 extends SimpleJsonTransformation {
 
     @FunctionalInterface
     public interface CheckedFunction<T, R> {
@@ -52,7 +52,7 @@ public class TargetVersionV2_5 extends SimpleJsonTransformation {
 
     private final String ABSORBER = "absorber";
 
-    public TargetVersionV2_5() {
+    public TargetVersionV2_4() {
         super(Version.V2_5);
     }
 

@@ -1,7 +1,7 @@
 {
   "name" : "labyrinth",
   "description" : "",
-  "release" : "2.5",
+  "release" : "2.4",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ {

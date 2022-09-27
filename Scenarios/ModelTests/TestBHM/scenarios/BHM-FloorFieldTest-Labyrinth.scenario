@@ -1,7 +1,7 @@
 {
   "name" : "BHM-FloorFieldTest-Labyrinth",
   "description" : "",
-  "release" : "2.5",
+  "release" : "2.4",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
