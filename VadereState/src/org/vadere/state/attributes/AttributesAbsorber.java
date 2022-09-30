@@ -22,6 +22,11 @@ public class AttributesAbsorber extends AttributesEnabled {
         super(enabled);
     }
 
+    public AttributesAbsorber(boolean enabled, double deletionDistance){
+        super(enabled);
+        this.deletionDistance = deletionDistance;
+    }
+
     public double getDeletionDistance() {
         return deletionDistance;
     }

@@ -18,7 +18,7 @@ public class AttributesTarget extends AttributesVisualElement {
 	 */
 	@VadereAttribute
 	@JsonView(Views.CacheViewExclude.class)
-	private AttributesAbsorber absorber = new AttributesAbsorber();
+	private AttributesAbsorber absorber = new AttributesAbsorber(true, 0.1);
 
 	@VadereAttribute
 	@JsonView(Views.CacheViewExclude.class)
