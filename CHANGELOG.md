@@ -48,9 +48,10 @@
 - Added `ListCellEditor` which provides an embedded `JAttributeTable` to place editors in a list.
 - Added `AttributeHelpView` which displays javadoc help for a selected field.
 
-#### Gui - Attribute Table
-- Introduced dark theme as default theme
-- Added a common icon theme for icons in the topography creator
+#### Gui
+- Introduced FlatLightLaf theme as default theme.
+- Added a common icon theme for icons in the topography creator.
+- 
 #### State
 Spawners were introduced to encapsulate logic and data of the distributions that were prior to this only used for sources
 - Added `LerpSpawner`
@@ -66,6 +67,7 @@ Spawners were introduced to encapsulate logic and data of the distributions that
 - Encapsulated absorbing and waiting behaviours into their own attribute classes.
 - VDistributions now only provide the `getNextSample(..)` method other methods were moved into the corresponding spawner classes.
 - Moved and renamed some attributes from distribution classes to spawner classes
+- In Gui/TopographyCreator, corrected create method for sources from Pedestrian to Circle
 
 ## v2.3:
 
