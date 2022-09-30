@@ -27,9 +27,9 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      showgrid="true"
-     inkscape:zoom="0.12464138"
-     inkscape:cx="1363.913"
-     inkscape:cy="-344.98977"
+     inkscape:zoom="0.70507812"
+     inkscape:cx="4318.6704"
+     inkscape:cy="255.29086"
      inkscape:window-width="1920"
      inkscape:window-height="1017"
      inkscape:window-x="-8"
@@ -173,7 +173,7 @@
        width="67.733398"
        height="67.733337"
        id="page13049"
-       inkscape:export-filename="../SourceCode/Java/VadereGui/resources/icons/stairs_icon.png"
+       inkscape:export-filename="convexHull.png"
        inkscape:export-xdpi="12"
        inkscape:export-ydpi="12" />
     <inkscape:page
@@ -1199,5 +1199,19 @@
        inkscape:transform-center-x="-0.079505468"
        inkscape:transform-center-y="-2.8006072"
        transform="translate(2.9463641,4.6180925)" />
+    <ellipse
+       style="fill:#cccccc;stroke:#e5e5e5;stroke-width:3;stroke-linecap:round;stroke-dasharray:none"
+       id="path855"
+       cx="1145.0417"
+       cy="33.837246"
+       rx="29.457434"
+       ry="29.64506"
+       inkscape:export-filename="circle.png"
+       inkscape:export-xdpi="12"
+       inkscape:export-ydpi="12" />
+    <path
+       style="fill:#cccccc;stroke:#e5e5e5;stroke-width:3;stroke-linecap:round;stroke-dasharray:none"
+       d="m 1064.9706,9.9442295 -16.1359,18.1998145 1.501,16.511172 12.1958,12.195752 29.8327,0.938135 -2.8144,-20.451339 -11.6329,-20.076084 z"
+       id="path1573" />
   </g>
 </svg>

@@ -273,8 +273,8 @@ public class TopographyWindow extends JPanel {
 				panelModel, undoSupport),
 				basicAction);
 		Action dot = new ActionSwitchSelectionMode(
-				Messages.getString("TopographyCreator.btnPedestrian.label"),
-				"/icons/paint_method_dot_icon.png","", panelModel, new DrawDotMode(panelModel,
+				Messages.getString("TopographyCreator.btnCircle.label"),
+				"/icons/paint_method_circle_icon.png","", panelModel, new DrawDotMode(panelModel,
 				undoSupport),
 				basicAction);
 
