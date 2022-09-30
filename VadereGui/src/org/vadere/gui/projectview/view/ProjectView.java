@@ -1,7 +1,7 @@
 package org.vadere.gui.projectview.view;
 
 
-import com.formdev.flatlaf.FlatDarkLaf;
+import com.formdev.flatlaf.FlatLightLaf;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.postvisualization.control.Player;
@@ -227,7 +227,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 	 */
 	public static void start(String projectPath){
 		EventQueue.invokeLater(() -> {
-			FlatDarkLaf.setup();
+			FlatLightLaf.setup();
 			// show GUI
 			ProjectViewModel model = new ProjectViewModel();
 			ProjectView frame = new ProjectView(model);
