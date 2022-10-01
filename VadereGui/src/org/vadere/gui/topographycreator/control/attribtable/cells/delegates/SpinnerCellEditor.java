@@ -5,9 +5,19 @@ import org.vadere.gui.topographycreator.control.attribtable.tree.FieldNode;
 
 import javax.swing.*;
 import javax.swing.text.NumberFormatter;
+import java.awt.*;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.util.Collections;
 
 public class SpinnerCellEditor extends AttributeEditor {
     private JSpinner spinner;
+
+    @Override
+    public java.util.List<Component> getInputComponent() {
+        return Collections.singletonList(
+                ((JSpinner.NumberEditor) spinner.getEditor()).getTextField());
+    }
 
     public SpinnerCellEditor(AttributeTreeModel.TreeNode model, JPanel contentPanel, Object initialValue) {
         super(model, contentPanel,initialValue);

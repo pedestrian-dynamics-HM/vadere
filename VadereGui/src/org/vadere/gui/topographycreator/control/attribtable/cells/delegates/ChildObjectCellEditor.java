@@ -8,6 +8,7 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Collections;
 
 /**
  * ChildObjectCellEditor is an editor used for any Object not registered and not abstract.
@@ -27,6 +28,11 @@ public class ChildObjectCellEditor extends AttributeEditor  {
     private AttributeTablePage page;
 
     protected Object objectInstance;
+
+    @Override
+    public java.util.List<Component> getInputComponent() {
+        return Collections.singletonList(button);
+    }
 
     public ChildObjectCellEditor(AttributeTreeModel.TreeNode model, JPanel contentPanel, Object initialValue) {
         super(model, contentPanel,initialValue);

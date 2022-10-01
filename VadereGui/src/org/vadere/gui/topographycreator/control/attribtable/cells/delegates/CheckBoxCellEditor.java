@@ -2,13 +2,23 @@ package org.vadere.gui.topographycreator.control.attribtable.cells.delegates;
 
 import org.vadere.gui.topographycreator.control.attribtable.tree.AttributeTreeModel;
 
+import javax.naming.CompositeName;
 import javax.swing.*;
+import java.awt.*;
+import java.util.Arrays;
+import java.util.Collections;
+
 /**
  * @author Ludwig Jaeck
  * This class is a table delegate for editing boolean fields.
  */
 public class CheckBoxCellEditor extends AttributeEditor {
     private JCheckBox checkBox;
+
+    @Override
+    public java.util.List<Component> getInputComponent() {
+        return Collections.singletonList(checkBox);
+    }
 
     public CheckBoxCellEditor(AttributeTreeModel.TreeNode model, JPanel contentPanel, Object initialValue) {
         super(model, contentPanel,initialValue);

@@ -17,6 +17,7 @@ public class JAttributeTable extends JPanel implements AttributeTreeModel.ValueL
     private final List<JComponent> renderOrderModel;
     private final HashMap<AttributeTreeModel.TreeNode, Pair<AttributeEditor,JComponent>> editors;
     private final GridBagConstraints gbc = Layouts.initGridBagConstraint(1.0);
+    private final ArrayList<Component> focusOrder;
     Styler rowDelegate;
 
     private final EditorRegistry registry = EditorRegistry.getInstance();
@@ -27,6 +28,7 @@ public class JAttributeTable extends JPanel implements AttributeTreeModel.ValueL
         this.renderOrderModel = new ArrayList<>();
         this.rowDelegate = rowDelegateStyler;
         this.model = model;
+        this.focusOrder = new ArrayList<>();
         editors =  new HashMap<>();
 
         model.addChangeListener(this);
@@ -34,6 +36,10 @@ public class JAttributeTable extends JPanel implements AttributeTreeModel.ValueL
 
         this.setVisible(true);
         refreshUI(model);
+    }
+
+    public List<Component> getFocusOrder(){
+        return focusOrder;
     }
 
     public void refreshUI(AttributeTreeModel.TreeNode model) {
@@ -52,6 +58,7 @@ public class JAttributeTable extends JPanel implements AttributeTreeModel.ValueL
                 }
                 var delegates = editors.get(subModel);
                 var editor = delegates.getFirst();
+                focusOrder.addAll(editor.getInputComponent());
                 var subPanel = delegates.getSecond();
                 renderOrderModel.add(this.rowDelegate.rowDelegateStyle(key, editor));
                 if (subPanel.getComponentCount() > 0) {
