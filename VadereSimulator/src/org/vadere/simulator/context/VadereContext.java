@@ -8,7 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class VadereContext extends Context {
 
-
+	public static final String TREE_NODE_CTX = "gui.treeNodeContext";
 	private static ConcurrentHashMap<String, VadereContext> contextMap = new ConcurrentHashMap<>();
 
 
