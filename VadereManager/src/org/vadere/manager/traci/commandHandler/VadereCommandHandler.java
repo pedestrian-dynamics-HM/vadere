@@ -94,7 +94,7 @@ public class VadereCommandHandler extends CommandHandler<VadereVar> {
 				//todo[TargetChanger] the creation of a TargetChanger with controller is complex and bad to read, can a pattern be applied?
 				TargetChanger tc = new TargetChanger(atc);
 				//todo[random]: use Random object from context for now. This should be replaced by the meta seed.
-				VadereContext ctx = VadereContext.get(state.getTopography());
+				VadereContext ctx = VadereContext.getCtx(state.getTopography());
 				Random rnd = (Random) ctx.get("random");
 				TargetChangerController tcc = new TargetChangerController(state.getTopography(), tc, rnd);
 				manager.getRemoteSimulationRun().addTargetChangerController(tcc);

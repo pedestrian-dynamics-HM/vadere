@@ -86,7 +86,7 @@ public class AirTransmissionModel extends AbstractExposureModel {
 		this.attributesAgent = attributesPedestrian;
 		this.attrAirTransmissionModel = Model.findAttributes(attributesList, AttributesAirTransmissionModel.class);
 		this.topography = domain.getTopography();
-		this.simTimeStepLength = VadereContext.get(this.topography).getDouble(simStepLength);
+		this.simTimeStepLength = VadereContext.getCtx(this.topography).getDouble(simStepLength);
 		this.aerosolCloudIdCounter = 1;
 		this.viewingDirections = new HashMap<>();
 		this.lastPedestrianPositions = new HashMap<>();

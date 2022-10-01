@@ -12,8 +12,11 @@ public class VadereContext extends Context {
 	private static ConcurrentHashMap<String, VadereContext> contextMap = new ConcurrentHashMap<>();
 
 
-	public synchronized static VadereContext get(final Topography topography){
+	public synchronized static VadereContext getCtx(final Topography topography){
 		return contextMap.getOrDefault(topography.getContextId(), new VadereContext());
+	}
+	public synchronized static VadereContext getCtx(final String key){
+		return contextMap.getOrDefault(key, new VadereContext());
 	}
 
 	public synchronized static void add(String contextId, VadereContext ctx){
