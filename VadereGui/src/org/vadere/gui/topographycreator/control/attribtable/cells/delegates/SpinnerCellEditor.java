@@ -26,7 +26,8 @@ public class SpinnerCellEditor extends AttributeEditor {
 
     private void initializeSpinnerModel() {
         JFormattedTextField txt = ((JSpinner.NumberEditor) spinner.getEditor()).getTextField();
-        ((NumberFormatter) txt.getFormatter()).setAllowsInvalid(false);
+        // allow invalid true to allow a single '-' minus Symbol to be valid
+        ((NumberFormatter) txt.getFormatter()).setAllowsInvalid(true);
     }
 
     private void initializeSpinnerValue() {
