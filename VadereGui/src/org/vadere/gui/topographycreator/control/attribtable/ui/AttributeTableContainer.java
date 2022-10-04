@@ -4,8 +4,11 @@ import org.reflections.Reflections;
 import org.vadere.gui.components.view.ISelectScenarioElementListener;
 import org.vadere.gui.topographycreator.control.AttributeHelpView;
 import org.vadere.gui.topographycreator.control.attribtable.ViewListener;
+import org.vadere.gui.topographycreator.control.attribtable.tree.TreeAdapter;
 import org.vadere.gui.topographycreator.control.attribtable.tree.TreeException;
+import org.vadere.gui.topographycreator.control.attribtable.tree.TreeModelCache;
 import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
+import org.vadere.simulator.context.VadereContext;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.AttributesScenarioElement;
 
@@ -19,6 +22,7 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.Set;
 
 import static org.vadere.gui.topographycreator.control.attribtable.util.Layouts.initGridBagConstraint;
 
@@ -35,7 +39,6 @@ public class AttributeTableContainer extends JPanel implements ISelectScenarioEl
     AttributeTableView attrView;
     JTextPane helpView;
     private final NotifyContext ctx = new NotifyContext(this.getClass());
-
     ScenarioElement selectedElement;
     TopographyCreatorModel panelModel;
 
@@ -70,12 +73,10 @@ public class AttributeTableContainer extends JPanel implements ISelectScenarioEl
         this.add(new JScrollPane(attrView), gbcPage);
         this.add(helpView, gbcHelp);
 
-        var registeredClasses = new Reflections("org.vadere")
-                .getSubTypesOf(AttributesScenarioElement.class);
-        for(var clazz : registeredClasses){
+        var cache  = (TreeModelCache) VadereContext.getCtx("GUI").get(VadereContext.TREE_NODE_CTX);
+        for(var clazz : cache.getSubTypeOff(AttributesScenarioElement.class)){
             attrView.buildPageFor(clazz);
         }
-
 
         defaultModel.addSelectScenarioElementListener(this);
         defaultModel.addObserver(this);

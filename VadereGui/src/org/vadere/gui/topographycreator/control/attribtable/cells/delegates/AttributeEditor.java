@@ -14,6 +14,7 @@ public abstract class AttributeEditor extends JPanel implements AttributeTreeMod
     Object oldValue;
     private boolean locked = false;
 
+    public abstract java.util.List<Component> getInputComponent();
 
     public AttributeEditor(AttributeTreeModel.TreeNode model, JPanel contentPanel, Object initialValue) {
         super(new BorderLayout());

@@ -7,6 +7,8 @@ import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
 import javax.swing.text.PlainDocument;
+import java.awt.*;
+import java.util.Collections;
 
 /**
  * @author Ludwig Jaeck
@@ -15,6 +17,11 @@ import javax.swing.text.PlainDocument;
  */
 public class TextEditCellEditor extends AttributeEditor {
     private JTextField textField;
+
+    @Override
+    public java.util.List<Component> getInputComponent() {
+        return Collections.singletonList(textField);
+    }
 
     public TextEditCellEditor(AttributeTreeModel.TreeNode model, JPanel contentPanel, Object initialValue) {
         super(model, contentPanel,initialValue);

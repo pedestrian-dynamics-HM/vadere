@@ -196,6 +196,7 @@ public class ScenarioElementView extends JPanel implements ISelectScenarioElemen
 				}
 			}
 		}
+		this.updateFromOutside = false;
 	}
 
 	@Override

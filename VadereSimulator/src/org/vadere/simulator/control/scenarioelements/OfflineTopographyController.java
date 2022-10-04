@@ -59,7 +59,7 @@ public class OfflineTopographyController extends ScenarioElementController  {
 
 		} else {
 			// add distance function
-			ScenarioCache cache = (ScenarioCache) VadereContext.get(getTopography()).getOrDefault("cache", ScenarioCache.empty());
+			ScenarioCache cache = (ScenarioCache) VadereContext.getCtx(getTopography()).getOrDefault("cache", ScenarioCache.empty());
 			PotentialFieldDistancesBruteForce distanceField = new PotentialFieldDistancesBruteForce(
 					getTopography().getObstacles().stream().map(obs -> obs.getShape()).collect(Collectors.toList()),
 					new VRectangle(getTopography().getBounds()),

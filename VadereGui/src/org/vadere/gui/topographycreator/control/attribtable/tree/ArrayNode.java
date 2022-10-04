@@ -63,32 +63,20 @@ public class ArrayNode extends AttributeTreeModel.TreeNode {
             getValueNode().setReference(obj);
             var array = (List)obj;
             var children = super.getChildren();
-            if(children.size() > array.size()){
-                for(int i = array.size(); i <= children.size(); i++){
-                    children.remove(String.valueOf(i));
-                }
-            }
-            for (int i = 0; i < array.size(); i++) {
+            // 1. clear old array values
+            children.clear();
+            // 2. create new array values based on obj data.
+            for (int i = 0; i<array.size();i++) {
                 var key = String.valueOf(i);
                 var value = array.get(i);
-                if (children.containsKey(key)) {
-                    var node = ((AttributeTreeModel.TreeNode)((Pair) children.get(key)).getSecond());
-                    node.setValueNode(new ValueNode(this, key, genericType, value));
+                AttributeTreeModel.TreeNode newNode = null;
+                if (Modifier.isAbstract(genericType.getModifiers())) {
+                    newNode = new AbstrNode(this, key, genericType);
                 } else {
-                    AttributeTreeModel.TreeNode newNode = null;
-                    if(Modifier.isAbstract(genericType.getModifiers())){
-                        newNode = new AbstrNode(this,key,genericType);
-                    }else{
-                        newNode = new FieldNode(this, key, genericType, new ValueNode(this, key, genericType, value));
-                    }
+                    newNode = new FieldNode(this, key, genericType, new ValueNode(this, key, genericType, value));
+                }
 
-                    children.put(key, new Pair(null, newNode));//new ValueNode(this, key, value.getClass(), value)
-                }
-            }
-            if(children.size() > array.size()){
-                for(int i = array.size(); i < children.size(); i++){
-                    children.remove(String.valueOf(i));
-                }
+                children.put(key, new Pair(null, newNode));//new ValueNode(this, key, value.getClass(), value)
             }
         }
         notifyStructureListeners();

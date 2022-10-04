@@ -8,12 +8,15 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class VadereContext extends Context {
 
-
+	public static final String TREE_NODE_CTX = "gui.treeNodeContext";
 	private static ConcurrentHashMap<String, VadereContext> contextMap = new ConcurrentHashMap<>();
 
 
-	public synchronized static VadereContext get(final Topography topography){
+	public synchronized static VadereContext getCtx(final Topography topography){
 		return contextMap.getOrDefault(topography.getContextId(), new VadereContext());
+	}
+	public synchronized static VadereContext getCtx(final String key){
+		return contextMap.getOrDefault(key, new VadereContext());
 	}
 
 	public synchronized static void add(String contextId, VadereContext ctx){

@@ -9,12 +9,18 @@ import javax.swing.text.NumberFormatter;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.util.Arrays;
 
 public class VPointCellEditor extends AttributeEditor {
 
     private JSpinner xSpinner;
     private JSpinner ySpinner;
     private VPoint pointBuffer;
+
+    @Override
+    public java.util.List<Component> getInputComponent() {
+        return Arrays.asList(xSpinner, ySpinner);
+    }
 
     public VPointCellEditor(AttributeTreeModel.TreeNode model, JPanel contentPanel, Object initialValue) {
         super(model, contentPanel,initialValue);

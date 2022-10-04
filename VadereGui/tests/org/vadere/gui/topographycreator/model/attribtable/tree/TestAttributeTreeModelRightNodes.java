@@ -44,6 +44,7 @@ public class TestAttributeTreeModelRightNodes {
 
     @Test
     public void testClassWithAbstractType(){
+        TreeModelCache.buildTreeModelCache();
         TestClassD testClass = new TestClassD();
         var tree = AttributeTreeModel.parseClassTree(null,null,testClass.getClass());
 

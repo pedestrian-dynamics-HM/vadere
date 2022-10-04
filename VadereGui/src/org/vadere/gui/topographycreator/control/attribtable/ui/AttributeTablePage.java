@@ -9,6 +9,7 @@ import org.vadere.gui.topographycreator.control.attribtable.cells.CellValueDeleg
 import org.vadere.gui.topographycreator.control.attribtable.cells.delegates.AttributeEditor;
 import org.vadere.gui.topographycreator.control.attribtable.tree.AttributeTreeModel;
 import org.vadere.gui.topographycreator.control.attribtable.tree.TreeException;
+import org.vadere.gui.topographycreator.control.attribtable.util.ManualAttributeTableFocus;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -48,6 +49,12 @@ public class AttributeTablePage extends JPanel implements AttributeTreeModel.Val
         container.add(view);
 
         this.add(container);
+    }
+
+    public void applyFocusPolicy(ManualAttributeTableFocus focusTraversalPolicy){
+        focusTraversalPolicy.add(view.getFocusOrder());
+        focusTraversalPolicy.addListener();
+
     }
 
 

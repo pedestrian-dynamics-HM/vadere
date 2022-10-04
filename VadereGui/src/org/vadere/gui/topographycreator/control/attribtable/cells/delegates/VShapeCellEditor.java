@@ -15,6 +15,9 @@ import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class VShapeCellEditor extends AttributeEditor implements ViewListener {
 
@@ -25,6 +28,12 @@ public class VShapeCellEditor extends AttributeEditor implements ViewListener {
     private AttributeTableView view;
 
     private GridBagConstraints gbc;
+
+    @Override
+    public List<Component> getInputComponent() {
+        return Collections.emptyList();
+    }
+
     public VShapeCellEditor(AttributeTreeModel.TreeNode model, JPanel contentPanel, Object initialValue) {
         super(model, contentPanel, initialValue);
         initializeGridBagConstraint();

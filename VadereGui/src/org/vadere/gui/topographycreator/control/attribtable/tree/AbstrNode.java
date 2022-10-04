@@ -1,6 +1,7 @@
 package org.vadere.gui.topographycreator.control.attribtable.tree;
 
-import org.reflections.Reflections;
+import org.vadere.simulator.context.VadereContext;
+
 import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -22,8 +23,8 @@ public class AbstrNode extends AttributeTreeModel.TreeNode {
         super(parent,fieldName,fieldType);
         node  = new ObjectNode(getParent(), fieldName,fieldType);
         setValueNode(new ValueNode(this,fieldName, fieldType,null));
-        this.classRegistry = (Map<Class<?>, AttributeTreeModel.TreeNode>) new Reflections("org.vadere")
-                .getSubTypesOf(fieldType)
+        var cache = (TreeModelCache) VadereContext.getCtx("GUI").get(VadereContext.TREE_NODE_CTX);
+        this.classRegistry = cache.getSubTypeOff(fieldType)
                 .stream()
                 .collect(Collectors.toMap(
                         aClass -> aClass,

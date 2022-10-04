@@ -5,6 +5,8 @@ import org.vadere.gui.topographycreator.control.attribtable.ViewListener;
 import org.vadere.gui.topographycreator.control.attribtable.tree.AttributeTreeModel;
 import org.vadere.gui.topographycreator.control.attribtable.tree.TreeAdapter;
 import org.vadere.gui.topographycreator.control.attribtable.tree.TreeException;
+import org.vadere.gui.topographycreator.control.attribtable.util.ManualAttributeTableFocus;
+import org.vadere.simulator.context.Context;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,12 +14,14 @@ import java.util.HashMap;
 
 public class AttributeTableView extends JPanel implements ViewListener {
     HashMap<Class, AttributeTablePage> pages;
+    private HashMap<Class, ManualAttributeTableFocus> pageFocus;
     AttributeTablePage activePage;
     ViewListener viewListener;
 
     public AttributeTableView(ViewListener viewListener) {
         super(new BorderLayout());
         this.pages = new HashMap<>();
+        this.pageFocus = new HashMap<>();
         this.viewListener = viewListener;
 
     }
@@ -57,11 +61,17 @@ public class AttributeTableView extends JPanel implements ViewListener {
     public void buildPageFor(Class clazz){
         var tree = AttributeTreeModel.parseClassTree(new TreeAdapter(this), null, clazz);
         var page = new AttributeTablePage(tree,AttributeTablePage.generateHeaderName(clazz),new AttributeTablePage.TableStyler(tree));
+        var f = new ManualAttributeTableFocus();
+        page.applyFocusPolicy(f);
         this.pages.put(clazz, page);
+        this.pageFocus.put(clazz, f);
     }
 
     public void buildPageFor(AttributeTreeModel.TreeNode tree){
         var page = new AttributeTablePage(tree,AttributeTablePage.generateHeaderName(tree.getFieldType()),new AttributeTablePage.TableStyler(tree));
+        var f = new ManualAttributeTableFocus();
+        page.applyFocusPolicy(f);
         this.pages.put(tree.getFieldType(), page);
+        this.pageFocus.put(tree.getFieldType(), f);
     }
 }

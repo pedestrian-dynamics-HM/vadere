@@ -158,7 +158,7 @@ public class ScenarioRun implements Runnable {
 				final Random random = modelBuilder.getRandom();
 				final Domain domain = modelBuilder.getDomain();
 				//todo[random]: place the Random object in the context for now. This should be replaced by the meta seed.
-				VadereContext.get(scenarioStore.getTopography()).put("random", random);
+				VadereContext.getCtx(scenarioStore.getTopography()).put("random", random);
 
 				// prepare processors and simulation data writer
 				if(scenarioStore.getAttributesSimulation().isWriteSimulationData()) {
