@@ -1,8 +1,7 @@
 {
   "name" : "s2ucre",
   "description" : "",
-  "release" : "2.3",
-  "commithash" : "ff5b381ea8f959e7e0d65a1b13bcdde1e13782cf",
+  "release" : "2.4",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ {
@@ -13,14 +12,14 @@
         "expectedResult" : "SUCCESS",
         "optimizationMetricProcessorId" : 2,
         "testEvacuationProcessorId" : 3,
-        "maxMeanPointDistance" : 0.0899909260756839,
-        "maxMeanDifferenceFuncValue" : 0.02454599248184318,
-        "infoMinPointDistanceL2" : 0.00486214225177224,
-        "infoMaxPointDistanceL2" : 0.5618698000962584,
-        "infoMinFuncDifference" : 1.8282880538400548E-4,
-        "infoMaxFuncDifference" : 0.115304814384805,
-        "infoStddevPointDistance" : 0.07170356699761087,
-        "infoStddevDifferenceFuncValue" : 0.01275342857630046
+        "maxMeanPointDistance" : 0.1014219103142462,
+        "maxMeanDifferenceFuncValue" : 0.02373497552288457,
+        "infoMinPointDistanceL2" : 0.01537797056353981,
+        "infoMaxPointDistanceL2" : 0.48914253480779896,
+        "infoMinFuncDifference" : 0.0013550135375233197,
+        "infoMaxFuncDifference" : 0.14354267102941698,
+        "infoStddevPointDistance" : 0.07292298612343912,
+        "infoStddevDifferenceFuncValue" : 0.015216011087113809
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianMetricOptimizationProcessor",
@@ -158,6 +157,7 @@
         "referenceCoordinateSystem" : null
       },
       "obstacles" : [ {
+        "id" : 1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -180,8 +180,9 @@
             "y" : 1.936819093301892
           } ]
         },
-        "id" : 1
+        "visible" : true
       }, {
+        "id" : 2,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -201,8 +202,9 @@
             "y" : -0.6501099467277527
           } ]
         },
-        "id" : 2
+        "visible" : true
       }, {
+        "id" : 4,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -228,7 +230,7 @@
             "y" : 49.5
           } ]
         },
-        "id" : 4
+        "visible" : true
       } ],
       "measurementAreas" : [ ],
       "stairs" : [ ],
@@ -250,15 +252,17 @@
             "y" : 4.9
           } ]
         },
-        "absorbing" : true,
-        "deletionDistance" : 0.1,
-        "waitingBehaviour" : "NO_WAITING",
-        "parallelWaiters" : 0,
-        "nextSpeed" : -1.0,
-        "waitingTimeDistribution" : null,
-        "distributionParameters" : null,
-        "startingWithRedLight" : false,
-        "waitingTimeYellowPhase" : 0.0
+        "visible" : true,
+        "absorber" : {
+          "enabled" : true,
+          "deletionDistance" : 0.1
+        },
+        "waiter" : {
+          "enabled" : false,
+          "distribution" : null
+        },
+        "leavingSpeed" : -1.0,
+        "parallelEvents" : 0
       } ],
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],
@@ -273,24 +277,35 @@
           "height" : 4.4,
           "type" : "RECTANGLE"
         },
-        "interSpawnTimeDistribution" : "constant",
-        "distributionParameters" : {
-          "updateFrequency" : 15.0
-        },
-        "spawnNumber" : 1,
-        "maxSpawnNumberTotal" : -1,
-        "startTime" : 0.0,
-        "endTime" : 100.0,
-        "spawnAtRandomPositions" : true,
-        "spawnAtGridPositionsCA" : false,
-        "useFreeSpaceOnly" : true,
+        "visible" : true,
         "targetIds" : [ 1 ],
-        "groupSizeDistribution" : [ 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN",
-        "attributesPedestrian" : null
+        "spawner" : {
+          "type" : "org.vadere.state.attributes.spawner.AttributesRegularSpawner",
+          "constraintsElementsMax" : -1,
+          "constraintsTimeStart" : 0.0,
+          "constraintsTimeEnd" : 100.0,
+          "eventPositionRandom" : true,
+          "eventPositionGridCA" : false,
+          "eventPositionFreeSpace" : true,
+          "eventElementCount" : 1,
+          "eventElement" : null,
+          "distribution" : {
+            "type" : "org.vadere.state.attributes.distributions.AttributesConstantDistribution",
+            "updateFrequency" : 15.0
+          }
+        },
+        "groupSizeDistribution" : [ 1.0 ]
       } ],
       "dynamicElements" : [ ],
       "attributesPedestrian" : {
+        "shape" : {
+          "x" : 0.0,
+          "y" : 0.0,
+          "width" : 1.0,
+          "height" : 1.0,
+          "type" : "RECTANGLE"
+        },
+        "visible" : true,
         "radius" : 0.195,
         "densityDependentSpeed" : false,
         "speedDistributionMean" : 1.34,
@@ -300,8 +315,8 @@
         "acceleration" : 2.0,
         "footstepHistorySize" : 4,
         "searchRadius" : 1.0,
-        "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-        "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+        "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+        "walkingDirectionCalculation" : "BY_TARGET_CENTER"
       },
       "teleporter" : null,
       "attributesCar" : null

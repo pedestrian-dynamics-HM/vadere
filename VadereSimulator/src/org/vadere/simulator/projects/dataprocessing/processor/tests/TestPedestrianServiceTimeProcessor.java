@@ -3,17 +3,14 @@ package org.vadere.simulator.projects.dataprocessing.processor.tests;
 import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
 import org.vadere.simulator.control.simulation.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
-
 import org.vadere.simulator.projects.dataprocessing.datakey.EventTimeKey;
-
 import org.vadere.simulator.projects.dataprocessing.datakey.PedestrianIdKey;
 import org.vadere.simulator.projects.dataprocessing.processor.PedestrianElementCountingProcessor;
 import org.vadere.simulator.projects.dataprocessing.processor.PedestrianLifetimeProcessor;
-
+import org.vadere.state.attributes.distributions.AttributesPoissonDistribution;
 import org.vadere.state.attributes.processor.AttributesTestServiceTimeProcessor;
 import org.vadere.state.scenario.Target;
 import org.vadere.util.logging.Logger;
-
 
 import java.util.Map;
 
@@ -37,7 +34,7 @@ public class TestPedestrianServiceTimeProcessor extends TestProcessor {
         this.elementCountingProcessor = new PedestrianElementCountingProcessor();
         this.lifetimeProcessor = new PedestrianLifetimeProcessor();
     }
-    private static Logger logger = Logger.getLogger(TestPedestrianServiceTimeProcessor.class);
+    private static final Logger logger = Logger.getLogger(TestPedestrianServiceTimeProcessor.class);
 
     @Override
     protected void doUpdate(SimulationState state) {
@@ -51,8 +48,8 @@ public class TestPedestrianServiceTimeProcessor extends TestProcessor {
 
         var source = state.getTopography().getSource(1);
         var sourceAttrib = source.getAttributes();
-        var distrbAttrib = sourceAttrib.getDistributionParameters();
-        var numberPedsPerSec = distrbAttrib.get("numberPedsPerSecond").asDouble();
+        var distrbAttrib = sourceAttrib.getSpawnerAttributes().getDistributionAttributes();
+        var numberPedsPerSec = ((AttributesPoissonDistribution)distrbAttrib).getNumberPedsPerSecond();
 
         Map<EventTimeKey, Integer> countProcessorData =
                 this.elementCountingProcessor.getData();
@@ -75,7 +72,7 @@ public class TestPedestrianServiceTimeProcessor extends TestProcessor {
         var upperbound = attrib.getUpperBound();
         var actualval = numberPedsPerSec*liveavg;
         handleAssertion(actualval > lowerbound
-        && actualval < upperbound);
+        && actualval < upperbound,"lowerbound "+lowerbound+", upperbound "+upperbound+",actual value "+actualval);
 
     }
 

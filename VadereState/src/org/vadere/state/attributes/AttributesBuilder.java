@@ -3,6 +3,7 @@ package org.vadere.state.attributes;
 
 
 import org.vadere.util.logging.Logger;
+import org.vadere.util.reflection.ClassFields;
 
 import java.lang.reflect.Field;
 
@@ -23,10 +24,10 @@ public class AttributesBuilder<T extends Attributes> {
     public void setField(String name, Object value) {
         Field field;
         try {
-            field = attributes.getClass().getDeclaredField(name);
+            field = ClassFields.getSuperDeclaredFields(attributes.getClass(),name).get();
             field.setAccessible(true);
             field.set(attributes, value);
-        } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
+        } catch (SecurityException | IllegalArgumentException | IllegalAccessException e) {
             e.printStackTrace();
             logger.error(e);
         }

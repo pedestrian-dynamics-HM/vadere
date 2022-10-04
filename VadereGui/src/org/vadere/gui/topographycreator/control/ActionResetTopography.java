@@ -1,14 +1,12 @@
 package org.vadere.gui.topographycreator.control;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.ImageIcon;
-import javax.swing.undo.UndoableEdit;
-import javax.swing.undo.UndoableEditSupport;
-
 import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.topographycreator.model.IDrawPanelModel;
 import org.vadere.state.scenario.Topography;
+
+import javax.swing.undo.UndoableEdit;
+import javax.swing.undo.UndoableEditSupport;
+import java.awt.event.ActionEvent;
 
 /**
  * Action: Resets the Topography. This means all ScenarioElements will be removed.
@@ -16,14 +14,14 @@ import org.vadere.state.scenario.Topography;
  * 
  */
 public class ActionResetTopography extends TopographyAction {
-	private static Resources resources = Resources.getInstance("topographycreator");
+	private static final Resources resources = Resources.getInstance("topographycreator");
 	private static final long serialVersionUID = -5557013510457451231L;
 
 	private final UndoableEditSupport undoSupport;
 
-	public ActionResetTopography(String name, ImageIcon icon, IDrawPanelModel panelModel,
+	public ActionResetTopography(String name, String iconPath,String shortDescription, IDrawPanelModel panelModel,
 			UndoableEditSupport undoSupport) {
-		super(name, icon, panelModel);
+		super(name, iconPath, shortDescription, panelModel);
 		this.undoSupport = undoSupport;
 	}
 

@@ -18,13 +18,13 @@ import java.util.stream.Collectors;
 
 public class SingleSourceController extends SourceController {
 
-	private static Logger logger = Logger.getLogger(SingleSourceController.class);
+	private static final Logger logger = Logger.getLogger(SingleSourceController.class);
 
 	private int numberToSpawn;
 	private static final int NUMBER_OF_REPOSITION_TRIES = 10;
 	private static final int NUMBER_OF_POINT_SEARCH = 1_500; // todo based on shape and position of source
 
-	private SingleSpawnArray spawnArray;
+	private final SingleSpawnArray spawnArray;
 
 	public SingleSourceController(Topography scenario, Source source,
 								  DynamicElementFactory dynamicElementFactory,
@@ -39,20 +39,20 @@ public class SingleSourceController extends SourceController {
 				new VRectangle(0, 0, elementBound.getWidth(), elementBound.getHeight()),
 				this.dynamicElementFactory::getDynamicElementRequiredPlace,
 				this::testFreeSpace,
-				source.getAttributes());
+				sourceAttributes.getSpawnerAttributes());
 	}
 
 	@Override
 	public void update(double simTimeInSec) {
-		if (!isSourceFinished(simTimeInSec)) {
+		if (!this.spawner.isFinished(simTimeInSec, () -> isQueueEmpty())) {
 			determineNumberOfSpawnsAndNextEvent(simTimeInSec);
 
 			if (numberToSpawn > 0) {
 				List<VPoint> spawnPoints;
 
-				if (sourceAttributes.isSpawnAtRandomPositions()) {
+				if (spawnerAttributes.isEventPositionRandom()) {
 
-					if(!sourceAttributes.isSpawnAtGridPositionsCA()) {
+					if (!spawnerAttributes.isEventPositionGridCA()) {
 
 						spawnPoints = getRealRandomPositions(
 								numberToSpawn,
@@ -78,7 +78,7 @@ public class SingleSourceController extends SourceController {
 
 				} else {
 
-					if (sourceAttributes.isUseFreeSpaceOnly()) {
+					if (spawnerAttributes.isEventPositionFreeSpace()) {
 						spawnPoints = getRealPositions(
 								numberToSpawn,
 								getDynElementsAtSource().stream()
@@ -100,12 +100,12 @@ public class SingleSourceController extends SourceController {
 				// wants to try to spawn the agents in the next update.
 				int remainingAgents = numberToSpawn - spawnPoints.size();
 				assert (remainingAgents >= 0);
-				this.distribution.setRemainingSpawnAgents(remainingAgents);
+				this.spawner.setRemainingSpawnAgents(remainingAgents);
 
 				for (VPoint spawnPoint : spawnPoints) {
-					if (!isMaximumNumberOfSpawnedElementsReached()) {
+					if (!spawner.isMaximumNumberOfSpawnedElementsReached()) {
 						addNewAgentToScenario(spawnPoint, simTimeInSec);
-						dynamicElementsCreatedTotal++;
+						spawner.incrementElementsCreatedTotal(1);
 					}
 				}
 			}
@@ -206,7 +206,7 @@ public class SingleSourceController extends SourceController {
 
 			// no intersection with other free spaces (obstacles & other pedestrians)
 
-			if (!sourceAttributes.isUseFreeSpaceOnly() || testFreeSpace(freeSpaceRequired, blockPedestrianShapes)) {
+			if (!spawnerAttributes.isEventPositionFreeSpace() || testFreeSpace(freeSpaceRequired, blockPedestrianShapes)) {
 				return Optional.of(randomPoint);
 			}
 		}
@@ -224,10 +224,10 @@ public class SingleSourceController extends SourceController {
 
 		// The concrete distribution implements how to proceed with agents that could not all be spawned
 		// e.g. because the source is too small
-		numberToSpawn = this.distribution.getRemainingSpawnAgents();
+		numberToSpawn = this.spawner.getRemainingSpawnAgents();
 
 		while (timeOfNextEvent <= simTimeInSec) {
-			numberToSpawn += distribution.getSpawnNumber(timeOfNextEvent);
+			numberToSpawn += spawner.getEventElementCount(timeOfNextEvent);
 			createNextEvent();
 		}
 	}

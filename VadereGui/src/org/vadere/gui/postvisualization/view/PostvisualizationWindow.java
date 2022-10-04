@@ -2,35 +2,18 @@ package org.vadere.gui.postvisualization.view;
 
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
-
 import org.apache.commons.configuration2.Configuration;
 import org.jetbrains.annotations.NotNull;
-import org.vadere.gui.components.control.ActionGeneratePoly;
-import org.vadere.gui.components.control.IViewportChangeListener;
-import org.vadere.gui.components.control.JViewportChangeListener;
-import org.vadere.gui.components.control.PanelResizeListener;
-import org.vadere.gui.components.control.ViewportChangeListener;
-import org.vadere.gui.components.control.simulation.ActionGenerateINETenv;
-import org.vadere.gui.components.control.simulation.ActionGeneratePNG;
-import org.vadere.gui.components.control.simulation.ActionGenerateSVG;
-import org.vadere.gui.components.control.simulation.ActionGenerateTikz;
-import org.vadere.gui.components.control.simulation.ActionSwapSelectionMode;
-import org.vadere.gui.components.control.simulation.ActionVisualization;
+import org.vadere.gui.components.control.*;
+import org.vadere.gui.components.control.simulation.*;
 import org.vadere.gui.components.model.IDefaultModel;
 import org.vadere.gui.components.utils.Messages;
+import org.vadere.gui.components.utils.ResourceStrings;
 import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.components.utils.SwingUtils;
 import org.vadere.gui.components.view.DialogFactory;
 import org.vadere.gui.components.view.ScenarioElementView;
-import org.vadere.gui.postvisualization.control.ActionOpenFile;
-import org.vadere.gui.postvisualization.control.ActionPause;
-import org.vadere.gui.postvisualization.control.ActionPlay;
-import org.vadere.gui.components.control.simulation.ActionRecording;
-import org.vadere.gui.postvisualization.control.ActionRemoveFloorFieldFile;
-import org.vadere.gui.postvisualization.control.ActionShowPotentialField;
-import org.vadere.gui.postvisualization.control.ActionStop;
-import org.vadere.gui.postvisualization.control.ActionVisualizationMenu;
-import org.vadere.gui.postvisualization.control.Player;
+import org.vadere.gui.postvisualization.control.*;
 import org.vadere.gui.postvisualization.model.ContactData;
 import org.vadere.gui.postvisualization.model.PostvisualizationModel;
 import org.vadere.gui.postvisualization.model.TableAerosolCloudData;
@@ -43,21 +26,15 @@ import org.vadere.util.config.VadereConfig;
 import org.vadere.util.io.IOUtils;
 import tech.tablesaw.api.Table;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
-import java.awt.dnd.DnDConstants;
-import java.awt.dnd.DropTarget;
-import java.awt.dnd.DropTargetDragEvent;
-import java.awt.dnd.DropTargetDropEvent;
-import java.awt.dnd.DropTargetEvent;
-import java.awt.dnd.DropTargetListener;
+import java.awt.dnd.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
 import java.util.List;
-
-import javax.swing.*;
+import java.util.*;
 
 /**
  * Main Window of the new post visualization.
@@ -66,19 +43,19 @@ public class PostvisualizationWindow extends JPanel implements Observer, DropTar
 	private static final long serialVersionUID = -8177132133860336295L;
 	private static final Configuration CONFIG = VadereConfig.getConfig();
 
-	private JToolBar toolbar;
-	private ScenarioPanel scenarioPanel;
-	private AdjustPanel adjustPanel;
-	private PostvisualizationModel model;
-	private JMenu mRecentFiles;
-	private JMenuBar menuBar;
-	private static Resources resources = Resources.getInstance("postvisualization");
+	private final JToolBar toolbar;
+	private final ScenarioPanel scenarioPanel;
+	private final AdjustPanel adjustPanel;
+	private final PostvisualizationModel model;
+	private final JMenu mRecentFiles;
+	private final JMenuBar menuBar;
+	private static final Resources resources = Resources.getInstance("postvisualization");
 	private final ScenarioElementView textView;
 
-	private ButtonGroup playControlGroup;
-	private JToggleButton playButton;
-	private JToggleButton pauseButton;
-	private JToggleButton stopButton;
+	private final ButtonGroup playControlGroup;
+	private final JToggleButton playButton;
+	private final JToggleButton pauseButton;
+	private final JToggleButton stopButton;
 
 	public PostvisualizationWindow(final String projectPath) {
 		this(false, projectPath);
@@ -318,6 +295,7 @@ public class PostvisualizationWindow extends JPanel implements Observer, DropTar
 				renderer, model);
 
 		AbstractAction polyImg = new ActionGeneratePoly(Messages.getString("ProjectView.btnPolySnapshot.tooltip"), resources.getIcon("camera_poly.png", iconWidth, iconHeight),
+				ResourceStrings.TOPOGRAPHY_CREATOR_BTN_GENERATE_POLY_TOOLTIP,
 				model);
 
 		imgOptions.add(pngImg);
@@ -342,7 +320,6 @@ public class PostvisualizationWindow extends JPanel implements Observer, DropTar
 						DialogFactory.createSettingsDialog(model).setVisible(true);
 					}
 
-				;
 				}, "ProjectView.btnSettings.tooltip");
 
 		menuBar = new JMenuBar();

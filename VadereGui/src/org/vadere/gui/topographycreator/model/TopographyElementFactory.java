@@ -4,9 +4,9 @@ import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.scenario.*;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.types.ScenarioElementType;
-import org.vadere.util.geometry.shapes.Vector2D;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.util.geometry.shapes.Vector2D;
 
 /**
  * A Factory to create new ScenarioElements.
@@ -14,7 +14,7 @@ import org.vadere.util.geometry.shapes.VShape;
  *
  */
 public class TopographyElementFactory {
-	private static TopographyElementFactory instance = new TopographyElementFactory();
+	private static final TopographyElementFactory instance = new TopographyElementFactory();
 
 	private TopographyElementFactory() {}
 
@@ -31,7 +31,7 @@ public class TopographyElementFactory {
 			case SOURCE:
 				return new org.vadere.state.scenario.Source(new AttributesSource(-1, shape));
 			case TARGET:
-				return new org.vadere.state.scenario.Target(new AttributesTarget(shape));
+				return new org.vadere.state.scenario.Target(new AttributesTarget(-1,shape));
 			case TARGET_CHANGER:
 				return new org.vadere.state.scenario.TargetChanger(new AttributesTargetChanger(shape));
 			case ABSORBING_AREA:

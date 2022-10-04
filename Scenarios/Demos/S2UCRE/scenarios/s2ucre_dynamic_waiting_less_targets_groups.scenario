@@ -1,8 +1,8 @@
 {
   "name" : "s2ucre_dynamic_waiting_less_targets_groups",
   "description" : "",
-  "release" : "2.3",
-  "commithash" : "ff5b381ea8f959e7e0d65a1b13bcdde1e13782cf",
+  "release" : "2.4",
+  "commithash" : "37d5cea029114cfbc5ced38fb76c86834cb50304",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -127,6 +127,7 @@
         "referenceCoordinateSystem" : null
       },
       "obstacles" : [ {
+        "id" : 2,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -143,8 +144,9 @@
             "y" : 0.5
           } ]
         },
-        "id" : 2
+        "visible" : true
       }, {
+        "id" : 3,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -173,8 +175,9 @@
             "y" : 45.90773453190923
           } ]
         },
-        "id" : 3
+        "visible" : true
       }, {
+        "id" : 4,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -191,8 +194,9 @@
             "y" : 12.7
           } ]
         },
-        "id" : 4
+        "visible" : true
       }, {
+        "id" : 1,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -227,10 +231,11 @@
             "y" : 5.936819093301892
           } ]
         },
-        "id" : 1
+        "visible" : true
       } ],
       "measurementAreas" : [ ],
       "stairs" : [ {
+        "id" : 6,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -247,13 +252,14 @@
             "y" : 12.7
           } ]
         },
-        "id" : 6,
+        "visible" : true,
         "treadCount" : 20,
         "upwardDirection" : {
           "x" : 0.4,
           "y" : -0.18
         }
       }, {
+        "id" : 7,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -270,13 +276,14 @@
             "y" : 0.84
           } ]
         },
-        "id" : 7,
+        "visible" : true,
         "treadCount" : 30,
         "upwardDirection" : {
           "x" : -0.7,
           "y" : 0.3
         }
       }, {
+        "id" : 6,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -293,13 +300,14 @@
             "y" : 9.7
           } ]
         },
-        "id" : 6,
+        "visible" : true,
         "treadCount" : 15,
         "upwardDirection" : {
           "x" : 0.4,
           "y" : -0.18
         }
       }, {
+        "id" : 6,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -316,7 +324,7 @@
             "y" : 10.1
           } ]
         },
-        "id" : 6,
+        "visible" : true,
         "treadCount" : 20,
         "upwardDirection" : {
           "x" : 0.4,
@@ -341,15 +349,17 @@
             "y" : 20.1
           } ]
         },
-        "absorbing" : true,
-        "deletionDistance" : 0.1,
-        "waitingBehaviour" : "NO_WAITING",
-        "parallelWaiters" : 0,
-        "nextSpeed" : -1.0,
-        "waitingTimeDistribution" : null,
-        "distributionParameters" : null,
-        "startingWithRedLight" : false,
-        "waitingTimeYellowPhase" : 0.0
+        "visible" : true,
+        "absorber" : {
+          "enabled" : true,
+          "deletionDistance" : 0.1
+        },
+        "waiter" : {
+          "enabled" : false,
+          "distribution" : null
+        },
+        "leavingSpeed" : -1.0,
+        "parallelEvents" : 0
       }, {
         "id" : 1,
         "shape" : {
@@ -368,15 +378,17 @@
             "y" : 5.900000000372529
           } ]
         },
-        "absorbing" : true,
-        "deletionDistance" : 0.1,
-        "waitingBehaviour" : "NO_WAITING",
-        "parallelWaiters" : 0,
-        "nextSpeed" : -1.0,
-        "waitingTimeDistribution" : null,
-        "distributionParameters" : null,
-        "startingWithRedLight" : false,
-        "waitingTimeYellowPhase" : 0.0
+        "visible" : true,
+        "absorber" : {
+          "enabled" : true,
+          "deletionDistance" : 0.1
+        },
+        "waiter" : {
+          "enabled" : false,
+          "distribution" : null
+        },
+        "leavingSpeed" : -1.0,
+        "parallelEvents" : 0
       }, {
         "id" : 100,
         "shape" : {
@@ -395,17 +407,20 @@
             "y" : 5.8
           } ]
         },
-        "absorbing" : false,
-        "deletionDistance" : 0.1,
-        "waitingBehaviour" : "INDIVIDUAL",
-        "parallelWaiters" : 0,
-        "nextSpeed" : -1.0,
-        "waitingTimeDistribution" : "constant",
-        "distributionParameters" : {
-          "updateFrequency" : 60.0
+        "visible" : true,
+        "absorber" : {
+          "enabled" : false,
+          "deletionDistance" : 0.1
         },
-        "startingWithRedLight" : false,
-        "waitingTimeYellowPhase" : 0.0
+        "waiter" : {
+          "enabled" : true,
+          "distribution" : {
+            "type" : "org.vadere.state.attributes.distributions.AttributesConstantDistribution",
+            "updateFrequency" : 60.0
+          }
+        },
+        "leavingSpeed" : -1.0,
+        "parallelEvents" : 0
       }, {
         "id" : 4,
         "shape" : {
@@ -424,17 +439,20 @@
             "y" : 40.73207802292548
           } ]
         },
-        "absorbing" : false,
-        "deletionDistance" : 0.1,
-        "waitingBehaviour" : "INDIVIDUAL",
-        "parallelWaiters" : 0,
-        "nextSpeed" : -1.0,
-        "waitingTimeDistribution" : "constant",
-        "distributionParameters" : {
-          "updateFrequency" : 30.0
+        "visible" : true,
+        "absorber" : {
+          "enabled" : false,
+          "deletionDistance" : 0.1
         },
-        "startingWithRedLight" : false,
-        "waitingTimeYellowPhase" : 0.0
+        "waiter" : {
+          "enabled" : true,
+          "distribution" : {
+            "type" : "org.vadere.state.attributes.distributions.AttributesConstantDistribution",
+            "updateFrequency" : 30.0
+          }
+        },
+        "leavingSpeed" : -1.0,
+        "parallelEvents" : 0
       }, {
         "id" : 4,
         "shape" : {
@@ -453,17 +471,20 @@
             "y" : 42.1
           } ]
         },
-        "absorbing" : false,
-        "deletionDistance" : 0.1,
-        "waitingBehaviour" : "INDIVIDUAL",
-        "parallelWaiters" : 0,
-        "nextSpeed" : -1.0,
-        "waitingTimeDistribution" : "constant",
-        "distributionParameters" : {
-          "updateFrequency" : 30.0
+        "visible" : true,
+        "absorber" : {
+          "enabled" : false,
+          "deletionDistance" : 0.1
         },
-        "startingWithRedLight" : false,
-        "waitingTimeYellowPhase" : 0.0
+        "waiter" : {
+          "enabled" : true,
+          "distribution" : {
+            "type" : "org.vadere.state.attributes.distributions.AttributesConstantDistribution",
+            "updateFrequency" : 30.0
+          }
+        },
+        "leavingSpeed" : -1.0,
+        "parallelEvents" : 0
       } ],
       "targetChangers" : [ {
         "id" : 8,
@@ -483,6 +504,7 @@
             "y" : 32.3
           } ]
         },
+        "visible" : true,
         "reachDistance" : 0.3,
         "changeAlgorithmType" : "SELECT_LIST",
         "nextTarget" : [ 4, 1 ],
@@ -505,6 +527,7 @@
             "y" : 28.43021344537003
           } ]
         },
+        "visible" : true,
         "reachDistance" : 0.3,
         "changeAlgorithmType" : "SELECT_LIST",
         "nextTarget" : [ 4, 1 ],
@@ -527,6 +550,7 @@
             "y" : 24.42218626764563
           } ]
         },
+        "visible" : true,
         "reachDistance" : 0.3,
         "changeAlgorithmType" : "SELECT_LIST",
         "nextTarget" : [ 4, 1 ],
@@ -549,6 +573,7 @@
             "y" : 36.0
           } ]
         },
+        "visible" : true,
         "reachDistance" : 0.3,
         "changeAlgorithmType" : "SELECT_LIST",
         "nextTarget" : [ 4, 1 ],
@@ -571,6 +596,7 @@
             "y" : 10.5
           } ]
         },
+        "visible" : true,
         "reachDistance" : 0.3,
         "changeAlgorithmType" : "SELECT_LIST",
         "nextTarget" : [ 100, 1 ],
@@ -593,6 +619,7 @@
             "y" : 20.1
           } ]
         },
+        "visible" : true,
         "reachDistance" : 0.3,
         "changeAlgorithmType" : "SELECT_LIST",
         "nextTarget" : [ 4, 1 ],
@@ -615,6 +642,7 @@
             "y" : 14.241623304301
           } ]
         },
+        "visible" : true,
         "reachDistance" : 0.3,
         "changeAlgorithmType" : "SELECT_LIST",
         "nextTarget" : [ 4, 1 ],
@@ -637,6 +665,7 @@
             "y" : 16.776978366002012
           } ]
         },
+        "visible" : true,
         "reachDistance" : 0.3,
         "changeAlgorithmType" : "SELECT_LIST",
         "nextTarget" : [ 4, 1 ],
@@ -663,24 +692,35 @@
             "y" : 49.5
           } ]
         },
-        "interSpawnTimeDistribution" : "constant",
-        "distributionParameters" : {
-          "updateFrequency" : 1.0
-        },
-        "spawnNumber" : 4,
-        "maxSpawnNumberTotal" : -1,
-        "startTime" : 0.0,
-        "endTime" : 500.0,
-        "spawnAtRandomPositions" : true,
-        "spawnAtGridPositionsCA" : false,
-        "useFreeSpaceOnly" : true,
+        "visible" : true,
         "targetIds" : [ 1 ],
-        "groupSizeDistribution" : [ 0.2, 0.6, 0.1, 0.1 ],
-        "dynamicElementType" : "PEDESTRIAN",
-        "attributesPedestrian" : null
+        "spawner" : {
+          "type" : "org.vadere.state.attributes.spawner.AttributesRegularSpawner",
+          "constraintsElementsMax" : -1,
+          "constraintsTimeStart" : 0.0,
+          "constraintsTimeEnd" : 500.0,
+          "eventPositionRandom" : true,
+          "eventPositionGridCA" : false,
+          "eventPositionFreeSpace" : true,
+          "eventElementCount" : 4,
+          "eventElement" : null,
+          "distribution" : {
+            "type" : "org.vadere.state.attributes.distributions.AttributesConstantDistribution",
+            "updateFrequency" : 1.0
+          }
+        },
+        "groupSizeDistribution" : [ 0.2, 0.6, 0.1, 0.1 ]
       } ],
       "dynamicElements" : [ ],
       "attributesPedestrian" : {
+        "shape" : {
+          "x" : 0.0,
+          "y" : 0.0,
+          "width" : 1.0,
+          "height" : 1.0,
+          "type" : "RECTANGLE"
+        },
+        "visible" : true,
         "radius" : 0.195,
         "densityDependentSpeed" : false,
         "speedDistributionMean" : 1.34,
@@ -690,8 +730,8 @@
         "acceleration" : 2.0,
         "footstepHistorySize" : 4,
         "searchRadius" : 1.0,
-        "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-        "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+        "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+        "walkingDirectionCalculation" : "BY_TARGET_CENTER"
       },
       "teleporter" : null,
       "attributesCar" : null

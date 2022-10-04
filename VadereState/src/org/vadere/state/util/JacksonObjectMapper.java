@@ -3,12 +3,6 @@ package org.vadere.state.util;
 import java.io.IOException;
 import java.util.List;
 
-import com.fasterxml.jackson.core.TreeNode;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.vadere.state.attributes.scenario.AttributesSource;
-import org.vadere.state.psychology.perception.json.StimulusInfoStore;
-import org.vadere.state.scenario.Source;
 import org.vadere.util.geometry.shapes.ShapeType;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.state.scenario.DynamicElement;
@@ -34,6 +28,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import org.vadere.util.reflection.VadereAttribute;
 
 public class JacksonObjectMapper extends ObjectMapper {
 
@@ -88,9 +83,9 @@ public class JacksonObjectMapper extends ObjectMapper {
 				ShapeType shapeType = convertValue(node.get("type"), ShapeType.class);
 				switch (shapeType) {
 					case CIRCLE:
-						return convertValue(node, CircleStore.class).newVCircle();
+						return convertValue(node, VCircleStore.class).newInstance();
 					case POLYGON:
-						return convertValue(node, Polygon2DStore.class).newVPolygon();
+						return convertValue(node, VPolygon2DStore.class).newInstance();
 					case RECTANGLE:
 						return deserializeVRectangle(node);
 					default:
@@ -105,11 +100,11 @@ public class JacksonObjectMapper extends ObjectMapper {
 					throws IOException {
 				switch (vShape.getType()) {
 					case CIRCLE:
-						jsonGenerator.writeTree(convertValue(new CircleStore((VCircle) vShape), JsonNode.class));
+						jsonGenerator.writeTree(convertValue(new VCircleStore((VCircle) vShape), JsonNode.class));
 						break;
 					case POLYGON:
 						jsonGenerator
-								.writeTree(convertValue(new Polygon2DStore((VPolygon) vShape), JsonNode.class));
+								.writeTree(convertValue(new VPolygon2DStore((VPolygon) vShape), JsonNode.class));
 						break;
 					case RECTANGLE:
 						jsonGenerator.writeTree(serializeVRectangle((VRectangle) vShape)); // this doesn't seem to get called ever, the VRectangle serializer always seem to get called
@@ -140,22 +135,47 @@ public class JacksonObjectMapper extends ObjectMapper {
 	}
 
 	private VRectangle deserializeVRectangle(JsonNode node) {
-		return convertValue(node, VRectangleStore.class).newVRectangle();
+		return convertValue(node, VRectangleStore.class).newInstance();
 	}
 
 	private JsonNode serializeVRectangle(VRectangle vRect) {
 		return convertValue(new VRectangleStore(vRect), JsonNode.class);
 	}
+	@VadereAttribute
+	public static abstract class VShapeStore{
+		public abstract VShape newInstance();
+	}
+
 
 	@SuppressWarnings("unused")
-	private static class VRectangleStore {
-		public double x;
-		public double y;
-		public double width;
-		public double height;
+    public static class VRectangleStore extends VShapeStore{
+		/**
+		 * This attribute stores the x coordinate of the origin point
+		 */
+		public Double x;
+		/**
+		 * This attribute stores the x coordinate of the origin point
+		 */
+		public Double y;
+		/**
+		 * This attribute stores the width of the rectangle.<br>
+		 * It cannot be less or equals zero.
+		 */
+		public Double width;
+		/**
+		 * This attribute stores the height of the rectangle.<br>
+		 * It cannot be less or equals zero.
+		 */
+		public Double height;
+		@VadereAttribute(exclude = true)
 		public ShapeType type = ShapeType.RECTANGLE;
 
-		public VRectangleStore() {}
+		public VRectangleStore() {
+			x = 0.0;
+			y = 0.0;
+			width = 1.0;
+			height = 1.0;
+		}
 
 		public VRectangleStore(VRectangle vRect) {
 			x = vRect.x;
@@ -164,41 +184,54 @@ public class JacksonObjectMapper extends ObjectMapper {
 			width = vRect.width;
 		}
 
-		public VRectangle newVRectangle() {
+		public VRectangle newInstance() {
 			return new VRectangle(x, y, width, height);
 		}
 	}
 
 	@SuppressWarnings("unused")
-	private static class Polygon2DStore {
+	public static class VPolygon2DStore extends VShapeStore{
+		@VadereAttribute(exclude = true)
 		public ShapeType type = ShapeType.POLYGON;
+		/**
+		 * This list is a collection of all point that make up the polygon.
+		 * The points are lay out clockwise.
+		 */
 		public List<VPoint> points;
 
-		public Polygon2DStore() {}
+		public VPolygon2DStore() {}
 
-		public Polygon2DStore(VPolygon vPoly) {
+		public VPolygon2DStore(VPolygon vPoly) {
 			points = vPoly.getPoints();
 		}
 
-		public VPolygon newVPolygon() {
+		public VPolygon newInstance() {
 			return GeometryUtils.polygonFromPoints2D(points);
 		}
 	}
 
 	@SuppressWarnings("unused")
-	private static class CircleStore {
-		public double radius;
+	public static class VCircleStore extends VShapeStore{
+		/**
+		 * This attribute stores the radius of the circle.<br>
+		 * It cannot be less or equals zero.
+		 */
+		public Double radius;
+		/**
+		 * This attribute stores the center origin point of the circle.
+		 */
 		public VPoint center;
+		@VadereAttribute(exclude = true)
 		public ShapeType type = ShapeType.CIRCLE;
 
-		public CircleStore() {}
+		public VCircleStore() {}
 
-		public CircleStore(VCircle vCircle) {
+		public VCircleStore(VCircle vCircle) {
 			radius = vCircle.getRadius();
 			center = vCircle.getCenter();
 		}
 
-		public VCircle newVCircle() {
+		public VCircle newInstance() {
 			return new VCircle(center, radius);
 		}
 	}

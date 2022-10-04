@@ -9,14 +9,12 @@ import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.logging.Logger;
 
+import javax.swing.undo.UndoableEdit;
+import javax.swing.undo.UndoableEditSupport;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import javax.swing.*;
-import javax.swing.undo.UndoableEdit;
-import javax.swing.undo.UndoableEditSupport;
 
 /**
  * @author Benedikt Zoennchen
@@ -24,11 +22,11 @@ import javax.swing.undo.UndoableEditSupport;
 public class ActionMergeObstacles extends TopographyAction {
 
 	private final UndoableEditSupport undoSupport;
-	private static Logger logger = Logger.getLogger(ActionMergeObstacles.class);
+	private static final Logger logger = Logger.getLogger(ActionMergeObstacles.class);
 
-	public ActionMergeObstacles(String name, ImageIcon icon, IDrawPanelModel panelModel,
+	public ActionMergeObstacles(String name, String icon,String shortDescription, IDrawPanelModel panelModel,
 	                            UndoableEditSupport undoSupport) {
-		super(name, icon, panelModel);
+		super(name, icon, shortDescription, panelModel);
 		this.undoSupport = undoSupport;
 	}
 

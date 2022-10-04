@@ -96,7 +96,7 @@ public class VadereCommandHandlerTest extends CommandHandlerTest {
 				when(rnd.nextInt()).thenReturn(42);
 				when(topo.getContextId()).thenReturn(scenario);
 				when(simState.getTopography()).thenReturn(topo);
-				VadereContext ctx = VadereContext.get(simState.getTopography());
+				VadereContext ctx = VadereContext.getCtx(simState.getTopography());
 				ctx.put("random", rnd);
 				VadereContext.add(scenario, ctx);
 			}

@@ -1,8 +1,8 @@
 {
   "name" : "narrow_passage_discrete_CA_fail",
   "description" : "",
-  "release" : "2.3",
-  "commithash" : "ff5b381ea8f959e7e0d65a1b13bcdde1e13782cf",
+  "release" : "2.4",
+  "commithash" : "37d5cea029114cfbc5ced38fb76c86834cb50304",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.NoDataKeyOutputFile",
@@ -146,6 +146,7 @@
         "referenceCoordinateSystem" : null
       },
       "obstacles" : [ {
+        "id" : 2,
         "shape" : {
           "x" : 4.0,
           "y" : 2.0,
@@ -153,8 +154,9 @@
           "height" : 3.0,
           "type" : "RECTANGLE"
         },
-        "id" : 2
+        "visible" : true
       }, {
+        "id" : 3,
         "shape" : {
           "x" : 0.0,
           "y" : 4.5,
@@ -162,8 +164,9 @@
           "height" : 0.5,
           "type" : "RECTANGLE"
         },
-        "id" : 3
+        "visible" : true
       }, {
+        "id" : 4,
         "shape" : {
           "x" : 0.0,
           "y" : 0.0,
@@ -171,8 +174,9 @@
           "height" : 4.5,
           "type" : "RECTANGLE"
         },
-        "id" : 4
+        "visible" : true
       }, {
+        "id" : 5,
         "shape" : {
           "x" : 0.5,
           "y" : 0.0,
@@ -180,8 +184,9 @@
           "height" : 0.5,
           "type" : "RECTANGLE"
         },
-        "id" : 5
+        "visible" : true
       }, {
+        "id" : 6,
         "shape" : {
           "x" : 9.5,
           "y" : 0.5,
@@ -189,8 +194,9 @@
           "height" : 4.0,
           "type" : "RECTANGLE"
         },
-        "id" : 6
+        "visible" : true
       }, {
+        "id" : 7,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -207,8 +213,9 @@
             "y" : 0.5001
           } ]
         },
-        "id" : 7
+        "visible" : true
       }, {
+        "id" : 8,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -225,8 +232,9 @@
             "y" : -1.0E-4
           } ]
         },
-        "id" : 8
+        "visible" : true
       }, {
+        "id" : 9,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -243,8 +251,9 @@
             "y" : 4.4999
           } ]
         },
-        "id" : 9
+        "visible" : true
       }, {
+        "id" : 10,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -261,8 +270,9 @@
             "y" : 5.0001
           } ]
         },
-        "id" : 10
+        "visible" : true
       }, {
+        "id" : 11,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -279,8 +289,9 @@
             "y" : 0.5001
           } ]
         },
-        "id" : 11
+        "visible" : true
       }, {
+        "id" : 12,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -297,8 +308,9 @@
             "y" : -1.0E-4
           } ]
         },
-        "id" : 12
+        "visible" : true
       }, {
+        "id" : 13,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -315,8 +327,9 @@
             "y" : 4.4999
           } ]
         },
-        "id" : 13
+        "visible" : true
       }, {
+        "id" : 14,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -333,7 +346,7 @@
             "y" : 5.0001
           } ]
         },
-        "id" : 14
+        "visible" : true
       } ],
       "measurementAreas" : [ ],
       "stairs" : [ ],
@@ -346,15 +359,17 @@
           "height" : 1.6,
           "type" : "RECTANGLE"
         },
-        "absorbing" : true,
-        "deletionDistance" : 0.1,
-        "waitingBehaviour" : "NO_WAITING",
-        "parallelWaiters" : 0,
-        "nextSpeed" : -1.0,
-        "waitingTimeDistribution" : null,
-        "distributionParameters" : null,
-        "startingWithRedLight" : false,
-        "waitingTimeYellowPhase" : 0.0
+        "visible" : true,
+        "absorber" : {
+          "enabled" : true,
+          "deletionDistance" : 0.1
+        },
+        "waiter" : {
+          "enabled" : false,
+          "distribution" : null
+        },
+        "leavingSpeed" : -1.0,
+        "parallelEvents" : 0
       } ],
       "targetChangers" : [ ],
       "absorbingAreas" : [ ],
@@ -364,6 +379,14 @@
       "dynamicElements" : [ {
         "attributes" : {
           "id" : 15,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -373,8 +396,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 1 ],
@@ -421,6 +444,14 @@
       }, {
         "attributes" : {
           "id" : 16,
+          "shape" : {
+            "x" : 0.0,
+            "y" : 0.0,
+            "width" : 1.0,
+            "height" : 1.0,
+            "type" : "RECTANGLE"
+          },
+          "visible" : true,
           "radius" : 0.195,
           "densityDependentSpeed" : false,
           "speedDistributionMean" : 1.34,
@@ -430,8 +461,8 @@
           "acceleration" : 2.0,
           "footstepHistorySize" : 4,
           "searchRadius" : 1.0,
-          "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-          "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+          "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+          "walkingDirectionCalculation" : "BY_TARGET_CENTER"
         },
         "source" : null,
         "targetIds" : [ 1 ],
@@ -477,6 +508,14 @@
         "type" : "PEDESTRIAN"
       } ],
       "attributesPedestrian" : {
+        "shape" : {
+          "x" : 0.0,
+          "y" : 0.0,
+          "width" : 1.0,
+          "height" : 1.0,
+          "type" : "RECTANGLE"
+        },
+        "visible" : true,
         "radius" : 0.195,
         "densityDependentSpeed" : false,
         "speedDistributionMean" : 1.34,
@@ -486,8 +525,8 @@
         "acceleration" : 2.0,
         "footstepHistorySize" : 4,
         "searchRadius" : 1.0,
-        "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-        "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+        "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+        "walkingDirectionCalculation" : "BY_TARGET_CENTER"
       },
       "teleporter" : null,
       "attributesCar" : null

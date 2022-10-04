@@ -1,9 +1,6 @@
 package org.vadere.simulator.models.potential.fields;
 
 import org.jetbrains.annotations.NotNull;
-import org.vadere.meshing.mesh.gen.PFace;
-import org.vadere.meshing.mesh.gen.PHalfEdge;
-import org.vadere.meshing.mesh.gen.PVertex;
 import org.vadere.simulator.context.VadereContext;
 import org.vadere.simulator.models.potential.solver.EikonalSolverProvider;
 import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
@@ -61,7 +58,7 @@ public interface IPotentialField {
 		logger.debug("create EikonalSolver");
 
 		// retrieve EikonalSolverProvider from context object.
-		EikonalSolverProvider provider = VadereContext.get(domain.getTopography()).getEikonalSolverProvider();
+		EikonalSolverProvider provider = VadereContext.getCtx(domain.getTopography()).getEikonalSolverProvider();
 
         return provider.provide(domain, targetId, targetShapes, attributesPedestrian, attributesPotential);
     }
@@ -73,7 +70,7 @@ public interface IPotentialField {
 	                            final AttributesAgent attributesPedestrian,
 	                            final AttributesFloorField attributesPotential)
 	{
-		EikonalSolverProvider provider = VadereContext.get(topography).getEikonalSolverProvider();
+		EikonalSolverProvider provider = VadereContext.getCtx(topography).getEikonalSolverProvider();
 		return provider.provide(domain, targetId, targetShapes, attributesPedestrian, attributesPotential);
 	}
 

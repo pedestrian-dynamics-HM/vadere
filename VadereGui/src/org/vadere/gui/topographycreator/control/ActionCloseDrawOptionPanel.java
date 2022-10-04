@@ -1,11 +1,9 @@
 package org.vadere.gui.topographycreator.control;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.ImageIcon;
-
 import org.vadere.gui.components.view.ActionDialog;
 import org.vadere.gui.topographycreator.model.IDrawPanelModel;
+
+import java.awt.event.ActionEvent;
 
 /**
  * Action: Hide the PaintMethodDialog Window.
@@ -17,9 +15,9 @@ public class ActionCloseDrawOptionPanel extends TopographyAction {
 
 	private final TopographyAction action;
 
-	public ActionCloseDrawOptionPanel(final String name, final ImageIcon icon, final IDrawPanelModel panelModel,
+	public ActionCloseDrawOptionPanel(final String name, final String iconPath, final IDrawPanelModel panelModel,
 			final TopographyAction action) {
-		super(name, icon, panelModel);
+		super(name, iconPath, panelModel);
 		this.action = action;
 	}
 

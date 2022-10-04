@@ -1,33 +1,33 @@
 package org.vadere.state.scenario.distribution.impl;
 
-import static org.junit.Assert.*;
-
-import org.vadere.state.scenario.distribution.VadereDistribution;
+import org.vadere.state.attributes.distributions.AttributesSingleSpawnDistribution;
+import org.vadere.state.scenario.distribution.VDistribution;
 import org.vadere.state.scenario.distribution.VadereDistributionTest;
-import org.vadere.state.scenario.distribution.parameter.SingleSpawnParameter;
+
+import static org.junit.Assert.assertEquals;
+
 
 /**
  * @author Aleksandar Ivanov(ivanov0@hm.edu)
  */
 public class SingleSpawnDistributionTest extends VadereDistributionTest {
 
-	private double spawnTime = 2;
+	private final double spawnTime = 2;
 
 	@Override
-	protected VadereDistribution<?> getDistributionUnderTest() throws Exception {
-		SingleSpawnParameter parameter = new SingleSpawnParameter();
-		parameter.setSpawnNumber(1);
+	protected VDistribution<?> getDistributionUnderTest() throws Exception {
+		AttributesSingleSpawnDistribution parameter = new AttributesSingleSpawnDistribution();
 		parameter.setSpawnTime(spawnTime);
 
-		SingleSpawnDistribution dist = new SingleSpawnDistribution(parameter, spawnNumber, null);
+		SingleSpawnDistribution dist = new SingleSpawnDistribution(parameter,null);
 
 		return dist;
 	}
 
 	@Override
-	public void testGetNextSpawnTime() throws Exception {
-		VadereDistribution<?> dist = getDistributionUnderTest();
-		double actual = dist.getNextSpawnTime(12);
+	public void testGetNextSample() throws Exception {
+		VDistribution<?> dist = getDistributionUnderTest();
+		double actual = dist.getNextSample(12);
 		assertEquals(spawnTime, actual, 0);
 	}
 

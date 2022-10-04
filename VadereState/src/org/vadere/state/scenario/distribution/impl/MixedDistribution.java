@@ -1,83 +1,89 @@
 package org.vadere.state.scenario.distribution.impl;
 
 import org.apache.commons.math3.random.RandomGenerator;
+import org.vadere.state.attributes.distributions.AttributesDistribution;
+import org.vadere.state.attributes.distributions.AttributesMixedDistribution;
 import org.vadere.state.scenario.distribution.DistributionFactory;
-import org.vadere.state.scenario.distribution.VadereDistribution;
-import org.vadere.state.scenario.distribution.parameter.MixedParameter;
-import org.vadere.state.scenario.distribution.parameter.MixedParameterDistribution;
+import org.vadere.state.scenario.distribution.VDistribution;
 import org.vadere.state.scenario.distribution.registry.RegisterDistribution;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Aleksandar Ivanov(ivanov0@hm.edu), Lukas Gradl (lgradl@hm.edu)
  */
-@RegisterDistribution(name = "mixed", parameter = MixedParameter.class)
-public class MixedDistribution extends VadereDistribution<MixedParameter> {
-
-	double[] switchpoints;
-	ArrayList<VadereDistribution<?>> distributions;
+@RegisterDistribution(name = "mixed", parameter = AttributesMixedDistribution.class)
+public class MixedDistribution extends VDistribution<AttributesMixedDistribution> {
+	List<Double> switchPoints;
+	List<VDistribution<?>> distributions;
 	private int currentInterval = 0;
 
-	public MixedDistribution(MixedParameter parameter, int spawnNumber, RandomGenerator randomGenerator)
+	public MixedDistribution(AttributesMixedDistribution parameter,RandomGenerator randomGenerator)
 	        throws Exception {
-		super(parameter, spawnNumber, randomGenerator);
+		super(parameter, randomGenerator);
 	}
 
 	@Override
-	protected void setValues(MixedParameter parameter, int spawnNumber, RandomGenerator randomGenerator)
+	protected void setValues(AttributesMixedDistribution parameter, RandomGenerator randomGenerator)
 	        throws Exception {
-		if (parameter.getSwitchpoints().length != parameter.getDistributions().size() - 1) {
+
+		final boolean tooManyFewSwitchPoints = parameter.getSwitchpoints().size() != parameter.getDistributions().size() - 1;
+		if (tooManyFewSwitchPoints) {
 			throw new Exception("There should be exactly one switchpoint for"
 			        + "every given distribution minus 1. However there are not.");
 		}
 
-		setDistributions(parameter.getDistributions(), spawnNumber, randomGenerator);
-		this.switchpoints = parameter.getSwitchpoints();
+		setDistributions(parameter.getDistributions(), randomGenerator);
+		this.switchPoints = parameter.getSwitchpoints();
 
 	}
 
-	private void setDistributions(ArrayList<MixedParameterDistribution> distributions, int spawnNumber,
+	private void setDistributions(List<AttributesDistribution> distributions,
 	        RandomGenerator randomGenerator) throws Exception {
 		this.distributions = new ArrayList<>();
 
-		for (MixedParameterDistribution distribution : distributions) {
-			VadereDistribution<?> dist = DistributionFactory.create(distribution.getInterSpawnTimeDistribution(),
-			        distribution.getDistributionParameters(), spawnNumber, randomGenerator);
+		for (AttributesDistribution distribution : distributions) {
+			VDistribution<?> dist = DistributionFactory
+					.create(
+							distribution,
+							randomGenerator
+					);
 			this.distributions.add(dist);
 		}
 	}
 
 	@Override
-	public int getSpawnNumber(double timeCurrentEvent) {
-		return getDistributionByTime(timeCurrentEvent).getSpawnNumber(timeCurrentEvent);
+	public double getNextSample(double timeCurrentEvent) {
+		return getDistributionByTime(timeCurrentEvent)
+				.getNextSample(timeCurrentEvent);
 	}
 
-	@Override
-	public double getNextSpawnTime(double timeCurrentEvent) {
-		return getDistributionByTime(timeCurrentEvent).getNextSpawnTime(timeCurrentEvent);
-	}
-
-	@Override
-	public int getRemainingSpawnAgents() {
-		return distributions.get(currentInterval).getRemainingSpawnAgents();
-	}
-
-	@Override
-	public void setRemainingSpawnAgents(int remainingAgents) {
-		distributions.get(currentInterval).setRemainingSpawnAgents(remainingAgents);
-	}
-
-	private VadereDistribution<?> getDistributionByTime(double timeCurrentEvent) {
-		while (!(currentInterval > switchpoints.length - 1) && timeCurrentEvent >= switchpoints[currentInterval]
-		        && !(timeCurrentEvent > switchpoints[switchpoints.length - 1])) {
+	private VDistribution<?> getDistributionByTime(double timeCurrentEvent) {
+		while (intervallAndTimeIsValidAt(timeCurrentEvent)) {
 			currentInterval++;
 		}
-
 		return distributions.get(currentInterval);
 	}
 
-	public VadereDistribution<?> getCurrentDistribution() {
+	private boolean intervallAndTimeIsValidAt(double timeCurrentEvent) {
+		return iscCurrentIntervalInBound() && isEventInCurrentInterval(timeCurrentEvent)
+				&& isTimeInBound(timeCurrentEvent);
+	}
+
+	private boolean isTimeInBound(double timeCurrentEvent) {
+		return !(timeCurrentEvent > switchPoints.get(switchPoints.size() - 1));
+	}
+
+	private boolean isEventInCurrentInterval(double timeCurrentEvent) {
+		return timeCurrentEvent >= switchPoints.get(currentInterval);
+	}
+
+	private boolean iscCurrentIntervalInBound() {
+		return !(currentInterval > switchPoints.size() - 1);
+	}
+
+	public VDistribution<?> getCurrentDistribution() {
 		return distributions.get(currentInterval);
 	}
 

@@ -12,9 +12,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Objects;
 
-public class MeasurementArea extends ScenarioElement {
+public class MeasurementArea extends ScenarioElement<AttributesMeasurementArea> {
 
-	private AttributesMeasurementArea attributes;
 
 	public MeasurementArea(){
 		this(new AttributesMeasurementArea());
@@ -95,17 +94,17 @@ public class MeasurementArea extends ScenarioElement {
 	}
 
 	@Override
-	public Attributes getAttributes() {
+	public AttributesMeasurementArea getAttributes() {
 		return attributes;
 	}
 
 	@Override
-	public void setAttributes(Attributes attributes) {
-		this.attributes = (AttributesMeasurementArea)attributes;
+	public void setAttributes(AttributesMeasurementArea attributes) {
+		this.attributes = attributes;
 	}
 
 	public void setId(int id){
-		((AttributesMeasurementArea)getAttributes()).setId(id);
+		(getAttributes()).setId(id);
 	}
 
 	@Override

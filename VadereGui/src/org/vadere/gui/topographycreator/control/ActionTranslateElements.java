@@ -5,29 +5,25 @@ import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.topographycreator.model.IDrawPanelModel;
 import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
 import org.vadere.gui.topographycreator.view.ActionTranslateTopographyDialog;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VRectangle;
 
-import java.awt.event.ActionEvent;
-import java.awt.geom.Rectangle2D;
-
-import javax.swing.*;
 import javax.swing.undo.UndoableEditSupport;
+import java.awt.event.ActionEvent;
 
 /**
  * @author Benedikt Zoennchen
  */
 public class ActionTranslateElements extends TopographyAction {
 
-	private TopographyAction action;
+	private final TopographyAction action;
 	private final UndoableEditSupport undoableEditSupport;
 
 	public ActionTranslateElements(final String name,
-	                               final ImageIcon icon,
+	                               final String iconPath,
+								   String shortDescription,
 	                               @NotNull final IDrawPanelModel<?> panelModel,
 	                               @NotNull final TopographyAction action,
 	                               @NotNull final UndoableEditSupport undoSupport) {
-		super(name, icon, panelModel);
+		super(name, iconPath, shortDescription, panelModel);
 		this.action = action;
 		this.undoableEditSupport = undoSupport;
 	}

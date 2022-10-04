@@ -1,7 +1,5 @@
 package org.vadere.state.scenario.distribution.impl;
 
-import static org.junit.Assert.*;
-
 import org.apache.commons.math3.random.RandomGenerator;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -9,10 +7,12 @@ import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
-import org.vadere.state.scenario.distribution.VadereDistribution;
+import org.vadere.state.attributes.distributions.AttributesNormalDistribution;
+import org.vadere.state.scenario.distribution.VDistribution;
 import org.vadere.state.scenario.distribution.VadereDistributionTest;
-import org.vadere.state.scenario.distribution.parameter.NormalParameter;
 import org.vadere.util.math.TruncatedNormalDistribution;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Aleksandar Ivanov(ivanov0@hm.edu)
@@ -25,8 +25,8 @@ public class NormalDistributionTest extends VadereDistributionTest {
 	TruncatedNormalDistribution distMock;
 
 	@Override
-	protected VadereDistribution<?> getDistributionUnderTest() throws Exception {
-		NormalParameter parameter = new NormalParameter();
+	protected VDistribution<?> getDistributionUnderTest() throws Exception {
+		AttributesNormalDistribution parameter = new AttributesNormalDistribution();
 		parameter.setMean(1);
 		parameter.setSd(2);
 
@@ -34,7 +34,7 @@ public class NormalDistributionTest extends VadereDistributionTest {
 
 		RandomGenerator randomGenerator = null;
 
-		NormalDistribution dist = new NormalDistribution(parameter, spawnNumber, randomGenerator);
+		NormalDistribution dist = new NormalDistribution(parameter, randomGenerator);
 
 		PowerMockito.verifyNew(TruncatedNormalDistribution.class).withArguments(randomGenerator, parameter.getMean(),
 		        parameter.getSd(), 0d, Double.MAX_VALUE, 1000);
@@ -43,13 +43,13 @@ public class NormalDistributionTest extends VadereDistributionTest {
 	}
 
 	@Override
-	public void testGetNextSpawnTime() throws Exception {
+	public void testGetNextSample() throws Exception {
 		double sample = 5;
 		Mockito.when(distMock.sample()).thenReturn(sample);
 		double timeCurrentEvent = 1;
 
-		VadereDistribution<?> dist = getDistributionUnderTest();
-		double actual = dist.getNextSpawnTime(timeCurrentEvent);
+		VDistribution<?> dist = getDistributionUnderTest();
+		double actual = dist.getNextSample(timeCurrentEvent);
 
 		assertEquals(sample + timeCurrentEvent, actual, 0);
 		Mockito.verify(distMock).sample();

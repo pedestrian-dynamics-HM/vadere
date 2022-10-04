@@ -1,17 +1,15 @@
 package org.vadere.simulator.control.scenarioelements;
 
-import org.apache.commons.math3.random.JDKRandomGenerator;
-import org.apache.commons.math3.distribution.RealDistribution;
 import org.vadere.simulator.control.scenarioelements.listener.ControllerEventListener;
 import org.vadere.simulator.control.scenarioelements.listener.ControllerEventProvider;
 import org.vadere.simulator.models.DynamicElementFactory;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesDynamicElement;
 import org.vadere.state.attributes.scenario.AttributesSource;
+import org.vadere.state.attributes.spawner.AttributesSpawner;
 import org.vadere.state.scenario.*;
-import org.vadere.state.scenario.distribution.DistributionFactory;
-import org.vadere.state.scenario.distribution.VadereDistribution;
 import org.vadere.state.scenario.distribution.impl.MixedDistribution;
+import org.vadere.state.scenario.spawner.VSpawner;
 import org.vadere.util.geometry.LinkedCellsGrid;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -32,7 +30,9 @@ public abstract class SourceController extends ScenarioElementController impleme
     protected final Source source;
     protected final DynamicElementFactory dynamicElementFactory;
     protected final Random random;
-    protected final AttributesSource sourceAttributes;
+
+    protected final  AttributesSource sourceAttributes;
+    protected final AttributesSpawner spawnerAttributes;
     protected final AttributesDynamicElement attributesDynamicElement;
     private final Topography topography;
 
@@ -42,8 +42,7 @@ public abstract class SourceController extends ScenarioElementController impleme
 	 * <code>null</code>, if there is no next event.
 	 */
 	protected Double timeOfNextEvent;
-	protected VadereDistribution distribution;
-	protected int dynamicElementsCreatedTotal;
+    protected VSpawner spawner;
 
     public SourceController(Topography scenario, Source source,
                             DynamicElementFactory dynamicElementFactory,
@@ -51,25 +50,17 @@ public abstract class SourceController extends ScenarioElementController impleme
                             Random random) {
         this.source = source;
         this.sourceAttributes = source.getAttributes();
+        this.spawner = SpawnerFactory.create(this.sourceAttributes.getSpawnerAttributes(), random);
+
         this.attributesDynamicElement = attributesDynamicElement;
         this.dynamicElementFactory = dynamicElementFactory;
         this.topography = scenario;
         this.random = random;
+        this.spawnerAttributes = sourceAttributes.getSpawnerAttributes();
         this.eventListener = new ArrayList<>();
+        timeOfNextEvent = spawnerAttributes.getConstraintsTimeStart();
+        spawner = SpawnerFactory.create(spawnerAttributes, random);
 
-        timeOfNextEvent = sourceAttributes.getStartTime();
-        try {
-            distribution = DistributionFactory.create(
-                    sourceAttributes.getInterSpawnTimeDistribution(),
-                    sourceAttributes.getDistributionParameters(),
-                    sourceAttributes.getSpawnNumber(),
-                    new JDKRandomGenerator(random.nextInt())
-            );
-
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Problem with scenario parameters for source: "
-                    + "interSpawnTimeDistribution and/or distributionParameters. See causing Excepion herefafter.", e);
-        }
     }
 
 
@@ -87,33 +78,10 @@ public abstract class SourceController extends ScenarioElementController impleme
 
     abstract public void update(double simTimeInSec);
 
-    public boolean isSourceFinished(double simTimeInSec) {
-        if (isMaximumNumberOfSpawnedElementsReached()) {
-            return true;
-        }
-        if (isSourceWithOneSingleSpawnEvent()) {
-            return dynamicElementsCreatedTotal == sourceAttributes.getSpawnNumber();
-        }
-        return isAfterSourceEndTime(simTimeInSec) && isQueueEmpty();
-    }
-
-    protected boolean isSourceWithOneSingleSpawnEvent() {
-        return sourceAttributes.getStartTime() == sourceAttributes.getEndTime();
-    }
-
-    protected boolean isAfterSourceEndTime(double simTimeInSec) {
-        return simTimeInSec > sourceAttributes.getEndTime();
-    }
-
-    protected boolean isMaximumNumberOfSpawnedElementsReached() {
-        final int maxNumber = sourceAttributes.getMaxSpawnNumberTotal();
-        return maxNumber != AttributesSource.NO_MAX_SPAWN_NUMBER_TOTAL
-                && dynamicElementsCreatedTotal >= maxNumber;
-    }
 
     protected boolean testFreeSpace(final VShape freeSpace, final List<VShape> blockPedestrianShapes) {
         VShape freeSpaceCA = new VCircle(((VCircle) freeSpace).getCenter(), ((VCircle) freeSpace).getRadius() - BUFFER_CA);
-        final VShape freeSpaceModelSpecific = sourceAttributes.isSpawnAtGridPositionsCA() ? freeSpaceCA : freeSpace;
+        final VShape freeSpaceModelSpecific = spawnerAttributes.isEventPositionGridCA() ? freeSpaceCA : freeSpace;
 
         boolean pedOverlap = blockPedestrianShapes.stream().noneMatch(shape -> shape.intersects(freeSpaceModelSpecific));
         boolean obstOverlap = this.getTopography().getObstacles().stream()
@@ -131,16 +99,17 @@ public abstract class SourceController extends ScenarioElementController impleme
     }
 
     protected void createNextEvent() {
-        if (isSourceWithOneSingleSpawnEvent()) {
+        if (spawner.isSpawnerWithOneSingleSpawnEvent()) {
             timeOfNextEvent = NO_EVENT;
             return;
         }
 
         // Read: timeOfNextEvent == timeOfCurrentEvent for this call
-        double newTimeOfNextEvent = distribution.getNextSpawnTime(timeOfNextEvent);
+        double newTimeOfNextEvent = spawner.getNextSpawnTime(timeOfNextEvent);
 
         if (newTimeOfNextEvent < timeOfNextEvent) { //TODO mit Herr Lehmberg reden wg. < vs <=
             String distributionName;
+            var distribution = spawner.getDistribution();
             if (distribution instanceof MixedDistribution) {
                 distributionName = ((MixedDistribution) distribution).
                         getCurrentDistribution().getClass().getSimpleName();
@@ -154,7 +123,7 @@ public abstract class SourceController extends ScenarioElementController impleme
             timeOfNextEvent = newTimeOfNextEvent;
         }
 
-        if (isAfterSourceEndTime(timeOfNextEvent)) {
+        if (spawner.isAfterSpawnerEndTime(timeOfNextEvent)) {
             timeOfNextEvent = NO_EVENT;
         }
 
@@ -189,20 +158,16 @@ public abstract class SourceController extends ScenarioElementController impleme
 
     private DynamicElement createDynamicElement(final VPoint position) {
         Agent result;
-        switch (sourceAttributes.getDynamicElementType()) {
-            case PEDESTRIAN:
-                if (source.getAttributes().getAttributesPedestrian() == null) {
-                    result = (Agent) dynamicElementFactory.createElement(position, AttributesAgent.ID_NOT_SET, Pedestrian.class);
-                } else {
-                    result = (Agent) dynamicElementFactory.createElement(position, AttributesAgent.ID_NOT_SET, source.getAttributes().getAttributesPedestrian(), Pedestrian.class);
-                }
-                break;
-            case CAR:
-                result = (Agent) dynamicElementFactory.createElement(position, AttributesAgent.ID_NOT_SET, Car.class);
-                break;
-            default:
-                throw new IllegalArgumentException("The controller's source has an unsupported element type: "
-                        + sourceAttributes.getDynamicElementType());
+        var elementAttribute = spawnerAttributes.getEventElementAttributes();
+        if(elementAttribute == null){
+            result = (Agent) dynamicElementFactory.createElement(position, AttributesAgent.ID_NOT_SET, Pedestrian.class);
+        }
+        else if(elementAttribute instanceof AttributesAgent){
+            result = (Agent) dynamicElementFactory.createElement(position, AttributesAgent.ID_NOT_SET, elementAttribute, Pedestrian.class);
+        }
+        else{
+            throw new IllegalArgumentException("The controller's source has an unsupported element type: "
+                    + elementAttribute);
         }
         result.setSource(source);
         return result;
@@ -220,14 +185,20 @@ public abstract class SourceController extends ScenarioElementController impleme
 
 	@Override
 	public void unregister(ControllerEventListener<Agent, SourceController> listener) {
-		eventListener.remove(listener);
-	}
+        eventListener.remove(listener);
+    }
 
-	protected void notifyListeners(double simTimeInSec, Agent pedestrian){
-		for (var listener: eventListener){
-			listener.notify(this, simTimeInSec, pedestrian);
-		}
-	}
+    protected void notifyListeners(double simTimeInSec, Agent pedestrian) {
+        for (var listener : eventListener) {
+            listener.notify(this, simTimeInSec, pedestrian);
+        }
+    }
 
-	public int getSourceId() { return source.getId(); }
+    public int getSourceId() {
+        return source.getId();
+    }
+
+    public boolean isSourceFinished(double simTimeInSec) {
+        return spawner.isFinished(simTimeInSec, () -> isQueueEmpty());
+    }
 }

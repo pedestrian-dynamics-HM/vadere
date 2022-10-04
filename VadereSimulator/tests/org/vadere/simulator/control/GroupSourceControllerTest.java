@@ -19,6 +19,7 @@ import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesDynamicElement;
 import org.vadere.state.attributes.scenario.AttributesSource;
 import org.vadere.state.attributes.scenario.SourceTestAttributesBuilder;
+import org.vadere.state.attributes.spawner.AttributesSpawner;
 import org.vadere.state.scenario.*;
 import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.geometry.LinkedCellsGrid;
@@ -389,7 +390,7 @@ public class GroupSourceControllerTest extends TestSourceControllerUsingConstant
 	@Test
 	public void testMaxSpawnNumberTotalNotSet() {
 		SourceTestAttributesBuilder builder = new SourceTestAttributesBuilder()
-				.setMaxSpawnNumberTotal(AttributesSource.NO_MAX_SPAWN_NUMBER_TOTAL) // <-- maximum not set
+				.setMaxSpawnNumberTotal(AttributesSpawner.NO_MAX_SPAWN_NUMBER_TOTAL) // <-- maximum not set
 				.setEndTime(2)
 				.setSourceDim(5.0, 5.0)
 				.setGroupSizeDistribution(0.0, 0.0, 0.25, 0.75)
@@ -520,18 +521,7 @@ public class GroupSourceControllerTest extends TestSourceControllerUsingConstant
 			"      \"x\" : 506.2999999999993,\n" +
 			"      \"y\" : 508.7000000000007\n" +
 			"    } ]\n" +
-			"  },\n" +
-			"  \"interSpawnTimeDistribution\" : \"org.vadere.state.scenario.ConstantDistribution\",\n" +
-			"  \"distributionParameters\" : [ 1.0 ],\n" +
-			"  \"spawnNumber\" : 35,\n" +
-			"  \"maxSpawnNumberTotal\" : -1,\n" +
-			"  \"startTime\" : 0.0,\n" +
-			"  \"endTime\" : 0.0,\n" +
-			"  \"spawnAtRandomPositions\" : true,\n" +
-			"  \"useFreeSpaceOnly\" : true,\n" +
-			"  \"targetIds\" : [ 1 ],\n" +
-			"  \"groupSizeDistribution\" : [ 0.1, 0.1, 0.1, 0.1, 0.6 ],\n" +
-			"  \"dynamicElementType\" : \"PEDESTRIAN\"\n" +
+			"  }\n" +
 			"}";
 
 

@@ -1,8 +1,8 @@
 {
   "name" : "route_choice_real_world_nomareas_oldtopogr",
   "description" : "",
-  "release" : "2.3",
-  "commithash" : "ff5b381ea8f959e7e0d65a1b13bcdde1e13782cf",
+  "release" : "2.4",
+  "commithash" : "37d5cea029114cfbc5ced38fb76c86834cb50304",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -250,6 +250,7 @@
         }
       },
       "obstacles" : [ {
+        "id" : 10,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -284,8 +285,9 @@
             "y" : 309.0
           } ]
         },
-        "id" : 10
+        "visible" : true
       }, {
+        "id" : 11,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -308,8 +310,9 @@
             "y" : 333.5
           } ]
         },
-        "id" : 11
+        "visible" : true
       }, {
+        "id" : 12,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -332,8 +335,9 @@
             "y" : 289.0
           } ]
         },
-        "id" : 12
+        "visible" : true
       }, {
+        "id" : 13,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -452,8 +456,9 @@
             "y" : 294.22350079892124
           } ]
         },
-        "id" : 13
+        "visible" : true
       }, {
+        "id" : 14,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -482,8 +487,9 @@
             "y" : 148.07266161125153
           } ]
         },
-        "id" : 14
+        "visible" : true
       }, {
+        "id" : 15,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -506,8 +512,9 @@
             "y" : 120.0
           } ]
         },
-        "id" : 15
+        "visible" : true
       }, {
+        "id" : 16,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -524,8 +531,9 @@
             "y" : 119.0
           } ]
         },
-        "id" : 16
+        "visible" : true
       }, {
+        "id" : 17,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -566,8 +574,9 @@
             "y" : 294.0
           } ]
         },
-        "id" : 17
+        "visible" : true
       }, {
+        "id" : 18,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -638,8 +647,9 @@
             "y" : 236.6
           } ]
         },
-        "id" : 18
+        "visible" : true
       }, {
+        "id" : 19,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -758,8 +768,9 @@
             "y" : 244.21359359752387
           } ]
         },
-        "id" : 19
+        "visible" : true
       }, {
+        "id" : 3,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -794,8 +805,9 @@
             "y" : 192.1
           } ]
         },
-        "id" : 3
+        "visible" : true
       }, {
+        "id" : 22,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -848,8 +860,9 @@
             "y" : 190.1
           } ]
         },
-        "id" : 22
+        "visible" : true
       }, {
+        "id" : 24,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -866,8 +879,9 @@
             "y" : 182.8
           } ]
         },
-        "id" : 24
+        "visible" : true
       }, {
+        "id" : 27,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -884,8 +898,9 @@
             "y" : 196.6
           } ]
         },
-        "id" : 27
+        "visible" : true
       }, {
+        "id" : 28,
         "shape" : {
           "type" : "POLYGON",
           "points" : [ {
@@ -902,7 +917,7 @@
             "y" : 189.4
           } ]
         },
-        "id" : 28
+        "visible" : true
       } ],
       "measurementAreas" : [ ],
       "stairs" : [ ],
@@ -924,15 +939,17 @@
             "y" : 360.95191854797304
           } ]
         },
-        "absorbing" : true,
-        "deletionDistance" : 0.1,
-        "waitingBehaviour" : "NO_WAITING",
-        "parallelWaiters" : 0,
-        "nextSpeed" : -1.0,
-        "waitingTimeDistribution" : null,
-        "distributionParameters" : null,
-        "startingWithRedLight" : false,
-        "waitingTimeYellowPhase" : 0.0
+        "visible" : true,
+        "absorber" : {
+          "enabled" : true,
+          "deletionDistance" : 0.1
+        },
+        "waiter" : {
+          "enabled" : false,
+          "distribution" : null
+        },
+        "leavingSpeed" : -1.0,
+        "parallelEvents" : 0
       }, {
         "id" : 2009,
         "shape" : {
@@ -951,15 +968,17 @@
             "y" : 173.48516997043043
           } ]
         },
-        "absorbing" : true,
-        "deletionDistance" : 0.1,
-        "waitingBehaviour" : "NO_WAITING",
-        "parallelWaiters" : 0,
-        "nextSpeed" : -1.0,
-        "waitingTimeDistribution" : null,
-        "distributionParameters" : null,
-        "startingWithRedLight" : false,
-        "waitingTimeYellowPhase" : 0.0
+        "visible" : true,
+        "absorber" : {
+          "enabled" : true,
+          "deletionDistance" : 0.1
+        },
+        "waiter" : {
+          "enabled" : false,
+          "distribution" : null
+        },
+        "leavingSpeed" : -1.0,
+        "parallelEvents" : 0
       }, {
         "id" : 11,
         "shape" : {
@@ -978,15 +997,17 @@
             "y" : 147.4
           } ]
         },
-        "absorbing" : true,
-        "deletionDistance" : 0.1,
-        "waitingBehaviour" : "NO_WAITING",
-        "parallelWaiters" : 0,
-        "nextSpeed" : -1.0,
-        "waitingTimeDistribution" : null,
-        "distributionParameters" : null,
-        "startingWithRedLight" : false,
-        "waitingTimeYellowPhase" : 0.0
+        "visible" : true,
+        "absorber" : {
+          "enabled" : true,
+          "deletionDistance" : 0.1
+        },
+        "waiter" : {
+          "enabled" : false,
+          "distribution" : null
+        },
+        "leavingSpeed" : -1.0,
+        "parallelEvents" : 0
       }, {
         "id" : 302,
         "shape" : {
@@ -1005,15 +1026,17 @@
             "y" : 220.55
           } ]
         },
-        "absorbing" : false,
-        "deletionDistance" : 0.1,
-        "waitingBehaviour" : "NO_WAITING",
-        "parallelWaiters" : 0,
-        "nextSpeed" : -1.0,
-        "waitingTimeDistribution" : null,
-        "distributionParameters" : null,
-        "startingWithRedLight" : false,
-        "waitingTimeYellowPhase" : 0.0
+        "visible" : true,
+        "absorber" : {
+          "enabled" : false,
+          "deletionDistance" : 0.1
+        },
+        "waiter" : {
+          "enabled" : false,
+          "distribution" : null
+        },
+        "leavingSpeed" : -1.0,
+        "parallelEvents" : 0
       }, {
         "id" : 1111,
         "shape" : {
@@ -1032,15 +1055,17 @@
             "y" : 219.6
           } ]
         },
-        "absorbing" : true,
-        "deletionDistance" : 0.1,
-        "waitingBehaviour" : "NO_WAITING",
-        "parallelWaiters" : 0,
-        "nextSpeed" : -1.0,
-        "waitingTimeDistribution" : null,
-        "distributionParameters" : null,
-        "startingWithRedLight" : false,
-        "waitingTimeYellowPhase" : 0.0
+        "visible" : true,
+        "absorber" : {
+          "enabled" : true,
+          "deletionDistance" : 0.1
+        },
+        "waiter" : {
+          "enabled" : false,
+          "distribution" : null
+        },
+        "leavingSpeed" : -1.0,
+        "parallelEvents" : 0
       }, {
         "id" : 41,
         "shape" : {
@@ -1059,15 +1084,17 @@
             "y" : 265.6
           } ]
         },
-        "absorbing" : false,
-        "deletionDistance" : 0.1,
-        "waitingBehaviour" : "NO_WAITING",
-        "parallelWaiters" : 0,
-        "nextSpeed" : -1.0,
-        "waitingTimeDistribution" : null,
-        "distributionParameters" : null,
-        "startingWithRedLight" : false,
-        "waitingTimeYellowPhase" : 0.0
+        "visible" : true,
+        "absorber" : {
+          "enabled" : false,
+          "deletionDistance" : 0.1
+        },
+        "waiter" : {
+          "enabled" : false,
+          "distribution" : null
+        },
+        "leavingSpeed" : -1.0,
+        "parallelEvents" : 0
       }, {
         "id" : 102,
         "shape" : {
@@ -1086,15 +1113,17 @@
             "y" : 286.5
           } ]
         },
-        "absorbing" : false,
-        "deletionDistance" : 0.1,
-        "waitingBehaviour" : "NO_WAITING",
-        "parallelWaiters" : 0,
-        "nextSpeed" : -1.0,
-        "waitingTimeDistribution" : null,
-        "distributionParameters" : null,
-        "startingWithRedLight" : false,
-        "waitingTimeYellowPhase" : 0.0
+        "visible" : true,
+        "absorber" : {
+          "enabled" : false,
+          "deletionDistance" : 0.1
+        },
+        "waiter" : {
+          "enabled" : false,
+          "distribution" : null
+        },
+        "leavingSpeed" : -1.0,
+        "parallelEvents" : 0
       }, {
         "id" : 51,
         "shape" : {
@@ -1113,15 +1142,17 @@
             "y" : 279.3
           } ]
         },
-        "absorbing" : false,
-        "deletionDistance" : 0.1,
-        "waitingBehaviour" : "NO_WAITING",
-        "parallelWaiters" : 0,
-        "nextSpeed" : -1.0,
-        "waitingTimeDistribution" : null,
-        "distributionParameters" : null,
-        "startingWithRedLight" : false,
-        "waitingTimeYellowPhase" : 0.0
+        "visible" : true,
+        "absorber" : {
+          "enabled" : false,
+          "deletionDistance" : 0.1
+        },
+        "waiter" : {
+          "enabled" : false,
+          "distribution" : null
+        },
+        "leavingSpeed" : -1.0,
+        "parallelEvents" : 0
       }, {
         "id" : 6,
         "shape" : {
@@ -1140,15 +1171,17 @@
             "y" : 271.0
           } ]
         },
-        "absorbing" : false,
-        "deletionDistance" : 0.1,
-        "waitingBehaviour" : "NO_WAITING",
-        "parallelWaiters" : 0,
-        "nextSpeed" : -1.0,
-        "waitingTimeDistribution" : null,
-        "distributionParameters" : null,
-        "startingWithRedLight" : false,
-        "waitingTimeYellowPhase" : 0.0
+        "visible" : true,
+        "absorber" : {
+          "enabled" : false,
+          "deletionDistance" : 0.1
+        },
+        "waiter" : {
+          "enabled" : false,
+          "distribution" : null
+        },
+        "leavingSpeed" : -1.0,
+        "parallelEvents" : 0
       }, {
         "id" : 31,
         "shape" : {
@@ -1167,15 +1200,17 @@
             "y" : 244.0
           } ]
         },
-        "absorbing" : false,
-        "deletionDistance" : 0.1,
-        "waitingBehaviour" : "NO_WAITING",
-        "parallelWaiters" : 0,
-        "nextSpeed" : -1.0,
-        "waitingTimeDistribution" : null,
-        "distributionParameters" : null,
-        "startingWithRedLight" : false,
-        "waitingTimeYellowPhase" : 0.0
+        "visible" : true,
+        "absorber" : {
+          "enabled" : false,
+          "deletionDistance" : 0.1
+        },
+        "waiter" : {
+          "enabled" : false,
+          "distribution" : null
+        },
+        "leavingSpeed" : -1.0,
+        "parallelEvents" : 0
       }, {
         "id" : 21,
         "shape" : {
@@ -1194,15 +1229,17 @@
             "y" : 220.0
           } ]
         },
-        "absorbing" : false,
-        "deletionDistance" : 0.1,
-        "waitingBehaviour" : "NO_WAITING",
-        "parallelWaiters" : 0,
-        "nextSpeed" : -1.0,
-        "waitingTimeDistribution" : null,
-        "distributionParameters" : null,
-        "startingWithRedLight" : false,
-        "waitingTimeYellowPhase" : 0.0
+        "visible" : true,
+        "absorber" : {
+          "enabled" : false,
+          "deletionDistance" : 0.1
+        },
+        "waiter" : {
+          "enabled" : false,
+          "distribution" : null
+        },
+        "leavingSpeed" : -1.0,
+        "parallelEvents" : 0
       }, {
         "id" : 111,
         "shape" : {
@@ -1221,15 +1258,17 @@
             "y" : 147.4
           } ]
         },
-        "absorbing" : true,
-        "deletionDistance" : 0.1,
-        "waitingBehaviour" : "NO_WAITING",
-        "parallelWaiters" : 0,
-        "nextSpeed" : -1.0,
-        "waitingTimeDistribution" : null,
-        "distributionParameters" : null,
-        "startingWithRedLight" : false,
-        "waitingTimeYellowPhase" : 0.0
+        "visible" : true,
+        "absorber" : {
+          "enabled" : true,
+          "deletionDistance" : 0.1
+        },
+        "waiter" : {
+          "enabled" : false,
+          "distribution" : null
+        },
+        "leavingSpeed" : -1.0,
+        "parallelEvents" : 0
       }, {
         "id" : 692,
         "shape" : {
@@ -1239,15 +1278,17 @@
           "height" : 2.4,
           "type" : "RECTANGLE"
         },
-        "absorbing" : true,
-        "deletionDistance" : 0.1,
-        "waitingBehaviour" : "NO_WAITING",
-        "parallelWaiters" : 0,
-        "nextSpeed" : -1.0,
-        "waitingTimeDistribution" : null,
-        "distributionParameters" : null,
-        "startingWithRedLight" : false,
-        "waitingTimeYellowPhase" : 0.0
+        "visible" : true,
+        "absorber" : {
+          "enabled" : true,
+          "deletionDistance" : 0.1
+        },
+        "waiter" : {
+          "enabled" : false,
+          "distribution" : null
+        },
+        "leavingSpeed" : -1.0,
+        "parallelEvents" : 0
       } ],
       "targetChangers" : [ {
         "id" : 7,
@@ -1267,6 +1308,7 @@
             "y" : 243.6
           } ]
         },
+        "visible" : true,
         "reachDistance" : 0.0,
         "changeAlgorithmType" : "SELECT_LIST",
         "nextTarget" : [ 302, 1111 ],
@@ -1289,6 +1331,7 @@
             "y" : 276.9
           } ]
         },
+        "visible" : true,
         "reachDistance" : 0.0,
         "changeAlgorithmType" : "SELECT_LIST",
         "nextTarget" : [ 6, 1111 ],
@@ -1302,6 +1345,7 @@
           "height" : 3.7,
           "type" : "RECTANGLE"
         },
+        "visible" : true,
         "reachDistance" : 0.0,
         "changeAlgorithmType" : "SELECT_LIST",
         "nextTarget" : [ 692 ],
@@ -1327,6 +1371,7 @@
             "y" : 291.6
           } ]
         },
+        "visible" : true,
         "reachDistance" : 0.0,
         "changeAlgorithmType" : "SELECT_LIST",
         "nextTarget" : [ 1111 ],
@@ -1344,24 +1389,35 @@
           "height" : 7.5,
           "type" : "RECTANGLE"
         },
-        "interSpawnTimeDistribution" : "constant",
-        "distributionParameters" : {
-          "updateFrequency" : 10.0
-        },
-        "spawnNumber" : 12,
-        "maxSpawnNumberTotal" : -1,
-        "startTime" : 0.0,
-        "endTime" : 1000.0,
-        "spawnAtRandomPositions" : true,
-        "spawnAtGridPositionsCA" : false,
-        "useFreeSpaceOnly" : true,
+        "visible" : true,
         "targetIds" : [ 41 ],
-        "groupSizeDistribution" : [ 0.0, 0.0, 1.0 ],
-        "dynamicElementType" : "PEDESTRIAN",
-        "attributesPedestrian" : null
+        "spawner" : {
+          "type" : "org.vadere.state.attributes.spawner.AttributesRegularSpawner",
+          "constraintsElementsMax" : -1,
+          "constraintsTimeStart" : 0.0,
+          "constraintsTimeEnd" : 1000.0,
+          "eventPositionRandom" : true,
+          "eventPositionGridCA" : false,
+          "eventPositionFreeSpace" : true,
+          "eventElementCount" : 12,
+          "eventElement" : null,
+          "distribution" : {
+            "type" : "org.vadere.state.attributes.distributions.AttributesConstantDistribution",
+            "updateFrequency" : 10.0
+          }
+        },
+        "groupSizeDistribution" : [ 0.0, 0.0, 1.0 ]
       } ],
       "dynamicElements" : [ ],
       "attributesPedestrian" : {
+        "shape" : {
+          "x" : 0.0,
+          "y" : 0.0,
+          "width" : 1.0,
+          "height" : 1.0,
+          "type" : "RECTANGLE"
+        },
+        "visible" : true,
         "radius" : 0.195,
         "densityDependentSpeed" : false,
         "speedDistributionMean" : 1.0,
@@ -1371,8 +1427,8 @@
         "acceleration" : 2.0,
         "footstepHistorySize" : 4,
         "searchRadius" : 1.0,
-        "walkingDirectionCalculation" : "BY_TARGET_CENTER",
-        "walkingDirectionSameIfAngleLessOrEqual" : 45.0
+        "walkingDirectionSameIfAngleLessOrEqual" : 45.0,
+        "walkingDirectionCalculation" : "BY_TARGET_CENTER"
       },
       "teleporter" : null,
       "attributesCar" : null

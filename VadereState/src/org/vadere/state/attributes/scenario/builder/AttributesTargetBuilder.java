@@ -32,6 +32,6 @@ public final class AttributesTargetBuilder {
 	}
 
 	public AttributesTarget build() {
-		return new AttributesTarget(shape, id, absorbing);
+		return new AttributesTarget(shape, id);
 	}
 }
