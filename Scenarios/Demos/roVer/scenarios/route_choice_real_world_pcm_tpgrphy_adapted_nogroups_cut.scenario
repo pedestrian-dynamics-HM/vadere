@@ -1394,9 +1394,9 @@
         },
         "interSpawnTimeDistribution" : "constant",
         "distributionParameters" : {
-          "updateFrequency" : 6.0
+          "updateFrequency" : 10.0
         },
-        "spawnNumber" : 9,
+        "spawnNumber" : 36,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
         "endTime" : 20000.0,

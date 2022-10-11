@@ -466,11 +466,11 @@
         "groupMemberRepulsionFactor" : 0.01,
         "leaderAttractionFactor" : 0.003,
         "lostMembers" : true,
-        "waitBehaviourRelevantAgentsFactor" : 5
+        "waitBehaviourRelevantAgentsFactor" : 7
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 1000.0,
+      "finishTime" : 200.0,
       "simTimeStepLength" : 0.4,
       "realTimeSimTimeRatio" : 0.0,
       "writeSimulationData" : true,
@@ -1091,7 +1091,7 @@
           "x" : 199.1,
           "y" : 204.8,
           "width" : 14.8,
-          "height" : 8.1999,
+          "height" : 8.19,
           "type" : "RECTANGLE"
         },
         "id" : 2
@@ -1416,9 +1416,9 @@
         },
         "interSpawnTimeDistribution" : "constant",
         "distributionParameters" : {
-          "updateFrequency" : 6.0
+          "updateFrequency" : 10
         },
-        "spawnNumber" : 3,
+        "spawnNumber" : 12,
         "maxSpawnNumberTotal" : -1,
         "startTime" : 0.0,
         "endTime" : 20000.0,
@@ -1468,7 +1468,7 @@
       },
       "stimuli" : [ {
         "type" : "InformationStimulus",
-        "information" : "use target 11"
+        "information" : "use all targets"
       } ]
     } ]
   }
