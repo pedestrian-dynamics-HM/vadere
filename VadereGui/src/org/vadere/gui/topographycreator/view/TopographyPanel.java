@@ -7,6 +7,7 @@ import org.vadere.gui.components.view.DefaultRenderer;
 import org.vadere.gui.components.view.ScaleablePanel;
 import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
 
+import java.awt.*;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -24,7 +25,6 @@ public class TopographyPanel extends ScaleablePanel implements Observer {
 		super(model, renderer, scrollPane);
 		this.model = model;
 		this.selectionMode = model.getMouseSelectionMode();
-
 		addMouseListener(selectionMode);
 		addMouseMotionListener(selectionMode);
 		addMouseWheelListener(selectionMode);

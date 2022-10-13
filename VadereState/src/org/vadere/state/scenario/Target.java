@@ -5,16 +5,13 @@ import org.vadere.state.attributes.scenario.AttributesTarget;
 import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.geometry.shapes.VShape;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.*;
 
 public class Target extends ScenarioElement implements Comparable<Target> {
 
 	private AttributesTarget attributes;
 	private final Map<Integer, Double> enteringTimes;
+	private final Map<Integer, Double> leavingTimes;
 	
 	/**
 	 * Collection of listeners - unordered because it's order is not predictable
@@ -22,41 +19,38 @@ public class Target extends ScenarioElement implements Comparable<Target> {
 	 */
 	private final Collection<TargetListener> targetListeners = new LinkedList<>();
 
+	public enum WaitingBehaviour {
+        INDIVIDUAL, TRAFFIC_LIGHT, NO_WAITING
+	}
 	public Target(AttributesTarget attributes) {
-		this(attributes, new HashMap<>());
+		this(attributes, new HashMap<>(),new HashMap<>());
 	}
 
 	public Target(AttributesTarget attributes, Map<Integer, Double> enteringTimes) {
+		this(attributes,enteringTimes,new HashMap<>());
+	}
+
+	public Target(AttributesTarget attributes, Map<Integer, Double> enteringTimes, Map<Integer, Double> leavingTimes) {
 		this.attributes = attributes;
 		this.enteringTimes = enteringTimes;
+		this.leavingTimes = leavingTimes;
 	}
+
 
 	public boolean isAbsorbing() {
 		return attributes.isAbsorbing();
 	}
 
-	public double getWaitingTime() {
-		return attributes.getWaitingTime();
-	}
-
-	public double getWaitingTimeYellowPhase() {
-		return attributes.getWaitingTimeYellowPhase();
-	}
-
 	public int getParallelWaiters() {
-		return attributes.getParallelWaiters();
-	}
-
-	public boolean isStartingWithRedLight() {
-		return attributes.isStartingWithRedLight();
-	}
-
-	public double getNextSpeed() {
-		return attributes.getNextSpeed();
+		return attributes.getParallelEvents();
 	}
 
 	public Map<Integer, Double> getEnteringTimes() {
 		return enteringTimes;
+	}
+
+	public Map<Integer, Double> getLeavingTimes(){
+		return leavingTimes;
 	}
 
 	@Override
@@ -100,13 +94,8 @@ public class Target extends ScenarioElement implements Comparable<Target> {
 		}
 		Target other = (Target) obj;
 		if (attributes == null) {
-			if (other.attributes != null) {
-				return false;
-			}
-		} else if (!attributes.equals(other.attributes)) {
-			return false;
-		}
-		return true;
+			return other.attributes == null;
+		} else return attributes.equals(other.attributes);
 	}
 
 	@Override

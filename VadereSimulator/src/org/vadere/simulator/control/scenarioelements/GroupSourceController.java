@@ -42,19 +42,19 @@ public class GroupSourceController extends SourceController {
 				new VRectangle(0, 0, elementBound.getWidth(), elementBound.getHeight()),
 				dynamicElementFactory::getDynamicElementRequiredPlace,
 				this::testFreeSpace,
-				source.getAttributes());
+				source.getAttributes().getSpawnerAttributes());
 
 	}
 
 	@Override
 	public void update(double simTimeInSec) {
-		if (!isSourceFinished(simTimeInSec)) {
+		if (!spawner.isFinished(simTimeInSec, () -> isQueueEmpty())) {
 			if (simTimeInSec >= timeOfNextEvent || !groupsToSpawn.isEmpty()) {
 				determineNumberOfSpawnsAndNextEvent(simTimeInSec);
 
-				if (sourceAttributes.isSpawnAtRandomPositions()) {
+				if (spawnerAttributes.isEventPositionRandom()) {
 
-					if (sourceAttributes.isUseFreeSpaceOnly()) {
+					if (spawnerAttributes.isEventPositionFreeSpace()) {
 						Iterator<Integer> iter = groupsToSpawn.iterator();
 						while (iter.hasNext()) {
 							int groupSize = iter.next();
@@ -98,7 +98,7 @@ public class GroupSourceController extends SourceController {
 
 				} else {
 
-					if (sourceAttributes.isUseFreeSpaceOnly()) {
+					if (spawnerAttributes.isEventPositionFreeSpace()) {
 						Iterator<Integer> iter = groupsToSpawn.iterator();
 						while (iter.hasNext()) {
 							int groupSize = iter.next();
@@ -212,14 +212,14 @@ public class GroupSourceController extends SourceController {
 	}
 
 	private void addElementToScenario(List<VPoint> group, double simTimeInSec) {
-		if (!group.isEmpty() && !isMaximumNumberOfSpawnedElementsReached()) {
+		if (!group.isEmpty() && !spawner.isMaximumNumberOfSpawnedElementsReached()) {
 			addNewAgentToScenario(group, simTimeInSec);
-			dynamicElementsCreatedTotal += group.size();
+			spawner.incrementElementsCreatedTotal(group.size());
 		}
 	}
 
 	private void getNewGroupSizeFromModel() {
-		for (int i = 0; i < sourceAttributes.getSpawnNumber(); i++) {
+		for (int i = 0; i < spawnerAttributes.getEventElementCount(); i++) {
 			int groupSize = groupModel.nextGroupForSource(this.source.getId());
 			groupsToSpawn.add(groupSize);
 		}

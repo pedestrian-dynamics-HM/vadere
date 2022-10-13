@@ -1,19 +1,19 @@
 package org.vadere.simulator.control.util;
 
-import org.vadere.state.attributes.scenario.AttributesSource;
+import org.vadere.state.attributes.spawner.AttributesSpawner;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.logging.Logger;
 
-import java.awt.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.function.Function;
 
 
 public class SpawnArray {
-	private static Logger logger = Logger.getLogger(SpawnArray.class);
+	private static final Logger logger = Logger.getLogger(SpawnArray.class);
 	private static double SPAWN_BUFFER = 0.001;
 	private final double grid_resolution_ca = 0.4;
 
@@ -39,13 +39,13 @@ public class SpawnArray {
 					  final VRectangle spawnElementBound,
 					  Function<VPoint, VShape> shapeProducer,
 					  SpawnOverlapCheck testFreeSpace,
-					  final AttributesSource sourceAttributes) {
+					  final AttributesSpawner spawnerAttributes) {
 		this.bound = new VRectangle(boundShape.getBounds2D());
 		this.spawnElementBound = spawnElementBound;
 		this.shapeProducer = shapeProducer;
 		this.testFreeSpace = testFreeSpace;
 
-		if(sourceAttributes.isSpawnAtGridPositionsCA()){
+		if(spawnerAttributes.isEventPositionGridCA()){
 			SPAWN_BUFFER = 0;
 		}
 
@@ -55,7 +55,7 @@ public class SpawnArray {
 		double offset_x_high = 0;
 		double offset_y_high = 0;
 
-		if(sourceAttributes.isSpawnAtGridPositionsCA()){
+		if(spawnerAttributes.isEventPositionGridCA()){
 			offset_x_low = calculateOffsetLow(bound.x);
 			offset_x_high = calculateOffsetHigh(bound.x+bound.width);
 			offset_y_low = calculateOffsetLow(bound.y);

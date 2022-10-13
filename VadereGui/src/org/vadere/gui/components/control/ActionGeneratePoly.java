@@ -8,35 +8,24 @@ import org.vadere.gui.components.utils.Messages;
 import org.vadere.meshing.mesh.impl.PSLG;
 import org.vadere.meshing.utils.io.poly.PSLGGenerator;
 import org.vadere.simulator.utils.pslg.PSLGConverter;
-import org.vadere.state.scenario.Obstacle;
 import org.vadere.util.config.VadereConfig;
-import org.vadere.util.geometry.shapes.VPolygon;
-import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.logging.Logger;
 
-import java.awt.event.ActionEvent;
-import java.awt.geom.Rectangle2D;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class ActionGeneratePoly extends AbstractAction {
-	private static Logger logger = Logger.getLogger(ActionGeneratePNG.class);
+	private static final Logger logger = Logger.getLogger(ActionGeneratePNG.class);
 	private static final Configuration CONFIG = VadereConfig.getConfig();
 	private final DefaultModel<? extends DefaultSimulationConfig> model;
 
-	public ActionGeneratePoly(final String name, Icon icon, final DefaultModel<? extends DefaultSimulationConfig> model) {
+	public ActionGeneratePoly(final String name, Icon icon,String shortDescription, final DefaultModel<? extends DefaultSimulationConfig> model) {
 		super(name, icon);
+		putValue(SHORT_DESCRIPTION,Messages.getString(shortDescription));
 		this.model = model;
 	}
 
@@ -65,7 +54,7 @@ public class ActionGeneratePoly extends AbstractAction {
 
 			try {
 				outputFile.createNewFile();
-				Writer out = new OutputStreamWriter(new FileOutputStream(outputFile), "UTF-8");
+				Writer out = new OutputStreamWriter(new FileOutputStream(outputFile), StandardCharsets.UTF_8);
 				out.write(polyString);
 				out.flush();
 				VadereConfig.getConfig().setProperty("SettingsDialog.snapshotDirectory.path", outputFile.getParentFile().getAbsolutePath());

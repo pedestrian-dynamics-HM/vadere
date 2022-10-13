@@ -1,7 +1,6 @@
 package org.vadere.state.attributes;
 
 import java.util.LinkedList;
-import java.util.Objects;
 
 public class AttributesStrategyModel extends Attributes {
 

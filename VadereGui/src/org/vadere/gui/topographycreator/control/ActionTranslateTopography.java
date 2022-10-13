@@ -7,26 +7,25 @@ import org.vadere.gui.topographycreator.view.ActionTranslateTopographyDialog;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 
+import javax.swing.undo.UndoableEditSupport;
 import java.awt.event.ActionEvent;
 import java.awt.geom.Rectangle2D;
-
-import javax.swing.*;
-import javax.swing.undo.UndoableEditSupport;
 
 /**
  * @author Benedikt Zoennchen
  */
 public class ActionTranslateTopography extends TopographyAction {
 
-	private TopographyAction action;
+	private final TopographyAction action;
 	private final UndoableEditSupport undoableEditSupport;
 
 	public ActionTranslateTopography(String name,
-	                                 ImageIcon icon,
+	                                 String iconPath,
+									 String shortDescription,
 	                                 @NotNull IDrawPanelModel<?> panelModel,
 	                                 @NotNull TopographyAction action,
 	                                 @NotNull final UndoableEditSupport undoSupport) {
-		super(name, icon, panelModel);
+		super(name, iconPath, shortDescription, panelModel);
 		this.action = action;
 		this.undoableEditSupport = undoSupport;
 	}

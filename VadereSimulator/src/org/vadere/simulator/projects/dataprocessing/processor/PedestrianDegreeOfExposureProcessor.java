@@ -19,6 +19,10 @@ public class PedestrianDegreeOfExposureProcessor extends DataProcessor<TimestepP
     @Override
     public void doUpdate(final SimulationState state) {
         Collection<Pedestrian> peds = state.getTopography().getElements(Pedestrian.class);
-        peds.forEach(p -> this.putValue(new TimestepPedestrianIdKey(state.getStep(), p.getId()), p.getDegreeOfExposure()));
+        peds.forEach(p -> {
+            if(!p.isInfectious()) {
+                this.putValue(new TimestepPedestrianIdKey(state.getStep(), p.getId()), p.getDegreeOfExposure());
+            }
+        });
     }
 }

@@ -1,202 +1,117 @@
 package org.vadere.state.attributes.scenario;
 
 import com.fasterxml.jackson.annotation.JsonView;
-
-import org.vadere.state.attributes.AttributesEmbedShape;
+import org.vadere.state.attributes.AttributesAbsorber;
+import org.vadere.state.attributes.AttributesWaiter;
 import org.vadere.state.scenario.Pedestrian;
+import org.vadere.state.scenario.Target;
 import org.vadere.state.util.Views;
 import org.vadere.util.geometry.shapes.VShape;
-
+import org.vadere.util.reflection.VadereAttribute;
 /**
- * Attributes of a target area, used by TargetController in VadereSimulation.
- * 
+ * Attributes of a {@link Target}.
+ * @author Ludwig Jaeck
  */
-public class AttributesTarget extends AttributesEmbedShape {
+public class AttributesTarget extends AttributesVisualElement {
+	/**
+	 * This component controls the absorbing behaviour of this target.
+	 */
+	@VadereAttribute
+	@JsonView(Views.CacheViewExclude.class)
+	private AttributesAbsorber absorber = new AttributesAbsorber(true, 0.1);
 
-	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
-	private int id = ID_NOT_SET;
+	@VadereAttribute
+	@JsonView(Views.CacheViewExclude.class)
+	private AttributesWaiter waiter = new AttributesWaiter();
 	/**
-	 * True: elements are removed from the simulation after entering.
-	 * False: the target id is removed from the target id list, but the element remains.
+	 * This attribute stores the speed an agent has after leaving this target
 	 */
-	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
-	private boolean absorbing = true;
-	/** Shape and position. */
-	private VShape shape;
+	@VadereAttribute
+	@JsonView(Views.CacheViewExclude.class)
+	private Double leavingSpeed = 0.0;
 	/**
-	 * Waiting time in seconds on this area.
-	 * If "individualWaiting" is true, then each element waits the given time on this area before
-	 * "absorbing" takes place.
-	 * If it is false, then the element waits this exact time before switching in "no waiting" mode
-	 * and back. This way, a traffic light can be simulated.
+	 * This attributes stores the number of agents the target can process at the same time.<br>
+	 * <b>NOTE:</b> If set to zero the target can process any number of agents at the same time.
 	 */
+	@VadereAttribute
 	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
-	private double waitingTime = 0;
-	/**
-	 * Waiting time on the target in the yellow phase (before red and green).
-	 * This can be used to cycle traffic lights in red, green or yellow phase, so that (Y -> R -> Y
-	 * -> G) cycles.
-	 * Needed on crossings, otherwise cars bump into each other.
-	 */
-	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
-	private double waitingTimeYellowPhase = 0;
-	/**
-	 * Number of elements that can wait or be absorbed at one time in parallel on this area.
-	 * If zero, an infinite amount can wait or be absorbed.
-	 */
-	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
-	private int parallelWaiters = 0;
-	/**
-	 * True: each element on the target area is treated individually.
-	 * False: the target waits for "waitingTime" and then enters "no waiting mode" for the same time
-	 * (and then goes back to waiting mode). See "waitingTime".
-	 */
-	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
-	private boolean individualWaiting = true;
+	private Integer parallelEvents = 0;
 
-	// TODO should be "reachedDistance"; agents do not necessarily get deleted/absorbed
-	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
-	private double deletionDistance = 0.1;
+	public AttributesTarget() {
+		super();
+	}
 
-	/**
-	 * If set to false, starts with green phase (nonblocking), otherwise blocks the path (red
-	 * phase).
-	 */
-	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
-	private boolean startingWithRedLight = false;
-
-	/**
-	 * If non-negative, determines the desired speed the particle (pedestrian, car) is assigned
-	 * after passing this target.
-	 * Can be used to model street networks with differing maximal speeds on roads.
-	 */
-	@JsonView(Views.CacheViewExclude.class) // ignore when determining if floor field cache is valid
-	private double nextSpeed = -1.0;
-
-	public AttributesTarget() {}
-
-	public AttributesTarget(final VShape shape) {
+	public AttributesTarget(final int id,final VShape shape) {
+		super();
 		this.shape = shape;
 	}
 
-	public AttributesTarget(final VShape shape, final int id, final boolean absorbing) {
+	public AttributesTarget(final VShape shape, final int id) {
 		this.shape = shape;
 		this.id = id;
-		this.absorbing = absorbing;
+	}
+	public AttributesTarget(final VShape shape, final int id,boolean absorbing) {
+		this(shape,id);
+		setAbsorbing(true);
 	}
 
 	public AttributesTarget(Pedestrian pedestrian) {
 		this.shape = pedestrian.getShape();
-		this.absorbing = true;
 		this.id = pedestrian.getIdAsTarget();
-		this.waitingTime = 0;
-		this.waitingTimeYellowPhase = 0;
-		this.parallelWaiters = 0;
-		this.individualWaiting = true;
-		this.startingWithRedLight = false;
-		this.nextSpeed = -1;
 	}
 
 	// Getters...
 
-	public boolean isIndividualWaiting() {
-		return individualWaiting;
-	}
-
 	public boolean isAbsorbing() {
-		return absorbing;
-	}
-
-	public int getId() {
-		return id;
-	}
-
-	@Override
-	public void setShape(VShape shape) {
-		this.shape = shape;
-	}
-
-	@Override
-	public VShape getShape() {
-		return shape;
-	}
-
-	public double getWaitingTime() {
-		return waitingTime;
-	}
-
-	public double getWaitingTimeYellowPhase() {
-		return waitingTimeYellowPhase;
-	}
-
-	public int getParallelWaiters() {
-		return parallelWaiters;
-	}
-
-	/**
-	 * Within this distance, pedestrians have reached the target. It is actually not a "deletion"
-	 * distance but a "reached" distance. Pedestrians do not necessarily get deleted. They can have
-	 * further targets.
-	 */
-	public double getDeletionDistance() {
-		return deletionDistance;
-	}
-
-	public boolean isStartingWithRedLight() {
-		return startingWithRedLight;
-	}
-
-	public double getNextSpeed() {
-		return nextSpeed;
-	}
-
-	public void setReachedDistance(double reachedDistance) {
-		checkSealed();
-		this.deletionDistance = reachedDistance;
-	}
-
-	public void setId(int id) {
-		checkSealed();
-		this.id = id;
+		return this.absorber.isEnabled();
 	}
 
 	public void setAbsorbing(boolean absorbing) {
 		checkSealed();
-		this.absorbing = absorbing;
+		this.absorber.setEnabled(absorbing);
 	}
 
-	public void setWaitingTime(double waitingTime) {
-		checkSealed();
-		this.waitingTime = waitingTime;
+	public AttributesAbsorber getAbsorberAttributes() {
+		return absorber;
 	}
 
-	public void setWaitingTimeYellowPhase(double waitingTimeYellowPhase) {
-		checkSealed();
-		this.waitingTimeYellowPhase = waitingTimeYellowPhase;
+	public void setAbsorberAttributes(AttributesAbsorber absorber) {
+		this.absorber = absorber;
 	}
 
-	public void setParallelWaiters(int parallelWaiters) {
-		checkSealed();
-		this.parallelWaiters = parallelWaiters;
+	public Boolean isWaiting() {
+		return this.waiter.isEnabled();
 	}
 
-	public void setIndividualWaiting(boolean individualWaiting) {
+	public void setWaiting(Boolean waiting) {
 		checkSealed();
-		this.individualWaiting = individualWaiting;
+		this.absorber.setEnabled(waiting);
 	}
 
-	public void setDeletionDistance(double deletionDistance) {
-		checkSealed();
-		this.deletionDistance = deletionDistance;
+	public AttributesWaiter getWaiterAttributes() {
+		return waiter;
 	}
 
-	public void setStartingWithRedLight(boolean startingWithRedLight) {
+	public void setWaiterAttributes(AttributesWaiter waiter) {
 		checkSealed();
-		this.startingWithRedLight = startingWithRedLight;
+		this.waiter = waiter;
 	}
 
-	public void setNextSpeed(double nextSpeed) {
+	public Double getLeavingSpeed() {
+		return leavingSpeed;
+	}
+
+	public void setLeavingSpeed(Double leavingSpeed) {
 		checkSealed();
-		this.nextSpeed = nextSpeed;
+		this.leavingSpeed = leavingSpeed;
+	}
+
+	public Integer getParallelEvents() {
+		return parallelEvents;
+	}
+
+	public void setParallelEvents(Integer parallelEvents) {
+		checkSealed();
+		this.parallelEvents = parallelEvents;
 	}
 }

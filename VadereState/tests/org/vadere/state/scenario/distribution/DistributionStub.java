@@ -1,32 +1,24 @@
 package org.vadere.state.scenario.distribution;
 
 import org.apache.commons.math3.random.RandomGenerator;
+import org.vadere.state.attributes.distributions.AttributesDistribution;
 
 /**
  * @author Aleksandar Ivanov(ivanov0@hm.edu)
  */
-public class DistributionStub extends VadereDistribution<Object> {
+public class DistributionStub extends VDistribution {
 
-	public DistributionStub(Object parameter, int spawnNumber, RandomGenerator randomGenerator) throws Exception {
-		super(parameter, spawnNumber, randomGenerator);
+	public DistributionStub(AttributesDistribution parameter,RandomGenerator randomGenerator) throws Exception {
+		super(parameter,randomGenerator);
 	}
 
-	protected void setValues(Object parameter, int spawnNumber, RandomGenerator randomGenerator) throws Exception {
+	@Override
+	protected void setValues(AttributesDistribution parameter, RandomGenerator randomGenerator) throws Exception {
+
 	}
 
-	public int getSpawnNumber(double timeCurrentEvent) {
+	@Override
+	public double getNextSample(double timeCurrentEvent) {
 		return 0;
 	}
-
-	public double getNextSpawnTime(double timeCurrentEvent) {
-		return 0;
-	}
-
-	public int getRemainingSpawnAgents() {
-		return 0;
-	}
-
-	public void setRemainingSpawnAgents(int remainingAgents) {
-	}
-
 }

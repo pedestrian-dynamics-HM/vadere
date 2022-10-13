@@ -1,8 +1,7 @@
 package org.vadere.gui.components.control;
 
-import org.apache.commons.configuration2.Configuration;
 import org.jetbrains.annotations.NotNull;
-import org.vadere.gui.components.control.simulation.ActionGeneratePNG;
+import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.projectview.model.ProjectViewModel;
 import org.vadere.gui.topographycreator.view.ActionTranslateTopographyDialog;
 import org.vadere.meshing.mesh.gen.PFace;
@@ -13,24 +12,23 @@ import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.utils.MeshConstructor;
 import org.vadere.meshing.utils.io.poly.MeshPolyWriter;
 import org.vadere.simulator.utils.pslg.PSLGConverter;
-import org.vadere.util.config.VadereConfig;
 import org.vadere.util.io.IOUtils;
 import org.vadere.util.logging.Logger;
 
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 
-import javax.swing.*;
-
 public class ActionGenerateMesh extends AbstractAction {
-	private static Logger logger = Logger.getLogger(ActionGenerateMesh.class);
+	private static final Logger logger = Logger.getLogger(ActionGenerateMesh.class);
 	private final ProjectViewModel model;
 
-	public ActionGenerateMesh(final String name, Icon icon, final ProjectViewModel model) {
+	public ActionGenerateMesh(final String name, Icon icon,String shortDescription, final ProjectViewModel model) {
 		super(name, icon);
+		putValue(SHORT_DESCRIPTION, Messages.getString(shortDescription));
 		this.model = model;
 	}
 

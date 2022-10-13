@@ -1,17 +1,29 @@
 package org.vadere.state.scenario.distribution.registry;
 
-import java.util.Set;
-import org.junit.Test;
 import com.google.common.collect.ImmutableSet;
+import org.junit.Test;
 
-import static org.junit.Assert.*;
+import java.util.Set;
+
+import static org.junit.Assert.assertTrue;
 
 public class DistributionRegistryTest {
 
 	@Test
 	public void testExpectedDistributionsRegistered() {
-		Set<String> expected = ImmutableSet.of("negativeExponential", "normal", "linearInterpolation", "constant",
-		        "empirical", "poisson", "singleSpawn");
+		Set<String> expected = ImmutableSet.of(
+				"org.vadere.state.attributes.distributions.AttributesBinomialDistribution",
+				"org.vadere.state.attributes.distributions.AttributesConstantDistribution",
+				"org.vadere.state.attributes.distributions.AttributesNormalDistribution",
+				"org.vadere.state.attributes.distributions.AttributesEmpiricalDistribution",
+				"org.vadere.state.attributes.distributions.AttributesLinearInterpolationDistribution",
+		        "org.vadere.state.attributes.distributions.AttributesMixedDistribution",
+				"org.vadere.state.attributes.distributions.AttributesNegativeExponentialDistribution",
+				"org.vadere.state.attributes.distributions.AttributesNormalDistribution",
+				"org.vadere.state.attributes.distributions.AttributesPoissonDistribution",
+				"org.vadere.state.attributes.distributions.AttributesSingleSpawnDistribution",
+				"org.vadere.state.attributes.distributions.AttributesTimeSeriesDistribution"
+		);
 
 		Set<String> actual = DistributionRegistry.getRegisteredNames();
 
@@ -20,7 +32,7 @@ public class DistributionRegistryTest {
 
 	@Test
 	public void testGetWithExistingDist() throws Exception {
-		DistributionRegistry.get("normal");
+		DistributionRegistry.get("org.vadere.state.attributes.distributions.AttributesNormalDistribution");
 
 	}
 

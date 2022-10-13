@@ -1,6 +1,5 @@
 package org.vadere.state.attributes.scenario;
 
-import org.vadere.state.attributes.AttributesEmbedShape;
 import org.vadere.state.scenario.Stairs;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.geometry.shapes.Vector2D;
@@ -16,11 +15,9 @@ import org.vadere.util.logging.Logger;
  * 
  *
  */
-public class AttributesStairs extends AttributesEmbedShape {
+public class AttributesStairs extends AttributesVisualElement {
 
-	private VShape shape = null;
-	private int id = ID_NOT_SET;
-	private int treadCount = 1;
+	private Integer treadCount = 1;
 	private Vector2D upwardDirection = new Vector2D(1.0, 0.0);
 
 	public AttributesStairs() { }
@@ -41,21 +38,6 @@ public class AttributesStairs extends AttributesEmbedShape {
 			Logger.getLogger(getClass()).error("Tread count too small (" + treadCount + "). Setting it to one.");
 		}
 	}
-
-	@Override
-	public void setShape(VShape shape) {
-		this.shape = shape;
-	}
-
-	@Override
-	public VShape getShape() {
-		return shape;
-	}
-
-	public int getId() {
-		return id;
-	}
-
 	public int getTreadCount() {
 		return treadCount;
 	}
@@ -64,8 +46,4 @@ public class AttributesStairs extends AttributesEmbedShape {
 		return upwardDirection;
 	}
 
-	public void setId(int id) {
-		checkSealed();
-		this.id = id;
-	}
 }

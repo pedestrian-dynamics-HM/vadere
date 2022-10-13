@@ -1,6 +1,11 @@
 package org.vadere.state.attributes;
 
-import java.util.*;
+import org.vadere.state.attributes.models.psychology.cognition.AttributesSimpleCognitionModel;
+import org.vadere.state.attributes.models.psychology.perception.AttributesSimplePerceptionModel;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * This class beautifies the JSON content by mapping
@@ -26,6 +31,8 @@ public class AttributesPsychologyLayer {
     // Constructors
     public AttributesPsychologyLayer() {
         this(DEFAULT_PERCEPTION_MODEL, DEFAULT_COGNITION_MODEL, new ArrayList<>());
+        this.attributesModel.add(0, new AttributesSimplePerceptionModel());
+        this.attributesModel.add(1, new AttributesSimpleCognitionModel());
     }
 
     public AttributesPsychologyLayer(String perception, String cognition, List<Attributes> attributesModel ) {

@@ -376,7 +376,7 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 	}
 
 	public synchronized int getStep() {
-		return Step.toFloorStep(getSimTimeInSec(), getSimTimeStepLength());
+		return Step.toCeilStep(getSimTimeInSec(), getSimTimeStepLength());
 	}
 
 	@Override

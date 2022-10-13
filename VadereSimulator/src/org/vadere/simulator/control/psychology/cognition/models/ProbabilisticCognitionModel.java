@@ -8,6 +8,7 @@ import org.vadere.state.attributes.models.psychology.cognition.AttributesCogniti
 import org.vadere.state.attributes.models.psychology.cognition.AttributesProbabilisticCognitionModel;
 import org.vadere.state.attributes.models.psychology.cognition.AttributesRouteChoiceDefinition;
 import org.vadere.state.psychology.cognition.SelfCategory;
+import org.vadere.state.psychology.information.InformationState;
 import org.vadere.state.psychology.perception.types.*;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Topography;
@@ -57,7 +58,7 @@ public class ProbabilisticCognitionModel extends AProbabilisticModel {
                 InformationStimulus information = (InformationStimulus) pedestrian.getMostImportantStimulus();
                 String instruction = information.getInformation();
 
-                if (!pedestrian.getKnowledgeBase().knowsAbout(instruction)) {
+                if (pedestrian.getKnowledgeBase().getKnowledge().size() == 0) {
 
                     AttributesRouteChoiceDefinition attr = getFilteredAttributes(instruction);
                     LinkedList<Integer> newTarget = getNewTarget(attr.getTargetIds(), attr.getTargetProbabilities());

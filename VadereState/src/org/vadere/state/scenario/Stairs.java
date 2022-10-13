@@ -1,6 +1,7 @@
 package org.vadere.state.scenario;
 
 import org.vadere.state.attributes.Attributes;
+import org.vadere.state.attributes.scenario.AttributesSource;
 import org.vadere.state.attributes.scenario.AttributesStairs;
 import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.geometry.shapes.VLine;
@@ -14,7 +15,7 @@ import java.awt.geom.Path2D;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Rectangle2D;
 
-public class Stairs extends ScenarioElement {
+public class Stairs extends ScenarioElement<AttributesStairs> {
 
 	private static Logger logger = Logger.getLogger(Stairs.class);
 	public static double MIN_TREAD_DEPTH = 0.100;
@@ -28,7 +29,6 @@ public class Stairs extends ScenarioElement {
 		}
 	}
 
-	private AttributesStairs attributes;
 	private Tread[] treads;
 	private double treadDepth;
 
@@ -78,8 +78,8 @@ public class Stairs extends ScenarioElement {
 	}
 
 	@Override
-	public void setAttributes(Attributes attributes) {
-		this.attributes = (AttributesStairs) attributes;
+	public void setAttributes(AttributesStairs attributes) {
+		this.attributes = attributes;
 		treads = computeTreads();
 	}
 

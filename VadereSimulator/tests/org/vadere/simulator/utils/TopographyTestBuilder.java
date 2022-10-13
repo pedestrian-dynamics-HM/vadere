@@ -72,6 +72,8 @@ public class TopographyTestBuilder {
 	}
 
 	public TopographyTestBuilder addTarget(int id, VShape s) {
+		var attribs = new AttributesTarget(s, id);
+		attribs.setAbsorbing(true);
 		addTarget(new AttributesTarget(s, id, true));
 		return this;
 	}

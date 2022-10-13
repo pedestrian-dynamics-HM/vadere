@@ -44,14 +44,14 @@ public class AdjustPanel extends JPanel implements Observer {
 			slider = new JSlider(SwingConstants.HORIZONTAL, model.getFirstStep(),
 					model.getLastStep(), model.getFirstStep());
 		} else {
-			slider = new JSlider(SwingConstants.HORIZONTAL, 1, 1, 1);
+			slider = new JSlider(SwingConstants.HORIZONTAL, 0, 0, 0);
 		}
 
 		slider.addMouseListener(new EJSliderAction(slider));
 
 		sModelVelocity = new SpinnerNumberModel(model.config.getFps(), 1, 200, 1);
 		sModelTime = new SpinnerNumberModel(0.0, 0.0, Double.MAX_VALUE, model.getTimeResolution());
-		sModelTimeStep = new SpinnerNumberModel(1, 1, Integer.MAX_VALUE, 1);
+		sModelTimeStep = new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1);
 		sModelTimeResolution = new SpinnerNumberModel(model.config.getTimeResolution(), 0.01, Double.MAX_VALUE, 0.01);
 		model.setTimeResolution(model.config.getTimeResolution());
 
@@ -119,7 +119,6 @@ public class AdjustPanel extends JPanel implements Observer {
 
 		ActionSetTimeStep setTimeStepAction = new ActionSetTimeStep("setTimeStep", model);
 		slider.addChangeListener(setTimeStepAction);
-
 		setToolTips();
 	}
 

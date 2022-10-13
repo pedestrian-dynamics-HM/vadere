@@ -1,9 +1,9 @@
 package org.vadere.state.attributes;
 
+import org.vadere.util.reflection.DynamicClassInstantiator;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import org.vadere.util.reflection.DynamicClassInstantiator;
 
 /**
  * POJO for the model definition.

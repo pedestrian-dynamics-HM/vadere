@@ -6,14 +6,13 @@ import org.vadere.gui.topographycreator.control.ActionSimplifyObstacles;
 import org.vadere.gui.topographycreator.model.IDrawPanelModel;
 import org.vadere.state.scenario.ScenarioElement;
 
+import javax.swing.*;
+import javax.swing.event.DocumentEvent;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.stream.Collectors;
-
-import javax.swing.*;
-import javax.swing.event.DocumentEvent;
 
 /**
  * Dialog which collects the ids of selected obstacles. The collected list will be combined into
@@ -23,12 +22,12 @@ import javax.swing.event.DocumentEvent;
  */
 public class ActionCombineDialog extends JDialog implements ISelectScenarioElementListener {
 
-	private JButton ok;
-	private JButton close;
-	private JTextField textField;
-	private IDrawPanelModel<?> panelModel;
-	private ActionSimplifyObstacles action;
-	private ActionListener okBtn;
+	private final JButton ok;
+	private final JButton close;
+	private final JTextField textField;
+	private final IDrawPanelModel<?> panelModel;
+	private final ActionSimplifyObstacles action;
+	private final ActionListener okBtn;
 
 
 	public ActionCombineDialog(ActionSimplifyObstacles action, ActionListener okBtn, IDrawPanelModel<?> panelModel) {
@@ -82,17 +81,19 @@ public class ActionCombineDialog extends JDialog implements ISelectScenarioEleme
 	}
 
 	@Override
-	public void selectionChange(ScenarioElement scenarioElement) {
-		if (scenarioElement.getId() != -1){
-			String tmp = textField.getText().strip();
-			if (tmp.length() == 0){
-				textField.setText(Integer.toString(scenarioElement.getId()));
-			} else if (tmp.endsWith(",")){
-				textField.setText(tmp + " " + scenarioElement.getId());
-			} else {
-				textField.setText(tmp + ", " + scenarioElement.getId());
-			}
+	public void selectionChange(ScenarioElement element) {
+		if(element != null) {
+			if (element.getId() != -1) {
+				String tmp = textField.getText().strip();
+				if (tmp.length() == 0) {
+					textField.setText(Integer.toString(element.getId()));
+				} else if (tmp.endsWith(",")) {
+					textField.setText(tmp + " " + element.getId());
+				} else {
+					textField.setText(tmp + ", " + element.getId());
+				}
 
+			}
 		}
 	}
 }

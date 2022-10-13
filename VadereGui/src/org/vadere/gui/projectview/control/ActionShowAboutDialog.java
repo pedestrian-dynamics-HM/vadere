@@ -1,18 +1,16 @@
 package org.vadere.gui.projectview.control;
 
-import javax.swing.*;
-
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.components.utils.Resources;
 import org.vadere.util.version.Version;
 
+import javax.swing.*;
 import java.awt.event.ActionEvent;
-import java.text.MessageFormat;
 
 public class ActionShowAboutDialog extends AbstractAction {
 
 	private static final long serialVersionUID = 1L;
-	private static Resources resources = Resources.getInstance("global");
+	private static final Resources resources = Resources.getInstance("global");
 
 	public ActionShowAboutDialog(final String name) {
 		super(name);

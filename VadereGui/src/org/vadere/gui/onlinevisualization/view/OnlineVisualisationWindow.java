@@ -2,21 +2,11 @@ package org.vadere.gui.onlinevisualization.view;
 
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
-
 import org.apache.commons.configuration2.Configuration;
-import org.vadere.gui.components.control.ActionGeneratePoly;
-import org.vadere.gui.components.control.IViewportChangeListener;
-import org.vadere.gui.components.control.JViewportChangeListener;
-import org.vadere.gui.components.control.PanelResizeListener;
-import org.vadere.gui.components.control.ViewportChangeListener;
-import org.vadere.gui.components.control.simulation.ActionGenerateINETenv;
-import org.vadere.gui.components.control.simulation.ActionGeneratePNG;
-import org.vadere.gui.components.control.simulation.ActionGenerateSVG;
-import org.vadere.gui.components.control.simulation.ActionGenerateTikz;
-import org.vadere.gui.components.control.simulation.ActionRecording;
-import org.vadere.gui.components.control.simulation.ActionSwapSelectionMode;
-import org.vadere.gui.components.control.simulation.ActionVisualization;
+import org.vadere.gui.components.control.*;
+import org.vadere.gui.components.control.simulation.*;
 import org.vadere.gui.components.utils.Messages;
+import org.vadere.gui.components.utils.ResourceStrings;
 import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.components.utils.SwingUtils;
 import org.vadere.gui.components.view.DialogFactory;
@@ -29,13 +19,12 @@ import org.vadere.gui.onlinevisualization.control.ActionShowPotentialField;
 import org.vadere.gui.onlinevisualization.model.OnlineVisualizationModel;
 import org.vadere.util.config.VadereConfig;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
-
-import javax.swing.*;
 
 public class OnlineVisualisationWindow extends JPanel implements Observer {
 
@@ -44,13 +33,13 @@ public class OnlineVisualisationWindow extends JPanel implements Observer {
 	private static final Configuration CONFIG = VadereConfig.getConfig();
 
 
-	private JToolBar toolbar;				// top
-	private SimulationInfoPanel infoPanel;	// footer
-	private JScrollPane scenarioScrollPane; // left
-	private ScenarioElementView jsonPanel;  // right
-	private JSplitPane splitPaneForTopographyAndJsonPane; // container left/right
-	private MainPanel mainPanel;
-	private OnlineVisualizationModel model;
+	private final JToolBar toolbar;				// top
+	private final SimulationInfoPanel infoPanel;	// footer
+	private final JScrollPane scenarioScrollPane; // left
+	private final ScenarioElementView jsonPanel;  // right
+	private final JSplitPane splitPaneForTopographyAndJsonPane; // container left/right
+	private final MainPanel mainPanel;
+	private final OnlineVisualizationModel model;
 
 	public OnlineVisualisationWindow(final MainPanel mainPanel, final OnlineVisualizationModel model) {
 		this.mainPanel = mainPanel;
@@ -210,6 +199,7 @@ public class OnlineVisualisationWindow extends JPanel implements Observer {
 		ActionGeneratePoly generatePoly = new ActionGeneratePoly(
 				Messages.getString("ProjectView.btnPolySnapshot.tooltip"),
 				resources.getIcon("camera_poly.png", iconWidth, iconHeight),
+				ResourceStrings.TOPOGRAPHY_CREATOR_BTN_GENERATE_POLY_TOOLTIP,
 				model);
 
         ActionShowPotentialField showPotentialField = new ActionShowPotentialField(

@@ -1,13 +1,15 @@
 package org.vadere.simulator.models.queuing;
 
-import java.util.*;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.vadere.state.attributes.scenario.AttributesTarget;
 import org.vadere.state.scenario.*;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VShape;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * A Queue is connected to a Target. All Pedestrians with the Target are out of the queue.
@@ -17,12 +19,12 @@ import org.vadere.util.geometry.shapes.VShape;
  */
 public class Queue implements DynamicElementRemoveListener<Pedestrian>, DynamicElementAddListener<Pedestrian> {
 
-	private static double INITIAL_DISTANCE = 3.0; // 5.0
-	private Map<Integer, Pedestrian> pedestrianInQueue;
-	private Map<Integer, Pedestrian> pedestrianOutQueue;
+	private static final double INITIAL_DISTANCE = 3.0; // 5.0
+	private final Map<Integer, Pedestrian> pedestrianInQueue;
+	private final Map<Integer, Pedestrian> pedestrianOutQueue;
 	private List<VShape> polytopes;
-	private int queueTailId;
-	private int targetId;
+	private final int queueTailId;
+	private final int targetId;
 	private final QueueDetector detector;
 	private final Topography topography;
 	private boolean active;
@@ -46,7 +48,7 @@ public class Queue implements DynamicElementRemoveListener<Pedestrian>, DynamicE
 	}
 
 	public List<Target> getTarget() {
-		return polytopes.stream().map(p -> new Target(new AttributesTarget(p, queueTailId, false)))
+		return polytopes.stream().map(p -> new Target(new AttributesTarget(p, queueTailId)))
 				.collect(Collectors.toList());
 	}
 
@@ -109,7 +111,7 @@ public class Queue implements DynamicElementRemoveListener<Pedestrian>, DynamicE
 			 */
 			topography.getTargets().removeIf(target -> target.getId() == this.queueTailId);
 			polytopes.forEach(polytope -> topography.getTargets()
-					.add(new TargetQueue(new AttributesTarget(polytope, queueTailId, false))));
+					.add(new TargetQueue(new AttributesTarget(polytope, queueTailId))));
 		}
 	}
 

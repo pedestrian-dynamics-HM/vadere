@@ -8,6 +8,8 @@ import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VShape;
 
+import javax.swing.undo.UndoableEdit;
+import javax.swing.undo.UndoableEditSupport;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.geom.Area;
@@ -17,10 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.swing.*;
-import javax.swing.undo.UndoableEdit;
-import javax.swing.undo.UndoableEditSupport;
-
 /**
  *
  */
@@ -28,9 +26,9 @@ public class ActionSubtractMeasurementArea extends TopographyAction {
 
     private final UndoableEditSupport undoSupport;
 
-    public ActionSubtractMeasurementArea(String name, ImageIcon icon, IDrawPanelModel panelModel,
+    public ActionSubtractMeasurementArea(String name, String iconPath, IDrawPanelModel panelModel,
                                          UndoableEditSupport undoSupport) {
-        super(name, icon, panelModel);
+        super(name, iconPath, panelModel);
         this.undoSupport = undoSupport;
     }
 

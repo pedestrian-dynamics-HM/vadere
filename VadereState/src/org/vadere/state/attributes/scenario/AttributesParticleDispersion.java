@@ -1,13 +1,13 @@
 package org.vadere.state.attributes.scenario;
 
-import org.vadere.state.attributes.AttributesEmbedShape;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VShape;
 
 import java.awt.geom.Path2D;
 
 
-public abstract class AttributesParticleDispersion extends AttributesEmbedShape {
+public abstract class AttributesParticleDispersion extends AttributesVisualElement {
 
     private int id;
     private double creationTime;
@@ -15,7 +15,7 @@ public abstract class AttributesParticleDispersion extends AttributesEmbedShape 
     private VShape shape;
 
     public AttributesParticleDispersion() {
-        this.id = AttributesEmbedShape.ID_NOT_SET;
+        this.id = Attributes.ID_NOT_SET;
         this.creationTime = -1;
         this.currentPathogenLoad = -1;
 

@@ -1,23 +1,22 @@
 package org.vadere.state.scenario.distribution.impl;
 
-import static org.junit.Assert.*;
-
-import java.util.ArrayList;
-
 import org.apache.commons.math3.random.RandomGenerator;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.vadere.state.attributes.distributions.AttributesDistribution;
+import org.vadere.state.attributes.distributions.AttributesMixedDistribution;
+import org.vadere.state.attributes.distributions.AttributesSingleSpawnDistribution;
 import org.vadere.state.scenario.distribution.DistributionFactory;
 import org.vadere.state.scenario.distribution.DistributionStub;
-import org.vadere.state.scenario.distribution.VadereDistribution;
+import org.vadere.state.scenario.distribution.VDistribution;
 import org.vadere.state.scenario.distribution.VadereDistributionTest;
-import org.vadere.state.scenario.distribution.parameter.MixedParameter;
-import org.vadere.state.scenario.distribution.parameter.MixedParameterDistribution;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import java.util.ArrayList;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Aleksandar Ivanov(ivanov0@hm.edu)
@@ -27,44 +26,42 @@ import com.fasterxml.jackson.databind.JsonNode;
 public class MixedDistributionTest extends VadereDistributionTest {
 
 	RandomGenerator randomGenerator = null;
-	VadereDistribution<?> distStub;
+	VDistribution<?> distStub;
 
 	public MixedDistributionTest() throws Exception {
-		distStub = new DistributionStub(null, 0, randomGenerator);
+		distStub = new DistributionStub(null,  randomGenerator);
 	}
 
 	@Override
-	protected VadereDistribution<?> getDistributionUnderTest() throws Exception {
-		MixedParameterDistribution parameterDist = new MixedParameterDistribution();
-		parameterDist.setInterSpawnTimeDistribution("");
-		parameterDist.setDistributionParameters(Mockito.mock(JsonNode.class));
+	protected VDistribution<?> getDistributionUnderTest() throws Exception {
+		SingleSpawnDistribution subDistr = new SingleSpawnDistribution(Mockito.mock(AttributesSingleSpawnDistribution.class),null);
 
-		ArrayList<MixedParameterDistribution> dists = new ArrayList<>();
-		dists.add(parameterDist);
+		ArrayList<AttributesDistribution> dists = new ArrayList<>();
+		dists.add(subDistr.getAttributes());
 
-		MixedParameter parameter = new MixedParameter();
+		AttributesMixedDistribution parameter = new AttributesMixedDistribution();
 		parameter.setDistributions(dists);
 
-		double[] switchpoints = {};
+		ArrayList<Double> switchpoints = new ArrayList<>();
 		parameter.setSwitchpoints(switchpoints);
 
 		PowerMockito.mockStatic(DistributionFactory.class);
 		PowerMockito.doReturn(distStub).when(DistributionFactory.class);
-		DistributionFactory.create(parameterDist.getInterSpawnTimeDistribution(),
-		        parameterDist.getDistributionParameters(), spawnNumber, randomGenerator);
+		DistributionFactory.create(subDistr.getAttributes(), randomGenerator);
 
-		MixedDistribution dist = new MixedDistribution(parameter, spawnNumber, null);
+		MixedDistribution dist = new MixedDistribution(parameter,  null);
 
 		return dist;
 	}
-
+/*
 	@Override
 	public void testGetSpawnNumber() throws Exception {
 		VadereDistribution<?> dist = getDistributionUnderTest();
 		int actual = dist.getSpawnNumber(1);
 		assertEquals(distStub.getSpawnNumber(1), actual);
 	}
-
+*/
+	/*
 	@Override
 	public void testRemainingSpawnAgents() throws Exception {
 		VadereDistribution<?> dist = getDistributionUnderTest();
@@ -72,12 +69,12 @@ public class MixedDistributionTest extends VadereDistributionTest {
 		int actual = dist.getRemainingSpawnAgents();
 		assertEquals(distStub.getRemainingSpawnAgents(), actual);
 	}
-
+*/
 	@Override
-	public void testGetNextSpawnTime() throws Exception {
-		VadereDistribution<?> dist = getDistributionUnderTest();
-		double actual = dist.getNextSpawnTime(12);
-		assertEquals(distStub.getNextSpawnTime(12), actual, 0);
+	public void testGetNextSample() throws Exception {
+		VDistribution<?> dist = getDistributionUnderTest();
+		double actual = dist.getNextSample(12);
+		assertEquals(distStub.getNextSample(12), actual, 0);
 	}
 
 }

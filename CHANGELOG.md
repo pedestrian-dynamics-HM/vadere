@@ -20,6 +20,78 @@
 
 ### Other
 
+## v2.4:
+
+### Added
+#### Gui - AttributeTree
+- Added `AttributeTreeModel` which represents an object instances fields.
+- Added `FieldNode` which represents a field of a registered type.
+- Added `ObjectNode`which represents a field with an object instance of an unregistered type.
+- Added `ArrayNode` which represents a field of type java.util.List<E>
+- Added `AbstrNode` which represents a field which can be instanced by subclasses of the given type
+#### Gui - Attribute Table
+- Added `AttributeTableContainer` which delegates calls from `TopographyCreatorModel` to the `AttributeTableView` to remove the dependent call to `getAttributes`.
+- Added `AttributTableView` which stores multiple `AttributeTablePage`.
+- Added `AttributeTablePage` which hold a reference to a node of the `AttributeTreeModel` as the root node of this page.
+- Added `JAtttributeTable` which servers as a layouter for the `AttributeEditor`s by using a `JAttributeTable.Styler`.
+- Added `JAttributeTable.Styler` which is used to build a view delegate for each row of the table.
+- Added `AttributeEditor` representing the abstract superclass for implementing custom editors.
+- Added `SpinnerCellEditor` for editing `Interger` instance.
+- Added `DoubleSpinnerCellEditor` for editing `Doubles` instance.
+- Added `CheckBoxCellEditor` for editing `Boolean` instance.
+- Added `ComboBoxCellEditor` for selecting enum types.
+- Added `TextEditCellEditor` for editing `String` instance.
+- Added `VPointCellEditor` for editing `VPoint` instance.
+- Added `VShapeCellEditors` for editing `VShape` subclassed instances.
+- Added `ChildObjectCellEditor` which provides an embedded `AttributeTablePage` for the corresponding object instance.
+- Added `AbstractTypeCellEditor` which provides an embedded `AttributeTableView` containing pages for each subclass of an abstract type.
+- Added `ListCellEditor` which provides an embedded `JAttributeTable` to place editors in a list.
+- Added `AttributeHelpView` which displays javadoc help for a selected field.
+
+#### Gui
+- Introduced FlatLightLaf theme as default theme.
+- Added a common icon theme for icons in the topography creator.
+- 
+#### State
+Spawners were introduced to encapsulate logic and data of the distributions that were prior to this only used for sources
+- Added `LerpSpawner`
+- Added `MixedSpawner`
+- Added `RegularSpawner`
+- Added `TimeSeriesSpawner`
+### Removed
+- Targets are not able to represent traffic lights anymore. Removed corresponding attributes.
+### Changed
+- Attribute based classes now inherit commonly used getters and setters for common attribute fields.
+- ScenarioElement like classes now inherit from AttributeAttached
+- Introduced spawners into sources to abstract the use of distributions for spawning agents.
+- Encapsulated absorbing and waiting behaviours into their own attribute classes.
+- VDistributions now only provide the `getNextSample(..)` method other methods were moved into the corresponding spawner classes.
+- Moved and renamed some attributes from distribution classes to spawner classes
+- In Gui/TopographyCreator, corrected create method for sources from Pedestrian to Circle
+
+## v2.3:
+
+### Added
+- Added new parameter `waitingTimeDistribution` to `AttributesTarget` describing a distribution used for the agents waiting time at a target.
+- Added new parameter `distributionParameters` to `AttributesTarget` describing the parameters of `waitingTimeDistribution`.
+- Added new parameter `waitingMode` to `AttributesTarget` used for differentiating between individual waiting and traffic light waiting. 
+  - can be set to `noWaiting` if agents should be absorbed immediately
+  - can be set to `individual` if agents should wait with individually assigned waiting times
+  - can be set to `trafficLight` if the target represents a traffic light
+### Removed
+- Removed parameter `waitingTime` from `AttributesTarget`, because this is now described by `distributionParameters`. 
+### Changed
+
+### Fixed
+
+### Performance
+
+### Security
+
+### Deprecated
+
+### Other
+
 
 ## v2.1 (2022-03-XX)
 

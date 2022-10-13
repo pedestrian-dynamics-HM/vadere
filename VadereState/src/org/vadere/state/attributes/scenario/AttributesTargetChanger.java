@@ -1,28 +1,21 @@
 package org.vadere.state.attributes.scenario;
 
-import org.vadere.state.attributes.AttributesEmbedShape;
 import org.vadere.state.scenario.TargetChangerAlgorithmType;
 import org.vadere.util.geometry.shapes.VShape;
 
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Attributes of "TargetChanger" object, used by "TargetChangerController" during simulation.
  */
-public class AttributesTargetChanger extends AttributesEmbedShape {
+public class AttributesTargetChanger extends AttributesVisualElement {
 
-    // Variables
-    private int id = ID_NOT_SET;
-
-    /**
-     * Shape and position.
-     */
-    private VShape shape;
     /**
      * Within this distance, pedestrians have reached this area.
      */
-    private double reachDistance = 0.0;
+    private Double reachDistance = 0.0;
     /**
      * Select TargetChangerAlgorithm {@link TargetChangerAlgorithmType}:
      * <ul>
@@ -53,12 +46,12 @@ public class AttributesTargetChanger extends AttributesEmbedShape {
      * is heading to the given target as new target. Otherwise, use the given target
      * id as "normal" target id.
      */
-    private LinkedList<Integer> nextTarget = new LinkedList<>();
+    private List<Integer> nextTarget = new LinkedList<>();
     /**
      * Change target of a given pedestrian only with a certain probability between
      * 0 and 1.
      */
-    private LinkedList<Double> probabilityToChangeTarget = new LinkedList<Double>(Arrays.asList(1.0));
+    private List<Double> probabilityToChangeTarget = new LinkedList<>(Arrays.asList(1.0));
 
 
 
@@ -84,16 +77,6 @@ public class AttributesTargetChanger extends AttributesEmbedShape {
         this.probabilityToChangeTarget = probabilitiesToChangeTarget;
     }
 
-    // Getters
-    public int getId() {
-        return id;
-    }
-
-    @Override
-    public VShape getShape() {
-        return shape;
-    }
-
     public double getReachDistance() {
         return reachDistance;
     }
@@ -107,23 +90,20 @@ public class AttributesTargetChanger extends AttributesEmbedShape {
     }
 
     public LinkedList<Integer> getNextTarget() {
-        return nextTarget;
+        if(!nextTarget.getClass().isAssignableFrom(LinkedList.class)){
+            nextTarget = new LinkedList<>(nextTarget);
+        }
+        return (LinkedList<Integer>) nextTarget;
     }
 
     public LinkedList<Double> getProbabilitiesToChangeTarget() {
-        return probabilityToChangeTarget;
+        if(!probabilityToChangeTarget.getClass().isAssignableFrom(LinkedList.class)){
+            probabilityToChangeTarget = new LinkedList<>(probabilityToChangeTarget);
+        }
+        return (LinkedList<Double>) probabilityToChangeTarget;
     }
 
     // Setters
-    public void setId(int id) {
-        checkSealed();
-        this.id = id;
-    }
-
-    @Override
-    public void setShape(VShape shape) {
-        this.shape = shape;
-    }
 
     public void setReachDistance(double reachDistance) {
         checkSealed();

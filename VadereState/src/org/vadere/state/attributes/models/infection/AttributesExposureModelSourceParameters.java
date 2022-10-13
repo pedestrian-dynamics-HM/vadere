@@ -1,7 +1,6 @@
 package org.vadere.state.attributes.models.infection;
 
 import org.vadere.state.attributes.Attributes;
-import org.vadere.state.attributes.AttributesEmbedShape;
 
 /**
  * Attributes required by an exposure model to define which source (defined by {@link #sourceId}) spawns
@@ -27,7 +26,7 @@ public class AttributesExposureModelSourceParameters extends Attributes {
     }
 
     public AttributesExposureModelSourceParameters() {
-        this(AttributesEmbedShape.ID_NOT_SET, false);
+        this(Attributes.ID_NOT_SET, false);
     }
 
     public boolean isInfectious() {
