@@ -1,13 +1,13 @@
 {
-  "name" : "route_choice_real_world_pcm_tpgrphy_adapted_cgm",
+  "name" : "route_choice_real_world_groups_test",
   "description" : "",
   "release" : "2.4",
-  "commithash" : "37d5cea029114cfbc5ced38fb76c86834cb50304",
+  "commithash" : "a8999356ff699a2f190e23bb37d337cc685f4d04",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
       "filename" : "postvis.traj",
-      "processors" : [ 1, 2, 20, 122 ]
+      "processors" : [ 1, 2, 20 ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOverlapOutputFile",
       "filename" : "overlaps.csv",
@@ -35,7 +35,7 @@
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepOutputFile",
       "filename" : "densities_counts.txt",
-      "processors" : [ 101, 102, 103, 104, 105, 108, 109, 110, 111 ]
+      "processors" : [ 112, 113, 114, 101, 102, 103, 110, 111 ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
       "filename" : "targetIds.txt",
@@ -43,7 +43,7 @@
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimeGridOutputFile",
       "filename" : "countsCellwise.txt",
-      "processors" : [ 21 ]
+      "processors" : [ ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
       "filename" : "commandIdsReceived.txt",
@@ -51,55 +51,59 @@
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepOutputFile",
       "filename" : "fundamentalDiagramm.txt",
-      "processors" : [ 116, 117, 118, 119, 120, 25, 121, 27, 29 ]
+      "processors" : [ ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
       "filename" : "ped_out.txt",
-      "processors" : [ 114, 19, 115, 23, 24, 123, 124 ]
+      "processors" : [ 19, 23, 24 ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
       "filename" : "densities_pedid.txt",
-      "processors" : [ 112 ]
+      "processors" : [ ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPositionOutputFile",
       "filename" : "voronoi_diagr_ma1.txt",
-      "processors" : [ 126 ]
+      "processors" : [ ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPositionOutputFile",
       "filename" : "voronoi_diagr_ma2.txt",
-      "processors" : [ 127 ]
+      "processors" : [ ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPositionOutputFile",
       "filename" : "voronoi_diagr_ma3.txt",
-      "processors" : [ 128 ]
+      "processors" : [ ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPositionOutputFile",
       "filename" : "voronoi_diagr_ma4.txt",
-      "processors" : [ 129 ]
+      "processors" : [ ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPositionOutputFile",
       "filename" : "voronoi_diagr_ma5.txt",
-      "processors" : [ 130 ]
+      "processors" : [ ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPositionOutputFile",
       "filename" : "voronoi_diagr_ma6.txt",
-      "processors" : [ 131 ]
+      "processors" : [ ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPositionOutputFile",
       "filename" : "voronoi_diagr_ma7.txt",
-      "processors" : [ 132 ]
+      "processors" : [ ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPositionOutputFile",
       "filename" : "voronoi_diagr_ma8.txt",
-      "processors" : [ 133 ]
+      "processors" : [ ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPositionOutputFile",
       "filename" : "voronoi_diagr_ma9.txt",
-      "processors" : [ 134 ]
+      "processors" : [ ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimeRectangleGridOutputFile",
       "filename" : "grid_spatial_time.txt",
-      "processors" : [ 135 ]
+      "processors" : [ ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.PedestrianIdOutputFile",
+      "filename" : "line_flow.txt",
+      "processors" : [ 107, 108 ]
     } ],
     "processors" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor",
@@ -132,14 +136,14 @@
       "id" : 102,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesAreaDensityCountingProcessor",
       "attributes" : {
-        "measurementAreaId" : 2
+        "measurementAreaId" : 4
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.AreaDensityCountingNormedProcessor",
       "id" : 103,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesAreaDensityCountingProcessor",
       "attributes" : {
-        "measurementAreaId" : 3
+        "measurementAreaId" : 5
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianTargetIdProcessor",
@@ -156,13 +160,6 @@
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepPsychologyStatusProcessor",
       "id" : 20
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.AreaDensityGridCountingSparseProcessor",
-      "id" : 21,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesAreaDensityGridCountingProcessor",
-      "attributes" : {
-        "cellSize" : 3.0
-      }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianCommandIdsReceivedTimesProcessor",
       "id" : 22
@@ -182,228 +179,79 @@
         "interpolate" : true
       }
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FundamentalDiagramCProcessor",
-      "id" : 25,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesFundamentalDiagramCProcessor",
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianTrajectoryProcessor",
+      "id" : 105
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianLineCrossProcessor",
+      "id" : 107,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianLineCrossProcessor",
       "attributes" : {
-        "measurementAreaId" : 1,
-        "pedestrianVelocityProcessorId" : 23
+        "p1" : {
+          "x" : 178.5,
+          "y" : 213.2
+        },
+        "p2" : {
+          "x" : 181.2,
+          "y" : 213.2
+        }
       }
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FundamentalDiagramCProcessor",
-      "id" : 27,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesFundamentalDiagramCProcessor",
-      "attributes" : {
-        "measurementAreaId" : 2,
-        "pedestrianVelocityProcessorId" : 23
-      }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FundamentalDiagramCProcessor",
-      "id" : 29,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesFundamentalDiagramCProcessor",
-      "attributes" : {
-        "measurementAreaId" : 3,
-        "pedestrianVelocityProcessorId" : 23
-      }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.AreaDensityCountingNormedProcessor",
-      "id" : 104,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesAreaDensityCountingProcessor",
-      "attributes" : {
-        "measurementAreaId" : 4
-      }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.AreaDensityCountingNormedProcessor",
-      "id" : 105,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesAreaDensityCountingProcessor",
-      "attributes" : {
-        "measurementAreaId" : 5
-      }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.AreaDensityCountingNormedProcessor",
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianLineCrossProcessor",
       "id" : 108,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesAreaDensityCountingProcessor",
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianLineCrossProcessor",
       "attributes" : {
-        "measurementAreaId" : 6
-      }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.AreaDensityCountingNormedProcessor",
-      "id" : 109,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesAreaDensityCountingProcessor",
-      "attributes" : {
-        "measurementAreaId" : 7
+        "p1" : {
+          "x" : 178.5,
+          "y" : 296.1
+        },
+        "p2" : {
+          "x" : 181.2,
+          "y" : 296.1
+        }
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.AreaDensityCountingNormedProcessor",
       "id" : 110,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesAreaDensityCountingProcessor",
       "attributes" : {
-        "measurementAreaId" : 8
+        "measurementAreaId" : 222
       }
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.AreaDensityCountingNormedProcessor",
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.AreaSpeedProcessor",
       "id" : 111,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesAreaDensityCountingProcessor",
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesAreaSpeedProcessor",
       "attributes" : {
-        "measurementAreaId" : 9
+        "measurementAreaId" : 222,
+        "pedestrianPositionProcessorId" : 24,
+        "pedestrianVelocityProcessorId" : 23
       }
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianDensityCountingProcessor",
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.AreaSpeedProcessor",
       "id" : 112,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianDensityCountingProcessor",
-      "attributes" : {
-        "pedestrianPositionProcessorId" : 24,
-        "radius" : 1.0
-      }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianPotentialProcessor",
-      "id" : 114,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianPotentialProcessor",
-      "attributes" : {
-        "pedestrianPositionProcessorId" : 24,
-        "targetId" : -1,
-        "type" : "TARGET"
-      }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianGroupIDProcessor",
-      "id" : 115
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FundamentalDiagramCProcessor",
-      "id" : 116,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesFundamentalDiagramCProcessor",
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesAreaSpeedProcessor",
       "attributes" : {
         "measurementAreaId" : 4,
+        "pedestrianPositionProcessorId" : 24,
         "pedestrianVelocityProcessorId" : 23
       }
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FundamentalDiagramCProcessor",
-      "id" : 117,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesFundamentalDiagramCProcessor",
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.AreaSpeedProcessor",
+      "id" : 113,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesAreaSpeedProcessor",
       "attributes" : {
         "measurementAreaId" : 5,
+        "pedestrianPositionProcessorId" : 24,
         "pedestrianVelocityProcessorId" : 23
       }
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FundamentalDiagramCProcessor",
-      "id" : 118,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesFundamentalDiagramCProcessor",
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.AreaSpeedProcessor",
+      "id" : 114,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesAreaSpeedProcessor",
       "attributes" : {
-        "measurementAreaId" : 6,
+        "measurementAreaId" : 1,
+        "pedestrianPositionProcessorId" : 24,
         "pedestrianVelocityProcessorId" : 23
       }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FundamentalDiagramCProcessor",
-      "id" : 119,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesFundamentalDiagramCProcessor",
-      "attributes" : {
-        "measurementAreaId" : 7,
-        "pedestrianVelocityProcessorId" : 23
-      }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FundamentalDiagramCProcessor",
-      "id" : 120,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesFundamentalDiagramCProcessor",
-      "attributes" : {
-        "measurementAreaId" : 8,
-        "pedestrianVelocityProcessorId" : 23
-      }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FundamentalDiagramCProcessor",
-      "id" : 121,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesFundamentalDiagramCProcessor",
-      "attributes" : {
-        "measurementAreaId" : 9,
-        "pedestrianVelocityProcessorId" : 23
-      }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepGroupIDProcessor",
-      "id" : 122
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.RelevantPedestriansProcessor",
-      "id" : 123,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesRelevantPedestriansProcessor",
-      "attributes" : { }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.LostPedestrianProcessor",
-      "id" : 124,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesLostPedestrianProcessor",
-      "attributes" : { }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.VoronoiPolygonProcessor",
-      "id" : 126,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesVoronoiPolygonProcessor",
-      "attributes" : {
-        "voronoiMeasurementAreaId" : 1
-      }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.VoronoiPolygonProcessor",
-      "id" : 127,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesVoronoiPolygonProcessor",
-      "attributes" : {
-        "voronoiMeasurementAreaId" : 2
-      }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.VoronoiPolygonProcessor",
-      "id" : 128,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesVoronoiPolygonProcessor",
-      "attributes" : {
-        "voronoiMeasurementAreaId" : 3
-      }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.VoronoiPolygonProcessor",
-      "id" : 129,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesVoronoiPolygonProcessor",
-      "attributes" : {
-        "voronoiMeasurementAreaId" : 4
-      }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.VoronoiPolygonProcessor",
-      "id" : 130,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesVoronoiPolygonProcessor",
-      "attributes" : {
-        "voronoiMeasurementAreaId" : 5
-      }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.VoronoiPolygonProcessor",
-      "id" : 131,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesVoronoiPolygonProcessor",
-      "attributes" : {
-        "voronoiMeasurementAreaId" : 6
-      }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.VoronoiPolygonProcessor",
-      "id" : 132,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesVoronoiPolygonProcessor",
-      "attributes" : {
-        "voronoiMeasurementAreaId" : 7
-      }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.VoronoiPolygonProcessor",
-      "id" : 133,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesVoronoiPolygonProcessor",
-      "attributes" : {
-        "voronoiMeasurementAreaId" : 8
-      }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.VoronoiPolygonProcessor",
-      "id" : 134,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesVoronoiPolygonProcessor",
-      "attributes" : {
-        "voronoiMeasurementAreaId" : 9
-      }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.AreaDensityGridSpatialTimeProcessor",
-      "id" : 135,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesAreaDensityGridSpatialTimeProcessor",
-      "attributes" : {
-        "cellSize" : 2.0,
-        "T" : 5.0,
-        "everyStep" : true,
-        "pedestrianTrajectoryProcessorId" : 136
-      }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianTrajectoryProcessor",
-      "id" : 136
     } ],
     "isTimestamped" : true,
     "isWriteMetaData" : false
@@ -466,12 +314,12 @@
       "org.vadere.state.attributes.models.AttributesCGM" : {
         "groupMemberRepulsionFactor" : 0.01,
         "leaderAttractionFactor" : 0.003,
-        "lostMembers" : true,
-        "waitBehaviourRelevantAgentsFactor" : 5
+        "lostMembers" : false,
+        "waitBehaviourRelevantAgentsFactor" : -1
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 600.0,
+      "finishTime" : 450.0,
       "simTimeStepLength" : 0.4,
       "realTimeSimTimeRatio" : 0.0,
       "writeSimulationData" : true,
@@ -997,6 +845,35 @@
         },
         "visible" : true
       }, {
+        "id" : 16,
+        "shape" : {
+          "type" : "POLYGON",
+          "points" : [ {
+            "x" : 178.5,
+            "y" : 119.4
+          }, {
+            "x" : 178.5,
+            "y" : 333.5
+          }, {
+            "x" : 122.0,
+            "y" : 333.4
+          }, {
+            "x" : 122.4,
+            "y" : 119.5
+          } ]
+        },
+        "visible" : true
+      }, {
+        "id" : 24,
+        "shape" : {
+          "x" : 178.2,
+          "y" : 301.3,
+          "width" : 3.0,
+          "height" : 32.2,
+          "type" : "RECTANGLE"
+        },
+        "visible" : true
+      }, {
         "id" : 22,
         "shape" : {
           "type" : "POLYGON",
@@ -1043,35 +920,6 @@
             "x" : 188.43711929477286,
             "y" : 219.60701931547374
           } ]
-        },
-        "visible" : true
-      }, {
-        "id" : 16,
-        "shape" : {
-          "type" : "POLYGON",
-          "points" : [ {
-            "x" : 178.5,
-            "y" : 119.4
-          }, {
-            "x" : 178.5,
-            "y" : 333.5
-          }, {
-            "x" : 122.0,
-            "y" : 333.4
-          }, {
-            "x" : 122.4,
-            "y" : 119.5
-          } ]
-        },
-        "visible" : true
-      }, {
-        "id" : 24,
-        "shape" : {
-          "x" : 178.2,
-          "y" : 301.3,
-          "width" : 3.0,
-          "height" : 32.2,
-          "type" : "RECTANGLE"
         },
         "visible" : true
       } ],
@@ -1126,16 +974,6 @@
         },
         "visible" : true
       }, {
-        "id" : 4,
-        "shape" : {
-          "x" : 178.50001,
-          "y" : 213.1,
-          "width" : 2.6999,
-          "height" : 39.8,
-          "type" : "RECTANGLE"
-        },
-        "visible" : true
-      }, {
         "id" : 5,
         "shape" : {
           "x" : 178.50001,
@@ -1182,6 +1020,26 @@
           "y" : 173.9,
           "width" : 1.4999,
           "height" : 11.6,
+          "type" : "RECTANGLE"
+        },
+        "visible" : true
+      }, {
+        "id" : 4,
+        "shape" : {
+          "x" : 178.50001,
+          "y" : 213.1,
+          "width" : 2.6999,
+          "height" : 39.8,
+          "type" : "RECTANGLE"
+        },
+        "visible" : true
+      }, {
+        "id" : 222,
+        "shape" : {
+          "x" : 178.5,
+          "y" : 213.1,
+          "width" : 2.7,
+          "height" : 83.1,
           "type" : "RECTANGLE"
         },
         "visible" : true
@@ -1479,11 +1337,11 @@
           "eventPositionRandom" : false,
           "eventPositionGridCA" : false,
           "eventPositionFreeSpace" : true,
-          "eventElementCount" : 3,
+          "eventElementCount" : 12,
           "eventElement" : null,
           "distribution" : {
             "type" : "org.vadere.state.attributes.distributions.AttributesConstantDistribution",
-            "updateFrequency" : 6.0
+            "updateFrequency" : 10.0
           }
         },
         "groupSizeDistribution" : [ 0.0, 0.0, 1.0 ]
@@ -1534,7 +1392,7 @@
       },
       "stimuli" : [ {
         "type" : "InformationStimulus",
-        "information" : "use all targets"
+        "information" : "use target 31"
       } ]
     } ]
   }

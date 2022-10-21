@@ -1,13 +1,13 @@
 {
-  "name" : "route_choice_real_world_pcm_tpgrphy_adapted_cgm",
+  "name" : "route_choice_real_world_pcm_tpgrphy_adapted_nogroups_cut",
   "description" : "",
   "release" : "2.4",
-  "commithash" : "37d5cea029114cfbc5ced38fb76c86834cb50304",
+  "commithash" : "a8999356ff699a2f190e23bb37d337cc685f4d04",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
       "filename" : "postvis.traj",
-      "processors" : [ 1, 2, 20, 122 ]
+      "processors" : [ 1, 2, 20 ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOverlapOutputFile",
       "filename" : "overlaps.csv",
@@ -35,7 +35,7 @@
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepOutputFile",
       "filename" : "densities_counts.txt",
-      "processors" : [ 101, 102, 103, 104, 105, 108, 109, 110, 111 ]
+      "processors" : [ 101, 102, 103, 104, 105, 137, 108, 109, 110 ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
       "filename" : "targetIds.txt",
@@ -55,7 +55,7 @@
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
       "filename" : "ped_out.txt",
-      "processors" : [ 114, 19, 115, 23, 24, 123, 124 ]
+      "processors" : [ 114, 19, 23, 24 ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
       "filename" : "densities_pedid.txt",
@@ -241,13 +241,6 @@
         "measurementAreaId" : 8
       }
     }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.AreaDensityCountingNormedProcessor",
-      "id" : 111,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesAreaDensityCountingProcessor",
-      "attributes" : {
-        "measurementAreaId" : 9
-      }
-    }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianDensityCountingProcessor",
       "id" : 112,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesPedestrianDensityCountingProcessor",
@@ -264,9 +257,6 @@
         "targetId" : -1,
         "type" : "TARGET"
       }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianGroupIDProcessor",
-      "id" : 115
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FundamentalDiagramCProcessor",
       "id" : 116,
@@ -315,19 +305,6 @@
         "measurementAreaId" : 9,
         "pedestrianVelocityProcessorId" : 23
       }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepGroupIDProcessor",
-      "id" : 122
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.RelevantPedestriansProcessor",
-      "id" : 123,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesRelevantPedestriansProcessor",
-      "attributes" : { }
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.processor.LostPedestrianProcessor",
-      "id" : 124,
-      "attributesType" : "org.vadere.state.attributes.processor.AttributesLostPedestrianProcessor",
-      "attributes" : { }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.VoronoiPolygonProcessor",
       "id" : 126,
@@ -396,7 +373,7 @@
       "id" : 135,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesAreaDensityGridSpatialTimeProcessor",
       "attributes" : {
-        "cellSize" : 2.0,
+        "cellSize" : 5.0,
         "T" : 5.0,
         "everyStep" : true,
         "pedestrianTrajectoryProcessorId" : 136
@@ -404,6 +381,13 @@
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianTrajectoryProcessor",
       "id" : 136
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.AreaDensityCountingNormedProcessor",
+      "id" : 137,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesAreaDensityCountingProcessor",
+      "attributes" : {
+        "measurementAreaId" : 954
+      }
     } ],
     "isTimestamped" : true,
     "isWriteMetaData" : false
@@ -430,7 +414,7 @@
         "targetPotentialModel" : "org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid",
         "pedestrianPotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldPedestrianCompactSoftshell",
         "obstaclePotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldObstacleCompactSoftshell",
-        "submodels" : [ "org.vadere.simulator.models.groups.cgm.CentroidGroupModel" ]
+        "submodels" : [ ]
       },
       "org.vadere.state.attributes.models.AttributesPotentialCompactSoftshell" : {
         "pedPotentialIntimateSpaceWidth" : 0.45,
@@ -462,16 +446,10 @@
           "width" : 0.2,
           "height" : 1.0
         }
-      },
-      "org.vadere.state.attributes.models.AttributesCGM" : {
-        "groupMemberRepulsionFactor" : 0.01,
-        "leaderAttractionFactor" : 0.003,
-        "lostMembers" : true,
-        "waitBehaviourRelevantAgentsFactor" : 5
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 600.0,
+      "finishTime" : 1000.0,
       "simTimeStepLength" : 0.4,
       "realTimeSimTimeRatio" : 0.0,
       "writeSimulationData" : true,
@@ -518,10 +496,10 @@
     "topography" : {
       "attributes" : {
         "bounds" : {
-          "x" : 121.8,
-          "y" : 118.9,
-          "width" : 164.1,
-          "height" : 215.1
+          "x" : 174.0,
+          "y" : 156.0,
+          "width" : 70.0,
+          "height" : 149.0
         },
         "boundingBoxWidth" : 0.5,
         "bounded" : true,
@@ -989,7 +967,7 @@
       }, {
         "id" : 3,
         "shape" : {
-          "x" : 192.3,
+          "x" : 192.5,
           "y" : 159.5,
           "width" : 1.5,
           "height" : 31.0,
@@ -1100,7 +1078,7 @@
         "shape" : {
           "x" : 190.80001,
           "y" : 163.0,
-          "width" : 1.4999,
+          "width" : 1.6999,
           "height" : 10.7,
           "type" : "RECTANGLE"
         },
@@ -1146,7 +1124,7 @@
         },
         "visible" : true
       }, {
-        "id" : 9,
+        "id" : 954,
         "shape" : {
           "x" : 183.0,
           "y" : 229.1,
@@ -1180,7 +1158,7 @@
         "shape" : {
           "x" : 190.80001,
           "y" : 173.9,
-          "width" : 1.4999,
+          "width" : 1.6999,
           "height" : 11.6,
           "type" : "RECTANGLE"
         },
@@ -1270,7 +1248,7 @@
         "shape" : {
           "x" : 190.8,
           "y" : 162.0,
-          "width" : 1.5,
+          "width" : 1.7,
           "height" : 2.0,
           "type" : "RECTANGLE"
         },
@@ -1438,7 +1416,7 @@
         "shape" : {
           "x" : 190.8,
           "y" : 160.0,
-          "width" : 1.5,
+          "width" : 1.7,
           "height" : 2.0,
           "type" : "RECTANGLE"
         },
@@ -1452,11 +1430,11 @@
           "eventPositionRandom" : true,
           "eventPositionGridCA" : false,
           "eventPositionFreeSpace" : true,
-          "eventElementCount" : 2,
+          "eventElementCount" : 0,
           "eventElement" : null,
           "distribution" : {
             "type" : "org.vadere.state.attributes.distributions.AttributesConstantDistribution",
-            "updateFrequency" : 15.0
+            "updateFrequency" : 25.0
           }
         },
         "groupSizeDistribution" : [ 1.0 ]
@@ -1479,14 +1457,14 @@
           "eventPositionRandom" : false,
           "eventPositionGridCA" : false,
           "eventPositionFreeSpace" : true,
-          "eventElementCount" : 3,
+          "eventElementCount" : 36,
           "eventElement" : null,
           "distribution" : {
             "type" : "org.vadere.state.attributes.distributions.AttributesConstantDistribution",
-            "updateFrequency" : 6.0
+            "updateFrequency" : 10.0
           }
         },
-        "groupSizeDistribution" : [ 0.0, 0.0, 1.0 ]
+        "groupSizeDistribution" : [ 1.0 ]
       } ],
       "dynamicElements" : [ ],
       "attributesPedestrian" : {
@@ -1534,7 +1512,7 @@
       },
       "stimuli" : [ {
         "type" : "InformationStimulus",
-        "information" : "use all targets"
+        "information" : "use target 11"
       } ]
     } ]
   }

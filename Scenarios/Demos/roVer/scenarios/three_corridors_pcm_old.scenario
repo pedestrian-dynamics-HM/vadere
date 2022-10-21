@@ -1,8 +1,8 @@
 {
-  "name" : "three_corridors_pcm",
+  "name" : "three_corridors_pcm_old",
   "description" : "",
   "release" : "2.4",
-  "commithash" : "37d5cea029114cfbc5ced38fb76c86834cb50304",
+  "commithash" : "a8999356ff699a2f190e23bb37d337cc685f4d04",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -62,20 +62,12 @@
       "processors" : [ 109 ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPositionOutputFile",
-      "filename" : "voronoi_diagr_ma1.txt",
+      "filename" : "voronoi_ma1.txt",
       "processors" : [ 111 ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimeRectangleGridOutputFile",
       "filename" : "grid_spatial_time.txt",
       "processors" : [ 114 ]
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPositionOutputFile",
-      "filename" : "voronoi_diagr_ma2.txt",
-      "processors" : [ 112 ]
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPositionOutputFile",
-      "filename" : "voronoi_diagr_ma3.txt",
-      "processors" : [ 113 ]
     } ],
     "processors" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor",
@@ -293,7 +285,7 @@
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 600.0,
+      "finishTime" : 60.0,
       "simTimeStepLength" : 0.4,
       "realTimeSimTimeRatio" : 0.0,
       "writeSimulationData" : true,
@@ -487,30 +479,30 @@
       "measurementAreas" : [ {
         "id" : 1,
         "shape" : {
-          "x" : 4.00001,
+          "x" : 4.0,
           "y" : 25.0,
-          "width" : 2.499,
-          "height" : 26.9999,
+          "width" : 2.5,
+          "height" : 27.0,
           "type" : "RECTANGLE"
         },
         "visible" : true
       }, {
         "id" : 3,
         "shape" : {
-          "x" : 19.00001,
+          "x" : 19.0,
           "y" : 25.0,
-          "width" : 2.4999,
-          "height" : 117.9999,
+          "width" : 2.5,
+          "height" : 118.0,
           "type" : "RECTANGLE"
         },
         "visible" : true
       }, {
         "id" : 2,
         "shape" : {
-          "x" : 11.50001,
+          "x" : 11.5,
           "y" : 25.0,
-          "width" : 2.4999,
-          "height" : 85.999,
+          "width" : 2.5,
+          "height" : 86.0,
           "type" : "RECTANGLE"
         },
         "visible" : true
@@ -706,7 +698,7 @@
       },
       "stimuli" : [ {
         "type" : "InformationStimulus",
-        "information" : "use all targets"
+        "information" : "use target 11"
       } ]
     } ]
   }

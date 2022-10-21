@@ -55,11 +55,27 @@
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
       "filename" : "ped_out.txt",
-      "processors" : [ 23, 24, 105, 11, 110 ]
+      "processors" : [ 116, 117, 23, 24, 105, 11, 110 ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
       "filename" : "densities_pedid.txt",
       "processors" : [ 109 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPositionOutputFile",
+      "filename" : "voronoi_diagr_ma1.txt",
+      "processors" : [ 111 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimeRectangleGridOutputFile",
+      "filename" : "grid_spatial_time.txt",
+      "processors" : [ 114 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPositionOutputFile",
+      "filename" : "voronoi_diagr_ma2.txt",
+      "processors" : [ 112 ]
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPositionOutputFile",
+      "filename" : "voronoi_diagr_ma3.txt",
+      "processors" : [ 113 ]
     } ],
     "processors" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.FootStepProcessor",
@@ -188,6 +204,50 @@
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianGroupIDProcessor",
       "id" : 110
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.VoronoiPolygonProcessor",
+      "id" : 111,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesVoronoiPolygonProcessor",
+      "attributes" : {
+        "voronoiMeasurementAreaId" : 1
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.VoronoiPolygonProcessor",
+      "id" : 112,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesVoronoiPolygonProcessor",
+      "attributes" : {
+        "voronoiMeasurementAreaId" : 2
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.VoronoiPolygonProcessor",
+      "id" : 113,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesVoronoiPolygonProcessor",
+      "attributes" : {
+        "voronoiMeasurementAreaId" : 3
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.AreaDensityGridSpatialTimeProcessor",
+      "id" : 114,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesAreaDensityGridSpatialTimeProcessor",
+      "attributes" : {
+        "cellSize" : 2.0,
+        "T" : 5.0,
+        "everyStep" : true,
+        "pedestrianTrajectoryProcessorId" : 115
+      }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianTrajectoryProcessor",
+      "id" : 115
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.RelevantPedestriansProcessor",
+      "id" : 116,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesRelevantPedestriansProcessor",
+      "attributes" : { }
+    }, {
+      "type" : "org.vadere.simulator.projects.dataprocessing.processor.LostPedestrianProcessor",
+      "id" : 117,
+      "attributesType" : "org.vadere.state.attributes.processor.AttributesLostPedestrianProcessor",
+      "attributes" : { }
     } ],
     "isTimestamped" : true,
     "isWriteMetaData" : false
@@ -449,30 +509,30 @@
       "measurementAreas" : [ {
         "id" : 1,
         "shape" : {
-          "x" : 4.0,
+          "x" : 4.00001,
           "y" : 25.0,
-          "width" : 2.5,
-          "height" : 27.0,
+          "width" : 2.499,
+          "height" : 26.9999,
           "type" : "RECTANGLE"
         },
         "visible" : true
       }, {
         "id" : 3,
         "shape" : {
-          "x" : 19.0,
+          "x" : 19.00001,
           "y" : 25.0,
-          "width" : 2.5,
-          "height" : 118.0,
+          "width" : 2.4999,
+          "height" : 117.9999,
           "type" : "RECTANGLE"
         },
         "visible" : true
       }, {
         "id" : 2,
         "shape" : {
-          "x" : 11.5,
+          "x" : 11.50001,
           "y" : 25.0,
-          "width" : 2.5,
-          "height" : 86.0,
+          "width" : 2.4999,
+          "height" : 85.999,
           "type" : "RECTANGLE"
         },
         "visible" : true

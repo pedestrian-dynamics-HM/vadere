@@ -1,8 +1,8 @@
 {
-  "name" : "route_choice_real_world_pcm_tpgrphy_adapted_cgm",
+  "name" : "route_choice_real_world_pcm_tpgrphy_adapted_cgm_cut",
   "description" : "",
   "release" : "2.4",
-  "commithash" : "37d5cea029114cfbc5ced38fb76c86834cb50304",
+  "commithash" : "a8999356ff699a2f190e23bb37d337cc685f4d04",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -245,7 +245,7 @@
       "id" : 111,
       "attributesType" : "org.vadere.state.attributes.processor.AttributesAreaDensityCountingProcessor",
       "attributes" : {
-        "measurementAreaId" : 9
+        "measurementAreaId" : 954
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianDensityCountingProcessor",
@@ -467,11 +467,11 @@
         "groupMemberRepulsionFactor" : 0.01,
         "leaderAttractionFactor" : 0.003,
         "lostMembers" : true,
-        "waitBehaviourRelevantAgentsFactor" : 5
+        "waitBehaviourRelevantAgentsFactor" : 7
       }
     },
     "attributesSimulation" : {
-      "finishTime" : 600.0,
+      "finishTime" : 200.0,
       "simTimeStepLength" : 0.4,
       "realTimeSimTimeRatio" : 0.0,
       "writeSimulationData" : true,
@@ -518,10 +518,10 @@
     "topography" : {
       "attributes" : {
         "bounds" : {
-          "x" : 121.8,
-          "y" : 118.9,
-          "width" : 164.1,
-          "height" : 215.1
+          "x" : 174.0,
+          "y" : 156.0,
+          "width" : 70.0,
+          "height" : 149.0
         },
         "boundingBoxWidth" : 0.5,
         "bounded" : true,
@@ -989,7 +989,7 @@
       }, {
         "id" : 3,
         "shape" : {
-          "x" : 192.3,
+          "x" : 192.5,
           "y" : 159.5,
           "width" : 1.5,
           "height" : 31.0,
@@ -1100,7 +1100,7 @@
         "shape" : {
           "x" : 190.80001,
           "y" : 163.0,
-          "width" : 1.4999,
+          "width" : 1.6999,
           "height" : 10.7,
           "type" : "RECTANGLE"
         },
@@ -1111,7 +1111,7 @@
           "x" : 199.1,
           "y" : 204.8,
           "width" : 14.8,
-          "height" : 8.1999,
+          "height" : 8.19,
           "type" : "RECTANGLE"
         },
         "visible" : true
@@ -1146,7 +1146,7 @@
         },
         "visible" : true
       }, {
-        "id" : 9,
+        "id" : 954,
         "shape" : {
           "x" : 183.0,
           "y" : 229.1,
@@ -1180,7 +1180,7 @@
         "shape" : {
           "x" : 190.80001,
           "y" : 173.9,
-          "width" : 1.4999,
+          "width" : 1.6999,
           "height" : 11.6,
           "type" : "RECTANGLE"
         },
@@ -1270,7 +1270,7 @@
         "shape" : {
           "x" : 190.8,
           "y" : 162.0,
-          "width" : 1.5,
+          "width" : 1.7,
           "height" : 2.0,
           "type" : "RECTANGLE"
         },
@@ -1438,7 +1438,7 @@
         "shape" : {
           "x" : 190.8,
           "y" : 160.0,
-          "width" : 1.5,
+          "width" : 1.7,
           "height" : 2.0,
           "type" : "RECTANGLE"
         },
@@ -1452,11 +1452,11 @@
           "eventPositionRandom" : true,
           "eventPositionGridCA" : false,
           "eventPositionFreeSpace" : true,
-          "eventElementCount" : 2,
+          "eventElementCount" : 1,
           "eventElement" : null,
           "distribution" : {
             "type" : "org.vadere.state.attributes.distributions.AttributesConstantDistribution",
-            "updateFrequency" : 15.0
+            "updateFrequency" : 25.0
           }
         },
         "groupSizeDistribution" : [ 1.0 ]
@@ -1479,11 +1479,11 @@
           "eventPositionRandom" : false,
           "eventPositionGridCA" : false,
           "eventPositionFreeSpace" : true,
-          "eventElementCount" : 3,
+          "eventElementCount" : 12,
           "eventElement" : null,
           "distribution" : {
             "type" : "org.vadere.state.attributes.distributions.AttributesConstantDistribution",
-            "updateFrequency" : 6.0
+            "updateFrequency" : 10.0
           }
         },
         "groupSizeDistribution" : [ 0.0, 0.0, 1.0 ]

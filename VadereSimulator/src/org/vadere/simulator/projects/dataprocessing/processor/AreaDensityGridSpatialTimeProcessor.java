@@ -43,7 +43,11 @@ public class AreaDensityGridSpatialTimeProcessor extends DataProcessor<TimeRecta
     @Override
     protected void doUpdate(SimulationState state) {
         this.trajectoryProcessor.update(state);
-        if (state.getSimTimeInSec() >= nextTime + timeWindowSize) {
+        if (state.getSimTimeInSec() >= nextTime + timeWindowSize + 2 ||
+                (state.getSimTimeInSec() >= timeWindowSize + 2 && attr.isEveryStep())) {
+            if (attr.isEveryStep()) {
+                nextTime = state.getSimTimeInSec() - (timeWindowSize/2);
+            }
             cellsElements.clear();
             Collection<Pedestrian> peds = state.getTopography().getPedestrianDynamicElements().getElements();
             for (Pedestrian ped : peds) {
@@ -62,11 +66,13 @@ public class AreaDensityGridSpatialTimeProcessor extends DataProcessor<TimeRecta
                 double time = nextTime + (timeWindowSize / 2);
                 if (totalPedTimeInCell > 0.0) {
                     logger.debug(time + ": total Time in cell " + Arrays.toString(result.getKey()) + ": " + totalPedTimeInCell);
+                    TimeRectangleGridKey key = new TimeRectangleGridKey(time, gridCell.x, gridCell.y, gridCell.width, gridCell.height);
+                    this.putValue(key, cellDensity);
                 }
-                TimeRectangleGridKey key = new TimeRectangleGridKey(time,  gridCell.x, gridCell.y, gridCell.width, gridCell.height);
-                this.putValue(key, cellDensity);
             }
-            nextTime += timeWindowSize;
+            if (!attr.isEveryStep()) {
+                nextTime += timeWindowSize;
+            }
         }
     }
 
@@ -74,7 +80,6 @@ public class AreaDensityGridSpatialTimeProcessor extends DataProcessor<TimeRecta
         if (!stepsInWindow.isEmpty()) {
             // set start time of footstep to start of timewindow
             FootStep fs = stepsInWindow.get(0);
-            FootStep fsPrev= stepsInWindow.get(0);
             double startTime = Math.max(fs.getStartTime(), nextTime);
             VPoint startPoint;
             if (startTime != fs.getStartTime()) {
@@ -82,13 +87,14 @@ public class AreaDensityGridSpatialTimeProcessor extends DataProcessor<TimeRecta
                 fs = new FootStep(startPoint, fs.getEnd(), startTime, fs.getEndTime());
                 stepsInWindow.set(0, fs);
             }
+            FootStep fsPrev= fs;
 
             int[] gridIdx = cellsElements.gridPos(fs.getStart());
             VRectangle currentCell = cellsElements.getGridCellAsRectangle(gridIdx[0], gridIdx[1]);
             double timeInCell = 0.0;
             Pair<VRectangle, Double> fsResult;
             for (int i = 0; i < stepsInWindow.size(); i++) {
-                if (fs.getStart() != fsPrev.getEnd() || fs.getStartTime() != fsPrev.getEndTime()) {
+                if (fs.getStart() != fsPrev.getEnd() || fs.getStartTime() != fsPrev.getEndTime() && i != 0) { // do not consider first fs since no prev fs
                     logger.debug("next footstep did start at different position and/or time. fs: "
                             + i + "/" + (stepsInWindow.size() - 1));
                     FootStep intermediate = new FootStep(fsPrev.getEnd(), fs.getStart(), fsPrev.getEndTime(), fs.getStartTime());
@@ -96,13 +102,22 @@ public class AreaDensityGridSpatialTimeProcessor extends DataProcessor<TimeRecta
                     currentCell = fsResult.getLeft();
                     timeInCell = fsResult.getRight();
                 }
-                fsResult = computeCellForFootStep(fs, currentCell, timeInCell, gridIdx, ped);
-                currentCell = fsResult.getLeft();
-                timeInCell = fsResult.getRight();
+
+                if (fs.getStartTime() < nextTime + timeWindowSize) { // necessary check in case intermediate step was added which passed the end of the time window already
+                    fsResult = computeCellForFootStep(fs, currentCell, timeInCell, gridIdx, ped);
+                    currentCell = fsResult.getLeft();
+                    timeInCell = fsResult.getRight();
+                }
                 // next footstep of ped
                 if (i + 1 < stepsInWindow.size()) {
                     fsPrev = fs;
                     fs = stepsInWindow.get(i + 1);
+                } else {
+                    if (timeInCell != 0.0){
+                        // add remaining time before going to next pedestrian
+                        PedestrianIdDuration cellDuration = new PedestrianIdDuration(ped.getId(), timeInCell, currentCell);
+                        cellsElements.addObject(cellDuration);
+                    }
                 }
             }
         }
@@ -113,9 +128,10 @@ public class AreaDensityGridSpatialTimeProcessor extends DataProcessor<TimeRecta
         if (cell.contains(fs.getEnd())) {
             // still same cell
             timeInCell += Math.min(fs.getEndTime(), nextTime + timeWindowSize) - fs.getStartTime();
-            timeInCell = timeInCell;
         } else {
-
+            if (!cell.contains(fs.getStart())) {
+                logger.warn("start point of footstep not in current cell");
+            }
             double exitingTime = fs.computeIntersectionTime(cell);
             //add rest time in cell
             timeInCell += Math.min(exitingTime, nextTime + timeWindowSize) - fs.getStartTime();
@@ -131,24 +147,27 @@ public class AreaDensityGridSpatialTimeProcessor extends DataProcessor<TimeRecta
                     logger.warn("computed cell " + cell + " for point " + fs.getEnd() + " did not contain it. ");
                 }
                 double newCellEnteringTime = fs.computeIntersectionTime(cell);
+                double skippedDuration = Math.min(newCellEnteringTime, nextTime + timeWindowSize)
+                        - exitingTime;
 
                 if (!skipped.isEmpty()) {
-                    double skippedDuration = Math.min(newCellEnteringTime, nextTime + timeWindowSize)
-                            - exitingTime;
                     for (VRectangle intermediateCell : skipped) {
                         //add every cell in between with a shared amount of time
                         cellsElements.addObject(new PedestrianIdDuration(ped.getId(),
                                 skippedDuration / skipped.size(), intermediateCell));
                         logger.debug(ped + " skipped grid cells during one footstep: " + skippedDuration + " s");
                     }
+                    skippedDuration = 0.0;
                 }
 
                 //new cell duration of footstep entering
                 if (newCellEnteringTime < nextTime + timeWindowSize) {
-                    timeInCell = Math.min(fs.getEndTime(), nextTime + timeWindowSize) - newCellEnteringTime;
+                    timeInCell = Math.min(fs.getEndTime(), nextTime + timeWindowSize) - newCellEnteringTime + skippedDuration;
                 } else {
-                    timeInCell = 0.0;
+                    timeInCell = Math.max(skippedDuration, 0.0); // emergency solution so missing time is not lost, even though agent has not entered yettimeInCell = 0.0;
                 }
+            } else {
+                timeInCell = 0.0;
             }
         }
         return Pair.of(cell, timeInCell);
@@ -168,21 +187,36 @@ public class AreaDensityGridSpatialTimeProcessor extends DataProcessor<TimeRecta
                 .descendingIterator();
 
         LinkedList<FootStep> stepsInWindow = new LinkedList<>();
+
         while (it.hasNext()) {
             FootStep footStep = it.next();
             stepsInWindow.addFirst(footStep);
             if (footStep.getStartTime() <= nextTime) {
                 if (footStep.getEndTime() <= nextTime) {
-                    // latest step before time Window
+                    // latest step is before time Window
                     stepsInWindow.removeFirst();
+                    if (stepsInWindow.isEmpty()) {
+                        break;
+                    }
+                    FootStep intermediate = new FootStep(footStep.getEnd(), stepsInWindow.getFirst().getStart(),
+                            footStep.getEndTime(), stepsInWindow.getFirst().getStartTime());
+                    stepsInWindow.addFirst(intermediate);
                 }
                 break;
             }
             if (nextTime + timeWindowSize <= footStep.getEndTime()) {
+                if (stepsInWindow.size() > 2) {
+                    logger.warn("Footsteps for Window probably not correct.");
+                }
                 if (stepsInWindow.size() > 1) {
                     stepsInWindow.removeLast();
                 }
             }
+        }
+
+        if (stepsInWindow.size() == 1 && stepsInWindow.getFirst().getStartTime() >= nextTime + timeWindowSize) {
+            // algorithm did not find any viable footsteps
+            stepsInWindow.clear();
         }
         return stepsInWindow;
     }
@@ -193,11 +227,14 @@ public class AreaDensityGridSpatialTimeProcessor extends DataProcessor<TimeRecta
         List<VRectangle> skippedCellsCenters = new ArrayList<>();
         double cellWidthX = currentCell.getWidth() * Integer.signum(iXDiff);
         double cellWidthY = currentCell.getHeight() * Integer.signum(iYDiff);
-        for (int i = 1; i < Math.abs(iXDiff); i++) {
-            for (int j = 1; j < Math.abs(iYDiff); j++) {
-                double intermediateX = currentCell.x + i * cellWidthX;
+
+        for (int i = 0; i < Math.abs(iXDiff); i++) {
+            double intermediateX = currentCell.x + i * cellWidthX;
+            for (int j = 0; j < Math.abs(iYDiff); j++) {
                 double intermediateY = currentCell.y + j * cellWidthY;
-                skippedCellsCenters.add(new VRectangle(intermediateX, intermediateY, currentCell.width, currentCell.height));
+                if (i != 0 || j != 0) { // do not add current cell
+                    skippedCellsCenters.add(new VRectangle(intermediateX, intermediateY, currentCell.width, currentCell.height));
+                }
             }
         }
         return skippedCellsCenters;
