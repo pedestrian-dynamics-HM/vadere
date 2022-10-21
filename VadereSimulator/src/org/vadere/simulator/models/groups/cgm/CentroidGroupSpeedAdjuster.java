@@ -7,6 +7,31 @@ import org.vadere.state.scenario.Pedestrian;
 import java.util.List;
 
 
+/**
+ The adjustment of speeds is based on the concept presented in seitz-2014 (doi: 10.1007/978-3-319-02447-9_67).
+ Group members ahead slow down and wait for others. Group members behind increase their speed to catch up.
+ However, the seitz-2014 model did not consider that group members cannot always wait, e.g. when a corridor is very busy.
+
+ In such cases, the seitz-2014 model can produce unrealistic blockades:
+ group members cannot catch up when there are people from other groups are already standing in the way.
+ Since they cannot catch up, their group members ahead slow down and start waiting.
+ This results in even more people blocking each other, which can lead to a complete congestion.
+
+ In reality, group members would not wait in such a situation.
+ Depending on the flow situation, they would move on and try to find the lost member later.
+
+ For this reason, the model of seitz-2014 was extended in the context of a bachelor thesis (hertle-2022).
+ The basic principle is that group members can temporarily get lost and act as individuals.
+ Agents ahead slow down, but they do no longer wait if they are too far apart.
+ In this case, they move on and act as individuals.
+ A similar behavior was implemented for agents behind.
+ This behavior is optional and can be controlled by AttributesCGM attributes.
+ **/
+
+
+
+
+
 public class CentroidGroupSpeedAdjuster implements SpeedAdjuster {
 
     private final CentroidGroupModel groupCollection;
@@ -35,7 +60,7 @@ public class CentroidGroupSpeedAdjuster implements SpeedAdjuster {
                                 group.getRelativeDistanceCentroid(ped, false, true) > 7) {
                             result = Double.MIN_VALUE;
                         }
-                        group.setLostMember(ped);
+                        group.setLostMember(ped); //TODO: [priority=low] [task=refactoring]  do not set lost members in the speed adjuster
                     }
                 }
             }
@@ -50,7 +75,7 @@ public class CentroidGroupSpeedAdjuster implements SpeedAdjuster {
                     if (!group.isCentroidWithinObstacle()) {
                         result = Double.MIN_VALUE; // wait behavior
                         if (groupCollection.getAttributesCGM().isLostMembers()) {
-                            group.setLostMember(ped);
+                            group.setLostMember(ped);  //TODO: [priority=low] [task=refactoring]  do not set lost members in the speed adjuster
                         }
                     }
                     // else: do not wait, treat group member as "lost"
@@ -67,7 +92,7 @@ public class CentroidGroupSpeedAdjuster implements SpeedAdjuster {
                     result /= 0.65;
                         if (groupCollection.getAttributesCGM().isLostMembers()) {
                             if (!group.isCentroidWithinObstacle()) {
-                            group.setLostMember(ped);
+                            group.setLostMember(ped);  //TODO: [priority=low] [task=refactoring]  do not set lost members in the speed adjuster
                         }
                     }
                 }
