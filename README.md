@@ -50,7 +50,7 @@ Latest build of master:
 * [Linux](http://www.vadere.org/builds/master/vadere.master.linux.zip)
 
 Stable releases and selected branch-builds:
-* [www.vadere.org/releases/](http://www.vadere.org/releases/)
+* [https://www.vadere.org/download/](https://www.vadere.org/download/)
 
 The ZIP file contains:
 * **README.md** - this README file. 
