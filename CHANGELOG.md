@@ -20,7 +20,7 @@
 
 ### Other
 
-## v2.4:
+## v2.4 (2022-10-04)
 
 ### Added
 #### Gui - AttributeTree
@@ -69,7 +69,7 @@ Spawners were introduced to encapsulate logic and data of the distributions that
 - Moved and renamed some attributes from distribution classes to spawner classes
 - In Gui/TopographyCreator, corrected create method for sources from Pedestrian to Circle
 
-## v2.3:
+## v2.3 (2022-09-01)
 
 ### Added
 - Added new parameter `waitingTimeDistribution` to `AttributesTarget` describing a distribution used for the agents waiting time at a target.
@@ -92,8 +92,12 @@ Spawners were introduced to encapsulate logic and data of the distributions that
 
 ### Other
 
+## v2.2 (2022-05-24)
 
-## v2.1 (2022-03-XX)
+### Changed
+- Change stimulus behavior
+
+## v2.1 (2022-03-24)
 
 ### Added
 
@@ -134,7 +138,7 @@ Spawners were introduced to encapsulate logic and data of the distributions that
 * enum `InfectionStatus` (`State`)
 
 
-## v2.0
+## v2.0 (2021-12-14)
 
 ### Changed
 - `SourceController`: Spawn agents according to time series. The number of agents was previously defined by a distribution function during spawning. In addition, there is now the possibility to store a time series. For this purpose, the definition of the sources was generalised.
