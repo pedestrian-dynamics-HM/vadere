@@ -78,6 +78,8 @@ public abstract class TraCICommand {
 					return new TraCISendFileCommand(cmdBuffer);
 			case LOAD:
 				return new TraCILoadCommand(cmdBuffer);
+			case SET_ORDER:
+				return new TraCISetOrderCommand(cmdBuffer);
 			default:
 				throw new TraCIExceptionInternal(String.format("Should not be reached. Only TraCI control commands expected: 0x%02X", cmd.id));
 		}

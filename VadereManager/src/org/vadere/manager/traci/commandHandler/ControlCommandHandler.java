@@ -159,6 +159,17 @@ public class ControlCommandHandler extends CommandHandler<ControlVar> {
 		return cmd;
 	}
 
+	public TraCICommand process_setOrder(TraCICommand rawCmd, RemoteManager remoteManager) {
+
+		//Note: Currently we do not allow multiple clients to be connected to one vadere instance,
+        //      therefore we simply ignore the SET_ORDER command
+        logger.warn("SET_ORDER command received - ignored since vadere handles only one client connection");
+		
+		// remoteManager.setOrder(...)  // currently not implemented
+
+		return rawCmd;
+	}
+
 	public TraCICommand process_load_file(TraCICommand rawCmd, RemoteManager remoteManager) {
 
 		if (VadereServer.currentVersion.greaterOrEqual(TraCIVersion.V20_0_2)) {

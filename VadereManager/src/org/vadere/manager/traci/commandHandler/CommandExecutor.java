@@ -23,6 +23,7 @@ public class CommandExecutor {
 		this.remoteManager = remoteManager;
 		cmdMap = new HashMap<>();
 		cmdMap.put(TraCICmd.GET_VERSION.id, ControlCommandHandler.instance::process_getVersion);
+		cmdMap.put(TraCICmd.SET_ORDER.id, ControlCommandHandler.instance::process_setOrder);
 		cmdMap.put(TraCICmd.LOAD.id, ControlCommandHandler.instance::process_load);
 		cmdMap.put(TraCICmd.SIM_STEP.id, ControlCommandHandler.instance::process_simStep);
 		cmdMap.put(TraCICmd.GET_STATE.id, ControlCommandHandler.instance::process_getState);
