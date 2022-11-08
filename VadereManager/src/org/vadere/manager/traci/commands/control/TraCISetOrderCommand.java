@@ -13,7 +13,10 @@ public class TraCISetOrderCommand extends TraCICommand {
 
 	@Override
 	public TraCIPacket buildResponsePacket() {
-		return null;
+		if (NOK_response != null)
+			return NOK_response;
+		else
+			return TraCIPacket.create(11).add_OK_StatusResponse(TraCICmd.SET_ORDER);
 	}
     
 }
