@@ -1,13 +1,11 @@
 package org.vadere.meshing.mesh.triangulation.triangulator.gen;
 
-/**
- * @author Benedikt Zoennchen
- */
+/** @author Benedikt Zoennchen */
 public enum SFCDirection {
-	FORWARD,
-	BACKWARD;
+  FORWARD,
+  BACKWARD;
 
-	public SFCDirection next() {
-		return this == FORWARD ? BACKWARD : FORWARD;
-	}
+  public SFCDirection next() {
+    return this == FORWARD ? BACKWARD : FORWARD;
+  }
 }

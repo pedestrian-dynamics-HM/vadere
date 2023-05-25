@@ -6,14 +6,13 @@ import org.vadere.util.geometry.shapes.Vector2D;
 
 public class Wander {
 
-	private ReynoldsSteeringModel model;
+  private ReynoldsSteeringModel model;
 
-	public Wander(ReynoldsSteeringModel model) {
-		this.model = model;
-	}
+  public Wander(ReynoldsSteeringModel model) {
+    this.model = model;
+  }
 
-	public Vector2D nextStep(double simTime, Vector2D currentMov, PedestrianReynolds ped) {
-		return new Vector2D(0, 0);
-	}
-
+  public Vector2D nextStep(double simTime, Vector2D currentMov, PedestrianReynolds ped) {
+    return new Vector2D(0, 0);
+  }
 }

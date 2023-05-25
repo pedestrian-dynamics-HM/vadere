@@ -1,8 +1,6 @@
 package org.vadere.state.scenario.distribution.impl;
 
-/**
- * @author Aleksandar Ivanov(ivanov0@hm.edu)
- */
+/** @author Aleksandar Ivanov(ivanov0@hm.edu) */
 
 /*
 @RunWith(PowerMockRunner.class)

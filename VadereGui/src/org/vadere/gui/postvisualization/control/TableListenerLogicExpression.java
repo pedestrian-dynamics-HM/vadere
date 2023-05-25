@@ -1,25 +1,21 @@
 package org.vadere.gui.postvisualization.control;
 
-
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.postvisualization.model.PredicateColoringModel;
 
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
-
-/**
- * @author Benedikt Zoennchen
- */
+/** @author Benedikt Zoennchen */
 public class TableListenerLogicExpression implements TableModelListener {
 
-	private PredicateColoringModel model;
+  private PredicateColoringModel model;
 
-	public TableListenerLogicExpression(@NotNull final PredicateColoringModel model) {
-		this.model = model;
-	}
+  public TableListenerLogicExpression(@NotNull final PredicateColoringModel model) {
+    this.model = model;
+  }
 
-	@Override
-	public void tableChanged(final TableModelEvent e) {
-		model.update(e);
-	}
+  @Override
+  public void tableChanged(final TableModelEvent e) {
+    model.update(e);
+  }
 }

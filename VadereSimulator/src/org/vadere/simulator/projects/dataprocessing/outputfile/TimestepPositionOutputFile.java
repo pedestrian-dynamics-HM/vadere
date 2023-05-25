@@ -5,12 +5,16 @@ import org.vadere.simulator.projects.dataprocessing.datakey.TimestepPositionKey;
 
 @OutputFileClass(dataKeyMapping = TimestepPositionKey.class)
 public class TimestepPositionOutputFile extends OutputFile<TimestepPositionKey> {
-    public TimestepPositionOutputFile() {
-        super(TimestepPositionKey.getHeaders());
-    }
+  public TimestepPositionOutputFile() {
+    super(TimestepPositionKey.getHeaders());
+  }
 
-    @Override
-    public String[] toStrings(TimestepPositionKey key) {
-        return new String[] { Integer.toString(key.getTimeStep()), Double.toString(key.getPosition().x), Double.toString(key.getPosition().y) };
-    }
+  @Override
+  public String[] toStrings(TimestepPositionKey key) {
+    return new String[] {
+      Integer.toString(key.getTimeStep()),
+      Double.toString(key.getPosition().x),
+      Double.toString(key.getPosition().y)
+    };
+  }
 }

@@ -7,15 +7,12 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /**
- * This annotation can be used to mark statistical JUnit test methods that use a
- * random generator and can fail with a certain probability. This is only for
- * documentation.
- *
+ * This annotation can be used to mark statistical JUnit test methods that use a random generator
+ * and can fail with a certain probability. This is only for documentation.
  */
 @Retention(SOURCE)
 @Target(METHOD)
 public @interface StatisticalTestCase {
 
-	double probabilityOfFailure() default Double.NaN;
-
+  double probabilityOfFailure() default Double.NaN;
 }

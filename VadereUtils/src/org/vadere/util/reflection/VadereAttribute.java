@@ -6,11 +6,11 @@ import java.lang.annotation.*;
 @Inherited
 @Target({ElementType.FIELD, ElementType.TYPE})
 public @interface VadereAttribute {
-    String name() default "";
+  String name() default "";
 
-    String group() default "";
+  String group() default "";
 
-    boolean exclude() default false;
+  boolean exclude() default false;
 
-    String descr() default "";
+  String descr() default "";
 }

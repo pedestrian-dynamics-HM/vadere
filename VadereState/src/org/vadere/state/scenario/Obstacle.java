@@ -8,79 +8,78 @@ import org.vadere.util.geometry.shapes.VShape;
 
 public class Obstacle extends ScenarioElement {
 
-	private AttributesObstacle attributes;
+  private AttributesObstacle attributes;
 
-	public Obstacle(@NotNull AttributesObstacle attributes) {
-		this.attributes = attributes;
-	}
-	
-	@Override
-	public void setShape(VShape newShape) {
-		attributes.setShape(newShape);
-	}
+  public Obstacle(@NotNull AttributesObstacle attributes) {
+    this.attributes = attributes;
+  }
 
-	@Override
-	public VShape getShape() {
-		return attributes.getShape();
-	}
+  @Override
+  public void setShape(VShape newShape) {
+    attributes.setShape(newShape);
+  }
 
-	@Override
-	public int getId() {
-		return attributes.getId();
-	}
+  @Override
+  public VShape getShape() {
+    return attributes.getShape();
+  }
 
-	public void setId(int id){
-		((AttributesObstacle)getAttributes()).setId(id);
-	}
+  @Override
+  public int getId() {
+    return attributes.getId();
+  }
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((attributes == null) ? 0 : attributes.hashCode());
-		return result;
-	}
+  public void setId(int id) {
+    ((AttributesObstacle) getAttributes()).setId(id);
+  }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (!(obj instanceof Obstacle)) {
-			return false;
-		}
-		Obstacle other = (Obstacle) obj;
-		if (attributes == null) {
-			if (other.attributes != null) {
-				return false;
-			}
-		} else if (!attributes.equals(other.attributes)) {
-			return false;
-		}
-		return true;
-	}
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((attributes == null) ? 0 : attributes.hashCode());
+    return result;
+  }
 
-	@Override
-	public ScenarioElementType getType() {
-		return ScenarioElementType.OBSTACLE;
-	}
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (!(obj instanceof Obstacle)) {
+      return false;
+    }
+    Obstacle other = (Obstacle) obj;
+    if (attributes == null) {
+      if (other.attributes != null) {
+        return false;
+      }
+    } else if (!attributes.equals(other.attributes)) {
+      return false;
+    }
+    return true;
+  }
 
-	@Override
-	public Attributes getAttributes() {
-		return attributes;
-	}
+  @Override
+  public ScenarioElementType getType() {
+    return ScenarioElementType.OBSTACLE;
+  }
 
-	@Override
-	public void setAttributes(Attributes attributes) {
-		this.attributes = (AttributesObstacle) attributes;
-	}
+  @Override
+  public Attributes getAttributes() {
+    return attributes;
+  }
 
+  @Override
+  public void setAttributes(Attributes attributes) {
+    this.attributes = (AttributesObstacle) attributes;
+  }
 
-	@Override
-	public Obstacle clone() {
-		return new Obstacle((AttributesObstacle) attributes.clone());
-	}
+  @Override
+  public Obstacle clone() {
+    return new Obstacle((AttributesObstacle) attributes.clone());
+  }
 }

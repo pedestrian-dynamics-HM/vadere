@@ -29,9 +29,8 @@ import org.vadere.state.scenario.Pedestrian;
  * - Mj: measurement j
  * </pre>
  *
- * Note: If two measurement areas M1 and M2 are disjoint
- *       and a pedestrian P1 is located within M1, M2 should
- *       log a speed of -1 for P1.
+ * Note: If two measurement areas M1 and M2 are disjoint and a pedestrian P1 is located within M1,
+ * M2 should log a speed of -1 for P1.
  *
  * <pre>
  * | timeStep | pedId | ... | M1  | M2  |
@@ -40,72 +39,86 @@ import org.vadere.state.scenario.Pedestrian;
  * |1         | 2     |     | -1  | 0.6 |
  * </pre>
  *
- * Watch out: This processor uses the {@link PedestrianVelocityDefaultProcessor} internally instead of the
- * {@link PedestrianTrajectoryProcessor} which is used by {@link PedestrianSpeedInAreaProcessorUsingAgentTrajectory}.
+ * Watch out: This processor uses the {@link PedestrianVelocityDefaultProcessor} internally instead
+ * of the {@link PedestrianTrajectoryProcessor} which is used by {@link
+ * PedestrianSpeedInAreaProcessorUsingAgentTrajectory}.
  */
 @DataProcessorClass()
-public class PedestrianSpeedInAreaProcessorUsingAgentVelocity extends DataProcessor<TimestepPedestrianIdKey, Double> {
+public class PedestrianSpeedInAreaProcessorUsingAgentVelocity
+    extends DataProcessor<TimestepPedestrianIdKey, Double> {
 
-	// Static variables
-	public static double ERROR_PED_NOT_IN_MEASUREMENT_AREA = -1;
+  // Static variables
+  public static double ERROR_PED_NOT_IN_MEASUREMENT_AREA = -1;
 
-	// Variables
-	private MeasurementArea measurementArea;
-	private PedestrianVelocityDefaultProcessor pedestrianVelocityDefaultProcessor;
+  // Variables
+  private MeasurementArea measurementArea;
+  private PedestrianVelocityDefaultProcessor pedestrianVelocityDefaultProcessor;
 
-	// Constructors
-	public PedestrianSpeedInAreaProcessorUsingAgentVelocity() {
-		super("speedInAreaUsingAgentVelocity");
-		// "init()" method is used by processor manager to initialize variables.
-	}
+  // Constructors
+  public PedestrianSpeedInAreaProcessorUsingAgentVelocity() {
+    super("speedInAreaUsingAgentVelocity");
+    // "init()" method is used by processor manager to initialize variables.
+  }
 
-	// Getter
-	public MeasurementArea getMeasurementArea() {
-		return this.measurementArea;
-	}
-	public PedestrianVelocityDefaultProcessor getPedestrianVelocityDefaultProcessor() { return pedestrianVelocityDefaultProcessor; }
+  // Getter
+  public MeasurementArea getMeasurementArea() {
+    return this.measurementArea;
+  }
 
-	// Methods (overridden)
-	@Override
-	public void init(final ProcessorManager manager) {
-		super.init(manager);
+  public PedestrianVelocityDefaultProcessor getPedestrianVelocityDefaultProcessor() {
+    return pedestrianVelocityDefaultProcessor;
+  }
 
-		AttributesSpeedInAreaProcessorUsingAgentVelocity processorAttributes = (AttributesSpeedInAreaProcessorUsingAgentVelocity) this.getAttributes();
+  // Methods (overridden)
+  @Override
+  public void init(final ProcessorManager manager) {
+    super.init(manager);
 
-		// manager.getMeasurementArea() throws an exception if area is "null" or not rectangular. Though, no checks required here.
-		boolean rectangularAreaRequired = true;
-		measurementArea = manager.getMeasurementArea(processorAttributes.getMeasurementAreaId(), rectangularAreaRequired);
+    AttributesSpeedInAreaProcessorUsingAgentVelocity processorAttributes =
+        (AttributesSpeedInAreaProcessorUsingAgentVelocity) this.getAttributes();
 
-		pedestrianVelocityDefaultProcessor = (PedestrianVelocityDefaultProcessor) manager.getProcessor(processorAttributes.getPedestrianVelocityDefaultProcessorId());
+    // manager.getMeasurementArea() throws an exception if area is "null" or not rectangular.
+    // Though, no checks required here.
+    boolean rectangularAreaRequired = true;
+    measurementArea =
+        manager.getMeasurementArea(
+            processorAttributes.getMeasurementAreaId(), rectangularAreaRequired);
 
-		if (pedestrianVelocityDefaultProcessor == null) {
-			throw new RuntimeException(String.format("PedestrianVelocityDefaultProcessor with index %d does not exist.", processorAttributes.getPedestrianVelocityDefaultProcessorId()));
-		}
-	}
+    pedestrianVelocityDefaultProcessor =
+        (PedestrianVelocityDefaultProcessor)
+            manager.getProcessor(processorAttributes.getPedestrianVelocityDefaultProcessorId());
 
-	@Override
-	public AttributesProcessor getAttributes() {
-		if (super.getAttributes() == null) {
-			setAttributes(new AttributesSpeedInAreaProcessorUsingAgentVelocity());
-		}
+    if (pedestrianVelocityDefaultProcessor == null) {
+      throw new RuntimeException(
+          String.format(
+              "PedestrianVelocityDefaultProcessor with index %d does not exist.",
+              processorAttributes.getPedestrianVelocityDefaultProcessorId()));
+    }
+  }
 
-		return super.getAttributes();
-	}
+  @Override
+  public AttributesProcessor getAttributes() {
+    if (super.getAttributes() == null) {
+      setAttributes(new AttributesSpeedInAreaProcessorUsingAgentVelocity());
+    }
 
-	@Override
-	protected void doUpdate(final SimulationState state) {
-		pedestrianVelocityDefaultProcessor.update(state);
+    return super.getAttributes();
+  }
 
-		for (Pedestrian pedestrian : state.getTopography().getElements(Pedestrian.class)) {
-			double speed = ERROR_PED_NOT_IN_MEASUREMENT_AREA;
-			TimestepPedestrianIdKey rowKey = new TimestepPedestrianIdKey(state.getStep(), pedestrian.getId());
+  @Override
+  protected void doUpdate(final SimulationState state) {
+    pedestrianVelocityDefaultProcessor.update(state);
 
-			if (measurementArea.getShape().contains(pedestrian.getPosition())) {
-				speed = pedestrianVelocityDefaultProcessor.getValue(rowKey);
-			}
+    for (Pedestrian pedestrian : state.getTopography().getElements(Pedestrian.class)) {
+      double speed = ERROR_PED_NOT_IN_MEASUREMENT_AREA;
+      TimestepPedestrianIdKey rowKey =
+          new TimestepPedestrianIdKey(state.getStep(), pedestrian.getId());
 
-			this.putValue(rowKey, speed);
-		}
-	}
+      if (measurementArea.getShape().contains(pedestrian.getPosition())) {
+        speed = pedestrianVelocityDefaultProcessor.getValue(rowKey);
+      }
 
+      this.putValue(rowKey, speed);
+    }
+  }
 }

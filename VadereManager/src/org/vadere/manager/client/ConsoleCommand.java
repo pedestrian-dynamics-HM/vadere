@@ -4,6 +4,5 @@ import java.io.IOException;
 
 public interface ConsoleCommand {
 
-	void execute(String[] args) throws IOException;
-
+  void execute(String[] args) throws IOException;
 }

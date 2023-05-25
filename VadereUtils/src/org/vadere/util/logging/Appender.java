@@ -1,7 +1,7 @@
-//package org.vadere.util.logging;
+// package org.vadere.util.logging;
 //
-//import org.apache.log4j.AppenderSkeleton;
+// import org.apache.log4j.AppenderSkeleton;
 //
-//public abstract class Appender extends AppenderSkeleton {
+// public abstract class Appender extends AppenderSkeleton {
 //
-//}
+// }

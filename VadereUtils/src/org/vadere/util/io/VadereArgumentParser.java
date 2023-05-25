@@ -9,88 +9,92 @@ import org.vadere.util.config.VadereConfig;
 import org.vadere.util.version.Version;
 
 /**
- * This class provides the functionality to parse command line arguments
- * and should be used by all Vadere end-user applications, i.e.:
+ * This class provides the functionality to parse command line arguments and should be used by all
+ * Vadere end-user applications, i.e.:
  *
- *   - VadereApplication
- *   - VadereConsole
- *   - PostVisualizationWindow
+ * <p>- VadereApplication - VadereConsole - PostVisualizationWindow
  */
 public class VadereArgumentParser {
 
-    // Variables
-    public ArgumentParser argumentParser;
+  // Variables
+  public ArgumentParser argumentParser;
 
-    // Constructors
-    public VadereArgumentParser() {
-        argumentParser = ArgumentParsers.newArgumentParser("Vadere")
-                .defaultHelp(true)
-                .description("Run the Vadere pedestrian simulator.");
+  // Constructors
+  public VadereArgumentParser() {
+    argumentParser =
+        ArgumentParsers.newArgumentParser("Vadere")
+            .defaultHelp(true)
+            .description("Run the Vadere pedestrian simulator.");
 
-        addOptionsToParser(argumentParser);
+    addOptionsToParser(argumentParser);
+  }
+
+  // Getters
+  public ArgumentParser getArgumentParser() {
+    return argumentParser;
+  }
+
+  // Methods
+  public Namespace parseArgsAndProcessInitialOptions(String[] args) throws ArgumentParserException {
+    if (versionIsRequested(args)) {
+      System.out.println(
+          String.format(
+              "Vadere %s (Commit Hash: %s)",
+              Version.releaseNumber(), Version.getVersionControlCommitHash()));
+      System.exit(0);
     }
 
-    // Getters
-    public ArgumentParser getArgumentParser() {
-        return argumentParser;
+    Namespace namespace = argumentParser.parseArgs(args);
+
+    String configFile = namespace.getString("configfile");
+    if (configFile != null) {
+      VadereConfig.setConfigPath(configFile);
     }
 
-    // Methods
-    public Namespace parseArgsAndProcessInitialOptions(String[] args) throws ArgumentParserException {
-        if (versionIsRequested(args)) {
-            System.out.println(String.format("Vadere %s (Commit Hash: %s)", Version.releaseNumber(), Version.getVersionControlCommitHash()));
-            System.exit(0);
-        }
+    return namespace;
+  }
 
-        Namespace namespace = argumentParser.parseArgs(args);
+  protected boolean versionIsRequested(String[] args) {
+    boolean versionRequrested = false;
 
-        String configFile = namespace.getString("configfile");
-        if (configFile != null) {
-            VadereConfig.setConfigPath(configFile);
-        }
-
-        return namespace;
+    for (String currentArgument : args) {
+      if (currentArgument.contains("--version")) {
+        versionRequrested = true;
+        break;
+      }
     }
 
-    protected boolean versionIsRequested(String[] args) {
-        boolean versionRequrested = false;
+    return versionRequrested;
+  }
 
-        for (String currentArgument : args) {
-            if (currentArgument.contains("--version")) {
-                versionRequrested = true;
-                break;
-            }
-        }
+  private void addOptionsToParser(ArgumentParser parser) {
+    parser
+        .addArgument("--version")
+        .action(Arguments.storeTrue())
+        .dest("version")
+        .help("Print version information and exit Vadere.");
 
-        return versionRequrested;
-    }
+    parser
+        .addArgument("--loglevel")
+        .required(false)
+        .type(String.class)
+        .dest("loglevel")
+        .choices("OFF", "FATAL", "ERROR", "WARN", "INFO", "DEBUG", "TRACE", "ALL")
+        .setDefault("INFO")
+        .help("Set Log Level.");
 
-    private void addOptionsToParser(ArgumentParser parser) {
-        parser.addArgument("--version")
-                .action(Arguments.storeTrue())
-                .dest("version")
-                .help("Print version information and exit Vadere.");
+    parser
+        .addArgument("--logname")
+        .required(false)
+        .type(String.class)
+        .dest("logname")
+        .help("Write log to given file.");
 
-        parser.addArgument("--loglevel")
-                .required(false)
-                .type(String.class)
-                .dest("loglevel")
-                .choices("OFF", "FATAL", "ERROR", "WARN", "INFO", "DEBUG", "TRACE", "ALL")
-                .setDefault("INFO")
-                .help("Set Log Level.");
-
-
-        parser.addArgument("--logname")
-                .required(false)
-                .type(String.class)
-                .dest("logname")
-                .help("Write log to given file.");
-
-        parser.addArgument("--config-file")
-                .required(false)
-                .type(String.class)
-                .dest("configfile")
-                .help("Use given config file instead of the default config file.");
-    }
-
+    parser
+        .addArgument("--config-file")
+        .required(false)
+        .type(String.class)
+        .dest("configfile")
+        .help("Use given config file instead of the default config file.");
+  }
 }

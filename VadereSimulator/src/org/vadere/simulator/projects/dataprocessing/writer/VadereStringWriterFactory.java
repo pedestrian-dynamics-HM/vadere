@@ -2,12 +2,10 @@ package org.vadere.simulator.projects.dataprocessing.writer;
 
 public class VadereStringWriterFactory extends VadereWriterFactory {
 
-	public VadereStringWriterFactory() {
+  public VadereStringWriterFactory() {}
 
-	}
-
-	@Override
-	public VadereWriter create(String path) {
-		return new VadereStringWriter();
-	}
+  @Override
+  public VadereWriter create(String path) {
+    return new VadereStringWriter();
+  }
 }

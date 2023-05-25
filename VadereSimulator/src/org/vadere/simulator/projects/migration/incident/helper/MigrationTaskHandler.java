@@ -4,5 +4,5 @@ import java.nio.file.Path;
 
 @FunctionalInterface
 public interface MigrationTaskHandler {
-	boolean handle(Path p);
+  boolean handle(Path p);
 }

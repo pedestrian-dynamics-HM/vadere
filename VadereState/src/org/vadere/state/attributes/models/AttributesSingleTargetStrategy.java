@@ -5,9 +5,9 @@ import org.vadere.state.attributes.Attributes;
 
 @ModelAttributeClass
 public class AttributesSingleTargetStrategy extends Attributes {
-	private int targetID = 0;
+  private int targetID = 0;
 
-	public int getTargetID() {
-		return targetID;
-	}
+  public int getTargetID() {
+    return targetID;
+  }
 }

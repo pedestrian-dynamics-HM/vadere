@@ -7,27 +7,39 @@ import org.vadere.simulator.projects.dataprocessing.datakey.TimestepGroupPairKey
 import org.vadere.simulator.projects.dataprocessing.processor.util.ModelFilter;
 
 @DataProcessorClass()
-public class GroupMemberPotentialDist extends DataProcessor<TimestepGroupPairKey, Double> implements ModelFilter {
+public class GroupMemberPotentialDist extends DataProcessor<TimestepGroupPairKey, Double>
+    implements ModelFilter {
 
-	public GroupMemberPotentialDist(){
-		super("potential_dist");
-	}
+  public GroupMemberPotentialDist() {
+    super("potential_dist");
+  }
 
-	@Override
-	protected void doUpdate(SimulationState state) {
-		int timestep = state.getStep();
-		getModel(state, CentroidGroupModel.class).ifPresent(m -> {
-			CentroidGroupModel model = (CentroidGroupModel)m;
-			model.getGroupsById().forEach((gId, group) -> {
-				group.getPotentialDist().forEach(data -> this.putValue(new TimestepGroupPairKey(timestep, gId, data.getKey()), data.getValue()));
-			});
-		});
-	}
+  @Override
+  protected void doUpdate(SimulationState state) {
+    int timestep = state.getStep();
+    getModel(state, CentroidGroupModel.class)
+        .ifPresent(
+            m -> {
+              CentroidGroupModel model = (CentroidGroupModel) m;
+              model
+                  .getGroupsById()
+                  .forEach(
+                      (gId, group) -> {
+                        group
+                            .getPotentialDist()
+                            .forEach(
+                                data ->
+                                    this.putValue(
+                                        new TimestepGroupPairKey(timestep, gId, data.getKey()),
+                                        data.getValue()));
+                      });
+            });
+  }
 
-	@Override
-	public String[] toStrings(TimestepGroupPairKey key) {
-		Double val = getValue(key);
-		String valStr = (val != null) ? Double.toString(val) : Double.toString(Double.NaN);
-		return new String[]{valStr};
-	}
+  @Override
+  public String[] toStrings(TimestepGroupPairKey key) {
+    Double val = getValue(key);
+    String valStr = (val != null) ? Double.toString(val) : Double.toString(Double.NaN);
+    return new String[] {valStr};
+  }
 }

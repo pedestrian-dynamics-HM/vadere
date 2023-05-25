@@ -1,9 +1,6 @@
 package org.vadere.gui.components.control;
 
-/**
- * This listener will be notified whenever the scale changes.
- *
- */
+/** This listener will be notified whenever the scale changes. */
 public interface IScaleChangeListener {
-	void scaleChange(final double scale);
+  void scaleChange(final double scale);
 }

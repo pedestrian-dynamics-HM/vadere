@@ -6,9 +6,9 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelListener;
 
 public interface IMode extends MouseListener, MouseMotionListener, MouseWheelListener {
-	Cursor getCursor();
+  Cursor getCursor();
 
-	IMode clone();
+  IMode clone();
 
-	Color getSelectionColor();
+  Color getSelectionColor();
 }

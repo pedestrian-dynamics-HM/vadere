@@ -1,14 +1,15 @@
 package org.vadere.gui.postvisualization.utils;
 
-import org.vadere.gui.components.model.DefaultSimulationConfig;
-
 import java.awt.*;
 import java.util.Locale;
+import org.vadere.gui.components.model.DefaultSimulationConfig;
 
 /**
- * A helper class to generate TikZ styles for the LaTeX preamble and the "\begin{tikzpicture}[...]" command.
+ * A helper class to generate TikZ styles for the LaTeX preamble and the "\begin{tikzpicture}[...]"
+ * command.
  *
- * For Instance:
+ * <p>For Instance:
+ *
  * <pre>
  * % Preamble
  * \definecolor{SourceColor}{RGB}{1,2,3}
@@ -21,65 +22,143 @@ import java.util.Locale;
  * </pre>
  */
 public class TikzStyleGenerator {
-    
-    // Methods
-    public static String generateTikzColorDefinitions(DefaultSimulationConfig simulationConfig) {
-        String colorDefinitions = "% Color Definitions\n";
 
-        String tikzColorTemplate = "\\definecolor{%s}{RGB}{%d,%d,%d}\n";
-        
-        Color sourceColor = simulationConfig.getSourceColor();
-        colorDefinitions += String.format(Locale.US, tikzColorTemplate, "SourceColor", sourceColor.getRed(), sourceColor.getGreen(), sourceColor.getBlue());
+  // Methods
+  public static String generateTikzColorDefinitions(DefaultSimulationConfig simulationConfig) {
+    String colorDefinitions = "% Color Definitions\n";
 
-        Color targetColor = simulationConfig.getTargetColor();
-        colorDefinitions += String.format(Locale.US, tikzColorTemplate, "TargetColor", targetColor.getRed(), targetColor.getGreen(), targetColor.getBlue());
+    String tikzColorTemplate = "\\definecolor{%s}{RGB}{%d,%d,%d}\n";
 
-        Color targetChangerColor = simulationConfig.getTargetChangerColor();
-        colorDefinitions += String.format(Locale.US, tikzColorTemplate, "TargetChangerColor", targetChangerColor.getRed(), targetChangerColor.getGreen(), targetChangerColor.getBlue());
+    Color sourceColor = simulationConfig.getSourceColor();
+    colorDefinitions +=
+        String.format(
+            Locale.US,
+            tikzColorTemplate,
+            "SourceColor",
+            sourceColor.getRed(),
+            sourceColor.getGreen(),
+            sourceColor.getBlue());
 
-        Color absorbingAreaColor = simulationConfig.getAbsorbingAreaColor();
-        colorDefinitions += String.format(Locale.US, tikzColorTemplate, "AbsorbingAreaColor", absorbingAreaColor.getRed(), absorbingAreaColor.getGreen(), absorbingAreaColor.getBlue());
+    Color targetColor = simulationConfig.getTargetColor();
+    colorDefinitions +=
+        String.format(
+            Locale.US,
+            tikzColorTemplate,
+            "TargetColor",
+            targetColor.getRed(),
+            targetColor.getGreen(),
+            targetColor.getBlue());
 
-        Color obstacleColor = simulationConfig.getObstacleColor();
-        colorDefinitions += String.format(Locale.US, tikzColorTemplate, "ObstacleColor", obstacleColor.getRed(), obstacleColor.getGreen(), obstacleColor.getBlue());
+    Color targetChangerColor = simulationConfig.getTargetChangerColor();
+    colorDefinitions +=
+        String.format(
+            Locale.US,
+            tikzColorTemplate,
+            "TargetChangerColor",
+            targetChangerColor.getRed(),
+            targetChangerColor.getGreen(),
+            targetChangerColor.getBlue());
 
-        Color stairColor = simulationConfig.getStairColor();
-        colorDefinitions += String.format(Locale.US, tikzColorTemplate, "StairColor", stairColor.getRed(), stairColor.getGreen(), stairColor.getBlue());
+    Color absorbingAreaColor = simulationConfig.getAbsorbingAreaColor();
+    colorDefinitions +=
+        String.format(
+            Locale.US,
+            tikzColorTemplate,
+            "AbsorbingAreaColor",
+            absorbingAreaColor.getRed(),
+            absorbingAreaColor.getGreen(),
+            absorbingAreaColor.getBlue());
 
-        Color measurementAreaColor = simulationConfig.getMeasurementAreaColor();
-        colorDefinitions += String.format(Locale.US, tikzColorTemplate, "MeasurementAreaColor", measurementAreaColor.getRed(), measurementAreaColor.getGreen(), measurementAreaColor.getBlue());
+    Color obstacleColor = simulationConfig.getObstacleColor();
+    colorDefinitions +=
+        String.format(
+            Locale.US,
+            tikzColorTemplate,
+            "ObstacleColor",
+            obstacleColor.getRed(),
+            obstacleColor.getGreen(),
+            obstacleColor.getBlue());
 
-        Color aerosolCloudColor = simulationConfig.getAerosolCloudColor();
-        colorDefinitions += String.format(Locale.US, tikzColorTemplate, "AerosolCloudColor", aerosolCloudColor.getRed(), aerosolCloudColor.getGreen(), aerosolCloudColor.getBlue());
+    Color stairColor = simulationConfig.getStairColor();
+    colorDefinitions +=
+        String.format(
+            Locale.US,
+            tikzColorTemplate,
+            "StairColor",
+            stairColor.getRed(),
+            stairColor.getGreen(),
+            stairColor.getBlue());
 
-        Color agentColor = simulationConfig.getPedestrianDefaultColor();
-        colorDefinitions += String.format(Locale.US, tikzColorTemplate, "AgentColor", agentColor.getRed(), agentColor.getGreen(), agentColor.getBlue());
+    Color measurementAreaColor = simulationConfig.getMeasurementAreaColor();
+    colorDefinitions +=
+        String.format(
+            Locale.US,
+            tikzColorTemplate,
+            "MeasurementAreaColor",
+            measurementAreaColor.getRed(),
+            measurementAreaColor.getGreen(),
+            measurementAreaColor.getBlue());
 
-        colorDefinitions += String.format(Locale.US, tikzColorTemplate, "AgentIdColor", 255, 127, 0); // This orange color is hard-coded in "DefaultRenderer".
-        colorDefinitions += "\n";
+    Color aerosolCloudColor = simulationConfig.getAerosolCloudColor();
+    colorDefinitions +=
+        String.format(
+            Locale.US,
+            tikzColorTemplate,
+            "AerosolCloudColor",
+            aerosolCloudColor.getRed(),
+            aerosolCloudColor.getGreen(),
+            aerosolCloudColor.getBlue());
 
-        double opacityBetweenZeroAndOne = simulationConfig.getMeasurementAreaAlpha() / 255.0;
-        colorDefinitions += String.format(Locale.US,"\\newcommand{\\MeasurementAreaOpacity}{%f}\n", opacityBetweenZeroAndOne);
+    Color agentColor = simulationConfig.getPedestrianDefaultColor();
+    colorDefinitions +=
+        String.format(
+            Locale.US,
+            tikzColorTemplate,
+            "AgentColor",
+            agentColor.getRed(),
+            agentColor.getGreen(),
+            agentColor.getBlue());
 
-        double aerosolCloudOpacityBetweenZeroAndOne = simulationConfig.getAerosolCloudAlphaMax() / 255.0;
-        colorDefinitions += String.format(Locale.US,"\\newcommand{\\AerosolCloudOpacity}{%f}\n", aerosolCloudOpacityBetweenZeroAndOne);
+    colorDefinitions +=
+        String.format(
+            Locale.US,
+            tikzColorTemplate,
+            "AgentIdColor",
+            255,
+            127,
+            0); // This orange color is hard-coded in "DefaultRenderer".
+    colorDefinitions += "\n";
 
-        colorDefinitions += "\n";
+    double opacityBetweenZeroAndOne = simulationConfig.getMeasurementAreaAlpha() / 255.0;
+    colorDefinitions +=
+        String.format(
+            Locale.US, "\\newcommand{\\MeasurementAreaOpacity}{%f}\n", opacityBetweenZeroAndOne);
 
-        return colorDefinitions;
-    }
+    double aerosolCloudOpacityBetweenZeroAndOne =
+        simulationConfig.getAerosolCloudAlphaMax() / 255.0;
+    colorDefinitions +=
+        String.format(
+            Locale.US,
+            "\\newcommand{\\AerosolCloudOpacity}{%f}\n",
+            aerosolCloudOpacityBetweenZeroAndOne);
 
-    public static String generateTikzStyles(double pedestrianRadius) {
-        String tikzStyles = "";
+    colorDefinitions += "\n";
 
-        tikzStyles += "trajectory/.style={line width=1},\n";
-        tikzStyles += String.format("pedestrian/.style={circle, fill=AgentColor, minimum size=%f cm},\n", pedestrianRadius);
-        tikzStyles += "walkdirection/.style={black, line width=1},\n";
-        tikzStyles += "selected/.style={draw=magenta, line width=2},\n";
-        tikzStyles += "group/.style={},\n";
-        tikzStyles += "voronoi/.style={black, line width=1}\n";
+    return colorDefinitions;
+  }
 
-        return tikzStyles;
-    }
-    
+  public static String generateTikzStyles(double pedestrianRadius) {
+    String tikzStyles = "";
+
+    tikzStyles += "trajectory/.style={line width=1},\n";
+    tikzStyles +=
+        String.format(
+            "pedestrian/.style={circle, fill=AgentColor, minimum size=%f cm},\n", pedestrianRadius);
+    tikzStyles += "walkdirection/.style={black, line width=1},\n";
+    tikzStyles += "selected/.style={draw=magenta, line width=2},\n";
+    tikzStyles += "group/.style={},\n";
+    tikzStyles += "voronoi/.style={black, line width=1}\n";
+
+    return tikzStyles;
+  }
 }

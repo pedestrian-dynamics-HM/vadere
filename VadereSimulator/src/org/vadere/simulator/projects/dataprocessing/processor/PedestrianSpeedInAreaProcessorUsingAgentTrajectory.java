@@ -1,5 +1,6 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
+import java.util.function.BiFunction;
 import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
 import org.vadere.simulator.control.simulation.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
@@ -12,8 +13,6 @@ import org.vadere.state.scenario.MeasurementArea;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.simulation.VTrajectory;
 import org.vadere.util.geometry.shapes.VRectangle;
-
-import java.util.function.BiFunction;
 
 /**
  * Log for each pedestrian the speed within a measurement area.
@@ -35,9 +34,8 @@ import java.util.function.BiFunction;
  * - Mj: measurement j
  * </pre>
  *
- * Note: If two measurement areas M1 and M2 are disjoint
- *       and a pedestrian P1 is located within M1, M2 should
- *       log a speed of -1 for P1.
+ * Note: If two measurement areas M1 and M2 are disjoint and a pedestrian P1 is located within M1,
+ * M2 should log a speed of -1 for P1.
  *
  * <pre>
  * | timeStep | pedId | ... | M1  | M2  |
@@ -48,126 +46,145 @@ import java.util.function.BiFunction;
  *
  * Note: If trajectory of pedestrian is empty, log -2.
  *
- * Use the {@link PedestrianTrajectoryProcessor} to access pedestrian's
- * trajectory.
+ * <p>Use the {@link PedestrianTrajectoryProcessor} to access pedestrian's trajectory.
  *
- * This processor offers different methods do calculate pedestrian's speed:
- * - ByTrajectory: Use {@link VTrajectory#speed()}, i.e. trajectory.length() / trajectory.duration()
- * - ByMeasurementAreaHeight: Use measurementArea.height() / trajectory.duration()
- * - ByMeasurementAreaWidth: Use measurementArea.width() / trajectory.duration()
+ * <p>This processor offers different methods do calculate pedestrian's speed: - ByTrajectory: Use
+ * {@link VTrajectory#speed()}, i.e. trajectory.length() / trajectory.duration() -
+ * ByMeasurementAreaHeight: Use measurementArea.height() / trajectory.duration() -
+ * ByMeasurementAreaWidth: Use measurementArea.width() / trajectory.duration()
  */
 @DataProcessorClass()
-public class PedestrianSpeedInAreaProcessorUsingAgentTrajectory extends DataProcessor<TimestepPedestrianIdKey, Double> {
+public class PedestrianSpeedInAreaProcessorUsingAgentTrajectory
+    extends DataProcessor<TimestepPedestrianIdKey, Double> {
 
-	// Static variables
-	public static double ERROR_PED_NOT_IN_MEASUREMENT_AREA = -1;
-	public static double ERROR_NO_TRAJECTORY_AVAILABLE = -2;
+  // Static variables
+  public static double ERROR_PED_NOT_IN_MEASUREMENT_AREA = -1;
+  public static double ERROR_NO_TRAJECTORY_AVAILABLE = -2;
 
-	// Variables
-	private MeasurementArea measurementArea;
-	private PedestrianTrajectoryProcessor pedestrianTrajectoryProcessor;
-	private BiFunction<VTrajectory, VRectangle, Double> speedCalculationStrategy;
+  // Variables
+  private MeasurementArea measurementArea;
+  private PedestrianTrajectoryProcessor pedestrianTrajectoryProcessor;
+  private BiFunction<VTrajectory, VRectangle, Double> speedCalculationStrategy;
 
-	// Constructors
-	public PedestrianSpeedInAreaProcessorUsingAgentTrajectory() {
-		super("speedInAreaUsingAgentTrajectory");
-		// "init()" method is used by processor manager to initialize variables.
-	}
+  // Constructors
+  public PedestrianSpeedInAreaProcessorUsingAgentTrajectory() {
+    super("speedInAreaUsingAgentTrajectory");
+    // "init()" method is used by processor manager to initialize variables.
+  }
 
-	// Getter
-	public MeasurementArea getMeasurementArea() {
-		return this.measurementArea;
-	}
-	public PedestrianTrajectoryProcessor getPedestrianTrajectoryProcessor() { return pedestrianTrajectoryProcessor; }
+  // Getter
+  public MeasurementArea getMeasurementArea() {
+    return this.measurementArea;
+  }
 
-	// Methods (overridden)
-	@Override
-	public void init(final ProcessorManager manager) {
-		super.init(manager);
+  public PedestrianTrajectoryProcessor getPedestrianTrajectoryProcessor() {
+    return pedestrianTrajectoryProcessor;
+  }
 
-		AttributesSpeedInAreaProcessorUsingAgentTrajectory processorAttributes = (AttributesSpeedInAreaProcessorUsingAgentTrajectory) this.getAttributes();
+  // Methods (overridden)
+  @Override
+  public void init(final ProcessorManager manager) {
+    super.init(manager);
 
-		// manager.getMeasurementArea() throws an exception if area is "null" or not rectangular. Though, no checks required here.
-		boolean rectangularAreaRequired = true;
-		measurementArea = manager.getMeasurementArea(processorAttributes.getMeasurementAreaId(), rectangularAreaRequired);
+    AttributesSpeedInAreaProcessorUsingAgentTrajectory processorAttributes =
+        (AttributesSpeedInAreaProcessorUsingAgentTrajectory) this.getAttributes();
 
-		pedestrianTrajectoryProcessor = (PedestrianTrajectoryProcessor) manager.getProcessor(processorAttributes.getPedestrianTrajectoryProcessorId());
+    // manager.getMeasurementArea() throws an exception if area is "null" or not rectangular.
+    // Though, no checks required here.
+    boolean rectangularAreaRequired = true;
+    measurementArea =
+        manager.getMeasurementArea(
+            processorAttributes.getMeasurementAreaId(), rectangularAreaRequired);
 
-		if (pedestrianTrajectoryProcessor == null) {
-			throw new RuntimeException(String.format("PedestrianTrajectoryProcessor with index %d does not exist.", processorAttributes.getPedestrianTrajectoryProcessorId()));
-		}
+    pedestrianTrajectoryProcessor =
+        (PedestrianTrajectoryProcessor)
+            manager.getProcessor(processorAttributes.getPedestrianTrajectoryProcessorId());
 
-		initSpeedCalculationStrategy(processorAttributes);
-	}
+    if (pedestrianTrajectoryProcessor == null) {
+      throw new RuntimeException(
+          String.format(
+              "PedestrianTrajectoryProcessor with index %d does not exist.",
+              processorAttributes.getPedestrianTrajectoryProcessorId()));
+    }
 
-	private void initSpeedCalculationStrategy(AttributesSpeedInAreaProcessorUsingAgentTrajectory processorAttributes) {
-		if (processorAttributes.getSpeedCalculationStrategy() == SpeedCalculationStrategy.BY_TRAJECTORY) {
-			speedCalculationStrategy = this::calculateSpeedByTrajectory;
-		} else if (processorAttributes.getSpeedCalculationStrategy() == SpeedCalculationStrategy.BY_MEASUREMENT_AREA_HEIGHT) {
-			speedCalculationStrategy = this::calculateSpeedByMeasurementAreaHeight;
-		} else if (processorAttributes.getSpeedCalculationStrategy() == SpeedCalculationStrategy.BY_MEASUREMENT_AREA_WIDTH) {
-			speedCalculationStrategy = this::calculateSpeedByMeasurementAreaWidth;
-		} else {
-			throw new RuntimeException("Unsupported speedCalculationStrategy.");
-		}
-	}
+    initSpeedCalculationStrategy(processorAttributes);
+  }
 
-	@Override
-	public AttributesProcessor getAttributes() {
-		if (super.getAttributes() == null) {
-			setAttributes(new AttributesSpeedInAreaProcessorUsingAgentTrajectory());
-		}
+  private void initSpeedCalculationStrategy(
+      AttributesSpeedInAreaProcessorUsingAgentTrajectory processorAttributes) {
+    if (processorAttributes.getSpeedCalculationStrategy()
+        == SpeedCalculationStrategy.BY_TRAJECTORY) {
+      speedCalculationStrategy = this::calculateSpeedByTrajectory;
+    } else if (processorAttributes.getSpeedCalculationStrategy()
+        == SpeedCalculationStrategy.BY_MEASUREMENT_AREA_HEIGHT) {
+      speedCalculationStrategy = this::calculateSpeedByMeasurementAreaHeight;
+    } else if (processorAttributes.getSpeedCalculationStrategy()
+        == SpeedCalculationStrategy.BY_MEASUREMENT_AREA_WIDTH) {
+      speedCalculationStrategy = this::calculateSpeedByMeasurementAreaWidth;
+    } else {
+      throw new RuntimeException("Unsupported speedCalculationStrategy.");
+    }
+  }
 
-		return super.getAttributes();
-	}
+  @Override
+  public AttributesProcessor getAttributes() {
+    if (super.getAttributes() == null) {
+      setAttributes(new AttributesSpeedInAreaProcessorUsingAgentTrajectory());
+    }
 
-	@Override
-	protected void doUpdate(final SimulationState state) {
-		pedestrianTrajectoryProcessor.update(state);
+    return super.getAttributes();
+  }
 
-		for (Pedestrian pedestrian : state.getTopography().getElements(Pedestrian.class)) {
-			double speed = ERROR_PED_NOT_IN_MEASUREMENT_AREA;
+  @Override
+  protected void doUpdate(final SimulationState state) {
+    pedestrianTrajectoryProcessor.update(state);
 
-			if (measurementArea.getShape().contains(pedestrian.getPosition())) {
-				VTrajectory wholeTrajectory = pedestrianTrajectoryProcessor.getValue(new PedestrianIdKey(pedestrian.getId()));
-				VTrajectory cuttedTrajectory = wholeTrajectory.cut(measurementArea.asVRectangle());
+    for (Pedestrian pedestrian : state.getTopography().getElements(Pedestrian.class)) {
+      double speed = ERROR_PED_NOT_IN_MEASUREMENT_AREA;
 
-				speed = speedCalculationStrategy.apply(cuttedTrajectory, measurementArea.asVRectangle());
-			}
+      if (measurementArea.getShape().contains(pedestrian.getPosition())) {
+        VTrajectory wholeTrajectory =
+            pedestrianTrajectoryProcessor.getValue(new PedestrianIdKey(pedestrian.getId()));
+        VTrajectory cuttedTrajectory = wholeTrajectory.cut(measurementArea.asVRectangle());
 
-			TimestepPedestrianIdKey rowKey = new TimestepPedestrianIdKey(state.getStep(), pedestrian.getId());
-			this.putValue(rowKey, speed);
-		}
-	}
+        speed = speedCalculationStrategy.apply(cuttedTrajectory, measurementArea.asVRectangle());
+      }
 
-	private double calculateSpeedByTrajectory(VTrajectory trajectory, VRectangle measurementArea) {
-		double speed = ERROR_NO_TRAJECTORY_AVAILABLE;
+      TimestepPedestrianIdKey rowKey =
+          new TimestepPedestrianIdKey(state.getStep(), pedestrian.getId());
+      this.putValue(rowKey, speed);
+    }
+  }
 
-		if (trajectory.speed().isPresent()) {
-			speed = trajectory.speed().get();
-		}
+  private double calculateSpeedByTrajectory(VTrajectory trajectory, VRectangle measurementArea) {
+    double speed = ERROR_NO_TRAJECTORY_AVAILABLE;
 
-		return speed;
-	}
+    if (trajectory.speed().isPresent()) {
+      speed = trajectory.speed().get();
+    }
 
-	private double calculateSpeedByMeasurementAreaHeight(VTrajectory trajectory, VRectangle measurementArea) {
-		double speed = ERROR_NO_TRAJECTORY_AVAILABLE;
+    return speed;
+  }
 
-		if (trajectory.duration().isPresent()) {
-			speed = (measurementArea.height / trajectory.duration().get());
-		}
+  private double calculateSpeedByMeasurementAreaHeight(
+      VTrajectory trajectory, VRectangle measurementArea) {
+    double speed = ERROR_NO_TRAJECTORY_AVAILABLE;
 
-		return speed;
-	}
+    if (trajectory.duration().isPresent()) {
+      speed = (measurementArea.height / trajectory.duration().get());
+    }
 
-	private double calculateSpeedByMeasurementAreaWidth(VTrajectory trajectory, VRectangle measurementArea) {
-		double speed = ERROR_NO_TRAJECTORY_AVAILABLE;
+    return speed;
+  }
 
-		if (trajectory.duration().isPresent()) {
-			speed = measurementArea.width / trajectory.duration().get();
-		}
+  private double calculateSpeedByMeasurementAreaWidth(
+      VTrajectory trajectory, VRectangle measurementArea) {
+    double speed = ERROR_NO_TRAJECTORY_AVAILABLE;
 
-		return speed;
-	}
+    if (trajectory.duration().isPresent()) {
+      speed = measurementArea.width / trajectory.duration().get();
+    }
 
+    return speed;
+  }
 }

@@ -1,5 +1,7 @@
 package org.vadere.gui.topographycreator.view;
 
+import java.awt.*;
+import java.awt.geom.Line2D;
 import org.vadere.gui.components.model.DefaultConfig;
 import org.vadere.gui.components.view.DefaultRenderer;
 import org.vadere.gui.topographycreator.model.IDrawPanelModel;
@@ -8,93 +10,101 @@ import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.geometry.shapes.VPoint;
 
-import java.awt.*;
-import java.awt.geom.Line2D;
+public class TopographyCreatorRenderer extends DefaultRenderer {
 
-public class TopographyCreatorRenderer  extends DefaultRenderer {
+  private final IDrawPanelModel<DefaultConfig> panelModel;
 
-	private final IDrawPanelModel<DefaultConfig> panelModel;
+  /** the buffer of the grid image. */
+  private Image gridImage;
 
+  /** the times in millis the thread sleeps after each repaint. */
+  private static final long REPAINT_SLEEP_TIME = 25; // 25 => 40 FPS
 
-	/** the buffer of the grid image. */
-	private Image gridImage;
+  private int boundId = -1;
+  private ScenarioElementRenderer[] renderers;
 
-	/** the times in millis the thread sleeps after each repaint. */
-	private final static long REPAINT_SLEEP_TIME = 25; // 25 => 40 FPS
+  /**
+   * Creates a new DrawPanel and start the repaint thead.
+   *
+   * @param panelModel the panelModel of the panel
+   */
+  public TopographyCreatorRenderer(final IDrawPanelModel panelModel) {
+    super(panelModel);
+    this.panelModel = panelModel;
+    this.renderers = new ScenarioElementRenderer[ScenarioElementType.values().length];
+    renderers[ScenarioElementType.OBSTACLE.ordinal()] = this::renderFilledShape;
+    renderers[ScenarioElementType.PEDESTRIAN.ordinal()] = this::renderFilledShape;
+    renderers[ScenarioElementType.SOURCE.ordinal()] = this::renderFilledShape;
+    renderers[ScenarioElementType.TARGET.ordinal()] = this::renderFilledShape;
+    renderers[ScenarioElementType.TARGET_CHANGER.ordinal()] = this::renderFilledShape;
+    renderers[ScenarioElementType.ABSORBING_AREA.ordinal()] = this::renderFilledShape;
+    renderers[ScenarioElementType.STAIRS.ordinal()] = this::renderStair;
+    renderers[ScenarioElementType.TELEPORTER.ordinal()] = this::renderFilledShape;
+    renderers[ScenarioElementType.CAR.ordinal()] = this::renderFilledShape;
+    renderers[ScenarioElementType.MEASUREMENT_AREA.ordinal()] = this::renderMeasurementArea;
+  }
 
-	private int boundId = -1;
-	private ScenarioElementRenderer[] renderers;
+  @Override
+  public void renderPostTransformation(
+      final Graphics2D graphics, final int width, final int height) {
+    super.renderPostTransformation(graphics, width, height);
+    graphics.setColor(Color.BLACK);
 
-	/**
-	 * Creates a new DrawPanel and start the repaint thead.
-	 * 
-	 * @param panelModel the panelModel of the panel
-	 */
-	public TopographyCreatorRenderer(final IDrawPanelModel panelModel){
-		super(panelModel);
-		this.panelModel = panelModel;
-		this.renderers = new ScenarioElementRenderer[ScenarioElementType.values().length];
-		renderers[ScenarioElementType.OBSTACLE.ordinal()] = this::renderFilledShape;
-		renderers[ScenarioElementType.PEDESTRIAN.ordinal()] = this::renderFilledShape;
-		renderers[ScenarioElementType.SOURCE.ordinal()] = this::renderFilledShape;
-		renderers[ScenarioElementType.TARGET.ordinal()] = this::renderFilledShape;
-		renderers[ScenarioElementType.TARGET_CHANGER.ordinal()] = this::renderFilledShape;
-		renderers[ScenarioElementType.ABSORBING_AREA.ordinal()] = this::renderFilledShape;
-		renderers[ScenarioElementType.STAIRS.ordinal()] = this::renderStair;
-		renderers[ScenarioElementType.TELEPORTER.ordinal()] = this::renderFilledShape;
-		renderers[ScenarioElementType.CAR.ordinal()] = this::renderFilledShape;
-		renderers[ScenarioElementType.MEASUREMENT_AREA.ordinal()] = this::renderMeasurementArea;
-	}
+    renderGrid(graphics);
 
-	@Override
-	public void renderPostTransformation(final Graphics2D graphics, final int width, final int height) {
-		super.renderPostTransformation(graphics, width, height);
-		graphics.setColor(Color.BLACK);
+    if (panelModel.isElementSelected()) {
+      renderSelectionBorder(graphics);
+    }
 
-		renderGrid(graphics);
+    for (ScenarioElement element : panelModel) {
+      Color color = panelModel.getScenarioElementColor(element.getType());
 
-		if (panelModel.isElementSelected()) {
-			renderSelectionBorder(graphics);
-		}
+      if (((AttributesVisualElement) element.getAttributes()).isVisible()) {
+        renderers[element.getType().ordinal()].render(element, graphics, color);
+      }
+    }
 
-		for (ScenarioElement element : panelModel) {
-			Color color = panelModel.getScenarioElementColor(element.getType());
+    if (panelModel.isPrototypeVisble()) {
+      graphics.setColor(Color.GRAY);
+      fill(panelModel.getPrototypeShape(), graphics);
+    }
 
-			if(((AttributesVisualElement)element.getAttributes()).isVisible()) {
-				renderers[element.getType().ordinal()].render(element, graphics, color);
-			}
-		}
+    if (panelModel.isElementSelected()) {
+      if (((AttributesVisualElement) panelModel.getSelectedElement().getAttributes()).isVisible()) {
+        renderSelectionBorder(graphics);
+      }
+    }
 
-		if (panelModel.isPrototypeVisble()) {
-			graphics.setColor(Color.GRAY);
-			fill(panelModel.getPrototypeShape(), graphics);
-		}
+    if (panelModel.isSelectionVisible()) {
+      renderSelectionShape(graphics);
+    }
 
-		if (panelModel.isElementSelected()) {
-			if(((AttributesVisualElement)panelModel.getSelectedElement().getAttributes()).isVisible()) {
-				renderSelectionBorder(graphics);
-			}
-		}
+    if (panelModel.getCursor().getType() == Cursor.DEFAULT_CURSOR) {
+      renderCursor(graphics, panelModel.getGridResolution(), getLineWidth());
+    }
 
-		if (panelModel.isSelectionVisible()) {
-			renderSelectionShape(graphics);
-		}
+    graphics.dispose();
+  }
 
-		if (panelModel.getCursor().getType() == Cursor.DEFAULT_CURSOR) {
-			renderCursor(graphics, panelModel.getGridResolution(), getLineWidth());
-		}
-
-		graphics.dispose();
-	}
-
-	private void renderCursor(Graphics2D g, double resolution, float lineWidth) {
-		g.setColor(panelModel.getCursorColor());
-		g.setStroke(new BasicStroke(lineWidth));
-		final VPoint cursorPosition = panelModel.getMousePosition();
-		double absolutCursorX = cursorPosition.x;
-		double absolutCursorY = cursorPosition.y;
-		draw(new Line2D.Double(absolutCursorX - resolution * 0.2, absolutCursorY, absolutCursorX + resolution * 0.2, absolutCursorY), g);
-		draw(new Line2D.Double(absolutCursorX, absolutCursorY - resolution * 0.2, absolutCursorX, absolutCursorY + resolution * 0.2), g);
-	}
-
+  private void renderCursor(Graphics2D g, double resolution, float lineWidth) {
+    g.setColor(panelModel.getCursorColor());
+    g.setStroke(new BasicStroke(lineWidth));
+    final VPoint cursorPosition = panelModel.getMousePosition();
+    double absolutCursorX = cursorPosition.x;
+    double absolutCursorY = cursorPosition.y;
+    draw(
+        new Line2D.Double(
+            absolutCursorX - resolution * 0.2,
+            absolutCursorY,
+            absolutCursorX + resolution * 0.2,
+            absolutCursorY),
+        g);
+    draw(
+        new Line2D.Double(
+            absolutCursorX,
+            absolutCursorY - resolution * 0.2,
+            absolutCursorX,
+            absolutCursorY + resolution * 0.2),
+        g);
+  }
 }

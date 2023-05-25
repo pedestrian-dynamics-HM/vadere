@@ -14,87 +14,101 @@ import org.vadere.state.scenario.MeasurementArea;
 import org.vadere.util.geometry.shapes.VRectangle;
 
 /**
- * <p>This processor computes the fundamental diagram by computing at a certain time the
+ * This processor computes the fundamental diagram by computing at a certain time the
  * <tt>density</tt> defined by the number of pedestrians contained in the <tt>measurementArea</tt>
- * divided by the area of <tt>measurementArea</tt> and the <tt>velocity</tt> which is defined by
- * the sum of pedestrian velocities contained in the <tt>measurementArea</tt> divided by the number
- * of pedestrians contained in <tt>measurementArea</tt>. This is the so called classical method.</p>
+ * divided by the area of <tt>measurementArea</tt> and the <tt>velocity</tt> which is defined by the
+ * sum of pedestrian velocities contained in the <tt>measurementArea</tt> divided by the number of
+ * pedestrians contained in <tt>measurementArea</tt>. This is the so called classical method.
  *
- * <p>For more details see zhang-2011 (doi:10.1088/1742-5468/2011/06/P06004) Method C.</p>
+ * <p>For more details see zhang-2011 (doi:10.1088/1742-5468/2011/06/P06004) Method C.
  *
  * @author Benedikt Zoennchen
  */
 @DataProcessorClass()
-public class FundamentalDiagramCProcessor extends AreaDataProcessor<Pair<Double, Double>> implements UsesMeasurementArea {
+public class FundamentalDiagramCProcessor extends AreaDataProcessor<Pair<Double, Double>>
+    implements UsesMeasurementArea {
 
-	private MeasurementArea measurementArea;
-	private VRectangle measurementAreaVRec;
+  private MeasurementArea measurementArea;
+  private VRectangle measurementAreaVRec;
 
-	private APedestrianVelocityProcessor pedestrianVelocityProcessor;
+  private APedestrianVelocityProcessor pedestrianVelocityProcessor;
 
-	public FundamentalDiagramCProcessor() {
-		super("velocity", "density");
-	}
+  public FundamentalDiagramCProcessor() {
+    super("velocity", "density");
+  }
 
-	@Override
-	public void init(final ProcessorManager manager) {
-		super.init(manager);
+  @Override
+  public void init(final ProcessorManager manager) {
+    super.init(manager);
 
-		AttributesFundamentalDiagramCProcessor att = (AttributesFundamentalDiagramCProcessor) this.getAttributes();
-		measurementArea = manager.getMeasurementArea(att.getMeasurementAreaId(), true);
-		pedestrianVelocityProcessor = (APedestrianVelocityProcessor) manager.getProcessor(att.getPedestrianVelocityProcessorId());
-		measurementAreaVRec = measurementArea.asVRectangle();
-	}
+    AttributesFundamentalDiagramCProcessor att =
+        (AttributesFundamentalDiagramCProcessor) this.getAttributes();
+    measurementArea = manager.getMeasurementArea(att.getMeasurementAreaId(), true);
+    pedestrianVelocityProcessor =
+        (APedestrianVelocityProcessor) manager.getProcessor(att.getPedestrianVelocityProcessorId());
+    measurementAreaVRec = measurementArea.asVRectangle();
+  }
 
-	@Override
-	public AttributesProcessor getAttributes() {
-		if (super.getAttributes() == null) {
-			setAttributes(new AttributesFundamentalDiagramCProcessor());
-		}
-		return super.getAttributes();
-	}
+  @Override
+  public AttributesProcessor getAttributes() {
+    if (super.getAttributes() == null) {
+      setAttributes(new AttributesFundamentalDiagramCProcessor());
+    }
+    return super.getAttributes();
+  }
 
-	@Override
-	public void preLoop(SimulationState state) {
-		super.preLoop(state);
-	}
+  @Override
+  public void preLoop(SimulationState state) {
+    super.preLoop(state);
+  }
 
-	@Override
-	protected void doUpdate(SimulationState state) {
-		pedestrianVelocityProcessor.update(state);
-		long N = state.getTopography().getPedestrianDynamicElements().getElements()
-				.stream()
-				.filter(pedestrian -> measurementAreaVRec.contains(pedestrian.getPosition()))
-				.count();
-		double velocity = state.getTopography().getPedestrianDynamicElements().getElements()
-				.stream()
-				.filter(pedestrian -> measurementAreaVRec.contains(pedestrian.getPosition()))
-				.mapToDouble(pedestrian ->
-						//pedestrian.getVelocity().getLength()
-						pedestrianVelocityProcessor.getValue(new TimestepPedestrianIdKey(state.getStep(), pedestrian.getId()))
-				)
-				.sum();
+  @Override
+  protected void doUpdate(SimulationState state) {
+    pedestrianVelocityProcessor.update(state);
+    long N =
+        state
+            .getTopography()
+            .getPedestrianDynamicElements()
+            .getElements()
+            .stream()
+            .filter(pedestrian -> measurementAreaVRec.contains(pedestrian.getPosition()))
+            .count();
+    double velocity =
+        state
+            .getTopography()
+            .getPedestrianDynamicElements()
+            .getElements()
+            .stream()
+            .filter(pedestrian -> measurementAreaVRec.contains(pedestrian.getPosition()))
+            .mapToDouble(
+                pedestrian ->
+                    // pedestrian.getVelocity().getLength()
+                    pedestrianVelocityProcessor.getValue(
+                        new TimestepPedestrianIdKey(state.getStep(), pedestrian.getId())))
+            .sum();
 
-		if(N == 0) {
-			velocity = 0.0;
-		}
-		else {
-			velocity /= N;
-		}
+    if (N == 0) {
+      velocity = 0.0;
+    } else {
+      velocity /= N;
+    }
 
-		double density = N / measurementAreaVRec.getArea();
+    double density = N / measurementAreaVRec.getArea();
 
-		putValue(new TimestepKey(state.getStep()), Pair.of(velocity, density));
-	}
+    putValue(new TimestepKey(state.getStep()), Pair.of(velocity, density));
+  }
 
-	@Override
-	public String[] toStrings(@NotNull final TimestepKey key) {
-		return new String[]{ Double.toString(getValue(key).getLeft()), Double.toString(getValue(key).getRight()) };
-	}
+  @Override
+  public String[] toStrings(@NotNull final TimestepKey key) {
+    return new String[] {
+      Double.toString(getValue(key).getLeft()), Double.toString(getValue(key).getRight())
+    };
+  }
 
-	@Override
-	public int[] getReferencedMeasurementAreaId() {
-		AttributesFundamentalDiagramCProcessor att = (AttributesFundamentalDiagramCProcessor) this.getAttributes();
-		return new int[]{att.getMeasurementAreaId()};
-	}
+  @Override
+  public int[] getReferencedMeasurementAreaId() {
+    AttributesFundamentalDiagramCProcessor att =
+        (AttributesFundamentalDiagramCProcessor) this.getAttributes();
+    return new int[] {att.getMeasurementAreaId()};
+  }
 }

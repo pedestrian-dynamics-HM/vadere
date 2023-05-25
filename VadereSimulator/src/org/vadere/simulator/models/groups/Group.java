@@ -1,36 +1,34 @@
 package org.vadere.simulator.models.groups;
 
+import java.util.List;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.state.scenario.AgentListener;
 import org.vadere.state.scenario.Pedestrian;
 
-import java.util.List;
-
 public interface Group extends AgentListener {
-	int getID();
+  int getID();
 
-	int getSize();
+  int getSize();
 
-	boolean isMember(Pedestrian ped);
+  boolean isMember(Pedestrian ped);
 
-	List<Pedestrian> getMembers();
+  List<Pedestrian> getMembers();
 
-	void addMember(Pedestrian ped);
+  void addMember(Pedestrian ped);
 
-	/**
-	 *
-	 * @param ped
-	 * @return		Retrun True if ped was the last one.
-	 */
-	boolean removeMember(Pedestrian ped);
+  /**
+   * @param ped
+   * @return Retrun True if ped was the last one.
+   */
+  boolean removeMember(Pedestrian ped);
 
-	boolean isFull();
+  boolean isFull();
 
-	int getOpenPersons();
+  int getOpenPersons();
 
-	boolean equals(Group other);
+  boolean equals(Group other);
 
-	void setPotentialFieldTarget(IPotentialFieldTarget potentialFieldTarget);
+  void setPotentialFieldTarget(IPotentialFieldTarget potentialFieldTarget);
 
-	IPotentialFieldTarget getPotentialFieldTarget();
+  IPotentialFieldTarget getPotentialFieldTarget();
 }

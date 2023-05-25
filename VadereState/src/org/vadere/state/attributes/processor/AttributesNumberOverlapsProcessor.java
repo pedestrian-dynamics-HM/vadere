@@ -1,19 +1,15 @@
 package org.vadere.state.attributes.processor;
 
-/**
- * @author Marion Gödel
- *
- */
-
+/** @author Marion Gödel */
 public class AttributesNumberOverlapsProcessor extends AttributesProcessor {
-    private int pedestrianOverlapProcessorId;
+  private int pedestrianOverlapProcessorId;
 
-    public int getPedestrianOverlapProcessorId() {
-        return this.pedestrianOverlapProcessorId;
-    }
+  public int getPedestrianOverlapProcessorId() {
+    return this.pedestrianOverlapProcessorId;
+  }
 
-    public void setPedestrianOverlapProcessorId(int pedestrianOverlapProcessorId) {
-        checkSealed();
-        this.pedestrianOverlapProcessorId = pedestrianOverlapProcessorId;
-    }
+  public void setPedestrianOverlapProcessorId(int pedestrianOverlapProcessorId) {
+    checkSealed();
+    this.pedestrianOverlapProcessorId = pedestrianOverlapProcessorId;
+  }
 }

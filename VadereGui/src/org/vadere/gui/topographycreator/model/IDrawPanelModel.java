@@ -1,5 +1,10 @@
 package org.vadere.gui.topographycreator.model;
 
+import java.awt.*;
+import java.awt.geom.Rectangle2D;
+import java.util.List;
+import java.util.Observer;
+import java.util.function.Predicate;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.components.control.IMode;
 import org.vadere.gui.components.model.DefaultConfig;
@@ -15,183 +20,171 @@ import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 
-import java.awt.*;
-import java.awt.geom.Rectangle2D;
-import java.util.List;
-import java.util.Observer;
-import java.util.function.Predicate;
+public interface IDrawPanelModel<T extends DefaultConfig>
+    extends IDefaultModel<T>, Iterable<ScenarioElement> {
 
-public interface IDrawPanelModel<T extends DefaultConfig> extends IDefaultModel<T>, Iterable<ScenarioElement> {
+  @Override
+  void notifyObservers();
 
-	@Override
-	void notifyObservers();
+  /**
+   * Build a new Topography out of the current state of the DrawPanelModel by using the
+   * TopographyBuilder.
+   *
+   * @return a complete new TopographyElement
+   */
+  Topography build();
 
-	/**
-	 * Build a new Topography out of the current state of the DrawPanelModel by using the
-	 * TopographyBuilder.
-	 * 
-	 * @return a complete new TopographyElement
-	 */
-	Topography build();
+  /**
+   * Part of the observer-pattern. Adds an observer that will be notified about the changes of this
+   * panelModel.
+   *
+   * @param observer the observer that will be notified about the change of this panelModel.
+   */
+  void addObserver(Observer observer);
 
-	/**
-	 * Part of the observer-pattern. Adds an observer that will be notified about the changes of
-	 * this panelModel.
-	 *
-	 * @param observer the observer that will be notified about the change of this panelModel.
-	 */
-	void addObserver(Observer observer);
+  /**
+   * Changes the topography bound (cutting).
+   *
+   * @param scenarioBound the new topography bound
+   */
+  void setTopographyBound(final VRectangle scenarioBound);
 
-	/**
-	 * Changes the topography bound (cutting).
-	 * 
-	 * @param scenarioBound the new topography bound
-	 */
-	void setTopographyBound(final VRectangle scenarioBound);
+  /**
+   * Returns the used font for displaying informations and so on.
+   *
+   * @return the used font
+   */
+  Font getFont();
 
-	/**
-	 * Returns the used font for displaying informations and so on.
-	 * 
-	 * @return the used font
-	 */
-	Font getFont();
+  /**
+   * Scales the whole topography, so every topography element will be scaled and will be translated
+   * to the correct position. Pedestrians has only to be translated.
+   *
+   * @param scale the scale factor has to be greater than zero
+   */
+  void scaleTopography(final double scale);
 
-	/**
-	 * Scales the whole topography, so every topography element will be scaled and will be
-	 * translated to the correct position. Pedestrians has only to be translated.
-	 * 
-	 * @param scale the scale factor has to be greater than zero
-	 */
-	void scaleTopography(final double scale);
+  /**
+   * True if the user is selecting a topography element, otherwise false.
+   *
+   * @return true if the user is selecting a topography element, otherwise false.
+   */
+  @Override
+  boolean isSelectionVisible();
 
+  /** After this call the selction shape will be painted. */
+  @Override
+  void showSelection();
 
-	/**
-	 * True if the user is selecting a topography element, otherwise false.
-	 * 
-	 * @return true if the user is selecting a topography element, otherwise false.
-	 */
-	@Override
-	boolean isSelectionVisible();
+  /** After this call the selction shape will no longer be painted. */
+  @Override
+  void hideSelection();
 
+  /**
+   * cleans the whole topography, after this call there is no topography element in the topography
+   * and resetTopographySize() will be called.
+   */
+  void resetScenario();
 
-	/**
-	 * After this call the selction shape will be painted.
-	 */
-	@Override
-	void showSelection();
+  @Override
+  ScenarioElement getSelectedElement();
 
-	/**
-	 * After this call the selction shape will no longer be painted.
-	 */
-	@Override
-	void hideSelection();
+  Color getCursorColor();
 
+  void setCursorColor(Color red);
 
-	/**
-	 * cleans the whole topography, after this call there is no topography element in the topography
-	 * and
-	 * resetTopographySize() will be called.
-	 */
-	void resetScenario();
+  @Override
+  void setMouseSelectionMode(IMode selectionMode);
 
+  @Override
+  IMode getMouseSelectionMode();
 
-	@Override
-	ScenarioElement getSelectedElement();
+  Cursor getCursor();
 
-	Color getCursorColor();
+  void setCursor(Cursor cursor);
 
-	void setCursorColor(Color red);
+  double getScalingFactor();
 
-	@Override
-	void setMouseSelectionMode(IMode selectionMode);
+  void setScalingFactor(double scalingFactor);
 
-	@Override
-	IMode getMouseSelectionMode();
+  void setVadereScenario(Scenario vadereScenario);
 
-	Cursor getCursor();
+  Teleporter getTeleporter();
 
-	void setCursor(Cursor cursor);
+  void setTeleporter(Teleporter teleporter);
 
-	double getScalingFactor();
+  // double getFinishTime();
 
-	void setScalingFactor(double scalingFactor);
+  void addShape(ScenarioElement shape);
 
-	void setVadereScenario(Scenario vadereScenario);
+  ScenarioElement removeElement(VPoint position);
 
-	Teleporter getTeleporter();
+  /**
+   * @Null
+   *
+   * @param position
+   * @return
+   */
+  @Override
+  ScenarioElement setSelectedElement(VPoint position);
 
-	void setTeleporter(Teleporter teleporter);
+  boolean removeElement(ScenarioElement element);
 
-	// double getFinishTime();
+  ScenarioElement deleteLastShape(ScenarioElementType type);
 
-	void addShape(ScenarioElement shape);
+  ScenarioElement deleteLastShape();
 
-	ScenarioElement removeElement(VPoint position);
+  void switchType(ScenarioElementType type);
 
-	/**
-	 * @Null
-	 * @param position
-	 * @return
-	 */
-	@Override
-	ScenarioElement setSelectedElement(VPoint position);
+  ScenarioElementType getCurrentType();
 
-	boolean removeElement(ScenarioElement element);
+  Scenario getScenario();
 
-	ScenarioElement deleteLastShape(ScenarioElementType type);
+  void setTopography(Topography topography);
 
-	ScenarioElement deleteLastShape();
+  @Override
+  void notifyObservers(final Object string);
 
-	void switchType(ScenarioElementType type);
+  int getBoundId();
 
-	ScenarioElementType getCurrentType();
+  @Override
+  void setSelectedElement(ScenarioElement selectedElement);
 
-	Scenario getScenario();
+  VShape translate(Point vector);
 
-	void setTopography(Topography topography);
+  VShape resize(Point start, Point end);
 
-	@Override
-	void notifyObservers(final Object string);
+  boolean isPrototypeVisble();
 
-	int getBoundId();
+  VShape getPrototypeShape();
 
-	@Override
-	void setSelectedElement(ScenarioElement selectedElement);
+  void setPrototypeShape(VShape prototypeShape);
 
-	VShape translate(Point vector);
+  void hidePrototypeShape();
 
-	VShape resize(Point start, Point end);
+  void showPrototypeShape();
 
-	boolean isPrototypeVisble();
+  ScenarioElement getCopiedElement();
 
-	VShape getPrototypeShape();
+  void setCopiedElement(ScenarioElement copiedElement);
 
-	void setPrototypeShape(VShape prototypeShape);
+  VShape translate(VPoint vector);
 
-	void hidePrototypeShape();
+  VShape translateElement(ScenarioElement elementToCopy, VPoint diff);
 
-	void showPrototypeShape();
+  void removeObstacleIf(final @NotNull Predicate<Obstacle> predicate);
 
-	ScenarioElement getCopiedElement();
+  void removeMeasurementAreaIf(final @NotNull Predicate<MeasurementArea> predicate);
 
-	void setCopiedElement(ScenarioElement copiedElement);
+  List<Obstacle> getObstacles();
 
-	VShape translate(VPoint vector);
+  List<MeasurementArea> getMeasurementAreas();
 
-	VShape translateElement(ScenarioElement elementToCopy, VPoint diff);
+  Rectangle2D.Double getBounds();
 
-	void removeObstacleIf(final @NotNull Predicate<Obstacle> predicate);
-
-	void removeMeasurementAreaIf(final @NotNull Predicate<MeasurementArea> predicate);
-
-	List<Obstacle> getObstacles();
-
-	List<MeasurementArea> getMeasurementAreas();
-
-	Rectangle2D.Double getBounds();
-
-	default VPoint translateVectorCoordinates(Point point) {
-		return new VPoint(point.x / getScaleFactor(), getTopography().getBounds().height - point.y / getScaleFactor());
-	}
-
+  default VPoint translateVectorCoordinates(Point point) {
+    return new VPoint(
+        point.x / getScaleFactor(),
+        getTopography().getBounds().height - point.y / getScaleFactor());
+  }
 }

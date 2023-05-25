@@ -5,20 +5,19 @@ import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.types.PedestrianAttitudeType;
 
 public class PedestrianLoadingStrategyUnitQueueingGame<T extends Pedestrian>
-		extends PedestrianLoadingStrategyConditioned<T> {
+    extends PedestrianLoadingStrategyConditioned<T> {
 
+  /** @param loading */
+  PedestrianLoadingStrategyUnitQueueingGame(final double loading) {
+    super(
+        new PedestrianLoadingStrategyUnit(loading),
+        ped ->
+            ped.getModelPedestrian(QueueingGamePedestrian.class).getAttituteType()
+                != PedestrianAttitudeType.COMPETITIVE);
+  }
 
-	/**
-	 *
-	 * @param loading
-	 */
-	PedestrianLoadingStrategyUnitQueueingGame(final double loading) {
-		super(new PedestrianLoadingStrategyUnit(loading), ped -> ped.getModelPedestrian(QueueingGamePedestrian.class)
-				.getAttituteType() != PedestrianAttitudeType.COMPETITIVE);
-	}
-
-	@Override
-	public String toString() {
-		return super.toString() + " (conditioned)";
-	}
+  @Override
+  public String toString() {
+    return super.toString() + " (conditioned)";
+  }
 }

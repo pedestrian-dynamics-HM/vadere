@@ -1,19 +1,15 @@
 package org.vadere.state.attributes.processor;
 
-/**
- * @author Manuel Hertle
- *
- */
-
+/** @author Manuel Hertle */
 public class AttributesGroupDistProcessor extends AttributesProcessor {
-	private int areaGroupMetaDataProcessorId;
+  private int areaGroupMetaDataProcessorId;
 
-	public int getAreaGroupMetaDataProcessorId() {
-		return this.areaGroupMetaDataProcessorId;
-	}
+  public int getAreaGroupMetaDataProcessorId() {
+    return this.areaGroupMetaDataProcessorId;
+  }
 
-	public void setAreaGroupMetaDataProcessorId(int areaGroupMetaDataProcessorId) {
-		checkSealed();
-		this.areaGroupMetaDataProcessorId= areaGroupMetaDataProcessorId;
-	}
+  public void setAreaGroupMetaDataProcessorId(int areaGroupMetaDataProcessorId) {
+    checkSealed();
+    this.areaGroupMetaDataProcessorId = areaGroupMetaDataProcessorId;
+  }
 }

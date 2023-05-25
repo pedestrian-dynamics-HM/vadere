@@ -6,9 +6,11 @@ import java.io.InputStream;
 
 public interface IDataReader<T> {
 
-	T fromTextFile(File file) throws Exception;
-	T fromTextFile(InputStream inputStream) throws Exception;
-	T fromBinary(File file) throws Exception;
-	T fromBinary(DataInputStream stream) throws Exception;
+  T fromTextFile(File file) throws Exception;
 
+  T fromTextFile(InputStream inputStream) throws Exception;
+
+  T fromBinary(File file) throws Exception;
+
+  T fromBinary(DataInputStream stream) throws Exception;
 }

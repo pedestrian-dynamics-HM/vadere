@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import org.vadere.state.attributes.models.seating.SeatFacingDirection;
 import org.vadere.state.attributes.models.seating.SeatRelativePosition;
 import org.vadere.state.attributes.models.seating.SeatSide;
@@ -16,234 +15,234 @@ import org.vadere.state.scenario.Target;
 
 public class SeatGroup {
 
-	public static final int SEATS_PER_SEAT_GROUP = 4;
+  public static final int SEATS_PER_SEAT_GROUP = 4;
 
-	private List<Seat> seats;
-	private int index;
-	private Compartment compartment;
+  private List<Seat> seats;
+  private int index;
+  private Compartment compartment;
 
-	// only for initialization
-	private Map<Target, Seat> targetSeatMap;
-	private List<List<Target>> longSeatRows;
+  // only for initialization
+  private Map<Target, Seat> targetSeatMap;
+  private List<List<Target>> longSeatRows;
 
-	public SeatGroup(Compartment compartment, int index, List<List<Target>> longSeatRows, Map<Target, Seat> targetSeatMap) {
-		this.index = index;
-		this.compartment = compartment;
-		this.seats = new ArrayList<>(4);
-		
-		this.longSeatRows = longSeatRows;
-		this.targetSeatMap = targetSeatMap;
-		createSeats();
-	}
+  public SeatGroup(
+      Compartment compartment,
+      int index,
+      List<List<Target>> longSeatRows,
+      Map<Target, Seat> targetSeatMap) {
+    this.index = index;
+    this.compartment = compartment;
+    this.seats = new ArrayList<>(4);
 
-	private void createSeats() {
-		final int compartmentIndex = compartment.getIndex();
-		
-		final int longRowIndex1, longRowIndex2;
-		if (isAtLeftSide()) {
-			longRowIndex1 = 0;
-			longRowIndex2 = 1;
-		} else {
-			longRowIndex1 = 2;
-			longRowIndex2 = 3;
-		}
+    this.longSeatRows = longSeatRows;
+    this.targetSeatMap = targetSeatMap;
+    createSeats();
+  }
 
-		final int targetIndex1;
-		if (compartment.isFirstHalfCompartment())
-			targetIndex1 = 0;
-		else
-			targetIndex1 = (compartmentIndex - 1) * 4 + (index / 2) * 2 + 2;
-		
-		addNewSeat(longRowIndex1, targetIndex1);
-		addNewSeat(longRowIndex2, targetIndex1);
-		addNewSeat(longRowIndex1, targetIndex1 + 1);
-		addNewSeat(longRowIndex2, targetIndex1 + 1);
+  private void createSeats() {
+    final int compartmentIndex = compartment.getIndex();
 
-	}
+    final int longRowIndex1, longRowIndex2;
+    if (isAtLeftSide()) {
+      longRowIndex1 = 0;
+      longRowIndex2 = 1;
+    } else {
+      longRowIndex1 = 2;
+      longRowIndex2 = 3;
+    }
 
-	private void addNewSeat(int longRowIndex, int targetIndex) {
-		final int number = TrainModel.calculateSeatNumberWithinCompartment(longRowIndex, targetIndex);
-		final Target target = longSeatRows.get(longRowIndex).get(targetIndex);
+    final int targetIndex1;
+    if (compartment.isFirstHalfCompartment()) targetIndex1 = 0;
+    else targetIndex1 = (compartmentIndex - 1) * 4 + (index / 2) * 2 + 2;
 
-		final Seat newSeat = new Seat(this, target, number);
-		seats.add(newSeat);
-		targetSeatMap.put(target, newSeat);
-		
-	}
+    addNewSeat(longRowIndex1, targetIndex1);
+    addNewSeat(longRowIndex2, targetIndex1);
+    addNewSeat(longRowIndex1, targetIndex1 + 1);
+    addNewSeat(longRowIndex2, targetIndex1 + 1);
+  }
 
-	public Seat getSeat(int index) {
-		return seats.get(index);
-	}
+  private void addNewSeat(int longRowIndex, int targetIndex) {
+    final int number = TrainModel.calculateSeatNumberWithinCompartment(longRowIndex, targetIndex);
+    final Target target = longSeatRows.get(longRowIndex).get(targetIndex);
 
-	public Seat setSeat(int index, Seat seat) {
-		return seats.set(index, seat);
-	}
+    final Seat newSeat = new Seat(this, target, number);
+    seats.add(newSeat);
+    targetSeatMap.put(target, newSeat);
+  }
 
-	public int getIndex() {
-		return index;
-	}
-	
-	public int getPersonCount() {
-		return (int) getOccupiedSeats().count();
-	}
+  public Seat getSeat(int index) {
+    return seats.get(index);
+  }
 
-	public Seat getTheAvailableSeat() {
-		checkPersonCount(3);
-		return getAvailableSeats().findAny().get();
-	}
+  public Seat setSeat(int index, Seat seat) {
+    return seats.set(index, seat);
+  }
 
-	public Seat getTheOccupiedSeat() {
-		checkPersonCount(1);
-		return getOccupiedSeats().findAny().get();
-	}
+  public int getIndex() {
+    return index;
+  }
 
-	public List<Seat> getTheTwoAvailableSeats() {
-		checkPersonCount(2);
-		return getAvailableSeats().collect(Collectors.toList());
-	}
+  public int getPersonCount() {
+    return (int) getOccupiedSeats().count();
+  }
 
-	private Stream<Seat> getAvailableSeats() {
-		return getSeatsAsStream().filter(Seat::isAvailable);
-	}
-	
-	private Stream<Seat> getOccupiedSeats() {
-		return getSeatsAsStream().filter(Seat::isOccupied);
-	}
+  public Seat getTheAvailableSeat() {
+    checkPersonCount(3);
+    return getAvailableSeats().findAny().get();
+  }
 
-	private Stream<Seat> getSeatsAsStream() {
-		List<Seat> list = new ArrayList<>(4);
-		for (int i = 0; i < 4; i++) {
-			list.add(getSeat(i));
-		}
-		return list.stream();
-	}
+  public Seat getTheOccupiedSeat() {
+    checkPersonCount(1);
+    return getOccupiedSeats().findAny().get();
+  }
 
-	private void checkPersonCount(int count) {
-		if (getPersonCount() != count) {
-			throw new IllegalStateException(
-					"This method must only be called on seat groups with exactly " + count + " pessengers.");
-		}
-	}
+  public List<Seat> getTheTwoAvailableSeats() {
+    checkPersonCount(2);
+    return getAvailableSeats().collect(Collectors.toList());
+  }
 
-	public boolean onlySideChoice() {
-		return isSeatAvailable(0) && isSeatAvailable(1)
-				|| isSeatAvailable(2) && isSeatAvailable(3);
-	}
+  private Stream<Seat> getAvailableSeats() {
+    return getSeatsAsStream().filter(Seat::isAvailable);
+  }
 
-	public boolean onlyFacingDirectionChoice() {
-		return isSeatAvailable(0) && isSeatAvailable(2)
-				|| isSeatAvailable(1) && isSeatAvailable(3);
-	}
+  private Stream<Seat> getOccupiedSeats() {
+    return getSeatsAsStream().filter(Seat::isOccupied);
+  }
 
-	private boolean isSeatAvailable(int index) {
-		return getSeat(index).getSittingPerson() == null;
-	}
+  private Stream<Seat> getSeatsAsStream() {
+    List<Seat> list = new ArrayList<>(4);
+    for (int i = 0; i < 4; i++) {
+      list.add(getSeat(i));
+    }
+    return list.stream();
+  }
 
-	public Seat seatRelativeTo(Seat theOccupiedSeat, SeatRelativePosition relativePosition) {
-		for (int i = 0; i < 4; i++) {
-			if (getSeat(i) == theOccupiedSeat) {
-				switch (relativePosition) {
-				case NEXT:
-					return getSeatNextTo(i);
-				case ACROSS:
-					return getSeatAccrossFrom(i);
-				case DIAGONAL:
-					return getSeatDiagonallyOppositeTo(i);
-				}
-			}
-		}
-		throw new IllegalArgumentException("Supplied occupied seat is not part of this seat group.");
-	}
+  private void checkPersonCount(int count) {
+    if (getPersonCount() != count) {
+      throw new IllegalStateException(
+          "This method must only be called on seat groups with exactly " + count + " pessengers.");
+    }
+  }
 
-	private Seat getSeatDiagonallyOppositeTo(int i) {
-		return getSeat(3 - i);
-	}
+  public boolean onlySideChoice() {
+    return isSeatAvailable(0) && isSeatAvailable(1) || isSeatAvailable(2) && isSeatAvailable(3);
+  }
 
-	private Seat getSeatAccrossFrom(int i) {
-		return getSeat((i + 2) % 4);
-	}
+  public boolean onlyFacingDirectionChoice() {
+    return isSeatAvailable(0) && isSeatAvailable(2) || isSeatAvailable(1) && isSeatAvailable(3);
+  }
 
-	private Seat getSeatNextTo(int i) {
-		final int[] diagonalOpposites = { 1, 0, 3, 2 };
-		return getSeat(diagonalOpposites[i]);
-	}
+  private boolean isSeatAvailable(int index) {
+    return getSeat(index).getSittingPerson() == null;
+  }
 
-	public Seat availableSeatAtSide(SeatSide side) {
-		int[] indexes;
+  public Seat seatRelativeTo(Seat theOccupiedSeat, SeatRelativePosition relativePosition) {
+    for (int i = 0; i < 4; i++) {
+      if (getSeat(i) == theOccupiedSeat) {
+        switch (relativePosition) {
+          case NEXT:
+            return getSeatNextTo(i);
+          case ACROSS:
+            return getSeatAccrossFrom(i);
+          case DIAGONAL:
+            return getSeatDiagonallyOppositeTo(i);
+        }
+      }
+    }
+    throw new IllegalArgumentException("Supplied occupied seat is not part of this seat group.");
+  }
 
-		if (isAtLeftSide()) {
-			if (side == SeatSide.WINDOW) {
-				indexes = new int[] {0, 2};
-			} else {
-				indexes = new int[] {1, 3};
-			}
-		} else {
-			if (side == SeatSide.WINDOW) {
-				indexes = new int[] {1, 3};
-			} else {
-				indexes = new int[] {0, 2};
-			}
-		}
+  private Seat getSeatDiagonallyOppositeTo(int i) {
+    return getSeat(3 - i);
+  }
 
-		for (int i : indexes) {
-			if (isSeatAvailable(i)) {
-				return getSeat(i);
-			}
-		}
-		throw new IllegalStateException("This method must only be called when there is a seat available at side " + side);
-	}
+  private Seat getSeatAccrossFrom(int i) {
+    return getSeat((i + 2) % 4);
+  }
 
-	public Seat availableSeatAtFacingDirection(SeatFacingDirection facingDirection) {
-		int[] indexes;
+  private Seat getSeatNextTo(int i) {
+    final int[] diagonalOpposites = {1, 0, 3, 2};
+    return getSeat(diagonalOpposites[i]);
+  }
 
-		if (facingDirection == SeatFacingDirection.FORWARD) {
-			indexes = new int[] {2, 3};
-		} else {
-			indexes = new int[] {0, 1};
-		}
+  public Seat availableSeatAtSide(SeatSide side) {
+    int[] indexes;
 
-		for (int i : indexes) {
-			if (isSeatAvailable(i)) {
-				return getSeat(i);
-			}
-		}
-		throw new IllegalStateException("This method must only be called when there is a seat available with facing direction" + facingDirection);
-	}
+    if (isAtLeftSide()) {
+      if (side == SeatSide.WINDOW) {
+        indexes = new int[] {0, 2};
+      } else {
+        indexes = new int[] {1, 3};
+      }
+    } else {
+      if (side == SeatSide.WINDOW) {
+        indexes = new int[] {1, 3};
+      } else {
+        indexes = new int[] {0, 2};
+      }
+    }
 
-	public Compartment getCompartment() {
-		return compartment;
-	}
+    for (int i : indexes) {
+      if (isSeatAvailable(i)) {
+        return getSeat(i);
+      }
+    }
+    throw new IllegalStateException(
+        "This method must only be called when there is a seat available at side " + side);
+  }
 
-	public List<Seat> getSeats() {
-		return Collections.unmodifiableList(seats);
-	}
+  public Seat availableSeatAtFacingDirection(SeatFacingDirection facingDirection) {
+    int[] indexes;
 
-	public boolean isFull() {
-		return getPersonCount() == SEATS_PER_SEAT_GROUP;
-	}
+    if (facingDirection == SeatFacingDirection.FORWARD) {
+      indexes = new int[] {2, 3};
+    } else {
+      indexes = new int[] {0, 1};
+    }
 
-	public Seat getSeatByPosition(SeatPosition seatPosition) {
-		return seats.get(getSeatIndexByPosition(seatPosition));
-	}
+    for (int i : indexes) {
+      if (isSeatAvailable(i)) {
+        return getSeat(i);
+      }
+    }
+    throw new IllegalStateException(
+        "This method must only be called when there is a seat available with facing direction"
+            + facingDirection);
+  }
 
-	private int getSeatIndexByPosition(SeatPosition seatPosition) {
-		final Map<SeatPosition, Integer> seatPositionMapping = new HashMap<>();
-		if (isAtLeftSide()) {
-			seatPositionMapping.put(SeatPosition.WINDOW_BACKWARD, 0);
-			seatPositionMapping.put(SeatPosition.AISLE_BACKWARD,  1);
-			seatPositionMapping.put(SeatPosition.WINDOW_FORWARD,  2);
-			seatPositionMapping.put(SeatPosition.AISLE_FORWARD,   3);
-		} else {
-			seatPositionMapping.put(SeatPosition.AISLE_BACKWARD,  0);
-			seatPositionMapping.put(SeatPosition.WINDOW_BACKWARD, 1);
-			seatPositionMapping.put(SeatPosition.AISLE_FORWARD,   2);
-			seatPositionMapping.put(SeatPosition.WINDOW_FORWARD,  3);
-		}
-		return seatPositionMapping.get(seatPosition);
-	}
+  public Compartment getCompartment() {
+    return compartment;
+  }
 
-	public boolean isAtLeftSide() {
-		return index % 2 == 0;
-	}
+  public List<Seat> getSeats() {
+    return Collections.unmodifiableList(seats);
+  }
 
+  public boolean isFull() {
+    return getPersonCount() == SEATS_PER_SEAT_GROUP;
+  }
+
+  public Seat getSeatByPosition(SeatPosition seatPosition) {
+    return seats.get(getSeatIndexByPosition(seatPosition));
+  }
+
+  private int getSeatIndexByPosition(SeatPosition seatPosition) {
+    final Map<SeatPosition, Integer> seatPositionMapping = new HashMap<>();
+    if (isAtLeftSide()) {
+      seatPositionMapping.put(SeatPosition.WINDOW_BACKWARD, 0);
+      seatPositionMapping.put(SeatPosition.AISLE_BACKWARD, 1);
+      seatPositionMapping.put(SeatPosition.WINDOW_FORWARD, 2);
+      seatPositionMapping.put(SeatPosition.AISLE_FORWARD, 3);
+    } else {
+      seatPositionMapping.put(SeatPosition.AISLE_BACKWARD, 0);
+      seatPositionMapping.put(SeatPosition.WINDOW_BACKWARD, 1);
+      seatPositionMapping.put(SeatPosition.AISLE_FORWARD, 2);
+      seatPositionMapping.put(SeatPosition.WINDOW_FORWARD, 3);
+    }
+    return seatPositionMapping.get(seatPosition);
+  }
+
+  public boolean isAtLeftSide() {
+    return index % 2 == 0;
+  }
 }

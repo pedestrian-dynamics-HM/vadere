@@ -1,39 +1,39 @@
-//package org.vadere.simulator.dataprocessing;
+// package org.vadere.simulator.dataprocessing;
 //
-//import org.junit.Before;
-//import org.junit.Test;
-//import org.mockito.internal.stubbing.answers.DoesNothing;
-//import org.mockito.invocation.InvocationOnMock;
-//import org.mockito.stubbing.Answer;
-//import org.vadere.simulator.control.simulation.SimulationState;
-//import org.vadere.simulator.projects.dataprocessing.processor.*;
-//import org.vadere.state.attributes.AttributesBuilder;
-//import org.vadere.state.attributes.processor.AttributesDensityVoronoiProcessor;
-//import org.vadere.state.attributes.scenario.AttributesAgent;
-//import org.vadere.state.scenario.Agent;
-//import org.vadere.state.scenario.Pedestrian;
-//import org.vadere.state.scenario.Topography;
-//import org.vadere.utils.data.Row;
-//import org.vadere.utils.data.Table;
-//import org.vadere.utils.geometry.GeometryUtils;
-//import org.vadere.utils.geometry.shapes.VPoint;
-//import org.vadere.utils.geometry.shapes.VRectangle;
+// import org.junit.Before;
+// import org.junit.Test;
+// import org.mockito.internal.stubbing.answers.DoesNothing;
+// import org.mockito.invocation.InvocationOnMock;
+// import org.mockito.stubbing.Answer;
+// import org.vadere.simulator.control.simulation.SimulationState;
+// import org.vadere.simulator.projects.dataprocessing.processor.*;
+// import org.vadere.state.attributes.AttributesBuilder;
+// import org.vadere.state.attributes.processor.AttributesDensityVoronoiProcessor;
+// import org.vadere.state.attributes.scenario.AttributesAgent;
+// import org.vadere.state.scenario.Agent;
+// import org.vadere.state.scenario.Pedestrian;
+// import org.vadere.state.scenario.Topography;
+// import org.vadere.utils.data.Row;
+// import org.vadere.utils.data.Table;
+// import org.vadere.utils.geometry.GeometryUtils;
+// import org.vadere.utils.geometry.shapes.VPoint;
+// import org.vadere.utils.geometry.shapes.VRectangle;
 //
-//import java.net.URISyntaxException;
-//import java.utils.ArrayList;
-//import java.utils.List;
+// import java.net.URISyntaxException;
+// import java.utils.ArrayList;
+// import java.utils.List;
 //
-//import static junit.framework.Assert.assertEquals;
-//import static junit.framework.Assert.assertTrue;
-//import static org.mockito.Mockito.mock;
-//import static org.mockito.Mockito.when;
+// import static junit.framework.Assert.assertEquals;
+// import static junit.framework.Assert.assertTrue;
+// import static org.mockito.Mockito.mock;
+// import static org.mockito.Mockito.when;
 //
 //
-///**
+/// **
 // * This class contains tests that test both Voronoi-Implementation (the JTS-Version and our own
 // * version).
 // */
-//public class TestVoronoiDensityProcessors {
+// public class TestVoronoiDensityProcessors {
 //
 //	private DensityVoronoiProcessor densityVoronoiProcessor;
 //	private DensityVoronoiGeoProcessor densityVoronoiGeoProcessor;
@@ -193,7 +193,8 @@
 //		setUpProcessors(voronoiArea);
 //
 //		VPoint[] pedestrianPoints = CreatePoints.generateRandomVPoint(voronoiArea, numberOfPedestrians);
-//		VPoint[] measurementPoints = CreatePoints.generateRandomVPoint(voronoiArea, numberOfMeasurePoints);
+//		VPoint[] measurementPoints = CreatePoints.generateRandomVPoint(voronoiArea,
+// numberOfMeasurePoints);
 //
 //		when(mockedTopography.getElements(Agent.class))
 //				.thenReturn(PointToPedestrianConverter.getPedestriansAt(pedestrianPoints));
@@ -231,7 +232,8 @@
 //				.add(new VPoint(voronoiArea.getWidth() - voronoiArea.getX() + GeometryUtils.DOUBLE_EPS, 0));
 //		pedestrianPoints[0] = pointOutsideVoronoiArea;
 //
-//		VPoint[] measurementPoints = CreatePoints.generateRandomVPoint(voronoiArea, numberOfMeasurePoints);
+//		VPoint[] measurementPoints = CreatePoints.generateRandomVPoint(voronoiArea,
+// numberOfMeasurePoints);
 //
 //		when(mockedTopography.getElements(Agent.class))
 //				.thenReturn(PointToPedestrianConverter.getPedestriansAt(pedestrianPoints));
@@ -279,8 +281,10 @@
 //				VRectangle voronoiArea = new VRectangle(2, 2, 10, 10);
 //				setUpProcessors(voronoiArea);
 //
-//				VPoint[] pedestrianPoints = CreatePoints.generateRandomVPoint(voronoiArea, numberOfPedestrians);
-//				VPoint[] measurementPoints = CreatePoints.generateRandomVPoint(voronoiArea, numberOfMeasurePoints);
+//				VPoint[] pedestrianPoints = CreatePoints.generateRandomVPoint(voronoiArea,
+// numberOfPedestrians);
+//				VPoint[] measurementPoints = CreatePoints.generateRandomVPoint(voronoiArea,
+// numberOfMeasurePoints);
 //
 //				when(mockedTopography.getElements(Agent.class))
 //						.thenReturn(PointToPedestrianConverter.getPedestriansAt(pedestrianPoints));
@@ -357,4 +361,4 @@
 //		stepCounter++;
 //		return stepCounter;
 //	}
-//}
+// }

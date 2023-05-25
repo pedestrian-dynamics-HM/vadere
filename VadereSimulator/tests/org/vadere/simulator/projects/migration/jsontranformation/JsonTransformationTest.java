@@ -6,20 +6,21 @@ import org.vadere.simulator.utils.reflection.TestJsonNodeExplorer;
 import org.vadere.simulator.utils.reflection.TestJsonNodeHelper;
 import org.vadere.simulator.utils.reflection.TestResourceHandlerScenario;
 
-public abstract class JsonTransformationTest implements TestJsonNodeExplorer, TestJsonNodeHelper, TestResourceHandlerScenario {
+public abstract class JsonTransformationTest
+    implements TestJsonNodeExplorer, TestJsonNodeHelper, TestResourceHandlerScenario {
 
-	protected org.vadere.simulator.projects.migration.jsontranformation.JsonTransformationFactory factory = org.vadere.simulator.projects.migration.jsontranformation.JsonTransformationFactory.instance();
+  protected org.vadere.simulator.projects.migration.jsontranformation.JsonTransformationFactory
+      factory =
+          org.vadere.simulator.projects.migration.jsontranformation.JsonTransformationFactory
+              .instance();
 
+  @Before
+  public void init() {
+    backupTestDir();
+  }
 
-	@Before
-	public void init() {
-		backupTestDir();
-	}
-
-	@After
-	public void cleaUp() {
-		loadFromBackup();
-	}
-
-
+  @After
+  public void cleaUp() {
+    loadFromBackup();
+  }
 }

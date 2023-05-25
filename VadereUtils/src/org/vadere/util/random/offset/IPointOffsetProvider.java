@@ -5,10 +5,9 @@ import org.vadere.util.geometry.shapes.VPoint;
 
 public interface IPointOffsetProvider {
 
-    static IPointOffsetProvider noOffset(){
-        return VPoint::new;
-    }
+  static IPointOffsetProvider noOffset() {
+    return VPoint::new;
+  }
 
-    IPoint applyOffset(IPoint point);
-
+  IPoint applyOffset(IPoint point);
 }

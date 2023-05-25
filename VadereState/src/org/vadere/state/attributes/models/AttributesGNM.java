@@ -7,35 +7,39 @@ import org.vadere.state.types.GradientProviderType;
 @ModelAttributeClass
 public class AttributesGNM extends Attributes {
 
-	private AttributesODEIntegrator attributesODEIntegrator;
-	private GradientProviderType floorGradientProviderType = GradientProviderType.FLOOR_EIKONAL_DISCRETE;
+  private AttributesODEIntegrator attributesODEIntegrator;
+  private GradientProviderType floorGradientProviderType =
+      GradientProviderType.FLOOR_EIKONAL_DISCRETE;
 
-	private String targetPotentialModel = "org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid";
-	private String pedestrianPotentialModel = "org.vadere.simulator.models.gnm.PotentialFieldPedestrianGNM";
-	private String obstaclePotentialModel = "org.vadere.simulator.models.gnm.PotentialFieldObstacleGNM";
+  private String targetPotentialModel =
+      "org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid";
+  private String pedestrianPotentialModel =
+      "org.vadere.simulator.models.gnm.PotentialFieldPedestrianGNM";
+  private String obstaclePotentialModel =
+      "org.vadere.simulator.models.gnm.PotentialFieldObstacleGNM";
 
-	public AttributesGNM() {
-		attributesODEIntegrator = new AttributesODEIntegrator();
-	}
+  public AttributesGNM() {
+    attributesODEIntegrator = new AttributesODEIntegrator();
+  }
 
-	// Getters...
-	public AttributesODEIntegrator getAttributesODEIntegrator() {
-		return attributesODEIntegrator;
-	}
+  // Getters...
+  public AttributesODEIntegrator getAttributesODEIntegrator() {
+    return attributesODEIntegrator;
+  }
 
-	public GradientProviderType getFloorGradientProviderType() {
-		return floorGradientProviderType;
-	}
+  public GradientProviderType getFloorGradientProviderType() {
+    return floorGradientProviderType;
+  }
 
-	public String getTargetPotentialModel() {
-		return targetPotentialModel;
-	}
+  public String getTargetPotentialModel() {
+    return targetPotentialModel;
+  }
 
-	public String getPedestrianPotentialModel() {
-		return pedestrianPotentialModel;
-	}
+  public String getPedestrianPotentialModel() {
+    return pedestrianPotentialModel;
+  }
 
-	public String getObstaclePotentialModel() {
-		return obstaclePotentialModel;
-	}
+  public String getObstaclePotentialModel() {
+    return obstaclePotentialModel;
+  }
 }

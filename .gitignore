@@ -11,6 +11,8 @@ target/
 # C extensions
 *.so
 vadere_analysis_tool/build
+*.bak
+.java-version
 
 # IDEs
 .idea/
@@ -23,6 +25,8 @@ vadere_analysis_tool/build
 .apt_generated
 .apt_generated_tests
 .factorypath
+
+Scenarios/Kloudspot
 
 # Package specific
 VadereGui/*.png

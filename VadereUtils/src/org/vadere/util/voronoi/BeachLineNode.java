@@ -1,7 +1,7 @@
 package org.vadere.util.voronoi;
 
 interface BeachLineNode {
-	BeachLineInternal getParent();
+  BeachLineInternal getParent();
 
-	void setParent(BeachLineInternal parent);
+  void setParent(BeachLineInternal parent);
 }

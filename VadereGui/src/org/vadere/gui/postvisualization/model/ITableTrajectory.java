@@ -1,115 +1,130 @@
 package org.vadere.gui.postvisualization.model;
 
 import org.jetbrains.annotations.NotNull;
-
 import tech.tablesaw.api.DoubleColumn;
 import tech.tablesaw.api.IntColumn;
 import tech.tablesaw.api.Table;
 
 public interface ITableTrajectory {
 
-	Table getTrajectoryDataFrame();
-	Table getAgentDataFrame();
+  Table getTrajectoryDataFrame();
 
-	void setSlice(final double startX, final double endX);
+  Table getAgentDataFrame();
 
-	default boolean isEmpty() {
-		return getTrajectoryDataFrame().isEmpty();
-	}
+  void setSlice(final double startX, final double endX);
 
-	default Table getAgents(final double startX, final double endX) {
-		return getCurrentSlice().where(getStartTime().isGreaterThanOrEqualTo(startX).and(getEndTime().isLessThanOrEqualTo(endX)));
-	}
+  default boolean isEmpty() {
+    return getTrajectoryDataFrame().isEmpty();
+  }
 
-	default Table getAliveAgents(final double startX, final double endX) {
-		return getCurrentSlice().where(getPedId().isIn(filterAgents(startX, endX))).where(getStartTime().isGreaterThanOrEqualTo(startX).and(getEndTime().isLessThanOrEqualTo(endX)));
-	}
+  default Table getAgents(final double startX, final double endX) {
+    return getCurrentSlice()
+        .where(
+            getStartTime()
+                .isGreaterThanOrEqualTo(startX)
+                .and(getEndTime().isLessThanOrEqualTo(endX)));
+  }
 
-	default Table getAgents(final double simTimeInSec) {
-		return getCurrentSlice().where(
-				getStartTime().isGreaterThanOrEqualTo(simTimeInSec)
-						.and(getEndTime().isLessThanOrEqualTo(simTimeInSec)))
-				.sortAscendingOn(getColumnName(getPedIdCol()));
-	}
+  default Table getAliveAgents(final double startX, final double endX) {
+    return getCurrentSlice()
+        .where(getPedId().isIn(filterAgents(startX, endX)))
+        .where(
+            getStartTime()
+                .isGreaterThanOrEqualTo(startX)
+                .and(getEndTime().isLessThanOrEqualTo(endX)));
+  }
 
-	default Table getAgent(final double simTimeInSec, final int pedId) {
-		return getCurrentSlice().where(
-				getStartTime().isGreaterThanOrEqualTo(simTimeInSec)
-						.and(getEndTime().isLessThanOrEqualTo(simTimeInSec))
-						.and(getPedId().isEqualTo(pedId)));
-	}
+  default Table getAgents(final double simTimeInSec) {
+    return getCurrentSlice()
+        .where(
+            getStartTime()
+                .isGreaterThanOrEqualTo(simTimeInSec)
+                .and(getEndTime().isLessThanOrEqualTo(simTimeInSec)))
+        .sortAscendingOn(getColumnName(getPedIdCol()));
+  }
 
-	default Integer[] filterAgents(final double startTime, final double endTime) {
-		return getCurrentSlice()
-				.where(getBirthTime().isGreaterThanOrEqualTo(startTime).and(getDeathTime().isLessThanOrEqualTo(endTime)))
-				.intColumn(getPedIdColADF())
-				.asObjectArray();
-	}
+  default Table getAgent(final double simTimeInSec, final int pedId) {
+    return getCurrentSlice()
+        .where(
+            getStartTime()
+                .isGreaterThanOrEqualTo(simTimeInSec)
+                .and(getEndTime().isLessThanOrEqualTo(simTimeInSec))
+                .and(getPedId().isEqualTo(pedId)));
+  }
 
-	int getPedIdCol();
+  default Integer[] filterAgents(final double startTime, final double endTime) {
+    return getCurrentSlice()
+        .where(
+            getBirthTime()
+                .isGreaterThanOrEqualTo(startTime)
+                .and(getDeathTime().isLessThanOrEqualTo(endTime)))
+        .intColumn(getPedIdColADF())
+        .asObjectArray();
+  }
 
+  int getPedIdCol();
 
-	int getPedIdColADF();
+  int getPedIdColADF();
 
-	Table getCurrentSlice();
+  Table getCurrentSlice();
 
-	double getMaxEndTime();
+  double getMaxEndTime();
 
-	double getMinStartTime();
+  double getMinStartTime();
 
-	default String getColumnName(final int colIndex) {
-		return getTrajectoryDataFrame().columnNames().get(colIndex);
-	}
+  default String getColumnName(final int colIndex) {
+    return getTrajectoryDataFrame().columnNames().get(colIndex);
+  }
 
-	default IntColumn getPedId(@NotNull final Table table) {
-		return table.intColumn(getPedIdCol());
-	}
+  default IntColumn getPedId(@NotNull final Table table) {
+    return table.intColumn(getPedIdCol());
+  }
 
-	DoubleColumn getStartX(@NotNull final Table table);
+  DoubleColumn getStartX(@NotNull final Table table);
 
-	DoubleColumn getStartY(@NotNull final Table table);
+  DoubleColumn getStartY(@NotNull final Table table);
 
-	DoubleColumn getEndX(@NotNull final Table table);
+  DoubleColumn getEndX(@NotNull final Table table);
 
-	DoubleColumn getEndY(@NotNull final Table table);
+  DoubleColumn getEndY(@NotNull final Table table);
 
-	DoubleColumn getStartTime(@NotNull final Table table);
+  DoubleColumn getStartTime(@NotNull final Table table);
 
-	DoubleColumn getEndTime(@NotNull final Table table);
+  DoubleColumn getEndTime(@NotNull final Table table);
 
-	DoubleColumn getBirthTime();
+  DoubleColumn getBirthTime();
 
-	DoubleColumn getDeathTime();
+  DoubleColumn getDeathTime();
 
-	double getBirthTime(final int pedId);
+  double getBirthTime(final int pedId);
 
-	double getDeathTime(final int pedId);
+  double getDeathTime(final int pedId);
 
-	default IntColumn getPedId() {
-		return getPedId(getCurrentSlice());
-	}
+  default IntColumn getPedId() {
+    return getPedId(getCurrentSlice());
+  }
 
-	default DoubleColumn getStartX() {
-		return getStartX(getCurrentSlice());
-	}
+  default DoubleColumn getStartX() {
+    return getStartX(getCurrentSlice());
+  }
 
-	default DoubleColumn getStartY() {
-		return getStartY(getCurrentSlice());
-	}
+  default DoubleColumn getStartY() {
+    return getStartY(getCurrentSlice());
+  }
 
-	default DoubleColumn getEndX() {
-		return getEndX(getCurrentSlice());
-	}
+  default DoubleColumn getEndX() {
+    return getEndX(getCurrentSlice());
+  }
 
-	default DoubleColumn getEndY() {
-		return getEndY(getCurrentSlice());
-	}
+  default DoubleColumn getEndY() {
+    return getEndY(getCurrentSlice());
+  }
 
-	default DoubleColumn getStartTime() {
-		return getStartTime(getCurrentSlice());
-	}
+  default DoubleColumn getStartTime() {
+    return getStartTime(getCurrentSlice());
+  }
 
-	default DoubleColumn getEndTime() {
-		return getEndTime(getCurrentSlice());
-	}
+  default DoubleColumn getEndTime() {
+    return getEndTime(getCurrentSlice());
+  }
 }

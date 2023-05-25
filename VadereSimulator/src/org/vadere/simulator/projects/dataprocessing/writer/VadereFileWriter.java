@@ -12,29 +12,28 @@ import java.io.UncheckedIOException;
  */
 public class VadereFileWriter implements VadereWriter {
 
-	PrintWriter w;
+  PrintWriter w;
 
-	public VadereFileWriter(String absoluteFileName) {
-		try {
-			this.w = new PrintWriter(new FileWriter(absoluteFileName));
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
-	}
+  public VadereFileWriter(String absoluteFileName) {
+    try {
+      this.w = new PrintWriter(new FileWriter(absoluteFileName));
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
+    }
+  }
 
-	@Override
-	public void println(String s) {
-		w.println(s);
-	}
+  @Override
+  public void println(String s) {
+    w.println(s);
+  }
 
-	@Override
-	public void flush() {
-		w.flush();
-	}
+  @Override
+  public void flush() {
+    w.flush();
+  }
 
-
-	@Override
-	public void close() throws IOException {
-		w.close();
-	}
+  @Override
+  public void close() throws IOException {
+    w.close();
+  }
 }

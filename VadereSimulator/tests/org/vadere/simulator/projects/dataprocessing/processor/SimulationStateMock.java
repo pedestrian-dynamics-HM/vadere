@@ -1,12 +1,11 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
-import org.mockito.Mockito;
-import org.vadere.simulator.control.simulation.SimulationState;
-import org.vadere.util.test.MockProvider;
-
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import org.mockito.Mockito;
+import org.vadere.simulator.control.simulation.SimulationState;
+import org.vadere.util.test.MockProvider;
 
 /**
  * Abstract Class for {@link SimulationStateMock}s
@@ -15,21 +14,21 @@ import static org.mockito.Mockito.when;
  */
 public abstract class SimulationStateMock implements MockProvider<SimulationState> {
 
-	protected SimulationState state;
+  protected SimulationState state;
 
-	SimulationStateMock() {
-		this.state = mock(SimulationState.class, Mockito.RETURNS_DEEP_STUBS);
-		mockIt();
-	}
+  SimulationStateMock() {
+    this.state = mock(SimulationState.class, Mockito.RETURNS_DEEP_STUBS);
+    mockIt();
+  }
 
-	SimulationStateMock(int simStep) {
-		this.state = mock(SimulationState.class, Mockito.RETURNS_DEEP_STUBS);
-		when(state.getStep()).thenReturn(simStep);
-		mockIt();
-	}
+  SimulationStateMock(int simStep) {
+    this.state = mock(SimulationState.class, Mockito.RETURNS_DEEP_STUBS);
+    when(state.getStep()).thenReturn(simStep);
+    mockIt();
+  }
 
-	@Override
-	public SimulationState get() {
-		return state;
-	}
+  @Override
+  public SimulationState get() {
+    return state;
+  }
 }

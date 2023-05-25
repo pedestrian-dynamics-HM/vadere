@@ -7,75 +7,75 @@ import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.logging.Logger;
 
 /**
- * TimeCostPedestrianDensity is a time cost function for the pedestrian density
- * that uses image processing filters. The function is for the purpose of
- * navigation around groups. The measurement with a loading is done by the
- * PedestrianGaussianFilter that uses the javaCV library. This has to be done
- * for every simulation step.
- * 
- * 
+ * TimeCostPedestrianDensity is a time cost function for the pedestrian density that uses image
+ * processing filters. The function is for the purpose of navigation around groups. The measurement
+ * with a loading is done by the PedestrianGaussianFilter that uses the javaCV library. This has to
+ * be done for every simulation step.
  */
 public class TimeCostPedestrianDensity implements ITimeCostFunction {
-	/** the radius for the measurement . */
-	private double heighestDensity = 0.0;
+  /** the radius for the measurement . */
+  private double heighestDensity = 0.0;
 
-	/** the image processing filter. */
-	private final IGaussianFilter gaussianCalculator;
+  /** the image processing filter. */
+  private final IGaussianFilter gaussianCalculator;
 
-	/** the decorator that will be uesed by this decorator. */
-	private ITimeCostFunction timeCostFunction;
+  /** the decorator that will be uesed by this decorator. */
+  private ITimeCostFunction timeCostFunction;
 
-	/** only for logging informations. */
-	private static Logger logger = Logger
-			.getLogger(TimeCostPedestrianDensity.class);
-	private int updateCount = 0;
-	private long runtime = 0;
-	private Topography topography;
+  /** only for logging informations. */
+  private static Logger logger = Logger.getLogger(TimeCostPedestrianDensity.class);
 
-	public TimeCostPedestrianDensity(final ITimeCostFunction timeCostFunction, final IGaussianFilter filter) {
-		this.timeCostFunction = timeCostFunction;
-		this.gaussianCalculator = filter;
+  private int updateCount = 0;
+  private long runtime = 0;
+  private Topography topography;
 
-		logger.info("timeCostFunction:  " + timeCostFunction);
-		logger.info("gaussianCalculator:  " + filter);
+  public TimeCostPedestrianDensity(
+      final ITimeCostFunction timeCostFunction, final IGaussianFilter filter) {
+    this.timeCostFunction = timeCostFunction;
+    this.gaussianCalculator = filter;
 
-		// the initial filtering (convolution), TODO: we have to destroy the filter if it is no longer needed!
-		this.gaussianCalculator.filterImage();
-	}
+    logger.info("timeCostFunction:  " + timeCostFunction);
+    logger.info("gaussianCalculator:  " + filter);
 
-	@Override
-	public double costAt(final IPoint p) {
-		long ms = System.currentTimeMillis();
-		double cost = gaussianCalculator.getFilteredValue(p.getX(), p.getY());
+    // the initial filtering (convolution), TODO: we have to destroy the filter if it is no longer
+    // needed!
+    this.gaussianCalculator.filterImage();
+  }
 
-		if (heighestDensity < cost) {
-			heighestDensity = cost;
-		}
+  @Override
+  public double costAt(final IPoint p) {
+    long ms = System.currentTimeMillis();
+    double cost = gaussianCalculator.getFilteredValue(p.getX(), p.getY());
 
-		runtime += System.currentTimeMillis() - ms;
-		return timeCostFunction.costAt(p) + cost;
-		// return timeCostFunction.costAt(p) + cost < 0.7 ? 0.0 : cost;
-	}
+    if (heighestDensity < cost) {
+      heighestDensity = cost;
+    }
 
-	@Override
-	public void update() {
-		runtime = 0;
-		long ms = System.currentTimeMillis();
+    runtime += System.currentTimeMillis() - ms;
+    return timeCostFunction.costAt(p) + cost;
+    // return timeCostFunction.costAt(p) + cost < 0.7 ? 0.0 : cost;
+  }
 
-		// refersh the filtered image
-		this.gaussianCalculator.filterImage();
-		runtime += System.currentTimeMillis() - ms;
-		//logger.info(++updateCount + " pedestrian density cost: "+ heighestDensity + ", runtime: " + runtime + "[msec]");
-		updateCount++;
-	}
+  @Override
+  public void update() {
+    runtime = 0;
+    long ms = System.currentTimeMillis();
 
-	@Override
-	public boolean needsUpdate() {
-		return true;
-	}
+    // refersh the filtered image
+    this.gaussianCalculator.filterImage();
+    runtime += System.currentTimeMillis() - ms;
+    // logger.info(++updateCount + " pedestrian density cost: "+ heighestDensity + ", runtime: " +
+    // runtime + "[msec]");
+    updateCount++;
+  }
 
-	@Override
-	public String toString() {
-		return "(pedestrian density function(x)) + " + timeCostFunction;
-	}
+  @Override
+  public boolean needsUpdate() {
+    return true;
+  }
+
+  @Override
+  public String toString() {
+    return "(pedestrian density function(x)) + " + timeCostFunction;
+  }
 }

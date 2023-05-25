@@ -6,35 +6,35 @@ import org.vadere.util.geometry.shapes.VRectangle;
 
 public class PedestrianIdDuration implements PointPositioned {
 
-    private int pedestrianId;
-    private double duration;
+  private int pedestrianId;
+  private double duration;
 
-    private VRectangle position;
+  private VRectangle position;
 
-    public PedestrianIdDuration(int pedestrianId, double duration, VRectangle position) {
-        this.pedestrianId = pedestrianId;
-        this.duration = duration;
-        this.position = position;
-    }
+  public PedestrianIdDuration(int pedestrianId, double duration, VRectangle position) {
+    this.pedestrianId = pedestrianId;
+    this.duration = duration;
+    this.position = position;
+  }
 
-    public int getPedestrianId() {
-        return pedestrianId;
-    }
+  public int getPedestrianId() {
+    return pedestrianId;
+  }
 
-    public void setPedestrianId(int pedestrianId) {
-        this.pedestrianId = pedestrianId;
-    }
+  public void setPedestrianId(int pedestrianId) {
+    this.pedestrianId = pedestrianId;
+  }
 
-    public double getDuration() {
-        return duration;
-    }
+  public double getDuration() {
+    return duration;
+  }
 
-    public void setDuration(double duration) {
-        this.duration = duration;
-    }
+  public void setDuration(double duration) {
+    this.duration = duration;
+  }
 
-    @Override
-    public VPoint getPosition() {
-        return new VPoint(position.getCenterX(), position.getCenterY());
-    }
+  @Override
+  public VPoint getPosition() {
+    return new VPoint(position.getCenterX(), position.getCenterY());
+  }
 }

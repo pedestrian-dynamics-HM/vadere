@@ -1,19 +1,16 @@
 package org.vadere.state.attributes.processor;
 
-/**
- * @author Marion Gödel
- *
- */
-
+/** @author Marion Gödel */
 public class AttributesMeanAreaDensityVoronoiProcessor extends AttributesProcessor {
-    private int pedestrianAreaDensityVoronoiProcessorId;
+  private int pedestrianAreaDensityVoronoiProcessorId;
 
-    public int getPedestrianAreaDensityVoronoiProcessorId() {
-        return this.pedestrianAreaDensityVoronoiProcessorId;
-    }
+  public int getPedestrianAreaDensityVoronoiProcessorId() {
+    return this.pedestrianAreaDensityVoronoiProcessorId;
+  }
 
-    public void setPedestrianAreaDensityVoronoiProcessorId(int pedestrianMeanAreaDensityVoronoiProcessorId) {
-        checkSealed();
-        this.pedestrianAreaDensityVoronoiProcessorId = pedestrianMeanAreaDensityVoronoiProcessorId;
-    }
+  public void setPedestrianAreaDensityVoronoiProcessorId(
+      int pedestrianMeanAreaDensityVoronoiProcessorId) {
+    checkSealed();
+    this.pedestrianAreaDensityVoronoiProcessorId = pedestrianMeanAreaDensityVoronoiProcessorId;
+  }
 }

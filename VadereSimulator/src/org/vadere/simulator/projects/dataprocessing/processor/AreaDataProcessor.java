@@ -5,26 +5,22 @@ import org.vadere.simulator.projects.dataprocessing.datakey.TimestepKey;
 import org.vadere.state.attributes.processor.AttributesAreaProcessor;
 import org.vadere.state.scenario.MeasurementArea;
 
-/**
- * @author Mario Teixeira Parente
- *
- */
-
+/** @author Mario Teixeira Parente */
 public abstract class AreaDataProcessor<V> extends DataProcessor<TimestepKey, V> {
-    private MeasurementArea measurementArea;
+  private MeasurementArea measurementArea;
 
-    protected AreaDataProcessor(final String... headers) {
-        super(headers);
-    }
+  protected AreaDataProcessor(final String... headers) {
+    super(headers);
+  }
 
-    @Override
-    public void init(final ProcessorManager manager) {
-        super.init(manager);
-        AttributesAreaProcessor att = (AttributesAreaProcessor) this.getAttributes();
-        this.measurementArea = manager.getMeasurementArea(att.getMeasurementAreaId(), false);
-    }
+  @Override
+  public void init(final ProcessorManager manager) {
+    super.init(manager);
+    AttributesAreaProcessor att = (AttributesAreaProcessor) this.getAttributes();
+    this.measurementArea = manager.getMeasurementArea(att.getMeasurementAreaId(), false);
+  }
 
-    public MeasurementArea getMeasurementArea() {
-        return this.measurementArea;
-    }
+  public MeasurementArea getMeasurementArea() {
+    return this.measurementArea;
+  }
 }

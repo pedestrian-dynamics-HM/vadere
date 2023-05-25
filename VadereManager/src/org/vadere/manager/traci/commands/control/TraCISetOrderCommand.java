@@ -7,16 +7,13 @@ import org.vadere.manager.traci.writer.TraCIPacket;
 
 public class TraCISetOrderCommand extends TraCICommand {
 
-	public TraCISetOrderCommand(TraCICommandBuffer cmdBuffer) {
-		super(TraCICmd.SET_ORDER);
-	}
+  public TraCISetOrderCommand(TraCICommandBuffer cmdBuffer) {
+    super(TraCICmd.SET_ORDER);
+  }
 
-	@Override
-	public TraCIPacket buildResponsePacket() {
-		if (NOK_response != null)
-			return NOK_response;
-		else
-			return TraCIPacket.create(11).add_OK_StatusResponse(TraCICmd.SET_ORDER);
-	}
-    
+  @Override
+  public TraCIPacket buildResponsePacket() {
+    if (NOK_response != null) return NOK_response;
+    else return TraCIPacket.create(11).add_OK_StatusResponse(TraCICmd.SET_ORDER);
+  }
 }

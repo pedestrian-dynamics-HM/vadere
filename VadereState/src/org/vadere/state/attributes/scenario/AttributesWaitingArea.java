@@ -8,25 +8,24 @@ import org.vadere.util.reflection.VadereAttribute;
 
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class AttributesWaitingArea extends AttributesVisualElement {
-    @VadereAttribute
-    private AttributesWaiter waiter = new AttributesWaiter();
+  @VadereAttribute private AttributesWaiter waiter = new AttributesWaiter();
 
-    AttributesWaitingArea(){
-        super();
-    }
+  AttributesWaitingArea() {
+    super();
+  }
 
-    AttributesWaitingArea(int id, VShape shape){
-        super();
-        this.id = id;
-        this.shape = shape;
-    }
+  AttributesWaitingArea(int id, VShape shape) {
+    super();
+    this.id = id;
+    this.shape = shape;
+  }
 
-    public AttributesDistribution getDistribution() {
-        return this.waiter.getDistribution();
-    }
+  public AttributesDistribution getDistribution() {
+    return this.waiter.getDistribution();
+  }
 
-    public AttributesWaitingArea setDistribution(AttributesDistribution distribution) {
-        this.waiter.setDistribution(distribution);
-        return this;
-    }
+  public AttributesWaitingArea setDistribution(AttributesDistribution distribution) {
+    this.waiter.setDistribution(distribution);
+    return this;
+  }
 }

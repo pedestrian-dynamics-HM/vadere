@@ -1,23 +1,11 @@
 package org.vadere.manager;
 
+import static org.mockito.Mockito.mock;
 
-import org.jetbrains.annotations.NotNull;
+import java.nio.file.Paths;
 import org.mockito.Mockito;
 import org.vadere.manager.traci.commandHandler.StateAccessHandler;
 import org.vadere.simulator.control.simulation.SimulationState;
-import org.vadere.state.scenario.Pedestrian;
-import org.vadere.state.scenario.ScenarioElement;
-import org.vadere.state.types.ScenarioElementType;
-
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
  * Simplified version of RemoteManager used to test ONLY {@link SimulationState} access during calls
@@ -27,26 +15,21 @@ import static org.mockito.Mockito.when;
  */
 public abstract class TestRemoteManager extends RemoteManager {
 
-	protected SimulationState simState;
-	protected RemoteManager remoteManager;
+  protected SimulationState simState;
+  protected RemoteManager remoteManager;
 
-	public TestRemoteManager() {
-		super(Paths.get(""), false);
-		this.simState = mock(SimulationState.class, Mockito.RETURNS_DEEP_STUBS);
-		this.remoteManager = mock(RemoteManager.class, Mockito.RETURNS_DEEP_STUBS);
-		mockIt();
-	}
+  public TestRemoteManager() {
+    super(Paths.get(""), false);
+    this.simState = mock(SimulationState.class, Mockito.RETURNS_DEEP_STUBS);
+    this.remoteManager = mock(RemoteManager.class, Mockito.RETURNS_DEEP_STUBS);
+    mockIt();
+  }
 
-	@Override
-	public boolean accessState(StateAccessHandler stateAccessHandler) {
-		stateAccessHandler.execute(remoteManager, simState);
-		return true;
-	}
+  @Override
+  public boolean accessState(StateAccessHandler stateAccessHandler) {
+    stateAccessHandler.execute(remoteManager, simState);
+    return true;
+  }
 
-	protected abstract void mockIt();
-
+  protected abstract void mockIt();
 }
-
-
-
-
