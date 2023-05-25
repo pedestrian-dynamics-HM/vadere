@@ -10,33 +10,33 @@ import org.vadere.util.geometry.shapes.IPoint;
  */
 public interface ITimeCostFunctionMesh<V extends IVertex> extends ITimeCostFunction {
 
-	double costAt(V p);
+  double costAt(V p);
 
-	default double costAt(V p, Object caller) {
-		return costAt(p);
-	}
+  default double costAt(V p, Object caller) {
+    return costAt(p);
+  }
 
-	static <V extends IVertex> ITimeCostFunctionMesh convert(@NotNull final ITimeCostFunction timeCostFunction) {
-		return new ITimeCostFunctionMesh<V>() {
-			@Override
-			public double costAt(V p) {
-				return timeCostFunction.costAt(p);
-			}
+  static <V extends IVertex> ITimeCostFunctionMesh convert(
+      @NotNull final ITimeCostFunction timeCostFunction) {
+    return new ITimeCostFunctionMesh<V>() {
+      @Override
+      public double costAt(V p) {
+        return timeCostFunction.costAt(p);
+      }
 
-			@Override
-			public double costAt(V p, Object obj) {
-				return timeCostFunction.costAt(p, obj);
-			}
+      @Override
+      public double costAt(V p, Object obj) {
+        return timeCostFunction.costAt(p, obj);
+      }
 
-			@Override
-			public double costAt(IPoint p) {
-				return timeCostFunction.costAt(p);
-			}
+      @Override
+      public double costAt(IPoint p) {
+        return timeCostFunction.costAt(p);
+      }
 
-			public double costAt(IPoint p, Object obj) {
-				return timeCostFunction.costAt(p, obj);
-			}
-
-		};
-	}
+      public double costAt(IPoint p, Object obj) {
+        return timeCostFunction.costAt(p, obj);
+      }
+    };
+  }
 }

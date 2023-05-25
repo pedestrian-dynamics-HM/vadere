@@ -1,5 +1,8 @@
 package org.vadere.simulator.models.osm;
 
+import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.control.factory.GroupSourceControllerFactory;
@@ -28,292 +31,338 @@ import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.logging.Logger;
 
-import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 @ModelClass(isMainModel = true)
 public class OptimalStepsModel implements MainModel, PotentialFieldModel {
 
-	private final static Logger logger = Logger.getLogger(OptimalStepsModel.class);
+  private static final Logger logger = Logger.getLogger(OptimalStepsModel.class);
 
-	private UpdateSchemeOSM updateSchemeOSM;
-	private AttributesOSM attributesOSM;
-	private AttributesAgent attributesPedestrian;
-	private Random random;
-	private StepCircleOptimizer stepCircleOptimizer;
-	private IPotentialFieldTarget potentialFieldTarget;
-	private PotentialFieldObstacle potentialFieldObstacle;
-	private PotentialFieldAgent potentialFieldPedestrian;
-	private List<SpeedAdjuster> speedAdjusters;
-	private List<StepSizeAdjuster> stepSizeAdjusters;
-	private Domain domain;
-	private double lastSimTimeInSec;
-	private ExecutorService executorService;
-	private List<Model> models = new LinkedList<>();
+  private UpdateSchemeOSM updateSchemeOSM;
+  private AttributesOSM attributesOSM;
+  private AttributesAgent attributesPedestrian;
+  private Random random;
+  private StepCircleOptimizer stepCircleOptimizer;
+  private IPotentialFieldTarget potentialFieldTarget;
+  private PotentialFieldObstacle potentialFieldObstacle;
+  private PotentialFieldAgent potentialFieldPedestrian;
+  private List<SpeedAdjuster> speedAdjusters;
+  private List<StepSizeAdjuster> stepSizeAdjusters;
+  private Domain domain;
+  private double lastSimTimeInSec;
+  private ExecutorService executorService;
+  private List<Model> models = new LinkedList<>();
 
-	public OptimalStepsModel() {
-		this.speedAdjusters = new LinkedList<>();
-		this.stepSizeAdjusters = new LinkedList<>();
-	}
+  public OptimalStepsModel() {
+    this.speedAdjusters = new LinkedList<>();
+    this.stepSizeAdjusters = new LinkedList<>();
+  }
 
-	@Override
-	public void initialize(List<Attributes> modelAttributesList, Domain domain,
-						   AttributesAgent attributesPedestrian, Random random) {
-		logger.debug("initialize OSM");
-		initialize(modelAttributesList, domain, attributesPedestrian, random,
-				Model.findAttributes(modelAttributesList, AttributesOSM.class), logger);
-	}
+  @Override
+  public void initialize(
+      List<Attributes> modelAttributesList,
+      Domain domain,
+      AttributesAgent attributesPedestrian,
+      Random random) {
+    logger.debug("initialize OSM");
+    initialize(
+        modelAttributesList,
+        domain,
+        attributesPedestrian,
+        random,
+        Model.findAttributes(modelAttributesList, AttributesOSM.class),
+        logger);
+  }
 
+  public void initialize(
+      List<Attributes> modelAttributesList,
+      Domain domain,
+      AttributesAgent attributesPedestrian,
+      Random random,
+      AttributesOSM atm,
+      Logger logger) {
 
-	public void initialize(List<Attributes> modelAttributesList, Domain domain,
-						   AttributesAgent attributesPedestrian, Random random, AttributesOSM atm, Logger logger) {
+    this.attributesOSM = atm;
+    this.domain = domain;
+    this.random = random;
+    this.attributesPedestrian = attributesPedestrian;
 
-		this.attributesOSM = atm;
-		this.domain = domain;
-		this.random = random;
-		this.attributesPedestrian = attributesPedestrian;
+    final SubModelBuilder subModelBuilder =
+        new SubModelBuilder(modelAttributesList, domain, attributesPedestrian, random);
+    logger.debug("build subModels");
+    subModelBuilder.buildSubModels(attributesOSM.getSubmodels());
+    subModelBuilder.addBuildedSubModelsToList(models);
 
-		final SubModelBuilder subModelBuilder = new SubModelBuilder(modelAttributesList, domain,
-				attributesPedestrian, random);
-		logger.debug("build subModels");
-		subModelBuilder.buildSubModels(attributesOSM.getSubmodels());
-		subModelBuilder.addBuildedSubModelsToList(models);
+    logger.debug("create Target potential field");
+    IPotentialFieldTargetGrid iPotentialTargetGrid =
+        IPotentialFieldTargetGrid.createPotentialField(
+            modelAttributesList,
+            domain,
+            attributesPedestrian,
+            attributesOSM.getTargetPotentialModel());
 
-		logger.debug("create Target potential field");
-		IPotentialFieldTargetGrid iPotentialTargetGrid = IPotentialFieldTargetGrid.createPotentialField(
-				modelAttributesList, domain, attributesPedestrian, attributesOSM.getTargetPotentialModel());
+    this.potentialFieldTarget = iPotentialTargetGrid;
+    models.add(iPotentialTargetGrid);
 
-		this.potentialFieldTarget = iPotentialTargetGrid;
-		models.add(iPotentialTargetGrid);
+    this.potentialFieldObstacle =
+        PotentialFieldObstacle.createPotentialField(
+            modelAttributesList,
+            domain,
+            attributesPedestrian,
+            random,
+            attributesOSM.getObstaclePotentialModel());
+    this.potentialFieldPedestrian =
+        PotentialFieldAgent.createPotentialField(
+            modelAttributesList,
+            domain,
+            attributesPedestrian,
+            random,
+            attributesOSM.getPedestrianPotentialModel());
 
-		this.potentialFieldObstacle = PotentialFieldObstacle.createPotentialField(
-				modelAttributesList, domain, attributesPedestrian, random, attributesOSM.getObstaclePotentialModel());
-		this.potentialFieldPedestrian = PotentialFieldAgent.createPotentialField(
-				modelAttributesList, domain, attributesPedestrian, random, attributesOSM.getPedestrianPotentialModel());
+    Optional<CentroidGroupModel> opCentroidGroupModel =
+        models
+            .stream()
+            .filter(ac -> ac instanceof CentroidGroupModel)
+            .map(ac -> (CentroidGroupModel) ac)
+            .findAny();
 
-		Optional<CentroidGroupModel> opCentroidGroupModel = models.stream().
-				filter(ac -> ac instanceof CentroidGroupModel).map(ac -> (CentroidGroupModel) ac).findAny();
+    if (opCentroidGroupModel.isPresent()) {
 
-		if (opCentroidGroupModel.isPresent()) {
+      CentroidGroupModel centroidGroupModel = opCentroidGroupModel.get();
+      centroidGroupModel.setPotentialFieldTarget(iPotentialTargetGrid);
 
-			CentroidGroupModel centroidGroupModel = opCentroidGroupModel.get();
-			centroidGroupModel.setPotentialFieldTarget(iPotentialTargetGrid);
+      this.potentialFieldPedestrian =
+          new CentroidGroupPotential(
+              centroidGroupModel,
+              potentialFieldPedestrian,
+              potentialFieldTarget,
+              centroidGroupModel.getAttributesCGM());
 
-			this.potentialFieldPedestrian =
-					new CentroidGroupPotential(centroidGroupModel,
-							potentialFieldPedestrian, potentialFieldTarget, centroidGroupModel.getAttributesCGM());
+      // this.stepSizeAdjusters.add(new CentroidGroupStepSizeAdjuster(centroidGroupModel));
+      this.speedAdjusters.add(new CentroidGroupSpeedAdjuster(centroidGroupModel));
+    }
 
-			//this.stepSizeAdjusters.add(new CentroidGroupStepSizeAdjuster(centroidGroupModel));
-			this.speedAdjusters.add(new CentroidGroupSpeedAdjuster(centroidGroupModel));
-		}
+    this.stepCircleOptimizer =
+        StepCircleOptimizer.create(
+            attributesOSM, random, domain.getTopography(), iPotentialTargetGrid);
 
-		this.stepCircleOptimizer = StepCircleOptimizer.create(
-				attributesOSM, random, domain.getTopography(), iPotentialTargetGrid);
+    // TODO implement a step speed adjuster for this!
+    if (attributesPedestrian.isDensityDependentSpeed()) {
+      throw new UnsupportedOperationException("densityDependentSpeed not jet implemented.");
+      // this.speedAdjusters.add(new SpeedAdjusterWeidmann());
+    }
 
-		// TODO implement a step speed adjuster for this!
-		if (attributesPedestrian.isDensityDependentSpeed()) {
-			throw new UnsupportedOperationException("densityDependentSpeed not jet implemented.");
-			//this.speedAdjusters.add(new SpeedAdjusterWeidmann());
-		}
+    if (attributesOSM.getUpdateType() == UpdateType.PARALLEL) {
+      this.executorService = Executors.newFixedThreadPool(8);
+    } else {
+      this.executorService = null;
+    }
 
-		if (attributesOSM.getUpdateType() == UpdateType.PARALLEL) {
-			this.executorService = Executors.newFixedThreadPool(8);
-		} else {
-			this.executorService = null;
-		}
+    this.updateSchemeOSM =
+        createUpdateScheme(modelAttributesList, domain.getTopography(), attributesOSM);
+    this.domain.getTopography().addElementAddedListener(Pedestrian.class, updateSchemeOSM);
+    this.domain.getTopography().addElementRemovedListener(Pedestrian.class, updateSchemeOSM);
 
-		this.updateSchemeOSM = createUpdateScheme(modelAttributesList, domain.getTopography(), attributesOSM);
-		this.domain.getTopography().addElementAddedListener(Pedestrian.class, updateSchemeOSM);
-		this.domain.getTopography().addElementRemovedListener(Pedestrian.class, updateSchemeOSM);
+    models.add(this);
+  }
 
-		models.add(this);
-	}
+  // Dirty quick implementation to test it! TODO: refactoring!
+  private UpdateSchemeOSM createUpdateScheme(
+      @NotNull final List<Attributes> attributesList,
+      @NotNull final Topography topography,
+      @NotNull final AttributesOSM attributesOSM) {
+    switch (attributesOSM.getUpdateType()) {
+      case PARALLEL_OPEN_CL:
+        {
+          throw new UnsupportedOperationException("not jet implemented.");
+          /*return UpdateSchemeOSM.createOpenCLUpdateScheme(
+          			topography,
+          			attributesOSM,
+          			Model.findAttributes(attributesList, AttributesFloorField.class),
+          			//3.0,
 
-	// Dirty quick implementation to test it! TODO: refactoring!
-	private UpdateSchemeOSM createUpdateScheme(
-			@NotNull final List<Attributes> attributesList,
-			@NotNull final Topography topography,
-			@NotNull final AttributesOSM attributesOSM) {
-		switch (attributesOSM.getUpdateType()) {
-			case PARALLEL_OPEN_CL: {
-				throw new UnsupportedOperationException("not jet implemented.");
-				/*return UpdateSchemeOSM.createOpenCLUpdateScheme(
-						topography,
-						attributesOSM,
-						Model.findAttributes(attributesList, AttributesFloorField.class),
-						//3.0,
+          			new GridEikonalSolver() {
+          				CellGrid cellGrid = null;
 
-						new GridEikonalSolver() {
-							CellGrid cellGrid = null;
+          				@Override
+          				public CellGrid getCellGrid() {
+          					if(cellGrid == null) {
+          						initialize();
+          					}
+          					return cellGrid;
+          				}
 
-							@Override
-							public CellGrid getCellGrid() {
-								if(cellGrid == null) {
-									initialize();
-								}
-								return cellGrid;
-							}
+          				@Override
+          				public void initialize() {
+          					potentialFieldTarget.preLoop(0.4);
+          					cellGrid = ((IPotentialFieldTargetGrid)potentialFieldTarget).getCellGrids().get(1);
+          				}
 
-							@Override
-							public void initialize() {
-								potentialFieldTarget.preLoop(0.4);
-								cellGrid = ((IPotentialFieldTargetGrid)potentialFieldTarget).getCellGrids().get(1);
-							}
+          				@Override
+          				public Function<IPoint, Double> getPotentialField() {
+          					return getCellGrid().getInterpolationFunction();
+          				}
 
-							@Override
-							public Function<IPoint, Double> getPotentialField() {
-								return getCellGrid().getInterpolationFunction();
-							}
+          				@Override
+          				public double getPotential(double x, double y) {
+          					return getPotential(x, y, 0.1, 1.0);
+          				}
 
-							@Override
-							public double getPotential(double x, double y) {
-								return getPotential(x, y, 0.1, 1.0);
-							}
+          			},
 
-						},
+          			new GridEikonalSolver() {
 
-						new GridEikonalSolver() {
+          				private CellGrid cellGrid = null;
 
-							private CellGrid cellGrid = null;
+          				@Override
+          				public CellGrid getCellGrid() {
+          					if(cellGrid == null) {
+          						initialize();
+          					}
+          					return cellGrid;
+          				}
 
-							@Override
-							public CellGrid getCellGrid() {
-								if(cellGrid == null) {
-									initialize();
-								}
-								return cellGrid;
-							}
+          				@Override
+          				public void initialize() {
+          					double resolution = Model.findAttributes(attributesList, AttributesFloorField.class).getPotentialFieldResolution();
+          					cellGrid = new CellGrid(topography.getBounds().getWidth(), topography.getBounds().getHeight(), resolution, new CellState());
+          					cellGrid.pointStream().forEach(p -> {
+          						double distance = topography.distanceToObstacle(cellGrid.pointToCoord(p));
+          						PathFindingTag tag = distance >= 0 ? PathFindingTag.Reached : PathFindingTag.Obstacle;
+          						cellGrid.setValue(p, new CellState(distance, tag));
+          					});
+          				}
 
-							@Override
-							public void initialize() {
-								double resolution = Model.findAttributes(attributesList, AttributesFloorField.class).getPotentialFieldResolution();
-								cellGrid = new CellGrid(topography.getBounds().getWidth(), topography.getBounds().getHeight(), resolution, new CellState());
-								cellGrid.pointStream().forEach(p -> {
-									double distance = topography.distanceToObstacle(cellGrid.pointToCoord(p));
-									PathFindingTag tag = distance >= 0 ? PathFindingTag.Reached : PathFindingTag.Obstacle;
-									cellGrid.setValue(p, new CellState(distance, tag));
-								});
-							}
+          				@Override
+          				public Function<IPoint, Double> getPotentialField() {
+          					if(cellGrid == null) {
+          						initialize();
+          					}
+          					return cellGrid.getInterpolationFunction();
+          				}
 
-							@Override
-							public Function<IPoint, Double> getPotentialField() {
-								if(cellGrid == null) {
-									initialize();
-								}
-								return cellGrid.getInterpolationFunction();
-							}
+          				@Override
+          				public double getPotential(double x, double y) {
+          					return cellGrid.getInterpolatedValueAt(x, y).getLeft();
+          				}
+          			}
+          			);
+          */ }
+      default:
+        return UpdateSchemeOSM.create(
+            attributesOSM.getUpdateType(),
+            topography,
+            random,
+            getPotentialFieldAgent().getMaximalInfluenceRadius());
+    }
+  }
 
-							@Override
-							public double getPotential(double x, double y) {
-								return cellGrid.getInterpolatedValueAt(x, y).getLeft();
-							}
-						}
-						);
-			*/}
-			default: return UpdateSchemeOSM.create(attributesOSM.getUpdateType(), topography, random, getPotentialFieldAgent().getMaximalInfluenceRadius());
-		}
-	}
+  @Override
+  public void preLoop(final double simTimeInSec) {
+    this.lastSimTimeInSec = simTimeInSec;
+  }
 
-	@Override
-	public void preLoop(final double simTimeInSec) {
-		this.lastSimTimeInSec = simTimeInSec;
-	}
+  @Override
+  public void postLoop(final double simTimeInSec) {
+    updateSchemeOSM.shutdown();
+  }
 
-	@Override
-	public void postLoop(final double simTimeInSec) {
-		updateSchemeOSM.shutdown();
-	}
+  @Override
+  public void update(final double simTimeInSec) {
+    double timeStepInSec = simTimeInSec - this.lastSimTimeInSec;
+    updateSchemeOSM.update(timeStepInSec, simTimeInSec);
+    lastSimTimeInSec = simTimeInSec;
+  }
 
-	@Override
-	public void update(final double simTimeInSec) {
-		double timeStepInSec = simTimeInSec - this.lastSimTimeInSec;
-		updateSchemeOSM.update(timeStepInSec, simTimeInSec);
-		lastSimTimeInSec = simTimeInSec;
-	}
+  /** At the moment, all pedestrians inherit position from "this.attributesPedestian"! */
+  @Override
+  public <T extends DynamicElement> PedestrianOSM createElement(
+      VPoint position, int id, Class<T> type) {
+    return createElement(position, id, this.attributesPedestrian, type);
+  }
 
-	/**
-	 * At the moment, all pedestrians inherit position from "this.attributesPedestian"!
-	 */
-	@Override
-	public <T extends DynamicElement> PedestrianOSM createElement(VPoint position, int id, Class<T> type) {
-			return createElement(position, id, this.attributesPedestrian, type);
-	}
+  @Override
+  public <T extends DynamicElement> PedestrianOSM createElement(
+      VPoint position, int id, Attributes attr, Class<T> type) {
 
-	@Override
-	public <T extends DynamicElement> PedestrianOSM createElement(VPoint position, int id, Attributes attr, Class<T> type) {
+    AttributesAgent aAttr = (AttributesAgent) attr;
 
-		AttributesAgent aAttr = (AttributesAgent)attr;
+    if (!Pedestrian.class.isAssignableFrom(type))
+      throw new IllegalArgumentException("OSM cannot initialize " + type.getCanonicalName());
 
-		if (!Pedestrian.class.isAssignableFrom(type))
-			throw new IllegalArgumentException("OSM cannot initialize " + type.getCanonicalName());
+    AttributesAgent pedAttributes =
+        new AttributesAgent(aAttr, registerDynamicElementId(domain.getTopography(), id));
 
-		AttributesAgent pedAttributes = new AttributesAgent(
-				aAttr, registerDynamicElementId(domain.getTopography(), id));
+    PedestrianOSM pedestrianOSM = createElement(position, pedAttributes);
+    return pedestrianOSM;
+  }
 
-		PedestrianOSM pedestrianOSM = createElement(position, pedAttributes);
-		return pedestrianOSM;
-	}
+  @Override
+  public VShape getDynamicElementRequiredPlace(@NotNull final VPoint position) {
+    return createElement(position, new AttributesAgent(attributesPedestrian, -1)).getShape();
+  }
 
-	@Override
-	public VShape getDynamicElementRequiredPlace(@NotNull final VPoint position) {
-		return createElement(position,  new AttributesAgent(attributesPedestrian, -1)).getShape();
-	}
+  private PedestrianOSM createElement(
+      VPoint position, @NotNull final AttributesAgent attributesAgent) {
+    PedestrianOSM pedestrian =
+        new PedestrianOSM(
+            attributesOSM,
+            attributesAgent,
+            domain.getTopography(),
+            random,
+            potentialFieldTarget,
+            potentialFieldObstacle.copy(),
+            potentialFieldPedestrian,
+            speedAdjusters,
+            stepCircleOptimizer.clone());
+    pedestrian.setPosition(position);
+    return pedestrian;
+  }
 
-	private PedestrianOSM createElement(VPoint position, @NotNull final AttributesAgent attributesAgent) {
-		PedestrianOSM pedestrian = new PedestrianOSM(attributesOSM,
-				attributesAgent, domain.getTopography(), random, potentialFieldTarget,
-				potentialFieldObstacle.copy(), potentialFieldPedestrian,
-				speedAdjusters, stepCircleOptimizer.clone());
-		pedestrian.setPosition(position);
-		return pedestrian;
-	}
+  @Override
+  public List<Model> getSubmodels() {
+    return models;
+  }
 
-	@Override
-	public List<Model> getSubmodels() {
-		return models;
-	}
+  @Override
+  public IPotentialFieldTarget getPotentialFieldTarget() {
+    return potentialFieldTarget;
+  }
 
-	@Override
-	public IPotentialFieldTarget getPotentialFieldTarget() {
-		return potentialFieldTarget;
-	}
+  @Override
+  public PotentialFieldObstacle getPotentialFieldObstacle() {
+    return potentialFieldObstacle;
+  }
 
-	@Override
-	public PotentialFieldObstacle getPotentialFieldObstacle() {
-		return potentialFieldObstacle;
-	}
+  @Override
+  public PotentialFieldAgent getPotentialFieldAgent() {
+    return potentialFieldPedestrian;
+  }
 
-	@Override
-	public PotentialFieldAgent getPotentialFieldAgent() {
-		return potentialFieldPedestrian;
-	}
+  @Override
+  public SourceControllerFactory getSourceControllerFactory() {
+    Optional<CentroidGroupModel> opCentroidGroupModel =
+        models
+            .stream()
+            .filter(ac -> ac instanceof CentroidGroupModel)
+            .map(ac -> (CentroidGroupModel) ac)
+            .findAny();
+    if (opCentroidGroupModel.isPresent()) {
+      return new GroupSourceControllerFactory(opCentroidGroupModel.get());
+    }
 
-	@Override
-	public SourceControllerFactory getSourceControllerFactory() {
-		Optional<CentroidGroupModel> opCentroidGroupModel = models.stream()
-				.filter(ac -> ac instanceof CentroidGroupModel)
-				.map(ac -> (CentroidGroupModel) ac).findAny();
-		if (opCentroidGroupModel.isPresent()) {
-			return new GroupSourceControllerFactory(opCentroidGroupModel.get());
-		}
+    return new SingleSourceControllerFactory();
+  }
 
-		return new SingleSourceControllerFactory();
-	}
+  /** Compares the time of the next possible move. */
+  private class ComparatorPedestrianOSM implements Comparator<PedestrianOSM> {
 
-	/**
-	 * Compares the time of the next possible move.
-	 */
-	private class ComparatorPedestrianOSM implements Comparator<PedestrianOSM> {
-
-		@Override
-		public int compare(PedestrianOSM ped1, PedestrianOSM ped2) {
-			// TODO [priority=low] [task=refactoring] use Double.compare() oder compareTo()
-			if (ped1.getTimeOfNextStep() < ped2.getTimeOfNextStep()) {
-				return -1;
-			} else {
-				return 1;
-			}
-		}
-	}
+    @Override
+    public int compare(PedestrianOSM ped1, PedestrianOSM ped2) {
+      // TODO [priority=low] [task=refactoring] use Double.compare() oder compareTo()
+      if (ped1.getTimeOfNextStep() < ped2.getTimeOfNextStep()) {
+        return -1;
+      } else {
+        return 1;
+      }
+    }
+  }
 }

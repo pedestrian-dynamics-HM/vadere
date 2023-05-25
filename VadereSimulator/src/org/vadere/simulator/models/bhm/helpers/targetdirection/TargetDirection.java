@@ -4,5 +4,5 @@ import org.vadere.state.scenario.Target;
 import org.vadere.util.geometry.shapes.VPoint;
 
 public interface TargetDirection {
-	VPoint getTargetDirection(final Target target);
+  VPoint getTargetDirection(final Target target);
 }

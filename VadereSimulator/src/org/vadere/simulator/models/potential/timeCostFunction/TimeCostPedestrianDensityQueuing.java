@@ -7,86 +7,82 @@ import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.logging.Logger;
 
 /**
- * TimeCostPedestrianDensityQueuing is a time cost function for the pedestrian
- * density that uses image processing filters. The function is for the purpose
- * queuing. The measurement with a loading is done by the
- * PedestrianGaussianFilter that uses the javaCV library. This has to be done
- * for every simulation step.
- * 
- * 
+ * TimeCostPedestrianDensityQueuing is a time cost function for the pedestrian density that uses
+ * image processing filters. The function is for the purpose queuing. The measurement with a loading
+ * is done by the PedestrianGaussianFilter that uses the javaCV library. This has to be done for
+ * every simulation step.
  */
 public class TimeCostPedestrianDensityQueuing implements ITimeCostFunction {
-	/** the image processing filter to measure the weighted density. */
-	private final IGaussianFilter gaussianCalculator;
+  /** the image processing filter to measure the weighted density. */
+  private final IGaussianFilter gaussianCalculator;
 
-	/** the decorator that is used by this decorator. */
-	private ITimeCostFunction timeCostFunction;
+  /** the decorator that is used by this decorator. */
+  private ITimeCostFunction timeCostFunction;
 
-	private final double queueWidthFactor;
+  private final double queueWidthFactor;
 
-	// private final static double EPSILON = 0.0001;
-	private final static double EPSILON = 0.000001;
+  // private final static double EPSILON = 0.0001;
+  private static final double EPSILON = 0.000001;
 
-	/** only for logging. */
-	private static Logger logger = Logger
-			.getLogger(TimeCostPedestrianDensityQueuing.class);
-	private double highestCost = 0.0;
-	private long runtime = 0;
+  /** only for logging. */
+  private static Logger logger = Logger.getLogger(TimeCostPedestrianDensityQueuing.class);
 
-	public TimeCostPedestrianDensityQueuing(
-			final ITimeCostFunction timeCostFunction,
-			final AttributesTimeCost attributes,
-			final IGaussianFilter filter) {
+  private double highestCost = 0.0;
+  private long runtime = 0;
 
-		this.timeCostFunction = timeCostFunction;
-		this.gaussianCalculator = filter;
-		this.queueWidthFactor = attributes.getQueueWidthLoading();
+  public TimeCostPedestrianDensityQueuing(
+      final ITimeCostFunction timeCostFunction,
+      final AttributesTimeCost attributes,
+      final IGaussianFilter filter) {
 
-		logger.info("time cost attributes:  " + attributes);
-		logger.info("queueWidthFactor: " + queueWidthFactor);
-		logger.info("filter: " + filter);
+    this.timeCostFunction = timeCostFunction;
+    this.gaussianCalculator = filter;
+    this.queueWidthFactor = attributes.getQueueWidthLoading();
 
-		// the initial filtering (convolution)
-		this.gaussianCalculator.filterImage();
-	}
+    logger.info("time cost attributes:  " + attributes);
+    logger.info("queueWidthFactor: " + queueWidthFactor);
+    logger.info("filter: " + filter);
 
-	@Override
-	public double costAt(final IPoint p) {
-		long ms = System.currentTimeMillis();
+    // the initial filtering (convolution)
+    this.gaussianCalculator.filterImage();
+  }
 
-		double cost = queueWidthFactor
-				* gaussianCalculator.getFilteredValue(p.getX(), p.getY());
+  @Override
+  public double costAt(final IPoint p) {
+    long ms = System.currentTimeMillis();
 
-		runtime += System.currentTimeMillis() - ms;
+    double cost = queueWidthFactor * gaussianCalculator.getFilteredValue(p.getX(), p.getY());
 
-		cost = Math.min(cost, 1.0 - EPSILON);
+    runtime += System.currentTimeMillis() - ms;
 
-		if (highestCost < cost) {
-			// logger.info("pedestrian density cost: " + cost);
-			highestCost = cost;
-		}
+    cost = Math.min(cost, 1.0 - EPSILON);
 
-		return timeCostFunction.costAt(p) - cost;
-	}
+    if (highestCost < cost) {
+      // logger.info("pedestrian density cost: " + cost);
+      highestCost = cost;
+    }
 
-	@Override
-	public void update() {
-		// logger.info("runtime: " + runtime);
-		runtime = 0;
-		long ms = System.currentTimeMillis();
+    return timeCostFunction.costAt(p) - cost;
+  }
 
-		// refresh the filtered image
-		this.gaussianCalculator.filterImage();
-		runtime += System.currentTimeMillis() - ms;
-	}
+  @Override
+  public void update() {
+    // logger.info("runtime: " + runtime);
+    runtime = 0;
+    long ms = System.currentTimeMillis();
 
-	@Override
-	public boolean needsUpdate() {
-		return true;
-	}
+    // refresh the filtered image
+    this.gaussianCalculator.filterImage();
+    runtime += System.currentTimeMillis() - ms;
+  }
 
-	@Override
-	public String toString() {
-		return "(pedestrian density function(x)) * " + timeCostFunction;
-	}
+  @Override
+  public boolean needsUpdate() {
+    return true;
+  }
+
+  @Override
+  public String toString() {
+    return "(pedestrian density function(x)) * " + timeCostFunction;
+  }
 }

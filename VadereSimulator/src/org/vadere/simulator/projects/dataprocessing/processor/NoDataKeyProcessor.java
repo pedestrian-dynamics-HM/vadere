@@ -11,24 +11,25 @@ import org.vadere.simulator.projects.dataprocessing.datakey.NoDataKey;
  */
 public abstract class NoDataKeyProcessor<V> extends DataProcessor<NoDataKey, V> {
 
-	private String header;
+  private String header;
 
-	protected NoDataKeyProcessor() {
-		super();
-	}
+  protected NoDataKeyProcessor() {
+    super();
+  }
 
-	protected NoDataKeyProcessor(final String header) {
-		super(new String[]{header});
-		this.header = header;
-	}
+  protected NoDataKeyProcessor(final String header) {
+    super(new String[] {header});
+    this.header = header;
+  }
 
-	public String getSimulationResultHeader() {
-		return header;
-	}
+  public String getSimulationResultHeader() {
+    return header;
+  }
 
-	@Override
-	public void postLoopAddResultInfo(@NotNull final SimulationState state, @NotNull final SimulationResult result){
-		result.addData(getSimulationResultHeader() + " (PID" + getId() + ")", getValue(NoDataKey.key()));
-	}
-
+  @Override
+  public void postLoopAddResultInfo(
+      @NotNull final SimulationState state, @NotNull final SimulationResult result) {
+    result.addData(
+        getSimulationResultHeader() + " (PID" + getId() + ")", getValue(NoDataKey.key()));
+  }
 }

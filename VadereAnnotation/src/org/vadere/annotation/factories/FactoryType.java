@@ -9,28 +9,18 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.ANNOTATION_TYPE)
 public @interface FactoryType {
-	/**
-	 * @return Nam of the new Factory class. This is mandatory.
-	 */
-	String factoryClassName();
+  /** @return Nam of the new Factory class. This is mandatory. */
+  String factoryClassName();
 
-	/**
-	 * @return Name of the super class if one exists.
-	 */
-	String extendedClassName() default "";
+  /** @return Name of the super class if one exists. */
+  String extendedClassName() default "";
 
-	/**
-	 * @return Generic information for super class if one exists.
-	 */
-	String genericFactoryTypes() default "";
+  /** @return Generic information for super class if one exists. */
+  String genericFactoryTypes() default "";
 
-	/**
-	 * @return List of imports needed for the new Factory class.
-	 */
-	String[] factoryImports() default {};
+  /** @return List of imports needed for the new Factory class. */
+  String[] factoryImports() default {};
 
-	/**
-	 * @return Package name of the new Factory class. This is mandatory.
-	 */
-	String factoryPackage();
+  /** @return Package name of the new Factory class. This is mandatory. */
+  String factoryPackage();
 }

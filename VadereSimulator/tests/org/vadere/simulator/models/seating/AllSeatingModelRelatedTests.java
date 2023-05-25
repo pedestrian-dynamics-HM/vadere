@@ -9,8 +9,13 @@ import org.vadere.simulator.models.seating.trainmodel.TestSeatGroup;
 import org.vadere.simulator.models.seating.trainmodel.TestTrainModel;
 
 @RunWith(Suite.class)
-@SuiteClasses({ TestChooseCompartment.class, TestChooseSeat.class, TestChooseSeatGroup.class, TestCompartment.class,
-		TestSeat.class, TestSeatGroup.class, TestTrainModel.class })
-public class AllSeatingModelRelatedTests {
-
-}
+@SuiteClasses({
+  TestChooseCompartment.class,
+  TestChooseSeat.class,
+  TestChooseSeatGroup.class,
+  TestCompartment.class,
+  TestSeat.class,
+  TestSeatGroup.class,
+  TestTrainModel.class
+})
+public class AllSeatingModelRelatedTests {}

@@ -1,6 +1,6 @@
 package org.vadere.manager.traci.commandHandler;
 
-
+import java.lang.reflect.Method;
 import org.vadere.manager.RemoteManager;
 import org.vadere.manager.Subscription;
 import org.vadere.manager.server.VadereServer;
@@ -15,175 +15,181 @@ import org.vadere.manager.traci.response.*;
 import org.vadere.simulator.control.simulation.SimThreadState;
 import org.vadere.util.logging.Logger;
 
-import java.lang.reflect.Method;
-
-/**
- * Handel {@link org.vadere.manager.traci.commands.TraCICommand}s for the Control API
- */
+/** Handel {@link org.vadere.manager.traci.commands.TraCICommand}s for the Control API */
 public class ControlCommandHandler extends CommandHandler<ControlVar> {
 
-	public static ControlCommandHandler instance;
-	private static Logger logger = Logger.getLogger(ControlCommandHandler.class);
+  public static ControlCommandHandler instance;
+  private static Logger logger = Logger.getLogger(ControlCommandHandler.class);
 
-	static {
-		instance = new ControlCommandHandler();
-	}
+  static {
+    instance = new ControlCommandHandler();
+  }
 
-	private ControlCommandHandler() {
-		super();
-		init(ControlHandler.class, ControlHandlers.class);
-	}
+  private ControlCommandHandler() {
+    super();
+    init(ControlHandler.class, ControlHandlers.class);
+  }
 
-	@Override
-	protected void init_HandlerSingle(Method m) {
-		ControlHandler an = m.getAnnotation(ControlHandler.class);
-		putHandler(an.cmd(), an.var(), m);
-	}
+  @Override
+  protected void init_HandlerSingle(Method m) {
+    ControlHandler an = m.getAnnotation(ControlHandler.class);
+    putHandler(an.cmd(), an.var(), m);
+  }
 
-	@Override
-	protected void init_HandlerMult(Method m) {
-		ControlHandler[] ans = m.getAnnotation(ControlHandlers.class).value();
-		for (ControlHandler a : ans) {
-			putHandler(a.cmd(), a.var(), m);
-		}
-	}
+  @Override
+  protected void init_HandlerMult(Method m) {
+    ControlHandler[] ans = m.getAnnotation(ControlHandlers.class).value();
+    for (ControlHandler a : ans) {
+      putHandler(a.cmd(), a.var(), m);
+    }
+  }
 
-	public TraCICommand process_load(TraCICommand rawCmd, RemoteManager remoteManager) {
-		return null;
-	}
+  public TraCICommand process_load(TraCICommand rawCmd, RemoteManager remoteManager) {
+    return null;
+  }
 
-	public TraCICommand process_close(TraCICommand rawCmd, RemoteManager remoteManager) {
+  public TraCICommand process_close(TraCICommand rawCmd, RemoteManager remoteManager) {
 
-		TraCICloseCommand cmd = (TraCICloseCommand) rawCmd;
+    TraCICloseCommand cmd = (TraCICloseCommand) rawCmd;
 
-		remoteManager.setClientCloseCommandReceived(true);
-		
-		if (remoteManager.getCurrentSimThreadState().equals(SimThreadState.MAIN_LOOP)) {
+    remoteManager.setClientCloseCommandReceived(true);
 
-			logger.info("Current simulation run in main loop. Stop simulation.");
-			remoteManager.getRemoteSimulationRun().setIsRunSimulation(false); // is_running = false in Simulation!
-			logger.info("Wake up simulation thread.");
-			remoteManager.getRemoteSimulationRun().notifySimulationThread(); // wake up simulation thread
-			logger.info("Wait for simulation end.");
-			remoteManager.waitForSimulationEnd(); // wait for simulation thread
-			logger.info("Wait for simulation end finished.");
-		}
+    if (remoteManager.getCurrentSimThreadState().equals(SimThreadState.MAIN_LOOP)) {
 
+      logger.info("Current simulation run in main loop. Stop simulation.");
+      remoteManager
+          .getRemoteSimulationRun()
+          .setIsRunSimulation(false); // is_running = false in Simulation!
+      logger.info("Wake up simulation thread.");
+      remoteManager.getRemoteSimulationRun().notifySimulationThread(); // wake up simulation thread
+      logger.info("Wait for simulation end.");
+      remoteManager.waitForSimulationEnd(); // wait for simulation thread
+      logger.info("Wait for simulation end finished.");
+    }
 
-		if (remoteManager.stopSimulationIfRunning())
-			cmd.getResponse().getStatusResponse().setDescription("Stop simulation waiting for client close EOF");
-		else
-			cmd.getResponse().getStatusResponse().setDescription("waiting for client close EOF");
-		return cmd;
-	}
+    if (remoteManager.stopSimulationIfRunning())
+      cmd.getResponse()
+          .getStatusResponse()
+          .setDescription("Stop simulation waiting for client close EOF");
+    else cmd.getResponse().getStatusResponse().setDescription("waiting for client close EOF");
+    return cmd;
+  }
 
-	public TraCICommand process_getState(TraCICommand rawCmd, RemoteManager remoteManager){
-		TraCIGetStateCommand cmd = (TraCIGetStateCommand) rawCmd;
+  public TraCICommand process_getState(TraCICommand rawCmd, RemoteManager remoteManager) {
+    TraCIGetStateCommand cmd = (TraCIGetStateCommand) rawCmd;
 
-		remoteManager.getSubscriptions().forEach(sub -> sub.executeSubscription(remoteManager));
+    remoteManager.getSubscriptions().forEach(sub -> sub.executeSubscription(remoteManager));
 
+    // get responses
+    TraCIGetStateResponse response =
+        new TraCIGetStateResponse(
+            new StatusResponse(cmd.getTraCICmd(), TraCIStatusResponse.OK, ""));
 
-		// get responses
-		TraCIGetStateResponse response = new TraCIGetStateResponse(
-				new StatusResponse(cmd.getTraCICmd(), TraCIStatusResponse.OK, ""));
+    remoteManager
+        .getSubscriptions()
+        .forEach(
+            sub -> {
+              response.addSubscriptionResponse(sub.getValueSubscriptionCommand().getResponse());
+            });
+    cmd.setResponse(response);
 
-		remoteManager.getSubscriptions().forEach(sub -> {
-			response.addSubscriptionResponse(sub.getValueSubscriptionCommand().getResponse());
-		});
-		cmd.setResponse(response);
+    return cmd;
+  }
 
-		return cmd;
-	}
+  public TraCICommand process_simStep(TraCICommand rawCmd, RemoteManager remoteManager) {
+    TraCISimStepCommand cmd = (TraCISimStepCommand) rawCmd;
 
-	public TraCICommand process_simStep(TraCICommand rawCmd, RemoteManager remoteManager) {
-		TraCISimStepCommand cmd = (TraCISimStepCommand) rawCmd;
+    logger.debugf("%s: Simulate until=%f", TraCICmd.SIM_STEP.name(), cmd.getTargetTime());
+    if (!remoteManager.nextStep(cmd.getTargetTime())) {
+      // Simulation finished. Wait until simulation thread finishes with post loop before
+      // telling traci client
+      // TODO: check if this is reachable
+      if (remoteManager.getCurrentSimThreadState().equals(SimThreadState.MAIN_LOOP)) {
+        remoteManager.waitForSimulationEnd();
+      }
+      cmd.setResponse(TraCISimTimeResponse.simEndReached());
+      remoteManager.notifySimulationThread();
+      return cmd;
+    }
+    // execute all
+    logger.debugf(
+        "%s: execute %d subscriptions",
+        TraCICmd.SIM_STEP.name(), remoteManager.getSubscriptions().size());
+    remoteManager.getSubscriptions().forEach(sub -> sub.executeSubscription(remoteManager));
 
-		logger.debugf("%s: Simulate until=%f", TraCICmd.SIM_STEP.name(), cmd.getTargetTime());
-		if (!remoteManager.nextStep(cmd.getTargetTime())) {
-			// Simulation finished. Wait until simulation thread finishes with post loop before
-			// telling traci client
-			// TODO: check if this is reachable
-			if (remoteManager.getCurrentSimThreadState().equals(SimThreadState.MAIN_LOOP)){
-				remoteManager.waitForSimulationEnd();
-			}
-			cmd.setResponse(TraCISimTimeResponse.simEndReached());
-			remoteManager.notifySimulationThread();
-			return cmd;
-		}
-		// execute all
-		logger.debugf("%s: execute %d subscriptions",
-				TraCICmd.SIM_STEP.name(),
-				remoteManager.getSubscriptions().size());
-		remoteManager.getSubscriptions().forEach(sub -> sub.executeSubscription(remoteManager));
+    // remove subscriptions no longer valid
+    remoteManager.getSubscriptions().removeIf(Subscription::isMarkedForRemoval);
 
-		// remove subscriptions no longer valid
-		remoteManager.getSubscriptions().removeIf(Subscription::isMarkedForRemoval);
+    // get responses
+    TraCISimTimeResponse response =
+        new TraCISimTimeResponse(new StatusResponse(cmd.getTraCICmd(), TraCIStatusResponse.OK, ""));
 
-		// get responses
-		TraCISimTimeResponse response = new TraCISimTimeResponse(
-				new StatusResponse(cmd.getTraCICmd(), TraCIStatusResponse.OK, ""));
+    remoteManager
+        .getSubscriptions()
+        .forEach(
+            sub -> {
+              response.addSubscriptionResponse(sub.getValueSubscriptionCommand().getResponse());
+            });
+    cmd.setResponse(response);
 
-		remoteManager.getSubscriptions().forEach(sub -> {
-			response.addSubscriptionResponse(sub.getValueSubscriptionCommand().getResponse());
-		});
-		cmd.setResponse(response);
+    // check RemoteManager if simulation is ended prematurely. This can happen if the
+    // a finish state is reached earlier than the given simulation time. In this case
+    // inform the TraCI client about this instead of giving it the Subscription results.
+    if (remoteManager.getSimulationStoppedEarlyAtTime() != Double.MAX_VALUE) {
+      double stoppedAtTime = remoteManager.getSimulationStoppedEarlyAtTime();
+      logger.infof(
+          "Stop simulation at %f. Inform TraCI client with simEndReach Response.", stoppedAtTime);
+      // Simulation finished. Wait until simulation thread finishes with post loop before
+      // telling traci client
+      if (remoteManager.getCurrentSimThreadState().equals(SimThreadState.MAIN_LOOP)) {
 
-		// check RemoteManager if simulation is ended prematurely. This can happen if the
-		// a finish state is reached earlier than the given simulation time. In this case
-		// inform the TraCI client about this instead of giving it the Subscription results.
-		if (remoteManager.getSimulationStoppedEarlyAtTime() != Double.MAX_VALUE){
-			double stoppedAtTime = remoteManager.getSimulationStoppedEarlyAtTime();
-			logger.infof("Stop simulation at %f. Inform TraCI client with simEndReach Response.", stoppedAtTime);
-			// Simulation finished. Wait until simulation thread finishes with post loop before
-			// telling traci client
-			if (remoteManager.getCurrentSimThreadState().equals(SimThreadState.MAIN_LOOP)){
+        logger.errorf("Main loop not finished.");
+      }
+      cmd.setResponse(TraCISimTimeResponse.simEndReached());
+      logger.info("Sent simEndReached command to client.");
 
-				logger.errorf("Main loop not finished.");
-			}
-			cmd.setResponse(TraCISimTimeResponse.simEndReached());
-			logger.info("Sent simEndReached command to client.");
+      remoteManager.notifySimulationThread();
+      logger.info("Notified simulation thread");
+    }
 
-			remoteManager.notifySimulationThread();
-			logger.info("Notified simulation thread");
-		}
+    logger.debug("process_simStep done.");
+    return cmd;
+  }
 
-		logger.debug("process_simStep done.");
-		return cmd;
-	}
+  public TraCICommand process_getVersion(TraCICommand rawCmd, RemoteManager remoteManager) {
 
-	public TraCICommand process_getVersion(TraCICommand rawCmd, RemoteManager remoteManager) {
+    TraCIGetVersionCommand cmd = (TraCIGetVersionCommand) rawCmd;
+    cmd.setResponse(new TraCIGetVersionResponse(VadereServer.currentVersion));
 
-		TraCIGetVersionCommand cmd = (TraCIGetVersionCommand) rawCmd;
-		cmd.setResponse(new TraCIGetVersionResponse(VadereServer.currentVersion));
+    return cmd;
+  }
 
-		return cmd;
-	}
+  public TraCICommand process_setOrder(TraCICommand rawCmd, RemoteManager remoteManager) {
 
-	public TraCICommand process_setOrder(TraCICommand rawCmd, RemoteManager remoteManager) {
+    // Note: Currently we do not allow multiple clients to be connected to one vadere instance,
+    //      therefore we simply ignore the SET_ORDER command
+    logger.warn(
+        "SET_ORDER command received - ignored since vadere handles only one client connection");
 
-		//Note: Currently we do not allow multiple clients to be connected to one vadere instance,
-        //      therefore we simply ignore the SET_ORDER command
-        logger.warn("SET_ORDER command received - ignored since vadere handles only one client connection");
-		
-		// remoteManager.setOrder(...)  // currently not implemented
+    // remoteManager.setOrder(...)  // currently not implemented
 
-		return rawCmd;
-	}
+    return rawCmd;
+  }
 
-	public TraCICommand process_load_file(TraCICommand rawCmd, RemoteManager remoteManager) {
+  public TraCICommand process_load_file(TraCICommand rawCmd, RemoteManager remoteManager) {
 
-		if (VadereServer.currentVersion.greaterOrEqual(TraCIVersion.V20_0_2)) {
-			TraCISendFileCommandV20_0_1 cmd = (TraCISendFileCommandV20_0_1) rawCmd;
+    if (VadereServer.currentVersion.greaterOrEqual(TraCIVersion.V20_0_2)) {
+      TraCISendFileCommandV20_0_1 cmd = (TraCISendFileCommandV20_0_1) rawCmd;
 
-			remoteManager.loadScenario(cmd.getFile(), cmd.getCacheData());
-			remoteManager.startSimulation();
-			return cmd;
-		} else {
-			TraCISendFileCommand cmd = (TraCISendFileCommand) rawCmd;
+      remoteManager.loadScenario(cmd.getFile(), cmd.getCacheData());
+      remoteManager.startSimulation();
+      return cmd;
+    } else {
+      TraCISendFileCommand cmd = (TraCISendFileCommand) rawCmd;
 
-			remoteManager.loadScenario(cmd.getFile());
-			remoteManager.startSimulation();
-			return cmd;
-		}
-	}
+      remoteManager.loadScenario(cmd.getFile());
+      remoteManager.startSimulation();
+      return cmd;
+    }
+  }
 }

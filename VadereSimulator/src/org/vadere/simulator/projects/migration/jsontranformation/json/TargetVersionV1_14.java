@@ -9,39 +9,35 @@ import org.vadere.state.attributes.AttributesStrategyModel;
 import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.version.Version;
 
-/**
- * Remove node "threatMemory" under "scenario.topography.dynamicElements.psychologyStatus"
- */
+/** Remove node "threatMemory" under "scenario.topography.dynamicElements.psychologyStatus" */
 @MigrationTransformation(targetVersionLabel = "1.14")
 public class TargetVersionV1_14 extends SimpleJsonTransformation {
 
-	public TargetVersionV1_14(){
-		super(Version.V1_14);
-	}
+  public TargetVersionV1_14() {
+    super(Version.V1_14);
+  }
 
-	@Override
-	protected void initDefaultHooks() {
-		addPostHookFirst(this::addStrategyLayer);
-		addPostHookLast(this::sort);
-	}
+  @Override
+  protected void initDefaultHooks() {
+    addPostHookFirst(this::addStrategyLayer);
+    addPostHookLast(this::sort);
+  }
 
-	public JsonNode addStrategyLayer(JsonNode node) throws MigrationException {
+  public JsonNode addStrategyLayer(JsonNode node) throws MigrationException {
 
-		String useStrategyModelKey = "attributesStrategy";
+    String useStrategyModelKey = "attributesStrategy";
 
-		JsonNode scenarioNode = path(node, "scenario");
-		JsonNode strategyModel = path(scenarioNode, useStrategyModelKey);
+    JsonNode scenarioNode = path(node, "scenario");
+    JsonNode strategyModel = path(scenarioNode, useStrategyModelKey);
 
-		if (strategyModel.isMissingNode()) {
+    if (strategyModel.isMissingNode()) {
 
-			ObjectNode n = (ObjectNode) scenarioNode;
-			JsonNode attributesStrategyNode = StateJsonConverter.serializeAttributesStrategyModelToNode(new AttributesStrategyModel());
-			n.set(useStrategyModelKey, attributesStrategyNode );
+      ObjectNode n = (ObjectNode) scenarioNode;
+      JsonNode attributesStrategyNode =
+          StateJsonConverter.serializeAttributesStrategyModelToNode(new AttributesStrategyModel());
+      n.set(useStrategyModelKey, attributesStrategyNode);
+    }
 
-		}
-
-		return node;
-
-	}
-
+    return node;
+  }
 }

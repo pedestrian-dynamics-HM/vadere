@@ -11,31 +11,30 @@ import org.vadere.state.scenario.Target;
 
 public class TestSeat {
 
-	@Test
-	public void test() {
-		final Target target = new Target(new AttributesTarget());
-		final Pedestrian pedestrian = TestTrainModel.createTestPedestrian();
-		final Seat seat = new Seat(null, target, 0);
-		
-		assertEquals(null, seat.getSeatGroup());
+  @Test
+  public void test() {
+    final Target target = new Target(new AttributesTarget());
+    final Pedestrian pedestrian = TestTrainModel.createTestPedestrian();
+    final Seat seat = new Seat(null, target, 0);
 
-		assertEquals(target, seat.getAssociatedTarget());
+    assertEquals(null, seat.getSeatGroup());
 
-		assertEquals(null, seat.getSittingPerson());
-		assertTrue(seat.isAvailable());
-		assertFalse(seat.isOccupied());
+    assertEquals(target, seat.getAssociatedTarget());
 
-		seat.setSittingPerson(pedestrian);
-		
-		assertEquals(pedestrian, seat.getSittingPerson());
-		assertTrue(seat.isOccupied());
-		assertFalse(seat.isAvailable());
+    assertEquals(null, seat.getSittingPerson());
+    assertTrue(seat.isAvailable());
+    assertFalse(seat.isOccupied());
 
-		seat.setSittingPerson(null);
+    seat.setSittingPerson(pedestrian);
 
-		assertEquals(null, seat.getSittingPerson());
-		assertTrue(seat.isAvailable());
-		assertFalse(seat.isOccupied());
-	}
+    assertEquals(pedestrian, seat.getSittingPerson());
+    assertTrue(seat.isOccupied());
+    assertFalse(seat.isAvailable());
 
+    seat.setSittingPerson(null);
+
+    assertEquals(null, seat.getSittingPerson());
+    assertTrue(seat.isAvailable());
+    assertFalse(seat.isOccupied());
+  }
 }

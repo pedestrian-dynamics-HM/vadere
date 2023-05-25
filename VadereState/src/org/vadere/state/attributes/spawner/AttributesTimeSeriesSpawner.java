@@ -7,20 +7,21 @@ import org.vadere.state.util.Views;
 
 public class AttributesTimeSeriesSpawner extends AttributesSpawner {
 
-    @JsonView(Views.CacheViewExclude.class)
-    protected AttributesTimeSeriesDistribution distribution = new AttributesTimeSeriesDistribution();
-    public AttributesTimeSeriesSpawner(){
-        super(new AttributesTimeSeriesDistribution());
-    }
+  @JsonView(Views.CacheViewExclude.class)
+  protected AttributesTimeSeriesDistribution distribution = new AttributesTimeSeriesDistribution();
 
-    @Override
-    public AttributesDistribution getDistributionAttributes() {
-        return distribution;
-    }
+  public AttributesTimeSeriesSpawner() {
+    super(new AttributesTimeSeriesDistribution());
+  }
 
-    @Override
-    public void setDistributionAttributes(AttributesDistribution distribution) {
-        checkSealed();
-        this.distribution = (AttributesTimeSeriesDistribution) distribution;
-    }
+  @Override
+  public AttributesDistribution getDistributionAttributes() {
+    return distribution;
+  }
+
+  @Override
+  public void setDistributionAttributes(AttributesDistribution distribution) {
+    checkSealed();
+    this.distribution = (AttributesTimeSeriesDistribution) distribution;
+  }
 }

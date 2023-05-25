@@ -10,69 +10,68 @@ import java.util.ArrayList;
 
 public class TimeStepFileHandler {
 
-	private File timeStepFile = null;
+  private File timeStepFile = null;
 
-	private static String ADirectiory = "Time Step file path is a directory";
+  private static String ADirectiory = "Time Step file path is a directory";
 
-	public TimeStepFileHandler(String timeStepFilePath) throws Exception {
+  public TimeStepFileHandler(String timeStepFilePath) throws Exception {
 
-		timeStepFile = new File(timeStepFilePath);
+    timeStepFile = new File(timeStepFilePath);
 
-		if (timeStepFile.isDirectory()) {
+    if (timeStepFile.isDirectory()) {
 
-			throw new Exception(ADirectiory);
-		}
-	}
+      throw new Exception(ADirectiory);
+    }
+  }
 
-	public void writeTimeStepFile(ArrayList<String> states) throws IOException {
+  public void writeTimeStepFile(ArrayList<String> states) throws IOException {
 
-		timeStepFile.delete();
-		timeStepFile.createNewFile();
+    timeStepFile.delete();
+    timeStepFile.createNewFile();
 
-		FileWriter writer = new FileWriter(timeStepFile, false);
-		BufferedWriter bufWriter = new BufferedWriter(writer);
+    FileWriter writer = new FileWriter(timeStepFile, false);
+    BufferedWriter bufWriter = new BufferedWriter(writer);
 
-		for (int iter = 0; iter < states.size(); iter++) {
+    for (int iter = 0; iter < states.size(); iter++) {
 
-			if (iter == states.size() - 1) {
-				bufWriter.write(states.get(iter));
-			} else {
-				bufWriter.write(states.get(iter) + "\n");
-			}
+      if (iter == states.size() - 1) {
+        bufWriter.write(states.get(iter));
+      } else {
+        bufWriter.write(states.get(iter) + "\n");
+      }
+    }
 
-		}
+    bufWriter.close();
+    writer.close();
+  }
 
-		bufWriter.close();
-		writer.close();
-	}
+  public void deleteTimeStepFile() {
 
-	public void deleteTimeStepFile() {
+    timeStepFile.delete();
+  }
 
-		timeStepFile.delete();
-	}
+  public ArrayList<String> readTimeStepFile() throws IOException {
 
-	public ArrayList<String> readTimeStepFile() throws IOException {
+    ArrayList<String> states = new ArrayList<String>();
 
-		ArrayList<String> states = new ArrayList<String>();
+    try {
 
-		try {
+      FileReader reader = new FileReader(timeStepFile);
+      BufferedReader bufferReader = new BufferedReader(reader);
 
-			FileReader reader = new FileReader(timeStepFile);
-			BufferedReader bufferReader = new BufferedReader(reader);
+      String state = null;
 
-			String state = null;
+      while ((state = bufferReader.readLine()) != null) {
 
-			while ((state = bufferReader.readLine()) != null) {
+        states.add(state);
+      }
 
-				states.add(state);
-			}
+      bufferReader.close();
+      reader.close();
+    } catch (IOException ex) {
 
-			bufferReader.close();
-			reader.close();
-		} catch (IOException ex) {
+    }
 
-		}
-
-		return states;
-	}
+    return states;
+  }
 }

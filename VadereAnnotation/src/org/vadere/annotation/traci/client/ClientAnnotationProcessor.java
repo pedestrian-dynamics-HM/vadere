@@ -47,7 +47,9 @@ public class ClientAnnotationProcessor extends AbstractProcessor {
     // see SupportedAnnotationTypes (here only TraCIApi)
     for (TypeElement annotation : annotations) {
       Set<? extends Element> annotatedElements =
-          roundEnv.getElementsAnnotatedWith(annotation).stream()
+          roundEnv
+              .getElementsAnnotatedWith(annotation)
+              .stream()
               .filter(
                   e ->
                       e.getKind().isClass()
@@ -309,7 +311,7 @@ public class ClientAnnotationProcessor extends AbstractProcessor {
           .append(", ")
           .append(qq(""))
           .append(", ")
-          .append(qq(apiHandler.dataTypeStrPython()));  
+          .append(qq(apiHandler.dataTypeStrPython()));
       if (apiHandler.dataTypeStr.length() > 0) {
         w.append(", data)");
       } else {

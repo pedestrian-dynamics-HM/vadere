@@ -5,15 +5,12 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/**
- * @author Aleksandar Ivanov(ivanov0@hm.edu)
- */
-@Target({ ElementType.TYPE })
+/** @author Aleksandar Ivanov(ivanov0@hm.edu) */
+@Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface RegisterDistribution {
 
-	String name();
+  String name();
 
-	Class<?> parameter();
-
+  Class<?> parameter();
 }

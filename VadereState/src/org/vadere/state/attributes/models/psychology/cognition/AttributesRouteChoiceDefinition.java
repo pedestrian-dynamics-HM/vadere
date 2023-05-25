@@ -4,37 +4,37 @@ import java.util.LinkedList;
 
 public class AttributesRouteChoiceDefinition {
 
-    private String instruction;
-    private LinkedList<Integer> targetIds;
-    private LinkedList<Double> targetProbabilities;
+  private String instruction;
+  private LinkedList<Integer> targetIds;
+  private LinkedList<Double> targetProbabilities;
 
-    public AttributesRouteChoiceDefinition(){
-        instruction = "";
-        targetIds = new LinkedList<>();
-        targetProbabilities = new LinkedList<>();
-    }
+  public AttributesRouteChoiceDefinition() {
+    instruction = "";
+    targetIds = new LinkedList<>();
+    targetProbabilities = new LinkedList<>();
+  }
 
-    public String getInstruction() {
-        return instruction;
-    }
+  public String getInstruction() {
+    return instruction;
+  }
 
-    public void setInstruction(String instruction) {
-        this.instruction = instruction;
-    }
+  public void setInstruction(String instruction) {
+    this.instruction = instruction;
+  }
 
-    public LinkedList<Integer> getTargetIds() {
-        return targetIds;
-    }
+  public LinkedList<Integer> getTargetIds() {
+    return targetIds;
+  }
 
-    public void setTargetIds(LinkedList<Integer> targetIds) {
-        this.targetIds = targetIds;
-    }
+  public void setTargetIds(LinkedList<Integer> targetIds) {
+    this.targetIds = targetIds;
+  }
 
-    public LinkedList<Double> getTargetProbabilities() {
-        return targetProbabilities;
-    }
+  public LinkedList<Double> getTargetProbabilities() {
+    return targetProbabilities;
+  }
 
-    public void setTargetProbabilities(LinkedList<Double> targetProbabilities) {
-        this.targetProbabilities = targetProbabilities;
-    }
+  public void setTargetProbabilities(LinkedList<Double> targetProbabilities) {
+    this.targetProbabilities = targetProbabilities;
+  }
 }

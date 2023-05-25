@@ -9,7 +9,7 @@ import java.io.Closeable;
  */
 public interface VadereWriter extends Closeable {
 
-	void println(String s);
+  void println(String s);
 
-	void flush();
+  void flush();
 }

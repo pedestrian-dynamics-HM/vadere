@@ -5,5 +5,5 @@ import org.vadere.state.attributes.Attributes;
 
 @ModelAttributeClass
 public class AttributesReynolds extends Attributes {
-	// no attributes yet
+  // no attributes yet
 }

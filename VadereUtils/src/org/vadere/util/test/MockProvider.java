@@ -2,7 +2,7 @@ package org.vadere.util.test;
 
 public interface MockProvider<T> {
 
-    T get();
+  T get();
 
-    void mockIt();
+  void mockIt();
 }

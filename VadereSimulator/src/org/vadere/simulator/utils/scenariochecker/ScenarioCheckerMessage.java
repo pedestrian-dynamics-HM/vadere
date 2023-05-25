@@ -1,125 +1,126 @@
 package org.vadere.simulator.utils.scenariochecker;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.util.Comparator;
+import org.jetbrains.annotations.NotNull;
 
 public class ScenarioCheckerMessage implements Comparable<ScenarioCheckerMessage> {
 
+  // label of enum is the MessageId for locale de/en. Multiple instances of the same topographyError
+  // will
+  // have the same reason.
+  private ScenarioCheckerReason reason;
+  // variable part of the reason. This will be concatenated to the reason on display time.
+  private String reasonModifier;
+  // topographyError or topographyWarning. A scenario with an topographyError cannot be simulated.
+  private ScenarioCheckerMessageType msgType;
+  // element producing the topographyError / topographyWarning
+  private ScenarioCheckerMessageTarget msgTarget;
 
-	// label of enum is the MessageId for locale de/en. Multiple instances of the same topographyError will
-	// have the same reason.
-	private ScenarioCheckerReason reason;
-	// variable part of the reason. This will be concatenated to the reason on display time.
-	private String reasonModifier;
-	// topographyError or topographyWarning. A scenario with an topographyError cannot be simulated.
-	private ScenarioCheckerMessageType msgType;
-	// element producing the topographyError / topographyWarning
-	private ScenarioCheckerMessageTarget msgTarget;
+  public ScenarioCheckerMessage(@NotNull ScenarioCheckerMessageType type) {
+    msgType = type;
+    msgTarget = null;
+    reasonModifier = "";
+  }
 
+  public ScenarioCheckerReason getReason() {
+    return reason;
+  }
 
-	public ScenarioCheckerMessage(@NotNull ScenarioCheckerMessageType type) {
-		msgType = type;
-		msgTarget = null;
-		reasonModifier = "";
-	}
+  public void setReason(ScenarioCheckerReason reason) {
+    this.reason = reason;
+  }
 
-	public ScenarioCheckerReason getReason() {
-		return reason;
-	}
+  public ScenarioCheckerMessageType getMsgType() {
+    return msgType;
+  }
 
-	public void setReason(ScenarioCheckerReason reason) {
-		this.reason = reason;
-	}
+  public void setMsgType(ScenarioCheckerMessageType msgType) {
+    this.msgType = msgType;
+  }
 
-	public ScenarioCheckerMessageType getMsgType() {
-		return msgType;
-	}
+  public ScenarioCheckerMessageTarget getMsgTarget() {
+    return msgTarget;
+  }
 
-	public void setMsgType(ScenarioCheckerMessageType msgType) {
-		this.msgType = msgType;
-	}
+  public void setMsgTarget(ScenarioCheckerMessageTarget msgTarget) {
+    this.msgTarget = msgTarget;
+  }
 
-	public ScenarioCheckerMessageTarget getMsgTarget() {
-		return msgTarget;
-	}
+  public String getReasonModifier() {
+    return reasonModifier;
+  }
 
-	public void setMsgTarget(ScenarioCheckerMessageTarget msgTarget) {
-		this.msgTarget = msgTarget;
-	}
+  public void setReasonModifier(String reasonModifier) {
+    this.reasonModifier = reasonModifier;
+  }
 
-	public String getReasonModifier() {
-		return reasonModifier;
-	}
+  public boolean isMessageForAllElements(Integer... ids) {
+    if (hasTarget()) {
+      return msgTarget.affectsAllTargets(ids);
+    } else {
+      return false;
+    }
+  }
 
-	public void setReasonModifier(String reasonModifier) {
-		this.reasonModifier = reasonModifier;
-	}
+  public boolean isError() {
+    return msgType.isErrorMsg();
+  }
 
-	public boolean isMessageForAllElements(Integer... ids){
-		if (hasTarget()){
-			return msgTarget.affectsAllTargets(ids);
-		} else {
-			return  false;
-		}
-	}
+  public boolean hasTarget() {
+    return msgTarget != null;
+  }
 
-	public boolean isError(){
-		return msgType.isErrorMsg();
-	}
+  public Comparator<ScenarioCheckerMessage> sortErrorToWarning() {
+    return (o1, o2) -> {
+      if (o1.equals(o2)) return 0;
+      if (o1.getMsgType().getId() > o2.getMsgType().getId()) {
+        return 1;
+      } else if (o1.getMsgType().getId() < o2.getMsgType().getId()) {
+        return -1;
+      } else {
+        return 0;
+      }
+    };
+  }
 
-	public boolean hasTarget(){
-		return msgTarget != null;
-	}
+  public Comparator<ScenarioCheckerMessage> sortOrdinalOnMessageType() {
+    return (o1, o2) -> {
+      if (o1.equals(o2)) return 0;
+      if (o1.getMsgType().ordinal() > o2.getMsgType().ordinal()) {
+        return 1;
+      } else if (o1.getMsgType().ordinal() < o2.getMsgType().ordinal()) {
+        return -1;
+      } else {
+        return sortErrorToWarning().compare(o1, o2);
+      }
+    };
+  }
 
-	public Comparator<ScenarioCheckerMessage> sortErrorToWarning() {
-		return (o1, o2) -> {
-			if (o1.equals(o2))
-				return 0;
-			if (o1.getMsgType().getId() > o2.getMsgType().getId()) {
-				return 1;
-			} else if (o1.getMsgType().getId() < o2.getMsgType().getId()) {
-				return -1;
-			} else {
-				return 0;
-			}
-		};
-	}
+  @Override
+  public int compareTo(@NotNull ScenarioCheckerMessage o) {
+    return compareErrorToWarn(o);
+  }
 
-	public Comparator<ScenarioCheckerMessage> sortOrdinalOnMessageType() {
-		return (o1, o2) -> {
-			if (o1.equals(o2))
-				return 0;
-			if (o1.getMsgType().ordinal() > o2.getMsgType().ordinal()) {
-				return 1;
-			} else if (o1.getMsgType().ordinal() < o2.getMsgType().ordinal()) {
-				return -1;
-			} else {
-				return sortErrorToWarning().compare(o1, o2);
-			}
-		};
-	}
+  public int compareOrdinal(@NotNull ScenarioCheckerMessage o) {
+    return sortOrdinalOnMessageType().compare(this, o);
+  }
 
-	@Override
-	public int compareTo(@NotNull ScenarioCheckerMessage o) {
-		return compareErrorToWarn(o);
-	}
+  public int compareErrorToWarn(@NotNull ScenarioCheckerMessage o) {
+    return sortErrorToWarning().compare(this, o);
+  }
 
-	public int compareOrdinal(@NotNull ScenarioCheckerMessage o){
-		return sortOrdinalOnMessageType().compare(this, o);
-	}
-
-	public int compareErrorToWarn(@NotNull ScenarioCheckerMessage o){
-		return sortErrorToWarning().compare(this, o);
-	}
-
-	@Override
-	public String toString() {
-		return "ScenarioCheckerMessage{" +
-				"reason=" + reason +
-				", reasonModifier='" + reasonModifier + '\'' +
-				", msgType=" + msgType +
-				", msgTarget=" + msgTarget +
-				'}';
-	}
+  @Override
+  public String toString() {
+    return "ScenarioCheckerMessage{"
+        + "reason="
+        + reason
+        + ", reasonModifier='"
+        + reasonModifier
+        + '\''
+        + ", msgType="
+        + msgType
+        + ", msgTarget="
+        + msgTarget
+        + '}';
+  }
 }

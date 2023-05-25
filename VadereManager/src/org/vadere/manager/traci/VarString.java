@@ -2,5 +2,5 @@ package org.vadere.manager.traci;
 
 public interface VarString {
 
-	String varAsString(int id);
+  String varAsString(int id);
 }

@@ -29,19 +29,20 @@ import org.vadere.util.logging.Logger;
 
 /** Handel GET/SET {@link org.vadere.manager.traci.commands.TraCICommand}s for the Person API */
 @TraCIApi(
-    name = "PersonAPI",
-    nameShort = "pers",
-    singleAnnotation = PersonHandler.class,
-    multipleAnnotation = PersonHandlers.class,
-    cmdEnum = TraCICmd.class,
-    varEnum = PersonVar.class,
-    var = "V_PERSON",
-    cmdGet = 0xae,
-    cmdSet = 0xce,
-    cmdSub = 0xde,
-    cmdResponseSub = 0xee,
-    cmdCtx = 0x8e,
-    cmdResponseCtx = 0x9e)
+  name = "PersonAPI",
+  nameShort = "pers",
+  singleAnnotation = PersonHandler.class,
+  multipleAnnotation = PersonHandlers.class,
+  cmdEnum = TraCICmd.class,
+  varEnum = PersonVar.class,
+  var = "V_PERSON",
+  cmdGet = 0xae,
+  cmdSet = 0xce,
+  cmdSub = 0xde,
+  cmdResponseSub = 0xee,
+  cmdCtx = 0x8e,
+  cmdResponseCtx = 0x9e
+)
 public class PersonCommandHandler extends CommandHandler<PersonVar> {
 
   public static PersonCommandHandler instance;
@@ -122,9 +123,10 @@ public class PersonCommandHandler extends CommandHandler<PersonVar> {
   ///////////////////////////// Handler /////////////////////////////
 
   @PersonHandler(
-      cmd = TraCICmd.GET_PERSON_VALUE,
-      var = PersonVar.HAS_NEXT_TARGET,
-      name = "getHasNextTarget")
+    cmd = TraCICmd.GET_PERSON_VALUE,
+    var = PersonVar.HAS_NEXT_TARGET,
+    name = "getHasNextTarget"
+  )
   public TraCICommand process_getHasNextTarget(TraCIGetCommand cmd, RemoteManager remoteManager) {
     remoteManager.accessState(
         (manager, state) -> {
@@ -150,9 +152,10 @@ public class PersonCommandHandler extends CommandHandler<PersonVar> {
   }
 
   @PersonHandler(
-      cmd = TraCICmd.GET_PERSON_VALUE,
-      var = PersonVar.NEXT_TARGET_LIST_INDEX,
-      name = "getNextTargetListIndex")
+    cmd = TraCICmd.GET_PERSON_VALUE,
+    var = PersonVar.NEXT_TARGET_LIST_INDEX,
+    name = "getNextTargetListIndex"
+  )
   public TraCICommand process_getNextTargetListIndex(
       TraCIGetCommand cmd, RemoteManager remoteManager) {
     int id = Integer.parseInt(cmd.getElementIdentifier());
@@ -168,10 +171,11 @@ public class PersonCommandHandler extends CommandHandler<PersonVar> {
   }
 
   @PersonHandler(
-      cmd = TraCICmd.SET_PERSON_STATE,
-      var = PersonVar.NEXT_TARGET_LIST_INDEX,
-      name = "setNextTargetListIndex",
-      dataTypeStr = "Integer")
+    cmd = TraCICmd.SET_PERSON_STATE,
+    var = PersonVar.NEXT_TARGET_LIST_INDEX,
+    name = "setNextTargetListIndex",
+    dataTypeStr = "Integer"
+  )
   public TraCICommand process_setNextTargetListIndex(
       TraCISetCommand cmd, RemoteManager remoteManager) {
     int data = Integer.parseInt(cmd.getVariableValue().toString());
@@ -191,15 +195,20 @@ public class PersonCommandHandler extends CommandHandler<PersonVar> {
   }
 
   @PersonHandler(
-      cmd = TraCICmd.GET_PERSON_VALUE,
-      var = PersonVar.ID_LIST,
-      name = "getIdList",
-      ignoreElementId = true)
+    cmd = TraCICmd.GET_PERSON_VALUE,
+    var = PersonVar.ID_LIST,
+    name = "getIdList",
+    ignoreElementId = true
+  )
   public TraCICommand process_getIDList(TraCIGetCommand cmd, RemoteManager remoteManager) {
     remoteManager.accessState(
         (manager, state) -> {
           List<String> data =
-              state.getTopography().getPedestrianDynamicElements().getElements().stream()
+              state
+                  .getTopography()
+                  .getPedestrianDynamicElements()
+                  .getElements()
+                  .stream()
                   .map(p -> Integer.toString(p.getId()))
                   .collect(Collectors.toList());
           logger.debugf(
@@ -215,10 +224,11 @@ public class PersonCommandHandler extends CommandHandler<PersonVar> {
   }
 
   @PersonHandler(
-      cmd = TraCICmd.GET_PERSON_VALUE,
-      var = PersonVar.NEXT_ID,
-      name = "getNextFreeId",
-      ignoreElementId = true)
+    cmd = TraCICmd.GET_PERSON_VALUE,
+    var = PersonVar.NEXT_ID,
+    name = "getNextFreeId",
+    ignoreElementId = true
+  )
   public TraCICommand process_getNextFreeId(TraCIGetCommand cmd, RemoteManager remoteManager) {
     remoteManager.accessState(
         (manager, state) -> {
@@ -230,10 +240,11 @@ public class PersonCommandHandler extends CommandHandler<PersonVar> {
   }
 
   @PersonHandler(
-      cmd = TraCICmd.GET_PERSON_VALUE,
-      var = PersonVar.COUNT,
-      name = "getIdCount",
-      ignoreElementId = true)
+    cmd = TraCICmd.GET_PERSON_VALUE,
+    var = PersonVar.COUNT,
+    name = "getIdCount",
+    ignoreElementId = true
+  )
   public TraCICommand process_getIDCount(TraCIGetCommand cmd, RemoteManager remoteManager) {
     remoteManager.accessState(
         (manager, state) -> {
@@ -262,10 +273,11 @@ public class PersonCommandHandler extends CommandHandler<PersonVar> {
   }
 
   @PersonHandler(
-      cmd = TraCICmd.SET_PERSON_STATE,
-      var = PersonVar.SPEED,
-      name = "setFreeFlowSpeed",
-      dataTypeStr = "Double")
+    cmd = TraCICmd.SET_PERSON_STATE,
+    var = PersonVar.SPEED,
+    name = "setFreeFlowSpeed",
+    dataTypeStr = "Double"
+  )
   public TraCICommand process_setFreeFlowSpeed(TraCISetCommand cmd, RemoteManager remoteManager) {
     String tmp = cmd.getVariableValue().toString();
     Double data = Double.parseDouble(tmp);
@@ -310,10 +322,11 @@ public class PersonCommandHandler extends CommandHandler<PersonVar> {
   }
 
   @PersonHandler(
-      cmd = TraCICmd.SET_PERSON_STATE,
-      var = PersonVar.POSITION,
-      name = "setPosition2D",
-      dataTypeStr = "VPoint")
+    cmd = TraCICmd.SET_PERSON_STATE,
+    var = PersonVar.POSITION,
+    name = "setPosition2D",
+    dataTypeStr = "VPoint"
+  )
   public TraCICommand process_setPosition(TraCISetCommand cmd, RemoteManager remoteManager) {
     VPoint data = (VPoint) cmd.getVariableValue();
     remoteManager.accessState(
@@ -332,9 +345,10 @@ public class PersonCommandHandler extends CommandHandler<PersonVar> {
   }
 
   @PersonHandler(
-      cmd = TraCICmd.GET_PERSON_VALUE,
-      var = PersonVar.POSITION3D,
-      name = "getPosition3D")
+    cmd = TraCICmd.GET_PERSON_VALUE,
+    var = PersonVar.POSITION3D,
+    name = "getPosition3D"
+  )
   public TraCICommand process_getPosition3D(TraCIGetCommand cmd, RemoteManager remoteManager) {
 
     remoteManager.accessState(
@@ -375,9 +389,10 @@ public class PersonCommandHandler extends CommandHandler<PersonVar> {
   }
 
   @PersonHandler(
-      cmd = TraCICmd.GET_PERSON_VALUE,
-      var = PersonVar.MAXSPEED,
-      name = "getMaximumSpeed")
+    cmd = TraCICmd.GET_PERSON_VALUE,
+    var = PersonVar.MAXSPEED,
+    name = "getMaximumSpeed"
+  )
   public TraCICommand process_getMaximumSpeed(TraCIGetCommand cmd, RemoteManager rmeoteManager) {
     rmeoteManager.accessState(
         (manager, state) -> {
@@ -395,15 +410,20 @@ public class PersonCommandHandler extends CommandHandler<PersonVar> {
   }
 
   @PersonHandler(
-      cmd = TraCICmd.GET_PERSON_VALUE,
-      var = PersonVar.POSITION_LIST,
-      name = "getPosition2DList",
-      ignoreElementId = true)
+    cmd = TraCICmd.GET_PERSON_VALUE,
+    var = PersonVar.POSITION_LIST,
+    name = "getPosition2DList",
+    ignoreElementId = true
+  )
   public TraCICommand process_getPosition2DList(TraCIGetCommand cmd, RemoteManager remoteManager) {
     remoteManager.accessState(
         (manager, state) -> {
           Map<String, VPoint> data =
-              state.getTopography().getPedestrianDynamicElements().getElements().stream()
+              state
+                  .getTopography()
+                  .getPedestrianDynamicElements()
+                  .getElements()
+                  .stream()
                   .map(
                       p -> {
                         String id = Integer.toString(p.getId());
@@ -487,9 +507,10 @@ public class PersonCommandHandler extends CommandHandler<PersonVar> {
   }
 
   @PersonHandler(
-      cmd = TraCICmd.GET_PERSON_VALUE,
-      var = PersonVar.TARGET_LIST,
-      name = "getTargetList")
+    cmd = TraCICmd.GET_PERSON_VALUE,
+    var = PersonVar.TARGET_LIST,
+    name = "getTargetList"
+  )
   public TraCICommand process_getTargetList(TraCIGetCommand cmd, RemoteManager remoteManager) {
     remoteManager.accessState(
         (manager, state) -> {
@@ -503,7 +524,8 @@ public class PersonCommandHandler extends CommandHandler<PersonVar> {
             cmd.setResponse(
                 responseOK(
                     PersonVar.TARGET_LIST.type,
-                    ped.getTargets().stream()
+                    ped.getTargets()
+                        .stream()
                         .map(i -> Integer.toString(i))
                         .collect(Collectors.toList())));
         });
@@ -511,9 +533,10 @@ public class PersonCommandHandler extends CommandHandler<PersonVar> {
   }
 
   @PersonHandler(
-      cmd = TraCICmd.SET_PERSON_STATE,
-      var = PersonVar.INFORMATION_ITEM,
-      name = "setInformation")
+    cmd = TraCICmd.SET_PERSON_STATE,
+    var = PersonVar.INFORMATION_ITEM,
+    name = "setInformation"
+  )
   public TraCICommand process_setStimulus(TraCISetCommand cmd, RemoteManager remoteManager) {
     CompoundObject data = (CompoundObject) cmd.getVariableValue();
     double start_t = (double) data.getData(0, TraCIDataType.DOUBLE);
@@ -540,10 +563,11 @@ public class PersonCommandHandler extends CommandHandler<PersonVar> {
   }
 
   @PersonHandler(
-      cmd = TraCICmd.SET_PERSON_STATE,
-      var = PersonVar.TARGET_LIST,
-      name = "setTargetList",
-      dataTypeStr = "ArrayList<String>")
+    cmd = TraCICmd.SET_PERSON_STATE,
+    var = PersonVar.TARGET_LIST,
+    name = "setTargetList",
+    dataTypeStr = "ArrayList<String>"
+  )
   public TraCICommand process_setTargetList(TraCISetCommand cmd, RemoteManager remoteManager) {
     List<String> tmp = (List<String>) cmd.getVariableValue();
     LinkedList<Integer> data =
@@ -564,11 +588,12 @@ public class PersonCommandHandler extends CommandHandler<PersonVar> {
   }
 
   @PersonHandler(
-      cmd = TraCICmd.SET_PERSON_STATE,
-      var = PersonVar.ADD,
-      ignoreElementId = true,
-      name = "createNew",
-      dataTypeStr = "String")
+    cmd = TraCICmd.SET_PERSON_STATE,
+    var = PersonVar.ADD,
+    ignoreElementId = true,
+    name = "createNew",
+    dataTypeStr = "String"
+  )
   public TraCICommand process_addPerson(TraCISetCommand cmd, RemoteManager remoteManager) {
     String data = (String) cmd.getVariableValue();
     remoteManager.accessState(
@@ -577,7 +602,11 @@ public class PersonCommandHandler extends CommandHandler<PersonVar> {
           try {
             generalPed = StateJsonConverter.deserializePedestrian(data);
             List<String> idList =
-                state.getTopography().getPedestrianDynamicElements().getElements().stream()
+                state
+                    .getTopography()
+                    .getPedestrianDynamicElements()
+                    .getElements()
+                    .stream()
                     .map(p -> Integer.toString(p.getId()))
                     .collect(Collectors.toList());
             if (checkIfIdIsFree(idList, cmd)) {
@@ -612,17 +641,19 @@ public class PersonCommandHandler extends CommandHandler<PersonVar> {
   }
 
   @PersonHandler(
-      cmd = TraCICmd.GET_PERSON_VALUE,
-      var = PersonVar.WAITING_TIME,
-      name = "getWaitingTime")
+    cmd = TraCICmd.GET_PERSON_VALUE,
+    var = PersonVar.WAITING_TIME,
+    name = "getWaitingTime"
+  )
   @PersonHandler(cmd = TraCICmd.GET_PERSON_VALUE, var = PersonVar.COLOR, name = "getColor")
   @PersonHandler(cmd = TraCICmd.GET_PERSON_VALUE, var = PersonVar.EDGE_POS, name = "getEdgePos")
   @PersonHandler(cmd = TraCICmd.GET_PERSON_VALUE, var = PersonVar.MIN_GAP, name = "getMinGap")
   @PersonHandler(cmd = TraCICmd.GET_PERSON_VALUE, var = PersonVar.NEXT_EDGE, name = "getNextEdge")
   @PersonHandler(
-      cmd = TraCICmd.GET_PERSON_VALUE,
-      var = PersonVar.REMAINING_STAGES,
-      name = "getRemainingStages")
+    cmd = TraCICmd.GET_PERSON_VALUE,
+    var = PersonVar.REMAINING_STAGES,
+    name = "getRemainingStages"
+  )
   @PersonHandler(cmd = TraCICmd.GET_PERSON_VALUE, var = PersonVar.VEHICLE, name = "getVehicle")
   public TraCICommand process_NotImplemented(TraCIGetCommand cmd, RemoteManager remoteManager) {
     return super.process_NotImplemented(cmd, remoteManager);

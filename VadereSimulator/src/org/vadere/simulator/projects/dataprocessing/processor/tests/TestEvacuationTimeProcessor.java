@@ -9,65 +9,61 @@ import org.vadere.simulator.projects.dataprocessing.processor.EvacuationTimeProc
 import org.vadere.state.attributes.processor.AttributesTestEvacuationTimeProcessor;
 import org.vadere.state.attributes.processor.AttributesTestNumberOverlapsProcessor;
 
-/**
- * @author Benedikt Zoennchen
- *
- */
+/** @author Benedikt Zoennchen */
 @DataProcessorClass()
 public class TestEvacuationTimeProcessor extends TestProcessor {
 
-	private EvacuationTimeProcessor evacuationTimeProcessor;
+  private EvacuationTimeProcessor evacuationTimeProcessor;
 
-	public TestEvacuationTimeProcessor() {
-		super("test-evacuationTime");
-		setAttributes(new AttributesTestEvacuationTimeProcessor());
-	}
+  public TestEvacuationTimeProcessor() {
+    super("test-evacuationTime");
+    setAttributes(new AttributesTestEvacuationTimeProcessor());
+  }
 
-	@Override
-	public void init(@NotNull final ProcessorManager manager) {
-		super.init(manager);
-		AttributesTestEvacuationTimeProcessor att = this.getAttributes();
-		evacuationTimeProcessor =
-				(EvacuationTimeProcessor) manager.getProcessor(att.getEvacuationTimeProcessorId());
-	}
+  @Override
+  public void init(@NotNull final ProcessorManager manager) {
+    super.init(manager);
+    AttributesTestEvacuationTimeProcessor att = this.getAttributes();
+    evacuationTimeProcessor =
+        (EvacuationTimeProcessor) manager.getProcessor(att.getEvacuationTimeProcessorId());
+  }
 
-	@Override
-	protected void doUpdate(@NotNull final SimulationState state) {
-		evacuationTimeProcessor.update(state);
-	}
+  @Override
+  protected void doUpdate(@NotNull final SimulationState state) {
+    evacuationTimeProcessor.update(state);
+  }
 
+  @Override
+  public void preLoop(SimulationState state) {
+    evacuationTimeProcessor.preLoop(state);
+  }
 
-	@Override
-	public void preLoop(SimulationState state) {
-		evacuationTimeProcessor.preLoop(state);
-	}
+  @Override
+  public void postLoop(SimulationState state) {
+    evacuationTimeProcessor.postLoop(state);
 
-	@Override
-	public void postLoop(SimulationState state) {
-		evacuationTimeProcessor.postLoop(state);
+    int invalidEvacuationTimes = 0;
 
-		int invalidEvacuationTimes = 0;
+    Double maximalEvacTime = getAttributes().getMaximalEvacuationTime();
+    Double minimalEvacTime = getAttributes().getMinimalEvacuationTime();
 
-		Double maximalEvacTime = getAttributes().getMaximalEvacuationTime();
-		Double minimalEvacTime = getAttributes().getMinimalEvacuationTime();
+    Double evacTime = evacuationTimeProcessor.getValue(NoDataKey.key());
 
-		Double evacTime = evacuationTimeProcessor.getValue(NoDataKey.key());
+    if ((evacTime == Double.POSITIVE_INFINITY && maximalEvacTime != Double.POSITIVE_INFINITY)
+        || (evacTime < minimalEvacTime || evacTime > maximalEvacTime)) {
+      invalidEvacuationTimes++;
+    }
 
-		if((evacTime == Double.POSITIVE_INFINITY && maximalEvacTime != Double.POSITIVE_INFINITY) ||
-				(evacTime < minimalEvacTime|| evacTime > maximalEvacTime)) {
-			invalidEvacuationTimes++;
-		}
+    String msg = minimalEvacTime + " <= " + evacTime + "(evacuation time) <= " + maximalEvacTime;
+    handleAssertion(invalidEvacuationTimes <= 0, msg);
+  }
 
-		String msg = minimalEvacTime + " <= " + evacTime + "(evacuation time) <= " + maximalEvacTime;
-		handleAssertion(invalidEvacuationTimes <= 0, msg);
-	}
+  @Override
+  public AttributesTestEvacuationTimeProcessor getAttributes() {
+    if (super.getAttributes() == null) {
+      setAttributes(new AttributesTestNumberOverlapsProcessor());
+    }
 
-	@Override
-	public AttributesTestEvacuationTimeProcessor getAttributes() {
-		if (super.getAttributes() == null) {
-			setAttributes(new AttributesTestNumberOverlapsProcessor());
-		}
-
-		return (AttributesTestEvacuationTimeProcessor)super.getAttributes();
-	}
+    return (AttributesTestEvacuationTimeProcessor) super.getAttributes();
+  }
 }

@@ -6,28 +6,24 @@ import java.util.List;
 
 public class VadereStringWriter implements VadereWriter {
 
-	List<String> output;
+  List<String> output;
 
-	public VadereStringWriter() {
-		output = new ArrayList<>();
-	}
+  public VadereStringWriter() {
+    output = new ArrayList<>();
+  }
 
-	public List<String> getOutput() {
-		return output;
-	}
+  public List<String> getOutput() {
+    return output;
+  }
 
-	@Override
-	public void println(String s) {
-		output.add(s);
-	}
+  @Override
+  public void println(String s) {
+    output.add(s);
+  }
 
-	@Override
-	public void flush() {
+  @Override
+  public void flush() {}
 
-	}
-
-	@Override
-	public void close() throws IOException {
-
-	}
+  @Override
+  public void close() throws IOException {}
 }

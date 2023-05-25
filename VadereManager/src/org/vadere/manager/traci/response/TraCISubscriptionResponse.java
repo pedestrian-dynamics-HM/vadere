@@ -1,190 +1,208 @@
 package org.vadere.manager.traci.response;
 
-import org.vadere.manager.traci.TraCICmd;
-import org.vadere.state.traci.TraCIDataType;
-import org.vadere.manager.traci.commands.TraCIValueSubscriptionCommand;
-import org.vadere.manager.traci.reader.TraCICommandBuffer;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import org.vadere.manager.traci.TraCICmd;
+import org.vadere.manager.traci.commands.TraCIValueSubscriptionCommand;
+import org.vadere.manager.traci.reader.TraCICommandBuffer;
+import org.vadere.state.traci.TraCIDataType;
 
 public class TraCISubscriptionResponse extends TraCIResponse {
 
-	public static final String SUB_REMOVED = "Subscription removed.";
+  public static final String SUB_REMOVED = "Subscription removed.";
 
-	private String elementId;
-	private int numberOfVariables;
-	private List<SingeVarResponse> responses;
+  private String elementId;
+  private int numberOfVariables;
+  private List<SingeVarResponse> responses;
 
+  public TraCISubscriptionResponse(
+      StatusResponse statusResponse, TraCICmd responseIdentifier, TraCICommandBuffer buffer) {
+    this(statusResponse, responseIdentifier);
 
-	public TraCISubscriptionResponse(StatusResponse statusResponse, TraCICmd responseIdentifier, TraCICommandBuffer buffer) {
-		this(statusResponse, responseIdentifier);
+    elementId = buffer.readString();
+    numberOfVariables = buffer.readUnsignedByte();
+    for (int i = 0; i < numberOfVariables; i++) {
+      responses.add(new SingeVarResponse(buffer));
+    }
+  }
 
-		elementId = buffer.readString();
-		numberOfVariables = buffer.readUnsignedByte();
-		for (int i = 0; i < numberOfVariables; i++) {
-			responses.add(new SingeVarResponse(buffer));
-		}
-	}
+  public TraCISubscriptionResponse(
+      StatusResponse statusResponse,
+      TraCICmd responseIdentifier,
+      String elementId,
+      int numberOfVariables) {
+    this(statusResponse, responseIdentifier);
+    this.elementId = elementId;
+    this.numberOfVariables = numberOfVariables;
+  }
 
+  public TraCISubscriptionResponse(StatusResponse statusResponse, TraCICmd responseIdentifier) {
+    super(statusResponse, responseIdentifier);
+    responses = new ArrayList<>();
+  }
 
-	public TraCISubscriptionResponse(StatusResponse statusResponse, TraCICmd responseIdentifier, String elementId, int numberOfVariables) {
-		this(statusResponse, responseIdentifier);
-		this.elementId = elementId;
-		this.numberOfVariables = numberOfVariables;
-	}
+  public static TraCISubscriptionResponse removeResponse(
+      TraCIValueSubscriptionCommand cmd, TraCICmd res) {
+    return new TraCISubscriptionResponse(
+        new StatusResponse(cmd.getTraCICmd(), TraCIStatusResponse.ERR, SUB_REMOVED),
+        res,
+        cmd.getElementIdentifier(),
+        cmd.getNumberOfVariables());
+  }
 
-	public TraCISubscriptionResponse(StatusResponse statusResponse, TraCICmd responseIdentifier) {
-		super(statusResponse, responseIdentifier);
-		responses = new ArrayList<>();
-	}
+  public void addVariableResponse(
+      int variableId, TraCIStatusResponse status, TraCIDataType dataType, Object value) {
+    responses.add(new SingeVarResponse(variableId, status, dataType, value));
+  }
 
-	public static TraCISubscriptionResponse removeResponse(TraCIValueSubscriptionCommand cmd, TraCICmd res) {
-		return new TraCISubscriptionResponse(
-				new StatusResponse(cmd.getTraCICmd(), TraCIStatusResponse.ERR, SUB_REMOVED),
-				res, cmd.getElementIdentifier(), cmd.getNumberOfVariables());
-	}
+  public String getElementId() {
+    return elementId;
+  }
 
-	public void addVariableResponse(int variableId, TraCIStatusResponse status, TraCIDataType dataType, Object value) {
-		responses.add(new SingeVarResponse(variableId, status, dataType, value));
-	}
+  public void setElementId(String elementId) {
+    this.elementId = elementId;
+  }
 
-	public String getElementId() {
-		return elementId;
-	}
+  public int getNumberOfVariables() {
+    return numberOfVariables;
+  }
 
-	public void setElementId(String elementId) {
-		this.elementId = elementId;
-	}
+  public void setNumberOfVariables(int numberOfVariables) {
+    this.numberOfVariables = numberOfVariables;
+  }
 
-	public int getNumberOfVariables() {
-		return numberOfVariables;
-	}
+  public List<SingeVarResponse> getResponses() {
+    return responses;
+  }
 
-	public void setNumberOfVariables(int numberOfVariables) {
-		this.numberOfVariables = numberOfVariables;
-	}
+  public void setResponses(List<SingeVarResponse> responses) {
+    this.responses = responses;
+  }
 
-	public List<SingeVarResponse> getResponses() {
-		return responses;
-	}
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    TraCISubscriptionResponse that = (TraCISubscriptionResponse) o;
+    return numberOfVariables == that.numberOfVariables
+        && elementId.equals(that.elementId)
+        && responses.equals(that.responses);
+  }
 
-	public void setResponses(List<SingeVarResponse> responses) {
-		this.responses = responses;
-	}
+  @Override
+  public int hashCode() {
+    return Objects.hash(elementId, numberOfVariables, responses);
+  }
 
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
-		TraCISubscriptionResponse that = (TraCISubscriptionResponse) o;
-		return numberOfVariables == that.numberOfVariables &&
-				elementId.equals(that.elementId) &&
-				responses.equals(that.responses);
-	}
+  @Override
+  public String toString() {
+    return "TraCISubscriptionResponse{"
+        + "elementId='"
+        + elementId
+        + '\''
+        + ", numberOfVariables="
+        + numberOfVariables
+        + ", responses="
+        + responses
+        + ", statusResponse="
+        + statusResponse
+        + '}';
+  }
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(elementId, numberOfVariables, responses);
-	}
+  public class SingeVarResponse {
 
-	@Override
-	public String toString() {
-		return "TraCISubscriptionResponse{" +
-				"elementId='" + elementId + '\'' +
-				", numberOfVariables=" + numberOfVariables +
-				", responses=" + responses +
-				", statusResponse=" + statusResponse +
-				'}';
-	}
+    int variableId;
+    TraCIStatusResponse status;
+    TraCIDataType variableDataType;
+    Object variableValue;
 
-	public class SingeVarResponse {
+    public SingeVarResponse(TraCICommandBuffer buffer) {
+      variableId = buffer.readUnsignedByte();
+      status = TraCIStatusResponse.fromId(buffer.readUnsignedByte());
+      if (status.equals(TraCIStatusResponse.OK)) {
+        variableDataType = TraCIDataType.fromId(buffer.readUnsignedByte());
+      } else {
+        variableDataType = TraCIDataType.STRING; // ERR
+      }
+      variableValue = buffer.readTypeValue(variableDataType);
+    }
 
-		int variableId;
-		TraCIStatusResponse status;
-		TraCIDataType variableDataType;
-		Object variableValue;
+    public SingeVarResponse(
+        int variableId,
+        TraCIStatusResponse status,
+        TraCIDataType variableDataType,
+        Object variableValue) {
+      this.variableId = variableId;
+      this.status = status;
+      this.variableDataType = variableDataType;
+      this.variableValue = variableValue;
+    }
 
-		public SingeVarResponse(TraCICommandBuffer buffer) {
-			variableId = buffer.readUnsignedByte();
-			status = TraCIStatusResponse.fromId(buffer.readUnsignedByte());
-			if (status.equals(TraCIStatusResponse.OK)) {
-				variableDataType = TraCIDataType.fromId(buffer.readUnsignedByte());
-			} else {
-				variableDataType = TraCIDataType.STRING; // ERR
-			}
-			variableValue = buffer.readTypeValue(variableDataType);
-		}
+    public boolean isStatusOK() {
+      return status.equals(TraCIStatusResponse.OK);
+    }
 
-		public SingeVarResponse(int variableId, TraCIStatusResponse status, TraCIDataType variableDataType, Object variableValue) {
-			this.variableId = variableId;
-			this.status = status;
-			this.variableDataType = variableDataType;
-			this.variableValue = variableValue;
-		}
+    public int getVariableId() {
+      return variableId;
+    }
 
-		public boolean isStatusOK() {
-			return status.equals(TraCIStatusResponse.OK);
-		}
+    public void setVariableId(int variableId) {
+      this.variableId = variableId;
+    }
 
-		public int getVariableId() {
-			return variableId;
-		}
+    public TraCIStatusResponse getStatus() {
+      return status;
+    }
 
-		public void setVariableId(int variableId) {
-			this.variableId = variableId;
-		}
+    public void setStatus(TraCIStatusResponse status) {
+      this.status = status;
+    }
 
-		public TraCIStatusResponse getStatus() {
-			return status;
-		}
+    public TraCIDataType getVariableDataType() {
+      return variableDataType;
+    }
 
-		public void setStatus(TraCIStatusResponse status) {
-			this.status = status;
-		}
+    public void setVariableDataType(TraCIDataType variableDataType) {
+      this.variableDataType = variableDataType;
+    }
 
-		public TraCIDataType getVariableDataType() {
-			return variableDataType;
-		}
+    public Object getVariableValue() {
+      return variableValue;
+    }
 
-		public void setVariableDataType(TraCIDataType variableDataType) {
-			this.variableDataType = variableDataType;
-		}
+    public void setVariableValue(Object variableValue) {
+      this.variableValue = variableValue;
+    }
 
-		public Object getVariableValue() {
-			return variableValue;
-		}
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) return true;
+      if (o == null || getClass() != o.getClass()) return false;
+      SingeVarResponse that = (SingeVarResponse) o;
+      return variableId == that.variableId
+          && status == that.status
+          && variableDataType == that.variableDataType
+          && variableValue.equals(that.variableValue);
+    }
 
-		public void setVariableValue(Object variableValue) {
-			this.variableValue = variableValue;
-		}
+    @Override
+    public int hashCode() {
+      return Objects.hash(variableId, status, variableDataType, variableValue);
+    }
 
-		@Override
-		public boolean equals(Object o) {
-			if (this == o) return true;
-			if (o == null || getClass() != o.getClass()) return false;
-			SingeVarResponse that = (SingeVarResponse) o;
-			return variableId == that.variableId &&
-					status == that.status &&
-					variableDataType == that.variableDataType &&
-					variableValue.equals(that.variableValue);
-		}
-
-		@Override
-		public int hashCode() {
-			return Objects.hash(variableId, status, variableDataType, variableValue);
-		}
-
-		@Override
-		public String toString() {
-			return "SingeVarResponse{" +
-					"variableId=" + variableId +
-					", status=" + status +
-					", variableDataType=" + variableDataType +
-					", variableValue=" + variableValue +
-					'}';
-		}
-	}
-
+    @Override
+    public String toString() {
+      return "SingeVarResponse{"
+          + "variableId="
+          + variableId
+          + ", status="
+          + status
+          + ", variableDataType="
+          + variableDataType
+          + ", variableValue="
+          + variableValue
+          + '}';
+    }
+  }
 }

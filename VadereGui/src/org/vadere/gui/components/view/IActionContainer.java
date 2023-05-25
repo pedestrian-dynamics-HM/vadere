@@ -4,5 +4,5 @@ import javax.swing.Action;
 import javax.swing.JButton;
 
 public interface IActionContainer {
-	JButton add(Action action);
+  JButton add(Action action);
 }

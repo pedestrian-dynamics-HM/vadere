@@ -1,5 +1,8 @@
 package org.vadere.simulator.control.psychology.cognition;
 
+import static org.junit.Assert.assertEquals;
+
+import java.util.*;
 import org.junit.Test;
 import org.vadere.simulator.control.psychology.cognition.models.CounterflowCognitionModel;
 import org.vadere.state.attributes.Attributes;
@@ -14,174 +17,168 @@ import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
 
-import java.util.*;
-
-import static org.junit.Assert.assertEquals;
-
 public class CounterflowCognitionModelTest {
 
-    private List<Attributes> attributes = new LinkedList<>();
+  private List<Attributes> attributes = new LinkedList<>();
 
+  private List<Pedestrian> createPedestrians(int totalPedestrians, boolean usePedIdAsTargetId) {
+    List<Pedestrian> pedestrians = new ArrayList<>();
 
-    private List<Pedestrian> createPedestrians(int totalPedestrians, boolean usePedIdAsTargetId) {
-        List<Pedestrian> pedestrians = new ArrayList<>();
+    for (int i = 0; i < totalPedestrians; i++) {
+      long seed = 0;
+      Random random = new Random(seed);
+      AttributesAgent attributesAgent = new AttributesAgent(i);
 
-        for (int i = 0; i < totalPedestrians; i++) {
-            long seed = 0;
-            Random random = new Random(seed);
-            AttributesAgent attributesAgent = new AttributesAgent(i);
+      Pedestrian currentPedestrian = new Pedestrian(attributesAgent, random);
 
-            Pedestrian currentPedestrian = new Pedestrian(attributesAgent, random);
+      currentPedestrian.setMostImportantStimulus(new ElapsedTime());
+      currentPedestrian.setSelfCategory(SelfCategory.TARGET_ORIENTED);
 
-            currentPedestrian.setMostImportantStimulus(new ElapsedTime());
-            currentPedestrian.setSelfCategory(SelfCategory.TARGET_ORIENTED);
+      LinkedList<Integer> targetIds =
+          (usePedIdAsTargetId) ? new LinkedList<>(Arrays.asList(i)) : new LinkedList<>();
+      currentPedestrian.setTargets(targetIds);
 
-            LinkedList<Integer> targetIds = (usePedIdAsTargetId) ? new LinkedList<>(Arrays.asList(i)) : new LinkedList<>();
-            currentPedestrian.setTargets(targetIds);
-
-            pedestrians.add(currentPedestrian);
-        }
-
-        return pedestrians;
+      pedestrians.add(currentPedestrian);
     }
 
-    private Topography createTopography(List<Pedestrian> initialPedestrians) {
-        Topography topography = new Topography();
+    return pedestrians;
+  }
 
-        initialPedestrians.stream().forEach(pedestrian -> topography.addElement(pedestrian));
+  private Topography createTopography(List<Pedestrian> initialPedestrians) {
+    Topography topography = new Topography();
 
-        List<Target> targets = createTwoTargets();
-        targets.stream().forEach(target -> topography.addTarget(target));
+    initialPedestrians.stream().forEach(pedestrian -> topography.addElement(pedestrian));
 
-        return topography;
+    List<Target> targets = createTwoTargets();
+    targets.stream().forEach(target -> topography.addTarget(target));
+
+    return topography;
+  }
+
+  private ArrayList<Target> createTwoTargets() {
+    ArrayList<Target> targets = new ArrayList<>();
+
+    Target target1 = createTarget(new VPoint(0, 0), 1, 0);
+    Target target2 = createTarget(new VPoint(5, 0), 1, 1);
+
+    targets.add(target1);
+    targets.add(target2);
+
+    return targets;
+  }
+
+  private Target createTarget(VPoint center, double radius, int id) {
+    VShape shape = new VCircle(center, radius);
+    boolean absorbing = true;
+
+    AttributesTarget attributesTarget = new AttributesTarget(shape, id, absorbing);
+    Target target = new Target(attributesTarget);
+
+    return target;
+  }
+
+  private void movePedestrian(Pedestrian pedestrian, VPoint newPosition, Topography topography) {
+    VPoint oldPosition = pedestrian.getPosition();
+    pedestrian.setPosition(newPosition);
+    topography.moveElement(pedestrian, oldPosition);
+  }
+
+  @Test
+  public void updateDoesNotChangeSelfCategoryIfPedHasNoTarget() {
+    boolean usePedIdAsTargetId = false;
+    List<Pedestrian> pedestrians = createPedestrians(2, usePedIdAsTargetId);
+    Topography topography = createTopography(pedestrians);
+
+    CounterflowCognitionModel counterflowCognitionModel = new CounterflowCognitionModel();
+    counterflowCognitionModel.initialize(topography, new Random(0));
+
+    counterflowCognitionModel.update(pedestrians);
+
+    SelfCategory expectedSelfCategory = SelfCategory.TARGET_ORIENTED;
+    for (Pedestrian pedestrian : pedestrians) {
+      assertEquals(expectedSelfCategory, pedestrian.getSelfCategory());
     }
+  }
 
-    private ArrayList<Target> createTwoTargets() {
-        ArrayList<Target> targets = new ArrayList<>();
+  @Test
+  public void updateDoesNotChangeSelfCategoryIfNoNeighborIsAvailable() {
+    boolean usePedIdAsTargetId = true;
+    List<Pedestrian> pedestrians = createPedestrians(2, usePedIdAsTargetId);
+    Topography topography = createTopography(pedestrians);
 
-        Target target1 = createTarget(new VPoint(0, 0), 1, 0);
-        Target target2 = createTarget(new VPoint(5, 0), 1, 1);
+    // Search radius is expected to be 1 m.
+    movePedestrian(pedestrians.get(0), new VPoint(0, 0), topography);
+    movePedestrian(pedestrians.get(1), new VPoint(2, 0), topography);
 
-        targets.add(target1);
-        targets.add(target2);
+    CounterflowCognitionModel counterflowCognitionModel = new CounterflowCognitionModel();
+    counterflowCognitionModel.initialize(topography, new Random(0));
 
-        return targets;
+    counterflowCognitionModel.update(pedestrians);
+
+    SelfCategory expectedSelfCategory = SelfCategory.TARGET_ORIENTED;
+    for (Pedestrian pedestrian : pedestrians) {
+      assertEquals(expectedSelfCategory, pedestrian.getSelfCategory());
     }
+  }
 
-    private Target createTarget(VPoint center, double radius, int id) {
-        VShape shape = new VCircle(center, radius);
-        boolean absorbing = true;
+  @Test
+  public void updateDoesNotChangeSelfCategoryIfNeighborIsFurtherAwayFromOwnTarget() {
+    boolean usePedIdAsTargetId = true;
+    List<Pedestrian> pedestrians = createPedestrians(2, usePedIdAsTargetId);
+    Topography topography = createTopography(pedestrians);
 
-        AttributesTarget attributesTarget = new AttributesTarget(shape, id, absorbing);
-        Target target = new Target(attributesTarget);
+    movePedestrian(pedestrians.get(0), new VPoint(0, 0), topography);
+    movePedestrian(pedestrians.get(1), new VPoint(0.5, 0), topography);
 
-        return target;
+    CounterflowCognitionModel counterflowCognitionModel = new CounterflowCognitionModel();
+    counterflowCognitionModel.initialize(topography, new Random(0));
+
+    counterflowCognitionModel.update(pedestrians);
+
+    SelfCategory expectedSelfCategory = SelfCategory.TARGET_ORIENTED;
+    for (Pedestrian pedestrian : pedestrians) {
+      assertEquals(expectedSelfCategory, pedestrian.getSelfCategory());
     }
+  }
 
-    private void movePedestrian(Pedestrian pedestrian, VPoint newPosition, Topography topography) {
-        VPoint oldPosition = pedestrian.getPosition();
-        pedestrian.setPosition(newPosition);
-        topography.moveElement(pedestrian, oldPosition);
+  @Test
+  public void updateChangesSelfCategoryIfNeighborIsCloserToTargetAndWalkingDirectionDiffers() {
+    boolean usePedIdAsTargetId = true;
+    List<Pedestrian> pedestrians = createPedestrians(2, usePedIdAsTargetId);
+    Topography topography = createTopography(pedestrians);
+
+    movePedestrian(pedestrians.get(0), new VPoint(2.5, 0), topography);
+    movePedestrian(pedestrians.get(1), new VPoint(2, 0), topography);
+
+    CounterflowCognitionModel counterflowCognitionModel = new CounterflowCognitionModel();
+    counterflowCognitionModel.initialize(topography, new Random(0));
+
+    counterflowCognitionModel.update(pedestrians);
+
+    SelfCategory expectedSelfCategory = SelfCategory.EVADE;
+    for (Pedestrian pedestrian : pedestrians) {
+      assertEquals(expectedSelfCategory, pedestrian.getSelfCategory());
     }
+  }
 
-    @Test
-    public void updateDoesNotChangeSelfCategoryIfPedHasNoTarget() {
-        boolean usePedIdAsTargetId = false;
-        List<Pedestrian> pedestrians = createPedestrians(2, usePedIdAsTargetId);
-        Topography topography = createTopography(pedestrians);
+  @Test
+  public void updateDoesNotChangeSelfCategoryIfNeighborIsCloserToTargetButWalkingDirectionIsSame() {
+    boolean usePedIdAsTargetId = true;
+    List<Pedestrian> pedestrians = createPedestrians(2, usePedIdAsTargetId);
+    Topography topography = createTopography(pedestrians);
 
-        CounterflowCognitionModel counterflowCognitionModel = new CounterflowCognitionModel();
-        counterflowCognitionModel.initialize(topography, new Random(0));
+    pedestrians.get(1).setTargets(pedestrians.get(0).getTargets());
+    movePedestrian(pedestrians.get(0), new VPoint(2.5, 0), topography);
+    movePedestrian(pedestrians.get(1), new VPoint(2, 0), topography);
 
-        counterflowCognitionModel.update(pedestrians);
+    CounterflowCognitionModel counterflowCognitionModel = new CounterflowCognitionModel();
+    counterflowCognitionModel.initialize(topography, new Random(0));
 
-        SelfCategory expectedSelfCategory = SelfCategory.TARGET_ORIENTED;
-        for (Pedestrian pedestrian : pedestrians) {
-            assertEquals(expectedSelfCategory, pedestrian.getSelfCategory());
-        }
+    counterflowCognitionModel.update(pedestrians);
+
+    SelfCategory expectedSelfCategory = SelfCategory.TARGET_ORIENTED;
+    for (Pedestrian pedestrian : pedestrians) {
+      assertEquals(expectedSelfCategory, pedestrian.getSelfCategory());
     }
-
-    @Test
-    public void updateDoesNotChangeSelfCategoryIfNoNeighborIsAvailable() {
-        boolean usePedIdAsTargetId = true;
-        List<Pedestrian> pedestrians = createPedestrians(2, usePedIdAsTargetId);
-        Topography topography = createTopography(pedestrians);
-
-        // Search radius is expected to be 1 m.
-        movePedestrian(pedestrians.get(0), new VPoint(0,0), topography);
-        movePedestrian(pedestrians.get(1), new VPoint(2,0), topography);
-
-        CounterflowCognitionModel counterflowCognitionModel = new CounterflowCognitionModel();
-        counterflowCognitionModel.initialize(topography, new Random(0));
-
-        counterflowCognitionModel.update(pedestrians);
-
-        SelfCategory expectedSelfCategory = SelfCategory.TARGET_ORIENTED;
-        for (Pedestrian pedestrian : pedestrians) {
-            assertEquals(expectedSelfCategory, pedestrian.getSelfCategory());
-        }
-    }
-
-
-    @Test
-    public void updateDoesNotChangeSelfCategoryIfNeighborIsFurtherAwayFromOwnTarget() {
-        boolean usePedIdAsTargetId = true;
-        List<Pedestrian> pedestrians = createPedestrians(2, usePedIdAsTargetId);
-        Topography topography = createTopography(pedestrians);
-
-        movePedestrian(pedestrians.get(0), new VPoint(0,0), topography);
-        movePedestrian(pedestrians.get(1), new VPoint(0.5,0), topography);
-
-        CounterflowCognitionModel counterflowCognitionModel = new CounterflowCognitionModel();
-        counterflowCognitionModel.initialize(topography, new Random(0));
-
-        counterflowCognitionModel.update(pedestrians);
-
-        SelfCategory expectedSelfCategory = SelfCategory.TARGET_ORIENTED;
-        for (Pedestrian pedestrian : pedestrians) {
-            assertEquals(expectedSelfCategory, pedestrian.getSelfCategory());
-        }
-    }
-
-    @Test
-    public void updateChangesSelfCategoryIfNeighborIsCloserToTargetAndWalkingDirectionDiffers() {
-        boolean usePedIdAsTargetId = true;
-        List<Pedestrian> pedestrians = createPedestrians(2, usePedIdAsTargetId);
-        Topography topography = createTopography(pedestrians);
-
-        movePedestrian(pedestrians.get(0), new VPoint(2.5,0), topography);
-        movePedestrian(pedestrians.get(1), new VPoint(2,0), topography);
-
-        CounterflowCognitionModel counterflowCognitionModel = new CounterflowCognitionModel();
-        counterflowCognitionModel.initialize(topography, new Random(0));
-
-        counterflowCognitionModel.update(pedestrians);
-
-        SelfCategory expectedSelfCategory = SelfCategory.EVADE;
-        for (Pedestrian pedestrian : pedestrians) {
-            assertEquals(expectedSelfCategory, pedestrian.getSelfCategory());
-        }
-    }
-
-    @Test
-    public void updateDoesNotChangeSelfCategoryIfNeighborIsCloserToTargetButWalkingDirectionIsSame() {
-        boolean usePedIdAsTargetId = true;
-        List<Pedestrian> pedestrians = createPedestrians(2, usePedIdAsTargetId);
-        Topography topography = createTopography(pedestrians);
-
-        pedestrians.get(1).setTargets(pedestrians.get(0).getTargets());
-        movePedestrian(pedestrians.get(0), new VPoint(2.5,0), topography);
-        movePedestrian(pedestrians.get(1), new VPoint(2,0), topography);
-
-        CounterflowCognitionModel counterflowCognitionModel = new CounterflowCognitionModel();
-        counterflowCognitionModel.initialize(topography, new Random(0));
-
-        counterflowCognitionModel.update(pedestrians);
-
-        SelfCategory expectedSelfCategory = SelfCategory.TARGET_ORIENTED;
-        for (Pedestrian pedestrian : pedestrians) {
-            assertEquals(expectedSelfCategory, pedestrian.getSelfCategory());
-        }
-    }
-
+  }
 }

@@ -11,15 +11,14 @@ import org.junit.Test;
  */
 public class PedestrianStartTimeProcessorTest extends ProcessorTest {
 
-	@Before
-	public void setup() {
-		processorTestEnv = new PedestrianStartTimeProcessorTestEnv();
-		super.setup();
-	}
+  @Before
+  public void setup() {
+    processorTestEnv = new PedestrianStartTimeProcessorTestEnv();
+    super.setup();
+  }
 
-	@Test
-	public void doUpdate() throws Exception {
-		super.doUpdate();
-	}
-
+  @Test
+  public void doUpdate() throws Exception {
+    super.doUpdate();
+  }
 }

@@ -1,5 +1,7 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
+import java.util.*;
+import java.util.stream.Collectors;
 import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
 import org.vadere.simulator.control.simulation.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
@@ -11,93 +13,96 @@ import org.vadere.state.traci.CompoundObjectProvider;
 import org.vadere.state.traci.TraCIDataType;
 import org.vadere.util.logging.Logger;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
 @DataProcessorClass
-public class PedestrianCommandIdsReceivedTimesProcessor extends DataProcessor<TimestepPedestrianIdKey, Integer>  implements CompoundObjectProvider {
+public class PedestrianCommandIdsReceivedTimesProcessor
+    extends DataProcessor<TimestepPedestrianIdKey, Integer> implements CompoundObjectProvider {
 
-	private static Logger logger = Logger.getLogger(PedestrianGroupIDProcessor.class);
-	private LinkedList<Integer> processedAgentIds;
+  private static Logger logger = Logger.getLogger(PedestrianGroupIDProcessor.class);
+  private LinkedList<Integer> processedAgentIds;
 
-	public PedestrianCommandIdsReceivedTimesProcessor() {
-		super("commandId");
-	}
+  public PedestrianCommandIdsReceivedTimesProcessor() {
+    super("commandId");
+  }
 
-	@Override
-	protected void doUpdate(SimulationState state) {
-		resetProcessedAgentIds();
-		int timeStep = state.getStep();
+  @Override
+  protected void doUpdate(SimulationState state) {
+    resetProcessedAgentIds();
+    int timeStep = state.getStep();
 
-		Collection<Pedestrian> peds = state.getTopography().getPedestrianDynamicElements().getElements();
+    Collection<Pedestrian> peds =
+        state.getTopography().getPedestrianDynamicElements().getElements();
 
-		for (Pedestrian ped : peds){
+    for (Pedestrian ped : peds) {
 
-			if (!getProcessedAgentIds().contains(ped.getId())) {
-				LinkedList<Pedestrian> groupMembers = ped.getPedGroupMembers();
-				int commandId = ped.getMostImportantStimulus().getId();
+      if (!getProcessedAgentIds().contains(ped.getId())) {
+        LinkedList<Pedestrian> groupMembers = ped.getPedGroupMembers();
+        int commandId = ped.getMostImportantStimulus().getId();
 
-				//if (commandId > 0) {
-					this.putValue(new TimestepPedestrianIdKey(timeStep, ped.getId()), commandId);
+        // if (commandId > 0) {
+        this.putValue(new TimestepPedestrianIdKey(timeStep, ped.getId()), commandId);
 
-					for (Pedestrian groupMember : groupMembers) {
-						// assign command id = 0 to pedestrian that follow other pedestrians (group member decisions)
-						this.putValue(new TimestepPedestrianIdKey(timeStep, groupMember.getId()), 0);
-						this.getProcessedAgentIds().add(groupMember.getId());
-					}
-				//}
-			}
-		}
+        for (Pedestrian groupMember : groupMembers) {
+          // assign command id = 0 to pedestrian that follow other pedestrians (group member
+          // decisions)
+          this.putValue(new TimestepPedestrianIdKey(timeStep, groupMember.getId()), 0);
+          this.getProcessedAgentIds().add(groupMember.getId());
+        }
+        // }
+      }
+    }
+  }
 
+  @Override
+  public void init(final ProcessorManager manager) {
+    super.init(manager);
+  }
 
-	}
+  public String[] toStrings(TimestepPedestrianIdKey key) {
+    Integer i = this.getValue(key);
+    if (i == null) {
+      logger.warn(
+          String.format(
+              "PedestrianGroupSizeProcessor does not have Data for Key: %s", key.toString()));
+      i = -1;
+    }
 
-	@Override
-	public void init(final ProcessorManager manager) {
-		super.init(manager);
-	}
+    return new String[] {Integer.toString(i)};
+  }
 
-	public String[] toStrings(TimestepPedestrianIdKey key){
-		Integer i = this.getValue(key);
-		if (i == null) {
-			logger.warn(String.format("PedestrianGroupSizeProcessor does not have Data for Key: %s",
-					key.toString()));
-			i = -1;
-		}
+  public LinkedList<Integer> getProcessedAgentIds() {
+    return processedAgentIds;
+  }
 
-		return new String[]{Integer.toString(i)};
-	}
+  public void resetProcessedAgentIds() {
+    this.processedAgentIds = new LinkedList<>();
+  }
 
-	public LinkedList<Integer> getProcessedAgentIds() {
-		return processedAgentIds;
-	}
+  @Override
+  public CompoundObject provide(CompoundObjectBuilder builder) {
+    int timestep = this.getLastKey().getTimestep();
+    List<TimestepPedestrianIdKey> keys =
+        this.getKeys()
+            .stream()
+            .filter(key -> key.getTimestep() == timestep)
+            .collect(Collectors.toList());
 
-	public void resetProcessedAgentIds() {
-		this.processedAgentIds = new LinkedList<>();
-	}
+    List<String> pedIds = new ArrayList<>();
+    List<String> commandIds = new ArrayList<>();
 
-	@Override
-	public CompoundObject provide(CompoundObjectBuilder builder) {
-		int timestep = this.getLastKey().getTimestep();
-		List<TimestepPedestrianIdKey> keys = this.getKeys().stream().filter(key -> key.getTimestep() == timestep).collect(Collectors.toList());
+    for (TimestepPedestrianIdKey key : keys) {
 
-		List<String> pedIds = new ArrayList<>();
-		List<String> commandIds = new ArrayList<>();
+      Integer commandId = this.getData().get(key);
+      Integer pedId = key.getPedestrianId();
 
-		for (TimestepPedestrianIdKey key : keys){
+      commandIds.add(commandId.toString());
+      pedIds.add(pedId.toString());
+    }
 
-			Integer commandId = this.getData().get(key);
-			Integer pedId = key.getPedestrianId();
-
-			commandIds.add(commandId.toString());
-			pedIds.add(pedId.toString());
-		}
-
-		return builder.rest()
-				.add(TraCIDataType.INTEGER) // timestep
-				.add(TraCIDataType.STRING_LIST) //  pedestrian Id
-				.add(TraCIDataType.STRING_LIST) // command Id
-				.build(timestep, pedIds, commandIds);
-	}
-
+    return builder
+        .rest()
+        .add(TraCIDataType.INTEGER) // timestep
+        .add(TraCIDataType.STRING_LIST) //  pedestrian Id
+        .add(TraCIDataType.STRING_LIST) // command Id
+        .build(timestep, pedIds, commandIds);
+  }
 }

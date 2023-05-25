@@ -9,27 +9,30 @@ import org.vadere.util.geometry.shapes.VPoint;
 
 public class TargetDirectionClose implements TargetDirection {
 
-	private final PedestrianBHM pedestrianBHM;
-	private final TargetDirection targetDirection;
-	private final TargetDirection closeTargetDirectionFallback;
-	private final IPotentialFieldTarget targetPotentialField;
+  private final PedestrianBHM pedestrianBHM;
+  private final TargetDirection targetDirection;
+  private final TargetDirection closeTargetDirectionFallback;
+  private final IPotentialFieldTarget targetPotentialField;
 
-	public TargetDirectionClose(@NotNull final PedestrianBHM pedestrianBHM, @NotNull final IPotentialFieldTarget targetPotentialField, @NotNull final TargetDirection targetDirection) {
-		this.pedestrianBHM = pedestrianBHM;
-		this.targetDirection = targetDirection;
-		this.targetPotentialField = targetPotentialField;
-		this.closeTargetDirectionFallback = new TargetDirectionEuclidean(pedestrianBHM);
-	}
+  public TargetDirectionClose(
+      @NotNull final PedestrianBHM pedestrianBHM,
+      @NotNull final IPotentialFieldTarget targetPotentialField,
+      @NotNull final TargetDirection targetDirection) {
+    this.pedestrianBHM = pedestrianBHM;
+    this.targetDirection = targetDirection;
+    this.targetPotentialField = targetPotentialField;
+    this.closeTargetDirectionFallback = new TargetDirectionEuclidean(pedestrianBHM);
+  }
 
-	@Override
-	public VPoint getTargetDirection(@NotNull final Target target) {
-		VPoint position = pedestrianBHM.getPosition();
-		VPoint direction = targetDirection.getTargetDirection(target);
-		VPoint nextPosition = UtilsBHM.getTargetStep(pedestrianBHM, position, direction);
-		if(targetPotentialField.getPotential(nextPosition, pedestrianBHM) <= 0) {
-			return closeTargetDirectionFallback.getTargetDirection(target);
-		} else {
-			return direction;
-		}
-	}
+  @Override
+  public VPoint getTargetDirection(@NotNull final Target target) {
+    VPoint position = pedestrianBHM.getPosition();
+    VPoint direction = targetDirection.getTargetDirection(target);
+    VPoint nextPosition = UtilsBHM.getTargetStep(pedestrianBHM, position, direction);
+    if (targetPotentialField.getPotential(nextPosition, pedestrianBHM) <= 0) {
+      return closeTargetDirectionFallback.getTargetDirection(target);
+    } else {
+      return direction;
+    }
+  }
 }

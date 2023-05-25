@@ -1,8 +1,6 @@
 package org.vadere.state.scenario.distribution;
 
-/**
- * @author Aleksandar Ivanov(ivanov0@hm.edu)
- */
+/** @author Aleksandar Ivanov(ivanov0@hm.edu) */
 
 /*
 

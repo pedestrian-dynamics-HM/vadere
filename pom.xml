@@ -1,60 +1,258 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>org.vadere</groupId>
-  <artifactId>vadere</artifactId>
-  <version>0.1-SNAPSHOT</version>
-  <packaging>pom</packaging>
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.vadere</groupId>
+    <artifactId>vadere</artifactId>
+    <version>0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
 
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <auto-service.version>1.0-rc2</auto-service.version>
-    <maven-compiler.version>3.5</maven-compiler.version>
-    <maven-compiler.source.version>11</maven-compiler.source.version>
-    <maven-compiler.target.version>11</maven-compiler.target.version>
-    <maven.compiler.release>11</maven.compiler.release>
-  </properties>
+    <!-- modules -->
+    <modules>
+        <!--  <module>./VadereExperiments</module>-->
+        <module>./VadereGui</module>
+        <module>./VadereSimulator</module>
+        <module>./VadereState</module>
+        <module>./VadereMeshing</module>
+        <module>./VadereUtils</module>
+        <module>./VadereAnnotation</module>
+        <module>./VadereManager</module>
+    </modules>
+
+    <properties>
+        <auto-service.version>1.0-rc2</auto-service.version>
+        <maven-compiler.source.version>11</maven-compiler.source.version>
+        <maven-compiler.target.version>11</maven-compiler.target.version>
+        <maven-compiler.version>3.5</maven-compiler.version>
+        <maven.compiler.release>11</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <!-- global dependencies! -->
+    <dependencies>
+        <!-- https://mvnrepository.com/artifact/com.bazaarvoice.jolt/jolt-core -->
+        <dependency>
+            <groupId>com.bazaarvoice.jolt</groupId>
+            <artifactId>jolt-core</artifactId>
+            <version>0.1.1</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.bazaarvoice.jolt/json-utils -->
+        <dependency>
+            <groupId>com.bazaarvoice.jolt</groupId>
+            <artifactId>json-utils</artifactId>
+            <version>0.1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.9.6</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.github.davidmoten/rtree -->
+        <dependency>
+            <groupId>com.github.davidmoten</groupId>
+            <artifactId>rtree</artifactId>
+            <version>0.8.7</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>25.0-jre</version>
+        </dependency>
+        <dependency>
+            <groupId>com.googlecode.java-diff-utils</groupId>
+            <artifactId>diffutils</artifactId>
+            <version>1.3.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.intellij</groupId>
+            <artifactId>annotations</artifactId>
+            <version>5.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
+            <version>1.9.4</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.4</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/javax.xml.bind/jaxb-api -->
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <version>2.3.1</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+        </dependency>
+        <!-- reading and writing csv-files -->
+        <dependency>
+            <groupId>net.sf.opencsv</groupId>
+            <artifactId>opencsv</artifactId>
+            <version>2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.py4j</groupId>
+            <artifactId>py4j</artifactId>
+            <version>0.10.8</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-configuration2</artifactId>
+            <version>2.6</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-math</artifactId>
+            <version>2.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-math3</artifactId>
+            <version>3.6.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <version>2.16.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>2.16.0</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.sis.core/sis-referencing -->
+        <dependency>
+            <groupId>org.apache.sis.core</groupId>
+            <artifactId>sis-referencing</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-all</artifactId>
+            <version>1.3</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20210307</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.mockito/mockito-core -->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>2.24.5</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.openjdk.jmh/jmh-core -->
+        <dependency>
+            <groupId>org.openjdk.jmh</groupId>
+            <artifactId>jmh-core</artifactId>
+            <version>1.20</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.openjdk.jmh/jmh-generator-annprocess -->
+        <dependency>
+            <groupId>org.openjdk.jmh</groupId>
+            <artifactId>jmh-generator-annprocess</artifactId>
+            <version>1.20</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>tech.tablesaw</groupId>
+            <artifactId>tablesaw-core</artifactId>
+            <version>0.32.6</version>
+        </dependency>
+        <dependency>
+            <groupId>tech.tablesaw</groupId>
+            <artifactId>tablesaw-jsplot</artifactId>
+            <version>0.32.6</version>
+        </dependency>
+
+    </dependencies>
 
     <build>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-enforcer-plugin</artifactId>
-                    <version>3.0.0-M2</version>
-                    <executions>
-                        <execution>
-                            <id>enforce-maven</id>
-                            <goals>
-                                <goal>enforce</goal>
-                            </goals>
-                            <configuration>
-                                <rules>
+        <plugins>
+            <plugin>
+                <groupId>com.coveo</groupId>
+                <artifactId>fmt-maven-plugin</artifactId>
+                <version>1.9.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>format</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.github.ekryd.sortpom</groupId>
+                <artifactId>sortpom-maven-plugin</artifactId>
+                <version>2.5.0</version>
+                <executions>
+                    <execution>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sort</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <sortProperties>true</sortProperties>
+                    <nrOfIndentSpace>4</nrOfIndentSpace>
+                    <sortDependencies>groupId,artifactId</sortDependencies>
+                    <sortPlugins>groupId,artifactId</sortPlugins>
+                    <keepBlankLines>true</keepBlankLines>
+                    <expandEmptyElements>false</expandEmptyElements>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compiler.version}</version>
+                <configuration>
+                    <!-- Workaround to avoid "java.lang.AssertionError: Visiting tree node before memberEnter". See: https://stackoverflow.com/a/52536499/5002766 -->
+                    <forceJavacCompilerUse>true</forceJavacCompilerUse>
+                    <source>${maven-compiler.source.version}</source>
+                    <target>${maven-compiler.target.version}</target>
+                    <release>${maven.compiler.release}</release>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>3.0.0-M2</version>
+                <executions>
+                    <execution>
+                        <id>enforce-maven</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
                                 <!-- Use Maven's range syntax: https://maven.apache.org/enforcer/enforcer-rules/versionRanges.html -->
-                                    <requireMavenVersion>
+                                <requireMavenVersion>
                                     <version>[3.0,)</version>
-                                    </requireMavenVersion>
+                                </requireMavenVersion>
                                 <requireJavaVersion>
                                     <version>[${maven-compiler.source.version},)</version>
                                 </requireJavaVersion>
-                                </rules>
-                            </configuration>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <version>${maven-compiler.version}</version>
-                    <configuration>
-                        <!-- Workaround to avoid "java.lang.AssertionError: Visiting tree node before memberEnter". See: https://stackoverflow.com/a/52536499/5002766 -->
-                        <forceJavacCompilerUse>true</forceJavacCompilerUse>
-                        <source>${maven-compiler.source.version}</source>
-                        <target>${maven-compiler.target.version}</target>
-                        <release>${maven.compiler.release}</release>
-                    </configuration>
-                </plugin>
-                <!--  Maven Surefire is used to run unit tests. -->
-                <plugin>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!--  Maven Surefire is used to run unit tests. -->
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.22.1</version>
@@ -69,205 +267,38 @@
                     <threadCount>1</threadCount>
                     <enableAssertions>true</enableAssertions>
                     <excludes>
-                        <exclude></exclude>
+                        <exclude />
                     </excludes>
                     <failIfNoTests>false</failIfNoTests>
                 </configuration>
             </plugin>
-                <plugin>
-                    <groupId>org.jacoco</groupId>
-                    <artifactId>jacoco-maven-plugin</artifactId>
-                    <version>0.8.6</version>
-                    <executions>
-                        <execution>
-                            <id>pre-unit-test-code-instrumentation</id>
-                            <goals>
-                                <goal>prepare-agent</goal>
-                            </goals>
-                            <configuration>
-                                <propertyName>${surefireArgLine}</propertyName>
-                            </configuration>
-                        </execution>
-                        <execution>
-                            <id>post-unit-test-report-generation</id>
-                            <phase>test</phase>
-                            <goals>
-                                <goal>report</goal>
-                            </goals>
-                            <configuration>
-                                <outputDirectory>${project.build.directory}/coverage-reports</outputDirectory>
-                            </configuration>
-                        </execution>
-                    </executions>
-                </plugin>
-            </plugins>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.6</version>
+                <executions>
+                    <execution>
+                        <id>pre-unit-test-code-instrumentation</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                        <configuration>
+                            <propertyName>${surefireArgLine}</propertyName>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>post-unit-test-report-generation</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/coverage-reports</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
     </build>
-
-<!-- modules -->
-  <modules>
-      <!--  <module>./VadereExperiments</module>-->
-      <module>./VadereGui</module>
-      <module>./VadereSimulator</module>
-      <module>./VadereState</module>
-      <module>./VadereMeshing</module>
-      <module>./VadereUtils</module>
-      <module>./VadereAnnotation</module>
-      <module>./VadereManager</module>
-  </modules>
-
-
-    <!-- global dependencies! -->
-  <dependencies>
-      <dependency>
-          <groupId>com.google.guava</groupId>
-          <artifactId>guava</artifactId>
-          <version>25.0-jre</version>
-      </dependency>
-      <dependency>
-          <groupId>org.apache.logging.log4j</groupId>
-          <artifactId>log4j-api</artifactId>
-          <version>2.16.0</version>
-      </dependency>
-      <dependency>
-          <groupId>org.apache.logging.log4j</groupId>
-          <artifactId>log4j-core</artifactId>
-          <version>2.16.0</version>
-      </dependency>
-      <dependency>
-         <groupId>org.apache.commons</groupId>
-         <artifactId>commons-math3</artifactId>
-         <version>3.6.1</version>
-      </dependency>
-      <dependency>
-          <groupId>org.apache.commons</groupId>
-          <artifactId>commons-configuration2</artifactId>
-          <version>2.6</version>
-      </dependency>
-      <!-- https://mvnrepository.com/artifact/org.apache.sis.core/sis-referencing -->
-      <dependency>
-          <groupId>org.apache.sis.core</groupId>
-          <artifactId>sis-referencing</artifactId>
-          <version>1.0</version>
-      </dependency>
-      <!-- https://mvnrepository.com/artifact/javax.xml.bind/jaxb-api -->
-      <dependency>
-          <groupId>javax.xml.bind</groupId>
-          <artifactId>jaxb-api</artifactId>
-          <version>2.3.1</version>
-      </dependency>
-
-
-      <dependency>
-          <groupId>commons-beanutils</groupId>
-          <artifactId>commons-beanutils</artifactId>
-          <version>1.9.4</version>
-      </dependency>
-      <!-- reading and writing csv-files -->
-      <dependency>
-         <groupId>net.sf.opencsv</groupId>
-         <artifactId>opencsv</artifactId>
-         <version>2.0</version>
-      </dependency>
-      <dependency>
-          <groupId>org.apache.commons</groupId>
-          <artifactId>commons-math</artifactId>
-          <version>2.2</version>
-      </dependency>
-      <dependency>
-          <groupId>tech.tablesaw</groupId>
-          <artifactId>tablesaw-core</artifactId>
-          <version>0.32.6</version>
-      </dependency>
-      <dependency>
-          <groupId>tech.tablesaw</groupId>
-          <artifactId>tablesaw-jsplot</artifactId>
-          <version>0.32.6</version>
-      </dependency>
-      <!-- https://mvnrepository.com/artifact/org.openjdk.jmh/jmh-core -->
-      <dependency>
-          <groupId>org.openjdk.jmh</groupId>
-          <artifactId>jmh-core</artifactId>
-          <version>1.20</version>
-      </dependency>
-      <!-- https://mvnrepository.com/artifact/org.openjdk.jmh/jmh-generator-annprocess -->
-      <dependency>
-          <groupId>org.openjdk.jmh</groupId>
-          <artifactId>jmh-generator-annprocess</artifactId>
-          <version>1.20</version>
-          <scope>provided</scope>
-      </dependency>
-      <dependency>
-          <groupId>com.fasterxml.jackson.core</groupId>
-          <artifactId>jackson-databind</artifactId>
-          <version>2.9.6</version>
-      </dependency>
-      <!-- https://mvnrepository.com/artifact/com.bazaarvoice.jolt/jolt-core -->
-      <dependency>
-          <groupId>com.bazaarvoice.jolt</groupId>
-          <artifactId>jolt-core</artifactId>
-          <version>0.1.1</version>
-      </dependency>
-      <!-- https://mvnrepository.com/artifact/com.bazaarvoice.jolt/json-utils -->
-      <dependency>
-          <groupId>com.bazaarvoice.jolt</groupId>
-          <artifactId>json-utils</artifactId>
-          <version>0.1.1</version>
-      </dependency>
-      <dependency>
-          <groupId>com.googlecode.java-diff-utils</groupId>
-          <artifactId>diffutils</artifactId>
-          <version>1.3.0</version>
-      </dependency>
-      <dependency>
-          <groupId>junit</groupId>
-          <artifactId>junit</artifactId>
-          <version>4.12</version>
-      </dependency>
-      <dependency>
-          <groupId>org.hamcrest</groupId>
-          <artifactId>hamcrest-all</artifactId>
-          <version>1.3</version>
-          <scope>test</scope>
-      </dependency>
-      <!-- https://mvnrepository.com/artifact/org.mockito/mockito-core -->
-      <dependency>
-          <groupId>org.mockito</groupId>
-          <artifactId>mockito-core</artifactId>
-          <version>2.24.5</version>
-          <scope>test</scope>
-      </dependency>
-      <dependency>
-          <groupId>commons-io</groupId>
-          <artifactId>commons-io</artifactId>
-          <version>2.4</version>
-      </dependency>
-      <dependency>
-          <groupId>com.intellij</groupId>
-          <artifactId>annotations</artifactId>
-          <version>5.1</version>
-      </dependency>
-      <dependency>
-          <groupId>org.apache.commons</groupId>
-          <artifactId>commons-lang3</artifactId>
-          <version>3.4</version>
-      </dependency>
-      <dependency>
-          <groupId>net.sf.py4j</groupId>
-          <artifactId>py4j</artifactId>
-          <version>0.10.8</version>
-      </dependency>
-      <!-- https://mvnrepository.com/artifact/com.github.davidmoten/rtree -->
-      <dependency>
-          <groupId>com.github.davidmoten</groupId>
-          <artifactId>rtree</artifactId>
-          <version>0.8.7</version>
-      </dependency>
-      <dependency>
-          <groupId>org.json</groupId>
-          <artifactId>json</artifactId>
-          <version>20210307</version>
-      </dependency>
-
-  </dependencies>
 
 </project>

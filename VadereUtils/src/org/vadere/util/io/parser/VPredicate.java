@@ -9,6 +9,5 @@ import java.text.ParseException;
  */
 @FunctionalInterface
 public interface VPredicate<T> {
-	Boolean test(T testObject) throws ParseException;
+  Boolean test(T testObject) throws ParseException;
 }
-

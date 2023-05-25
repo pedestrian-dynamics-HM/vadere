@@ -1,28 +1,25 @@
 package org.vadere.state.attributes.processor;
 
-/**
- * @author Benedikt Zoennchen
- *
- */
+/** @author Benedikt Zoennchen */
 public class AttributesPedestrianVelocityByTrajectoryProcessor extends AttributesProcessor {
-	private int pedestrianTrajectoryProcessorId;
-	private int backSteps = 1;
+  private int pedestrianTrajectoryProcessorId;
+  private int backSteps = 1;
 
-	public int getPedestrianTrajectoryProcessorId() {
-		return pedestrianTrajectoryProcessorId;
-	}
+  public int getPedestrianTrajectoryProcessorId() {
+    return pedestrianTrajectoryProcessorId;
+  }
 
-	public void setPedestrianTrajectoryProcessorId(int pedestrianTrajectoryProcessorId) {
-		checkSealed();
-		this.pedestrianTrajectoryProcessorId = pedestrianTrajectoryProcessorId;
-	}
+  public void setPedestrianTrajectoryProcessorId(int pedestrianTrajectoryProcessorId) {
+    checkSealed();
+    this.pedestrianTrajectoryProcessorId = pedestrianTrajectoryProcessorId;
+  }
 
-	public int getBackSteps() {
-		return this.backSteps;
-	}
+  public int getBackSteps() {
+    return this.backSteps;
+  }
 
-	public void setBackSteps(int backSteps) {
-		checkSealed();
-		this.backSteps = backSteps;
-	}
+  public void setBackSteps(int backSteps) {
+    checkSealed();
+    this.backSteps = backSteps;
+  }
 }

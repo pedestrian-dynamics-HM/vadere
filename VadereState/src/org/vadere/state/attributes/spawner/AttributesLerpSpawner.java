@@ -6,23 +6,22 @@ import org.vadere.state.attributes.distributions.AttributesLinearInterpolationDi
 import org.vadere.state.util.Views;
 
 public class AttributesLerpSpawner extends AttributesSpawner {
-    public AttributesLerpSpawner(){
-        super(new AttributesLinearInterpolationDistribution());
-    }
-    /**
-     * This attribute controls the event times at which agents can be spawned.
-     */
-    @JsonView(Views.CacheViewExclude.class)
-    protected AttributesLinearInterpolationDistribution distribution = new AttributesLinearInterpolationDistribution();
-    @Override
-    public AttributesDistribution getDistributionAttributes() {
-        return distribution;
-    }
+  public AttributesLerpSpawner() {
+    super(new AttributesLinearInterpolationDistribution());
+  }
+  /** This attribute controls the event times at which agents can be spawned. */
+  @JsonView(Views.CacheViewExclude.class)
+  protected AttributesLinearInterpolationDistribution distribution =
+      new AttributesLinearInterpolationDistribution();
 
-    @Override
-    public void setDistributionAttributes(AttributesDistribution distribution) {
-        checkSealed();
-        this.distribution = (AttributesLinearInterpolationDistribution) distribution;
-    }
+  @Override
+  public AttributesDistribution getDistributionAttributes() {
+    return distribution;
+  }
 
+  @Override
+  public void setDistributionAttributes(AttributesDistribution distribution) {
+    checkSealed();
+    this.distribution = (AttributesLinearInterpolationDistribution) distribution;
+  }
 }
