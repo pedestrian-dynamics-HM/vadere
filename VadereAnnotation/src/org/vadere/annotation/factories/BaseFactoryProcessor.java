@@ -16,7 +16,7 @@ public abstract class BaseFactoryProcessor extends AbstractFactoryProcessor {
 
 	@Override
 	protected void writeFactory(Set<? extends Element> elements) throws IOException {
-		JavaFileObject jFile = processingEnv.getFiler().createSourceFile(factoryClassName);
+		JavaFileObject jFile = processingEnv.getFiler().createSourceFile(factoryPackage + '.'+factoryClassName);
 
 		try (PrintWriter out = new PrintWriter(jFile.openWriter())) {
 			out.append("package ").append(factoryPackage).append(";").println();

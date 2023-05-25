@@ -11,6 +11,8 @@ target/
 # C extensions
 *.so
 vadere_analysis_tool/build
+*.bak
+.java-version
 
 # IDEs
 .idea/
