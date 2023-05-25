@@ -1,6 +1,6 @@
 package org.vadere.meshing.mesh.triangulation.triangulator.gen;
 
-import org.apache.commons.lang3.tuple.Pair;;
+import org.apache.commons.lang3.tuple.Pair;
 import org.vadere.meshing.mesh.inter.IFace;
 import org.vadere.meshing.mesh.inter.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IMesh;

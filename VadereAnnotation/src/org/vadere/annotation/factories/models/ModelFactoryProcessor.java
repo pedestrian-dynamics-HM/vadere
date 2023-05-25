@@ -72,7 +72,7 @@ public class ModelFactoryProcessor extends AbstractFactoryProcessor {
 
 	@Override
 	protected void writeFactory(Set<? extends Element> elements) throws IOException {
-		JavaFileObject jFile = processingEnv.getFiler().createSourceFile(factoryClassName);
+		JavaFileObject jFile = processingEnv.getFiler().createSourceFile(factoryPackage+"."+factoryClassName);
 
 		mainModels = getMainModels(elements);
 		subModels = getSubModelMap(elements);
