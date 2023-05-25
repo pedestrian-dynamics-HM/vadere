@@ -26,10 +26,10 @@ public @interface TraCIApi {
 	String extendedClassName() default "TraCIClientApi";
 	String name();
 	String nameShort() default "";
-	Class<?> singleAnnotation();
-	Class<?> multipleAnnotation();
-	Class<?> cmdEnum();
-	Class<?> varEnum();
+	Class singleAnnotation();
+	Class multipleAnnotation();
+	Class cmdEnum();
+	Class varEnum();
 	String var();
 	int cmdGet();
 	int cmdSet();
