@@ -21,7 +21,6 @@ import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Stairs;
 import org.vadere.state.scenario.Topography;
-;
 
 import java.util.*;
 import java.util.stream.Collectors;
