@@ -37,7 +37,7 @@ public class TrajectoryBufferTest {
         StringBuilder actualBuilder = new StringBuilder();
 
         while ((step = trajectoryBuffer.getNextStep()) != null) {
-            actualBuilder.append(step.toString()).append("\n");
+            actualBuilder.append(step).append("\n");
             trajectoryBuffer.removeStep();
         }
 
