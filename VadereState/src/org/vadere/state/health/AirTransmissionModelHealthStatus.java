@@ -23,21 +23,43 @@ public class AirTransmissionModelHealthStatus extends ExposureModelHealthStatus 
      */
     private VPoint exhalationStartPosition;
 
+    boolean talking;
+
+    boolean coughing;
+
+    boolean sneezing;
+
+    private int breathCounterCoughing;
+
+    private int breathCounterSneezing;
+
+    private int coughingEveryNthBreath;
+
+    private int sneezingEveryNthBreath;
+
     /*
      * reset value for simulation periods during which pedestrian inhales
      */
     private final static VPoint RESET_EXHALATION_POSITION = null;
 
+
     // Constructors
     public AirTransmissionModelHealthStatus() {
-        this(false, 0, RESET_EXHALATION_POSITION);
+        this(false, 0, RESET_EXHALATION_POSITION, false, false, false, -1, -1);
     }
 
-    public AirTransmissionModelHealthStatus(boolean breathingIn, double respiratoryTimeOffset, VPoint exhalationStartPosition) {
+    public AirTransmissionModelHealthStatus(boolean breathingIn, double respiratoryTimeOffset, VPoint exhalationStartPosition, boolean talking, boolean coughing, boolean sneezing, int coughingEveryNthBreath, int sneezingEveryNthBreath) {
         super();
         this.breathingIn = breathingIn;
         this.respiratoryTimeOffset = respiratoryTimeOffset;
         this.exhalationStartPosition = exhalationStartPosition;
+        this.talking = talking;
+        this.coughing = coughing;
+        this.sneezing = sneezing;
+        this.breathCounterCoughing = 0;
+        this.breathCounterSneezing = 0;
+        this.coughingEveryNthBreath = coughingEveryNthBreath;
+        this.sneezingEveryNthBreath = sneezingEveryNthBreath;
     }
 
     public AirTransmissionModelHealthStatus(AirTransmissionModelHealthStatus other) {
@@ -45,8 +67,12 @@ public class AirTransmissionModelHealthStatus extends ExposureModelHealthStatus 
         this.breathingIn = other.isBreathingIn();
         this.respiratoryTimeOffset = other.getRespiratoryTimeOffset();
         this.exhalationStartPosition = other.getExhalationStartPosition();
+        this.talking = other.talking;
+        this.coughing = other.coughing;
+        this.sneezing = other.sneezing;
+        this.breathCounterCoughing = other.breathCounterCoughing;
+        this.breathCounterSneezing = other.breathCounterSneezing;
     }
-
 
     // Getter
     @Override
@@ -57,6 +83,16 @@ public class AirTransmissionModelHealthStatus extends ExposureModelHealthStatus 
     @Override
     public double getDegreeOfExposure() {
         return degreeOfExposure;
+    }
+
+    public boolean isTalking() {
+        return talking;
+    }
+
+    public boolean isCoughing() { return coughing; }
+
+    public boolean isSneezing() {
+        return sneezing;
     }
 
     public boolean isBreathingIn() {
@@ -80,6 +116,26 @@ public class AirTransmissionModelHealthStatus extends ExposureModelHealthStatus 
     @Override
     public void setDegreeOfExposure(double degreeOfExposure) {
         this.degreeOfExposure = degreeOfExposure;
+    }
+
+    public void setTalking(boolean talking) {
+        this.talking = talking;
+    }
+
+    public void setCoughing(boolean coughing) {
+        this.coughing = coughing;
+    }
+
+    public void setSneezing(boolean sneezing) {
+        this.sneezing = sneezing;
+    }
+
+    public void setCoughingEveryNthBreath(int coughingEveryNthBreath) {
+        this.coughingEveryNthBreath = coughingEveryNthBreath;
+    }
+
+    public void setSneezingEveryNthBreath(int sneezingEveryNthBreath) {
+        this.sneezingEveryNthBreath = sneezingEveryNthBreath;
     }
 
     public void setBreathingIn(boolean breathingIn) {
@@ -106,7 +162,9 @@ public class AirTransmissionModelHealthStatus extends ExposureModelHealthStatus 
         if (!(obj instanceof AirTransmissionModelHealthStatus)) return false;
         if (!super.equals(obj)) return false;
         AirTransmissionModelHealthStatus other = (AirTransmissionModelHealthStatus) obj;
-        return breathingIn == other.breathingIn && Double.compare(other.respiratoryTimeOffset, respiratoryTimeOffset) == 0 && Objects.equals(exhalationStartPosition, other.exhalationStartPosition);
+        return breathingIn == (other.breathingIn && Double.compare(other.respiratoryTimeOffset, respiratoryTimeOffset) == 0
+                && Objects.equals(exhalationStartPosition, other.exhalationStartPosition)
+                && talking == other.talking && coughing == other.coughing && sneezing == other.sneezing);
     }
 
     @Override
@@ -134,5 +192,30 @@ public class AirTransmissionModelHealthStatus extends ExposureModelHealthStatus 
 
     public void resetStartExhalationPosition() {
         exhalationStartPosition = RESET_EXHALATION_POSITION;
+    }
+
+
+    public boolean isCoughingNow() {
+        return (breathCounterCoughing == coughingEveryNthBreath);
+    }
+
+    public void incrementBreathCounterCoughing() {
+        breathCounterCoughing++;
+    }
+
+    public void resetBreathCounterCoughing() {
+        breathCounterCoughing = 0;
+    }
+
+    public boolean isSneezingNow() {
+        return (breathCounterSneezing == sneezingEveryNthBreath);
+    }
+
+    public void incrementBreathCounterSneezing() {
+        breathCounterSneezing++;
+    }
+
+    public void resetBreathCounterSneezing() {
+        breathCounterSneezing = 0;
     }
 }

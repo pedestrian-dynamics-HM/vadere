@@ -347,10 +347,13 @@ public class TargetVersionV2_1 extends SimpleJsonTransformation {
         AttributesAirTransmissionModelAerosolCloud aerosolCloudParameters = new AttributesAirTransmissionModelAerosolCloud(
                 tempData.get("aerosolCloudHalfLife"),
                 initialRadius,
-                Math.pow(10, tempData.get("pedestrianPathogenEmissionCapacity")),
+                (int) Math.pow(10, tempData.get("pedestrianPathogenEmissionCapacity")),
                 0,
                 0.0125,
-                tempData.get("pedestrianPathogenAbsorptionRate")
+                tempData.get("pedestrianPathogenAbsorptionRate"),
+                10,
+                20,
+                100
         );
 
         addAttributesObjectToNode(attributesNode, aerosolCloudParameters, "aerosolCloudParameters");

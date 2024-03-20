@@ -159,21 +159,47 @@ public class AirTransmissionModel extends AbstractExposureModel {
 			VPoint stopBreatheOutPosition = pedestrian.getPosition();
 			VLine distanceWalkedDuringExhalation = new VLine(startBreatheOutPosition, stopBreatheOutPosition);
 
-			AerosolCloud aerosolCloud = generateAerosolCloud(simTimeInSec, distanceWalkedDuringExhalation);
+			int initialPathogenLoad = computeAerosolCloudPathogenLoad(pedestrian);
+			AerosolCloud aerosolCloud = generateAerosolCloud(simTimeInSec, distanceWalkedDuringExhalation, initialPathogenLoad);
 			topography.addAerosolCloud(aerosolCloud);
 
 			pedestrian.<AirTransmissionModelHealthStatus>getHealthStatus().resetStartExhalationPosition();
 		}
 	}
 
-	private AerosolCloud generateAerosolCloud(double simTimeInSec, VLine distanceWalkedDuringExhalation) {
+
+	private int computeAerosolCloudPathogenLoad(Pedestrian pedestrian) {
+		int initialPathogenLoad = attrAirTransmissionModel.getAerosolCloudInitialPathogenLoad();
+		if (pedestrian.<AirTransmissionModelHealthStatus>getHealthStatus().isTalking()) {
+			initialPathogenLoad = initialPathogenLoad * attrAirTransmissionModel.getAerosolCloudPathogenLoadMultiplierTalking();
+		}
+		if (pedestrian.<AirTransmissionModelHealthStatus>getHealthStatus().isCoughing()) {
+			pedestrian.<AirTransmissionModelHealthStatus>getHealthStatus().incrementBreathCounterCoughing();
+			if (pedestrian.<AirTransmissionModelHealthStatus>getHealthStatus().isCoughingNow()) {
+				initialPathogenLoad = initialPathogenLoad * attrAirTransmissionModel.getAerosolCloudPathogenLoadMultiplierCoughing();
+				pedestrian.<AirTransmissionModelHealthStatus>getHealthStatus().resetBreathCounterCoughing();
+			}
+		}
+		if (pedestrian.<AirTransmissionModelHealthStatus>getHealthStatus().isSneezing()) {
+			pedestrian.<AirTransmissionModelHealthStatus>getHealthStatus().incrementBreathCounterSneezing();
+			if (pedestrian.<AirTransmissionModelHealthStatus>getHealthStatus().isSneezingNow()) {
+				initialPathogenLoad = initialPathogenLoad * attrAirTransmissionModel.getAerosolCloudPathogenLoadMultiplierSneezing();
+				pedestrian.<AirTransmissionModelHealthStatus>getHealthStatus().resetBreathCounterSneezing();
+			}
+		}
+		// TODO set maximum pathogen load
+		return initialPathogenLoad;
+	}
+
+
+	private AerosolCloud generateAerosolCloud(double simTimeInSec, VLine distanceWalkedDuringExhalation, double initialPathogenLoad) {
 		VPoint center = distanceWalkedDuringExhalation.midPoint();
 
 		AerosolCloud aerosolCloud = new AerosolCloud(new AttributesAerosolCloud(aerosolCloudIdCounter,
 				attrAirTransmissionModel.getAerosolCloudInitialRadius(),
 				center,
 				simTimeInSec,
-				attrAirTransmissionModel.getAerosolCloudInitialPathogenLoad()));
+				initialPathogenLoad));
 
 		aerosolCloudIdCounter = aerosolCloudIdCounter + 1;
 
@@ -226,7 +252,9 @@ public class AirTransmissionModel extends AbstractExposureModel {
 		Collection<AerosolCloud> allAerosolClouds = topography.getAerosolClouds();
 		for (AerosolCloud aerosolCloud : allAerosolClouds) {
 			double t = simTimeInSec - aerosolCloud.getCreationTime();
-			aerosolCloud.setCurrentPathogenLoad(attrAirTransmissionModel.getAerosolCloudInitialPathogenLoad() * Math.exp(-lambda * t));
+			//aerosolCloud.setCurrentPathogenLoad(attrAirTransmissionModel.getAerosolCloudInitialPathogenLoad() * Math.exp(-lambda * t));
+
+			aerosolCloud.setCurrentPathogenLoad(aerosolCloud.getCurrentPathogenLoad() * Math.exp(-lambda * simTimeStepLength));
 		}
 	}
 
@@ -369,6 +397,11 @@ public class AirTransmissionModel extends AbstractExposureModel {
 		Pedestrian ped = (Pedestrian) scenarioElement;
 		ped.setHealthStatus(new AirTransmissionModelHealthStatus());
 		ped.setInfectious(sourceParameters.isInfectious());
+		ped.<AirTransmissionModelHealthStatus>getHealthStatus().setTalking(sourceParameters.isTalking());
+		ped.<AirTransmissionModelHealthStatus>getHealthStatus().setCoughing(sourceParameters.isCoughing());
+		ped.<AirTransmissionModelHealthStatus>getHealthStatus().setSneezing(sourceParameters.isSneezing());
+		ped.<AirTransmissionModelHealthStatus>getHealthStatus().setCoughingEveryNthBreath(sourceParameters.getCoughingEveryNthBreath());
+		ped.<AirTransmissionModelHealthStatus>getHealthStatus().setSneezingEveryNthBreath(sourceParameters.getSneezingEveryNthBreath());
 		ped.<AirTransmissionModelHealthStatus>getHealthStatus().setRespiratoryTimeOffset(random.nextDouble() * attrAirTransmissionModel.getPedestrianRespiratoryCyclePeriod());
 		ped.<AirTransmissionModelHealthStatus>getHealthStatus().setBreathingIn(false);
 		return ped;

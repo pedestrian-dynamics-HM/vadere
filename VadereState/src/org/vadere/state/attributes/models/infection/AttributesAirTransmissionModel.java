@@ -58,8 +58,20 @@ public class AttributesAirTransmissionModel extends AttributesExposureModel {
 		return aerosolCloudsActive;
 	}
 
-	public double getAerosolCloudInitialPathogenLoad() {
+	public int getAerosolCloudInitialPathogenLoad() {
 		return aerosolCloudParameters.getInitialPathogenLoad();
+	}
+
+	public int getAerosolCloudPathogenLoadMultiplierTalking() {
+		return aerosolCloudParameters.getPathogenLoadMultiplierTalking();
+	}
+
+	public int getAerosolCloudPathogenLoadMultiplierCoughing() {
+		return aerosolCloudParameters.getPathogenLoadMultiplierCoughing();
+	}
+
+	public int getAerosolCloudPathogenLoadMultiplierSneezing() {
+		return aerosolCloudParameters.getPathogenLoadMultiplierSneezing();
 	}
 
 	public double getAerosolCloudHalfLife() {

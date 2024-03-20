@@ -30,7 +30,7 @@ public class AttributesAirTransmissionModelAerosolCloud extends Attributes {
      * is mitigated, e.g. by masks.
      * Unit: particles / exhalation
      */
-    private double initialPathogenLoad;
+    private int initialPathogenLoad;
 
     /**
      * Describes constant dispersion (over time), i.e. the spatial spread over time due to local air movement.
@@ -55,6 +55,26 @@ public class AttributesAirTransmissionModelAerosolCloud extends Attributes {
      */
     private double absorptionRate;
 
+    /**
+     * Describes the number the initial pathogen load is multiplied with if the pedestrian is talking.
+     * Unit: 1
+     */
+    private int pathogenLoadMultiplierTalking;
+
+    /**
+     * Describes the number the initial pathogen load is multiplied with if the pedestrian is coughing.
+     * Unit: 1
+     */
+    private int pathogenLoadMultiplierCoughing;
+
+    /**
+     * Describes the number the initial pathogen load is multiplied with if the pedestrian is sneezing.
+     * Unit: 1
+     */
+    private int pathogenLoadMultiplierSneezing;
+
+
+
     public AttributesAirTransmissionModelAerosolCloud() {
         this.halfLife = 600;
         this.initialRadius = 1.5;
@@ -62,15 +82,23 @@ public class AttributesAirTransmissionModelAerosolCloud extends Attributes {
         this.airDispersionFactor = 0;
         this.pedestrianDispersionWeight = 0.0125;
         this.absorptionRate = 0.0005;
+        this.pathogenLoadMultiplierTalking = 10;
+        this.pathogenLoadMultiplierCoughing = 20;
+        this.pathogenLoadMultiplierSneezing = 100;
     }
 
-    public AttributesAirTransmissionModelAerosolCloud(double aerosolCloudHalfLife, double aerosolCloudInitialRadius, double initialPathogenLoad, double airDispersionFactor, double pedestrianDispersionWeight, double absorptionRate) {
+    public AttributesAirTransmissionModelAerosolCloud(double aerosolCloudHalfLife, double aerosolCloudInitialRadius, int initialPathogenLoad, double airDispersionFactor,
+                                                      double pedestrianDispersionWeight, double absorptionRate, int pathogenLoadMultiplierTalking,
+                                                      int pathogenLoadMultiplierCoughing, int pathogenLoadMultiplierSneezing) {
         this.halfLife = aerosolCloudHalfLife;
         this.initialRadius = aerosolCloudInitialRadius;
         this.initialPathogenLoad = initialPathogenLoad;
         this.airDispersionFactor = airDispersionFactor;
         this.pedestrianDispersionWeight = pedestrianDispersionWeight;
         this.absorptionRate = absorptionRate;
+        this.pathogenLoadMultiplierTalking = pathogenLoadMultiplierTalking;
+        this.pathogenLoadMultiplierCoughing = pathogenLoadMultiplierCoughing;
+        this.pathogenLoadMultiplierSneezing = pathogenLoadMultiplierSneezing;
     }
 
     // Getter
@@ -83,9 +111,15 @@ public class AttributesAirTransmissionModelAerosolCloud extends Attributes {
         return initialRadius;
     }
 
-    public double getInitialPathogenLoad() {
+    public int getInitialPathogenLoad() {
         return initialPathogenLoad;
     }
+
+    public int getPathogenLoadMultiplierTalking() { return pathogenLoadMultiplierTalking; }
+
+    public int getPathogenLoadMultiplierCoughing() { return pathogenLoadMultiplierCoughing; }
+
+    public int getPathogenLoadMultiplierSneezing() { return pathogenLoadMultiplierSneezing; }
 
     public double getAirDispersionFactor() {
         return airDispersionFactor;
