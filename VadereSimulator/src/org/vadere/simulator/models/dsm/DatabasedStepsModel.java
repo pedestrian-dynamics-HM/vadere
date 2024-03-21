@@ -46,7 +46,7 @@ public class DatabasedStepsModel implements MainModel {
         subModelBuilder.addBuildedSubModelsToList(models);
         models.add(this);
 
-        trajectoryBuffer = new TrajectoryBuffer(attributesDSM.getTrajotoryFile(), attributesDSM.getBufferedLines());
+        trajectoryBuffer = new TrajectoryBuffer(attributesDSM.getTrajectoryFile(), attributesDSM.getBufferedLines());
     }
 
     @Override

@@ -3,6 +3,7 @@ package org.vadere.state.attributes.models;
 import org.vadere.annotation.factories.attributes.ModelAttributeClass;
 import org.vadere.state.attributes.Attributes;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -11,16 +12,16 @@ import java.util.List;
  */
 @ModelAttributeClass
 public class AttributesDSM extends Attributes {
-    private String trajotoryFile = "./temp/postvis.traj";
+    private String trajectoryFile = "./temp/postvis.traj";
     private List<String> submodels = new LinkedList<>();
     private int bufferedLines = 1000;
 
-    public String getTrajotoryFile() {
-        return trajotoryFile;
+    public String getTrajectoryFile() {
+        return trajectoryFile;
     }
 
     public List<String> getSubmodels() {
-        return submodels;
+        return new ArrayList<>(submodels);
     }
 
     public int getBufferedLines() {
