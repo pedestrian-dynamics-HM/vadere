@@ -14,6 +14,7 @@ import org.vadere.state.simulation.FootstepHistory;
 import org.vadere.state.simulation.VTrajectory;
 import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.Vector2D;
 
 import java.util.*;
 
@@ -35,6 +36,10 @@ public class Pedestrian extends Agent {
 
     private ExposureModelHealthStatus healthStatus;
     private DoseResponseModelInfectionStatus infectionStatus;
+
+    private boolean isSitting;
+
+    private Vector2D sittingDirection;
 
 	private LinkedList<Integer> groupIds; // TODO should actually be an attribute or a member of a subclass
 	private LinkedList<Integer> groupSizes;
@@ -77,6 +82,8 @@ public class Pedestrian extends Agent {
 		psychologyStatus = new PsychologyStatus(null, new ThreatMemory(), SelfCategory.TARGET_ORIENTED, GroupMembership.OUT_GROUP, new KnowledgeBase());
         healthStatus = null;
         infectionStatus = null;
+        isSitting = false;
+        sittingDirection = null;
 		groupIds = new LinkedList<>();
 		groupSizes = new LinkedList<>();
 		modelPedestrianMap = new HashMap<>();
@@ -103,6 +110,13 @@ public class Pedestrian extends Agent {
             infectionStatus = other.infectionStatus;
         } else {
             infectionStatus = null;
+        }
+
+        isSitting = other.isSitting;
+        if (other.sittingDirection != null) {
+            sittingDirection = other.sittingDirection;
+        } else {
+            sittingDirection = null;
         }
 
         if (other.groupIds != null) {
@@ -195,6 +209,10 @@ public class Pedestrian extends Agent {
     public double getProbabilityOfInfection() {
         return infectionStatus.getProbabilityOfInfection();
     }
+
+    public boolean isSitting() { return isSitting; }
+
+    public Vector2D getSittingDirection() { return sittingDirection; }
 
 
     public VTrajectory getTrajectory() {
@@ -298,6 +316,10 @@ public class Pedestrian extends Agent {
     public void setProbabilityOfInfectionToMax() {
         infectionStatus.setProbabilityOfInfectionToMax();
     }
+
+    public void setSitting(boolean isSitting) { this.isSitting = isSitting; }
+
+    public void setSittingDirection(Vector2D sittingDirection) { this.sittingDirection = sittingDirection; }
 
     // Methods
     public boolean isTarget() {

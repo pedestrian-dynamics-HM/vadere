@@ -155,12 +155,9 @@ public class AirTransmissionModel extends AbstractExposureModel {
 			pedestrian.<AirTransmissionModelHealthStatus>getHealthStatus().setExhalationStartPosition(pedestrian.getPosition());
 
 		} else if (pedestrian.<AirTransmissionModelHealthStatus>getHealthStatus().isStartingInhalation()) {
-			VPoint startBreatheOutPosition = pedestrian.<AirTransmissionModelHealthStatus>getHealthStatus().getExhalationStartPosition();
-			VPoint stopBreatheOutPosition = pedestrian.getPosition();
-			VLine distanceWalkedDuringExhalation = new VLine(startBreatheOutPosition, stopBreatheOutPosition);
-
+			VPoint aerosolCloudCenter = computeAerosolCloudCenter(pedestrian);
 			int initialPathogenLoad = computeAerosolCloudPathogenLoad(pedestrian);
-			AerosolCloud aerosolCloud = generateAerosolCloud(simTimeInSec, distanceWalkedDuringExhalation, initialPathogenLoad);
+			AerosolCloud aerosolCloud = generateAerosolCloud(simTimeInSec, aerosolCloudCenter, initialPathogenLoad);
 			topography.addAerosolCloud(aerosolCloud);
 
 			pedestrian.<AirTransmissionModelHealthStatus>getHealthStatus().resetStartExhalationPosition();
@@ -191,13 +188,27 @@ public class AirTransmissionModel extends AbstractExposureModel {
 		return initialPathogenLoad;
 	}
 
+	private VPoint computeAerosolCloudCenter(Pedestrian pedestrian) {
+		VPoint aerosolCloudCenter;
+		if (pedestrian.isSitting()) {
+			Vector2D aerosolCloudDirection = pedestrian.getSittingDirection().normalize(attrAirTransmissionModel.getAerosolCloudInitialRadius());
+			aerosolCloudCenter = new VPoint(pedestrian.getPosition().getX() + aerosolCloudDirection.getX(),
+					pedestrian.getPosition().getY() + aerosolCloudDirection.getY());
+		}
+		else {
+			VPoint startBreatheOutPosition = pedestrian.<AirTransmissionModelHealthStatus>getHealthStatus().getExhalationStartPosition();
+			VPoint stopBreatheOutPosition = pedestrian.getPosition();
+			VLine distanceWalkedDuringExhalation = new VLine(startBreatheOutPosition, stopBreatheOutPosition);
+			aerosolCloudCenter = distanceWalkedDuringExhalation.midPoint();
+		}
+		return aerosolCloudCenter;
+	}
 
-	private AerosolCloud generateAerosolCloud(double simTimeInSec, VLine distanceWalkedDuringExhalation, double initialPathogenLoad) {
-		VPoint center = distanceWalkedDuringExhalation.midPoint();
 
+	private AerosolCloud generateAerosolCloud(double simTimeInSec, VPoint AerosolCloudCenter, double initialPathogenLoad) {
 		AerosolCloud aerosolCloud = new AerosolCloud(new AttributesAerosolCloud(aerosolCloudIdCounter,
 				attrAirTransmissionModel.getAerosolCloudInitialRadius(),
-				center,
+				AerosolCloudCenter,
 				simTimeInSec,
 				initialPathogenLoad));
 

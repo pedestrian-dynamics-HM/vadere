@@ -6,7 +6,7 @@ import org.vadere.state.attributes.Attributes;
 
 import java.util.ArrayList;
 
-@ModelAttributeClass
+
 public class AttributesSeatGroup extends Attributes{
     private int tableTargetId;
     //private ArrayList<Integer> sourceIds;

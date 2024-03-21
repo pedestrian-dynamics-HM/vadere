@@ -2,25 +2,18 @@ package org.vadere.simulator.models.restaurant;
 
 import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.Model;
-import org.vadere.simulator.models.seating.trainmodel.Seat;
 import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.distributions.AttributesConstantDistribution;
 import org.vadere.state.attributes.models.restaurant.AttributesRestaurantModel;
 import org.vadere.state.attributes.models.restaurant.AttributesSeatGroup;
 import org.vadere.state.attributes.scenario.AttributesAgent;
-import org.vadere.state.health.AirTransmissionModelHealthStatus;
 import org.vadere.state.scenario.*;
-import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.Vector2D;
 import org.vadere.util.logging.Logger;
 
 import java.util.*;
-
-import org.apache.commons.lang3.ArrayUtils;
-
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 
 @ModelClass
@@ -58,7 +51,9 @@ public class RestaurantModel implements Model {
         this.sittingPedestriansSeatMap = new ConcurrentHashMap<>();
 
         for (AttributesSeatGroup attrSeatGroup : this.attrRestaurantModel.getAttrsSeatGroup()) {
-            initializeSeatGroup(attrSeatGroup);
+            if (attrSeatGroup.getTableTargetId() != attrRestaurantModel.INVALID_ID) {
+                initializeSeatGroup(attrSeatGroup);
+            }
         }
     }
 
@@ -81,6 +76,7 @@ public class RestaurantModel implements Model {
             seatTarget.getAttributes().getWaiterAttributes().setEnabled(true);
             seatTarget.getAttributes().getWaiterAttributes().setDistribution(new AttributesConstantDistribution(attrSeatGroup.getLengthOfStay()));
             seatTarget.getAttributes().getWaiterAttributes().setIndividualWaiting(true);
+            seatTarget.getAttributes().getAbsorberAttributes().getDeletionDistance();
             // TODO correct?
             seatTarget.getAttributes().setParallelEvents(1); // only one person can sit on the chair
             seatGroup.addSeatTarget(seatTarget);
@@ -131,7 +127,7 @@ public class RestaurantModel implements Model {
     }
 
     private void standUpFromSeat(double simTimeInSec) {
-        // check who of the sitting pedestrians is not sitting anymore -> set isSitting = False and remove from list
+        // check who of the sitting pedestrians is not sitting anymore -> set isSitting = false and remove from list
         for (Pedestrian sittingPed : this.sittingPedestriansSeatMap.keySet()) {
             Target seatTarget = this.sittingPedestriansSeatMap.get(sittingPed);
             if (!seatTarget.getAttributes().isWaiting() ||

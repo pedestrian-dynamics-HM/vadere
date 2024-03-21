@@ -13,6 +13,8 @@ public class AttributesRestaurantModel extends Attributes{
     private ArrayList<AttributesSeatGroup> attrsSeatGroup;
     //private Map<Integer, AttributesSeatGroup> tableTargetMap;
 
+    public static final int INVALID_ID = -1;
+
     public AttributesRestaurantModel() {
         this.attrsSeatGroup = new ArrayList<AttributesSeatGroup>();
         this.attrsSeatGroup.add(new AttributesSeatGroup());
@@ -27,7 +29,9 @@ public class AttributesRestaurantModel extends Attributes{
     public LinkedList<Integer> getTableTargetIds() {
         LinkedList<Integer> targetIds = new LinkedList<>();
         for (AttributesSeatGroup attrtable : this.attrsSeatGroup) {
-            targetIds.add(attrtable.getTableTargetId());
+            if (attrtable.getTableTargetId() != INVALID_ID) {
+                targetIds.add(attrtable.getTableTargetId());
+            }
         }
         return targetIds;
     }
