@@ -198,8 +198,15 @@ public class AirTransmissionModel extends AbstractExposureModel {
 		else {
 			VPoint startBreatheOutPosition = pedestrian.<AirTransmissionModelHealthStatus>getHealthStatus().getExhalationStartPosition();
 			VPoint stopBreatheOutPosition = pedestrian.getPosition();
+			double walkingDirectionX = stopBreatheOutPosition.getX() - startBreatheOutPosition.getX();
+			double walkingDirectionY = stopBreatheOutPosition.getY() - startBreatheOutPosition.getY();
+			Vector2D aerosolCloudDirection = new Vector2D(walkingDirectionX, walkingDirectionY).normalize(attrAirTransmissionModel.getAerosolCloudInitialRadius());
+
 			VLine distanceWalkedDuringExhalation = new VLine(startBreatheOutPosition, stopBreatheOutPosition);
-			aerosolCloudCenter = distanceWalkedDuringExhalation.midPoint();
+			//aerosolCloudCenter = distanceWalkedDuringExhalation.midPoint();
+			VPoint walkingMidPoint = distanceWalkedDuringExhalation.midPoint();
+			aerosolCloudCenter = new VPoint(walkingMidPoint.getX() + aerosolCloudDirection.getX(),
+					walkingMidPoint.getY() + aerosolCloudDirection.getY());
 		}
 		return aerosolCloudCenter;
 	}
