@@ -167,16 +167,6 @@ public class AirTransmissionModel extends AbstractExposureModel {
 
 	private int computeAerosolCloudPathogenLoad(Pedestrian pedestrian) {
 		int initialPathogenLoad = attrAirTransmissionModel.getAerosolCloudInitialPathogenLoad();
-		if (pedestrian.<AirTransmissionModelHealthStatus>getHealthStatus().isTalking()) {
-			initialPathogenLoad = initialPathogenLoad * attrAirTransmissionModel.getAerosolCloudPathogenLoadMultiplierTalking();
-		}
-		if (pedestrian.<AirTransmissionModelHealthStatus>getHealthStatus().isCoughing()) {
-			pedestrian.<AirTransmissionModelHealthStatus>getHealthStatus().incrementBreathCounterCoughing();
-			if (pedestrian.<AirTransmissionModelHealthStatus>getHealthStatus().isCoughingNow()) {
-				initialPathogenLoad = initialPathogenLoad * attrAirTransmissionModel.getAerosolCloudPathogenLoadMultiplierCoughing();
-				pedestrian.<AirTransmissionModelHealthStatus>getHealthStatus().resetBreathCounterCoughing();
-			}
-		}
 		if (pedestrian.<AirTransmissionModelHealthStatus>getHealthStatus().isSneezing()) {
 			pedestrian.<AirTransmissionModelHealthStatus>getHealthStatus().incrementBreathCounterSneezing();
 			if (pedestrian.<AirTransmissionModelHealthStatus>getHealthStatus().isSneezingNow()) {
@@ -184,7 +174,16 @@ public class AirTransmissionModel extends AbstractExposureModel {
 				pedestrian.<AirTransmissionModelHealthStatus>getHealthStatus().resetBreathCounterSneezing();
 			}
 		}
-		// TODO set maximum pathogen load
+		else if (pedestrian.<AirTransmissionModelHealthStatus>getHealthStatus().isCoughing()) {  //cannot cough/sneeze/speak at the same time
+			pedestrian.<AirTransmissionModelHealthStatus>getHealthStatus().incrementBreathCounterCoughing();
+			if (pedestrian.<AirTransmissionModelHealthStatus>getHealthStatus().isCoughingNow()) {
+				initialPathogenLoad = initialPathogenLoad * attrAirTransmissionModel.getAerosolCloudPathogenLoadMultiplierCoughing();
+				pedestrian.<AirTransmissionModelHealthStatus>getHealthStatus().resetBreathCounterCoughing();
+			}
+		}
+		else if (pedestrian.<AirTransmissionModelHealthStatus>getHealthStatus().isTalking()) {
+			initialPathogenLoad = initialPathogenLoad * attrAirTransmissionModel.getAerosolCloudPathogenLoadMultiplierTalking();
+		}
 		return initialPathogenLoad;
 	}
 
