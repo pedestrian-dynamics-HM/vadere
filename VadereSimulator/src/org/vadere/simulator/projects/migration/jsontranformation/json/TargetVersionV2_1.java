@@ -350,10 +350,7 @@ public class TargetVersionV2_1 extends SimpleJsonTransformation {
                 (int) Math.pow(10, tempData.get("pedestrianPathogenEmissionCapacity")),
                 0,
                 0.0125,
-                tempData.get("pedestrianPathogenAbsorptionRate"),
-                10,
-                20,
-                100
+                tempData.get("pedestrianPathogenAbsorptionRate")
         );
 
         addAttributesObjectToNode(attributesNode, aerosolCloudParameters, "aerosolCloudParameters");
