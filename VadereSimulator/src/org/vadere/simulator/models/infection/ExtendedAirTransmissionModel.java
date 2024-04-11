@@ -32,6 +32,24 @@ public class ExtendedAirTransmissionModel extends AirTransmissionModel {
     }
 
     @Override
+    public void updateAerosolClouds(double simTimeInSec) {
+        updateAerosolCloudsPathogenLoad(simTimeInSec);
+        updateAerosolCloudsExtent();
+        updateAerosolCloudsLocation();
+        deleteExpiredAerosolClouds();
+    }
+
+    private void updateAerosolCloudsLocation() {
+        double shiftLength = attrAirTransmissionModel.getAerosolCloudWindSpeed() * simTimeStepLength / 100;
+        double windDirectionAngle = attrAirTransmissionModel.getAerosolCloudWindDirection();
+
+        Collection<AerosolCloud> allAerosolClouds = topography.getAerosolClouds();
+        for (AerosolCloud aerosolCloud : allAerosolClouds) {
+            aerosolCloud.shiftShape(windDirectionAngle, shiftLength);
+        }
+    }
+
+    @Override
     public void createAerosolClouds(double simTimeInSec, Pedestrian pedestrian) {
 
         if (pedestrian.<AirTransmissionModelHealthStatus>getHealthStatus().isStartingExhalation()) {

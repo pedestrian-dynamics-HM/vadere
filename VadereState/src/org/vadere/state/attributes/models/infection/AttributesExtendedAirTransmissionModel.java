@@ -25,6 +25,13 @@ public class AttributesExtendedAirTransmissionModel extends AttributesAirTransmi
         return aerosolCloudParameters.getPathogenLoadMultiplierSneezing();
     }
 
+    public double getAerosolCloudWindSpeed() {
+        return aerosolCloudParameters.getWindSpeed();
+    }
+
+    public double getAerosolCloudWindDirection() {
+        return aerosolCloudParameters.getWindDirection();
+    }
     public ArrayList<AttributesExtendedExposureModelSourceParameters> getExtendedExposureModelSourceParameters() {
         return exposureModelSourceParameters;
     }

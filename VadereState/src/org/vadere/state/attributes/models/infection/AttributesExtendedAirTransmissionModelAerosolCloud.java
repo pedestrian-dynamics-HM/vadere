@@ -20,12 +20,26 @@ public class AttributesExtendedAirTransmissionModelAerosolCloud extends Attribut
      */
     private int pathogenLoadMultiplierSneezing;
 
+    /**
+     * Describes the speed of the wind shifting the AerosolClouds
+     * Unit: cm/s
+     */
+    private double windSpeed;
+
+    /**
+     * Describes the direction of the wind
+     * Unit: point of the compass
+     */
+    private WindDirection windDirection;
+
     public AttributesExtendedAirTransmissionModelAerosolCloud() {
         super();
 
         this.pathogenLoadMultiplierTalking = 10;
         this.pathogenLoadMultiplierCoughing = 20;
         this.pathogenLoadMultiplierSneezing = 100;
+        this.windSpeed = 10;
+        this.windDirection = WindDirection.N;
     }
 
     public AttributesExtendedAirTransmissionModelAerosolCloud(double aerosolCloudHalfLife,
@@ -48,5 +62,30 @@ public class AttributesExtendedAirTransmissionModelAerosolCloud extends Attribut
     public int getPathogenLoadMultiplierCoughing() { return pathogenLoadMultiplierCoughing; }
 
     public int getPathogenLoadMultiplierSneezing() { return pathogenLoadMultiplierSneezing; }
+
+    public double getWindSpeed() {
+        return windSpeed;
+    }
+
+    public double getWindDirection()  {
+        return windDirection.angle;
+    }
+
+    public enum WindDirection {
+        N(Math.PI * 1/2),
+        NO(Math.PI * 1/4),
+        O(0),
+        SO(Math.PI * 7/4),
+        S(Math.PI * 3/2),
+        SW(Math.PI * 5/4),
+        W(Math.PI),
+        NW(Math.PI * 3/4);
+
+        final double angle;
+
+        WindDirection(double angle) {
+            this.angle = angle;
+        }
+    }
 
 }
