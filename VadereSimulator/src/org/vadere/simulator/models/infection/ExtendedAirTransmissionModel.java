@@ -139,7 +139,6 @@ public class ExtendedAirTransmissionModel extends AirTransmissionModel {
         AttributesExtendedExposureModelSourceParameters sourceParameters = (AttributesExtendedExposureModelSourceParameters) defineSourceParameters(controller, attrModel);
 
         Pedestrian ped = (Pedestrian) scenarioElement;
-
         ExtendedAirTransmissionModelHealthStatus healthStatus = new ExtendedAirTransmissionModelHealthStatus();
         healthStatus.setTalking(sourceParameters.isTalking());
         healthStatus.setCoughing(sourceParameters.isCoughing());
@@ -150,6 +149,7 @@ public class ExtendedAirTransmissionModel extends AirTransmissionModel {
         healthStatus.setBreathingIn(false);
         ped.setHealthStatus(healthStatus);
         ped.setInfectious(sourceParameters.isInfectious());
+
         return ped;
     }
 
