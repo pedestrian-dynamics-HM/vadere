@@ -24,10 +24,13 @@ public class ExtendedAirTransmissionModel extends AirTransmissionModel {
     private final Logger logger = Logger.getLogger(ExtendedAirTransmissionModel.class);
     private AttributesExtendedAirTransmissionModel attrAirTransmissionModel;
 
+    private Map<Integer, Integer> spawnCounter;
+
     @Override
     public void initialize(List<Attributes> attributesList, Domain domain, AttributesAgent attributesPedestrian, Random random) {
         super.initialize(domain, attributesPedestrian, random);
         attrAirTransmissionModel = Model.findAttributes(attributesList, AttributesExtendedAirTransmissionModel.class);
+        spawnCounter = new HashMap<>();
     }
 
     @Override
@@ -134,7 +137,7 @@ public class ExtendedAirTransmissionModel extends AirTransmissionModel {
     }
 
     @Override
-    public Agent sourceControllerEvent(SourceController controller, double simTimeInSec, Agent scenarioElement) {
+    synchronized public Agent sourceControllerEvent(SourceController controller, double simTimeInSec, Agent scenarioElement) {
         AttributesExtendedAirTransmissionModel attrModel = (AttributesExtendedAirTransmissionModel) getAttributes();
         AttributesExtendedExposureModelSourceParameters sourceParameters = (AttributesExtendedExposureModelSourceParameters) defineSourceParameters(controller, attrModel);
 
@@ -148,8 +151,16 @@ public class ExtendedAirTransmissionModel extends AirTransmissionModel {
         healthStatus.setRespiratoryTimeOffset(random.nextDouble() * attrModel.getPedestrianRespiratoryCyclePeriod());
         healthStatus.setBreathingIn(false);
         ped.setHealthStatus(healthStatus);
-        ped.setInfectious(sourceParameters.isInfectious());
 
+        if (!spawnCounter.containsKey(controller.getSourceId())) {
+            spawnCounter.put(controller.getSourceId(), 0);
+        }
+        int counter = spawnCounter.get(controller.getSourceId());
+        if (!sourceParameters.getInfectiousSpawnIds().isEmpty() && sourceParameters.getInfectiousSpawnIds().get(0) == counter) {
+            ped.setInfectious(sourceParameters.isInfectious());
+            sourceParameters.getInfectiousSpawnIds().remove(0);
+        }
+        spawnCounter.put(controller.getSourceId(), counter + 1);
         return ped;
     }
 
