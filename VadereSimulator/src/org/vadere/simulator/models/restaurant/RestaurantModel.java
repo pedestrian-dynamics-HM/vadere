@@ -19,25 +19,41 @@ import java.util.stream.Collectors;
 @ModelClass
 public class RestaurantModel implements Model {
 
+    /**
+     * Distance from a table, where pedestrians can occupy seats belonging to the associated seating group
+     */
+    private final static int TABLE_REACH_DISTANCE = 2;
+
+    /**
+     * Maximum waiting time a pedestrian would stay at a seating group
+     */
+    private final static double MAX_WAITING_TIME = 1000;
+
     private static Logger logger = Logger.getLogger(RestaurantModel.class);
+
     private Random random;
+
     private Domain domain;
+
     private AttributesAgent attributesAgent;
+
     private Topography topography;
 
     private AttributesRestaurantModel attrRestaurantModel;
 
-    private LinkedList<SeatGroup> seatGroups;
-
+    /**
+     * Seating groups that can be accessed by the id of the table (target)
+     */
     private Map<Integer, SeatGroup> seatGroupMap;
 
-    private Map<Target, Target> seatTableMap;
+    /**
+     * Memory for the assignments at which table a pedestrian get sat
+     */
+    private Map<Pedestrian, Integer> pedestrianSeatGroupMap;
 
-    private Map<Pedestrian, Target> sittingPedestriansSeatMap;
-
-    private final static int TABLE_REACH_DISTANCE = 2;
-
-
+    /**
+     * Initialize the Restaurant Model with all associated seating groups
+     */
     @Override
     public void initialize(List<Attributes> attributesList, Domain domain, AttributesAgent attributesPedestrian, Random random) {
         this.domain = domain;
@@ -45,46 +61,55 @@ public class RestaurantModel implements Model {
         this.attributesAgent = attributesPedestrian;
         this.attrRestaurantModel = Model.findAttributes(attributesList, AttributesRestaurantModel.class);
         this.topography = domain.getTopography();
-        this.seatGroups = new LinkedList<>();
         this.seatGroupMap = new HashMap<>();
-        this.seatTableMap = new HashMap<>();
-        this.sittingPedestriansSeatMap = new ConcurrentHashMap<>();
+        this.pedestrianSeatGroupMap = new ConcurrentHashMap<>();
 
+        // initialize seating groups
         for (AttributesSeatGroup attrSeatGroup : this.attrRestaurantModel.getAttrsSeatGroup()) {
-            if (attrSeatGroup.getTableTargetId() != attrRestaurantModel.INVALID_ID) {
+            if (attrSeatGroup.getTableTargetId() != AttributesRestaurantModel.INVALID_ID) {
                 initializeSeatGroup(attrSeatGroup);
             }
         }
     }
 
-
+    /**
+     * Initialize a seating group
+     * @param attrSeatGroup attributes of the seating group
+     */
     public void initializeSeatGroup(AttributesSeatGroup attrSeatGroup) {
-        List<Target> seatGroupTableTargets = this.topography.getTargets(attrSeatGroup.getTableTargetId());
-        if (seatGroupTableTargets.size() != 1) {
+        List<Target> seatGroupTables = this.topography.getTargets(attrSeatGroup.getTableTargetId());
+        if (seatGroupTables.size() != 1) {
             throw new IllegalStateException("Improper number of targets for a given target ID.");
         }
-        Target tableTarget = seatGroupTableTargets.get(0);
-        SeatGroup seatGroup = new SeatGroup(tableTarget, attrSeatGroup.getSeatTargetIds().size());
+        Target tableTarget = seatGroupTables.get(0);
+        SeatGroup seatGroup = new SeatGroup(tableTarget, attrSeatGroup.getLengthOfStay());
 
-        //add seatTargets
-        for (int seatTargetId: attrSeatGroup.getSeatTargetIds()) {
-            List<Target> seatTargets = this.topography.getTargets(seatTargetId);
-            if (seatTargets.size() != 1) {
+        tableTarget.getAttributes().getAbsorberAttributes().setEnabled(false);
+        tableTarget.getAttributes().getWaiterAttributes().setEnabled(true);
+        tableTarget.getAttributes().getWaiterAttributes().setIndividualWaiting(false);
+        tableTarget.getAttributes().setParallelEvents(0);
+        tableTarget.getAttributes().getWaiterAttributes().setDistribution(new AttributesConstantDistribution(0));
+
+        //add seats to seating group
+        for (int seatId: attrSeatGroup.getSeatTargetIds()) {
+            List<Target> seats = this.topography.getTargets(seatId);
+            if (seats.size() != 1) {
                 throw new IllegalStateException("Improper number of targets for a given target ID.");
             }
-            Target seatTarget = seatTargets.get(0);
-            seatTarget.getAttributes().getWaiterAttributes().setEnabled(true);
-            seatTarget.getAttributes().getWaiterAttributes().setDistribution(new AttributesConstantDistribution(attrSeatGroup.getLengthOfStay()));
-            seatTarget.getAttributes().getWaiterAttributes().setIndividualWaiting(true);
-            seatTarget.getAttributes().getAbsorberAttributes().getDeletionDistance();
-            // TODO correct?
-            seatTarget.getAttributes().setParallelEvents(1); // only one person can sit on the chair
-            seatGroup.addSeatTarget(seatTarget);
+            Target seatTarget = seats.get(0);
 
+            // adjust the settings of the seats (targets), so that they do not remove arriving pedestrians and let them wait
+            seatTarget.getAttributes().getAbsorberAttributes().setEnabled(false);
+            seatTarget.getAttributes().getWaiterAttributes().setEnabled(true);
+            seatTarget.getAttributes().getWaiterAttributes().setIndividualWaiting(true);
+            seatTarget.getAttributes().setParallelEvents(1);
+            seatTarget.getAttributes().getWaiterAttributes().setDistribution(new AttributesConstantDistribution(MAX_WAITING_TIME));
+
+            seatGroup.addSeat(seatId);
+
+            // add listener that gets notified when a pedestrian sits down on the seat
             seatTarget.addListener(seatTargetListener);
-            this.seatTableMap.put(seatTarget, seatGroupTableTargets.get(0));
         }
-        this.seatGroups.add(seatGroup);
         this.seatGroupMap.put(attrSeatGroup.getTableTargetId(), seatGroup);
     }
 
@@ -97,64 +122,98 @@ public class RestaurantModel implements Model {
     @Override
     public void postLoop(double simTimeInSec) {}
 
+    /**
+     * Update model by assigning arriving pedestrians to seats and removing departing pedestrians
+     * @param simTimeInSec current simulation time
+     */
     @Override
     public void update(double simTimeInSec) {
-        chooseSeatsForArrivingPedestrians();
-        standUpFromSeat(simTimeInSec);
+        for (SeatGroup seatGroup : seatGroupMap.values()) {
+            Collection<List<Pedestrian>> leavingGroups = seatGroup.leaveSeats(simTimeInSec);
+            // leaving pedestrians have to stand up
+            leavingGroups.forEach(group -> group.forEach(pedestrian -> {
+                pedestrian.setSitting(false);
+                pedestrianSeatGroupMap.remove(pedestrian);
+            }));
+        }
+        chooseSeatsForArrivingPedestrians(simTimeInSec);
     }
 
-    private void chooseSeatsForArrivingPedestrians() {
-        // find pedestrians who are going to their "table" in the restaurant
+    /**
+     * Occupy seats for arriving groups or pedestrians.
+     * @param simTime current simulation time
+     */
+    private void chooseSeatsForArrivingPedestrians(double simTime) {
         Collection<Pedestrian> arrivingPedestrians = topography.getPedestrianDynamicElements().getElements()
                 .stream()
                 .filter(p -> this.attrRestaurantModel.getTableTargetIds().contains(p.getNextTargetId()))
                 .collect(Collectors.toSet());
 
-        for (Pedestrian ped : arrivingPedestrians) {
-            SeatGroup seatGroup = seatGroupMap.get(ped.getNextTargetId());
-            // check if pedestrian is within a specific distance to the table
-            if (seatGroup.getTableTarget().getShape().distance(ped.getPosition()) < TABLE_REACH_DISTANCE) {
-                // specify the next seat
-                int nextSeatTargetId = seatGroup.nextSeatTargetId();
-                //ped.setIdAsTarget(nextSeatTarget.getId());
-                LinkedList<Integer> targetIdsList = ped.getTargets();
-                // replace next "table" target by "seat" target
-                targetIdsList.set(ped.getNextTargetListIndex(), nextSeatTargetId);
-                ped.setTargets(targetIdsList);
-                // if no seat found -> wait
+        // arriving groups
+        Map<LinkedList<Integer>, List<Pedestrian>> groups = arrivingPedestrians.stream().filter(ped-> !ped.getGroupIds().isEmpty()).collect(Collectors.groupingBy(Pedestrian::getGroupIds));
+        // arriving single pedestrians
+        List<Pedestrian> singles = arrivingPedestrians.stream().filter(ped-> ped.getGroupIds().isEmpty()).toList();
+
+        // try to occupy seats for a whole group
+        for (Map.Entry<LinkedList<Integer>, List<Pedestrian>> groupEntry : groups.entrySet()) {
+            List<Pedestrian> pedestrians = groupEntry.getValue();
+            int tableId = pedestrians.get(0).getNextTargetId();
+            SeatGroup seatGroup = seatGroupMap.get(tableId);
+            if (pedestrians.size() > seatGroup.getSeatGroupSize()) {
+                for (Pedestrian pedestrian : pedestrians) {
+                    LinkedList<Integer> targets = pedestrian.getTargets();
+                    targets.pop();
+                    pedestrian.setTargets(targets);
+                }
+            } else if (pedestrians.stream().anyMatch(ped -> seatGroup.getTable().getShape().distance(ped.getPosition()) < TABLE_REACH_DISTANCE)) {
+                if (seatGroup.requestFreeSeats(pedestrians, simTime)) {
+                    pedestrians.forEach(ped -> pedestrianSeatGroupMap.put(ped, tableId));
+                }
+            }
+        }
+
+        // try to occupy seats for a single pedestrian
+        for (Pedestrian pedestrian : singles) {
+            int tableId = pedestrian.getNextTargetId();
+            SeatGroup seatGroup = seatGroupMap.get(tableId);
+            if (seatGroup.getTable().getShape().distance(pedestrian.getPosition()) < TABLE_REACH_DISTANCE) {
+                if (seatGroup.requestFreeSeats(List.of(pedestrian), simTime)) {
+                    pedestrianSeatGroupMap.put(pedestrian, tableId);
+                }
             }
         }
     }
 
-    private void standUpFromSeat(double simTimeInSec) {
-        // check who of the sitting pedestrians is not sitting anymore -> set isSitting = false and remove from list
-        for (Pedestrian sittingPed : this.sittingPedestriansSeatMap.keySet()) {
-            Target seatTarget = this.sittingPedestriansSeatMap.get(sittingPed);
-            if (!seatTarget.getAttributes().isWaiting() ||
-                    (seatTarget.getLeavingTimes().containsKey(sittingPed.getId()) &&
-                            seatTarget.getLeavingTimes().get(sittingPed.getId()) <= simTimeInSec)) {
-                sittingPed.setSitting(false);
-                this.sittingPedestriansSeatMap.remove(sittingPed);
-            }
-        }
-    }
-
-
+    /**
+     * Listener for the seats belonging to a seating group
+     */
     private final TargetListener seatTargetListener = new TargetListener() {
+        /**
+         * Arriving pedestrians at a seat get sat down and their looking directions get adjusted to the middle of the table
+         * @param target seat
+         * @param agent pedestrian
+         */
         @Override
         public void reachedTarget(Target target, Agent agent) {
-            // is target a seat
-            Target table = seatTableMap.get(target);
-            if (table != null) {
-                Pedestrian sittingPedestrian = topography.getPedestrianDynamicElements().getElement(agent.getId());
-                sittingPedestrian.setSitting(true);
-                double sittingDirectionX = table.getShape().getCentroid().getX() - sittingPedestrian.getPosition().getX();
-                double sittingDirectionY = table.getShape().getCentroid().getY() - sittingPedestrian.getPosition().getY();
-                Vector2D sittingDirection = new Vector2D(sittingDirectionX, sittingDirectionY);
-                sittingPedestrian.setSittingDirection(sittingDirection);
-                sittingPedestriansSeatMap.put(sittingPedestrian, target);
+            Pedestrian pedestrian = topography.getPedestrianDynamicElements().getElement(agent.getId());
+            if (!pedestrian.isSitting()) {
+                Target table = seatGroupMap.get(pedestrianSeatGroupMap.get(pedestrian)).getTable();
+                if (table != null) {
+                    pedestrian.setSitting(true);
+                    double sittingDirectionX = table.getShape().getCentroid().getX() - pedestrian.getPosition().getX();
+                    double sittingDirectionY = table.getShape().getCentroid().getY() - pedestrian.getPosition().getY();
+                    Vector2D sittingDirection = new Vector2D(sittingDirectionX, sittingDirectionY);
+                    pedestrian.setSittingDirection(sittingDirection);
+                }
             }
         }
     };
 
+    public TargetListener getSeatTargetListener() {
+        return seatTargetListener;
+    }
+
+    public List<SeatGroup> getSeatGroups() {
+        return new ArrayList<>(seatGroupMap.values());
+    }
 }

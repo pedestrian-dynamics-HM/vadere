@@ -1,56 +1,122 @@
 package org.vadere.simulator.models.restaurant;
-import java.util.ArrayList;
+import java.util.*;
+import java.util.stream.Collectors;
 
+import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Target;
 import org.vadere.state.scenario.Source;
 
 public class SeatGroup {
-    private Target tableTarget;
 
-    //private ArrayList<Source> sources;
+    /**
+     * Table belonging to the seating group
+     */
+    private final Target table;
 
-    private ArrayList<Target> seatTargets;
+    /**
+     * Arrival times (time when getting seats) for a group of pedestrians
+     * (that belong together according to the group model)
+     */
+    private Map<List<Pedestrian>, Double> arrivalTimes;
 
-    private int nextSeatIndex;
+    /**
+     * Ids of the seats (targets) belonging to the seating group with reference if they are free
+     */
+    private Map<Integer, Boolean> seats;
+
+    /**
+     * Time a group of pedestrians stays at the table
+     */
+    private final double tableTime;
 
 
-    // specify size of arrayLists directly for more efficiency
-    public SeatGroup (Target tableTarget, int seatTargetsSize) {
-        this.tableTarget = tableTarget;
-        //this.sources = new ArrayList<>(sourcesSize);
-        this.seatTargets = new ArrayList<>(seatTargetsSize);
-        this.nextSeatIndex = 0;
+    public SeatGroup (Target tableTarget, double tableTime) {
+        this.table = tableTarget;
+        this.seats = new HashMap<>();
+        this.arrivalTimes = new HashMap<>();
+        this.tableTime = tableTime;
     }
 
-    public SeatGroup (Target tableTarget, ArrayList<Target> seatTargets) {
-        this.tableTarget = tableTarget;
-        //this.sources = sources;
-        this.seatTargets = seatTargets;
-        this.nextSeatIndex = 0;
+    public SeatGroup (Target table, List<Integer> seats, double tableTime) {
+        this.table = table;
+        this.seats = seats.stream().collect(Collectors.toMap(i -> i, i -> true));
+        this.tableTime = tableTime;
     }
 
-    public Target getTableTarget() { return this.tableTarget; }
-
-    //public void addSource(Source source) {
-    //    this.sources.add(source);
-    //}
-
-    public void addSeatTarget(Target target) {
-        this.seatTargets.add(target);
+    /**
+     * Get the table belonging to the seating group
+     * @return table
+     */
+    public Target getTable() {
+        return this.table;
     }
 
-    // just iterate over seats
-    // TODO get closest next seat or do any other kind of ordering
-    public int nextSeatTargetId() {
-        int nextSeatId = this.seatTargets.get(this.nextSeatIndex).getId();
-        this.nextSeatIndex = (this.nextSeatIndex + 1) % this.seatTargets.size();
-        return nextSeatId;
+    /**
+     * Add seat to the seating group
+     * @param seatId id of the seat (target)
+     */
+    public void addSeat(int seatId) {
+        seats.put(seatId, true);
     }
 
-    //getfreeseats
-    //getnextseat
-    //getdirection
+    /**
+     * Requests seats for a group of pedestrians.
+     * If enough free seats are available, the seats get occupied, else the request gets denied
+     * @param pedestrians group of pedestrians
+     * @param simTime current simulation time
+     * @return true, if enough seats are available, else false
+     */
+    public boolean requestFreeSeats(List<Pedestrian> pedestrians, double simTime) {
+        List<Integer> freeSeats = getFreeSeats();
+        if (freeSeats.size() >= pedestrians.size()) {
+            for (int i = 0; i < pedestrians.size(); i++) {
+                int seat = freeSeats.get(i);
+                Pedestrian pedestrian = pedestrians.get(i);
+                seats.put(seat, false);
+                LinkedList<Integer> targetIds = pedestrian.getTargets();
+                targetIds.set(pedestrian.getNextTargetListIndex(), seat);
+                Pedestrian.setGroupTarget(List.of(pedestrian), targetIds);
+            }
+            arrivalTimes.put(pedestrians, simTime);
+            return true;
+        }
+        return false;
+    }
 
+    /**
+     * Updates the seatGroup by removing the pedestrian groups, that stayed enough time at the table
+     * @param simTime current simulation time
+     * @return list of groups of pedestrians that left the table
+     */
+    public Collection<List<Pedestrian>> leaveSeats(double simTime) {
+        Collection<List<Pedestrian>> groups = new HashSet<>();
+        for (Map.Entry<List<Pedestrian>, Double> entry : arrivalTimes.entrySet()) {
+            if (entry.getValue() + tableTime <= simTime) {
+                for (Pedestrian pedestrian : entry.getKey()) {
+                    int seat = pedestrian.getTargets().pop();
+                    seats.put(seat, true);
+                }
+                groups.add(entry.getKey());
+            }
+        }
+        groups.forEach(pedestrians -> arrivalTimes.remove(pedestrians));
+        return groups;
+    }
 
+    /**
+     * Get all seats belonging to this seating group, that are not occupied by pedestrians
+     * @return list of free seats
+     */
+    public List<Integer> getFreeSeats() {
+        return seats.entrySet().stream().filter(Map.Entry::getValue).map(Map.Entry::getKey).collect(Collectors.toList());
+    }
+
+    /**
+     * Get the maximum number of pedestrian that can sit at a seating group
+     * @return size of the seating group
+     */
+    public int getSeatGroupSize() {
+        return seats.size();
+    }
 
 }
