@@ -27,7 +27,7 @@ import java.util.function.Supplier;
 })
 public abstract class VSpawner<T extends AttributesSpawner>  extends AttributesAttached<T> {
     protected int dynamicElementsCreatedTotal = 0;
-    private final VDistribution distribution;
+    private final VDistribution<?> distribution;
 
     public VSpawner(T attributes, Random random) {
         this.attributes= attributes;
@@ -77,7 +77,7 @@ public abstract class VSpawner<T extends AttributesSpawner>  extends AttributesA
 
     @Override
     public void setAttributes(T attributes) {
-        this.attributes = attributes;
+        super.setAttributes(attributes);
     }
 
     public double getNextSpawnTime(double timeCurrentEvent) {
@@ -92,7 +92,7 @@ public abstract class VSpawner<T extends AttributesSpawner>  extends AttributesA
         dynamicElementsCreatedTotal += count;
     }
 
-    public VDistribution getDistribution() {
+    public VDistribution<?> getDistribution() {
         return distribution;
     }
 }
