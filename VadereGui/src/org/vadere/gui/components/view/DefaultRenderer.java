@@ -35,6 +35,7 @@ import java.util.Collection;
  */
 public abstract class DefaultRenderer {
 
+
 	private IDefaultModel defaultModel;
 	private BufferedImage logo;
 	private BufferedImage image;
@@ -59,6 +60,11 @@ public abstract class DefaultRenderer {
 	 * @param width
 	 * @param height
 	 */
+
+	public IDefaultModel getDefaultModel() {
+		return defaultModel;
+	}
+
 	public void render(final Graphics2D targetGraphics2D, final int width, final int height) {
 		synchronized (defaultModel) {
 			render(targetGraphics2D, 0, 0, width, height);

@@ -15,6 +15,7 @@ import tech.tablesaw.api.Table;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Path2D;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
 import java.util.Collection;
@@ -109,27 +110,23 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 		g.setStroke(savedStroke);
 	}
 
-	private void renderImage(Graphics2D g2, double x, double y, double radius){
+	private void renderImage(Graphics2D g2, Pedestrian ped){
+
+		double x = ped.getPosition().getX();
+		double y = ped.getPosition().getY();
+		double radius = ped.getRadius();
 
 		BufferedImage before = getImage();
 
-		double scale = 0.0006;
+		double scale = 2.0*radius/before.getHeight();
 		AffineTransform at = new AffineTransform();
 
-
+		// move icon to correct position and scale it so that it covers an agent's torso
 		at.translate(x+radius,y-radius);
 		at.rotate(Math.toRadians(180),-radius,radius);
 		at.scale(-scale,scale);
-
 		g2.drawImage(before, at, null);
 
-
-
-
-
-
-		//g2.drawImage(before, x_low, y_low, x_high, y_high, 0, 0, before.getWidth(), before.getHeight(), null);
-		//g2.scale(pixelPerMeter, pixelPerMeter);
 	}
 
 	private void renderPedestrians(Graphics2D g, Collection<Pedestrian> pedestrians, Map<Integer, Color> agentColors) {
@@ -148,12 +145,15 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 					if (model.config.isShowPedestrianInOutGroup()) {
 						renderPedestrianInOutGroup(g, pedestrian);
 					}
+
+					if (model.config.isShowImage()) {
+						renderImage(g, pedestrian);
+					}
+
+
 				}
 
 
-				//TODO user input image
-				VPoint position = pedestrian.getPosition();
-				renderImage(g,position.getX(), position.getY(), pedestrian.getRadius());
 
 
 				if (model.config.isShowWalkdirection() &&
