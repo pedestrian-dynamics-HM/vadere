@@ -13,6 +13,7 @@ import tech.tablesaw.api.Row;
 import tech.tablesaw.api.Table;
 
 import java.awt.*;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Path2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
@@ -111,21 +112,23 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 	private void renderImage(Graphics2D g2, double x, double y){
 
 		BufferedImage before = getImage();
-		
-		double imageWidth = 0.5; //in m
+		AffineTransform at = new AffineTransform();
 
-		int pixelPerMeter = 100;
-		g2.scale(1.0/pixelPerMeter, 1.0/pixelPerMeter);
+		double width = 0.42;
 
-		int figSize = (int) (pixelPerMeter*imageWidth);
-		int x_low = (int) (pixelPerMeter*x - figSize/2);
-		int y_low = (int) (pixelPerMeter*y + figSize/2);
+		at.translate(x+width/2,y-width/2);
+		at.rotate(Math.toRadians(180),-width/2,width/2);
+		at.scale(-0.0006,0.0006);
 
-		int x_high = (int) (pixelPerMeter*x + figSize/2 );
-		int y_high = (int) (pixelPerMeter*y - figSize/2);
+		g2.drawImage(before, at, null);
 
-		g2.drawImage(before, x_low, y_low, x_high, y_high, 0, 0, before.getWidth(), before.getHeight(), null);
-		g2.scale(pixelPerMeter, pixelPerMeter);
+
+
+
+
+
+		//g2.drawImage(before, x_low, y_low, x_high, y_high, 0, 0, before.getWidth(), before.getHeight(), null);
+		//g2.scale(pixelPerMeter, pixelPerMeter);
 	}
 
 	private void renderPedestrians(Graphics2D g, Collection<Pedestrian> pedestrians, Map<Integer, Color> agentColors) {
