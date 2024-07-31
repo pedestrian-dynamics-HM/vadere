@@ -108,13 +108,24 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 		g.setStroke(savedStroke);
 	}
 
-	private void renderImage(Graphics2D g2, int x, int y){
+	private void renderImage(Graphics2D g2, double x, double y){
 
 		BufferedImage before = getImage();
-		int w2 = 1;
-		int h2 = 1;
-		g2.drawImage(before, x, y, x+w2, y+h2, 0, 0, before.getWidth(), before.getHeight(), null);
 
+		int pixelPerMeter = 100;
+		int figSize = 50;
+
+
+		g2.scale(1.0/pixelPerMeter, 1.0/pixelPerMeter);
+
+		int x_low = (int) (100*x - figSize/2);
+		int y_low = (int) (100*y + figSize/2);
+
+		int x_high = (int) (100*x + figSize/2 );
+		int y_high = (int) (100*y - figSize/2);
+
+		g2.drawImage(before, x_low, y_low, x_high, y_high, 0, 0, before.getWidth(), before.getHeight(), null);
+		g2.scale(pixelPerMeter, pixelPerMeter);
 	}
 
 	private void renderPedestrians(Graphics2D g, Collection<Pedestrian> pedestrians, Map<Integer, Color> agentColors) {
@@ -138,7 +149,7 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 
 				//TODO user input image
 				VPoint position = pedestrian.getPosition();
-				renderImage(g, (int) position.getX(), (int) position.getY());
+				renderImage(g,  position.getX(), position.getY());
 
 
 				if (model.config.isShowWalkdirection() &&
