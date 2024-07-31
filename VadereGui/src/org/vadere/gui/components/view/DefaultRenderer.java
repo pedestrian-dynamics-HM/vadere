@@ -108,10 +108,7 @@ public abstract class DefaultRenderer {
 	}
 
 	public void setImage(final BufferedImage image) {
-
 		this.image = image;
-
-
 	}
 
 	public BufferedImage getImage(){
