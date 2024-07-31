@@ -14,6 +14,8 @@ import tech.tablesaw.api.Table;
 
 import java.awt.*;
 import java.awt.geom.Path2D;
+import java.awt.image.BufferedImage;
+import java.awt.image.ImageObserver;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -106,6 +108,15 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 		g.setStroke(savedStroke);
 	}
 
+	private void renderImage(Graphics2D g2, int x, int y){
+
+		BufferedImage before = getImage();
+		int w2 = 1;
+		int h2 = 1;
+		g2.drawImage(before, x, y, x+w2, y+h2, 0, 0, before.getWidth(), before.getHeight(), null);
+
+	}
+
 	private void renderPedestrians(Graphics2D g, Collection<Pedestrian> pedestrians, Map<Integer, Color> agentColors) {
 
 		AgentRender agentRender = getAgentRender();
@@ -123,6 +134,12 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 						renderPedestrianInOutGroup(g, pedestrian);
 					}
 				}
+
+
+				//TODO user input image
+				VPoint position = pedestrian.getPosition();
+				renderImage(g, (int) position.getX(), (int) position.getY());
+
 
 				if (model.config.isShowWalkdirection() &&
 						(model.config.isShowFaydedPedestrians() || model.getTrajectories().getDeathTime(pedestrian.getId()) > model.getSimTimeInSec())) {

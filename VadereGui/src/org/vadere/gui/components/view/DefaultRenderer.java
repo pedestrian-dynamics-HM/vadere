@@ -37,6 +37,7 @@ public abstract class DefaultRenderer {
 
 	private IDefaultModel defaultModel;
 	private BufferedImage logo;
+	private BufferedImage image;
 	private static final double rotNeg90 = - Math.PI /2;
 	private boolean renderNodes = VadereConfig.getConfig().getBoolean("Gui.showNodes");
 	private double nodeRadius = VadereConfig.getConfig().getDouble("Gui.node.radius");
@@ -104,6 +105,17 @@ public abstract class DefaultRenderer {
 
 	public void setLogo(final BufferedImage logo) {
 		this.logo = logo;
+	}
+
+	public void setImage(final BufferedImage image) {
+
+		this.image = image;
+
+
+	}
+
+	public BufferedImage getImage(){
+		return this.image;
 	}
 
 	protected void renderPreTransformation(final Graphics2D graphics2D, final int width, final int height) {}

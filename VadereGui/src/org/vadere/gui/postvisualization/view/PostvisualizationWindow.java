@@ -85,6 +85,8 @@ public class PostvisualizationWindow extends JPanel implements Observer {
         // 3. set up renderer (he draws also the svg and the png's)
         renderer.setLogo(resources.getImage("vadere.png"));
 
+        renderer.setImage(resources.getImage("zombie.png"));
+
         // 4. set up the jscrollpane
         scrollPane.getViewport()
                 .addChangeListener(new JViewportChangeListener(model, scrollPane.getVerticalScrollBar()));
