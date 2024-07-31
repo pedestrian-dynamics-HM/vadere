@@ -109,16 +109,17 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 		g.setStroke(savedStroke);
 	}
 
-	private void renderImage(Graphics2D g2, double x, double y){
+	private void renderImage(Graphics2D g2, double x, double y, double radius){
 
 		BufferedImage before = getImage();
+
+		double scale = 0.0006;
 		AffineTransform at = new AffineTransform();
 
-		double width = 0.42;
 
-		at.translate(x+width/2,y-width/2);
-		at.rotate(Math.toRadians(180),-width/2,width/2);
-		at.scale(-0.0006,0.0006);
+		at.translate(x+radius,y-radius);
+		at.rotate(Math.toRadians(180),-radius,radius);
+		at.scale(-scale,scale);
 
 		g2.drawImage(before, at, null);
 
@@ -152,7 +153,7 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 
 				//TODO user input image
 				VPoint position = pedestrian.getPosition();
-				renderImage(g,  position.getX(), position.getY());
+				renderImage(g,position.getX(), position.getY(), pedestrian.getRadius());
 
 
 				if (model.config.isShowWalkdirection() &&
