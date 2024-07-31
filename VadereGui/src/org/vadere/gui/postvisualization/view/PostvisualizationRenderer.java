@@ -111,18 +111,18 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 	private void renderImage(Graphics2D g2, double x, double y){
 
 		BufferedImage before = getImage();
+		
+		double imageWidth = 0.5; //in m
 
 		int pixelPerMeter = 100;
-		int figSize = 50;
-
-
 		g2.scale(1.0/pixelPerMeter, 1.0/pixelPerMeter);
 
-		int x_low = (int) (100*x - figSize/2);
-		int y_low = (int) (100*y + figSize/2);
+		int figSize = (int) (pixelPerMeter*imageWidth);
+		int x_low = (int) (pixelPerMeter*x - figSize/2);
+		int y_low = (int) (pixelPerMeter*y + figSize/2);
 
-		int x_high = (int) (100*x + figSize/2 );
-		int y_high = (int) (100*y - figSize/2);
+		int x_high = (int) (pixelPerMeter*x + figSize/2 );
+		int y_high = (int) (pixelPerMeter*y - figSize/2);
 
 		g2.drawImage(before, x_low, y_low, x_high, y_high, 0, 0, before.getWidth(), before.getHeight(), null);
 		g2.scale(pixelPerMeter, pixelPerMeter);
