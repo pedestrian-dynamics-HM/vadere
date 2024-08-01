@@ -1,6 +1,7 @@
 package org.vadere.gui.components.model;
 
 import java.awt.*;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -68,6 +69,7 @@ public class DefaultSimulationConfig extends DefaultConfig {
 	private final double MIN_CELL_WIDTH = CONFIG.getDouble("ProjectView.minCellWidth");
 	private final double MAX_CELL_WIDTH = CONFIG.getDouble("ProjectView.maxCellWidth");
 	private AgentColoring agentColoring = AgentColoring.TARGET;
+	private Path imagePath;
 
 	public DefaultSimulationConfig() {
 		super();
@@ -298,6 +300,15 @@ public class DefaultSimulationConfig extends DefaultConfig {
 	public void setShowImage(final boolean showImage){
 		this.showImage =showImage;
 		setChanged();
+	}
+
+	public void setImagePath(final Path imagePath){
+		this.imagePath = imagePath;
+		setChanged();
+	}
+
+	public Path getImagePath(){
+		return this.imagePath;
 	}
 
 	public void setShowPotentialField(final boolean showPotentialField) {

@@ -19,8 +19,10 @@ import org.vadere.simulator.projects.io.IOOutput;
 import org.vadere.util.config.VadereConfig;
 import org.vadere.util.io.IOUtils;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.Observable;
@@ -81,11 +83,13 @@ public class PostvisualizationWindow extends JPanel implements Observer {
         // 2. set up the model
         model.addObserver(this);
         model.config.setLoadTopographyInformationsOnly(loadTopographyInformationsOnly);
+        model.config.setImage(getImage());
 
         // 3. set up renderer (he draws also the svg and the png's)
         renderer.setLogo(resources.getImage("vadere.png"));
 
-        renderer.setImage(resources.getImage("daisy.png"));
+
+
 
         // 4. set up the jscrollpane
         scrollPane.getViewport()
@@ -183,4 +187,16 @@ public class PostvisualizationWindow extends JPanel implements Observer {
         }
 
     }
+
+    private BufferedImage getImage(){
+        BufferedImage image;
+        try {
+            image = ImageIO.read(Resources.class.getResource("/agent_icons/" + "daisy.png"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return image;
+
+    }
+
 }

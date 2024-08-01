@@ -301,10 +301,9 @@ public class SettingsDialog extends JDialog {
 
 		initColoringBySelfCategory(cbSelfCategories, pSelfCategoryColor, bChangeSelfCategoryColor);
 
-
-		JTextField textFieldImageOverlay = new JTextField("VadereGui/resources/agent_icons/daisy.png");
-		final JPanel pImageOverlay = new JPanel();
-		initImageOverlay(textFieldImageOverlay,pImageOverlay);
+		JComboBox<String> cbImagePaths = new JComboBox<>(new String[]{"daisy.png", "zombie.png"});
+		//final JButton bImageOverlay = new JButton(Messages.getString("SettingsDialog.btnEditColor.text"));
+		initImageOverlay(cbImagePaths);
 
 
 		final JPanel pPedestrianColorLowerExposure = new JPanel();
@@ -374,7 +373,7 @@ public class SettingsDialog extends JDialog {
 		colorSettingsPane.add(bChangeSelfCategoryColor, cc.xy(column5, row));
 
 		colorSettingsPane.add(rbImageOverlay, cc.xy(column1, row += NEXT_CELL));
-		colorSettingsPane.add(textFieldImageOverlay, cc.xy(column2, row));
+		colorSettingsPane.add(cbImagePaths, cc.xy(column2, row));
 
 
 
@@ -443,9 +442,17 @@ public class SettingsDialog extends JDialog {
 		return comboBox;
 	}
 
-	private void initImageOverlay(JTextField textFieldImageOverlay, JPanel pImageOverlay){
+	private void initImageOverlay(JComboBox<String> comboBox){
 
-		textFieldImageOverlay.addActionListener(new ActionSetImageOverlay("Set image", model, pImageOverlay, textFieldImageOverlay)) ;
+		comboBox.addActionListener(new ActionSetImageOverlay("Set image", model, comboBox)) ;
+
+
+
+		/*
+		comboBox.addActionListener(e -> {
+			String selectedPath = comboBox.getItemAt(comboBox.getSelectedIndex());
+			pSelfCategoryColor.setBackground(model.config.getSelfCategoryColor(selectedSelfCategoryInner));
+		});*/
 
 
 	}
@@ -497,6 +504,10 @@ public class SettingsDialog extends JDialog {
 		// When user changes a color, save it in the model.
 		bChangeSelfCategoryColor.addActionListener(new ActionSetSelfCategoryColor("Set Self Category Color", model, pSelfCategoryColor,
 				cbSelfCategories));
+
+		//model.config.setImagePath();
+
+
 
 		// Retrieve configured color from "model".
 		cbSelfCategories.addActionListener(e -> {
@@ -657,7 +668,7 @@ public class SettingsDialog extends JDialog {
             model.config.setShowPedestrianInOutGroup(!model.config.isShowPedestrianInOutGroup());
             model.notifyObservers();
         });
-		
+
 		int row = 0;
 		int column = 2;
 		int colSpan = 5;

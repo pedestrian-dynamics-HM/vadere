@@ -118,14 +118,16 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 
 		BufferedImage before = getImage();
 
-		double scale = 2.0*radius/before.getHeight();
-		AffineTransform at = new AffineTransform();
+		if (before != null) {
+			double scale = 2.0 * radius / before.getHeight();
+			AffineTransform at = new AffineTransform();
 
-		// move icon to correct position and scale it so that it covers an agent's torso
-		at.translate(x+radius,y-radius);
-		at.rotate(Math.toRadians(180),-radius,radius);
-		at.scale(-scale,scale);
-		g2.drawImage(before, at, null);
+			// move icon to correct position and scale it so that it covers an agent's torso
+			at.translate(x + radius, y - radius);
+			at.rotate(Math.toRadians(180), -radius, radius);
+			at.scale(-scale, scale);
+			g2.drawImage(before, at, null);
+		}
 
 	}
 

@@ -5,6 +5,7 @@ import org.vadere.state.psychology.cognition.GroupMembership;
 import org.vadere.state.scenario.AerosolCloud;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.HashMap;
 
 public class DefaultConfig {
@@ -28,6 +29,7 @@ public class DefaultConfig {
 	private Color infectiousColor = new Color(202, 76, 76);
 	private HashMap<GroupMembership, Color> groupMembershipColors = new HashMap<>();
 	private boolean changed = false;
+	private BufferedImage image;
 
 	// Constructors
 	public DefaultConfig() {
@@ -199,5 +201,13 @@ public class DefaultConfig {
 	public void setInfectiousColor(Color infectiousColor) {
 		this.infectiousColor = infectiousColor;
 		setChanged();
+	}
+
+	public void setImage(BufferedImage image){
+		this.image = image;
+	}
+
+	public BufferedImage getImage(){
+		return this.image;
 	}
 }

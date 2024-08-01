@@ -2,6 +2,7 @@ package org.vadere.gui.components.view;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.components.model.IDefaultModel;
+import org.vadere.gui.components.model.SimulationModel;
 import org.vadere.meshing.mesh.gen.MeshRenderer;
 import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.state.scenario.*;
@@ -114,11 +115,16 @@ public abstract class DefaultRenderer {
 	}
 
 	public void setImage(final BufferedImage image) {
-		this.image = image;
+
+		SimulationModel simulationModel = (SimulationModel) this.getDefaultModel();
+		simulationModel.getConfig().setImage(image);
 	}
 
 	public BufferedImage getImage(){
-		return this.image;
+
+		SimulationModel simulationModel = (SimulationModel) this.getDefaultModel();
+		return  simulationModel.getConfig().getImage();
+
 	}
 
 	protected void renderPreTransformation(final Graphics2D graphics2D, final int width, final int height) {}
