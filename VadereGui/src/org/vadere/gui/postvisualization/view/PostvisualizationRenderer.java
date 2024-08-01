@@ -125,11 +125,48 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 			// move icon to correct position and scale it so that it covers an agent's torso
 			at.translate(x + radius, y - radius);
 			at.rotate(Math.toRadians(180), -radius, radius);
+
+			double angle = computeAngleWalkingDirection(ped);
+			at.rotate(angle, -radius, radius);
+
 			at.scale(-scale, scale);
 			g2.drawImage(before, at, null);
 		}
 
 	}
+
+
+	private double computeAngleWalkingDirection(Pedestrian pedestrian){
+
+		int pedestrianId = pedestrian.getId();
+		VPoint lastPosition = lastPedestrianPositions.get(pedestrianId);
+		VPoint position = pedestrian.getPosition();
+
+		if (lastPosition != null) {
+			VPoint direction;
+			if (lastPosition.distance(position) < MIN_ARROW_LENGTH) {
+				direction = pedestrianDirections.get(pedestrianId);
+			} else {
+				direction = new VPoint(lastPosition.getX() - position.getX(),
+						lastPosition.getY() - position.getY());
+				direction = direction.norm();
+				pedestrianDirections.put(pedestrianId, direction);
+			}
+
+			if (!pedestrianDirections.containsKey(pedestrianId)) {
+				pedestrianDirections.put(pedestrianId, direction);
+			}
+			if (direction != null) {
+				return Math.atan2(-direction.getY(), -direction.getX());
+			}
+		}
+
+		return 0.0;
+
+	}
+
+
+
 
 	public void renderPedestrians(Graphics2D g, Collection<Pedestrian> pedestrians, Map<Integer, Color> agentColors) {
 
