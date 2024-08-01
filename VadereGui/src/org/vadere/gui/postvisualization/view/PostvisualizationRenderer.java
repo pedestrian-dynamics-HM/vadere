@@ -137,7 +137,7 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 
 
 	private double computeAngleWalkingDirection(Pedestrian pedestrian){
-
+		//TODO: refactor. code duplication
 		int pedestrianId = pedestrian.getId();
 		VPoint lastPosition = lastPedestrianPositions.get(pedestrianId);
 		VPoint position = pedestrian.getPosition();
@@ -160,7 +160,6 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 				return Math.atan2(-direction.getY(), -direction.getX());
 			}
 		}
-
 		return 0.0;
 
 	}
@@ -189,10 +188,7 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 						renderImage(g, pedestrian);
 					}
 
-
 				}
-
-
 
 
 				if (model.config.isShowWalkdirection() &&
