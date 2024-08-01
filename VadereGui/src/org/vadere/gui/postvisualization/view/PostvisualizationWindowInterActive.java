@@ -123,17 +123,6 @@ public class PostvisualizationWindowInterActive extends PostvisualizationWindow 
                 }, "ProjectView.btnShowGroupInformation.tooltip");
 
         addToggleActionToToolbar(toolbar,
-                new ActionVisualization("show_image",
-                        RESOURCE.getIconSVG("image",ICON_SIZE,ICON_SIZE), model) {
-                    @Override
-                    public void actionPerformed(ActionEvent e1) {
-                        model.config.setShowImage(!model.config.isShowImage());
-                        model.notifyObservers();
-                    }
-                }, "ProjectView.btnShowImageInformation.tooltip");
-
-
-        addToggleActionToToolbar(toolbar,
                 new ActionVisualization("show_contacts",RESOURCE.getIconSVG("contacts",ICON_SIZE,ICON_SIZE),
                         model) {
                     @Override
