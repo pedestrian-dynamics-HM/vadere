@@ -205,6 +205,7 @@ public class DefaultConfig {
 
 	public void setImage(BufferedImage image){
 		this.image = image;
+		setChanged();
 	}
 
 	public BufferedImage getImage(){

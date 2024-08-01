@@ -44,6 +44,16 @@ public abstract class DefaultRenderer {
 	private boolean renderNodes = VadereConfig.getConfig().getBoolean("Gui.showNodes");
 	private double nodeRadius = VadereConfig.getConfig().getDouble("Gui.node.radius");
 
+	public Graphics2D getGraphics2D() {
+		return graphics2D;
+	}
+
+	public void setGraphics2D(Graphics2D graphics2D) {
+		this.graphics2D = graphics2D;
+	}
+
+	private Graphics2D graphics2D;
+
 	/**
 	 * <p>Default constructor.</p>
 	 *
@@ -104,8 +114,8 @@ public abstract class DefaultRenderer {
 	public BufferedImage renderImage(final int width, final int height) {
 		synchronized (defaultModel) {
 			BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-			Graphics2D bufferGraphics2D = (Graphics2D) image.getGraphics();
-			renderGraphics(bufferGraphics2D, width, height);
+			graphics2D = (Graphics2D) image.getGraphics();
+			renderGraphics(graphics2D, width, height);
 			return image;
 		}
 	}
@@ -115,9 +125,8 @@ public abstract class DefaultRenderer {
 	}
 
 	public void setImage(final BufferedImage image) {
-
-		SimulationModel simulationModel = (SimulationModel) this.getDefaultModel();
-		simulationModel.getConfig().setImage(image);
+			SimulationModel simulationModel = (SimulationModel) this.getDefaultModel();
+			simulationModel.getConfig().setImage(image);
 	}
 
 	public BufferedImage getImage(){

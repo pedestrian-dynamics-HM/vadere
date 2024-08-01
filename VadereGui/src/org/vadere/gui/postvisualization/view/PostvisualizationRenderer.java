@@ -43,7 +43,7 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 	}
 
 	@Override
-	protected void renderSimulationContent(final Graphics2D g) {
+	public void renderSimulationContent(final Graphics2D g) {
 
 		if (!model.isEmpty()) {
 			Color savedColor = g.getColor();
@@ -131,7 +131,7 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 
 	}
 
-	private void renderPedestrians(Graphics2D g, Collection<Pedestrian> pedestrians, Map<Integer, Color> agentColors) {
+	public void renderPedestrians(Graphics2D g, Collection<Pedestrian> pedestrians, Map<Integer, Color> agentColors) {
 
 		AgentRender agentRender = getAgentRender();
 

@@ -505,9 +505,6 @@ public class SettingsDialog extends JDialog {
 		bChangeSelfCategoryColor.addActionListener(new ActionSetSelfCategoryColor("Set Self Category Color", model, pSelfCategoryColor,
 				cbSelfCategories));
 
-		//model.config.setImagePath();
-
-
 
 		// Retrieve configured color from "model".
 		cbSelfCategories.addActionListener(e -> {
