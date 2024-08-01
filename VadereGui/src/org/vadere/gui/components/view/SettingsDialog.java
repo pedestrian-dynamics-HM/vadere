@@ -9,9 +9,9 @@ import org.vadere.gui.components.model.AgentColoring;
 import org.vadere.gui.components.model.DefaultSimulationConfig;
 import org.vadere.gui.components.model.SimulationModel;
 import org.vadere.gui.components.utils.Messages;
+import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.components.utils.SwingUtils;
 import org.vadere.gui.postvisualization.control.ActionCloseSettingDialog;
-import org.vadere.gui.postvisualization.control.ActionImageOverlay;
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.psychology.information.InformationState;
 import org.vadere.state.scenario.Target;
@@ -21,6 +21,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
 import java.util.Optional;
 
 public class SettingsDialog extends JDialog {
@@ -301,7 +302,7 @@ public class SettingsDialog extends JDialog {
 
 		initColoringBySelfCategory(cbSelfCategories, pSelfCategoryColor, bChangeSelfCategoryColor);
 
-		JComboBox<String> cbImagePaths = new JComboBox<>(new String[]{"daisy.png", "zombie.png"});
+		JComboBox<String> cbImagePaths = createImagePathComboBox();
 		//final JButton bImageOverlay = new JButton(Messages.getString("SettingsDialog.btnEditColor.text"));
 		initImageOverlay(cbImagePaths);
 
@@ -437,24 +438,27 @@ public class SettingsDialog extends JDialog {
 		return comboBox;
 	}
 
+	private JComboBox<String> createImagePathComboBox() {
+
+		String[] imageList = new String[]{"daisy.png", "zombie.png"};
+
+		File directory = new File(Resources.class.getResource("/agent_icons/").getPath());
+
+		File[] dd = directory.listFiles();
+		//TODO add check
+
+		JComboBox<String> cbImagePath = new JComboBox<>(imageList);
+
+		return cbImagePath;
+	}
+
 	private JComboBox<InformationState> createInformationStateComboBox() {
 		JComboBox<InformationState> comboBox = new JComboBox<>(InformationState.values());
 		return comboBox;
 	}
 
 	private void initImageOverlay(JComboBox<String> comboBox){
-
 		comboBox.addActionListener(new ActionSetImageOverlay("Set image", model, comboBox)) ;
-
-
-
-		/*
-		comboBox.addActionListener(e -> {
-			String selectedPath = comboBox.getItemAt(comboBox.getSelectedIndex());
-			pSelfCategoryColor.setBackground(model.config.getSelfCategoryColor(selectedSelfCategoryInner));
-		});*/
-
-
 	}
 
 	private void initColoringByTargetId(JComboBox<Integer> cbTargetIds, JPanel pTargetColor, JButton bChangeTargetColor, JButton bChangePedestrianColorNoTarget, JPanel pPedestrianColorNoTarget) {
