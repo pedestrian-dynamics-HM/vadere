@@ -307,6 +307,8 @@ public abstract class SimulationRenderer extends DefaultRenderer {
 		        return model.config.getColorByTargetId(targetId).orElseGet(model.config::getPedestrianDefaultColor);
 		    case RANDOM:
 		        return model.config.getRandomColor(agent.getId());
+            case IMAGE_OVERLAY:
+                return model.config.getImageOverlay();
             case SELF_CATEGORY:
                 if (agent instanceof Pedestrian) {
                     Pedestrian pedestrian = (Pedestrian) agent;

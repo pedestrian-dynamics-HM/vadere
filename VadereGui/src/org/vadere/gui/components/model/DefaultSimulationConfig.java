@@ -372,6 +372,10 @@ public class DefaultSimulationConfig extends DefaultConfig {
 		return randomColors.get(pedId);
 	}
 
+	public Color getImageOverlay(){
+		return Color.WHITE;
+	}
+
 	public void setSelfCategoryColor(SelfCategory selfCategory, final Color color) {
 		this.selfCategoryColors.put(selfCategory.ordinal(), color);
 		setChanged();

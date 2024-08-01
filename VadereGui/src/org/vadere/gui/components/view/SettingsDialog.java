@@ -11,6 +11,7 @@ import org.vadere.gui.components.model.SimulationModel;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.components.utils.SwingUtils;
 import org.vadere.gui.postvisualization.control.ActionCloseSettingDialog;
+import org.vadere.gui.postvisualization.control.ActionImageOverlay;
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.psychology.information.InformationState;
 import org.vadere.state.scenario.Target;
@@ -270,6 +271,7 @@ public class SettingsDialog extends JDialog {
 		JRadioButton rbSelfCategoryColoring = createRadioButtonWithListener(AgentColoring.SELF_CATEGORY, Messages.getString("SettingsDialog.lblSelfCategoryColoring.text")+ ":");
 		JRadioButton rbHealthStatusColoring = createRadioButtonWithListener(AgentColoring.HEALTH_STATUS, Messages.getString("SettingsDialog.lblHealthStatusColoring.text")+ ":");
 		JRadioButton rbInformationColoring = createRadioButtonWithListener(AgentColoring.INFORMATION_STATE, Messages.getString("SettingsDialog.lblInformationColoring.text")+ ":");
+		JRadioButton rbImageOverlay = createRadioButtonWithListener(AgentColoring.IMAGE_OVERLAY, Messages.getString("SettingsDialog.tfUseImageOverlay.text"));
 
 
 		rbTargetColoring.setSelected(true);
@@ -278,10 +280,12 @@ public class SettingsDialog extends JDialog {
 		group = new ButtonGroup();
 		group.add(rbTargetColoring);
 		group.add(rbRandomColoring);
+		group.add(rbImageOverlay);
 		group.add(rbGroupColoring);
 		group.add(rbSelfCategoryColoring);
 		group.add(rbHealthStatusColoring);
 		group.add(rbInformationColoring);
+
 
 		JComboBox<Integer> cbTargetIds = createTargetIdsComboBoxAndAddIds();
 		final JPanel pTargetColor = new JPanel();
@@ -296,6 +300,12 @@ public class SettingsDialog extends JDialog {
 		final JButton bChangeSelfCategoryColor = new JButton(Messages.getString("SettingsDialog.btnEditColor.text"));
 
 		initColoringBySelfCategory(cbSelfCategories, pSelfCategoryColor, bChangeSelfCategoryColor);
+
+
+		JTextField textFieldImageOverlay = new JTextField("VadereGui/resources/agent_icons/daisy.png");
+		final JPanel pImageOverlay = new JPanel();
+		initImageOverlay(textFieldImageOverlay,pImageOverlay);
+
 
 		final JPanel pPedestrianColorLowerExposure = new JPanel();
 		final JButton bChangePedestrianColorLowerExposure = new JButton(Messages.getString("SettingsDialog.btnEditColor.text"));
@@ -351,7 +361,6 @@ public class SettingsDialog extends JDialog {
 		colorSettingsPane.add(cbTargetIds, cc.xy(column2, row));
 		colorSettingsPane.add(pTargetColor, cc.xy(column4, row));
 		colorSettingsPane.add(bChangeTargetColor, cc.xy(column5, row));
-
 		colorSettingsPane.add(new JLabel(Messages.getString("SettingsDialog.lblPedestrianNoTarget.text") + ":"), cc.xy(column2, row += NEXT_CELL));
 		colorSettingsPane.add(pPedestrianColorNoTarget, cc.xy(column4, row));
 		colorSettingsPane.add(bChangePedestrianColorNoTarget, cc.xy(column5, row));
@@ -363,6 +372,11 @@ public class SettingsDialog extends JDialog {
 		colorSettingsPane.add(cbSelfCategories, cc.xy(column2, row));
 		colorSettingsPane.add(pSelfCategoryColor, cc.xy(column4, row));
 		colorSettingsPane.add(bChangeSelfCategoryColor, cc.xy(column5, row));
+
+		colorSettingsPane.add(rbImageOverlay, cc.xy(column1, row += NEXT_CELL));
+		colorSettingsPane.add(textFieldImageOverlay, cc.xy(column2, row));
+
+
 
 		colorSettingsPane.add(rbHealthStatusColoring, cc.xy(column1, row += NEXT_CELL));
 		colorSettingsPane.add(new JLabel(Messages.getString("SettingsDialog.lblPedestrianLowerExposure.text") + ":"), cc.xy(column2, row));
@@ -384,18 +398,27 @@ public class SettingsDialog extends JDialog {
 		colorSettingsPane.add(pInformationStateColor, cc.xy(column4, row));
 		colorSettingsPane.add(bChangeInformationStateColor, cc.xy(column5, row));
 
+
 		// Evacuation time and criteria coloring comes in the next row see "postvisualization/.../SettingsDialog.java".
 	}
 
 	private JRadioButton createRadioButtonWithListener(AgentColoring colorScheme, String buttonText) {
 		JRadioButton radioButton = new JRadioButton(buttonText);
 		radioButton.addItemListener(e -> {
+			model.config.setShowImage(colorScheme.equals(AgentColoring.IMAGE_OVERLAY));
 			model.setAgentColoring(colorScheme);
 			model.notifyObservers();
 		});
 
 		return radioButton;
 	}
+
+
+
+
+
+
+
 
 	private JComboBox<Integer> createTargetIdsComboBoxAndAddIds() {
 		java.util.List<Target> targets = model.getTopography().getTargets();
@@ -420,6 +443,13 @@ public class SettingsDialog extends JDialog {
 		return comboBox;
 	}
 
+	private void initImageOverlay(JTextField textFieldImageOverlay, JPanel pImageOverlay){
+
+		textFieldImageOverlay.addActionListener(new ActionSetImageOverlay("Set image", model, pImageOverlay, textFieldImageOverlay)) ;
+
+
+	}
+
 	private void initColoringByTargetId(JComboBox<Integer> cbTargetIds, JPanel pTargetColor, JButton bChangeTargetColor, JButton bChangePedestrianColorNoTarget, JPanel pPedestrianColorNoTarget) {
 		cbTargetIds.setSelectedIndex(0);
 
@@ -435,6 +465,7 @@ public class SettingsDialog extends JDialog {
 		// When user changes a color, save it in the model.
 		bChangeTargetColor.addActionListener(new ActionSetPedestrianColor("Set Pedestrian Color", model, pTargetColor,
 				cbTargetIds));
+
 
 		// Retrieve configured color from "model" or use default color.
 		cbTargetIds.addActionListener(e -> {
@@ -626,7 +657,7 @@ public class SettingsDialog extends JDialog {
             model.config.setShowPedestrianInOutGroup(!model.config.isShowPedestrianInOutGroup());
             model.notifyObservers();
         });
-
+		
 		int row = 0;
 		int column = 2;
 		int colSpan = 5;
