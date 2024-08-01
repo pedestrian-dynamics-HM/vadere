@@ -335,7 +335,14 @@ public abstract class SimulationRenderer extends DefaultRenderer {
             case HEALTH_STATUS: {
                 if (agent instanceof Pedestrian) {
                     Pedestrian pedestrian = (Pedestrian) agent;
-                    return model.config.getHealthStatusColor(pedestrian.isInfectious(), pedestrian.getDegreeOfExposure());
+
+                    boolean isInfectious = false;
+                    double degreeOfExposure = 0.0;
+                    if (pedestrian.getHealthStatus() != null) {
+                        isInfectious = pedestrian.isInfectious();
+                        degreeOfExposure = pedestrian.getDegreeOfExposure();
+                    }
+                    return model.config.getHealthStatusColor(isInfectious, degreeOfExposure);
                 }
             }
 		    default: return model.config.getPedestrianColor();
