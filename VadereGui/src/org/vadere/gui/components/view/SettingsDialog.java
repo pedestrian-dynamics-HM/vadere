@@ -12,21 +12,20 @@ import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.components.utils.SwingUtils;
 import org.vadere.gui.postvisualization.control.ActionCloseSettingDialog;
+import org.vadere.gui.postvisualization.view.ComboBoxMultiSelect;
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.psychology.information.InformationState;
 import org.vadere.state.scenario.Target;
 import org.vadere.util.config.VadereConfig;
+import org.vadere.util.io.IOUtils;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
-import java.util.Arrays;
+import java.util.*;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class SettingsDialog extends JDialog {
@@ -308,7 +307,7 @@ public class SettingsDialog extends JDialog {
 		initColoringBySelfCategory(cbSelfCategories, pSelfCategoryColor, bChangeSelfCategoryColor);
 
 		//JComboBox<String> cbImagePaths = createImagePathComboBox();
-		JList<String> cbImagePaths = createImagePathSelList();
+		ComboBoxMultiSelect<String> cbImagePaths = createImagePathSelList();
 		initImageOverlay(cbImagePaths);
 
 
@@ -445,14 +444,17 @@ public class SettingsDialog extends JDialog {
 
 
 
-	private JList<String> createImagePathSelList() {
+	private ComboBoxMultiSelect<String> createImagePathSelList() {
 
-		File directory = new File(Resources.class.getResource("/agent_icons/").getPath());
-		String[] files = Stream.of(directory.listFiles()).filter(file -> !file.isDirectory()).map(File::getName).toArray(String[]::new);
+		ComboBoxMultiSelect cb = new ComboBoxMultiSelect();
 
-		JList<String> jList = new JList<>(files);
-		jList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-		return jList;
+		List<String> files  =  IOUtils.getFileNameList(config.getImageDirectory(), ".png");
+
+		for (String f : files) {
+			cb.addItem(f);
+		}
+		cb.setSelectedElements(files);
+		return cb;
 	}
 
 	private JComboBox<InformationState> createInformationStateComboBox() {
@@ -460,8 +462,10 @@ public class SettingsDialog extends JDialog {
 		return comboBox;
 	}
 
-	private void initImageOverlay(JList<String> jlist){
-		jlist.addListSelectionListener(new ActionSetImageOverlay("Set image", model, jlist));
+
+
+	private void initImageOverlay(ComboBoxMultiSelect<String> jlist){
+		jlist.addActionListener(new ActionSetImageOverlay("Set image", model, jlist));
 	}
 
 	private void initColoringByTargetId(JComboBox<Integer> cbTargetIds, JPanel pTargetColor, JButton bChangeTargetColor, JButton bChangePedestrianColorNoTarget, JPanel pPedestrianColorNoTarget) {

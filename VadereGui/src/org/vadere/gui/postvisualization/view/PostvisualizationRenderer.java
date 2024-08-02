@@ -114,10 +114,14 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 		double y = ped.getPosition().getY();
 		double radius = ped.getRadius();
 
+
+		BufferedImage before = null;
+
 		// choose image dependent on pedestrian id
-		BufferedImage before;
-		int index = ped.getId() % getImage().size();
-		before = getImage().get(index);
+		if (getImage().size() > 0) {
+			int index = ped.getId() % getImage().size();
+			before = getImage().get(index);
+		}
 
 		// draw image over pedestrian
 		if (before != null) {

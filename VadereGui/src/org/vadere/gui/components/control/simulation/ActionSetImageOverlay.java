@@ -1,37 +1,37 @@
 package org.vadere.gui.components.control.simulation;
 
-import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.components.model.DefaultSimulationConfig;
 import org.vadere.gui.components.model.SimulationModel;
-import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.components.view.SimulationRenderer;
 import org.vadere.gui.onlinevisualization.view.IRendererChangeListener;
+import org.vadere.gui.postvisualization.view.ComboBoxMultiSelect;
+import org.vadere.util.config.VadereConfig;
+import org.vadere.util.logging.Logger;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-public class ActionSetImageOverlay extends ActionVisualization implements IRendererChangeListener, ListSelectionListener {
-    private final JList<String> jList;
+public class ActionSetImageOverlay extends ActionVisualization implements IRendererChangeListener {
+
+    private static final Logger LOGGER = Logger.getLogger(ActionSetImageOverlay.class);
+
+    private final ComboBoxMultiSelect<String> jList;
 
     public ActionSetImageOverlay(final String name, final SimulationModel<? extends DefaultSimulationConfig> model,
-                                 final JList<String> jList) {
+                                 final ComboBoxMultiSelect<String> jList) {
         super(name, model);
         this.jList = jList;
-        setInitialImage();
+        initializeImage();
+
     }
 
-    private void setInitialImage(){
-
-        jList.setSelectedIndex(0);
-        List<String> images = jList.getSelectedValuesList();
-        LinkedList<BufferedImage> linkedList = getBufferedImageLinkedList(images);
+    private void initializeImage() {
+        LinkedList<BufferedImage> linkedList = getBufferedImageLinkedList(jList.getSelectedElements());
         model.config.setImage(linkedList);
         model.notifyObservers();
     }
@@ -41,28 +41,53 @@ public class ActionSetImageOverlay extends ActionVisualization implements IRende
     }
 
     @Override
-    public void valueChanged(ListSelectionEvent e) {
+    public void actionPerformed(final ActionEvent e) {
 
+        Object obj = jList.getSelectedItem();
+        if (jList.getSelectedElements().contains(obj)) {
+            jList.removeItemObject(obj);
+        } else {
+            jList.addItemObject(obj);
+        }
 
-        List<String> images = jList.getSelectedValuesList();
+        List<Object> images = jList.getSelectedElements();
         LinkedList<BufferedImage> linkedList = getBufferedImageLinkedList(images);
         model.config.setImage(linkedList);
         model.notifyObservers();
-
+        super.actionPerformed(e);
 
     }
 
-    private static LinkedList<BufferedImage> getBufferedImageLinkedList(List<String> images) {
+    private LinkedList<BufferedImage> getBufferedImageLinkedList(List<Object> images) {
         BufferedImage image;
         LinkedList<BufferedImage> linkedList = new LinkedList<>();
-        for(String imageName: images){
+
+        for(Object imageName: images){
             try {
-                image = ImageIO.read(Resources.class.getResource("/agent_icons/" + imageName));
+                File imagePath = new File(model.config.getImageDirectory(), (String) imageName);
+                image = ImageIO.read(imagePath);
+
+                checkImageRatio(image, imagePath);
+
+
                 linkedList.add(image);
             } catch (IOException event) {
                 throw new RuntimeException(event);
             }
         }
         return linkedList;
+    }
+
+    private void checkImageRatio (BufferedImage image, File imagePath) {
+        double h = image.getHeight();
+        double w = image.getWidth();
+        double aspectRatio =  w/h;
+        double aspectRatioAllowed = 1.2;
+
+        if (aspectRatio > aspectRatioAllowed || aspectRatioAllowed < 1/aspectRatioAllowed){
+            LOGGER.info("Image " + imagePath.toString() + ": side lengths differ strongly." +
+                    "Width = " +  image.getWidth() + ". Height = " + image.getHeight() + "." +
+                     " Aspect ratio: " + aspectRatio + ". It is recommended to use quadratic images.");
+        }
     }
 }

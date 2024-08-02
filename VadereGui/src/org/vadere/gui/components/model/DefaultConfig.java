@@ -1,11 +1,13 @@
 package org.vadere.gui.components.model;
 
+import org.vadere.gui.components.utils.Resources;
 import org.vadere.state.attributes.models.infection.AttributesAirTransmissionModel;
 import org.vadere.state.psychology.cognition.GroupMembership;
 import org.vadere.state.scenario.AerosolCloud;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.HashMap;
 import java.util.LinkedList;
 
@@ -31,6 +33,7 @@ public class DefaultConfig {
 	private HashMap<GroupMembership, Color> groupMembershipColors = new HashMap<>();
 	private boolean changed = false;
 	private LinkedList<BufferedImage> linkedListImages = new LinkedList<>();
+
 
 	// Constructors
 	public DefaultConfig() {
@@ -212,6 +215,7 @@ public class DefaultConfig {
 	public LinkedList<BufferedImage> getImage(){
 		return this.linkedListImages;
 	}
+
 
 
 }
