@@ -44,27 +44,12 @@ public class ComboBoxMultiSelect<E> extends JComboBox<E> {
         comboItem.clear();
     }
 
-    public void clearSelectedItems() {
-        selectedItems.clear();
-        Component editorCom = getEditor().getEditorComponent();
-        if (editorCom instanceof JScrollPane) {
-            JScrollPane scroll = (JScrollPane) editorCom;
-            JPanel panel = (JPanel) scroll.getViewport().getComponent(0);
-            panel.removeAll();
-            revalidate();
-            repaint();
-            comboList.repaint();
-        }
-    }
-
     private final List<Object> selectedItems = new ArrayList<>();
     private final ComboBoxMultiCellEditor comboBoxMultiCellEditor;
     private Component comboList;
 
     public void removeItemObject(Object obj) {
-        System.out.println("Remove :" + obj);
         selectedItems.remove(obj);
-        System.out.println(selectedItems);
         comboBoxMultiCellEditor.removeItem(obj);
         if (comboList != null) {
             comboList.repaint();
@@ -72,23 +57,12 @@ public class ComboBoxMultiSelect<E> extends JComboBox<E> {
     }
 
     public void addItemObject(Object obj) {
-        System.out.println("Add :" + obj);
         selectedItems.add(obj);
-        System.out.println(selectedItems);
         comboBoxMultiCellEditor.addItem(obj);
         if (comboList != null) {
             comboList.repaint();
         }
     }
-
-    public void addItemObjectUnselected(Object obj) {
-        System.out.println("Add :" + obj);
-        comboBoxMultiCellEditor.addItem(obj);
-        if (comboList != null) {
-            comboList.repaint();
-        }
-    }
-
 
     public ComboBoxMultiSelect() {
         setUI(new ComboBoxMultiUI());
@@ -96,22 +70,6 @@ public class ComboBoxMultiSelect<E> extends JComboBox<E> {
         setRenderer(new ComboBoxMultiCellRenderer());
         setEditor(comboBoxMultiCellEditor);
         setEditable(true);
-        /*addActionListener((e) -> {
-            if (e.getModifiers() == ActionEvent.MOUSE_EVENT_MASK) {
-                JComboBox combo = (JComboBox) e.getSource();
-                Object obj = combo.getSelectedItem();
-                if (selectedItems.contains(obj)) {
-                    System.out.println("Remove header :" + obj);
-                    removeItemObject(obj);
-                } else {
-                    System.out.println("Upper header :" + obj);
-                    addItemObject(obj);
-                }
-            }
-        });
-
-        */
-
     }
 
     @Override
@@ -159,13 +117,11 @@ public class ComboBoxMultiSelect<E> extends JComboBox<E> {
         protected final JPanel panel;
 
         protected void addItem(Object obj) {
-
             Item item = new Item(obj);
             panel.add(item);
             panel.repaint();
             panel.revalidate();
-
-
+            
         }
 
         protected void removeItem(Object obj) {
@@ -232,8 +188,6 @@ public class ComboBoxMultiSelect<E> extends JComboBox<E> {
             super(item.toString());
             this.item = item;
         }
-
-
 
         @Override
         protected void paintComponent(Graphics g) {

@@ -384,7 +384,10 @@ public class DefaultSimulationConfig extends DefaultConfig {
 	}
 
 	public Color getImageOverlay(){
-		return Color.WHITE;
+
+		Color color = new Color(0.f, 0.f, 0.f, 0.f);  // transparent
+		return color;
+
 	}
 
 	public void setSelfCategoryColor(SelfCategory selfCategory, final Color color) {

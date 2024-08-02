@@ -21,13 +21,15 @@ public class ActionSetImageOverlay extends ActionVisualization implements IRende
                                  final ComboBoxMultiSelect<String> jList) {
         super(name, model);
         this.jList = jList;
+        initializeImage();
 
+    }
+
+    private void initializeImage() {
         LinkedList<BufferedImage> linkedList = getBufferedImageLinkedList(jList.getSelectedItems());
         model.config.setImage(linkedList);
         model.notifyObservers();
     }
-
-
 
     @Override
     public void update(SimulationRenderer renderer) {
@@ -43,10 +45,7 @@ public class ActionSetImageOverlay extends ActionVisualization implements IRende
             jList.addItemObject(obj);
         }
 
-
         List<Object> images = jList.getSelectedItems();
-        System.out.println( "Selected:" + images);
-
         LinkedList<BufferedImage> linkedList = getBufferedImageLinkedList(images);
         model.config.setImage(linkedList);
         model.notifyObservers();
