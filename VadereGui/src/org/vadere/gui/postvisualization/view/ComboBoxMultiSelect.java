@@ -26,6 +26,18 @@ import javax.swing.plaf.basic.ComboPopup;
 
 public class ComboBoxMultiSelect<E> extends JComboBox<E> {
 
+    private final List<Object> selectedItems = new ArrayList<>();
+    private final ComboBoxMultiCellEditor comboBoxMultiCellEditor;
+    private Component comboList;
+
+    public ComboBoxMultiSelect() {
+        setUI(new ComboBoxMultiUI());
+        comboBoxMultiCellEditor = new ComboBoxMultiCellEditor();
+        setRenderer(new ComboBoxMultiCellRenderer());
+        setEditor(comboBoxMultiCellEditor);
+        setEditable(true);
+    }
+
     public List<Object> getSelectedItems() {
         return selectedItems;
     }
@@ -44,10 +56,6 @@ public class ComboBoxMultiSelect<E> extends JComboBox<E> {
         comboItem.clear();
     }
 
-    private final List<Object> selectedItems = new ArrayList<>();
-    private final ComboBoxMultiCellEditor comboBoxMultiCellEditor;
-    private Component comboList;
-
     public void removeItemObject(Object obj) {
         selectedItems.remove(obj);
         comboBoxMultiCellEditor.removeItem(obj);
@@ -64,13 +72,6 @@ public class ComboBoxMultiSelect<E> extends JComboBox<E> {
         }
     }
 
-    public ComboBoxMultiSelect() {
-        setUI(new ComboBoxMultiUI());
-        comboBoxMultiCellEditor = new ComboBoxMultiCellEditor();
-        setRenderer(new ComboBoxMultiCellRenderer());
-        setEditor(comboBoxMultiCellEditor);
-        setEditable(true);
-    }
 
     @Override
     public void setPopupVisible(boolean v) {
@@ -121,7 +122,7 @@ public class ComboBoxMultiSelect<E> extends JComboBox<E> {
             panel.add(item);
             panel.repaint();
             panel.revalidate();
-            
+
         }
 
         protected void removeItem(Object obj) {
