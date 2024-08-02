@@ -1,6 +1,5 @@
 package org.vadere.gui.postvisualization.view;
 
-import org.jetbrains.annotations.Nullable;
 import org.vadere.gui.components.view.DefaultRenderer;
 import org.vadere.gui.components.view.SimulationRenderer;
 import org.vadere.gui.postvisualization.model.PostvisualizationModel;
@@ -16,9 +15,7 @@ import tech.tablesaw.api.Table;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Path2D;
-import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import java.awt.image.ImageObserver;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -129,46 +126,22 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 
 			at.translate(x + radius, y - radius);
 			at.rotate(Math.toRadians(180), -radius, radius);
-			
-			double angle = computeAngleWalkingDirection(ped); // allow torso rotation
-			at.rotate(angle, -radius, radius);
+
+
+			computeWalkingDirection(ped);
+			if (pedestrianDirections.containsKey(ped.getId())){
+				VPoint direction = pedestrianDirections.get(ped.getId());
+				if (direction != null) {
+					double angle = Math.atan2(-direction.getY(), -direction.getX());
+					at.rotate(angle, -radius, radius);
+				}
+			}
 
 			at.scale(-scale, scale);
 			g2.drawImage(before, at, null);
 		}
 
 	}
-
-
-
-	private double computeAngleWalkingDirection(Pedestrian pedestrian){
-		//TODO: refactor. code duplication
-		int pedestrianId = pedestrian.getId();
-		VPoint lastPosition = lastPedestrianPositions.get(pedestrianId);
-		VPoint position = pedestrian.getPosition();
-
-		if (lastPosition != null) {
-			VPoint direction;
-			if (lastPosition.distance(position) < MIN_ARROW_LENGTH) {
-				direction = pedestrianDirections.get(pedestrianId);
-			} else {
-				direction = new VPoint(lastPosition.getX() - position.getX(),
-						lastPosition.getY() - position.getY());
-				direction = direction.norm();
-				pedestrianDirections.put(pedestrianId, direction);
-			}
-
-			if (!pedestrianDirections.containsKey(pedestrianId)) {
-				pedestrianDirections.put(pedestrianId, direction);
-			}
-			if (direction != null) {
-				return Math.atan2(-direction.getY(), -direction.getX());
-			}
-		}
-		return 0.0;
-
-	}
-
 
 
 
@@ -192,9 +165,7 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 					if (model.config.isShowImage()) {
 						renderImage(g, pedestrian);
 					}
-
 				}
-
 
 				if (model.config.isShowWalkdirection() &&
 						(model.config.isShowFaydedPedestrians() || model.getTrajectories().getDeathTime(pedestrian.getId()) > model.getSimTimeInSec())) {
@@ -205,6 +176,23 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 	}
 
 	private void renderWalkingDirection(Graphics2D g, Pedestrian pedestrian) {
+
+		computeWalkingDirection(pedestrian);
+		if (pedestrianDirections.containsKey(pedestrian.getId())) {
+			VPoint direction = pedestrianDirections.get(pedestrian.getId());
+			VPoint position = pedestrian.getPosition();
+
+			if (direction != null) {
+				double theta = Math.atan2(-direction.getY(), -direction.getX());
+				DefaultRenderer.drawArrow(g, theta,
+						position.getX() - pedestrian.getRadius() * 2 * direction.getX(),
+						position.getY() - pedestrian.getRadius() * 2 * direction.getY());
+			}
+		}
+	}
+
+
+	private void computeWalkingDirection(Pedestrian pedestrian){
 
 		int pedestrianId = pedestrian.getId();
 		VPoint lastPosition = lastPedestrianPositions.get(pedestrianId);
@@ -226,14 +214,9 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 			if (!pedestrianDirections.containsKey(pedestrianId)) {
 				pedestrianDirections.put(pedestrianId, direction);
 			}
-			if (direction != null) {
-				double theta = Math.atan2(-direction.getY(), -direction.getX());
-				DefaultRenderer.drawArrow(g, theta,
-						position.getX() - pedestrian.getRadius() * 2 * direction.getX(),
-						position.getY() - pedestrian.getRadius() * 2 * direction.getY());
-			}
 		}
 	}
+
 
 	private void renderConnectingLinesByContact(Graphics2D g) {
 		boolean showContacts = model.config.isShowContacts() && !model.getContactData().isEmpty();
