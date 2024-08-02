@@ -1,5 +1,6 @@
 package org.vadere.gui.postvisualization.view;
 
+import org.jetbrains.annotations.Nullable;
 import org.vadere.gui.components.view.DefaultRenderer;
 import org.vadere.gui.components.view.SimulationRenderer;
 import org.vadere.gui.postvisualization.model.PostvisualizationModel;
@@ -116,7 +117,8 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 		double y = ped.getPosition().getY();
 		double radius = ped.getRadius();
 
-		BufferedImage before = getImage();
+
+		BufferedImage before = getNextBufferedImage();
 
 		if (before != null) {
 			double scale = 2.0 * radius / before.getHeight();
@@ -133,6 +135,24 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 			g2.drawImage(before, at, null);
 		}
 
+	}
+
+	@Nullable
+	private BufferedImage getNextBufferedImage() {
+		BufferedImage before = null;
+		int index = this.getLastImageIndex();
+
+		if (!getImage().isEmpty()) {
+		    before = getImage().get(index);
+		}
+
+		// iterate through list of buffered images
+		if (index < getImage().size() - 1){
+			this.setLastImageIndex( index + 1 );
+		} else {
+			this.setLastImageIndex( 0 );
+		}
+		return before;
 	}
 
 

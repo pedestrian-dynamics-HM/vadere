@@ -83,10 +83,11 @@ public class PostvisualizationWindow extends JPanel implements Observer {
         // 2. set up the model
         model.addObserver(this);
         model.config.setLoadTopographyInformationsOnly(loadTopographyInformationsOnly);
-        model.config.setImage(getImage());
+        //model.config.setImage(getImage());
 
         // 3. set up renderer (he draws also the svg and the png's)
         renderer.setLogo(resources.getImage("vadere.png"));
+
 
 
 

@@ -30,6 +30,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.Collection;
+import java.util.LinkedList;
 
 /**
  * @author Benedikt Zoennchen
@@ -124,12 +125,12 @@ public abstract class DefaultRenderer {
 		this.logo = logo;
 	}
 
-	public void setImage(final BufferedImage image) {
+	public void setImage(LinkedList<BufferedImage> image) {
 			SimulationModel simulationModel = (SimulationModel) this.getDefaultModel();
 			simulationModel.getConfig().setImage(image);
 	}
 
-	public BufferedImage getImage(){
+	public LinkedList<BufferedImage> getImage(){
 
 		SimulationModel simulationModel = (SimulationModel) this.getDefaultModel();
 		return  simulationModel.getConfig().getImage();

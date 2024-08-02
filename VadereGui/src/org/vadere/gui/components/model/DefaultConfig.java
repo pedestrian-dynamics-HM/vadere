@@ -7,6 +7,7 @@ import org.vadere.state.scenario.AerosolCloud;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
+import java.util.LinkedList;
 
 public class DefaultConfig {
 
@@ -29,7 +30,7 @@ public class DefaultConfig {
 	private Color infectiousColor = new Color(202, 76, 76);
 	private HashMap<GroupMembership, Color> groupMembershipColors = new HashMap<>();
 	private boolean changed = false;
-	private BufferedImage image;
+	private LinkedList<BufferedImage> linkedListImages = new LinkedList<>();
 
 	// Constructors
 	public DefaultConfig() {
@@ -203,12 +204,14 @@ public class DefaultConfig {
 		setChanged();
 	}
 
-	public void setImage(BufferedImage image){
-		this.image = image;
+	public void setImage(LinkedList<BufferedImage> image){
+		this.linkedListImages = image;
 		setChanged();
 	}
 
-	public BufferedImage getImage(){
-		return this.image;
+	public LinkedList<BufferedImage> getImage(){
+		return this.linkedListImages;
 	}
+
+
 }

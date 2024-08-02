@@ -23,6 +23,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -442,30 +443,15 @@ public class SettingsDialog extends JDialog {
 		return comboBox;
 	}
 
-	private JComboBox<String> createImagePathComboBox() {
 
-		String[] imageList = new String[]{"daisy.png", "zombie.png"};
-
-		File directory = new File(Resources.class.getResource("/agent_icons/").getPath());
-
-
-		Set<String> files = Stream.of(directory.listFiles()).filter(file -> !file.isDirectory()).map(File::getName).collect(Collectors.toSet());
-
-		JComboBox<String> cbImagePath = new JComboBox<>(imageList);
-
-		return cbImagePath;
-	}
 
 	private JList<String> createImagePathSelList() {
 
 		File directory = new File(Resources.class.getResource("/agent_icons/").getPath());
-		Set<String> files = Stream.of(directory.listFiles()).filter(file -> !file.isDirectory()).map(File::getName).collect(Collectors.toSet());
+		String[] files = Stream.of(directory.listFiles()).filter(file -> !file.isDirectory()).map(File::getName).toArray(String[]::new);
 
-
-		String[] imageList = new String[]{"daisy.png", "zombie.png"};
-		JList<String> jList = new JList<>(imageList);
+		JList<String> jList = new JList<>(files);
 		jList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-
 		return jList;
 	}
 
