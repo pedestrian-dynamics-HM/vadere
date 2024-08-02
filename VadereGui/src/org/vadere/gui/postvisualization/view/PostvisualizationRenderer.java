@@ -142,16 +142,15 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 		BufferedImage before = null;
 		int index = this.getLastImageIndex();
 
+		// reset index
+		if (!(index < getImage().size())){ index = 0;}
+
 		if (!getImage().isEmpty()) {
-		    before = getImage().get(index);
+			before = getImage().get(index);
 		}
 
-		// iterate through list of buffered images
-		if (index < getImage().size() - 1){
-			this.setLastImageIndex( index + 1 );
-		} else {
-			this.setLastImageIndex( 0 );
-		}
+		setLastImageIndex(index+1);
+
 		return before;
 	}
 
