@@ -24,28 +24,6 @@ public class ActionSetImageOverlay extends ActionVisualization implements IRende
         this.jList = comboBox;
     }
 
-
-
-    @Override
-    public void actionPerformed(final ActionEvent event) {
-
-        System.out.println("action Performed:");
-
-        String imageName = jList.getSelectedValuesList().get(0);
-        System.out.println(imageName);
-
-        BufferedImage image;
-        try {
-            image = ImageIO.read(Resources.class.getResource("/agent_icons/" + imageName));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        model.config.setImage(image);
-        model.notifyObservers();
-        super.actionPerformed(event);
-
-    }
-
     @Override
     public void update(SimulationRenderer renderer) {
     }
