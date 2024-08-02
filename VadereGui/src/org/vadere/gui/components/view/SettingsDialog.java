@@ -12,6 +12,7 @@ import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.components.utils.SwingUtils;
 import org.vadere.gui.postvisualization.control.ActionCloseSettingDialog;
+import org.vadere.gui.postvisualization.view.ComboBoxMultiSelect;
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.psychology.information.InformationState;
 import org.vadere.state.scenario.Target;
@@ -308,7 +309,7 @@ public class SettingsDialog extends JDialog {
 		initColoringBySelfCategory(cbSelfCategories, pSelfCategoryColor, bChangeSelfCategoryColor);
 
 		//JComboBox<String> cbImagePaths = createImagePathComboBox();
-		JList<String> cbImagePaths = createImagePathSelList();
+		ComboBoxMultiSelect<String> cbImagePaths = createImagePathSelList();
 		initImageOverlay(cbImagePaths);
 
 
@@ -445,14 +446,16 @@ public class SettingsDialog extends JDialog {
 
 
 
-	private JList<String> createImagePathSelList() {
-
+	private ComboBoxMultiSelect<String> createImagePathSelList() {
+		// read file names from
 		File directory = new File(Resources.class.getResource("/agent_icons/").getPath());
 		String[] files = Stream.of(directory.listFiles()).filter(file -> !file.isDirectory()).map(File::getName).toArray(String[]::new);
 
-		JList<String> jList = new JList<>(files);
-		jList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-		return jList;
+		ComboBoxMultiSelect comboBoxMultiSelect = new ComboBoxMultiSelect();
+		for (String f : files){
+			comboBoxMultiSelect.addItem(f);
+		}
+		return comboBoxMultiSelect;
 	}
 
 	private JComboBox<InformationState> createInformationStateComboBox() {
@@ -460,8 +463,10 @@ public class SettingsDialog extends JDialog {
 		return comboBox;
 	}
 
-	private void initImageOverlay(JList<String> jlist){
-		jlist.addListSelectionListener(new ActionSetImageOverlay("Set image", model, jlist));
+	//
+
+	private void initImageOverlay(ComboBoxMultiSelect<String> jlist){
+		jlist.addActionListener(new ActionSetImageOverlay("Set image", model, jlist));
 	}
 
 	private void initColoringByTargetId(JComboBox<Integer> cbTargetIds, JPanel pTargetColor, JButton bChangeTargetColor, JButton bChangePedestrianColorNoTarget, JPanel pPedestrianColorNoTarget) {

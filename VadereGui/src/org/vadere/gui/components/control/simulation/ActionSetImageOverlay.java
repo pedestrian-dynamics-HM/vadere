@@ -1,27 +1,24 @@
 package org.vadere.gui.components.control.simulation;
 
-import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.components.model.DefaultSimulationConfig;
 import org.vadere.gui.components.model.SimulationModel;
 import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.components.view.SimulationRenderer;
 import org.vadere.gui.onlinevisualization.view.IRendererChangeListener;
+import org.vadere.gui.postvisualization.view.ComboBoxMultiSelect;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-public class ActionSetImageOverlay extends ActionVisualization implements IRendererChangeListener, ListSelectionListener {
-    private final JList<String> jList;
+public class ActionSetImageOverlay extends ActionVisualization implements IRendererChangeListener {
+    private final ComboBoxMultiSelect<String> jList;
 
     public ActionSetImageOverlay(final String name, final SimulationModel<? extends DefaultSimulationConfig> model,
-                                 final JList<String> jList) {
+                                 final ComboBoxMultiSelect<String> jList) {
         super(name, model);
         this.jList = jList;
         setInitialImage();
@@ -30,7 +27,7 @@ public class ActionSetImageOverlay extends ActionVisualization implements IRende
     private void setInitialImage(){
 
         jList.setSelectedIndex(0);
-        List<String> images = jList.getSelectedValuesList();
+        List<Object> images = jList.getSelectedItems();
         LinkedList<BufferedImage> linkedList = getBufferedImageLinkedList(images);
         model.config.setImage(linkedList);
         model.notifyObservers();
@@ -41,21 +38,20 @@ public class ActionSetImageOverlay extends ActionVisualization implements IRende
     }
 
     @Override
-    public void valueChanged(ListSelectionEvent e) {
+    public void actionPerformed(final ActionEvent e) {
 
+        List<Object> images = jList.getSelectedItems();
 
-        List<String> images = jList.getSelectedValuesList();
         LinkedList<BufferedImage> linkedList = getBufferedImageLinkedList(images);
         model.config.setImage(linkedList);
         model.notifyObservers();
 
-
     }
 
-    private static LinkedList<BufferedImage> getBufferedImageLinkedList(List<String> images) {
+    private static LinkedList<BufferedImage> getBufferedImageLinkedList(List<Object> images) {
         BufferedImage image;
         LinkedList<BufferedImage> linkedList = new LinkedList<>();
-        for(String imageName: images){
+        for(Object imageName: images){
             try {
                 image = ImageIO.read(Resources.class.getResource("/agent_icons/" + imageName));
                 linkedList.add(image);
