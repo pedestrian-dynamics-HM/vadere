@@ -17,6 +17,7 @@ import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.psychology.information.InformationState;
 import org.vadere.state.scenario.Target;
 import org.vadere.util.config.VadereConfig;
+import org.vadere.util.io.IOUtils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -444,13 +445,17 @@ public class SettingsDialog extends JDialog {
 
 
 	private ComboBoxMultiSelect<String> createImagePathSelList() {
-		File directory = new File(Resources.class.getResource("/agent_icons/").getPath());
-		List<String> imageNames = Stream.of(directory.listFiles()).filter(file -> !file.isDirectory()).map(File::getName).toList();
+
 		ComboBoxMultiSelect cb = new ComboBoxMultiSelect();
-		for (String f : imageNames) {
+
+
+		File directory = new File(Resources.class.getResource("/agent_icons/").getPath());
+		List<String> files  =  IOUtils.getFileNameList(directory, ".png");
+
+		for (String f : files) {
 			cb.addItem(f);
 		}
-		cb.setSelectedElements(imageNames);
+		cb.setSelectedElements(files);
 		return cb;
 	}
 
