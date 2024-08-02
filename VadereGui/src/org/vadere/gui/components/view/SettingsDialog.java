@@ -448,9 +448,7 @@ public class SettingsDialog extends JDialog {
 
 		ComboBoxMultiSelect cb = new ComboBoxMultiSelect();
 
-
-		File directory = new File(Resources.class.getResource("/agent_icons/").getPath());
-		List<String> files  =  IOUtils.getFileNameList(directory, ".png");
+		List<String> files  =  IOUtils.getFileNameList(config.getImageDirectory(), ".png");
 
 		for (String f : files) {
 			cb.addItem(f);

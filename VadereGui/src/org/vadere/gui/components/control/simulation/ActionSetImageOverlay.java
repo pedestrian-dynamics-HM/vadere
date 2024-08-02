@@ -10,7 +10,10 @@ import org.vadere.gui.postvisualization.view.ComboBoxMultiSelect;
 import javax.imageio.ImageIO;
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -53,12 +56,14 @@ public class ActionSetImageOverlay extends ActionVisualization implements IRende
 
     }
 
-    private static LinkedList<BufferedImage> getBufferedImageLinkedList(List<Object> images) {
+    private LinkedList<BufferedImage> getBufferedImageLinkedList(List<Object> images) {
         BufferedImage image;
         LinkedList<BufferedImage> linkedList = new LinkedList<>();
+
         for(Object imageName: images){
             try {
-                image = ImageIO.read(Resources.class.getResource("/agent_icons/" + imageName));
+                File imagePath = new File( model.config.getImageDirectory(), (String) imageName);
+                image = ImageIO.read(imagePath);
                 linkedList.add(image);
             } catch (IOException event) {
                 throw new RuntimeException(event);

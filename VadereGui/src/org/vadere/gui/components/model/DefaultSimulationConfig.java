@@ -1,13 +1,14 @@
 package org.vadere.gui.components.model;
 
 import java.awt.*;
-import java.nio.file.Path;
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
 
 import org.apache.commons.configuration2.Configuration;
+import org.vadere.gui.components.utils.Resources;
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.psychology.information.InformationState;
 import org.vadere.util.config.VadereConfig;
@@ -69,7 +70,11 @@ public class DefaultSimulationConfig extends DefaultConfig {
 	private final double MIN_CELL_WIDTH = CONFIG.getDouble("ProjectView.minCellWidth");
 	private final double MAX_CELL_WIDTH = CONFIG.getDouble("ProjectView.maxCellWidth");
 	private AgentColoring agentColoring = AgentColoring.TARGET;
-	private Path imagePath;
+
+	private File imageDirectory = new File(Resources.class.getResource("/agent_icons/").getPath());
+
+
+
 
 	public DefaultSimulationConfig() {
 		super();
@@ -302,14 +307,6 @@ public class DefaultSimulationConfig extends DefaultConfig {
 		setChanged();
 	}
 
-	public void setImagePath(final Path imagePath){
-		this.imagePath = imagePath;
-		setChanged();
-	}
-
-	public Path getImagePath(){
-		return this.imagePath;
-	}
 
 	public void setShowPotentialField(final boolean showPotentialField) {
 		this.showPotentialField = showPotentialField;
@@ -521,4 +518,11 @@ public class DefaultSimulationConfig extends DefaultConfig {
 	public boolean isRecording() {
 		return recording;
 	}
+
+	public File getImageDirectory() {
+		return this.imageDirectory;
+	}
+
+
+
 }
