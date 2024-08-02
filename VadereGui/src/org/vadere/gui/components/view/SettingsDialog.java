@@ -22,7 +22,11 @@ import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.util.Arrays;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class SettingsDialog extends JDialog {
 
@@ -302,8 +306,8 @@ public class SettingsDialog extends JDialog {
 
 		initColoringBySelfCategory(cbSelfCategories, pSelfCategoryColor, bChangeSelfCategoryColor);
 
-		JComboBox<String> cbImagePaths = createImagePathComboBox();
-		//final JButton bImageOverlay = new JButton(Messages.getString("SettingsDialog.btnEditColor.text"));
+		//JComboBox<String> cbImagePaths = createImagePathComboBox();
+		JList<String> cbImagePaths = createImagePathSelList();
 		initImageOverlay(cbImagePaths);
 
 
@@ -444,12 +448,25 @@ public class SettingsDialog extends JDialog {
 
 		File directory = new File(Resources.class.getResource("/agent_icons/").getPath());
 
-		File[] dd = directory.listFiles();
-		//TODO add check
+
+		Set<String> files = Stream.of(directory.listFiles()).filter(file -> !file.isDirectory()).map(File::getName).collect(Collectors.toSet());
 
 		JComboBox<String> cbImagePath = new JComboBox<>(imageList);
 
 		return cbImagePath;
+	}
+
+	private JList<String> createImagePathSelList() {
+
+		File directory = new File(Resources.class.getResource("/agent_icons/").getPath());
+		Set<String> files = Stream.of(directory.listFiles()).filter(file -> !file.isDirectory()).map(File::getName).collect(Collectors.toSet());
+
+
+		String[] imageList = new String[]{"daisy.png", "zombie.png"};
+		JList<String> jList = new JList<>(imageList);
+		jList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+
+		return jList;
 	}
 
 	private JComboBox<InformationState> createInformationStateComboBox() {
@@ -457,8 +474,8 @@ public class SettingsDialog extends JDialog {
 		return comboBox;
 	}
 
-	private void initImageOverlay(JComboBox<String> comboBox){
-		comboBox.addActionListener(new ActionSetImageOverlay("Set image", model, comboBox)) ;
+	private void initImageOverlay(JList<String> jlist){
+		jlist.addListSelectionListener(new ActionSetImageOverlay("Set image", model, jlist));
 	}
 
 	private void initColoringByTargetId(JComboBox<Integer> cbTargetIds, JPanel pTargetColor, JButton bChangeTargetColor, JButton bChangePedestrianColorNoTarget, JPanel pPedestrianColorNoTarget) {
