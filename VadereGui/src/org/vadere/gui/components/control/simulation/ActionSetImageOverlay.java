@@ -26,7 +26,7 @@ public class ActionSetImageOverlay extends ActionVisualization implements IRende
     }
 
     private void initializeImage() {
-        LinkedList<BufferedImage> linkedList = getBufferedImageLinkedList(jList.getSelectedItems());
+        LinkedList<BufferedImage> linkedList = getBufferedImageLinkedList(jList.getSelectedElements());
         model.config.setImage(linkedList);
         model.notifyObservers();
     }
@@ -39,13 +39,13 @@ public class ActionSetImageOverlay extends ActionVisualization implements IRende
     public void actionPerformed(final ActionEvent e) {
 
         Object obj = jList.getSelectedItem();
-        if (jList.getSelectedItems().contains(obj)) {
+        if (jList.getSelectedElements().contains(obj)) {
             jList.removeItemObject(obj);
         } else {
             jList.addItemObject(obj);
         }
 
-        List<Object> images = jList.getSelectedItems();
+        List<Object> images = jList.getSelectedElements();
         LinkedList<BufferedImage> linkedList = getBufferedImageLinkedList(images);
         model.config.setImage(linkedList);
         model.notifyObservers();
