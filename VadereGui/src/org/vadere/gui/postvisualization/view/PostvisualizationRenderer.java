@@ -117,18 +117,20 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 		double y = ped.getPosition().getY();
 		double radius = ped.getRadius();
 
+		// choose image dependent on pedestrian id
+		BufferedImage before;
+		int index = ped.getId() % getImage().size();
+		before = getImage().get(index);
 
-		BufferedImage before = getNextBufferedImage();
-
+		// draw image over pedestrian
 		if (before != null) {
 			double scale = 2.0 * radius / before.getHeight();
 			AffineTransform at = new AffineTransform();
 
-			// move icon to correct position and scale it so that it covers an agent's torso
 			at.translate(x + radius, y - radius);
 			at.rotate(Math.toRadians(180), -radius, radius);
-
-			double angle = computeAngleWalkingDirection(ped);
+			
+			double angle = computeAngleWalkingDirection(ped); // allow torso rotation
 			at.rotate(angle, -radius, radius);
 
 			at.scale(-scale, scale);
@@ -137,22 +139,6 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 
 	}
 
-	@Nullable
-	private BufferedImage getNextBufferedImage() {
-		BufferedImage before = null;
-		int index = this.getLastImageIndex();
-
-		// reset index
-		if (!(index < getImage().size())){ index = 0;}
-
-		if (!getImage().isEmpty()) {
-			before = getImage().get(index);
-		}
-
-		setLastImageIndex(index+1);
-
-		return before;
-	}
 
 
 	private double computeAngleWalkingDirection(Pedestrian pedestrian){
