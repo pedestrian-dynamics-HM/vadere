@@ -22,11 +22,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.Arrays;
+import java.util.*;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -447,15 +446,14 @@ public class SettingsDialog extends JDialog {
 
 
 	private ComboBoxMultiSelect<String> createImagePathSelList() {
-		// read file names from
 		File directory = new File(Resources.class.getResource("/agent_icons/").getPath());
-		String[] files = Stream.of(directory.listFiles()).filter(file -> !file.isDirectory()).map(File::getName).toArray(String[]::new);
-
-		ComboBoxMultiSelect comboBoxMultiSelect = new ComboBoxMultiSelect();
-		for (String f : files){
-			comboBoxMultiSelect.addItem(f);
+		List<String> imageNames = Stream.of(directory.listFiles()).filter(file -> !file.isDirectory()).map(File::getName).toList();
+		ComboBoxMultiSelect cb = new ComboBoxMultiSelect();
+		for (String f : imageNames) {
+			cb.addItem(f);
 		}
-		return comboBoxMultiSelect;
+		cb.setSelectedItems(imageNames);
+		return cb;
 	}
 
 	private JComboBox<InformationState> createInformationStateComboBox() {
@@ -463,7 +461,7 @@ public class SettingsDialog extends JDialog {
 		return comboBox;
 	}
 
-	//
+
 
 	private void initImageOverlay(ComboBoxMultiSelect<String> jlist){
 		jlist.addActionListener(new ActionSetImageOverlay("Set image", model, jlist));

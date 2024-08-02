@@ -126,6 +126,7 @@ public abstract class DefaultRenderer {
 	}
 
 	public void setImage(LinkedList<BufferedImage> image) {
+		System.out.println("Set images:" + image );
 			SimulationModel simulationModel = (SimulationModel) this.getDefaultModel();
 			simulationModel.getConfig().setImage(image);
 	}

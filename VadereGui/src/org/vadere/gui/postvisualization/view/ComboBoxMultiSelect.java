@@ -31,15 +31,15 @@ public class ComboBoxMultiSelect<E> extends JComboBox<E> {
     }
 
     public void setSelectedItems(List<Object> selectedItems) {
+        this.selectedItems.clear();
         List<Object> comboItem = new ArrayList<>();
-        int count = getItemCount();
+        int count = selectedItems.size();
         for (int i = 0; i < count; i++) {
             comboItem.add(getItemAt(i));
         }
         for (Object obj : selectedItems) {
-            if (comboItem.contains(obj)) {
                 addItemObject(obj);
-            }
+
         }
         comboItem.clear();
     }
@@ -61,21 +61,34 @@ public class ComboBoxMultiSelect<E> extends JComboBox<E> {
     private final ComboBoxMultiCellEditor comboBoxMultiCellEditor;
     private Component comboList;
 
-    private void removeItemObject(Object obj) {
+    public void removeItemObject(Object obj) {
+        System.out.println("Remove :" + obj);
         selectedItems.remove(obj);
+        System.out.println(selectedItems);
         comboBoxMultiCellEditor.removeItem(obj);
         if (comboList != null) {
             comboList.repaint();
         }
     }
 
-    private void addItemObject(Object obj) {
+    public void addItemObject(Object obj) {
+        System.out.println("Add :" + obj);
         selectedItems.add(obj);
+        System.out.println(selectedItems);
         comboBoxMultiCellEditor.addItem(obj);
         if (comboList != null) {
             comboList.repaint();
         }
     }
+
+    public void addItemObjectUnselected(Object obj) {
+        System.out.println("Add :" + obj);
+        comboBoxMultiCellEditor.addItem(obj);
+        if (comboList != null) {
+            comboList.repaint();
+        }
+    }
+
 
     public ComboBoxMultiSelect() {
         setUI(new ComboBoxMultiUI());
@@ -83,17 +96,22 @@ public class ComboBoxMultiSelect<E> extends JComboBox<E> {
         setRenderer(new ComboBoxMultiCellRenderer());
         setEditor(comboBoxMultiCellEditor);
         setEditable(true);
-        addActionListener((e) -> {
+        /*addActionListener((e) -> {
             if (e.getModifiers() == ActionEvent.MOUSE_EVENT_MASK) {
                 JComboBox combo = (JComboBox) e.getSource();
                 Object obj = combo.getSelectedItem();
                 if (selectedItems.contains(obj)) {
+                    System.out.println("Remove header :" + obj);
                     removeItemObject(obj);
                 } else {
+                    System.out.println("Upper header :" + obj);
                     addItemObject(obj);
                 }
             }
         });
+
+        */
+
     }
 
     @Override
@@ -141,10 +159,13 @@ public class ComboBoxMultiSelect<E> extends JComboBox<E> {
         protected final JPanel panel;
 
         protected void addItem(Object obj) {
+
             Item item = new Item(obj);
             panel.add(item);
             panel.repaint();
             panel.revalidate();
+
+
         }
 
         protected void removeItem(Object obj) {
@@ -210,35 +231,12 @@ public class ComboBoxMultiSelect<E> extends JComboBox<E> {
         public Item(Object item) {
             super(item.toString());
             this.item = item;
-            init();
         }
 
-        private void init() {
-            putClientProperty(FlatClientProperties.STYLE, ""
-                    + "border:0,5,0,20;"
-                    + "background:darken($ComboBox.background,10%)");
-            JButton cmd = new JButton();
-            cmd.putClientProperty(FlatClientProperties.STYLE, ""
-                    + "arc:999;"
-                    + "margin:1,1,1,1;"
-                    + "background:null;"
-                    + "focusWidth:0");
-            cmd.addActionListener((e) -> {
-                removeItemObject(item);
-            });
-            cmd.setFocusable(false);
-            add(cmd, "pos 1al 0.5al 10 10");
-        }
+
 
         @Override
         protected void paintComponent(Graphics g) {
-            Graphics2D g2 = (Graphics2D) g.create();
-            FlatUIUtils.setRenderingHints(g2);
-            int arc = UIScale.scale(10);
-            g2.setColor(getBackground());
-            FlatUIUtils.paintComponentBackground(g2, 0, 0, getWidth(), getHeight(), 0, arc);
-            g2.dispose();
-            super.paintComponent(g);
         }
     }
 }
