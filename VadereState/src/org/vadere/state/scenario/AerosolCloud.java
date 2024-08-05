@@ -168,14 +168,23 @@ public class AerosolCloud extends ParticleDispersion {
         }
     }
 
-    public void shiftShape(double angle, double length) {
-        double radius = attributes.getRadius();
+    public void shiftShape(double x, double y) {
+//        double radius = attributes.getRadius();
+//        VPoint newCenter = new VPoint(
+//                getCenter().getX() + Math.cos(angle) * length,
+//                getCenter().getY() + Math.sin(angle) * length
+//        );
+//        VCircle newShape = createAerosolCloudShape(newCenter, radius);
+//        attributes.setShape(newShape);
+
         VPoint newCenter = new VPoint(
-                getCenter().getX() + Math.cos(angle) * length,
-                getCenter().getY() + Math.sin(angle) * length
+                getCenter().getX() + x,
+                getCenter().getY() + y
         );
-        VCircle newShape = createAerosolCloudShape(newCenter, radius);
+        VCircle newShape = createAerosolCloudShape(newCenter, attributes.getRadius());
         attributes.setShape(newShape);
+
+
     }
 
     /*

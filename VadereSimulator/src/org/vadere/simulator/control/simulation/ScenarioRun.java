@@ -2,6 +2,7 @@ package org.vadere.simulator.control.simulation;
 
 import it.unimi.dsi.fastutil.io.FastBufferedInputStream;
 
+import org.jcodec.common.Tuple;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.vadere.meshing.mesh.gen.AFace;
@@ -31,24 +32,21 @@ import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.utils.cache.ScenarioCache;
 import org.vadere.state.psychology.perception.json.StimulusInfo;
+import org.vadere.state.scenario.Obstacle;
+import org.vadere.state.scenario.Topography;
+import org.vadere.util.geometry.shapes.ShapeType;
+import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.io.IOUtils;
 import org.vadere.util.logging.Logger;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.UncheckedIOException;
+import java.awt.geom.Rectangle2D;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Manages single simulation runs.
@@ -154,6 +152,9 @@ public class ScenarioRun implements Runnable {
 
 				AMesh floorFieldMesh = loadFloorFieldMesh().orElse(null);
 				AMesh backgroundMesh = loadBackgrounddMesh().orElse(null);
+
+				scenarioStore.getTopography().initAirFlow(scenarioFilePath.toString());
+
 				MainModelBuilder modelBuilder = new MainModelBuilder(scenarioStore, floorFieldMesh, backgroundMesh);
 				modelBuilder.createModelAndRandom();
 

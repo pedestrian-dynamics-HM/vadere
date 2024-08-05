@@ -32,6 +32,7 @@ public class AttributesExtendedAirTransmissionModelAerosolCloud extends Attribut
      */
     private WindDirection windDirection;
 
+
     public AttributesExtendedAirTransmissionModelAerosolCloud() {
         super();
 
