@@ -35,7 +35,6 @@ public abstract class SimulationRenderer extends DefaultRenderer {
     private Color lastDensityColor = null;
     private int topographyId;
     private AgentRender agentRender;
-    private int lastImageIndex = 0;
 
     public SimulationRenderer(final SimulationModel model) {
         super(model);
@@ -350,12 +349,5 @@ public abstract class SimulationRenderer extends DefaultRenderer {
 
 	    }
     }
-
-    public int getLastImageIndex() {
-        return lastImageIndex;
-    }
-
-    public void setLastImageIndex(int lastImageIndex) {
-        this.lastImageIndex = lastImageIndex;
-    }
+    
 }
