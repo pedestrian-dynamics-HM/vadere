@@ -58,7 +58,6 @@ public abstract class DefaultRenderer {
 	 * @param width
 	 * @param height
 	 */
-
 	public void render(final Graphics2D targetGraphics2D, final int width, final int height) {
 		synchronized (defaultModel) {
 			render(targetGraphics2D, 0, 0, width, height);
@@ -97,8 +96,8 @@ public abstract class DefaultRenderer {
 	public BufferedImage renderImage(final int width, final int height) {
 		synchronized (defaultModel) {
 			BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-			graphics2D = (Graphics2D) image.getGraphics();
-			renderGraphics(graphics2D, width, height);
+			Graphics2D bufferGraphics2D = (Graphics2D) image.getGraphics();
+			renderGraphics(bufferGraphics2D, width, height);
 			return image;
 		}
 	}
@@ -106,6 +105,7 @@ public abstract class DefaultRenderer {
 	public void setLogo(final BufferedImage logo) {
 		this.logo = logo;
 	}
+	
 	protected void renderPreTransformation(final Graphics2D graphics2D, final int width, final int height) {}
 
 	protected void renderPostTransformation(final Graphics2D graphics2D, final int width, final int height) {
