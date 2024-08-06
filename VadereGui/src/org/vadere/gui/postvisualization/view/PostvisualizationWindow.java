@@ -83,14 +83,9 @@ public class PostvisualizationWindow extends JPanel implements Observer {
         // 2. set up the model
         model.addObserver(this);
         model.config.setLoadTopographyInformationsOnly(loadTopographyInformationsOnly);
-        //model.config.setImage(getImage());
 
         // 3. set up renderer (he draws also the svg and the png's)
         renderer.setLogo(resources.getImage("vadere.png"));
-
-
-
-
 
         // 4. set up the jscrollpane
         scrollPane.getViewport()
@@ -188,16 +183,4 @@ public class PostvisualizationWindow extends JPanel implements Observer {
         }
 
     }
-
-    private BufferedImage getImage(){
-        BufferedImage image;
-        try {
-            image = ImageIO.read(Resources.class.getResource("/agent_icons/" + "daisy.png"));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        return image;
-
-    }
-
 }
