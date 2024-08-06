@@ -35,12 +35,11 @@ import java.util.Collection;
  */
 public abstract class DefaultRenderer {
 
-	private IDefaultModel defaultModel;
+	protected IDefaultModel defaultModel;
 	private BufferedImage logo;
 	private static final double rotNeg90 = - Math.PI /2;
 	private boolean renderNodes = VadereConfig.getConfig().getBoolean("Gui.showNodes");
 	private double nodeRadius = VadereConfig.getConfig().getDouble("Gui.node.radius");
-	private Graphics2D graphics2D;
 	/**
 	 * <p>Default constructor.</p>
 	 *
@@ -105,7 +104,7 @@ public abstract class DefaultRenderer {
 	public void setLogo(final BufferedImage logo) {
 		this.logo = logo;
 	}
-	
+
 	protected void renderPreTransformation(final Graphics2D graphics2D, final int width, final int height) {}
 
 	protected void renderPostTransformation(final Graphics2D graphics2D, final int width, final int height) {
@@ -815,12 +814,5 @@ public abstract class DefaultRenderer {
 	private float getGridLineWidth() {
 		return (float) (0.5 / defaultModel.getScaleFactor());
 	}
-
-	public IDefaultModel getDefaultModel() {
-		return defaultModel;
-	}
-
-
-
-
+	
 }

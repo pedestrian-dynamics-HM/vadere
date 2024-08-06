@@ -262,7 +262,7 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 	}
 
 	public LinkedList<BufferedImage> getAgentImages(){
-		SimulationModel simulationModel = (SimulationModel) this.getDefaultModel();
-		return  simulationModel.getConfig().getImage();
+		SimulationModel simulationModel = (SimulationModel) this.defaultModel;
+		return simulationModel.getConfig().getImage();
 	}
 }
