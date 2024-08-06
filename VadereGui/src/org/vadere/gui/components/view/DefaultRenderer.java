@@ -2,7 +2,6 @@ package org.vadere.gui.components.view;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.components.model.IDefaultModel;
-import org.vadere.gui.components.model.SimulationModel;
 import org.vadere.meshing.mesh.gen.MeshRenderer;
 import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.state.scenario.*;
@@ -30,31 +29,18 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.Collection;
-import java.util.LinkedList;
 
 /**
  * @author Benedikt Zoennchen
  */
 public abstract class DefaultRenderer {
 
-
 	private IDefaultModel defaultModel;
 	private BufferedImage logo;
-	private BufferedImage image;
 	private static final double rotNeg90 = - Math.PI /2;
 	private boolean renderNodes = VadereConfig.getConfig().getBoolean("Gui.showNodes");
 	private double nodeRadius = VadereConfig.getConfig().getDouble("Gui.node.radius");
-
-	public Graphics2D getGraphics2D() {
-		return graphics2D;
-	}
-
-	public void setGraphics2D(Graphics2D graphics2D) {
-		this.graphics2D = graphics2D;
-	}
-
 	private Graphics2D graphics2D;
-
 	/**
 	 * <p>Default constructor.</p>
 	 *
@@ -72,10 +58,6 @@ public abstract class DefaultRenderer {
 	 * @param width
 	 * @param height
 	 */
-
-	public IDefaultModel getDefaultModel() {
-		return defaultModel;
-	}
 
 	public void render(final Graphics2D targetGraphics2D, final int width, final int height) {
 		synchronized (defaultModel) {
@@ -124,20 +106,6 @@ public abstract class DefaultRenderer {
 	public void setLogo(final BufferedImage logo) {
 		this.logo = logo;
 	}
-
-	public void setImage(LinkedList<BufferedImage> image) {
-		System.out.println("Set images:" + image );
-			SimulationModel simulationModel = (SimulationModel) this.getDefaultModel();
-			simulationModel.getConfig().setImage(image);
-	}
-
-	public LinkedList<BufferedImage> getImage(){
-
-		SimulationModel simulationModel = (SimulationModel) this.getDefaultModel();
-		return  simulationModel.getConfig().getImage();
-
-	}
-
 	protected void renderPreTransformation(final Graphics2D graphics2D, final int width, final int height) {}
 
 	protected void renderPostTransformation(final Graphics2D graphics2D, final int width, final int height) {
@@ -847,4 +815,12 @@ public abstract class DefaultRenderer {
 	private float getGridLineWidth() {
 		return (float) (0.5 / defaultModel.getScaleFactor());
 	}
+
+	public IDefaultModel getDefaultModel() {
+		return defaultModel;
+	}
+
+
+
+
 }

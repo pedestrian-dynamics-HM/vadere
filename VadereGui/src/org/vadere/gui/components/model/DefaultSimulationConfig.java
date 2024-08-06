@@ -382,7 +382,7 @@ public class DefaultSimulationConfig extends DefaultConfig {
 
 	public Color getImageOverlay(){
 
-		Color color = new Color(0.f, 0.f, 0.f, 0.f);  // transparent
+		Color color = Color.BLUE; // new Color(0.f, 0.f, 0.f, 0.f);  = transparent
 		return color;
 
 	}

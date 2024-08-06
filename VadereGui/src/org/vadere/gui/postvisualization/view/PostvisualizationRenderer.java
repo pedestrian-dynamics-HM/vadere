@@ -1,5 +1,6 @@
 package org.vadere.gui.postvisualization.view;
 
+import org.vadere.gui.components.model.SimulationModel;
 import org.vadere.gui.components.view.DefaultRenderer;
 import org.vadere.gui.components.view.SimulationRenderer;
 import org.vadere.gui.postvisualization.model.PostvisualizationModel;
@@ -18,6 +19,7 @@ import java.awt.geom.Path2D;
 import java.awt.image.BufferedImage;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 
 public class PostvisualizationRenderer extends SimulationRenderer {
@@ -108,19 +110,17 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 		g.setStroke(savedStroke);
 	}
 
-	private void renderImage(Graphics2D g2, Pedestrian ped){
+	private void renderImageOverAgent(Graphics2D g2, Pedestrian ped){
 
 		double x = ped.getPosition().getX();
 		double y = ped.getPosition().getY();
 		double radius = ped.getRadius();
 
-
 		BufferedImage before = null;
-
 		// choose image dependent on pedestrian id
-		if (getImage().size() > 0) {
-			int index = ped.getId() % getImage().size();
-			before = getImage().get(index);
+		if (getAgentImages().size() > 0) {
+			int index = ped.getId() % getAgentImages().size();
+			before = getAgentImages().get(index);
 		}
 
 		// draw image over pedestrian
@@ -131,23 +131,18 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 			at.translate(x + radius, y - radius);
 			at.rotate(Math.toRadians(180), -radius, radius);
 
-
 			computeWalkingDirection(ped);
 			if (pedestrianDirections.containsKey(ped.getId())){
 				VPoint direction = pedestrianDirections.get(ped.getId());
 				if (direction != null) {
 					double angle = Math.atan2(-direction.getY(), -direction.getX());
-					at.rotate(angle, -radius, radius);
+					at.rotate(angle, -radius, radius); //rotate image according to walking dir
 				}
 			}
-
 			at.scale(-scale, scale);
 			g2.drawImage(before, at, null);
 		}
-
 	}
-
-
 
 	public void renderPedestrians(Graphics2D g, Collection<Pedestrian> pedestrians, Map<Integer, Color> agentColors) {
 
@@ -167,7 +162,7 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 					}
 
 					if (model.config.isShowImage()) {
-						renderImage(g, pedestrian);
+						renderImageOverAgent(g, pedestrian);
 					}
 				}
 
@@ -180,7 +175,6 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 	}
 
 	private void renderWalkingDirection(Graphics2D g, Pedestrian pedestrian) {
-
 		computeWalkingDirection(pedestrian);
 		if (pedestrianDirections.containsKey(pedestrian.getId())) {
 			VPoint direction = pedestrianDirections.get(pedestrian.getId());
@@ -194,7 +188,6 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 			}
 		}
 	}
-
 
 	private void computeWalkingDirection(Pedestrian pedestrian){
 
@@ -220,7 +213,6 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 			}
 		}
 	}
-
 
 	private void renderConnectingLinesByContact(Graphics2D g) {
 		boolean showContacts = model.config.isShowContacts() && !model.getContactData().isEmpty();
@@ -267,5 +259,10 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 				renderAerosolClouds(aerosolClouds, g, model.config.getAerosolCloudColor());
 			}
 		}
+	}
+
+	public LinkedList<BufferedImage> getAgentImages(){
+		SimulationModel simulationModel = (SimulationModel) this.getDefaultModel();
+		return  simulationModel.getConfig().getImage();
 	}
 }

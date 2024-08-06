@@ -285,11 +285,11 @@ public class SettingsDialog extends JDialog {
 		group = new ButtonGroup();
 		group.add(rbTargetColoring);
 		group.add(rbRandomColoring);
-		group.add(rbImageOverlay);
 		group.add(rbGroupColoring);
 		group.add(rbSelfCategoryColoring);
 		group.add(rbHealthStatusColoring);
 		group.add(rbInformationColoring);
+		group.add(rbImageOverlay);
 
 
 		JComboBox<Integer> cbTargetIds = createTargetIdsComboBoxAndAddIds();
@@ -305,11 +305,6 @@ public class SettingsDialog extends JDialog {
 		final JButton bChangeSelfCategoryColor = new JButton(Messages.getString("SettingsDialog.btnEditColor.text"));
 
 		initColoringBySelfCategory(cbSelfCategories, pSelfCategoryColor, bChangeSelfCategoryColor);
-
-		//JComboBox<String> cbImagePaths = createImagePathComboBox();
-		ComboBoxMultiSelect<String> cbImagePaths = createImagePathSelList();
-		initImageOverlay(cbImagePaths);
-
 
 		final JPanel pPedestrianColorLowerExposure = new JPanel();
 		final JButton bChangePedestrianColorLowerExposure = new JButton(Messages.getString("SettingsDialog.btnEditColor.text"));
@@ -351,6 +346,9 @@ public class SettingsDialog extends JDialog {
 
 		initColoringByInformationState(cbInformationStates, pInformationStateColor, bChangeInformationStateColor);
 
+		ComboBoxMultiSelect<String> cbImagePaths = createImagePathSelList();
+		initImageOverlay(cbImagePaths);
+
 
 		int row = 0;
 		int column1 = 2;
@@ -377,11 +375,6 @@ public class SettingsDialog extends JDialog {
 		colorSettingsPane.add(pSelfCategoryColor, cc.xy(column4, row));
 		colorSettingsPane.add(bChangeSelfCategoryColor, cc.xy(column5, row));
 
-		colorSettingsPane.add(rbImageOverlay, cc.xy(column1, row += NEXT_CELL));
-		colorSettingsPane.add(cbImagePaths, cc.xy(column2, row));
-
-
-
 		colorSettingsPane.add(rbHealthStatusColoring, cc.xy(column1, row += NEXT_CELL));
 		colorSettingsPane.add(new JLabel(Messages.getString("SettingsDialog.lblPedestrianLowerExposure.text") + ":"), cc.xy(column2, row));
 		colorSettingsPane.add(spinnerLowerExposure, cc.xy(column3, row));
@@ -401,6 +394,9 @@ public class SettingsDialog extends JDialog {
 		colorSettingsPane.add(cbInformationStates, cc.xy(column2, row));
 		colorSettingsPane.add(pInformationStateColor, cc.xy(column4, row));
 		colorSettingsPane.add(bChangeInformationStateColor, cc.xy(column5, row));
+
+		colorSettingsPane.add(rbImageOverlay, cc.xy(column1, row += NEXT_CELL));
+		colorSettingsPane.add(cbImagePaths, cc.xy(column2, row));
 
 
 		// Evacuation time and criteria coloring comes in the next row see "postvisualization/.../SettingsDialog.java".

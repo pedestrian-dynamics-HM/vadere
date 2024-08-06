@@ -35,7 +35,7 @@ public class SettingsDialog extends org.vadere.gui.components.view.SettingsDialo
 		JRadioButton chShowCriteriaColor = new JRadioButton(Messages.getString("PostVis.chShowCriteriaColor.text") + ":");
 		PedestrianColorPanel pedestrianColorPanel = new PedestrianColorPanel(model);
 		agentColorSettingsPane.add(chShowCriteriaColor, cc.xy(2, row += NEXT_CELL,  CellConstraints.LEFT, CellConstraints.TOP));
-		agentColorSettingsPane.add(pedestrianColorPanel, cc.xyw(4, row, 7));
+		agentColorSettingsPane.add(pedestrianColorPanel, cc.xyw(4, row += NEXT_CELL, 7));
 		chShowCriteriaColor.addItemListener(e -> {
 			model.setAgentColoring(AgentColoring.PREDICATE);
 			model.notifyObservers();
