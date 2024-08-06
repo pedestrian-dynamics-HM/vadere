@@ -40,6 +40,7 @@ public abstract class DefaultRenderer {
 	private static final double rotNeg90 = - Math.PI /2;
 	private boolean renderNodes = VadereConfig.getConfig().getBoolean("Gui.showNodes");
 	private double nodeRadius = VadereConfig.getConfig().getDouble("Gui.node.radius");
+
 	/**
 	 * <p>Default constructor.</p>
 	 *
@@ -814,5 +815,4 @@ public abstract class DefaultRenderer {
 	private float getGridLineWidth() {
 		return (float) (0.5 / defaultModel.getScaleFactor());
 	}
-	
 }
