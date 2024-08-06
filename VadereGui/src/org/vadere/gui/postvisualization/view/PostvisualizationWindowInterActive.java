@@ -121,7 +121,6 @@ public class PostvisualizationWindowInterActive extends PostvisualizationWindow 
                         model.notifyObservers();
                     }
                 }, "ProjectView.btnShowGroupInformation.tooltip");
-
         addToggleActionToToolbar(toolbar,
                 new ActionVisualization("show_contacts",RESOURCE.getIconSVG("contacts",ICON_SIZE,ICON_SIZE),
                         model) {
