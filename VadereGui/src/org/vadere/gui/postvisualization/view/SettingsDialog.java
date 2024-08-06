@@ -23,6 +23,7 @@ public class SettingsDialog extends org.vadere.gui.components.view.SettingsDialo
 	public void initComponents() {
 		super.initComponents();
 		int row = 20; //TODO this is hard coded; must be adapted when further elements are inserted above
+		/** Remark: rows 1 ... 17 are occupied by objects added in {@link org.vadere.gui.components.view.SettingsDialog}*/
 		CellConstraints cc = new CellConstraints();
 		JRadioButton chShowEvacTimeColor = new JRadioButton(Messages.getString("PostVis.chShowEvacTimeColor.text"));
 		agentColorSettingsPane.add(chShowEvacTimeColor, cc.xyw(2, row += NEXT_CELL, 9));

@@ -395,11 +395,17 @@ public class SettingsDialog extends JDialog {
 		colorSettingsPane.add(pInformationStateColor, cc.xy(column4, row));
 		colorSettingsPane.add(bChangeInformationStateColor, cc.xy(column5, row));
 
+		// Evacuation time and criteria coloring comes in the next row see "postvisualization/.../SettingsDialog.java".
+
+		// add image overlay as last option
+		// add a horizontal line to make the user aware that overlaying an image is a special type of coloring
+		int additionalSpace = 8; /** leave space for entries added in {@link org.vadere.gui.postvisualization.view.SettingsDialog} */
+		colorSettingsPane.add(new JSeparator(), cc.xyw(column1, row += (NEXT_CELL + additionalSpace), column5 ));
+
 		colorSettingsPane.add(rbImageOverlay, cc.xy(column1, row += NEXT_CELL));
 		colorSettingsPane.add(cbImagePaths, cc.xy(column2, row));
 
 
-		// Evacuation time and criteria coloring comes in the next row see "postvisualization/.../SettingsDialog.java".
 	}
 
 	private JRadioButton createRadioButtonWithListener(AgentColoring colorScheme, String buttonText) {
