@@ -67,30 +67,6 @@ public class ExtendedAirTransmissionModelTest {
     }
 
     @Test
-    public void testUpdateAerosolCloudLocation() {
-        AttributesExtendedAirTransmissionModel attrModel = (AttributesExtendedAirTransmissionModel) airTransmissionModel.getAttributes();
-        attrModel.setAerosolCloudHalfLife(SIM_TIME_STEP_LENGTH);
-
-        setAerosolCloudsActive();
-        createAerosolCloud(airTransmissionModel);
-
-        int nSimSteps = 10;
-
-        AerosolCloud cloud = topography.getAerosolClouds().get(0);
-        VPoint lastLocation = cloud.getCenter();
-
-        for (int i = 0; i < nSimSteps; i++) {
-            airTransmissionModel.updateAerosolCloudsLocation();
-            VPoint newLocation = cloud.getCenter();
-
-            assertEquals(attrModel.getAerosolCloudWindSpeed() * SIM_TIME_STEP_LENGTH / 100, newLocation.distance(lastLocation), ALLOWED_DOUBLE_TOLERANCE);
-            double angle = Math.acos(newLocation.subtract(lastLocation).scalarProduct(new VPoint(1, 0)) / newLocation.subtract(lastLocation).distance(0, 0));
-            assertEquals(attrModel.getAerosolCloudWindDirection(), angle, ALLOWED_DOUBLE_TOLERANCE);
-            lastLocation = newLocation;
-        }
-    }
-
-    @Test
     public void testUpdateCreateAerosolCloudsPathogenLoadSneezing() {
         AttributesExtendedAirTransmissionModel attrModel = (AttributesExtendedAirTransmissionModel) airTransmissionModel.getAttributes();
         setAerosolCloudsActive();

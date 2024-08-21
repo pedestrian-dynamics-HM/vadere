@@ -209,4 +209,8 @@ public class ScenarioCache {
 	public boolean isNotEmpty(){
 		return  !empty;
 	}
+
+	public String getHash() {
+		return hash;
+	}
 }

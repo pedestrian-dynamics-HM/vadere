@@ -13,62 +13,54 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-public class AirFlowModel implements Model {
+public class AirFlowModel extends AbstractAirFlowModel {
 
     private static final Logger logger = Logger.getLogger(AirFlow.class);
 
-    // private static final String CONDA_EXE = "/opt/miniconda3/bin/conda";
-    // private static final String CONDA_ENV = "shk";
+    protected static final String X_VELOCITY_FILE_ENDING = "_Vx.txt";
+    protected static final String Y_VELOCITY_FILE_ENDING = "_Vy.txt";
 
-    private static final String X_VELOCITY_FILE_ENDING = "_U.txt";
-    private static final String Y_VELOCITY_FILE_ENDING = "_V.txt";
+    protected AttributesAirFlowModel attributesAirFlowModel;
 
-    private AttributesAirFlowModel attributesAirFlowModel;
-
-    private AirFlow airFlow;
 
     @Override
     public void initialize(List<Attributes> attributesList, Domain domain, AttributesAgent attributesPedestrian, Random random) {
+        super.initialize(attributesList, domain, attributesPedestrian, random);
         this.attributesAirFlowModel = Model.findAttributes(attributesList, AttributesAirFlowModel.class);
-        this.airFlow = domain.getTopography().getAirFlow();
     }
 
     @Override
-    public void preLoop(double simTimeInSec) {
-        File f_x_velocity = new File(airFlow.getScenarioPath() + X_VELOCITY_FILE_ENDING);
-        File f_y_velocity = new File(airFlow.getScenarioPath() + Y_VELOCITY_FILE_ENDING);
+    public void setupAirFlow() {
+        File f_x_velocity = new File(airFlow.getScenarioPath() + "_" +  airFlow.getScenarioHash() + X_VELOCITY_FILE_ENDING);
+        File f_y_velocity = new File(airFlow.getScenarioPath() + "_" +  airFlow.getScenarioHash() + Y_VELOCITY_FILE_ENDING);
         if(!(f_x_velocity.exists() && !f_x_velocity.isDirectory()) && !(f_y_velocity.exists() && !f_y_velocity.isDirectory())) {
-            calculateAirFlow(airFlow.getScenarioPath());
+            calculateAirFlow();
         }
-        init(airFlow.getScenarioPath());
-    }
-
-    @Override
-    public void postLoop(double simTimeInSec) {
-        // ignore
-    }
-
-    @Override
-    public void update(double simTimeInSec) {
-        // ignore
-    }
-
-    public void init(String scenarioName) {
         try {
-            airFlow.setX_velocity(readArrayFromFIle(scenarioName + X_VELOCITY_FILE_ENDING));
-            airFlow.setY_velocity(readArrayFromFIle(scenarioName + Y_VELOCITY_FILE_ENDING));
+            airFlow.setX_velocity(readArrayFromFile(airFlow.getScenarioPath() + "_" +  airFlow.getScenarioHash() + X_VELOCITY_FILE_ENDING));
+            airFlow.setY_velocity(readArrayFromFile(airFlow.getScenarioPath() + "_" +  airFlow.getScenarioHash() + Y_VELOCITY_FILE_ENDING));
             airFlow.setGridSize(attributesAirFlowModel.getGridSize());
         } catch (IOException e) {
             logger.error("Error reading airflow matrices: {}", e.getMessage());
         }
     }
 
-    private void calculateAirFlow(String scenarioFile) {
+    protected void calculateAirFlow() {
         logger.info("Running python script for calculating airflow");
         try {
             ProcessBuilder processBuilder = new ProcessBuilder();
             processBuilder.command(attributesAirFlowModel.getCondaPath(),  "run", "-n", attributesAirFlowModel.getCondaEnv(),
-                    "python", "poisson_fem_v2.py", scenarioFile, Double.toString(attributesAirFlowModel.getGridSize()));
+                    "python", "VadereSimulator/src/org/vadere/simulator/models/airflow/python/scikit-fem_stokes_flow_v2.py", airFlow.getScenarioPath(), airFlow.getScenarioHash(),
+                    Double.toString(attributesAirFlowModel.getGridSize()),
+                    Double.toString(attributesAirFlowModel.getAreaThreshold()),
+                    attributesAirFlowModel.getInletSide(),
+                    Double.toString(attributesAirFlowModel.getInletStart()),
+                    Double.toString(attributesAirFlowModel.getInletEnd()),
+                    Double.toString(attributesAirFlowModel.getInletVelocity()),
+                    attributesAirFlowModel.getOutletSide(),
+                    Double.toString(attributesAirFlowModel.getOutletStart()),
+                    Double.toString(attributesAirFlowModel.getOutletEnd())
+            );
             Process process = processBuilder.start();
 
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
@@ -80,7 +72,7 @@ public class AirFlowModel implements Model {
         }
     }
 
-    private double[][] readArrayFromFIle(String filename) throws IOException {
+    private double[][] readArrayFromFile(String filename) throws IOException {
         BufferedReader reader = new BufferedReader(new FileReader(filename));
 
         String header = reader.readLine();

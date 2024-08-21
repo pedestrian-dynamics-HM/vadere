@@ -153,7 +153,8 @@ public class ScenarioRun implements Runnable {
 				AMesh floorFieldMesh = loadFloorFieldMesh().orElse(null);
 				AMesh backgroundMesh = loadBackgrounddMesh().orElse(null);
 
-				scenarioStore.getTopography().initAirFlow(scenarioFilePath.toString());
+				scenarioStore.getTopography().initAirFlow(scenarioFilePath.toString(), scenarioCache.getHash());
+
 
 				MainModelBuilder modelBuilder = new MainModelBuilder(scenarioStore, floorFieldMesh, backgroundMesh);
 				modelBuilder.createModelAndRandom();

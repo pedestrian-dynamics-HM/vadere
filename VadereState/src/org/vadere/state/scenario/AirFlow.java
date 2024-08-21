@@ -3,14 +3,16 @@ package org.vadere.state.scenario;
 public class AirFlow {
 
     private final String scenarioPath;
+    private final String scenarioHash;
 
     private double gridSize;
 
     private double[][] x_velocity;
     private double[][] y_velocity;
 
-    public AirFlow(String scenarioPath) {
+    public AirFlow(String scenarioPath, String scenarioHash) {
         this.scenarioPath = scenarioPath;
+        this.scenarioHash = scenarioHash;
     }
 
     public void setX_velocity(double[][] x_velocity) {
@@ -27,6 +29,10 @@ public class AirFlow {
 
     public String getScenarioPath() {
         return scenarioPath;
+    }
+
+    public String getScenarioHash() {
+        return scenarioHash;
     }
 
     public double[] getFlowDirection(double x, double y) {
