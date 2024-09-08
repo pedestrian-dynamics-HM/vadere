@@ -42,7 +42,7 @@ public abstract class SourceController extends ScenarioElementController impleme
 	 * <code>null</code>, if there is no next event.
 	 */
 	protected Double timeOfNextEvent;
-    protected VSpawner spawner;
+    protected VSpawner<?> spawner;
 
     public SourceController(Topography scenario, Source source,
                             DynamicElementFactory dynamicElementFactory,
@@ -59,8 +59,6 @@ public abstract class SourceController extends ScenarioElementController impleme
         this.spawnerAttributes = sourceAttributes.getSpawnerAttributes();
         this.eventListener = new ArrayList<>();
         timeOfNextEvent = spawnerAttributes.getConstraintsTimeStart();
-        spawner = SpawnerFactory.create(spawnerAttributes, random);
-
     }
 
 

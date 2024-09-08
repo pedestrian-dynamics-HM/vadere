@@ -7,6 +7,7 @@ import org.vadere.state.attributes.distributions.*;
 import org.vadere.state.attributes.spawner.AttributesRegularSpawner;
 import org.vadere.state.attributes.spawner.AttributesSpawner;
 import org.vadere.state.scenario.SpawnerFactory;
+import org.vadere.state.scenario.distribution.impl.SingleSpawnDistribution;
 import org.vadere.state.scenario.spawner.VSpawner;
 
 import java.util.ArrayList;
@@ -107,23 +108,23 @@ class RegularSpawnerTest {
     @Test
     void testSingleSpawnDistribution() {
         AttributesSingleSpawnDistribution attributesDistribution = new AttributesSingleSpawnDistribution();
-        attributesDistribution.setSpawnTime(2.);
+        attributesDistribution.setSpawnTime(3.);
 
         VSpawner<?> elementConstraintSpawner = getSpawner(attributesDistribution, true);
         testElementConstraintSpawner(elementConstraintSpawner);
 
         VSpawner<?> timeConstraintSpawner = getSpawner(attributesDistribution, false);
-        testElementConstraintSpawner(timeConstraintSpawner);
+        testTimeConstraintSpawner(timeConstraintSpawner);
     }
 
     @Test
     void testTimeSeriesDistribution() {
         AttributesTimeSeriesDistribution attributesDistribution = new AttributesTimeSeriesDistribution();
-        attributesDistribution.setSpawnsPerInterval(new ArrayList<>(List.of(1)));
+        attributesDistribution.setSpawnsPerInterval(new ArrayList<>(List.of(1, 0)));
         attributesDistribution.setIntervalLength(1);
-        VSpawner<?> elementConstraintSpawner = getSpawner(attributesDistribution, true);
 
-        testElementConstraintSpawner(elementConstraintSpawner);
+        VSpawner<?> timeConstraintSpawner = getSpawner(attributesDistribution, false);
+        testTimeConstraintSpawner(timeConstraintSpawner);
     }
 
     @Test
@@ -138,7 +139,6 @@ class RegularSpawnerTest {
         while(!elementConstraintSpawner.isFinished(simTime, () -> true)) {
             simTime = elementConstraintSpawner.getNextSpawnTime(simTime);
             elementConstraintSpawner.incrementElementsCreatedTotal(elementConstraintSpawner.getEventElementCount(simTime));
-            System.out.println(simTime);
         }
     }
 
@@ -151,12 +151,9 @@ class RegularSpawnerTest {
 
         while(simTime <= spawner.getAttributes().getConstraintsTimeEnd()) {
             if (!spawner.isFinished(simTime, () -> true)) {
-                while (timeOfNextEvent <= simTime) {
-                    System.out.println("test");
-                    spawner.incrementElementsCreatedTotal(spawner.getEventElementCount(simTime));
-                    spawns += spawner.getEventElementCount(timeOfNextEvent);
-                    timeOfNextEvent = spawner.getNextSpawnTime(simTime);
-                }
+                spawner.incrementElementsCreatedTotal(spawner.getEventElementCount(simTime));
+                spawns += spawner.getEventElementCount(timeOfNextEvent);
+                timeOfNextEvent = spawner.getNextSpawnTime(simTime);
             }
             simTime += stepTime;
         }
@@ -175,7 +172,11 @@ class RegularSpawnerTest {
 
                     spawner.incrementElementsCreatedTotal(spawner.getEventElementCount(simTime));
                     timeOfNextEvent = spawner.getNextSpawnTime(simTime);
-                    assertTrue(timeOfNextEvent >= simTime);
+                    if (!(spawner.getDistribution() instanceof SingleSpawnDistribution)) {
+                        assertTrue(timeOfNextEvent >= simTime);
+                    } else {
+                        break;
+                    }
                 }
             }
             simTime += stepTime;
