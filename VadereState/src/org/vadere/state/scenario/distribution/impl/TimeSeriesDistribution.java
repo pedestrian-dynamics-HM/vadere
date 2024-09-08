@@ -60,7 +60,7 @@ public class TimeSeriesDistribution extends VDistribution<AttributesTimeSeriesDi
 		final boolean spawnsSetToRepeat = spawns > 0;
 
 		if (spawnsSetToRepeat) {
-			dist = initAsConstantDistribution(intervalLength,spawns);
+			dist = initAsConstantDistribution(intervalLength, spawns);
 		} else {
 			dist = initAsSingleEventDistribution(spawnsPerInterval, intervalLength, currentTime, i);
 		}
