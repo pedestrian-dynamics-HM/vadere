@@ -48,9 +48,6 @@ public class ExtendedAirTransmissionModel extends AirTransmissionModel {
 
     public void updateAerosolCloudsLocation() {
         AttributesExtendedAirTransmissionModel attrModel = (AttributesExtendedAirTransmissionModel) getAttributes();
-        // double shiftLength = attrModel.getAerosolCloudWindSpeed() * simTimeStepLength / 100;
-        // double windDirectionAngle = attrModel.getAerosolCloudWindDirection();
-
         Collection<AerosolCloud> allAerosolClouds = topography.getAerosolClouds();
         for (AerosolCloud aerosolCloud : allAerosolClouds) {
             double[] windXY = topography.getAirFlow().getFlowDirection(aerosolCloud.getCenter().getX(), aerosolCloud.getCenter().getY());

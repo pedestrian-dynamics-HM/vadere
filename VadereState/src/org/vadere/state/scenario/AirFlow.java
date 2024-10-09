@@ -50,9 +50,20 @@ public class AirFlow {
         else if (y_idx >= y_velocity.length)
             y_idx = y_velocity.length - 1;
 
-        result[0] = x_velocity[x_idx][y_idx];
-        result[1] = y_velocity[x_idx][y_idx];
+        result[0] = x_velocity[y_idx][x_idx];
+        result[1] = y_velocity[y_idx][x_idx];
         return result;
     }
 
+    public double[][] getXVelocities() {
+        return x_velocity;
+    }
+
+    public double[][] getYVelocities() {
+        return y_velocity;
+    }
+
+    public double getGridSize() {
+        return gridSize;
+    }
 }
