@@ -571,7 +571,8 @@ public class SettingsDialog extends JDialog {
 		JCheckBox chShowSources = new JCheckBox((Localization.getString("SettingsDialog.chbShowSources.text")));
 		JCheckBox chShowAbsorbingAreas = new JCheckBox((Localization.getString("SettingsDialog.chbShowAbsorbingAreas.text")));
 		JCheckBox chShowAerosolClouds = new JCheckBox((Localization.getString("SettingsDialog.chbShowAerosolClouds.text")));
-		JCheckBox chShowDropletClouds = new JCheckBox((Localization.getString("SettingsDialog.chbShowDropletClouds.text")));
+        JCheckBox chShowAirFlow = new JCheckBox((Localization.getString("SettingsDialog.chbShowAirflow.text")));
+        JCheckBox chShowDropletClouds = new JCheckBox((Localization.getString("SettingsDialog.chbShowDropletClouds.text")));
 		JCheckBox chShowMeasurementAreas = new JCheckBox((Localization.getString("SettingsDialog.chbShowMeasurementAreas.text")));
 		JCheckBox chShowStairs = new JCheckBox((Localization.getString("SettingsDialog.chbShowStairs.text")));
 		JCheckBox chShowTargetChangers = new JCheckBox((Localization.getString("SettingsDialog.chbShowTargetChangers.text")));
@@ -594,6 +595,12 @@ public class SettingsDialog extends JDialog {
 				model.showVoronoiDiagram();
 				model.notifyObservers();
 			}
+		});
+
+		chShowAirFlow.setSelected(model.config.isShowAirflow());
+		chShowAirFlow.addItemListener(e -> {
+			model.config.setShowAirflow(!model.config.isShowAirflow());
+			model.notifyObservers();
 		});
 
 		chShowObstacles.setSelected(model.config.isShowObstacles());
@@ -679,6 +686,7 @@ public class SettingsDialog extends JDialog {
 		otherSettingsPane.add(chShowPedIds, cc.xyw(column, row += NEXT_CELL, colSpan));
         otherSettingsPane.add(chShowPedestrianInOutGroup, cc.xyw(column, row += NEXT_CELL, colSpan));
 		otherSettingsPane.add(chShowAerosolClouds, cc.xyw(column, row += NEXT_CELL, colSpan));
+		otherSettingsPane.add(chShowAirFlow, cc.xyw(column, row += NEXT_CELL, colSpan));
 		otherSettingsPane.add(chShowDropletClouds, cc.xyw(column, row += NEXT_CELL, colSpan));
 
 		JCheckBox chChowLogo = new JCheckBox(Localization.getString("SettingsDialog.chbLogo.text"));

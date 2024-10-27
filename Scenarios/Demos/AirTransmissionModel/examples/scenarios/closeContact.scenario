@@ -2,7 +2,6 @@
   "name" : "closeContact",
   "description" : "",
   "release" : "3.0",
-  "commithash" : "a200b4ddd066a581da3fd86d600a9c689f60a145",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -16,14 +15,6 @@
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.NoDataKeyOutputFile",
       "filename" : "overlapCount.txt",
       "processors" : [ 4 ]
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepPedestrianIdOutputFile",
-      "filename" : "pedestrianPathogenLoad.txt",
-      "processors" : [ 5 ]
-    }, {
-      "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimeGridOutputFile",
-      "filename" : "pathogenConcentration.txt",
-      "processors" : [ 6 ]
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.TimestepIdDataOutputFile",
       "filename" : "aerosolCloudData.txt",
@@ -139,7 +130,7 @@
         "aerosolCloudParameters" : {
           "halfLife" : 600.0,
           "initialRadius" : 1.5,
-          "initialPathogenLoad" : 10000.0,
+          "initialPathogenLoad" : 10000,
           "airDispersionFactor" : 0.0,
           "pedestrianDispersionWeight" : 0.0125,
           "absorptionRate" : 5.0E-4

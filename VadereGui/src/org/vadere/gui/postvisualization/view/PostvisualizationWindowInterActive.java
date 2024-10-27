@@ -9,6 +9,7 @@ import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.components.utils.SwingUtils;
 import org.vadere.gui.components.view.DialogFactory;
 import org.vadere.gui.postvisualization.control.*;
+import org.vadere.gui.postvisualization.model.AirflowData;
 import org.vadere.gui.postvisualization.model.ContactData;
 import org.vadere.gui.postvisualization.model.TableAerosolCloudData;
 import org.vadere.gui.projectview.control.ActionDeselect;
@@ -349,6 +350,8 @@ public class PostvisualizationWindowInterActive extends PostvisualizationWindow 
                         additionalTables.put(entry.getKey(), IOOutput.readContactData(entry.getValue().toPath()));
                     case TableAerosolCloudData.TABLE_NAME:
                         additionalTables.put(entry.getKey(), IOOutput.readAerosolCloudData(entry.getValue().toPath()));
+                    case AirflowData.TABLE_NAME:
+                        additionalTables.put(entry.getKey(), IOOutput.readAirflowData(entry.getValue().toPath()));
                 }
             }
             model.init(IOOutput.readTrajectories(trajectoryFile.toPath()), additionalTables, scenario, trajectoryFile.getParent());

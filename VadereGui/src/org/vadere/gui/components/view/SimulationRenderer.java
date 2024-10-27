@@ -118,6 +118,10 @@ public abstract class SimulationRenderer extends DefaultRenderer {
             renderScenarioElement(model.getTopography().getSources(), graphics, model.config.getSourceColor());
         }
 
+        if (model.config.isShowAirflow()) {
+            renderAirflow(model.getTopography().getAirFlow(), graphics);
+        }
+
         if (model.isVoronoiDiagramAvailable() && model.isVoronoiDiagramVisible()) {
             renderVoronoiDiagram(graphics, model.getVoronoiDiagram());
         }

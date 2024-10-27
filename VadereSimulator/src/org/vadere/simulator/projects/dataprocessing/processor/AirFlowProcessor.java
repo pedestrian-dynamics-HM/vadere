@@ -34,7 +34,7 @@ public class AirFlowProcessor extends DataProcessor<TopographyGridKey, String> {
 
         for (int i = 0; i < xVelocity.length; i++) {
             for (int j = 0; j < xVelocity[i].length; j++) {
-                putValue(new TopographyGridKey(i, j), String.format("%.1f %.1f %.1f %.1f %.2f %.2f", i*gridSize, (i+1)*gridSize, j*gridSize, (j+1)*gridSize, xVelocity[i][j], yVelocity[i][j]));
+                putValue(new TopographyGridKey(j, i), String.format("%.1f %.1f %.1f %.1f %.2f %.2f", j*gridSize, (j+1)*gridSize, i*gridSize, (i+1)*gridSize, xVelocity[i][j], yVelocity[i][j]));
             }
         }
     }

@@ -292,6 +292,28 @@ public abstract class DefaultRenderer {
 		graphics.setColor(tmpColor);
 	}
 
+	protected void renderAirflow(final AirFlow airFlow, final Graphics2D g){
+
+		if (airFlow != null){
+			double[][] xVelocities = airFlow.getXVelocities();
+			double[][] yVelocities = airFlow.getYVelocities();
+
+			double cellSize = airFlow.getGridSize();
+
+			g.setColor(Color.black);
+			g.setStroke(new BasicStroke(3*getLineWidth()));
+
+			for (int i = 0; i < xVelocities.length; i++){
+				for (int j = 0; j < xVelocities[i].length; j++){
+					double mX = i * cellSize + cellSize / 2;
+					double mY = j * cellSize + cellSize / 2;
+					g.fill(new Rectangle2D.Double(mX - 0.02, mY - 0.02, 0.04, 0.04));
+					g.draw(new Line2D.Double(mX, mY, mX + xVelocities[i][j] * 4, mY + yVelocities[i][j] * 4));
+				}
+			}
+		}
+	}
+
 	protected void renderAllDroplets(final Iterable<? extends ScenarioElement> elements, final Graphics2D g,
 									 final Color color){
 		for (ScenarioElement e : elements){

@@ -78,6 +78,11 @@ public abstract class IOOutput {
 		Table result = reader.readFile();
 		return result;
 	}
+	public static Table readAirflowData(final Path airflowDataFilePath) throws IOException {
+		AirflowDataReader reader = new AirflowDataReader(airflowDataFilePath);
+		Table result = reader.readFile();
+		return result;
+	}
 
 	/**
 	 * Check if the trajectory file of the project is valid by only reading the first line of the file.

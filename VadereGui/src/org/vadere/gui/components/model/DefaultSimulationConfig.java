@@ -50,6 +50,7 @@ public class DefaultSimulationConfig extends DefaultConfig {
 	private boolean showGrid = false;
 	private boolean showDensity = false;
 	private boolean showGroups = false;
+	private boolean showAirflow = false;
 	protected final Color pedestrianDefaultColor = new Color(76, 114, 202);
 	private Map<Integer, Color> pedestrianColors = new TreeMap<>();
 	private Map<Integer, Color> randomColors = new HashMap<>();
@@ -111,6 +112,10 @@ public class DefaultSimulationConfig extends DefaultConfig {
 		this.showPotentialField = config.showPotentialField;
 		this.showTargetPotentielFieldMesh = config.showTargetPotentielFieldMesh;
 		this.agentColoring = config.agentColoring;
+	}
+
+	public boolean isShowAirflow() {
+		return showAirflow;
 	}
 
 	public boolean isShowGroups() {
@@ -207,6 +212,11 @@ public class DefaultSimulationConfig extends DefaultConfig {
 
 	public boolean isShowTargetPotentielFieldMesh() {
 		return showTargetPotentielFieldMesh;
+	}
+
+	public void setShowAirflow(boolean showAirflow) {
+		this.showAirflow = showAirflow;
+		setChanged();
 	}
 
 	public void setShowTargets(boolean showTargets) {
