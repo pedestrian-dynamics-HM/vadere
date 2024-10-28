@@ -49,17 +49,10 @@ public class AirFlowModel extends AbstractAirFlowModel {
         logger.info("Running python script for calculating airflow");
         try {
             ProcessBuilder processBuilder = new ProcessBuilder();
+            System.out.println(attributesAirFlowModel.getCondaPath() + " " +  "run" + " " + "-n" + " " + attributesAirFlowModel.getCondaEnv() + " " +
+                    "python" + " " + "VadereSimulator/src/org/vadere/simulator/models/airflow/python/scikit-fem_stokes_flow_v3.py" + " " + airFlow.getScenarioPath() + " " + airFlow.getScenarioHash());
             processBuilder.command(attributesAirFlowModel.getCondaPath(),  "run", "-n", attributesAirFlowModel.getCondaEnv(),
-                    "python", "VadereSimulator/src/org/vadere/simulator/models/airflow/python/scikit-fem_stokes_flow_v2.py", airFlow.getScenarioPath(), airFlow.getScenarioHash(),
-                    Double.toString(attributesAirFlowModel.getGridSize()),
-                    Double.toString(attributesAirFlowModel.getAreaThreshold()),
-                    attributesAirFlowModel.getInletSide(),
-                    Double.toString(attributesAirFlowModel.getInletStart()),
-                    Double.toString(attributesAirFlowModel.getInletEnd()),
-                    Double.toString(attributesAirFlowModel.getInletVelocity()),
-                    attributesAirFlowModel.getOutletSide(),
-                    Double.toString(attributesAirFlowModel.getOutletStart()),
-                    Double.toString(attributesAirFlowModel.getOutletEnd())
+                    "python", "VadereSimulator/src/org/vadere/simulator/models/airflow/python/scikit-fem_stokes_flow_v3.py", airFlow.getScenarioPath(), airFlow.getScenarioHash()
             );
             Process process = processBuilder.start();
 
