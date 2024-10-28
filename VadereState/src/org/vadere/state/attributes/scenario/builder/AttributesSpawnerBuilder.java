@@ -1,15 +1,9 @@
 package org.vadere.state.attributes.scenario.builder;
 
-import com.fasterxml.jackson.annotation.JsonView;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.spawner.*;
 import org.vadere.state.scenario.spawner.VSpawner;
-import org.vadere.state.scenario.spawner.impl.LERPSpawner;
-import org.vadere.state.scenario.spawner.impl.MixedSpawner;
 import org.vadere.state.scenario.spawner.impl.RegularSpawner;
-import org.vadere.state.scenario.spawner.impl.TimeSeriesSpawner;
-import org.vadere.state.util.Views;
-import org.vadere.util.reflection.VadereAttribute;
 
 public class AttributesSpawnerBuilder {
 
@@ -73,15 +67,6 @@ public class AttributesSpawnerBuilder {
         AttributesSpawner attributes = null;
         if(spawnerClass.isAssignableFrom(RegularSpawner.class)){
             attributes = new AttributesRegularSpawner();
-        }
-        if(spawnerClass.isAssignableFrom(LERPSpawner.class)){
-            attributes = new AttributesLerpSpawner();
-        }
-        if(spawnerClass.isAssignableFrom(MixedSpawner.class)){
-            attributes = new AttributesMixedSpawner();
-        }
-        if(spawnerClass.isAssignableFrom(TimeSeriesSpawner.class)){
-            attributes = new AttributesTimeSeriesSpawner();
         }
         attributes.setConstraintsElementsMax(this.constraintsElementsMax);
         attributes.setConstraintsTimeStart(this.constraintsTimeStart);
