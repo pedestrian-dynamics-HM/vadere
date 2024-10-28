@@ -7,10 +7,7 @@ import org.vadere.state.attributes.spawner.AttributesSpawner;
 import org.vadere.state.scenario.AttributesAttached;
 import org.vadere.state.scenario.distribution.DistributionFactory;
 import org.vadere.state.scenario.distribution.VDistribution;
-import org.vadere.state.scenario.spawner.impl.LERPSpawner;
-import org.vadere.state.scenario.spawner.impl.MixedSpawner;
 import org.vadere.state.scenario.spawner.impl.RegularSpawner;
-import org.vadere.state.scenario.spawner.impl.TimeSeriesSpawner;
 
 import java.util.Random;
 import java.util.function.Supplier;
@@ -20,10 +17,7 @@ import java.util.function.Supplier;
         property = "type"
 )
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = RegularSpawner.class, name = "org.vadere.state.scenario.spawner.impl.RegularSpawner"),
-        @JsonSubTypes.Type(value = LERPSpawner.class, name = "org.vadere.state.scenario.spawner.impl.LERPSpawner"),
-        @JsonSubTypes.Type(value = TimeSeriesSpawner.class, name = "org.vadere.state.scenario.spawner.impl.TimeSeriesSpawner"),
-        @JsonSubTypes.Type(value = MixedSpawner.class, name = "org.vadere.state.scenario.spawner.impl.MixedSpawner")
+        @JsonSubTypes.Type(value = RegularSpawner.class, name = "org.vadere.state.scenario.spawner.impl.RegularSpawner")
 })
 public abstract class VSpawner<T extends AttributesSpawner>  extends AttributesAttached<T> {
     protected int dynamicElementsCreatedTotal = 0;
