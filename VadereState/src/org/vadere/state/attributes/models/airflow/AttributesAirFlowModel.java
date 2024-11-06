@@ -18,7 +18,9 @@ public class AttributesAirFlowModel extends Attributes {
 
     private double inletVelocity;
 
-    private ArrayList<AttributesInOutLet> inOutLets;
+    private ArrayList<AttributesInOutLet> inlets;
+
+    private ArrayList<AttributesInOutLet> outlets;
 
     public AttributesAirFlowModel() {
         condaPath = "CONDA_EXE";
@@ -26,7 +28,8 @@ public class AttributesAirFlowModel extends Attributes {
         gridSize = 0.5;
         areaThreshold = 0.1;
         inletVelocity = 1;
-        inOutLets = new ArrayList<>();
+        inlets = new ArrayList<>();
+        outlets = new ArrayList<>();
     }
 
     public AttributesAirFlowModel(double gridSize) {
@@ -53,7 +56,11 @@ public class AttributesAirFlowModel extends Attributes {
         return inletVelocity;
     }
 
-    public List<AttributesInOutLet> getInOutLets() {
-        return inOutLets;
+    public List<AttributesInOutLet> getInlets() {
+        return inlets;
+    }
+
+    public List<AttributesInOutLet> getOutlets() {
+        return outlets;
     }
 }

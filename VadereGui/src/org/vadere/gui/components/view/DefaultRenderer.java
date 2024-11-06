@@ -4,6 +4,10 @@ import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.components.model.IDefaultModel;
 import org.vadere.meshing.mesh.gen.MeshRenderer;
 import org.vadere.meshing.mesh.inter.IMesh;
+import org.vadere.simulator.models.Model;
+import org.vadere.state.attributes.Attributes;
+import org.vadere.state.attributes.models.airflow.AttributesAirFlowModel;
+import org.vadere.state.attributes.models.airflow.AttributesInOutLet;
 import org.vadere.state.scenario.*;
 import org.vadere.util.config.VadereConfig;
 import org.vadere.util.geometry.shapes.VShape;
@@ -292,26 +296,84 @@ public abstract class DefaultRenderer {
 		graphics.setColor(tmpColor);
 	}
 
-	protected void renderAirflow(final AirFlow airFlow, final Graphics2D g){
+	protected void renderAirflow(final Topography topography, final AirFlow airFlow, final Graphics2D g, final java.util.List<Attributes> modelAttributes){
 
 		if (airFlow != null){
-			double[][] xVelocities = airFlow.getXVelocities();
-			double[][] yVelocities = airFlow.getYVelocities();
 
-			double cellSize = airFlow.getGridSize();
+			Rectangle2D.Double bounds = topography.getBounds();
+
+			AttributesAirFlowModel attributesAirFlowModel = Model.findAttributes(modelAttributes, AttributesAirFlowModel.class);
+
+			g.setColor(Color.green);
+
+			for (AttributesInOutLet inlet : attributesAirFlowModel.getInlets()) {
+				switch (inlet.getSide()) {
+					case "bottom":
+						g.fill(new VRectangle.Double(inlet.getStart(), topography.getBoundingBoxWidth() - 0.1, inlet.getEnd() - inlet.getStart(), 0.1));
+						break;
+					case "top":
+						g.fill(new VRectangle.Double(inlet.getStart(), bounds.getHeight() - topography.getBoundingBoxWidth(), inlet.getEnd() - inlet.getStart(), 0.1));
+						break;
+					case "left":
+						g.fill(new VRectangle.Double(topography.getBoundingBoxWidth() - 0.1, inlet.getStart(), 0.1, inlet.getEnd() - inlet.getStart()));
+						break;
+					case "right":
+						g.fill(new VRectangle.Double(bounds.getWidth() - topography.getBoundingBoxWidth(), inlet.getStart(), 0.1, inlet.getEnd() - inlet.getStart()));
+						break;
+				}
+
+			}
+
+			g.setColor(Color.red);
+
+			for (AttributesInOutLet outlet : attributesAirFlowModel.getOutlets()) {
+				switch (outlet.getSide()) {
+					case "bottom":
+						g.fill(new VRectangle.Double(outlet.getStart(), topography.getBoundingBoxWidth() - 0.1, outlet.getEnd() - outlet.getStart(), 0.1));
+						break;
+					case "top":
+						g.fill(new VRectangle.Double(outlet.getStart(), bounds.getHeight() - topography.getBoundingBoxWidth(), outlet.getEnd() - outlet.getStart(), 0.1));
+						break;
+					case "left":
+						g.fill(new VRectangle.Double(topography.getBoundingBoxWidth() - 0.1, outlet.getStart(), 0.1, outlet.getEnd() - outlet.getStart()));
+						break;
+					case "right":
+						g.fill(new VRectangle.Double(bounds.getWidth() - topography.getBoundingBoxWidth(), outlet.getStart(), 0.1, outlet.getEnd() - outlet.getStart()));
+						break;
+				}
+
+			}
 
 			g.setColor(Color.black);
 			g.setStroke(new BasicStroke(3*getLineWidth()));
 
+
+			double[][] xVelocities = airFlow.getXVelocities();
+			double[][] yVelocities = airFlow.getYVelocities();
+
+			double cellSize = airFlow.getGridSize();
+			double arrowLengthMultiplier = 4.;
 			for (int i = 0; i < xVelocities.length; i++){
 				for (int j = 0; j < xVelocities[i].length; j++){
-					double mX = i * cellSize + cellSize / 2;
-					double mY = j * cellSize + cellSize / 2;
-					g.fill(new Rectangle2D.Double(mX - 0.02, mY - 0.02, 0.04, 0.04));
-					g.draw(new Line2D.Double(mX, mY, mX + xVelocities[i][j] * 4, mY + yVelocities[i][j] * 4));
+					double mX = i * cellSize + cellSize / 2 + topography.getBoundingBoxWidth();
+					double mY = j * cellSize + cellSize / 2 + topography.getBoundingBoxWidth();
+					drawLineArrow(g, mX, mY, mX + xVelocities[i][j] * arrowLengthMultiplier, mY + yVelocities[i][j] * arrowLengthMultiplier);
 				}
 			}
 		}
+	}
+
+	protected void drawLineArrow(Graphics2D g2d, double x1, double y1, double x2, double y2) {
+		double phi = Math.atan2(y2 - y1, x2 - x1);
+		double peek = 0.1;
+
+		g2d.draw(new Line2D.Double(x1, y1, x2, y2));
+
+		double phi1 = phi + Math.PI - Math.PI / 8;
+		g2d.draw(new Line2D.Double(x2, y2, x2 + Math.cos(phi1) * peek, y2 + Math.sin(phi1) * peek));
+
+		double phi2 = phi + Math.PI + Math.PI / 8;
+		g2d.draw(new Line2D.Double(x2, y2, x2 + Math.cos(phi2) * peek, y2 + Math.sin(phi2) * peek));
 	}
 
 	protected void renderAllDroplets(final Iterable<? extends ScenarioElement> elements, final Graphics2D g,

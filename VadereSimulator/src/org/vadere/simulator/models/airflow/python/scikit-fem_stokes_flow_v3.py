@@ -78,9 +78,11 @@ def build_mesh():
     for entry in outlets:
         points.extend(get_side_coords(entry["side"], entry["coords"]))
 
-    points = np.array(points)
+    print(points)
+
+    # points = np.array(points)
     info = triangle.MeshInfo()
-    info.set_points(points.tolist())
+    info.set_points(points)
     info.set_holes(holes)
     info.set_facets(edges)
 
@@ -158,10 +160,13 @@ if __name__ == '__main__':
 
         data = json.load(file)
         topography = data['scenario']['topography']
-        x_min = topography['attributes']['bounds']['x']
-        y_min = topography['attributes']['bounds']['y']
-        x_max = x_min + topography['attributes']['bounds']['width']
-        y_max = x_min + topography['attributes']['bounds']['height']
+
+        bounding_box_width = topography['attributes']['boundingBoxWidth']
+
+        x_min = topography['attributes']['bounds']['x'] + bounding_box_width
+        y_min = topography['attributes']['bounds']['y'] + bounding_box_width
+        x_max = topography['attributes']['bounds']['width'] - bounding_box_width
+        y_max = topography['attributes']['bounds']['height'] - bounding_box_width
         attributes_model = data['scenario']['attributesModel']['org.vadere.state.attributes.models.airflow.AttributesAirFlowModel']
 
         grid_size = float(attributes_model['gridSize'])
@@ -170,9 +175,11 @@ if __name__ == '__main__':
 
         inlets = []
         outlets = []
-        for i, in_out in enumerate(attributes_model['inOutLets']):
-            inlets.append({"id": i, "side": in_out['inletSide'], "coords": [float(in_out['inletStart']), float(in_out['inletEnd'])]})
-            outlets.append({"id": i, "side": in_out['outletSide'], "coords": [float(in_out['outletStart']), float(in_out['outletEnd'])]})
+        for i, ins in enumerate(attributes_model['inlets']):
+            inlets.append({"id": i, "side": ins['side'], "coords": [float(ins['start']), float(ins['end'])]})
+
+        for i, outs in enumerate(attributes_model['outlets']):
+            outlets.append({"id": i, "side": outs['side'], "coords": [float(outs['start']), float(outs['end'])]})
 
         obstacles = []
         for obstacle in topography['obstacles']:
@@ -185,9 +192,6 @@ if __name__ == '__main__':
 
             if obstacle['shape']['type'] == 'POLYGON':
                 obstacles.append([(point['x'], point['y']) for point in obstacle['shape']['points']])
-
-    print(inlets)
-    print(outlets)
 
     inlet_dict = {}
     for entry in inlets:

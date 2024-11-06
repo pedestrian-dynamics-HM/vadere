@@ -5,6 +5,7 @@ import org.vadere.gui.components.model.AgentColoring;
 import org.vadere.gui.components.model.SimulationModel;
 import org.vadere.gui.postvisualization.utils.PotentialFieldContainer;
 import org.vadere.simulator.projects.Scenario;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.health.BasicExposureModelHealthStatus;
@@ -323,6 +324,10 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 	@Override
 	public synchronized Topography getTopography() {
 		return scenario.getTopography();
+	}
+
+	public List<Attributes> getModelAttributes() {
+		return scenario.getModelAttributes();
 	}
 
 	@Override
