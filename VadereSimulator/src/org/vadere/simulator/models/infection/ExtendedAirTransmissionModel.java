@@ -11,6 +11,7 @@ import org.vadere.state.health.AirTransmissionModelHealthStatus;
 import org.vadere.state.health.ExtendedAirTransmissionModelHealthStatus;
 import org.vadere.state.scenario.AerosolCloud;
 import org.vadere.state.scenario.Agent;
+import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -21,9 +22,12 @@ import java.util.*;
 
 public class ExtendedAirTransmissionModel extends AirTransmissionModel {
 
+    private static final int STUCK_MAX = 10;
+
     private final Logger logger = Logger.getLogger(ExtendedAirTransmissionModel.class);
     private AttributesExtendedAirTransmissionModel attrAirTransmissionModel;
 
+    private Map<AerosolCloud, Integer> aerosolCounter;
     private Map<Integer, Integer> spawnCounter;
 
     @Override
@@ -31,6 +35,7 @@ public class ExtendedAirTransmissionModel extends AirTransmissionModel {
         super.initialize(domain, attributesPedestrian, random);
         attrAirTransmissionModel = Model.findAttributes(attributesList, AttributesExtendedAirTransmissionModel.class);
         spawnCounter = new HashMap<>();
+        aerosolCounter = new HashMap<>();
     }
 
     @Override
@@ -44,6 +49,31 @@ public class ExtendedAirTransmissionModel extends AirTransmissionModel {
         updateAerosolCloudsExtent();
         updateAerosolCloudsLocation();
         deleteExpiredAerosolClouds();
+        removeStuckAerosolClouds();
+    }
+
+    public void removeStuckAerosolClouds() {
+        Collection<AerosolCloud> aerosolClouds = topography.getAerosolClouds();
+        Collection<Obstacle> obstacles = topography.getObstacles();
+        Collection<AerosolCloud> toRemove = new ArrayList<>();
+        for (AerosolCloud aerosolCloud : aerosolClouds) {
+            boolean isStuck = obstacles.stream().anyMatch(obstacle -> obstacle.getShape().contains(aerosolCloud.getCenter()));
+            if (isStuck) {
+                if (aerosolCounter.containsKey(aerosolCloud)) {
+                    aerosolCounter.put(aerosolCloud, aerosolCounter.get(aerosolCloud) + 1);
+
+                    if (aerosolCounter.get(aerosolCloud) > STUCK_MAX) {
+                        aerosolCounter.remove(aerosolCloud);
+                        toRemove.add(aerosolCloud);
+                    }
+                } else {
+                    aerosolCounter.put(aerosolCloud, 1);
+                }
+            }  else {
+                aerosolCounter.remove(aerosolCloud);
+            }
+        }
+        aerosolClouds.removeAll(toRemove);
     }
 
     public void updateAerosolCloudsLocation() {

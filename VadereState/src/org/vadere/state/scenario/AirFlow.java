@@ -6,13 +6,15 @@ public class AirFlow {
     private final String scenarioHash;
 
     private double gridSize;
+    private final double border;
 
     private double[][] x_velocity;
     private double[][] y_velocity;
 
-    public AirFlow(String scenarioPath, String scenarioHash) {
+    public AirFlow(String scenarioPath, String scenarioHash, double border) {
         this.scenarioPath = scenarioPath;
         this.scenarioHash = scenarioHash;
+        this.border = border;
     }
 
     public void setX_velocity(double[][] x_velocity) {
@@ -38,13 +40,13 @@ public class AirFlow {
     public double[] getFlowDirection(double x, double y) {
         double[] result = new double[2];
 
-        int x_idx = (int) (x / gridSize);
+        int x_idx = (int) ((x - border) / gridSize);
         if (x_idx < 0)
             x_idx = 0;
         else if (x_idx >= x_velocity.length)
             x_idx = x_velocity.length - 1;
 
-        int y_idx = (int) (y / gridSize);
+        int y_idx = (int) ((y - border) / gridSize);
         if (y_idx < 0)
             y_idx = 0;
         else if (y_idx >= y_velocity.length)

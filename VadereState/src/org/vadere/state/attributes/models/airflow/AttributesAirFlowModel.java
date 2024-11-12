@@ -22,6 +22,8 @@ public class AttributesAirFlowModel extends Attributes {
 
     private ArrayList<AttributesInOutLet> outlets;
 
+    private boolean isObstacleBlocking;
+
     public AttributesAirFlowModel() {
         condaPath = "CONDA_EXE";
         condaEnv = "CONDA_ENV";
@@ -30,6 +32,7 @@ public class AttributesAirFlowModel extends Attributes {
         inletVelocity = 1;
         inlets = new ArrayList<>();
         outlets = new ArrayList<>();
+        isObstacleBlocking = true;
     }
 
     public AttributesAirFlowModel(double gridSize) {
@@ -62,5 +65,9 @@ public class AttributesAirFlowModel extends Attributes {
 
     public List<AttributesInOutLet> getOutlets() {
         return outlets;
+    }
+
+    public boolean isObstacleBlocking() {
+        return isObstacleBlocking;
     }
 }

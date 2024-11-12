@@ -78,8 +78,6 @@ def build_mesh():
     for entry in outlets:
         points.extend(get_side_coords(entry["side"], entry["coords"]))
 
-    print(points)
-
     # points = np.array(points)
     info = triangle.MeshInfo()
     info.set_points(points)
@@ -172,6 +170,7 @@ if __name__ == '__main__':
         grid_size = float(attributes_model['gridSize'])
         area_threshold = float(attributes_model['areaThreshold'])
         inlet_velocity = float(attributes_model['inletVelocity'])
+        is_obstacle_blocking = attributes_model['isObstacleBlocking']
 
         inlets = []
         outlets = []
@@ -182,16 +181,19 @@ if __name__ == '__main__':
             outlets.append({"id": i, "side": outs['side'], "coords": [float(outs['start']), float(outs['end'])]})
 
         obstacles = []
-        for obstacle in topography['obstacles']:
-            if obstacle['shape']['type'] == 'RECTANGLE':
-                ob_x_min = obstacle['shape']['x']
-                ob_y_min = obstacle['shape']['y']
-                ob_x_max = ob_x_min + obstacle['shape']['width']
-                ob_y_max = ob_y_min + obstacle['shape']['height']
-                obstacles.append([(ob_x_min, ob_y_min), (ob_x_min, ob_y_max), (ob_x_max, ob_y_max), (ob_x_max, ob_y_min)])
+        if is_obstacle_blocking:
+            for obstacle in topography['obstacles']:
+                if obstacle['shape']['type'] == 'RECTANGLE':
+                    ob_x_min = obstacle['shape']['x']
+                    ob_y_min = obstacle['shape']['y']
+                    ob_x_max = ob_x_min + obstacle['shape']['width']
+                    ob_y_max = ob_y_min + obstacle['shape']['height']
+                    obstacles.append([(ob_x_min, ob_y_min), (ob_x_min, ob_y_max), (ob_x_max, ob_y_max), (ob_x_max, ob_y_min)])
 
-            if obstacle['shape']['type'] == 'POLYGON':
-                obstacles.append([(point['x'], point['y']) for point in obstacle['shape']['points']])
+                if obstacle['shape']['type'] == 'POLYGON':
+                    obstacles.append([(point['x'], point['y']) for point in obstacle['shape']['points']])
+
+        print(obstacles)
 
     inlet_dict = {}
     for entry in inlets:
@@ -247,8 +249,8 @@ if __name__ == '__main__':
     Vx = -(interp_u(X + h, Y) - interp_u(X - h, Y)) / (2 * h)
     Vy = -(interp_u(X, Y + h) - interp_u(X, Y - h)) / (2 * h)
     velocity = np.sqrt(Vx ** 2 + Vy ** 2)
-    print(Vx.max())
-    print(velocity.max())
+    # print(Vx.max())
+    # print(velocity.max())
 
     # Create square grid
     plt.figure()
