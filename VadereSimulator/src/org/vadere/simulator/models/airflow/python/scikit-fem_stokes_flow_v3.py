@@ -170,7 +170,7 @@ if __name__ == '__main__':
         grid_size = float(attributes_model['gridSize'])
         area_threshold = float(attributes_model['areaThreshold'])
         inlet_velocity = float(attributes_model['inletVelocity'])
-        is_obstacle_blocking = attributes_model['isObstacleBlocking']
+        not_blocking_obstacles = attributes_model['notBlockingObstacles']
 
         inlets = []
         outlets = []
@@ -181,8 +181,8 @@ if __name__ == '__main__':
             outlets.append({"id": i, "side": outs['side'], "coords": [float(outs['start']), float(outs['end'])]})
 
         obstacles = []
-        if is_obstacle_blocking:
-            for obstacle in topography['obstacles']:
+        for obstacle in topography['obstacles']:
+            if obstacle['id'] not in not_blocking_obstacles:
                 if obstacle['shape']['type'] == 'RECTANGLE':
                     ob_x_min = obstacle['shape']['x']
                     ob_y_min = obstacle['shape']['y']
@@ -192,8 +192,6 @@ if __name__ == '__main__':
 
                 if obstacle['shape']['type'] == 'POLYGON':
                     obstacles.append([(point['x'], point['y']) for point in obstacle['shape']['points']])
-
-        print(obstacles)
 
     inlet_dict = {}
     for entry in inlets:
