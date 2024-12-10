@@ -172,13 +172,19 @@ if __name__ == '__main__':
         inlet_velocity = float(attributes_model['inletVelocity'])
         not_blocking_obstacles = attributes_model['notBlockingObstacles']
 
+        parameter_string = attributes_model['gridSize'] + "-" + attributes_model['areaThreshold'] + "-" + attributes_model['inletVelocity'] + "-"
+
         inlets = []
         outlets = []
         for i, ins in enumerate(attributes_model['inlets']):
+            parameter_string = parameter_string +  ins['side'] + [ins['start'], ins['end']]
             inlets.append({"id": i, "side": ins['side'], "coords": [float(ins['start']), float(ins['end'])]})
-
+        parameter_string = parameter_string + "-"
         for i, outs in enumerate(attributes_model['outlets']):
+            parameter_string = parameter_string + outs['side'] + [outs['start'], outs['end']]
             outlets.append({"id": i, "side": outs['side'], "coords": [float(outs['start']), float(outs['end'])]})
+
+        parameter_string = parameter_string + "-" + not_blocking_obstacles
 
         obstacles = []
         for obstacle in topography['obstacles']:
@@ -256,5 +262,5 @@ if __name__ == '__main__':
     plt.title('Velocity Field')
     plt.show()
 
-    np.savetxt(scenario_file_path + '_' + scenario_hash + '_Vx.txt', Vx, header=f'{Vx.shape[0]} {Vx.shape[1]}')
-    np.savetxt(scenario_file_path + '_' + scenario_hash + '_Vy.txt', Vy, header=f'{Vy.shape[0]} {Vy.shape[1]}')
+    np.savetxt(scenario_file_path + '_' + scenario_hash + '_Vx.txt', Vx, header=f'{Vx.shape[0]} {Vx.shape[1]} {parameter_string}')
+    np.savetxt(scenario_file_path + '_' + scenario_hash + '_Vy.txt', Vy, header=f'{Vy.shape[0]} {Vy.shape[1]} {parameter_string}')

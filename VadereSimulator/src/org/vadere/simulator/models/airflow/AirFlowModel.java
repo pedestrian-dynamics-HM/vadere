@@ -4,11 +4,13 @@ import org.vadere.simulator.models.Model;
 import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.airflow.AttributesAirFlowModel;
+import org.vadere.state.attributes.models.airflow.AttributesInOutLet;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.AirFlow;
 import org.vadere.util.logging.Logger;
 
 import java.io.*;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -68,10 +70,17 @@ public class AirFlowModel extends AbstractAirFlowModel {
     private double[][] readArrayFromFile(String filename) throws IOException {
         BufferedReader reader = new BufferedReader(new FileReader(filename));
 
+        String expectedParameters = getAttributesString(attributesAirFlowModel);
+        System.out.println(expectedParameters);
+
         String header = reader.readLine();
         String[] split = header.split(" ");
         int x_dim = Integer.parseInt(split[1]);
         int y_dim = Integer.parseInt(split[2]);
+
+        if (!expectedParameters.equals(split[3])) {
+            System.out.println("Wrong parameter ---------------------------------------------------");
+        }
 
         double[][] result = new double[x_dim][y_dim];
 
@@ -84,6 +93,22 @@ public class AirFlowModel extends AbstractAirFlowModel {
                 } catch (NumberFormatException ignored) {}
             }
         }
+        return result;
+    }
+
+    private String getAttributesString(AttributesAirFlowModel attributes) {
+        String result = "";
+        result += attributes.getGridSize();
+        result += "-" + attributes.getAreaThreshold();
+        result += "-" + attributes.getInletVelocity() + "-";
+        for (AttributesInOutLet inlet : attributes.getInlets()) {
+            result += inlet.getSide() + "[" + inlet.getStart() + "," + inlet.getEnd() + "]";
+        }
+        result += "-";
+        for (AttributesInOutLet outlet : attributes.getOutlets()) {
+            result += outlet.getSide() + "[" + outlet.getStart() + "," + outlet.getEnd() + "]";
+        }
+        result += "-" + Arrays.toString(attributes.getNotBlockingObstacles().toArray(new Integer[0]));
         return result;
     }
 }
