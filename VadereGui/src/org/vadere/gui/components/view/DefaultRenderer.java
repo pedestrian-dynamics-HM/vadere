@@ -347,6 +347,8 @@ public abstract class DefaultRenderer {
 			g.setColor(Color.black);
 			g.setStroke(new BasicStroke(3*getLineWidth()));
 
+			double visTolerance = 10e-8;
+
 
 			double[][] xVelocities = airFlow.getXVelocities();
 			double[][] yVelocities = airFlow.getYVelocities();
@@ -355,9 +357,11 @@ public abstract class DefaultRenderer {
 			double arrowLengthMultiplier = 4.;
 			for (int i = 0; i < xVelocities.length; i++){
 				for (int j = 0; j < xVelocities[i].length; j++){
-					double mX = i * cellSize + cellSize / 2 + topography.getBoundingBoxWidth();
-					double mY = j * cellSize + cellSize / 2 + topography.getBoundingBoxWidth();
-					drawLineArrow(g, mX, mY, mX + xVelocities[i][j] * arrowLengthMultiplier, mY + yVelocities[i][j] * arrowLengthMultiplier);
+					if (Math.abs(Math.pow(xVelocities[i][j], 2) + Math.pow(yVelocities[i][j], 2)) > visTolerance) {
+						double mX = i * cellSize + cellSize / 2 + topography.getBoundingBoxWidth();
+						double mY = j * cellSize + cellSize / 2 + topography.getBoundingBoxWidth();
+						drawLineArrow(g, mX, mY, mX + xVelocities[i][j] * arrowLengthMultiplier, mY + yVelocities[i][j] * arrowLengthMultiplier);
+					}
 				}
 			}
 		}
