@@ -42,6 +42,15 @@ public class AirFlowModel extends AbstractAirFlowModel {
             airFlow.setX_velocity(readArrayFromFile(airFlow.getScenarioPath() + "_" +  airFlow.getScenarioHash() + X_VELOCITY_FILE_ENDING));
             airFlow.setY_velocity(readArrayFromFile(airFlow.getScenarioPath() + "_" +  airFlow.getScenarioHash() + Y_VELOCITY_FILE_ENDING));
             airFlow.setGridSize(attributesAirFlowModel.getGridSize());
+        } catch (IllegalArgumentException e) {
+            calculateAirFlow();
+            try {
+                airFlow.setX_velocity(readArrayFromFile(airFlow.getScenarioPath() + "_" +  airFlow.getScenarioHash() + X_VELOCITY_FILE_ENDING));
+                airFlow.setY_velocity(readArrayFromFile(airFlow.getScenarioPath() + "_" +  airFlow.getScenarioHash() + Y_VELOCITY_FILE_ENDING));
+                airFlow.setGridSize(attributesAirFlowModel.getGridSize());
+            } catch (IOException ex) {
+                logger.error("Error reading airflow matrices: {}", e.getMessage());
+            }
         } catch (IOException e) {
             logger.error("Error reading airflow matrices: {}", e.getMessage());
         }
@@ -71,15 +80,17 @@ public class AirFlowModel extends AbstractAirFlowModel {
         BufferedReader reader = new BufferedReader(new FileReader(filename));
 
         String expectedParameters = getAttributesString(attributesAirFlowModel);
-        System.out.println(expectedParameters);
 
         String header = reader.readLine();
-        String[] split = header.split(" ");
-        int x_dim = Integer.parseInt(split[1]);
-        int y_dim = Integer.parseInt(split[2]);
+        String[] split = header.substring(2).split("_");
+        System.out.println(Arrays.toString(split));
+        int x_dim = Integer.parseInt(split[0]);
+        int y_dim = Integer.parseInt(split[1]);
 
-        if (!expectedParameters.equals(split[3])) {
+        if (!expectedParameters.equals(split[2])) {
             System.out.println("Wrong parameter ---------------------------------------------------");
+            System.out.println(expectedParameters + " : " + split[2]);
+            throw new IllegalArgumentException();
         }
 
         double[][] result = new double[x_dim][y_dim];
