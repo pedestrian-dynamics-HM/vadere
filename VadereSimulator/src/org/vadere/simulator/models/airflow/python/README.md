@@ -18,7 +18,7 @@ conda activate CONDA_ENV
 Install required packages.
 
 ```bash
-pip install -r requirments.txt
+pip install -r requirements.txt
 ```
 
 ## Usage of conda environment for airflow calculation
