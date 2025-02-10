@@ -47,7 +47,7 @@ public class ExtendedAirTransmissionModel extends AirTransmissionModel {
     public void updateAerosolClouds(double simTimeInSec) {
         updateAerosolCloudsPathogenLoad(simTimeInSec);
         updateAerosolCloudsExtent();
-        updateAerosolCloudsLocation();
+        updateAerosolCloudsLocation(simTimeInSec);
         deleteExpiredAerosolClouds();
         removeStuckAerosolClouds();
     }
@@ -57,7 +57,10 @@ public class ExtendedAirTransmissionModel extends AirTransmissionModel {
         Collection<Obstacle> obstacles = topography.getObstacles();
         Collection<AerosolCloud> toRemove = new ArrayList<>();
         for (AerosolCloud aerosolCloud : aerosolClouds) {
-            boolean isStuck = obstacles.stream().anyMatch(obstacle -> obstacle.getShape().contains(aerosolCloud.getCenter()));
+            boolean isStuck = obstacles.stream()
+                    .filter(obstacle -> obstacle.getShape().contains(aerosolCloud.getCenter()))
+                    .anyMatch(obstacle -> topography.getAirFlow().getBlockingObstaclesIDs().contains(obstacle.getId()));
+
             if (isStuck) {
                 if (aerosolCounter.containsKey(aerosolCloud)) {
                     aerosolCounter.put(aerosolCloud, aerosolCounter.get(aerosolCloud) + 1);
@@ -76,11 +79,11 @@ public class ExtendedAirTransmissionModel extends AirTransmissionModel {
         aerosolClouds.removeAll(toRemove);
     }
 
-    public void updateAerosolCloudsLocation() {
+    public void updateAerosolCloudsLocation(double simTimeInSec) {
         AttributesExtendedAirTransmissionModel attrModel = (AttributesExtendedAirTransmissionModel) getAttributes();
         Collection<AerosolCloud> allAerosolClouds = topography.getAerosolClouds();
         for (AerosolCloud aerosolCloud : allAerosolClouds) {
-            double[] windXY = topography.getAirFlow().getFlowDirection(aerosolCloud.getCenter().getX(), aerosolCloud.getCenter().getY());
+            double[] windXY = topography.getAirFlow().getFlowDirection(simTimeInSec ,aerosolCloud.getCenter().getX(), aerosolCloud.getCenter().getY());
             aerosolCloud.shiftShape(windXY[0] / simTimeStepLength, windXY[1] / simTimeStepLength);
         }
     }

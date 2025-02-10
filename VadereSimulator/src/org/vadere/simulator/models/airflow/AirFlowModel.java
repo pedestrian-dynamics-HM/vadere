@@ -35,19 +35,28 @@ public class AirFlowModel extends AbstractAirFlowModel {
     public void setupAirFlow() {
         File f_x_velocity = new File(airFlow.getScenarioPath() + "_" +  airFlow.getScenarioHash() + X_VELOCITY_FILE_ENDING);
         File f_y_velocity = new File(airFlow.getScenarioPath() + "_" +  airFlow.getScenarioHash() + Y_VELOCITY_FILE_ENDING);
+
         if(!(f_x_velocity.exists() && !f_x_velocity.isDirectory()) && !(f_y_velocity.exists() && !f_y_velocity.isDirectory())) {
             calculateAirFlow();
         }
+
         try {
             airFlow.setX_velocity(readArrayFromFile(airFlow.getScenarioPath() + "_" +  airFlow.getScenarioHash() + X_VELOCITY_FILE_ENDING));
             airFlow.setY_velocity(readArrayFromFile(airFlow.getScenarioPath() + "_" +  airFlow.getScenarioHash() + Y_VELOCITY_FILE_ENDING));
             airFlow.setGridSize(attributesAirFlowModel.getGridSize());
+            airFlow.setPeriod(attributesAirFlowModel.getOnPeriod(), attributesAirFlowModel.getOffPeriod());
+            airFlow.setBlockingObstaclesIDs(attributesAirFlowModel.getBlockingObstacles());
+
         } catch (IllegalArgumentException e) {
             calculateAirFlow();
+
             try {
                 airFlow.setX_velocity(readArrayFromFile(airFlow.getScenarioPath() + "_" +  airFlow.getScenarioHash() + X_VELOCITY_FILE_ENDING));
                 airFlow.setY_velocity(readArrayFromFile(airFlow.getScenarioPath() + "_" +  airFlow.getScenarioHash() + Y_VELOCITY_FILE_ENDING));
                 airFlow.setGridSize(attributesAirFlowModel.getGridSize());
+                airFlow.setPeriod(attributesAirFlowModel.getOnPeriod(), attributesAirFlowModel.getOffPeriod());
+                airFlow.setBlockingObstaclesIDs(attributesAirFlowModel.getBlockingObstacles());
+
             } catch (IOException ex) {
                 logger.error("Error reading airflow matrices: {}", e.getMessage());
             }
@@ -60,17 +69,16 @@ public class AirFlowModel extends AbstractAirFlowModel {
         logger.info("Running python script for calculating airflow");
         try {
             ProcessBuilder processBuilder = new ProcessBuilder();
-            System.out.println(attributesAirFlowModel.getCondaPath() + " " +  "run" + " " + "-n" + " " + attributesAirFlowModel.getCondaEnv() + " " +
-                    "python" + " " + "VadereSimulator/src/org/vadere/simulator/models/airflow/python/scikit-fem_stokes_flow_v3.py" + " " + airFlow.getScenarioPath() + " " + airFlow.getScenarioHash());
             processBuilder.command(attributesAirFlowModel.getCondaPath(),  "run", "-n", attributesAirFlowModel.getCondaEnv(),
                     "python", "VadereSimulator/src/org/vadere/simulator/models/airflow/python/scikit-fem_stokes_flow_v3.py", airFlow.getScenarioPath(), airFlow.getScenarioHash()
             );
             Process process = processBuilder.start();
 
-            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            logger.info(reader.lines().collect(Collectors.toList()));
+            // BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            // logger.info(reader.lines().collect(Collectors.toList()));
+
             int exitCode = process.waitFor();
-            logger.info("Finished python Script with exitCode: {}", exitCode);
+            logger.info("Finished python script with exitCode: {}", exitCode);
         } catch (InterruptedException | IOException e) {
             logger.error(e.getMessage());
         }
@@ -83,14 +91,11 @@ public class AirFlowModel extends AbstractAirFlowModel {
 
         String header = reader.readLine();
         String[] split = header.substring(2).split("_");
-        System.out.println(Arrays.toString(split));
         int x_dim = Integer.parseInt(split[0]);
         int y_dim = Integer.parseInt(split[1]);
 
         if (!expectedParameters.equals(split[2])) {
-            System.out.println("Wrong parameter ---------------------------------------------------");
-            System.out.println(expectedParameters + " : " + split[2]);
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Wrong parameters for airflow");
         }
 
         double[][] result = new double[x_dim][y_dim];
@@ -107,19 +112,23 @@ public class AirFlowModel extends AbstractAirFlowModel {
         return result;
     }
 
-    private String getAttributesString(AttributesAirFlowModel attributes) {
-        String result = "";
-        result += attributes.getGridSize();
-        result += "-" + attributes.getAreaThreshold();
-        result += "-" + attributes.getInletVelocity() + "-";
+    public static String getAttributesString(AttributesAirFlowModel attributes) {
+        StringBuilder result = new StringBuilder();
+        result.append(attributes.getGridSize()).append("-");
+        result.append(attributes.getAreaThreshold()).append("-");
+        result.append(attributes.getInletVelocity()).append("-");
+
         for (AttributesInOutLet inlet : attributes.getInlets()) {
-            result += inlet.getSide() + "[" + inlet.getStart() + "," + inlet.getEnd() + "]";
+            result.append(inlet.getSide()).append("[").append(inlet.getStart()).append(",").append(inlet.getEnd()).append("]");
         }
-        result += "-";
+        result.append("-");
+
         for (AttributesInOutLet outlet : attributes.getOutlets()) {
-            result += outlet.getSide() + "[" + outlet.getStart() + "," + outlet.getEnd() + "]";
+            result.append(outlet.getSide()).append("[").append(outlet.getStart()).append(",").append(outlet.getEnd()).append("]");
         }
-        result += "-" + Arrays.toString(attributes.getNotBlockingObstacles().toArray(new Integer[0]));
-        return result;
+        result.append("-");
+
+        result.append(Arrays.toString(attributes.getBlockingObstacles().toArray(new Integer[0])));
+        return result.toString();
     }
 }

@@ -28,13 +28,17 @@ public class AirFlowProcessor extends DataProcessor<TopographyGridKey, String> {
 
     @Override
     public void postLoop(SimulationState state) {
+
+
         double[][] xVelocity = airFlow.getXVelocities();
         double[][] yVelocity = airFlow.getYVelocities();
         double gridSize = airFlow.getGridSize();
 
-        for (int i = 0; i < xVelocity.length; i++) {
-            for (int j = 0; j < xVelocity[i].length; j++) {
-                putValue(new TopographyGridKey(j, i), String.format("%.1f %.1f %.1f %.1f %.2f %.2f", j*gridSize, (j+1)*gridSize, i*gridSize, (i+1)*gridSize, xVelocity[i][j], yVelocity[i][j]));
+        if (xVelocity != null && yVelocity != null) {
+            for (int i = 0; i < xVelocity.length; i++) {
+                for (int j = 0; j < xVelocity[i].length; j++) {
+                    putValue(new TopographyGridKey(j, i), String.format("%.1f %.1f %.1f %.1f %.2f %.2f", j*gridSize, (j+1)*gridSize, i*gridSize, (i+1)*gridSize, xVelocity[i][j], yVelocity[i][j]));
+                }
             }
         }
     }

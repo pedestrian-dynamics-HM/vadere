@@ -354,29 +354,48 @@ public abstract class DefaultRenderer {
 			double[][] yVelocities = airFlow.getYVelocities();
 
 			double cellSize = airFlow.getGridSize();
-			double arrowLengthMultiplier = 4.;
+
+			double maxArrowLength = 0;
+
 			for (int i = 0; i < xVelocities.length; i++){
 				for (int j = 0; j < xVelocities[i].length; j++){
-					if (Math.abs(Math.pow(xVelocities[i][j], 2) + Math.pow(yVelocities[i][j], 2)) > visTolerance) {
+					double arrowLength = Math.abs(Math.pow(xVelocities[i][j], 2) + Math.pow(yVelocities[i][j], 2));
+					if (arrowLength > maxArrowLength){
+						maxArrowLength = arrowLength;
+					}
+				}
+			}
+
+			for (int i = 0; i < xVelocities.length; i++){
+				for (int j = 0; j < xVelocities[i].length; j++){
+					double arrowLength = Math.abs(Math.pow(xVelocities[i][j], 2) + Math.pow(yVelocities[i][j], 2));
+					if (arrowLength > visTolerance) {
+
 						double mX = i * cellSize + cellSize / 2 + topography.getBoundingBoxWidth();
 						double mY = j * cellSize + cellSize / 2 + topography.getBoundingBoxWidth();
-						drawLineArrow(g, mX, mY, mX + xVelocities[i][j] * arrowLengthMultiplier, mY + yVelocities[i][j] * arrowLengthMultiplier);
+
+						double angle = Math.atan2(yVelocities[i][j], xVelocities[i][j]);
+
+						drawLineArrow(g, mX, mY, angle, arrowLength / maxArrowLength * cellSize);
 					}
 				}
 			}
 		}
 	}
 
-	protected void drawLineArrow(Graphics2D g2d, double x1, double y1, double x2, double y2) {
-		double phi = Math.atan2(y2 - y1, x2 - x1);
+	protected void drawLineArrow(Graphics2D g2d, double x1, double y1, double angle, double length) {
+
 		double peek = 0.1;
+
+		double x2 = x1 + Math.cos(angle) * length;
+		double y2 = y1 + Math.sin(angle) * length;
 
 		g2d.draw(new Line2D.Double(x1, y1, x2, y2));
 
-		double phi1 = phi + Math.PI - Math.PI / 8;
+		double phi1 = angle + Math.PI - Math.PI / 8;
 		g2d.draw(new Line2D.Double(x2, y2, x2 + Math.cos(phi1) * peek, y2 + Math.sin(phi1) * peek));
 
-		double phi2 = phi + Math.PI + Math.PI / 8;
+		double phi2 = angle + Math.PI + Math.PI / 8;
 		g2d.draw(new Line2D.Double(x2, y2, x2 + Math.cos(phi2) * peek, y2 + Math.sin(phi2) * peek));
 	}
 

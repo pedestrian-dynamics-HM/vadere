@@ -14,6 +14,12 @@ public class AttributesInOutLet {
         end = 2;
     }
 
+    public AttributesInOutLet(String side, double start, double end) {
+        this.side = side;
+        this.start = start;
+        this.end = end;
+    }
+
     public String getSide() {
         return side;
     }

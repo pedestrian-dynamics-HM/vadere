@@ -22,7 +22,11 @@ public class AttributesAirFlowModel extends Attributes {
 
     private ArrayList<AttributesInOutLet> outlets;
 
-    private ArrayList<Integer> notBlockingObstacles;
+    private ArrayList<Integer> blockingObstacles;
+
+    private double onPeriod;
+
+    private double offPeriod;
 
     public AttributesAirFlowModel() {
         condaPath = "CONDA_EXE";
@@ -31,8 +35,28 @@ public class AttributesAirFlowModel extends Attributes {
         areaThreshold = 0.1;
         inletVelocity = 1;
         inlets = new ArrayList<>();
+        inlets.add(new AttributesInOutLet("left", 1, 2));
         outlets = new ArrayList<>();
-        notBlockingObstacles = new ArrayList<>();
+        outlets.add(new AttributesInOutLet("right", 1, 2));
+        blockingObstacles = new ArrayList<>();
+        onPeriod = 1.0;
+        offPeriod = 0;
+
+    }
+
+    public AttributesAirFlowModel(double gridSize, double areaThreshold, double inletVelocity,
+                                  ArrayList<AttributesInOutLet> inlets, ArrayList<AttributesInOutLet> outlets,
+                                  ArrayList<Integer> notBlockingObstacles) {
+        condaPath = "CONDA_EXE";
+        condaEnv = "CONDA_ENV";
+        this.gridSize = gridSize;
+        this.areaThreshold = areaThreshold;
+        this.inletVelocity = inletVelocity;
+        this.inlets = inlets;
+        this.outlets = outlets;
+        this.blockingObstacles = notBlockingObstacles;
+        onPeriod = 1.0;
+        offPeriod = 0;
     }
 
     public AttributesAirFlowModel(double gridSize) {
@@ -67,7 +91,19 @@ public class AttributesAirFlowModel extends Attributes {
         return outlets;
     }
 
-    public ArrayList<Integer> getNotBlockingObstacles() {
-        return notBlockingObstacles;
+    public ArrayList<Integer> getBlockingObstacles() {
+        return blockingObstacles;
+    }
+
+    public double getOnPeriod() {
+        return onPeriod;
+    }
+
+    public double getOffPeriod() {
+        return offPeriod;
+    }
+
+    public void setOffPeriod(double period) {
+        this.offPeriod = period;
     }
 }

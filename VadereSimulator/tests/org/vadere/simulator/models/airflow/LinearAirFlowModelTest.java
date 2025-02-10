@@ -53,16 +53,16 @@ public class LinearAirFlowModelTest {
     @Test
     public void testSetupAirFlow() {
         initializeModel();
-        assertThrows(NullPointerException.class,() -> airFlowModel.airFlow.getFlowDirection(0, 0));
+        assertThrows(NullPointerException.class,() -> airFlowModel.airFlow.getFlowDirection(0, 0, 0));
         airFlowModel.preLoop(0);
-        assertNotNull(airFlowModel.airFlow.getFlowDirection(0, 0));
+        assertNotNull(airFlowModel.airFlow.getFlowDirection(0,0, 0));
     }
 
     @Test
     public void testXYVelocities() {
         initializeModel();
         airFlowModel.preLoop(0);
-        double[] result = airFlowModel.airFlow.getFlowDirection(0, 0);
+        double[] result = airFlowModel.airFlow.getFlowDirection(0, 0, 0);
         assertEquals(Math.atan2(result[1], result[0]), airFlowModel.attributesLinearAirFlowModel.getWindDirection());
         assertEquals(Math.sqrt(Math.pow(result[0], 2) + Math.pow(result[1], 2)), airFlowModel.attributesLinearAirFlowModel.getWindSpeed());
     }

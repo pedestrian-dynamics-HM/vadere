@@ -1,5 +1,8 @@
 package org.vadere.state.scenario;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class AirFlow {
 
     private final String scenarioPath;
@@ -10,6 +13,11 @@ public class AirFlow {
 
     private double[][] x_velocity;
     private double[][] y_velocity;
+
+    private double onPeriod;
+    private double offPeriod;
+
+    private List<Integer> blockingObstaclesIDs = new ArrayList<Integer>();
 
     public AirFlow(String scenarioPath, String scenarioHash, double border) {
         this.scenarioPath = scenarioPath;
@@ -37,7 +45,15 @@ public class AirFlow {
         return scenarioHash;
     }
 
-    public double[] getFlowDirection(double x, double y) {
+    public double[] getFlowDirection(double simTime, double x, double y) {
+
+        if (x_velocity == null) {
+            return new double[]{0, 0};
+        }
+
+        if (offPeriod > 0 && (simTime % (onPeriod + offPeriod) < offPeriod)) {
+            return new double[]{0, 0};
+        }
         double[] result = new double[2];
 
         int x_idx = (int) ((x - border) / gridSize);
@@ -67,5 +83,18 @@ public class AirFlow {
 
     public double getGridSize() {
         return gridSize;
+    }
+
+    public void setPeriod(double onPeriod, double offPeriod) {
+        this.onPeriod = onPeriod;
+        this.offPeriod = offPeriod;
+    }
+
+    public void setBlockingObstaclesIDs(List<Integer> blockingObstaclesIDs) {
+        this.blockingObstaclesIDs = blockingObstaclesIDs;
+    }
+
+    public List<Integer> getBlockingObstaclesIDs() {
+        return blockingObstaclesIDs;
     }
 }

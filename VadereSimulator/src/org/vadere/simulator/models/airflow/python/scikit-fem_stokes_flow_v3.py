@@ -172,7 +172,7 @@ if __name__ == '__main__':
         grid_size = float(attributes_model['gridSize'])
         area_threshold = float(attributes_model['areaThreshold'])
         inlet_velocity = float(attributes_model['inletVelocity'])
-        not_blocking_obstacles = attributes_model['notBlockingObstacles']
+        blocking_obstacles = attributes_model['blockingObstacles']
 
         parameter_string = parameter_string + str(attributes_model['gridSize']) + "-" + str(attributes_model['areaThreshold']) + "-" + str(attributes_model['inletVelocity']) + "-"
 
@@ -186,11 +186,11 @@ if __name__ == '__main__':
             parameter_string = parameter_string + outs['side'] + "[" + str(outs['start'])+","+  str(outs['end']) + "]"
             outlets.append({"id": i, "side": outs['side'], "coords": [float(outs['start']), float(outs['end'])]})
 
-        parameter_string = parameter_string + "-" + str(not_blocking_obstacles)
+        parameter_string = parameter_string + "-" + str(blocking_obstacles)
 
         obstacles = []
         for obstacle in topography['obstacles']:
-            if obstacle['id'] not in not_blocking_obstacles:
+            if obstacle['id'] in blocking_obstacles:
                 if obstacle['shape']['type'] == 'RECTANGLE':
                     ob_x_min = obstacle['shape']['x']
                     ob_y_min = obstacle['shape']['y']
@@ -259,7 +259,9 @@ if __name__ == '__main__':
     # print(velocity.max())
 
     # Create square grid
+    # plt.figure(figsize=(x_length,y_length))
     plt.figure()
+    plt.gca().set_aspect('equal')
     plt.quiver(X, Y, Vx, Vy)
     plt.title('Velocity Field')
     plt.show()
