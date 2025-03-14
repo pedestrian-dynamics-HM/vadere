@@ -374,12 +374,21 @@ public abstract class DefaultRenderer {
 					double arrowLength = Math.abs(Math.pow(xVelocities[i][j], 2) + Math.pow(yVelocities[i][j], 2));
 					arrowLength = arrowLength / maxArrowLength;
 
+					if ((i == 0 || i == xVelocities.length - 1) && (j == 0 || j == xVelocities[i].length - 1)) {
+						System.out.println(xVelocities[i][j]);
+						System.out.println(yVelocities[i][j]);
+					}
+
 					if (airflowScale.equals(Messages.getString("SettingsDialog.chbAirflowScaleSqrt.text"))) {
 						arrowLength = (Math.sqrt(arrowLength) - Math.sqrt(0)) / (Math.sqrt(1) - Math.sqrt(0));
 					} else if (airflowScale.equals(Messages.getString("SettingsDialog.chbAirflowScaleLog.text"))) {
 						arrowLength = (Math.log(arrowLength) - Math.log(visTolerance)) / (Math.log(1) - Math.log(visTolerance));
 					}
 					arrowLength = arrowLength * cellSize;
+
+					if ((i == 0 || i == xVelocities.length - 1) && (j == 0 || j == xVelocities[i].length - 1)) {
+						System.out.println(arrowLength);
+					}
 
 					if (arrowLength > visTolerance) {
 

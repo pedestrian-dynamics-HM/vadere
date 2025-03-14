@@ -57,6 +57,10 @@ public class AirTransmissionModel extends AbstractExposureModel {
 	Topography topography;
 	int aerosolCloudIdCounter;
 
+	private Map<Integer, Integer> spawnCounter;
+	private Map<AerosolCloud, Integer> aerosolCounter;
+
+
 	private Map<Integer, VPoint> lastPedestrianPositions;
 	private Map<Integer, Vector2D> viewingDirections;
 	private Map<Integer, Double> nextDropletsExhalationTime;
@@ -80,6 +84,11 @@ public class AirTransmissionModel extends AbstractExposureModel {
 	 */
 	protected static final double minimumPercentage = 0.01;
 
+	/**
+	 * Define the simulation steps after which an aerosol cloud gets removed when moving through an obstacle
+	 */
+	private static final int STUCK_MAX = 10;
+
 	@Override
 	public void initialize(List<Attributes> attributesList, Domain domain, AttributesAgent attributesPedestrian, Random random) {
 		initialize(domain, attributesPedestrian, random);
@@ -96,6 +105,9 @@ public class AirTransmissionModel extends AbstractExposureModel {
 		viewingDirections = new HashMap<>();
 		lastPedestrianPositions = new HashMap<>();
 		nextDropletsExhalationTime = new HashMap<>();
+
+		spawnCounter = new HashMap<>();
+		aerosolCounter = new HashMap<>();
 	}
 
 	private void setAttributes(List<Attributes> attributesList) {
@@ -155,7 +167,9 @@ public class AirTransmissionModel extends AbstractExposureModel {
 	public void updateAerosolClouds(double simTimeInSec) {
 		updateAerosolCloudsPathogenLoad(simTimeInSec);
 		updateAerosolCloudsExtent();
+		updateAerosolCloudsLocation(simTimeInSec);
 		deleteExpiredAerosolClouds();
+		removeStuckAerosolClouds();
 	}
 
 	public void updateDroplets(double simTimeInSec) {
@@ -170,24 +184,49 @@ public class AirTransmissionModel extends AbstractExposureModel {
 			healthStatus.setExhalationStartPosition(pedestrian.getPosition());
 
 		} else if (healthStatus.isStartingInhalation()) {
-			VPoint startBreatheOutPosition = healthStatus.getExhalationStartPosition();
-			VPoint stopBreatheOutPosition = pedestrian.getPosition();
-			VLine distanceWalkedDuringExhalation = new VLine(startBreatheOutPosition, stopBreatheOutPosition);
+			// VPoint startBreatheOutPosition = healthStatus.getExhalationStartPosition();
+			// VPoint stopBreatheOutPosition = pedestrian.getPosition();
+			// VLine distanceWalkedDuringExhalation = new VLine(startBreatheOutPosition, stopBreatheOutPosition);
+			// VPoint center = distanceWalkedDuringExhalation.midPoint();
+			VPoint aerosolCloudCenter = computeAerosolCloudCenter(pedestrian);
 
-			AerosolCloud aerosolCloud = generateAerosolCloud(simTimeInSec, distanceWalkedDuringExhalation);
+			AerosolCloud aerosolCloud = generateAerosolCloud(simTimeInSec, aerosolCloudCenter);
 			topography.addAerosolCloud(aerosolCloud);
 
 			healthStatus.resetStartExhalationPosition();
 		}
 	}
 
-	private AerosolCloud generateAerosolCloud(double simTimeInSec, VLine distanceWalkedDuringExhalation){
+	private VPoint computeAerosolCloudCenter(Pedestrian pedestrian) {
 		AttributesAirTransmissionModel attrModel = (AttributesAirTransmissionModel) getAttributes();
-		VPoint center = distanceWalkedDuringExhalation.midPoint();
+		VPoint aerosolCloudCenter;
+		if (pedestrian.isSitting()) {
+			Vector2D aerosolCloudDirection = pedestrian.getSittingDirection().normalize(attrModel.getAerosolCloudInitialRadius());
+			aerosolCloudCenter = new VPoint(pedestrian.getPosition().getX() + aerosolCloudDirection.getX(),
+					pedestrian.getPosition().getY() + aerosolCloudDirection.getY());
+		}
+		else {
+			VPoint startBreatheOutPosition = pedestrian.<AirTransmissionModelHealthStatus>getHealthStatus().getExhalationStartPosition();
+			VPoint stopBreatheOutPosition = pedestrian.getPosition();
+			double walkingDirectionX = stopBreatheOutPosition.getX() - startBreatheOutPosition.getX();
+			double walkingDirectionY = stopBreatheOutPosition.getY() - startBreatheOutPosition.getY();
+			Vector2D aerosolCloudDirection = new Vector2D(walkingDirectionX, walkingDirectionY).normalize(attrModel.getAerosolCloudInitialRadius());
+
+			VLine distanceWalkedDuringExhalation = new VLine(startBreatheOutPosition, stopBreatheOutPosition);
+			//aerosolCloudCenter = distanceWalkedDuringExhalation.midPoint();
+			VPoint walkingMidPoint = distanceWalkedDuringExhalation.midPoint();
+			aerosolCloudCenter = new VPoint(walkingMidPoint.getX() + aerosolCloudDirection.getX(),
+					walkingMidPoint.getY() + aerosolCloudDirection.getY());
+		}
+		return aerosolCloudCenter;
+	}
+
+	private AerosolCloud generateAerosolCloud(double simTimeInSec, VPoint aerosolCloudCenter){
+		AttributesAirTransmissionModel attrModel = (AttributesAirTransmissionModel) getAttributes();
 
 		AerosolCloud aerosolCloud = new AerosolCloud(new AttributesAerosolCloud(aerosolCloudIdCounter,
 				attrModel.getAerosolCloudInitialRadius(),
-				center,
+				aerosolCloudCenter,
 				simTimeInSec,
 				attrModel.getAerosolCloudInitialPathogenLoad()));
 
@@ -395,7 +434,16 @@ public class AirTransmissionModel extends AbstractExposureModel {
 		healthStatus.setRespiratoryTimeOffset(random.nextDouble() * attrModel.getPedestrianRespiratoryCyclePeriod());
 		healthStatus.setBreathingIn(false);
 		ped.setHealthStatus(healthStatus);
-		ped.setInfectious(sourceParameters.isInfectious());
+
+		if (!spawnCounter.containsKey(controller.getSourceId())) {
+			spawnCounter.put(controller.getSourceId(), 0);
+		}
+		int counter = spawnCounter.get(controller.getSourceId());
+		if (!sourceParameters.getInfectiousSpawnIds().isEmpty() && sourceParameters.getInfectiousSpawnIds().get(0) == counter) {
+			ped.setInfectious(sourceParameters.isInfectious());
+			sourceParameters.getInfectiousSpawnIds().remove(0);
+		}
+		spawnCounter.put(controller.getSourceId(), counter + 1);
 
 		return ped;
 	}
@@ -440,5 +488,41 @@ public class AirTransmissionModel extends AbstractExposureModel {
 			}
 		}
 		return pedestriansInsideAerosolCloud;
+	}
+
+	public void updateAerosolCloudsLocation(double simTimeInSec) {
+		AttributesAirTransmissionModel attrModel = (AttributesAirTransmissionModel) getAttributes();
+		Collection<AerosolCloud> allAerosolClouds = topography.getAerosolClouds();
+		for (AerosolCloud aerosolCloud : allAerosolClouds) {
+			double[] windXY = topography.getAirFlow().getFlowDirection(simTimeInSec ,aerosolCloud.getCenter().getX(), aerosolCloud.getCenter().getY());
+			aerosolCloud.shiftShape(windXY[0] / simTimeStepLength, windXY[1] / simTimeStepLength);
+		}
+	}
+
+	public void removeStuckAerosolClouds() {
+		Collection<AerosolCloud> aerosolClouds = topography.getAerosolClouds();
+		Collection<Obstacle> obstacles = topography.getObstacles();
+		Collection<AerosolCloud> toRemove = new ArrayList<>();
+		for (AerosolCloud aerosolCloud : aerosolClouds) {
+			boolean isStuck = obstacles.stream()
+					.filter(obstacle -> obstacle.getShape().contains(aerosolCloud.getCenter()))
+					.anyMatch(obstacle -> topography.getAirFlow().getBlockingObstaclesIDs().contains(obstacle.getId()));
+
+			if (isStuck) {
+				if (aerosolCounter.containsKey(aerosolCloud)) {
+					aerosolCounter.put(aerosolCloud, aerosolCounter.get(aerosolCloud) + 1);
+
+					if (aerosolCounter.get(aerosolCloud) > STUCK_MAX) {
+						aerosolCounter.remove(aerosolCloud);
+						toRemove.add(aerosolCloud);
+					}
+				} else {
+					aerosolCounter.put(aerosolCloud, 1);
+				}
+			}  else {
+				aerosolCounter.remove(aerosolCloud);
+			}
+		}
+		aerosolClouds.removeAll(toRemove);
 	}
 }
