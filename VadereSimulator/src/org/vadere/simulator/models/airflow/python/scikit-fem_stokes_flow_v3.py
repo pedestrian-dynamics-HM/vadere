@@ -91,45 +91,6 @@ def build_mesh():
 
     return P, T
 
-# # Building the mesh
-# def build_mesh(inlets, outlets):
-#     points = [(x_min, y_min), (x_min, y_max), (x_max, y_max), (x_max, y_min)]
-#     edges = round_trip_connect(0, len(points) - 1)
-#
-#     for obs in obstacles:
-#         (x1, y1), (x2, y2) = obs
-#         rect_points = [(x1, y1), (x1, y2), (x2, y2), (x2, y1)]
-#         rect_start_idx = len(points)
-#         points.extend(rect_points)
-#         edges.extend(round_trip_connect(rect_start_idx, len(points) - 1))
-#
-#     for entry in inlets:
-#         points.extend(get_side_coords(entry["side"], entry["coords"]))
-#     for entry in outlets:
-#         points.extend(get_side_coords(entry["side"], entry["coords"]))
-#
-#     points = np.array(points)
-#     info = triangle.MeshInfo()
-#     info.set_points(points.tolist())
-#     # Define holes - the center points of obstacles
-#     holes = [((o[0][0] + o[1][0]) / 2, (o[0][1] + o[1][1]) / 2) for o in obstacles]
-#     info.set_holes(holes)
-#     info.set_facets(edges)
-#
-#     mesh = triangle.build(info, refinement_func=needs_refinement)
-#
-#     P = np.array(mesh.points)
-#     T = np.array(mesh.elements)
-#
-#     # Plot mesh
-#     mesh_points = np.array(mesh.points)
-#     mesh_tris = np.array(mesh.elements)
-#     mesh_facets = np.array(mesh.facets)
-#     plt.triplot(mesh_points[:, 0], mesh_points[:, 1], mesh_tris)
-#     plt.show()
-#
-#     return P, T
-
 def get_boundary_lambda(side, coords):
     if side == 'left':
         return lambda x: np.isclose(x[0], x_min) & (x[1] >= coords[0]) & (x[1] <= coords[1])
@@ -210,9 +171,10 @@ if __name__ == '__main__':
     boundary_dict = inlet_dict | outlet_dict
 
     P, T = build_mesh()
-    # P, T = build_mesh(inlets, outlets)
 
     mesh = (MeshTri(P.T, T.T).with_boundaries(boundary_dict))
+
+    print(mesh)
 
     element = {'u': ElementVector(ElementTriP2()),
                'p': ElementTriP1()}
@@ -245,15 +207,27 @@ if __name__ == '__main__':
     u = uv[basis['u'].nodal_dofs.flatten()[:nr_points]]
     v = uv[basis['u'].nodal_dofs.flatten()[nr_points:2*nr_points]]
 
+    print(u.shape)
+    print(v.shape)
+
     # Compute the velocity field manually using finite differences and interpolation
     triang = Triangulation(*mesh.p, mesh.t.T)
+
+    #print(triang)
+    #plt.triplot(triang, marker="o")
+    #plt.show()
+
+
     interp_u = LinearTriInterpolator(triang, np.sqrt(u ** 2 + v ** 2))
 
-    X, Y = np.meshgrid(np.arange(x_min, x_max, grid_size), np.arange(y_min, y_max, grid_size))
+    X, Y = np.meshgrid(np.arange(x_min + grid_size/2, x_max, grid_size), np.arange(y_min + grid_size/2, y_max, grid_size))
     # Compute gradient using finite differences
     h = 1e-2
+
+
     Vx = -(interp_u(X + h, Y) - interp_u(X - h, Y)) / (2 * h)
     Vy = -(interp_u(X, Y + h) - interp_u(X, Y - h)) / (2 * h)
+
     velocity = np.sqrt(Vx ** 2 + Vy ** 2)
     # print(Vx.max())
     # print(velocity.max())

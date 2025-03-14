@@ -572,6 +572,8 @@ public class SettingsDialog extends JDialog {
 		JCheckBox chShowAbsorbingAreas = new JCheckBox((Localization.getString("SettingsDialog.chbShowAbsorbingAreas.text")));
 		JCheckBox chShowAerosolClouds = new JCheckBox((Localization.getString("SettingsDialog.chbShowAerosolClouds.text")));
         JCheckBox chShowAirFlow = new JCheckBox((Localization.getString("SettingsDialog.chbShowAirflow.text")));
+        JComboBox<String> chSetAirflowScale = new JComboBox<>(new String[]{Localization.getString("SettingsDialog.chbAirflowScaleLin.text"),
+                Localization.getString("SettingsDialog.chbAirflowScaleLog.text"), Localization.getString("SettingsDialog.chbAirflowScaleSqrt.text")});
         JCheckBox chShowDropletClouds = new JCheckBox((Localization.getString("SettingsDialog.chbShowDropletClouds.text")));
 		JCheckBox chShowMeasurementAreas = new JCheckBox((Localization.getString("SettingsDialog.chbShowMeasurementAreas.text")));
 		JCheckBox chShowStairs = new JCheckBox((Localization.getString("SettingsDialog.chbShowStairs.text")));
@@ -600,6 +602,11 @@ public class SettingsDialog extends JDialog {
 		chShowAirFlow.setSelected(model.config.isShowAirflow());
 		chShowAirFlow.addItemListener(e -> {
 			model.config.setShowAirflow(!model.config.isShowAirflow());
+			model.notifyObservers();
+		});
+
+		chSetAirflowScale.addItemListener(e -> {
+			model.config.setAirflowScale(e.getItem().toString());
 			model.notifyObservers();
 		});
 
@@ -686,6 +693,7 @@ public class SettingsDialog extends JDialog {
 		otherSettingsPane.add(chShowPedIds, cc.xyw(column, row += NEXT_CELL, colSpan));
         otherSettingsPane.add(chShowPedestrianInOutGroup, cc.xyw(column, row += NEXT_CELL, colSpan));
 		otherSettingsPane.add(chShowAerosolClouds, cc.xyw(column, row += NEXT_CELL, colSpan));
+		otherSettingsPane.add(chSetAirflowScale, cc.xyw(column, row += NEXT_CELL, colSpan));
 		otherSettingsPane.add(chShowAirFlow, cc.xyw(column, row += NEXT_CELL, colSpan));
 		otherSettingsPane.add(chShowDropletClouds, cc.xyw(column, row += NEXT_CELL, colSpan));
 

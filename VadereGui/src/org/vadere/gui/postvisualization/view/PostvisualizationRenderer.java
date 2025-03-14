@@ -288,7 +288,7 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 		if (model.config.isShowAirflow()) {
 			model.getTableAirflow().initAirflow();
 			AirFlow airflow = model.getTableAirflow().getAirflow();
-			renderAirflow(model.getTopography(), airflow, g, model.getModelAttributes());
+			renderAirflow(model.getTopography(), airflow, g, model.getModelAttributes(), model.config.getAirflowScale());
 		}
 
 	}

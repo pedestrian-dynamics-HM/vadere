@@ -1,5 +1,6 @@
 package org.vadere.simulator.models.infection;
 
+import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.control.scenarioelements.SourceController;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.projects.Domain;
@@ -20,6 +21,7 @@ import org.vadere.util.logging.Logger;
 
 import java.util.*;
 
+@ModelClass
 public class ExtendedAirTransmissionModel extends AirTransmissionModel {
 
     private static final int STUCK_MAX = 10;

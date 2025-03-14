@@ -119,7 +119,7 @@ public abstract class SimulationRenderer extends DefaultRenderer {
         }
 
         if (model.config.isShowAirflow()) {
-            renderAirflow(model.getTopography(), model.getTopography().getAirFlow(), graphics, model.getModelAttributes());
+            renderAirflow(model.getTopography(), model.getTopography().getAirFlow(), graphics, model.getModelAttributes(), model.config.getAirflowScale());
         }
 
         if (model.isVoronoiDiagramAvailable() && model.isVoronoiDiagramVisible()) {

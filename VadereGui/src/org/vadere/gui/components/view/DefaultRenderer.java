@@ -2,6 +2,7 @@ package org.vadere.gui.components.view;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.components.model.IDefaultModel;
+import org.vadere.gui.components.utils.Messages;
 import org.vadere.meshing.mesh.gen.MeshRenderer;
 import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.simulator.models.Model;
@@ -34,6 +35,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.Collection;
+import java.util.Objects;
 
 /**
  * @author Benedikt Zoennchen
@@ -296,7 +298,7 @@ public abstract class DefaultRenderer {
 		graphics.setColor(tmpColor);
 	}
 
-	protected void renderAirflow(final Topography topography, final AirFlow airFlow, final Graphics2D g, final java.util.List<Attributes> modelAttributes){
+	protected void renderAirflow(final Topography topography, final AirFlow airFlow, final Graphics2D g, final java.util.List<Attributes> modelAttributes, String airflowScale){
 
 		if (airFlow != null){
 
@@ -368,7 +370,17 @@ public abstract class DefaultRenderer {
 
 			for (int i = 0; i < xVelocities.length; i++){
 				for (int j = 0; j < xVelocities[i].length; j++){
+
 					double arrowLength = Math.abs(Math.pow(xVelocities[i][j], 2) + Math.pow(yVelocities[i][j], 2));
+					arrowLength = arrowLength / maxArrowLength;
+
+					if (airflowScale.equals(Messages.getString("SettingsDialog.chbAirflowScaleSqrt.text"))) {
+						arrowLength = (Math.sqrt(arrowLength) - Math.sqrt(0)) / (Math.sqrt(1) - Math.sqrt(0));
+					} else if (airflowScale.equals(Messages.getString("SettingsDialog.chbAirflowScaleLog.text"))) {
+						arrowLength = (Math.log(arrowLength) - Math.log(visTolerance)) / (Math.log(1) - Math.log(visTolerance));
+					}
+					arrowLength = arrowLength * cellSize;
+
 					if (arrowLength > visTolerance) {
 
 						double mX = i * cellSize + cellSize / 2 + topography.getBoundingBoxWidth();
@@ -376,7 +388,7 @@ public abstract class DefaultRenderer {
 
 						double angle = Math.atan2(yVelocities[i][j], xVelocities[i][j]);
 
-						drawLineArrow(g, mX, mY, angle, arrowLength / maxArrowLength * cellSize);
+						drawLineArrow(g, mX, mY, angle, arrowLength);
 					}
 				}
 			}

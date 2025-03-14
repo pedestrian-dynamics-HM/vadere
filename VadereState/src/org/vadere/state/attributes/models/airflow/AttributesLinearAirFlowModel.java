@@ -1,7 +1,9 @@
 package org.vadere.state.attributes.models.airflow;
 
+import org.vadere.annotation.factories.attributes.ModelAttributeClass;
 import org.vadere.state.attributes.Attributes;
 
+@ModelAttributeClass
 public class AttributesLinearAirFlowModel extends Attributes {
 
     /**

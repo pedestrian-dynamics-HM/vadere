@@ -1,5 +1,6 @@
 package org.vadere.simulator.models.airflow;
 
+import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.Attributes;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
+@ModelClass
 public class AirFlowModel extends AbstractAirFlowModel {
 
     private static final Logger logger = Logger.getLogger(AirFlow.class);
@@ -73,6 +75,9 @@ public class AirFlowModel extends AbstractAirFlowModel {
                     "python", "VadereSimulator/src/org/vadere/simulator/models/airflow/python/scikit-fem_stokes_flow_v3.py", airFlow.getScenarioPath(), airFlow.getScenarioHash()
             );
             Process process = processBuilder.start();
+
+            System.out.println(attributesAirFlowModel.getCondaPath() + " " +  "run" + " " + "-n" + " " + attributesAirFlowModel.getCondaEnv() + " " +
+                    "python" + " " + "VadereSimulator/src/org/vadere/simulator/models/airflow/python/scikit-fem_stokes_flow_v3.py" + " " + airFlow.getScenarioPath() + " " + airFlow.getScenarioHash());
 
             // BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
             // logger.info(reader.lines().collect(Collectors.toList()));

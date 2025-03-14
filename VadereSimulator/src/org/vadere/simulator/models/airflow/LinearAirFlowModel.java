@@ -1,6 +1,7 @@
 package org.vadere.simulator.models.airflow;
 
 
+import org.vadere.annotation.factories.models.ModelClass;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.Attributes;
@@ -11,6 +12,7 @@ import org.vadere.util.logging.Logger;
 import java.util.List;
 import java.util.Random;
 
+@ModelClass
 public class LinearAirFlowModel extends AbstractAirFlowModel {
 
     private static final Logger logger = Logger.getLogger(LinearAirFlowModel.class);

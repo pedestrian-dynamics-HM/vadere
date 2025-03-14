@@ -1,8 +1,11 @@
 package org.vadere.state.attributes.models.infection;
 
+import org.vadere.annotation.factories.attributes.ModelAttributeClass;
+
 import java.util.ArrayList;
 import java.util.List;
 
+@ModelAttributeClass
 public class AttributesExtendedAirTransmissionModel extends AttributesAirTransmissionModel {
 
     private ArrayList<AttributesExtendedExposureModelSourceParameters> exposureModelSourceParameters;

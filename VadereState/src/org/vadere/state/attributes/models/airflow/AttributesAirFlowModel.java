@@ -1,11 +1,13 @@
 package org.vadere.state.attributes.models.airflow;
 
 
+import org.vadere.annotation.factories.attributes.ModelAttributeClass;
 import org.vadere.state.attributes.Attributes;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@ModelAttributeClass
 public class AttributesAirFlowModel extends Attributes {
 
     private String condaPath;
