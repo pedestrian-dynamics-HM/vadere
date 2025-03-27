@@ -27,7 +27,7 @@ public class RestaurantModel implements Model {
     /**
      * Maximum waiting time a pedestrian would stay at a seating group
      */
-    private final static double MAX_WAITING_TIME = 1000;
+    private final static double MAX_WAITING_TIME = 18000;
 
     private static Logger logger = Logger.getLogger(RestaurantModel.class);
 

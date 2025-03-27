@@ -22,7 +22,7 @@ public class SeatGroup {
     /**
      * Ids of the seats (targets) belonging to the seating group with reference if they are free
      */
-    private Map<Integer, Boolean> seats;
+    private LinkedHashMap<Integer, Boolean> seats;
 
     /**
      * Time a group of pedestrians stays at the table
@@ -32,14 +32,14 @@ public class SeatGroup {
 
     public SeatGroup (Target tableTarget, double tableTime) {
         this.table = tableTarget;
-        this.seats = new HashMap<>();
+        this.seats = new LinkedHashMap<>();
         this.arrivalTimes = new HashMap<>();
         this.tableTime = tableTime;
     }
 
     public SeatGroup (Target table, List<Integer> seats, double tableTime) {
         this.table = table;
-        this.seats = seats.stream().collect(Collectors.toMap(i -> i, i -> true));
+        this.seats = (LinkedHashMap<Integer, Boolean>) seats.stream().collect(Collectors.toMap(i -> i, i -> true));
         this.tableTime = tableTime;
     }
 
