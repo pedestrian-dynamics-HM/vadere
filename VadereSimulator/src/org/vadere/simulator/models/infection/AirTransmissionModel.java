@@ -200,6 +200,8 @@ public class AirTransmissionModel extends AbstractExposureModel {
 	private VPoint computeAerosolCloudCenter(Pedestrian pedestrian) {
 		AttributesAirTransmissionModel attrModel = (AttributesAirTransmissionModel) getAttributes();
 		VPoint aerosolCloudCenter;
+		// TODO delete next line if necessary
+		pedestrian.setSitting(false);
 		if (pedestrian.isSitting()) {
 			Vector2D aerosolCloudDirection = pedestrian.getSittingDirection().normalize(attrModel.getAerosolCloudInitialRadius());
 			aerosolCloudCenter = new VPoint(pedestrian.getPosition().getX() + aerosolCloudDirection.getX(),
