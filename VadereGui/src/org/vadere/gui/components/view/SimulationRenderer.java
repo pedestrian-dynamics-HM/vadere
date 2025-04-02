@@ -307,6 +307,8 @@ public abstract class SimulationRenderer extends DefaultRenderer {
 		        return model.config.getColorByTargetId(targetId).orElseGet(model.config::getPedestrianDefaultColor);
 		    case RANDOM:
 		        return model.config.getRandomColor(agent.getId());
+            case IMAGE_OVERLAY:
+                return model.config.getImageOverlay();
             case SELF_CATEGORY:
                 if (agent instanceof Pedestrian) {
                     Pedestrian pedestrian = (Pedestrian) agent;
@@ -333,7 +335,14 @@ public abstract class SimulationRenderer extends DefaultRenderer {
             case HEALTH_STATUS: {
                 if (agent instanceof Pedestrian) {
                     Pedestrian pedestrian = (Pedestrian) agent;
-                    return model.config.getHealthStatusColor(pedestrian.isInfectious(), pedestrian.getDegreeOfExposure());
+
+                    boolean isInfectious = false;
+                    double degreeOfExposure = 0.0;
+                    if (pedestrian.getHealthStatus() != null) {
+                        isInfectious = pedestrian.isInfectious();
+                        degreeOfExposure = pedestrian.getDegreeOfExposure();
+                    }
+                    return model.config.getHealthStatusColor(isInfectious, degreeOfExposure);
                 }
             }
 		    default: return model.config.getPedestrianColor();

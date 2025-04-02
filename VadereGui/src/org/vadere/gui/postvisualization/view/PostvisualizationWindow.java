@@ -19,8 +19,10 @@ import org.vadere.simulator.projects.io.IOOutput;
 import org.vadere.util.config.VadereConfig;
 import org.vadere.util.io.IOUtils;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.Observable;

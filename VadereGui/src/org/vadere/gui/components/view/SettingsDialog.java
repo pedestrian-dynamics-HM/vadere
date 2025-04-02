@@ -11,16 +11,19 @@ import org.vadere.gui.components.model.SimulationModel;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.components.utils.SwingUtils;
 import org.vadere.gui.postvisualization.control.ActionCloseSettingDialog;
+import org.vadere.gui.postvisualization.view.ComboBoxMultiSelect;
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.psychology.information.InformationState;
 import org.vadere.state.scenario.Target;
 import org.vadere.util.config.VadereConfig;
+import org.vadere.util.io.IOUtils;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.Optional;
+import java.util.*;
+import java.util.List;
 
 public class SettingsDialog extends JDialog {
 
@@ -270,6 +273,7 @@ public class SettingsDialog extends JDialog {
 		JRadioButton rbSelfCategoryColoring = createRadioButtonWithListener(AgentColoring.SELF_CATEGORY, Messages.getString("SettingsDialog.lblSelfCategoryColoring.text")+ ":");
 		JRadioButton rbHealthStatusColoring = createRadioButtonWithListener(AgentColoring.HEALTH_STATUS, Messages.getString("SettingsDialog.lblHealthStatusColoring.text")+ ":");
 		JRadioButton rbInformationColoring = createRadioButtonWithListener(AgentColoring.INFORMATION_STATE, Messages.getString("SettingsDialog.lblInformationColoring.text")+ ":");
+		JRadioButton rbImageOverlay = createRadioButtonWithListener(AgentColoring.IMAGE_OVERLAY, Messages.getString("SettingsDialog.tfUseImageOverlay.text"));
 
 
 		rbTargetColoring.setSelected(true);
@@ -282,6 +286,8 @@ public class SettingsDialog extends JDialog {
 		group.add(rbSelfCategoryColoring);
 		group.add(rbHealthStatusColoring);
 		group.add(rbInformationColoring);
+		group.add(rbImageOverlay);
+
 
 		JComboBox<Integer> cbTargetIds = createTargetIdsComboBoxAndAddIds();
 		final JPanel pTargetColor = new JPanel();
@@ -337,6 +343,8 @@ public class SettingsDialog extends JDialog {
 
 		initColoringByInformationState(cbInformationStates, pInformationStateColor, bChangeInformationStateColor);
 
+		ComboBoxMultiSelect<String> cbImagePaths = createComboBoxWithImageNames();
+		initImageOverlay(cbImagePaths);
 
 		int row = 0;
 		int column1 = 2;
@@ -351,7 +359,6 @@ public class SettingsDialog extends JDialog {
 		colorSettingsPane.add(cbTargetIds, cc.xy(column2, row));
 		colorSettingsPane.add(pTargetColor, cc.xy(column4, row));
 		colorSettingsPane.add(bChangeTargetColor, cc.xy(column5, row));
-
 		colorSettingsPane.add(new JLabel(Messages.getString("SettingsDialog.lblPedestrianNoTarget.text") + ":"), cc.xy(column2, row += NEXT_CELL));
 		colorSettingsPane.add(pPedestrianColorNoTarget, cc.xy(column4, row));
 		colorSettingsPane.add(bChangePedestrianColorNoTarget, cc.xy(column5, row));
@@ -385,17 +392,29 @@ public class SettingsDialog extends JDialog {
 		colorSettingsPane.add(bChangeInformationStateColor, cc.xy(column5, row));
 
 		// Evacuation time and criteria coloring comes in the next row see "postvisualization/.../SettingsDialog.java".
+
+		// add image overlay as last option
+		// add a horizontal line to make the user aware that overlaying an image is a special type of coloring
+		int additionalSpace = 8; /** leave space for entries added in {@link org.vadere.gui.postvisualization.view.SettingsDialog} */
+		colorSettingsPane.add(new JSeparator(), cc.xyw(column1, row += (NEXT_CELL + additionalSpace), column5 ));
+
+		colorSettingsPane.add(rbImageOverlay, cc.xy(column1, row += NEXT_CELL));
+		colorSettingsPane.add(cbImagePaths, cc.xy(column2, row));
+
+
 	}
 
 	private JRadioButton createRadioButtonWithListener(AgentColoring colorScheme, String buttonText) {
 		JRadioButton radioButton = new JRadioButton(buttonText);
 		radioButton.addItemListener(e -> {
+			model.config.setShowImage(colorScheme.equals(AgentColoring.IMAGE_OVERLAY));
 			model.setAgentColoring(colorScheme);
 			model.notifyObservers();
 		});
 
 		return radioButton;
 	}
+
 
 	private JComboBox<Integer> createTargetIdsComboBoxAndAddIds() {
 		java.util.List<Target> targets = model.getTopography().getTargets();
@@ -420,6 +439,16 @@ public class SettingsDialog extends JDialog {
 		return comboBox;
 	}
 
+	private ComboBoxMultiSelect<String> createComboBoxWithImageNames() {
+		ComboBoxMultiSelect cb = new ComboBoxMultiSelect();
+		List<String> files  =  IOUtils.getFileNameList(config.getImageDirectory(), ".png");
+		for (String f : files) {
+			cb.addItem(f); // each *.png image will be list entry in the combobox
+		}
+		cb.setSelectedElements(files); // default setting: use all images found in the directory
+		return cb;
+	}
+
 	private void initColoringByTargetId(JComboBox<Integer> cbTargetIds, JPanel pTargetColor, JButton bChangeTargetColor, JButton bChangePedestrianColorNoTarget, JPanel pPedestrianColorNoTarget) {
 		cbTargetIds.setSelectedIndex(0);
 
@@ -435,6 +464,7 @@ public class SettingsDialog extends JDialog {
 		// When user changes a color, save it in the model.
 		bChangeTargetColor.addActionListener(new ActionSetPedestrianColor("Set Pedestrian Color", model, pTargetColor,
 				cbTargetIds));
+
 
 		// Retrieve configured color from "model" or use default color.
 		cbTargetIds.addActionListener(e -> {
@@ -466,6 +496,7 @@ public class SettingsDialog extends JDialog {
 		// When user changes a color, save it in the model.
 		bChangeSelfCategoryColor.addActionListener(new ActionSetSelfCategoryColor("Set Self Category Color", model, pSelfCategoryColor,
 				cbSelfCategories));
+
 
 		// Retrieve configured color from "model".
 		cbSelfCategories.addActionListener(e -> {
@@ -518,6 +549,10 @@ public class SettingsDialog extends JDialog {
 		});
 
 		int i;
+	}
+
+	private void initImageOverlay(ComboBoxMultiSelect<String> boxMultiSelect){
+		boxMultiSelect.addActionListener(new ActionSetImageOverlay("Set image", model, boxMultiSelect));
 	}
 
 

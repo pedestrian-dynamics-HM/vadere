@@ -248,6 +248,7 @@ public class OnlineVisualizationModel extends SimulationModel<DefaultSimulationC
 	public void setAgentColoring(@NotNull AgentColoring agentColoring) {
 		switch (agentColoring) {
 			case TARGET:
+			case IMAGE_OVERLAY:
 			case GROUP:
 			case RANDOM:
 			case SELF_CATEGORY:

@@ -35,7 +35,7 @@ import java.util.Collection;
  */
 public abstract class DefaultRenderer {
 
-	private IDefaultModel defaultModel;
+	protected IDefaultModel defaultModel;
 	private BufferedImage logo;
 	private static final double rotNeg90 = - Math.PI /2;
 	private boolean renderNodes = VadereConfig.getConfig().getBoolean("Gui.showNodes");

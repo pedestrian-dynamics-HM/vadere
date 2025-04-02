@@ -1,12 +1,14 @@
 package org.vadere.gui.components.model;
 
 import java.awt.*;
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
 
 import org.apache.commons.configuration2.Configuration;
+import org.vadere.gui.components.utils.Resources;
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.psychology.information.InformationState;
 import org.vadere.util.config.VadereConfig;
@@ -26,6 +28,7 @@ public class DefaultSimulationConfig extends DefaultConfig {
 	private boolean interpolatePositions = true;
 	private boolean showPedestrianIds = false;
 	private boolean showPedestrianInOutGroup = false;
+	private boolean showImage = false;
 	private boolean showTargets = true;
 	private boolean showTargetChangers = true;
 	private boolean showAbsorbingAreas = true;
@@ -68,6 +71,11 @@ public class DefaultSimulationConfig extends DefaultConfig {
 	private final double MAX_CELL_WIDTH = CONFIG.getDouble("ProjectView.maxCellWidth");
 	private AgentColoring agentColoring = AgentColoring.TARGET;
 
+	private File imageDirectory = new File(Resources.class.getResource("/agent_icons/").getPath());
+
+
+
+
 	public DefaultSimulationConfig() {
 		super();
 	}
@@ -89,6 +97,7 @@ public class DefaultSimulationConfig extends DefaultConfig {
 
 		this.showPedestrianIds = config.showPedestrianIds;
 		this.showPedestrianInOutGroup = config.showPedestrianInOutGroup;
+		this.showImage = config.showImage;
 		this.gridWidth = config.gridWidth;
 		this.showDensity = config.showDensity;
 		this.showTargetPotentialField = config.showTargetPotentialField;
@@ -293,6 +302,12 @@ public class DefaultSimulationConfig extends DefaultConfig {
 		setChanged();
 	}
 
+	public void setShowImage(final boolean showImage){
+		this.showImage =showImage;
+		setChanged();
+	}
+
+
 	public void setShowPotentialField(final boolean showPotentialField) {
 		this.showPotentialField = showPotentialField;
 		setChanged();
@@ -363,6 +378,13 @@ public class DefaultSimulationConfig extends DefaultConfig {
 			randomColors.put(pedId, ColorHelper.randomColor());
 		}
 		return randomColors.get(pedId);
+	}
+
+	public Color getImageOverlay(){
+
+		Color color = Color.BLUE; // new Color(0.f, 0.f, 0.f, 0.f);  = transparent
+		return color;
+
 	}
 
 	public void setSelfCategoryColor(SelfCategory selfCategory, final Color color) {
@@ -466,6 +488,8 @@ public class DefaultSimulationConfig extends DefaultConfig {
 
 	public boolean isShowPedestrianInOutGroup() { return showPedestrianInOutGroup; }
 
+	public boolean isShowImage() {return showImage; }
+
 	public void setShowPedestrianIds(final boolean showPedestrianIds) {
 		this.showPedestrianIds = showPedestrianIds;
 	}
@@ -494,4 +518,11 @@ public class DefaultSimulationConfig extends DefaultConfig {
 	public boolean isRecording() {
 		return recording;
 	}
+
+	public File getImageDirectory() {
+		return this.imageDirectory;
+	}
+
+
+
 }
