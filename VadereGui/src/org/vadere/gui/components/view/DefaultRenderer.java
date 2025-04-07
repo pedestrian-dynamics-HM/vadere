@@ -306,7 +306,7 @@ public abstract class DefaultRenderer {
 
 			AttributesAirFlowModel attributesAirFlowModel = Model.findAttributes(modelAttributes, AttributesAirFlowModel.class);
 
-			g.setColor(Color.green);
+			g.setColor(new Color(0, 153, 50)); // green
 
 			for (AttributesInOutLet inlet : attributesAirFlowModel.getInlets()) {
 				switch (inlet.getSide()) {
@@ -326,7 +326,7 @@ public abstract class DefaultRenderer {
 
 			}
 
-			g.setColor(Color.red);
+			g.setColor(new Color(204, 0, 0)); // red
 
 			for (AttributesInOutLet outlet : attributesAirFlowModel.getOutlets()) {
 				switch (outlet.getSide()) {
@@ -346,8 +346,8 @@ public abstract class DefaultRenderer {
 
 			}
 
-			g.setColor(Color.black);
-			g.setStroke(new BasicStroke(3*getLineWidth()));
+			g.setColor(new Color(140, 140, 140)); // gray
+			g.setStroke(new BasicStroke(2*getLineWidth()));
 
 			double visTolerance = 10e-8;
 
