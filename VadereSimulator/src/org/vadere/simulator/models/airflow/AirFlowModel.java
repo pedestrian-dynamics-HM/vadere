@@ -72,12 +72,12 @@ public class AirFlowModel extends AbstractAirFlowModel {
         try {
             ProcessBuilder processBuilder = new ProcessBuilder();
             processBuilder.command(attributesAirFlowModel.getCondaPath(),  "run", "-n", attributesAirFlowModel.getCondaEnv(),
-                    "python", "VadereSimulator/src/org/vadere/simulator/models/airflow/python/scikit-fem_stokes_flow_v3.py", airFlow.getScenarioPath(), airFlow.getScenarioHash()
+                    "python", attributesAirFlowModel.getPythonPath(), airFlow.getScenarioPath(), airFlow.getScenarioHash()
             );
             Process process = processBuilder.start();
 
             System.out.println(attributesAirFlowModel.getCondaPath() + " " +  "run" + " " + "-n" + " " + attributesAirFlowModel.getCondaEnv() + " " +
-                    "python" + " " + "VadereSimulator/src/org/vadere/simulator/models/airflow/python/scikit-fem_stokes_flow_v3.py" + " " + airFlow.getScenarioPath() + " " + airFlow.getScenarioHash());
+                    "python" + " " + attributesAirFlowModel.getPythonPath() + " " + airFlow.getScenarioPath() + " " + airFlow.getScenarioHash());
 
             // BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
             // logger.info(reader.lines().collect(Collectors.toList()));

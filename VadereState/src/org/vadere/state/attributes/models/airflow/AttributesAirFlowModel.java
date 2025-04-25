@@ -14,6 +14,8 @@ public class AttributesAirFlowModel extends Attributes {
 
     private String condaEnv;
 
+    private String pythonPath;
+
     private double gridSize;
 
     private double areaThreshold;
@@ -33,6 +35,7 @@ public class AttributesAirFlowModel extends Attributes {
     public AttributesAirFlowModel() {
         condaPath = "CONDA_EXE";
         condaEnv = "CONDA_ENV";
+        pythonPath = "VadereSimulator/src/org/vadere/simulator/models/airflow/python/scikit-fem_stokes_flow_v3.py";
         gridSize = 0.5;
         areaThreshold = 0.1;
         inletVelocity = 1;
@@ -51,6 +54,7 @@ public class AttributesAirFlowModel extends Attributes {
                                   ArrayList<Integer> notBlockingObstacles) {
         condaPath = "CONDA_EXE";
         condaEnv = "CONDA_ENV";
+        pythonPath = "VadereSimulator/src/org/vadere/simulator/models/airflow/python/scikit-fem_stokes_flow_v3.py";
         this.gridSize = gridSize;
         this.areaThreshold = areaThreshold;
         this.inletVelocity = inletVelocity;
@@ -72,6 +76,8 @@ public class AttributesAirFlowModel extends Attributes {
     public String getCondaEnv() {
         return condaEnv;
     }
+
+    public String getPythonPath() { return pythonPath; }
 
     public double getGridSize() {
         return gridSize;
