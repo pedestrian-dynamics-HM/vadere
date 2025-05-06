@@ -174,8 +174,6 @@ if __name__ == '__main__':
 
     mesh = (MeshTri(P.T, T.T).with_boundaries(boundary_dict))
 
-    print(mesh)
-
     element = {'u': ElementVector(ElementTriP2()),
                'p': ElementTriP1()}
     basis = {variable: Basis(mesh, e, intorder=3)
@@ -238,6 +236,7 @@ if __name__ == '__main__':
     plt.gca().set_aspect('equal')
     plt.quiver(X, Y, Vx, Vy)
     plt.title('Velocity Field')
+    plt.close()
     plt.show()
 
     np.savetxt(scenario_file_path + '_' + scenario_hash + '_Vx.txt', Vx, header=f'{Vx.shape[0]}_{Vx.shape[1]}_{parameter_string}')
