@@ -74,6 +74,7 @@ def is_on_obstacle_boundary(x, obstacles_arg):
 
     return on_any_polygon_segment
 
+
 def find_midpoint_of_polygon(obstacle):
     obstacle.append(obstacle[0])
     c = [0, 0, -1]
@@ -88,6 +89,7 @@ def find_midpoint_of_polygon(obstacle):
         b.append(-n[0] * obstacle[i][0] - n[1] * obstacle[i][1])
     result = optim.linprog(c=c, A_ub=np.stack((a_x, a_y, a_r), axis=1), b_ub=b)
     return result.x[0], result.x[1]
+
 
 def build_mesh(inlets, outlets, obstacles, area_threshold, x_min, x_max, y_min, y_max):
     """Builds the mesh using meshpy.triangle."""
@@ -105,10 +107,8 @@ def build_mesh(inlets, outlets, obstacles, area_threshold, x_min, x_max, y_min, 
     for entry in outlets: points.extend(get_side_coords(entry["side"], entry["coords"],
                                                         x_min, x_max, y_min, y_max))
 
-    points = np.array(points)
     info = triangle.MeshInfo()
-    info.set_points(points.tolist())
-    holes = [((o[0][0] + o[1][0]) / 2, (o[0][1] + o[1][1]) / 2) for o in obstacles]
+    info.set_points(points)
     info.set_holes(holes)
     info.set_facets(edges)
 

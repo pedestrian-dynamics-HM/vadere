@@ -13,6 +13,12 @@ import numpy as np
 import argparse
 import json
 
+# Navier Stokes parameters
+nu = 0.01 # viscosity
+num_iterations = 50
+tolerance = 1e-3
+relaxation = 0.5
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -38,8 +44,22 @@ if __name__ == '__main__':
         basis = {variable: Basis(mesh, e, intorder=4)
                  for variable, e in element.items()}
 
+        # --- Define Bilinear Forms for Navier-Stokes ---
+        @BilinearForm
+        def stokes_visc(u, v, w):
+            """Viscous term"""
+            return nu * inner(sym_grad(u), sym_grad(v))
+
+        @BilinearForm
+        def convection(u, v, w):
+            """Convection term, skew-symmetric form for more stability"""
+            #return dot(dot(w['w'], grad(u)), v)
+            return dot(dot(w['w'], grad(u)), v) - dot(dot(w['w'], grad(v)), u) / 2.0
+
+
+        # Solve Stokes flow first for initial guess
         D = define_dofs(basis, mesh, inlet_dict, outlet_dict)
-        A_stokes = asm(vector_laplace, basis['u'])
+        A_stokes = asm(stokes_visc, basis['u'])
         B = -asm(divergence, basis['u'], basis['p'])
         K_stokes = bmat([[A_stokes, B.T], [B, None]], 'csr')
 
@@ -52,6 +72,28 @@ if __name__ == '__main__':
         ))
         uvp_stokes = solve(*condense(K_stokes, x=uvp, D=D))
         u0, p0 = np.split(uvp_stokes, K_stokes.blocks)
+        uvp_fixed_bc = uvp
+
+        for iteration in range(num_iterations):
+            w_field = basis['u'].interpolate(u0.squeeze())
+            A_conv = asm(convection, basis['u'], w=w_field)
+            A = A_stokes + A_conv
+            K = bmat([[A, B.T], [B, None]], 'csr')
+            uvp = solve(*condense(K, x=uvp_fixed_bc, D=D))
+            u_new = uvp[:basis['u'].N]
+            p_new = uvp[basis['u'].N:]
+
+            # Apply relaxation to velocity update for stability
+            u_relaxed = relaxation * u_new + (1.0 - relaxation) * u0
+            diff_u = np.linalg.norm(u_relaxed.ravel() - u0.ravel()) / (np.linalg.norm(u_relaxed.ravel()) + 1e-12)
+            u0 = u_relaxed
+            p0 = p_new
+
+            print(f"Iteration: {iteration}, difference u: {diff_u:.2f}")
+            if diff_u < tolerance:
+                 print(f"\nConverged after {iteration+1} iterations.")
+                 break
+
         uv = u0.ravel()
 
         X, Y, Vx, Vy, velocity_magnitude = postprocess_solution(basis, mesh, uv, grid_size, x_min, x_max, y_min, y_max)
