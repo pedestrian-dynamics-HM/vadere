@@ -35,7 +35,7 @@ public class AttributesAirFlowModel extends Attributes {
     public AttributesAirFlowModel() {
         condaPath = "CONDA_EXE";
         condaEnv = "CONDA_ENV";
-        pythonPath = "VadereSimulator/src/org/vadere/simulator/models/airflow/python/stokes_flow.py";
+        pythonPath = "VadereSimulator/src/org/vadere/simulator/models/airflow/python/navier_stokes.py";
         gridSize = 0.5;
         areaThreshold = 0.1;
         inletVelocity = 1;
@@ -54,7 +54,7 @@ public class AttributesAirFlowModel extends Attributes {
                                   ArrayList<Integer> notBlockingObstacles) {
         condaPath = "CONDA_EXE";
         condaEnv = "CONDA_ENV";
-        pythonPath = "VadereSimulator/src/org/vadere/simulator/models/airflow/python/stokes_flow.py";
+        pythonPath = "VadereSimulator/src/org/vadere/simulator/models/airflow/python/navier_stokes.py";
         this.gridSize = gridSize;
         this.areaThreshold = areaThreshold;
         this.inletVelocity = inletVelocity;
