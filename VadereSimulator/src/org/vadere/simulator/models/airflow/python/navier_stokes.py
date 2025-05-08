@@ -37,8 +37,20 @@ if __name__ == '__main__':
         topography = data['scenario']['topography']
         attributes_model = data['scenario']['attributesModel']['org.vadere.state.attributes.models.airflow.AttributesAirFlowModel']
         grid_size, area_threshold, x_min, x_max, y_min, y_max, inlet_velocity, inlets, outlets, obstacles, parameter_string = extract_attributes(topography, attributes_model, parameter_string)
+        # SET MANUAL LIMITS
+        #x_min = 7.2
+        #x_max = 25.8
 
         mesh, inlet_dict, outlet_dict, boundary_dict = build_mesh(inlets, outlets, obstacles, area_threshold, x_min, x_max, y_min, y_max)
+
+        plt.figure(figsize=(10, 8))
+        ax = plt.gca()
+        ax.triplot(mesh.p[0, :], mesh.p[1, :], mesh.t.T, linewidth=0.5, color='blue')
+        ax.set_title("FEM Mesh")
+        ax.set_xlabel("x (m)")
+        ax.set_ylabel("y (m)")
+        ax.axis('equal')
+        plt.show()
 
         element = {'u': ElementVector(ElementTriP2()), 'p': ElementTriP1()}
         basis = {variable: Basis(mesh, e, intorder=4)
@@ -89,7 +101,7 @@ if __name__ == '__main__':
             u0 = u_relaxed
             p0 = p_new
 
-            print(f"Iteration: {iteration}, difference u: {diff_u:.2f}")
+            #print(f"Iteration: {iteration}, difference u: {diff_u:.2f}")
             if diff_u < tolerance:
                  print(f"\nConverged after {iteration+1} iterations.")
                  break

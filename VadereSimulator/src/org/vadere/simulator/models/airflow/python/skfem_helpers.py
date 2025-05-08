@@ -33,14 +33,11 @@ def define_dofs(basis, mesh, inlet_dict, outlet_dict):
     wall_dofs = basis['u'].get_dofs(facets=wall_facet_indices)
     obstacle_dofs = basis['u'].get_dofs(facets=obstacle_facets)
 
-    D_velocity = np.unique(np.concatenate((
+    D = np.unique(np.concatenate((
         inlet_dofs.all(),
         wall_dofs.all(),
         obstacle_dofs.all()
     )))
-    p_dof_index_local = basis['p'].nodal_dofs.flatten()[0]
-    D_pressure_global = basis['u'].N + p_dof_index_local
-    D = np.unique(np.concatenate((D_velocity, [D_pressure_global])))
     return D
 
 
