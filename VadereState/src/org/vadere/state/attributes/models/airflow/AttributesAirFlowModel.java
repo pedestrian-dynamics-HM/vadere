@@ -36,9 +36,9 @@ public class AttributesAirFlowModel extends Attributes {
         condaPath = "CONDA_EXE";
         condaEnv = "CONDA_ENV";
         pythonPath = "VadereSimulator/src/org/vadere/simulator/models/airflow/python/navier_stokes.py";
-        gridSize = 0.5;
+        gridSize = 0.2;
         areaThreshold = 0.1;
-        inletVelocity = 1;
+        inletVelocity = 0.3;
         inlets = new ArrayList<>();
         inlets.add(new AttributesInOutLet("left", 1, 2));
         outlets = new ArrayList<>();

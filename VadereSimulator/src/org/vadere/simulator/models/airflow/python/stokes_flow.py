@@ -27,6 +27,7 @@ if __name__ == '__main__':
     parameter_string = ""
 
     with open(scenario_file_path) as file:
+        print("scenario_file_path: ", scenario_file_path)
         data = json.load(file)
         topography = data['scenario']['topography']
         attributes_model = data['scenario']['attributesModel']['org.vadere.state.attributes.models.airflow.AttributesAirFlowModel']
@@ -62,11 +63,13 @@ if __name__ == '__main__':
 
         showPlot = True
         if showPlot:
-            plt.figure()
+            data_ratio = (x_max - x_min) / (y_max - y_min)
+            fig_width = 20
+            fig_height = fig_width / data_ratio
+            plt.figure(figsize=(fig_width, fig_height))
             contour = plt.contourf(X, Y, velocity_magnitude, levels=50, cmap='viridis')
             plt.colorbar(contour, label='Velocity magnitude (m/s)')
-            scale_factor = 2
-            plt.quiver(X, Y, Vx, Vy, color='white', scale=scale_factor, width=0.004)
+            plt.quiver(X, Y, Vx, Vy, color='white', scale=2, width=0.004)
             plt.title('Velocity field')
             for obs in obstacles:
                 x_coords = [vertex[0] for vertex in obs]
@@ -74,5 +77,6 @@ if __name__ == '__main__':
                 plt.fill(x_coords, y_coords, color='grey', alpha=1.0)
             plt.xlabel("x (m)")
             plt.ylabel("y (m)")
+            plt.axis("equal")
             plt.show()
 

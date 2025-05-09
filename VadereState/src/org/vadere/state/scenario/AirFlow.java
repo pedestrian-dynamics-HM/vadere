@@ -56,17 +56,17 @@ public class AirFlow {
         }
         double[] result = new double[2];
 
-        int x_idx = (int) ((x - border) / gridSize);
-        if (x_idx < 0)
-            x_idx = 0;
+        int x_idx = (int) Math.round(((x - border) / gridSize));
+        if (x_idx <= 0)
+            x_idx = 1;
         else if (x_idx >= x_velocity[0].length)
-            x_idx = x_velocity[0].length - 1;
+            x_idx = x_velocity[0].length - 2;
 
-        int y_idx = (int) ((y - border) / gridSize);
-        if (y_idx < 0)
-            y_idx = 0;
+        int y_idx = (int) Math.round(((y - border) / gridSize));
+        if (y_idx <= 0)
+            y_idx = 1;
         else if (y_idx >= y_velocity.length)
-            y_idx = y_velocity.length - 1;
+            y_idx = y_velocity.length - 2;
 
         result[0] = x_velocity[y_idx][x_idx];
         result[1] = y_velocity[y_idx][x_idx];

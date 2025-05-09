@@ -497,7 +497,7 @@ public class AirTransmissionModel extends AbstractExposureModel {
 		Collection<AerosolCloud> allAerosolClouds = topography.getAerosolClouds();
 		for (AerosolCloud aerosolCloud : allAerosolClouds) {
 			double[] windXY = topography.getAirFlow().getFlowDirection(simTimeInSec ,aerosolCloud.getCenter().getX(), aerosolCloud.getCenter().getY());
-			aerosolCloud.shiftShape(windXY[0] / simTimeStepLength, windXY[1] / simTimeStepLength);
+			aerosolCloud.shiftShape(windXY[0] * simTimeStepLength, windXY[1] * simTimeStepLength);
 		}
 	}
 
