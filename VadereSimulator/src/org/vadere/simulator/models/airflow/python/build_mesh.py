@@ -18,11 +18,11 @@ def get_side_coords(side, coords, x_min, x_max, y_min, y_max):
 
 def get_boundary_lambda(side, coords, x_min, x_max, y_min, y_max):
     """Returns lambda function to identify boundary facets."""
-    tol = 1e-9
-    # IMPORTANT: Make sure outlet check uses the potentially updated x_max
+    domain_size = min(x_max - x_min, y_max - y_min)
+    tol = domain_size * 1e-6
     if side == 'left': return lambda x: np.isclose(x[0], x_min) & (x[1] >= coords[0 ] -tol) & (x[1] <= coords[1 ] +tol)
     elif side == 'right': return lambda x: np.isclose(x[0], x_max) & (x[1] >= coords[0 ] -tol) & \
-                    (x[1] <= coords[1] + tol)  # Uses current x_max
+                    (x[1] <= coords[1] + tol)  
     elif side == 'bottom':
         return lambda x: np.isclose(x[1], y_min) & (x[0] >= coords[0] - tol) & (x[0] <= coords[1] + tol)
     elif side == 'top':

@@ -10,6 +10,8 @@ import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.infection.AttributesAirTransmissionModel;
 import org.vadere.state.attributes.models.infection.AttributesExposureModel;
 import org.vadere.state.attributes.models.infection.AttributesExposureModelSourceParameters;
+import org.vadere.state.attributes.models.airflow.AttributesAirFlowModel;
+import org.vadere.state.attributes.models.airflow.AttributesInOutLet;
 import org.vadere.state.attributes.scenario.AttributesAerosolCloud;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesDroplets;
@@ -60,6 +62,7 @@ public class AirTransmissionModel extends AbstractExposureModel {
 	private Map<Integer, Integer> spawnCounter;
 	private Map<AerosolCloud, Integer> aerosolCounter;
 
+	private List<Attributes> modelAttributesList;
 
 	private Map<Integer, VPoint> lastPedestrianPositions;
 	private Map<Integer, Vector2D> viewingDirections;
@@ -88,11 +91,14 @@ public class AirTransmissionModel extends AbstractExposureModel {
 	 * Define the simulation steps after which an aerosol cloud gets removed when moving through an obstacle
 	 */
 	private static final int STUCK_MAX = 10;
+	private static final int MOVE_EVERY_N_STEPS = 3;  // Move clouds every 3rd step
+	private int stepCounter = 0;
 
 	@Override
 	public void initialize(List<Attributes> attributesList, Domain domain, AttributesAgent attributesPedestrian, Random random) {
 		initialize(domain, attributesPedestrian, random);
 		setAttributes(attributesList);
+		this.modelAttributesList = attributesList;
 	}
 
 	protected void initialize(Domain domain, AttributesAgent attributesPedestrian, Random random) {
@@ -493,11 +499,122 @@ public class AirTransmissionModel extends AbstractExposureModel {
 	}
 
 	public void updateAerosolCloudsLocation(double simTimeInSec) {
-		AttributesAirTransmissionModel attrModel = (AttributesAirTransmissionModel) getAttributes();
-		Collection<AerosolCloud> allAerosolClouds = topography.getAerosolClouds();
-		for (AerosolCloud aerosolCloud : allAerosolClouds) {
-			double[] windXY = topography.getAirFlow().getFlowDirection(simTimeInSec ,aerosolCloud.getCenter().getX(), aerosolCloud.getCenter().getY());
-			aerosolCloud.shiftShape(windXY[0] * simTimeStepLength, windXY[1] * simTimeStepLength);
+		stepCounter++;
+		
+		// Only compute and apply movement on nth step
+		if (stepCounter >= MOVE_EVERY_N_STEPS) {
+			AttributesAirTransmissionModel attrModel = (AttributesAirTransmissionModel) getAttributes();
+			Collection<AerosolCloud> allAerosolClouds = topography.getAerosolClouds();
+
+			for (AerosolCloud aerosolCloud : allAerosolClouds) {
+				VPoint center = aerosolCloud.getCenter();
+				double[] windXY = topography.getAirFlow().getFlowDirection(simTimeInSec, center.getX(), center.getY());
+				
+				AttributesInOutLet closestOutlet = findClosestOutlet(aerosolCloud);
+				if (closestOutlet != null && isCloseToOutlet(closestOutlet, aerosolCloud)) {
+					double velocityMagnitude = Math.sqrt(windXY[0] * windXY[0] + windXY[1] * windXY[1]);
+					double minVelocityNearOutlet = 0.1;
+					double ZERO_THRESHOLD = 1e-4;
+					
+					if (velocityMagnitude < minVelocityNearOutlet && velocityMagnitude > ZERO_THRESHOLD) {
+						double scale = minVelocityNearOutlet / velocityMagnitude;
+						//windXY[0] *= scale;
+						//windXY[1] *= scale;
+					} else if (velocityMagnitude <= ZERO_THRESHOLD) {
+						VPoint direction = getOutletDirection(closestOutlet);
+						//windXY[0] = direction.getX() * minVelocityNearOutlet;
+						//windXY[1] = direction.getY() * minVelocityNearOutlet;
+					}
+				}
+
+				aerosolCloud.shiftShape(windXY[0] * simTimeStepLength * MOVE_EVERY_N_STEPS, 
+									  windXY[1] * simTimeStepLength * MOVE_EVERY_N_STEPS);
+			}
+			
+			stepCounter = 0;
+		}
+	}
+
+	private AttributesInOutLet findClosestOutlet(AerosolCloud aerosolCloud) {
+		AttributesAirFlowModel airFlowAttributes = Model.findAttributes(modelAttributesList, AttributesAirFlowModel.class);
+		if (airFlowAttributes == null || airFlowAttributes.getOutlets().isEmpty()) {
+			return null;
+		}
+
+		VPoint center = aerosolCloud.getCenter();
+		double x = center.getX();
+		double y = center.getY();
+		double shortestDistance = Double.MAX_VALUE;
+		AttributesInOutLet nearestOutlet = null;
+
+		for (AttributesInOutLet outlet : airFlowAttributes.getOutlets()) {
+			String side = outlet.getSide();
+			double outletCenter = (outlet.getStart() + outlet.getEnd()) / 2;
+			double distance;
+
+			if (side.equals("right") || side.equals("left")) {
+				distance = Math.abs(y - outletCenter);
+			} else {
+				distance = Math.abs(x - outletCenter);
+			}
+
+			if (distance < shortestDistance) {
+				shortestDistance = distance;
+				nearestOutlet = outlet;
+			}
+		}
+		return nearestOutlet;
+	}
+
+	private boolean isCloseToOutlet(AttributesInOutLet outlet, AerosolCloud aerosolCloud) {
+		if (outlet == null) return false;
+
+		VPoint center = aerosolCloud.getCenter();
+		double x = center.getX();
+		double y = center.getY();
+		Rectangle2D bounds = topography.getBounds();
+		double boundaryBufferDistance = 2.5;
+		double border = topography.getBoundingBoxWidth();
+
+		String side = outlet.getSide();
+		switch (side) {
+			case "right":
+				return x > bounds.getMaxX() - border - boundaryBufferDistance &&
+					   y >= outlet.getStart() - boundaryBufferDistance && 
+					   y <= outlet.getEnd() + boundaryBufferDistance;
+			case "left":
+				return x < bounds.getMinX() + border + boundaryBufferDistance &&
+					   y >= outlet.getStart() - boundaryBufferDistance && 
+					   y <= outlet.getEnd() + boundaryBufferDistance;
+			case "top":
+				return y > bounds.getMaxY() - border - boundaryBufferDistance &&
+					   x >= outlet.getStart() - boundaryBufferDistance && 
+					   x <= outlet.getEnd() + boundaryBufferDistance;
+			case "bottom":
+				return y < bounds.getMinY() + border + boundaryBufferDistance &&
+					   x >= outlet.getStart() - boundaryBufferDistance && 
+					   x <= outlet.getEnd() + boundaryBufferDistance;
+			default:
+				return false;
+		}
+	}
+
+	private VPoint getOutletDirection(AttributesInOutLet outlet) {
+		if (outlet == null) {
+			return new VPoint(0, 0);
+		}
+		
+		switch (outlet.getSide()) {
+			case "right":
+				return new VPoint(1, 0);
+			case "left":
+				return new VPoint(-1, 0);
+			case "top":
+				return new VPoint(0, 1);
+			case "bottom":
+				return new VPoint(0, -1);
+			default:
+				return new VPoint(0, 0);
 		}
 	}
 

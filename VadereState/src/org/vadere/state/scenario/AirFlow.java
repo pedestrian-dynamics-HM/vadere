@@ -46,6 +46,7 @@ public class AirFlow {
     }
 
     public double[] getFlowDirection(double simTime, double x, double y) {
+        // Return velocity components at the nearest grid point
 
         if (x_velocity == null) {
             return new double[]{0, 0};
@@ -54,23 +55,18 @@ public class AirFlow {
         if (offPeriod > 0 && (simTime % (onPeriod + offPeriod) < offPeriod)) {
             return new double[]{0, 0};
         }
-        double[] result = new double[2];
 
-        int x_idx = (int) Math.round(((x - border) / gridSize));
-        if (x_idx <= 0)
-            x_idx = 1;
-        else if (x_idx >= x_velocity[0].length)
-            x_idx = x_velocity[0].length - 2;
+        int x_idx = (int) Math.round((x - border) / gridSize);
+        int y_idx = (int) Math.round((y - border) / gridSize);
 
-        int y_idx = (int) Math.round(((y - border) / gridSize));
-        if (y_idx <= 0)
-            y_idx = 1;
-        else if (y_idx >= y_velocity.length)
-            y_idx = y_velocity.length - 2;
+        // Clamp indices to valid grid range, keeping one cell buffer from edges, because edges are always zero
+        x_idx = Math.max(1, Math.min(x_idx, x_velocity[0].length - 2));
+        y_idx = Math.max(1, Math.min(y_idx, y_velocity.length - 2));
 
-        result[0] = x_velocity[y_idx][x_idx];
-        result[1] = y_velocity[y_idx][x_idx];
-        return result;
+        return new double[]{
+            x_velocity[y_idx][x_idx],
+            y_velocity[y_idx][x_idx]
+        };
     }
 
     public double[][] getXVelocities() {
