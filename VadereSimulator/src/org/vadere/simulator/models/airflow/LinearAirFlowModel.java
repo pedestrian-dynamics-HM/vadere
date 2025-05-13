@@ -23,14 +23,25 @@ public class LinearAirFlowModel extends AbstractAirFlowModel {
     public void initialize(List<Attributes> attributesList, Domain domain, AttributesAgent attributesPedestrian, Random random) {
         super.initialize(attributesList, domain, attributesPedestrian, random);
         this.attributesLinearAirFlowModel = Model.findAttributes(attributesList, AttributesLinearAirFlowModel.class);
+        // Initialize airFlow with null velocities
+        airFlow.setX_velocity(null);
+        airFlow.setY_velocity(null);
     }
 
     @Override
     public void setupAirFlow() {
         double xVelocity = Math.cos(attributesLinearAirFlowModel.getWindDirection()) * attributesLinearAirFlowModel.getWindSpeed();
         double yVelocity = Math.sin(attributesLinearAirFlowModel.getWindDirection()) * attributesLinearAirFlowModel.getWindSpeed();
-        airFlow.setX_velocity(new double[][]{{xVelocity}});
-        airFlow.setY_velocity(new double[][]{{yVelocity}});
+ 
+        // Set velocity only in the center cell (1,1) because borders are not used anyway in getFlowDirection (requires 3x3 arrays)
+        double[][] xVelocities = new double[3][3]; 
+        double[][] yVelocities = new double[3][3]; 
+        
+        xVelocities[1][1] = xVelocity;
+        yVelocities[1][1] = yVelocity;
+        
+        airFlow.setX_velocity(xVelocities);
+        airFlow.setY_velocity(yVelocities);
         airFlow.setGridSize(Double.POSITIVE_INFINITY);
     }
 }

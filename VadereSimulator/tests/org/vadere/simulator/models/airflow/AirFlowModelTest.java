@@ -52,7 +52,8 @@ class AirFlowModelTest {
     @Test
     public void testSetupAirFlow() {
         initializeModel(true, false);
-        assertThrows(NullPointerException.class,() -> airFlowModel.airFlow.getFlowDirection(0, 0, 0));
+        assertNull(airFlowModel.airFlow.getXVelocities(), "X velocities should be null before preLoop");
+        assertNull(airFlowModel.airFlow.getYVelocities(), "Y velocities should be null before preLoop");
         airFlowModel.preLoop(0);
         assertNotNull(airFlowModel.airFlow.getFlowDirection(0, 0, 0));
     }
@@ -61,7 +62,8 @@ class AirFlowModelTest {
     public void testSetupAirFlowWithExistingFile() {
         initializeModel(true, false);
         airFlowModel.calculateAirFlow("1234");
-        assertThrows(NullPointerException.class,() -> airFlowModel.airFlow.getFlowDirection(0, 0, 0));
+        assertNull(airFlowModel.airFlow.getXVelocities(), "X velocities should be null before preLoop");
+        assertNull(airFlowModel.airFlow.getYVelocities(), "Y velocities should be null before preLoop");
         airFlowModel.preLoop(0);
         assertNotNull(airFlowModel.airFlow.getFlowDirection(0, 0, 0));
     }
@@ -70,7 +72,8 @@ class AirFlowModelTest {
     public void testSetupAirFlowWithExistingFileAndRecalculation() {
         initializeModel(true, false);
         airFlowModel.calculateWrongAirFlow();
-        assertThrows(NullPointerException.class,() -> airFlowModel.airFlow.getFlowDirection(0, 0, 0));
+        assertNull(airFlowModel.airFlow.getXVelocities(), "X velocities should be null before preLoop");
+        assertNull(airFlowModel.airFlow.getYVelocities(), "Y velocities should be null before preLoop");
         airFlowModel.preLoop(0);
         assertNotNull(airFlowModel.airFlow.getFlowDirection(0, 0, 0));
     }

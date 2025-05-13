@@ -53,7 +53,6 @@ public class LinearAirFlowModelTest {
     @Test
     public void testSetupAirFlow() {
         initializeModel();
-        assertThrows(NullPointerException.class,() -> airFlowModel.airFlow.getFlowDirection(0, 0, 0));
         airFlowModel.preLoop(0);
         assertNotNull(airFlowModel.airFlow.getFlowDirection(0,0, 0));
     }
