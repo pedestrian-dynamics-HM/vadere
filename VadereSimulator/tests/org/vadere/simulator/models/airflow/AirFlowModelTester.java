@@ -29,9 +29,9 @@ public class AirFlowModelTester extends AirFlowModel {
     Random rand = new Random();
 
     @Override
-    protected void calculateAirFlow() {
-        File file1 = new File(airFlow.getScenarioPath() + "_" + airFlow.getScenarioHash() + X_VELOCITY_FILE_ENDING);
-        File file2 = new File(airFlow.getScenarioPath() + "_" + airFlow.getScenarioHash() + Y_VELOCITY_FILE_ENDING);
+    protected void calculateAirFlow(String hash) {
+        File file1 = new File(airFlow.getScenarioPath() + "_" + hash + X_VELOCITY_FILE_ENDING);
+        File file2 = new File(airFlow.getScenarioPath() + "_" + hash + Y_VELOCITY_FILE_ENDING);
         try {
             file1.createNewFile();
             file2.createNewFile();

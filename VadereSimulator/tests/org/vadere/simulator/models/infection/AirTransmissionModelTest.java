@@ -14,11 +14,14 @@ import org.vadere.state.attributes.models.infection.AttributesAirTransmissionMod
 import org.vadere.state.attributes.scenario.AttributesAerosolCloud;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesDroplets;
+import org.vadere.state.attributes.scenario.AttributesObstacle;
 import org.vadere.state.health.AirTransmissionModelHealthStatus;
 import org.vadere.state.health.ExposureModelHealthStatus;
 import org.vadere.state.scenario.*;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.Vector2D;
+import org.vadere.util.geometry.shapes.VShape;
+import org.vadere.util.geometry.shapes.VRectangle;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -44,6 +47,7 @@ public class AirTransmissionModelTest {
         airTransmissionModel = new AirTransmissionModel();
         topography = new Topography();
         topography.setContextId("testId");
+
         rdm = new Random(0);
         ctx = new VadereContext();
         ctx.put(AirTransmissionModel.simStepLength, SIM_TIME_STEP_LENGTH);
@@ -602,5 +606,114 @@ public class AirTransmissionModelTest {
         AttributesAirTransmissionModel attrModel = (AttributesAirTransmissionModel) airTransmissionModel.getAttributes();
         
         attrModel.setDropletsActive(active);
+    }
+
+    @Test
+    public void testUpdateAerosolCloudsLocationStepCounterAndCorrectShift() {
+        // Test that clouds only move every MOVE_EVERY_N_STEPS steps
+        setAerosolCloudsActive(true);
+        createAerosolCloud(airTransmissionModel);
+        int dx = 1;
+        int dy = 1;
+        double[][] xVelocity = new double[][]{{0,0,0},{0,dx,0},{0,0,0}};
+        double[][] yVelocity = new double[][]{{0,0,0},{0,dy,0},{0,0,0}};
+        createAirflow(airTransmissionModel, xVelocity, yVelocity);
+        AerosolCloud cloud = topography.getAerosolClouds().stream().findFirst().get();
+        VPoint initialPosition = cloud.getCenter();
+
+        for (int i = 0; i < airTransmissionModel.MOVE_EVERY_N_STEPS - 1; i++)
+            airTransmissionModel.updateAerosolCloudsLocation(0);
+            assertEquals(initialPosition, cloud.getCenter());
+
+        airTransmissionModel.updateAerosolCloudsLocation(0);
+        assertEquals(initialPosition.x + dx * airTransmissionModel.simTimeStepLength * airTransmissionModel.MOVE_EVERY_N_STEPS, cloud.getCenter().x, "Aerosol cloud should be shifted correctly");
+        assertEquals(initialPosition.y + dy * airTransmissionModel.simTimeStepLength * airTransmissionModel.MOVE_EVERY_N_STEPS, cloud.getCenter().y, "Aerosol cloud should be shifted correctly");
+    }
+
+    private void createAirflow(AirTransmissionModel airTransmissionModel, double[][] xVelocity, double[][] yVelocity) {
+        airTransmissionModel.topography.initAirFlow("test", "test");
+        airTransmissionModel.topography.getAirFlow().setX_velocity(xVelocity);
+        airTransmissionModel.topography.getAirFlow().setY_velocity(yVelocity);
+        airTransmissionModel.topography.getAirFlow().setGridSize(Double.POSITIVE_INFINITY);
+    }
+
+    @Test
+    public void testRemoveStuckAerosolCloudsNotStuck() {
+        setAerosolCloudsActive(true);
+        createAerosolCloud(airTransmissionModel);
+        AerosolCloud cloud = topography.getAerosolClouds().stream().findFirst().get();
+
+        // Cloud is not in any obstacle
+        airTransmissionModel.removeStuckAerosolClouds();
+        assertEquals(1, topography.getAerosolClouds().size(), "Aerosol cloud should not be removed yet");
+        assertFalse(airTransmissionModel.aerosolCounter.containsKey(cloud), "Aerosol counter should not contain cloud");
+    }
+
+    @Test
+    public void testRemoveStuckAerosolCloudsStuckButNotLongEnough() {
+        setAerosolCloudsActive(true);
+        createAerosolCloud(airTransmissionModel);
+        AerosolCloud cloud = topography.getAerosolClouds().stream().findFirst().get();
+        double[][] xVelocity = new double[][]{{0}};
+        double[][] yVelocity = new double[][]{{0}};
+        createAirflow(airTransmissionModel, xVelocity, yVelocity);
+
+        Obstacle blockingObstacle = createBlockingObstacleAtPosition(cloud.getCenter());
+        topography.addObstacle(blockingObstacle);
+
+        airTransmissionModel.removeStuckAerosolClouds();
+        assertEquals(1, topography.getAerosolClouds().size(), "Aerosol cloud should not be removed yet");
+        assertEquals(1, (int) airTransmissionModel.aerosolCounter.get(cloud), "Aerosol counter should contain cloud");
+    }
+
+    @Test
+    public void testRemoveStuckAerosolCloudsStuckAndRemoved() {
+        setAerosolCloudsActive(true);
+        createAerosolCloud(airTransmissionModel);
+        AerosolCloud cloud = topography.getAerosolClouds().stream().findFirst().get();
+        double[][] xVelocity = new double[][]{{0}};
+        double[][] yVelocity = new double[][]{{0}};
+        createAirflow(airTransmissionModel, xVelocity, yVelocity);
+
+        Obstacle obstacle = createBlockingObstacleAtPosition(cloud.getCenter());
+        topography.addObstacle(obstacle);
+
+        for (int i = 0; i <= airTransmissionModel.STUCK_MAX; i++) {
+            airTransmissionModel.removeStuckAerosolClouds();
+        }
+
+        assertTrue(topography.getAerosolClouds().isEmpty(), "Cloud should be removed after being stuck for more than STUCK_MAX steps");
+        assertFalse(airTransmissionModel.aerosolCounter.containsKey(cloud), "Counter should be removed after cloud removal");
+    }
+
+    @Test
+    public void testRemoveStuckAerosolCloudsBecomesUnstuck() {
+        setAerosolCloudsActive(true);
+        createAerosolCloud(airTransmissionModel);
+        AerosolCloud cloud = topography.getAerosolClouds().stream().findFirst().get();
+        double[][] xVelocity = new double[][]{{0}};
+        double[][] yVelocity = new double[][]{{0}};
+        createAirflow(airTransmissionModel, xVelocity, yVelocity);
+
+        Obstacle blockingObstacle = createBlockingObstacleAtPosition(cloud.getCenter());
+        topography.addObstacle(blockingObstacle);
+
+        // First check - should increment counter
+        airTransmissionModel.removeStuckAerosolClouds();
+        assertEquals(1, (int) airTransmissionModel.aerosolCounter.get(cloud), "Counter should be 1 after first stuck detection");
+
+        // Remove obstacle - cloud becomes unstuck
+        topography.getObstacles().remove(blockingObstacle);
+        airTransmissionModel.removeStuckAerosolClouds();
+
+        assertFalse(airTransmissionModel.aerosolCounter.containsKey(cloud), "Counter should be removed when cloud becomes unstuck");
+        assertEquals(1, topography.getAerosolClouds().size(), "Cloud should remain when it becomes unstuck");
+    }
+
+    private Obstacle createBlockingObstacleAtPosition(VPoint position) {
+        VShape shape = new VRectangle(position.x - 0.5, position.y - 0.5, 1, 1);
+        Obstacle obstacle = new Obstacle(new AttributesObstacle(1, shape));
+        topography.getAirFlow().setBlockingObstaclesIDs(List.of(1));
+        return obstacle;
     }
 }

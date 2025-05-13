@@ -10,8 +10,6 @@ import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.infection.AttributesAirTransmissionModel;
 import org.vadere.state.attributes.models.infection.AttributesExposureModel;
 import org.vadere.state.attributes.models.infection.AttributesExposureModelSourceParameters;
-import org.vadere.state.attributes.models.airflow.AttributesAirFlowModel;
-import org.vadere.state.attributes.models.airflow.AttributesInOutLet;
 import org.vadere.state.attributes.scenario.AttributesAerosolCloud;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesDroplets;
@@ -60,7 +58,7 @@ public class AirTransmissionModel extends AbstractExposureModel {
 	int aerosolCloudIdCounter;
 
 	private Map<Integer, Integer> spawnCounter;
-	private Map<AerosolCloud, Integer> aerosolCounter;
+	protected Map<AerosolCloud, Integer> aerosolCounter;
 
 	private Map<Integer, VPoint> lastPedestrianPositions;
 	private Map<Integer, Vector2D> viewingDirections;
@@ -88,9 +86,9 @@ public class AirTransmissionModel extends AbstractExposureModel {
 	/**
 	 * Define the simulation steps after which an aerosol cloud gets removed when moving through an obstacle
 	 */
-	private static final int STUCK_MAX = 10;
-	private static final int MOVE_EVERY_N_STEPS = 3;  // Move clouds every 3rd step
-	private int stepCounter = 0;
+	protected static final int STUCK_MAX = 10;
+	protected static final int MOVE_EVERY_N_STEPS = 3;  // Move clouds every 3rd step
+	protected int airflowStepCounter = 0;
 
 	@Override
 	public void initialize(List<Attributes> attributesList, Domain domain, AttributesAgent attributesPedestrian, Random random) {
@@ -496,9 +494,11 @@ public class AirTransmissionModel extends AbstractExposureModel {
 	}
 
 	public void updateAerosolCloudsLocation(double simTimeInSec) {
-		stepCounter++;
-		// Only compute and apply movement on nth step
-		if (stepCounter >= MOVE_EVERY_N_STEPS) {
+		if (topography.getAirFlow() == null) {
+			return;
+		}
+		airflowStepCounter++;
+		if (airflowStepCounter >= MOVE_EVERY_N_STEPS) {
 			Collection<AerosolCloud> allAerosolClouds = topography.getAerosolClouds();
 			for (AerosolCloud aerosolCloud : allAerosolClouds) {
 				VPoint center = aerosolCloud.getCenter();
@@ -506,11 +506,14 @@ public class AirTransmissionModel extends AbstractExposureModel {
 				aerosolCloud.shiftShape(windXY[0] * simTimeStepLength * MOVE_EVERY_N_STEPS, 
 									  windXY[1] * simTimeStepLength * MOVE_EVERY_N_STEPS);
 			}
-			stepCounter = 0;
+			airflowStepCounter = 0;
 		}
 	}
 
 	public void removeStuckAerosolClouds() {
+		if (topography.getAirFlow() == null) {
+			return;
+		}
 		Collection<AerosolCloud> aerosolClouds = topography.getAerosolClouds();
 		Collection<Obstacle> obstacles = topography.getObstacles();
 		Collection<AerosolCloud> toRemove = new ArrayList<>();

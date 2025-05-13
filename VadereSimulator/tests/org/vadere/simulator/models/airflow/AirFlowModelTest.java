@@ -60,7 +60,7 @@ class AirFlowModelTest {
     @Test
     public void testSetupAirFlowWithExistingFile() {
         initializeModel(true, false);
-        airFlowModel.calculateAirFlow();
+        airFlowModel.calculateAirFlow("1234");
         assertThrows(NullPointerException.class,() -> airFlowModel.airFlow.getFlowDirection(0, 0, 0));
         airFlowModel.preLoop(0);
         assertNotNull(airFlowModel.airFlow.getFlowDirection(0, 0, 0));

@@ -58,5 +58,6 @@ def postprocess_solution(basis, mesh, uv, grid_size, x_min, x_max, y_min, y_max)
     print(f"Max U component on grid: {np.max(Vx):.4f}")
     print(f"Max V component on grid: {np.max(Vy):.4f}")
     print(f"Max velocity magnitude on grid: {np.max(velocity_magnitude):.4f}")
+    print(f"Average velocity magnitude on grid: {np.mean(velocity_magnitude):.4f}")
 
     return X, Y, Vx, Vy, velocity_magnitude
