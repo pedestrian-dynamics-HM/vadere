@@ -35,26 +35,28 @@ public class AirFlowModel extends AbstractAirFlowModel {
 
     @Override
     public void setupAirFlow() {
-        File f_x_velocity = new File(airFlow.getScenarioPath() + "_" +  airFlow.getScenarioHash() + X_VELOCITY_FILE_ENDING);
-        File f_y_velocity = new File(airFlow.getScenarioPath() + "_" +  airFlow.getScenarioHash() + Y_VELOCITY_FILE_ENDING);
+        String hash = airFlow.getScenarioHash() + Math.abs(attributesAirFlowModel.getPythonPath().hashCode() % 10000);
+        
+        File f_x_velocity = new File(airFlow.getScenarioPath() + "_" + hash + X_VELOCITY_FILE_ENDING);
+        File f_y_velocity = new File(airFlow.getScenarioPath() + "_" + hash + Y_VELOCITY_FILE_ENDING);
 
         if(!(f_x_velocity.exists() && !f_x_velocity.isDirectory()) && !(f_y_velocity.exists() && !f_y_velocity.isDirectory())) {
-            calculateAirFlow();
+            calculateAirFlow(hash);
         }
 
         try {
-            airFlow.setX_velocity(readArrayFromFile(airFlow.getScenarioPath() + "_" +  airFlow.getScenarioHash() + X_VELOCITY_FILE_ENDING));
-            airFlow.setY_velocity(readArrayFromFile(airFlow.getScenarioPath() + "_" +  airFlow.getScenarioHash() + Y_VELOCITY_FILE_ENDING));
+            airFlow.setX_velocity(readArrayFromFile(airFlow.getScenarioPath() + "_" + hash + X_VELOCITY_FILE_ENDING));
+            airFlow.setY_velocity(readArrayFromFile(airFlow.getScenarioPath() + "_" + hash + Y_VELOCITY_FILE_ENDING));
             airFlow.setGridSize(attributesAirFlowModel.getGridSize());
             airFlow.setPeriod(attributesAirFlowModel.getOnPeriod(), attributesAirFlowModel.getOffPeriod());
             airFlow.setBlockingObstaclesIDs(attributesAirFlowModel.getBlockingObstacles());
 
         } catch (IllegalArgumentException e) {
-            calculateAirFlow();
+            calculateAirFlow(hash);
 
             try {
-                airFlow.setX_velocity(readArrayFromFile(airFlow.getScenarioPath() + "_" +  airFlow.getScenarioHash() + X_VELOCITY_FILE_ENDING));
-                airFlow.setY_velocity(readArrayFromFile(airFlow.getScenarioPath() + "_" +  airFlow.getScenarioHash() + Y_VELOCITY_FILE_ENDING));
+                airFlow.setX_velocity(readArrayFromFile(airFlow.getScenarioPath() + "_" + hash + X_VELOCITY_FILE_ENDING));
+                airFlow.setY_velocity(readArrayFromFile(airFlow.getScenarioPath() + "_" + hash + Y_VELOCITY_FILE_ENDING));
                 airFlow.setGridSize(attributesAirFlowModel.getGridSize());
                 airFlow.setPeriod(attributesAirFlowModel.getOnPeriod(), attributesAirFlowModel.getOffPeriod());
                 airFlow.setBlockingObstaclesIDs(attributesAirFlowModel.getBlockingObstacles());
@@ -67,17 +69,17 @@ public class AirFlowModel extends AbstractAirFlowModel {
         }
     }
 
-    protected void calculateAirFlow() {
+    protected void calculateAirFlow(String hash) {
         logger.info("Running python script for calculating airflow");
         try {
             ProcessBuilder processBuilder = new ProcessBuilder();
             processBuilder.command(attributesAirFlowModel.getCondaPath(),  "run", "-n", attributesAirFlowModel.getCondaEnv(),
-                    "python", attributesAirFlowModel.getPythonPath(), airFlow.getScenarioPath(), airFlow.getScenarioHash()
+                    "python", attributesAirFlowModel.getPythonPath(), airFlow.getScenarioPath(), hash
             );
             Process process = processBuilder.start();
 
             System.out.println(attributesAirFlowModel.getCondaPath() + " " +  "run" + " " + "-n" + " " + attributesAirFlowModel.getCondaEnv() + " " +
-                    "python" + " " + attributesAirFlowModel.getPythonPath() + " " + airFlow.getScenarioPath() + " " + airFlow.getScenarioHash());
+                    "python" + " " + attributesAirFlowModel.getPythonPath() + " " + airFlow.getScenarioPath() + " " + hash);
 
             // BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
             // logger.info(reader.lines().collect(Collectors.toList()));
