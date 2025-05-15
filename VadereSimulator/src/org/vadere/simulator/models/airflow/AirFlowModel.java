@@ -8,13 +8,13 @@ import org.vadere.state.attributes.models.airflow.AttributesAirFlowModel;
 import org.vadere.state.attributes.models.airflow.AttributesInOutLet;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.AirFlow;
+import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.logging.Logger;
 
 import java.io.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
-import java.util.stream.Collectors;
 
 @ModelClass
 public class AirFlowModel extends AbstractAirFlowModel {
@@ -31,11 +31,14 @@ public class AirFlowModel extends AbstractAirFlowModel {
     public void initialize(List<Attributes> attributesList, Domain domain, AttributesAgent attributesPedestrian, Random random) {
         super.initialize(attributesList, domain, attributesPedestrian, random);
         this.attributesAirFlowModel = Model.findAttributes(attributesList, AttributesAirFlowModel.class);
+        
+        String hash = StateJsonConverter.getAirFlowHash(domain.getTopography(), attributesAirFlowModel);
+        airFlow.setAirflowHash(hash);
     }
 
     @Override
     public void setupAirFlow() {
-        String hash = airFlow.getScenarioHash() + Math.abs(attributesAirFlowModel.getPythonPath().hashCode() % 10000);
+        String hash = airFlow.getAirflowHash();
         
         File f_x_velocity = new File(airFlow.getScenarioPath() + "_" + hash + X_VELOCITY_FILE_ENDING);
         File f_y_velocity = new File(airFlow.getScenarioPath() + "_" + hash + Y_VELOCITY_FILE_ENDING);

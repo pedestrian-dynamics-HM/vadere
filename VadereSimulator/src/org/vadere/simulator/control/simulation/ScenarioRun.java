@@ -124,6 +124,7 @@ public class ScenarioRun implements Runnable {
 		ctx.put(AirTransmissionModel.simStepLength, scenario.getAttributesSimulation().getSimTimeStepLength());
         ctx.put(DatabasedStepsModel.outputPath, outputPath.toString());
         ctx.put(DatabasedStepsModel.simulationSeedName, scenario.getAttributesSimulation().getSimulationSeed());
+		ctx.put("scenarioPath", scenarioFilePath.toString());
 
 		VadereContext.add(scenarioName, ctx);
 		logger.info("scenario context initialized.");
@@ -152,9 +153,6 @@ public class ScenarioRun implements Runnable {
 
 				AMesh floorFieldMesh = loadFloorFieldMesh().orElse(null);
 				AMesh backgroundMesh = loadBackgrounddMesh().orElse(null);
-
-				scenarioStore.getTopography().initAirFlow(scenarioFilePath.toString(), scenarioCache.getHash());
-
 
 				MainModelBuilder modelBuilder = new MainModelBuilder(scenarioStore, floorFieldMesh, backgroundMesh);
 				modelBuilder.createModelAndRandom();

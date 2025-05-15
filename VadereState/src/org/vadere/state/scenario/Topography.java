@@ -836,7 +836,7 @@ public class Topography implements DynamicElementMover{
 		return airFlow;
 	}
 
-	public void initAirFlow(String scenarioName, String scenarioHash) {
-		airFlow = new AirFlow(scenarioName, scenarioHash, getBoundingBoxWidth());
+	public void setAirFlow(AirFlow airFlow) {
+		this.airFlow = airFlow;	
 	}
 }

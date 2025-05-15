@@ -5,6 +5,7 @@ import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.AirFlow;
+import org.vadere.simulator.context.VadereContext;
 
 import java.util.List;
 import java.util.Random;
@@ -16,7 +17,9 @@ public abstract class AbstractAirFlowModel implements Model {
 
     @Override
     public void initialize(List<Attributes> attributesList, Domain domain, AttributesAgent attributesPedestrian, Random random) {
-        airFlow = domain.getTopography().getAirFlow();
+        String scenarioPath = VadereContext.getCtx(domain.getTopography()).getString("scenarioPath");
+        this.airFlow = new AirFlow(scenarioPath, "", domain.getTopography().getBoundingBoxWidth());
+        domain.getTopography().setAirFlow(airFlow);
     }
 
     @Override

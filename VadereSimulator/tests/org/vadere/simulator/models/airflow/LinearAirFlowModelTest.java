@@ -31,9 +31,9 @@ public class LinearAirFlowModelTest {
         airFlowModel = new LinearAirFlowModel();
         topography = new Topography(new AttributesTopography(), null);
         topography.setContextId("AirFlowModelTest");
-        topography.initAirFlow("scenarioName", "scenarioHash");
         rdm = new Random(0);
         ctx = new VadereContext();
+        ctx.put("scenarioPath", "scenarioName");
         VadereContext.add(topography.getContextId(), ctx);
     }
 

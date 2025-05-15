@@ -1,9 +1,17 @@
 package org.vadere.simulator.models.airflow;
 
+import org.vadere.simulator.models.Model;
+import org.vadere.simulator.projects.Domain;
+import org.vadere.state.attributes.Attributes;
+import org.vadere.state.attributes.models.airflow.AttributesAirFlowModel;
+import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.scenario.AirFlow;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
 import java.util.Random;
 
 public class AirFlowModelTester extends AirFlowModel {
@@ -29,6 +37,20 @@ public class AirFlowModelTester extends AirFlowModel {
     Random rand = new Random();
 
     @Override
+    public void initialize(List<Attributes> attributesList, Domain domain, AttributesAgent attributesPedestrian, Random random) {
+        // First initialize the airflow with a null hash to prevent NPE
+        super.initialize(attributesList, domain, attributesPedestrian, random);
+        
+        // Then find and set attributes
+        this.attributesAirFlowModel = Model.findAttributes(attributesList, AttributesAirFlowModel.class);
+        
+        // Finally set the test hash after everything else is initialized
+        if (this.airFlow != null) {
+            this.airFlow.setAirflowHash("test_hash");
+        }
+    }
+
+    @Override
     protected void calculateAirFlow(String hash) {
         File file1 = new File(airFlow.getScenarioPath() + "_" + hash + X_VELOCITY_FILE_ENDING);
         File file2 = new File(airFlow.getScenarioPath() + "_" + hash + Y_VELOCITY_FILE_ENDING);
@@ -48,8 +70,8 @@ public class AirFlowModelTester extends AirFlowModel {
     }
 
     protected void calculateWrongAirFlow() {
-        File file1 = new File(airFlow.getScenarioPath() + "_" + airFlow.getScenarioHash() + X_VELOCITY_FILE_ENDING);
-        File file2 = new File(airFlow.getScenarioPath() + "_" + airFlow.getScenarioHash() + Y_VELOCITY_FILE_ENDING);
+        File file1 = new File(airFlow.getScenarioPath() + "_" + airFlow.getAirflowHash() + X_VELOCITY_FILE_ENDING);
+        File file2 = new File(airFlow.getScenarioPath() + "_" + airFlow.getAirflowHash() + Y_VELOCITY_FILE_ENDING);
         try {
             file1.createNewFile();
             file2.createNewFile();

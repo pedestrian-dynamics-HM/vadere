@@ -80,3 +80,11 @@ if __name__ == '__main__':
             plt.axis("equal")
             plt.show()
 
+            #plt.figure()
+            #plt.gca().set_aspect('equal')
+            #plt.xlim(0,6)
+            #plt.ylim(0,8)
+            #plt.quiver(X, Y, Vx, Vy)
+            #plt.title('Velocity Field')
+            #plt.show()
+

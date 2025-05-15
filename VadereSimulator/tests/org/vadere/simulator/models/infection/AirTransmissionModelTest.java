@@ -51,8 +51,14 @@ public class AirTransmissionModelTest {
         rdm = new Random(0);
         ctx = new VadereContext();
         ctx.put(AirTransmissionModel.simStepLength, SIM_TIME_STEP_LENGTH);
+        ctx.put("scenarioPath", "test");
         VadereContext.add(topography.getContextId(), ctx);
         simStartTime = 0.0;
+
+        // Initialize AirFlow
+        AirFlow airFlow = new AirFlow("test", "test_hash", 0.0);
+        airFlow.setGridSize(Double.POSITIVE_INFINITY);
+        topography.setAirFlow(airFlow);
 
         initializeTransmissionModel();
     }
@@ -631,10 +637,16 @@ public class AirTransmissionModelTest {
     }
 
     private void createAirflow(AirTransmissionModel airTransmissionModel, double[][] xVelocity, double[][] yVelocity) {
-        airTransmissionModel.topography.initAirFlow("test", "test");
-        airTransmissionModel.topography.getAirFlow().setX_velocity(xVelocity);
-        airTransmissionModel.topography.getAirFlow().setY_velocity(yVelocity);
-        airTransmissionModel.topography.getAirFlow().setGridSize(Double.POSITIVE_INFINITY);
+        VadereContext ctx = new VadereContext();
+        ctx.put("scenarioPath", "test");
+        VadereContext.add(topography.getContextId(), ctx);
+
+        AirFlow airFlow = new AirFlow("test", "test_hash", 0.0);
+        airFlow.setX_velocity(xVelocity);
+        airFlow.setY_velocity(yVelocity);
+        airFlow.setGridSize(Double.POSITIVE_INFINITY);
+
+        topography.setAirFlow(airFlow);
     }
 
     @Test

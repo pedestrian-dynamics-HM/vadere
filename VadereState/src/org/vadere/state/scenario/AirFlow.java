@@ -6,7 +6,7 @@ import java.util.List;
 public class AirFlow {
 
     private final String scenarioPath;
-    private final String scenarioHash;
+    private String airflowHash;
 
     private double gridSize;
     private final double border;
@@ -19,9 +19,9 @@ public class AirFlow {
 
     private List<Integer> blockingObstaclesIDs = new ArrayList<Integer>();
 
-    public AirFlow(String scenarioPath, String scenarioHash, double border) {
+    public AirFlow(String scenarioPath, String airflowHash, double border) {
         this.scenarioPath = scenarioPath;
-        this.scenarioHash = scenarioHash;
+        this.airflowHash = airflowHash;
         this.border = border;
     }
 
@@ -41,8 +41,12 @@ public class AirFlow {
         return scenarioPath;
     }
 
-    public String getScenarioHash() {
-        return scenarioHash;
+    public String getAirflowHash() {
+        return airflowHash;
+    }
+
+    public void setAirflowHash(String airflowHash) {
+        this.airflowHash = airflowHash;
     }
 
     public double[] getFlowDirection(double simTime, double x, double y) {

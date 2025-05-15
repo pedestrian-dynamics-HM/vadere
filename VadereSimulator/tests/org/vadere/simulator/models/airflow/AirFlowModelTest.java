@@ -6,10 +6,8 @@ import org.junit.jupiter.api.io.TempDir;
 import org.vadere.simulator.context.VadereContext;
 import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.Attributes;
-import org.vadere.state.attributes.exceptions.AttributesNotFoundException;
 import org.vadere.state.attributes.models.airflow.AttributesAirFlowModel;
 import org.vadere.state.attributes.models.airflow.AttributesInOutLet;
-import org.vadere.state.attributes.scenario.AttributesTopography;
 import org.vadere.state.scenario.Topography;
 
 import java.nio.file.Path;
@@ -34,16 +32,26 @@ class AirFlowModelTest {
     public void setUp() {
         attributesList = new ArrayList<>();
         airFlowModel = new AirFlowModelTester();
-        topography = new Topography(new AttributesTopography(), null);
+        
+        // Create a basic topography
+        topography = new Topography();
         topography.setContextId("AirFlowModelTest");
-        topography.initAirFlow(tempDir.toAbsolutePath() + "/scenarioName", "scenarioHash");
+        
         rdm = new Random(0);
         ctx = new VadereContext();
-        VadereContext.add(topography.getContextId(), ctx);
+        ctx.put("scenarioPath", tempDir.toAbsolutePath().toString());
+        VadereContext.add("AirFlowModelTest", ctx);
     }
 
     @Test
     public void testInitialize() {
+        ArrayList<AttributesInOutLet> inlets = new ArrayList<>();
+        inlets.add(new AttributesInOutLet("left", 1., 2.));
+        ArrayList<AttributesInOutLet> outlets = new ArrayList<>();
+        outlets.add(new AttributesInOutLet("right", 4., 5.));
+        AttributesAirFlowModel attributesAirFlowModel = new AttributesAirFlowModel(2., 0.1, 1., inlets, outlets, new ArrayList<>());
+        attributesList.add(attributesAirFlowModel);
+        
         initializeModel(true, false);
         assertNotNull(airFlowModel.airFlow);
         assertNotNull(airFlowModel.attributesAirFlowModel);
@@ -111,13 +119,13 @@ class AirFlowModelTest {
         AttributesAirFlowModel attributesAirFlowModel;
         if (rightParameters) {
             attributesAirFlowModel = new AttributesAirFlowModel(2., 0.1, 1., inlets, outlets, new ArrayList<>());
-
         } else {
             attributesAirFlowModel = new AttributesAirFlowModel(1., 0.1, 1., inlets, outlets, new ArrayList<>());
         }
         if (periodic) {
             attributesAirFlowModel.setOffPeriod(1.0);
         }
+        attributesList.clear();  // Clear any existing attributes
         attributesList.add(attributesAirFlowModel);
         airFlowModel.initialize(attributesList, new Domain(topography), null, rdm);
     }
