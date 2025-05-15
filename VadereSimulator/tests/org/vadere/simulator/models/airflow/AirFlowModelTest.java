@@ -125,7 +125,7 @@ class AirFlowModelTest {
         if (periodic) {
             attributesAirFlowModel.setOffPeriod(1.0);
         }
-        attributesList.clear();  // Clear any existing attributes
+        attributesList.clear();
         attributesList.add(attributesAirFlowModel);
         airFlowModel.initialize(attributesList, new Domain(topography), null, rdm);
     }

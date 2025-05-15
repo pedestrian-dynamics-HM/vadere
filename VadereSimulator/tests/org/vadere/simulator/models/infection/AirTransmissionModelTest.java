@@ -650,6 +650,57 @@ public class AirTransmissionModelTest {
     }
 
     @Test
+    public void testUpdateAerosolCloudsLocationWithDifferentSimTimeStepLength() {
+        attributesList = new ArrayList<>();
+        AttributesAirTransmissionModel attr = new AttributesAirTransmissionModel();
+        attributesList.add(attr);
+        airTransmissionModel = new AirTransmissionModel();
+        topography = new Topography();
+        topography.setContextId("testId");
+
+        // Create a simple airflow field with constant x-velocity of 1.0
+        AirFlow airFlow = new AirFlow("test", "test_hash", 0.0);
+        double[][] xVelocity = new double[][]{{1.0}};
+        double[][] yVelocity = new double[][]{{0.0}};
+        airFlow.setX_velocity(xVelocity);
+        airFlow.setY_velocity(yVelocity);
+        airFlow.setGridSize(Double.POSITIVE_INFINITY);
+        topography.setAirFlow(airFlow);
+
+        // Initialize model with time step 0.4
+        ctx = new VadereContext();
+        ctx.put(AirTransmissionModel.simStepLength, 0.4);
+        ctx.put("scenarioPath", "test");
+        VadereContext.add(topography.getContextId(), ctx);
+        initializeTransmissionModel();
+
+        // Create an aerosol cloud at position (0,0)
+        AttributesAerosolCloud attributes = new AttributesAerosolCloud(1, 1.0, new VPoint(0.0, 0.0), 0.0, 10000.0);
+        AerosolCloud cloud = new AerosolCloud(attributes);
+        topography.addAerosolCloud(cloud);
+
+        // Run two steps with simTimeStepLength 0.4
+        airTransmissionModel.update(0.4);
+        airTransmissionModel.update(0.8);
+        double xPos1 = topography.getAerosolClouds().get(0).getCenter().x;
+        double yPos1 = topography.getAerosolClouds().get(0).getCenter().y;
+
+        // Reset and run one time step with simTimeStepLength 0.8
+        topography.getAerosolClouds().clear();
+        attributes = new AttributesAerosolCloud(1, 1.0, new VPoint(0.0, 0.0), 0.0, 10000.0);
+        cloud = new AerosolCloud(attributes);
+        topography.addAerosolCloud(cloud);
+        ctx.put(AirTransmissionModel.simStepLength, 0.8);
+        airTransmissionModel.update(0.8);
+        double xPos2 = topography.getAerosolClouds().get(0).getCenter().x;
+        double yPos2 = topography.getAerosolClouds().get(0).getCenter().y;
+
+        // The positions should be equal
+        assertEquals(xPos1, xPos2, 1e-10);
+        assertEquals(yPos1, yPos2, 1e-10);
+    }
+
+    @Test
     public void testRemoveStuckAerosolCloudsNotStuck() {
         setAerosolCloudsActive(true);
         createAerosolCloud(airTransmissionModel);
