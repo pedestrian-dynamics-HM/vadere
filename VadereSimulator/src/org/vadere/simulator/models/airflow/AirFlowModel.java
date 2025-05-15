@@ -43,13 +43,21 @@ public class AirFlowModel extends AbstractAirFlowModel {
         File f_x_velocity = new File(airFlow.getScenarioPath() + "_" + hash + X_VELOCITY_FILE_ENDING);
         File f_y_velocity = new File(airFlow.getScenarioPath() + "_" + hash + Y_VELOCITY_FILE_ENDING);
 
+        // To make sure suq controller doesn't compute airflow multiple times for same scenario: 
+        // If files don't exist with exact name, try finding files with alternative pattern
         if(!(f_x_velocity.exists() && !f_x_velocity.isDirectory()) && !(f_y_velocity.exists() && !f_y_velocity.isDirectory())) {
-            calculateAirFlow(hash);
+            File[] alternativeFiles = findAlternativeVelocityFiles(hash);
+            if (alternativeFiles != null) {
+                f_x_velocity = alternativeFiles[0];
+                f_y_velocity = alternativeFiles[1];
+            } else {
+                calculateAirFlow(hash);
+            }
         }
 
         try {
-            airFlow.setX_velocity(readArrayFromFile(airFlow.getScenarioPath() + "_" + hash + X_VELOCITY_FILE_ENDING));
-            airFlow.setY_velocity(readArrayFromFile(airFlow.getScenarioPath() + "_" + hash + Y_VELOCITY_FILE_ENDING));
+            airFlow.setX_velocity(readArrayFromFile(f_x_velocity.getAbsolutePath()));
+            airFlow.setY_velocity(readArrayFromFile(f_y_velocity.getAbsolutePath()));
             airFlow.setGridSize(attributesAirFlowModel.getGridSize());
             airFlow.setPeriod(attributesAirFlowModel.getOnPeriod(), attributesAirFlowModel.getOffPeriod());
             airFlow.setBlockingObstaclesIDs(attributesAirFlowModel.getBlockingObstacles());
@@ -58,8 +66,8 @@ public class AirFlowModel extends AbstractAirFlowModel {
             calculateAirFlow(hash);
 
             try {
-                airFlow.setX_velocity(readArrayFromFile(airFlow.getScenarioPath() + "_" + hash + X_VELOCITY_FILE_ENDING));
-                airFlow.setY_velocity(readArrayFromFile(airFlow.getScenarioPath() + "_" + hash + Y_VELOCITY_FILE_ENDING));
+                airFlow.setX_velocity(readArrayFromFile(f_x_velocity.getAbsolutePath()));
+                airFlow.setY_velocity(readArrayFromFile(f_y_velocity.getAbsolutePath()));
                 airFlow.setGridSize(attributesAirFlowModel.getGridSize());
                 airFlow.setPeriod(attributesAirFlowModel.getOnPeriod(), attributesAirFlowModel.getOffPeriod());
                 airFlow.setBlockingObstaclesIDs(attributesAirFlowModel.getBlockingObstacles());
@@ -70,6 +78,34 @@ public class AirFlowModel extends AbstractAirFlowModel {
         } catch (IOException e) {
             logger.error("Error reading airflow matrices: {}", e.getMessage());
         }
+    }
+
+
+    private File[] findAlternativeVelocityFiles(String hash) {
+        File scenarioFile = new File(airFlow.getScenarioPath());
+        File parentDir = scenarioFile.getParentFile();
+        if (parentDir == null || !parentDir.exists()) {
+            return null;
+        }
+
+        String basePath = parentDir.getAbsolutePath();
+        
+        File[] files = parentDir.listFiles((dir, name) -> 
+            name.matches("\\d+_\\d+\\.scenario_" + hash + X_VELOCITY_FILE_ENDING));
+        
+        if (files == null || files.length == 0) {
+            return null;
+        }
+
+        for (File x_velocity : files) {
+            String y_velocity_name = x_velocity.getName().replace(X_VELOCITY_FILE_ENDING, Y_VELOCITY_FILE_ENDING);
+            File y_velocity = new File(basePath + File.separator + y_velocity_name);
+
+            if (y_velocity.exists() && !y_velocity.isDirectory()) {
+                return new File[]{x_velocity, y_velocity};
+            }
+        }
+        return null;
     }
 
     protected void calculateAirFlow(String hash) {
