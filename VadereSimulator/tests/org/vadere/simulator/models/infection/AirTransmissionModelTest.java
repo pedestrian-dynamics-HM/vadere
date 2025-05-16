@@ -56,7 +56,7 @@ public class AirTransmissionModelTest {
         simStartTime = 0.0;
 
         // Initialize AirFlow
-        AirFlow airFlow = new AirFlow("test", "test_hash", 0.0);
+        AirFlow airFlow = new AirFlow("test", "test_hash", 0.0, 0.0);
         airFlow.setGridSize(Double.POSITIVE_INFINITY);
         topography.setAirFlow(airFlow);
 

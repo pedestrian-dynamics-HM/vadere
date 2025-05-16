@@ -6,8 +6,8 @@ def extract_attributes(topography, attributes_model, parameter_string):
 
     x_min = topography['attributes']['bounds']['x'] + bounding_box_width
     y_min = topography['attributes']['bounds']['y'] + bounding_box_width
-    x_max = topography['attributes']['bounds']['width'] - bounding_box_width + topography['attributes']['bounds']['x']
-    y_max = topography['attributes']['bounds']['height'] - bounding_box_width + topography['attributes']['bounds']['y']
+    x_max = topography['attributes']['bounds']['x'] + topography['attributes']['bounds']['width'] - bounding_box_width
+    y_max = topography['attributes']['bounds']['y'] + topography['attributes']['bounds']['height'] - bounding_box_width
 
     grid_size = float(attributes_model['gridSize'])
     area_threshold = float(attributes_model['areaThreshold'])

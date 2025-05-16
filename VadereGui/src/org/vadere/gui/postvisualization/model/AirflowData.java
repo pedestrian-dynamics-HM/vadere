@@ -60,7 +60,7 @@ public class AirflowData {
             yVelocity[row.getInt(idXCol)][row.getInt(idYCol)] = row.getDouble(yVelocityCol);
         }
 
-        airFlow = new AirFlow("", "", 0);
+        airFlow = new AirFlow("", "", 0, 0);
         airFlow.setX_velocity(xVelocity);
         airFlow.setY_velocity(yVelocity);
         try {

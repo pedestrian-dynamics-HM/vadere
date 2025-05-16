@@ -9,7 +9,8 @@ public class AirFlow {
     private String airflowHash;
 
     private double gridSize;
-    private final double border;
+    private final double xmin;
+    private final double ymin;
 
     private double[][] x_velocity;
     private double[][] y_velocity;
@@ -19,10 +20,11 @@ public class AirFlow {
 
     private List<Integer> blockingObstaclesIDs = new ArrayList<Integer>();
 
-    public AirFlow(String scenarioPath, String airflowHash, double border) {
+    public AirFlow(String scenarioPath, String airflowHash, double xmin, double ymin) {
         this.scenarioPath = scenarioPath;
         this.airflowHash = airflowHash;
-        this.border = border;
+        this.xmin = xmin;
+        this.ymin = ymin;
     }
 
     public void setX_velocity(double[][] x_velocity) {
@@ -60,8 +62,8 @@ public class AirFlow {
             return new double[]{0, 0};
         }
 
-        int x_idx = (int) Math.round((x - border) / gridSize);
-        int y_idx = (int) Math.round((y - border) / gridSize);
+        int x_idx = (int) Math.round((x - xmin) / gridSize);
+        int y_idx = (int) Math.round((y - ymin) / gridSize);
 
         // Clamp indices to valid grid range, keeping one cell buffer from edges, because edges are always zero
         x_idx = Math.max(1, Math.min(x_idx, x_velocity[0].length - 2));

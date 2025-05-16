@@ -18,7 +18,9 @@ public abstract class AbstractAirFlowModel implements Model {
     @Override
     public void initialize(List<Attributes> attributesList, Domain domain, AttributesAgent attributesPedestrian, Random random) {
         String scenarioPath = VadereContext.getCtx(domain.getTopography()).getString("scenarioPath");
-        this.airFlow = new AirFlow(scenarioPath, "", domain.getTopography().getBoundingBoxWidth());
+        this.airFlow = new AirFlow(scenarioPath, "",
+                domain.getTopography().getBounds().x + domain.getTopography().getBoundingBoxWidth(),
+                domain.getTopography().getBounds().y + domain.getTopography().getBoundingBoxWidth());
         domain.getTopography().setAirFlow(airFlow);
     }
 

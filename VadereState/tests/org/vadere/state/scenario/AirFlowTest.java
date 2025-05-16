@@ -13,7 +13,7 @@ public class AirFlowTest {
 
     @BeforeEach
     public void setUp() {
-        airFlow = new AirFlow("testScenario", "testHash", BORDER);
+        airFlow = new AirFlow("testScenario", "testHash", BORDER, BORDER);
         airFlow.setGridSize(GRID_SIZE);
     }
 
