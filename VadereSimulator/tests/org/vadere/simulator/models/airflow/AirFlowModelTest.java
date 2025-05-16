@@ -129,22 +129,4 @@ class AirFlowModelTest {
         attributesList.add(attributesAirFlowModel);
         airFlowModel.initialize(attributesList, new Domain(topography), null, rdm);
     }
-
-    @Test
-    public void testGetAttributesString() {
-        ArrayList<AttributesInOutLet> inlets = new ArrayList<>();
-        inlets.add(new AttributesInOutLet("left", 1., 2.));
-        inlets.add(new AttributesInOutLet("top", 0.2, 2.4));
-        ArrayList<AttributesInOutLet> outlets = new ArrayList<>();
-        outlets.add(new AttributesInOutLet("right", 4., 5.));
-        outlets.add(new AttributesInOutLet("bottom", 1.3, 2.3));
-        ArrayList<Integer> notBlockingObstacles = new ArrayList<>();
-        notBlockingObstacles.add(1);
-        notBlockingObstacles.add(2);
-        notBlockingObstacles.add(3);
-        AttributesAirFlowModel attributesAirFlowModel = new AttributesAirFlowModel(0.5, 0.2, 0.1, inlets, outlets, notBlockingObstacles);
-
-        String actualAttributesString = AirFlowModel.getAttributesString(attributesAirFlowModel);
-        assertEquals("0.5-0.2-0.1-left[1.0,2.0]top[0.2,2.4]-right[4.0,5.0]bottom[1.3,2.3]-[1, 2, 3]", actualAttributesString);
-    }
 }

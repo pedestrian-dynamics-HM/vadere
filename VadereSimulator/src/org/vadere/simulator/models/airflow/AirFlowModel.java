@@ -133,16 +133,10 @@ public class AirFlowModel extends AbstractAirFlowModel {
     private double[][] readArrayFromFile(String filename) throws IOException {
         BufferedReader reader = new BufferedReader(new FileReader(filename));
 
-        String expectedParameters = getAttributesString(attributesAirFlowModel);
-
         String header = reader.readLine();
         String[] split = header.substring(2).split("_");
         int x_dim = Integer.parseInt(split[0]);
         int y_dim = Integer.parseInt(split[1]);
-
-        if (!expectedParameters.equals(split[2])) {
-            throw new IllegalArgumentException("Wrong parameters for airflow");
-        }
 
         double[][] result = new double[x_dim][y_dim];
 
@@ -156,25 +150,5 @@ public class AirFlowModel extends AbstractAirFlowModel {
             }
         }
         return result;
-    }
-
-    public static String getAttributesString(AttributesAirFlowModel attributes) {
-        StringBuilder result = new StringBuilder();
-        result.append(attributes.getGridSize()).append("-");
-        result.append(attributes.getAreaThreshold()).append("-");
-        result.append(attributes.getInletVelocity()).append("-");
-
-        for (AttributesInOutLet inlet : attributes.getInlets()) {
-            result.append(inlet.getSide()).append("[").append(inlet.getStart()).append(",").append(inlet.getStart()+inlet.getWidth()).append("]");
-        }
-        result.append("-");
-
-        for (AttributesInOutLet outlet : attributes.getOutlets()) {
-            result.append(outlet.getSide()).append("[").append(outlet.getStart()).append(",").append(outlet.getStart()+outlet.getWidth()).append("]");
-        }
-        result.append("-");
-
-        result.append(Arrays.toString(attributes.getBlockingObstacles().toArray(new Integer[0])));
-        return result.toString();
     }
 }
