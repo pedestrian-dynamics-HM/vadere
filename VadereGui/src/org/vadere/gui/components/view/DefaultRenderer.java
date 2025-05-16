@@ -35,7 +35,6 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.Collection;
-import java.util.Objects;
 
 /**
  * @author Benedikt Zoennchen
@@ -311,16 +310,16 @@ public abstract class DefaultRenderer {
 			for (AttributesInOutLet inlet : attributesAirFlowModel.getInlets()) {
 				switch (inlet.getSide()) {
 					case "bottom":
-						g.fill(new VRectangle.Double(inlet.getStart(), topography.getBoundingBoxWidth() - 0.1, inlet.getEnd() - inlet.getStart(), 0.1));
+						g.fill(new VRectangle.Double(inlet.getStart(), topography.getBoundingBoxWidth() - 0.1, inlet.getWidth(), 0.1));
 						break;
 					case "top":
-						g.fill(new VRectangle.Double(inlet.getStart(), bounds.getHeight() - topography.getBoundingBoxWidth(), inlet.getEnd() - inlet.getStart(), 0.1));
+						g.fill(new VRectangle.Double(inlet.getStart(), bounds.getHeight() - topography.getBoundingBoxWidth(), inlet.getWidth(), 0.1));
 						break;
 					case "left":
-						g.fill(new VRectangle.Double(topography.getBoundingBoxWidth() - 0.1, inlet.getStart(), 0.1, inlet.getEnd() - inlet.getStart()));
+						g.fill(new VRectangle.Double(topography.getBoundingBoxWidth() - 0.1, inlet.getStart(), 0.1, inlet.getWidth()));
 						break;
 					case "right":
-						g.fill(new VRectangle.Double(bounds.getWidth() - topography.getBoundingBoxWidth(), inlet.getStart(), 0.1, inlet.getEnd() - inlet.getStart()));
+						g.fill(new VRectangle.Double(bounds.getWidth() - topography.getBoundingBoxWidth(), inlet.getStart(), 0.1, inlet.getWidth()));
 						break;
 				}
 
@@ -331,16 +330,16 @@ public abstract class DefaultRenderer {
 			for (AttributesInOutLet outlet : attributesAirFlowModel.getOutlets()) {
 				switch (outlet.getSide()) {
 					case "bottom":
-						g.fill(new VRectangle.Double(outlet.getStart(), topography.getBoundingBoxWidth() - 0.1, outlet.getEnd() - outlet.getStart(), 0.1));
+						g.fill(new VRectangle.Double(outlet.getStart(), topography.getBoundingBoxWidth() - 0.1, outlet.getWidth(), 0.1));
 						break;
 					case "top":
-						g.fill(new VRectangle.Double(outlet.getStart(), bounds.getHeight() - topography.getBoundingBoxWidth(), outlet.getEnd() - outlet.getStart(), 0.1));
+						g.fill(new VRectangle.Double(outlet.getStart(), bounds.getHeight() - topography.getBoundingBoxWidth(), outlet.getWidth(), 0.1));
 						break;
 					case "left":
-						g.fill(new VRectangle.Double(topography.getBoundingBoxWidth() - 0.1, outlet.getStart(), 0.1, outlet.getEnd() - outlet.getStart()));
+						g.fill(new VRectangle.Double(topography.getBoundingBoxWidth() - 0.1, outlet.getStart(), 0.1, outlet.getWidth()));
 						break;
 					case "right":
-						g.fill(new VRectangle.Double(bounds.getWidth() - topography.getBoundingBoxWidth(), outlet.getStart(), 0.1, outlet.getEnd() - outlet.getStart()));
+						g.fill(new VRectangle.Double(bounds.getWidth() - topography.getBoundingBoxWidth(), outlet.getStart(), 0.1, outlet.getWidth()));
 						break;
 				}
 

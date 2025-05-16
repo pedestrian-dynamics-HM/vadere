@@ -165,12 +165,12 @@ public class AirFlowModel extends AbstractAirFlowModel {
         result.append(attributes.getInletVelocity()).append("-");
 
         for (AttributesInOutLet inlet : attributes.getInlets()) {
-            result.append(inlet.getSide()).append("[").append(inlet.getStart()).append(",").append(inlet.getEnd()).append("]");
+            result.append(inlet.getSide()).append("[").append(inlet.getStart()).append(",").append(inlet.getStart()+inlet.getWidth()).append("]");
         }
         result.append("-");
 
         for (AttributesInOutLet outlet : attributes.getOutlets()) {
-            result.append(outlet.getSide()).append("[").append(outlet.getStart()).append(",").append(outlet.getEnd()).append("]");
+            result.append(outlet.getSide()).append("[").append(outlet.getStart()).append(",").append(outlet.getStart()+outlet.getWidth()).append("]");
         }
         result.append("-");
 

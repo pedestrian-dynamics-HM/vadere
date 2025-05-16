@@ -6,18 +6,18 @@ public class AttributesInOutLet {
 
     private double start;
 
-    private double end;
+    private double width;
 
     public AttributesInOutLet() {
         side = "bottom";
         start = 0;
-        end = 2;
+        width = 1;
     }
 
-    public AttributesInOutLet(String side, double start, double end) {
+    public AttributesInOutLet(String side, double start, double width) {
         this.side = side;
         this.start = start;
-        this.end = end;
+        this.width = width;
     }
 
     public String getSide() {
@@ -28,7 +28,7 @@ public class AttributesInOutLet {
         return start;
     }
 
-    public double getEnd() {
-        return end;
+    public double getWidth() {
+        return width;
     }
 }

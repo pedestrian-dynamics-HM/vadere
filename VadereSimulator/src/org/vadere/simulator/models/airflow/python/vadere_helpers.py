@@ -19,12 +19,12 @@ def extract_attributes(topography, attributes_model, parameter_string):
     inlets = []
     outlets = []
     for i, ins in enumerate(attributes_model['inlets']):
-        parameter_string = parameter_string + ins['side'] + "[" + str(ins['start']) +","+ str(ins['end']) + "]"
-        inlets.append({"id": i, "side": ins['side'], "coords": [float(ins['start']), float(ins['end'])]})
+        parameter_string = parameter_string + ins['side'] + "[" + str(ins['start']) +","+ str(ins['start']+ins['width']) + "]"
+        inlets.append({"id": i, "side": ins['side'], "coords": [float(ins['start']), float(ins['start']+ins['width'])]})
     parameter_string = parameter_string + "-"
     for i, outs in enumerate(attributes_model['outlets']):
-        parameter_string = parameter_string + outs['side'] + "[" + str(outs['start'])+","+  str(outs['end']) + "]"
-        outlets.append({"id": i, "side": outs['side'], "coords": [float(outs['start']), float(outs['end'])]})
+        parameter_string = parameter_string + outs['side'] + "[" + str(outs['start'])+","+  str(outs['start']+outs['width']) + "]"
+        outlets.append({"id": i, "side": outs['side'], "coords": [float(outs['start']), float(outs['start']+outs['width'])]})
 
     parameter_string = parameter_string + "-" + str(blocking_obstacles)
 
