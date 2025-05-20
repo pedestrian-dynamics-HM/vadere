@@ -11,6 +11,8 @@ public class AirFlow {
     private double gridSize;
     private final double xmin;
     private final double ymin;
+    private final double xmax;
+    private final double ymax;
 
     private double[][] x_velocity;
     private double[][] y_velocity;
@@ -20,11 +22,13 @@ public class AirFlow {
 
     private List<Integer> blockingObstaclesIDs = new ArrayList<Integer>();
 
-    public AirFlow(String scenarioPath, String airflowHash, double xmin, double ymin) {
+    public AirFlow(String scenarioPath, String airflowHash, double xmin, double ymin, double xmax, double ymax) {
         this.scenarioPath = scenarioPath;
         this.airflowHash = airflowHash;
         this.xmin = xmin;
         this.ymin = ymin;
+        this.xmax = xmax;
+        this.ymax = ymax;
     }
 
     public void setX_velocity(double[][] x_velocity) {
@@ -59,6 +63,11 @@ public class AirFlow {
         }
 
         if (offPeriod > 0 && (simTime % (onPeriod + offPeriod) < offPeriod)) {
+            return new double[]{0, 0};
+        }
+
+        // Check bounds
+        if (x < xmin || x > xmax || y < ymin || y > ymax) {
             return new double[]{0, 0};
         }
 
@@ -99,4 +108,9 @@ public class AirFlow {
     public List<Integer> getBlockingObstaclesIDs() {
         return blockingObstaclesIDs;
     }
+
+    public double getXmin() { return xmin; }
+    public double getXmax() { return xmax; }
+    public double getYmin() { return ymin; }
+    public double getYmax() { return ymax; }
 }

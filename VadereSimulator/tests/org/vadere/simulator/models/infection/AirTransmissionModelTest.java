@@ -56,7 +56,7 @@ public class AirTransmissionModelTest {
         simStartTime = 0.0;
 
         // Initialize AirFlow
-        AirFlow airFlow = new AirFlow("test", "test_hash", 0.0, 0.0);
+        AirFlow airFlow = new AirFlow("test", "test_hash", 0.0, 0.0, 10, 10);
         airFlow.setGridSize(Double.POSITIVE_INFINITY);
         topography.setAirFlow(airFlow);
 
@@ -641,7 +641,7 @@ public class AirTransmissionModelTest {
         ctx.put("scenarioPath", "test");
         VadereContext.add(topography.getContextId(), ctx);
 
-        AirFlow airFlow = new AirFlow("test", "test_hash", 0.0, 0.0);
+        AirFlow airFlow = new AirFlow("test", "test_hash", 0.0, 0.0, 10, 10);
         airFlow.setX_velocity(xVelocity);
         airFlow.setY_velocity(yVelocity);
         airFlow.setGridSize(Double.POSITIVE_INFINITY);
@@ -659,7 +659,7 @@ public class AirTransmissionModelTest {
         topography.setContextId("testId");
 
         // Create a simple airflow field with constant x-velocity of 1.0
-        AirFlow airFlow = new AirFlow("test", "test_hash", 0.0, 0.0);
+        AirFlow airFlow = new AirFlow("test", "test_hash", 0.0, 0.0, 10, 10);
         double[][] xVelocity = new double[][]{{1.0}};
         double[][] yVelocity = new double[][]{{0.0}};
         airFlow.setX_velocity(xVelocity);

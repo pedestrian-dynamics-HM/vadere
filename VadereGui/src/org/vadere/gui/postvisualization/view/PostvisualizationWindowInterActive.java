@@ -4,12 +4,13 @@ import com.formdev.flatlaf.FlatLightLaf;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.components.control.ActionGeneratePoly;
 import org.vadere.gui.components.control.simulation.*;
+import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.components.utils.Localization;
 import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.components.utils.SwingUtils;
 import org.vadere.gui.components.view.DialogFactory;
 import org.vadere.gui.postvisualization.control.*;
-import org.vadere.gui.postvisualization.model.AirflowData;
+import org.vadere.gui.postvisualization.model.AirFlowData;
 import org.vadere.gui.postvisualization.model.ContactData;
 import org.vadere.gui.postvisualization.model.TableAerosolCloudData;
 import org.vadere.gui.projectview.control.ActionDeselect;
@@ -350,7 +351,7 @@ public class PostvisualizationWindowInterActive extends PostvisualizationWindow 
                         additionalTables.put(entry.getKey(), IOOutput.readContactData(entry.getValue().toPath()));
                     case TableAerosolCloudData.TABLE_NAME:
                         additionalTables.put(entry.getKey(), IOOutput.readAerosolCloudData(entry.getValue().toPath()));
-                    case AirflowData.TABLE_NAME:
+                    case AirFlowData.TABLE_NAME:
                         additionalTables.put(entry.getKey(), IOOutput.readAirflowData(entry.getValue().toPath()));
                 }
             }

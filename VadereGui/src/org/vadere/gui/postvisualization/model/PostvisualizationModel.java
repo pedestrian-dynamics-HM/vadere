@@ -55,7 +55,7 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 
 	private TableAerosolCloudData tableAerosolCloudData;
 
-	private AirflowData airflowData;
+	private AirFlowData airFlowData;
 
 	private PredicateColoringModel predicateColoringModel;
 
@@ -77,7 +77,7 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 		this.topographyId = 0;
 		this.potentialContainer = null;
 		this.tableAerosolCloudData = new TableAerosolCloudData(Table.create());
-		this.airflowData = new AirflowData(Table.create());
+		this.airFlowData = new AirFlowData(Table.create());
 		this.simTimeStepLength = new AttributesSimulation().getSimTimeStepLength();
 		this.timeResolution = this.simTimeStepLength;
 		this.visTime = 0;
@@ -114,8 +114,8 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 				case TableAerosolCloudData.TABLE_NAME:
 					this.config.setAerosolCloudsRecorded(true);
 					this.tableAerosolCloudData = new TableAerosolCloudData(entry.getValue());
-				case AirflowData.TABLE_NAME:
-					this.airflowData = new AirflowData(entry.getValue());
+				case AirFlowData.TABLE_NAME:
+					this.airFlowData = new AirFlowData(entry.getValue());
 			}
 		}
 		this.visTime = 0;
@@ -226,8 +226,8 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 		return tableAerosolCloudData;
 	}
 
-	public synchronized AirflowData getTableAirflow() {
-		return airflowData;
+	public synchronized AirFlowData getTableAirflow() {
+		return airFlowData;
 	}
 
 	public synchronized DoubleColumn getDeathTime() {
@@ -243,7 +243,7 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 		contactData = new ContactData(Table.create());
 		config.setAerosolCloudsRecorded(false);
 		tableAerosolCloudData = new TableAerosolCloudData(Table.create());
-		airflowData = new AirflowData(Table.create());
+		airFlowData = new AirFlowData(Table.create());
 	}
 
 	private Pedestrian toAgent(final Row row) {

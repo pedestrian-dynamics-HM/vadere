@@ -52,7 +52,7 @@ public class DefaultSimulationConfig extends DefaultConfig {
 	private boolean showDensity = false;
 	private boolean showGroups = false;
 	private boolean showAirflow = false;
-	private String airflowScale = Messages.getString("SettingsDialog.chbAirflowScaleLin.text");
+	private String airFlowScale = Messages.getString("SettingsDialog.chbAirflowScaleLin.text");
 	protected final Color pedestrianDefaultColor = new Color(76, 114, 202);
 	private Map<Integer, Color> pedestrianColors = new TreeMap<>();
 	private Map<Integer, Color> randomColors = new HashMap<>();
@@ -121,7 +121,7 @@ public class DefaultSimulationConfig extends DefaultConfig {
 	}
 
 	public String getAirflowScale() {
-		return airflowScale;
+		return airFlowScale;
 	}
 
 	public boolean isShowGroups() {
@@ -225,8 +225,8 @@ public class DefaultSimulationConfig extends DefaultConfig {
 		setChanged();
 	}
 
-	public void setAirflowScale(String airflowScale) {
-		this.airflowScale = airflowScale;
+	public void setAirflowScale(String airFlowScale) {
+		this.airFlowScale = airFlowScale;
 		setChanged();
 	}
 

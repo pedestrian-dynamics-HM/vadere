@@ -7,6 +7,7 @@ import org.vadere.simulator.context.VadereContext;
 import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.airflow.AttributesAirFlowModel;
+import org.vadere.state.attributes.models.airflow.AttributesBounds;
 import org.vadere.state.attributes.models.airflow.AttributesInOutLet;
 import org.vadere.state.scenario.Topography;
 
@@ -49,7 +50,7 @@ class AirFlowModelTest {
         inlets.add(new AttributesInOutLet("left", 1., 2.));
         ArrayList<AttributesInOutLet> outlets = new ArrayList<>();
         outlets.add(new AttributesInOutLet("right", 4., 5.));
-        AttributesAirFlowModel attributesAirFlowModel = new AttributesAirFlowModel(2., 0.1, 1., inlets, outlets, new ArrayList<>());
+        AttributesAirFlowModel attributesAirFlowModel = new AttributesAirFlowModel(2., 0.1, 1., inlets, outlets, new ArrayList<>(), new AttributesBounds());
         attributesList.add(attributesAirFlowModel);
         
         initializeModel(true, false);
@@ -97,18 +98,18 @@ class AirFlowModelTest {
         initializeModel(true, true);
         airFlowModel.preLoop(0);
         assertNotNull(airFlowModel.airFlow.getFlowDirection(0, 0, 0));
-        double[] airflow = airFlowModel.airFlow.getFlowDirection(0, 0, 0);
-        assertFalse(Math.pow(airflow[0], 2) + Math.pow(airflow[1], 2) > 0);
-        airflow = airFlowModel.airFlow.getFlowDirection(0.5, 0, 0);
-        assertFalse(Math.pow(airflow[0], 2) + Math.pow(airflow[1], 2) > 0);
-        airflow = airFlowModel.airFlow.getFlowDirection(1, 0, 0);
-        assertTrue(Math.pow(airflow[0], 2) + Math.pow(airflow[1], 2) > 0);
-        airflow = airFlowModel.airFlow.getFlowDirection(1.5, 0, 0);
-        assertTrue(Math.pow(airflow[0], 2) + Math.pow(airflow[1], 2) > 0);
-        airflow = airFlowModel.airFlow.getFlowDirection(2, 0, 0);
-        assertFalse(Math.pow(airflow[0], 2) + Math.pow(airflow[1], 2) > 0);
-        airflow = airFlowModel.airFlow.getFlowDirection(2.5, 0, 0);
-        assertFalse(Math.pow(airflow[0], 2) + Math.pow(airflow[1], 2) > 0);
+        double[] airFlow = airFlowModel.airFlow.getFlowDirection(0, 0, 0);
+        assertFalse(Math.pow(airFlow[0], 2) + Math.pow(airFlow[1], 2) > 0);
+        airFlow = airFlowModel.airFlow.getFlowDirection(0.5, 0, 0);
+        assertFalse(Math.pow(airFlow[0], 2) + Math.pow(airFlow[1], 2) > 0);
+        airFlow = airFlowModel.airFlow.getFlowDirection(1, 0, 0);
+        assertTrue(Math.pow(airFlow[0], 2) + Math.pow(airFlow[1], 2) > 0);
+        airFlow = airFlowModel.airFlow.getFlowDirection(1.5, 0, 0);
+        assertTrue(Math.pow(airFlow[0], 2) + Math.pow(airFlow[1], 2) > 0);
+        airFlow = airFlowModel.airFlow.getFlowDirection(2, 0, 0);
+        assertFalse(Math.pow(airFlow[0], 2) + Math.pow(airFlow[1], 2) > 0);
+        airFlow = airFlowModel.airFlow.getFlowDirection(2.5, 0, 0);
+        assertFalse(Math.pow(airFlow[0], 2) + Math.pow(airFlow[1], 2) > 0);
     }
 
     private void initializeModel(boolean rightParameters, boolean periodic) {
@@ -118,9 +119,9 @@ class AirFlowModelTest {
         outlets.add(new AttributesInOutLet("right", 4., 5.));
         AttributesAirFlowModel attributesAirFlowModel;
         if (rightParameters) {
-            attributesAirFlowModel = new AttributesAirFlowModel(2., 0.1, 1., inlets, outlets, new ArrayList<>());
+            attributesAirFlowModel = new AttributesAirFlowModel(2., 0.1, 1., inlets, outlets, new ArrayList<>(), new AttributesBounds());
         } else {
-            attributesAirFlowModel = new AttributesAirFlowModel(1., 0.1, 1., inlets, outlets, new ArrayList<>());
+            attributesAirFlowModel = new AttributesAirFlowModel(1., 0.1, 1., inlets, outlets, new ArrayList<>(), new AttributesBounds());
         }
         if (periodic) {
             attributesAirFlowModel.setOffPeriod(1.0);

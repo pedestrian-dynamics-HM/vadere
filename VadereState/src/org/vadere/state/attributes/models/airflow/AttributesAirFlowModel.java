@@ -32,6 +32,8 @@ public class AttributesAirFlowModel extends Attributes {
 
     private double offPeriod;
 
+    private AttributesBounds bounds;
+
     public AttributesAirFlowModel() {
         condaPath = "CONDA_EXE";
         condaEnv = "CONDA_ENV";
@@ -46,12 +48,12 @@ public class AttributesAirFlowModel extends Attributes {
         blockingObstacles = new ArrayList<>();
         onPeriod = 1.0;
         offPeriod = 0;
-
+        bounds = new AttributesBounds();
     }
 
     public AttributesAirFlowModel(double gridSize, double areaThreshold, double inletVelocity,
                                   ArrayList<AttributesInOutLet> inlets, ArrayList<AttributesInOutLet> outlets,
-                                  ArrayList<Integer> notBlockingObstacles) {
+                                  ArrayList<Integer> notBlockingObstacles, AttributesBounds bounds) {
         condaPath = "CONDA_EXE";
         condaEnv = "CONDA_ENV";
         pythonPath = "VadereSimulator/src/org/vadere/simulator/models/airflow/python/navier_stokes.py";
@@ -62,7 +64,8 @@ public class AttributesAirFlowModel extends Attributes {
         this.outlets = outlets;
         this.blockingObstacles = notBlockingObstacles;
         onPeriod = 1.0;
-        offPeriod = 0;
+        offPeriod = 0; 
+        this.bounds = bounds;
     }
 
     public AttributesAirFlowModel(double gridSize) {
@@ -113,5 +116,13 @@ public class AttributesAirFlowModel extends Attributes {
 
     public void setOffPeriod(double period) {
         this.offPeriod = period;
+    }
+
+    public AttributesBounds getBounds() {
+        return bounds;
+    }
+
+    public void setBounds(AttributesBounds bounds) {
+        this.bounds = bounds;
     }
 }

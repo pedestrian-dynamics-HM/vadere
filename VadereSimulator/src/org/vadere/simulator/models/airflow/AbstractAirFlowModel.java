@@ -3,6 +3,7 @@ package org.vadere.simulator.models.airflow;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.Attributes;
+import org.vadere.state.attributes.models.airflow.AttributesAirFlowModel;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.AirFlow;
 import org.vadere.simulator.context.VadereContext;
@@ -18,9 +19,19 @@ public abstract class AbstractAirFlowModel implements Model {
     @Override
     public void initialize(List<Attributes> attributesList, Domain domain, AttributesAgent attributesPedestrian, Random random) {
         String scenarioPath = VadereContext.getCtx(domain.getTopography()).getString("scenarioPath");
-        this.airFlow = new AirFlow(scenarioPath, "",
-                domain.getTopography().getBounds().x + domain.getTopography().getBoundingBoxWidth(),
-                domain.getTopography().getBounds().y + domain.getTopography().getBoundingBoxWidth());
+
+        AttributesAirFlowModel attributesAirFlowModel = Model.findAttributes(attributesList, AttributesAirFlowModel.class);
+        double xmin = domain.getTopography().getBounds().x + domain.getTopography().getBoundingBoxWidth();
+        double ymin = domain.getTopography().getBounds().y + domain.getTopography().getBoundingBoxWidth();
+        double xmax = domain.getTopography().getBounds().x + domain.getTopography().getBounds().width;
+        double ymax = domain.getTopography().getBounds().y + domain.getTopography().getBounds().height;
+        if (attributesAirFlowModel != null) {
+            xmin = Math.max(xmin, attributesAirFlowModel.getBounds().getXmin());
+            ymin = Math.max(ymin, attributesAirFlowModel.getBounds().getYmin());
+            xmax = Math.min(xmax, attributesAirFlowModel.getBounds().getXmax());
+            ymax = Math.min(ymax, attributesAirFlowModel.getBounds().getYmax());
+        }
+        this.airFlow = new AirFlow(scenarioPath, "", xmin, ymin, xmax, ymax);
         domain.getTopography().setAirFlow(airFlow);
     }
 

@@ -48,6 +48,8 @@ public class AirFlowModelTester extends AirFlowModel {
         if (this.airFlow != null) {
             this.airFlow.setAirflowHash("test_hash");
         }
+        // Set bounds explicitly for test
+        this.airFlow = new AirFlow("", "test_hash", 0, 0, 2, 2); // Example bounds
     }
 
     @Override
@@ -84,5 +86,12 @@ public class AirFlowModelTester extends AirFlowModel {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void testAirflowBounds() {
+        double[] inside = airFlow.getFlowDirection(0, 1, 1);
+        double[] outside = airFlow.getFlowDirection(0, 3, 3);
+        assert inside[0] != 0 || inside[1] != 0 : "Airflow inside bounds should not be zero";
+        assert outside[0] == 0 && outside[1] == 0 : "Airflow outside bounds should be zero";
     }
 }

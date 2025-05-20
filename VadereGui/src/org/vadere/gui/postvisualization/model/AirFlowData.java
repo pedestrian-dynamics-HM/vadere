@@ -7,9 +7,10 @@ import tech.tablesaw.api.Row;
 import tech.tablesaw.api.Table;
 
 
-public class AirflowData {
 
-    public static final String TABLE_NAME = "airflow";
+public class AirFlowData {
+
+    public static final String TABLE_NAME = "airFlow";
 
     public final int idXCol;
     public final int idYCol;
@@ -29,7 +30,7 @@ public class AirflowData {
      *
      * @param dataFrame the whole table containing all data points of all aerosol clouds for all times
      */
-    public AirflowData(@NotNull final Table dataFrame) {
+    public AirFlowData(@NotNull final Table dataFrame) {
         ColumnNames columnNames = ColumnNames.getInstance();
 
         idXCol = columnNames.getAirflowIdXCol(dataFrame);
@@ -40,27 +41,27 @@ public class AirflowData {
         yPosEndCol = columnNames.getAirflowYPosEndCol(dataFrame);
         xVelocityCol = columnNames.getAirflowXVelocityCol(dataFrame);
         yVelocityCol = columnNames.getAirflowYVelocityCol(dataFrame);
-
         this.data = dataFrame;
     }
 
-    public void setAirflow(Table airflowData) {
+    public void setAirflow(Table airFlowData) {
 
-        if (airflowData.isEmpty()) {
+        if (airFlowData.isEmpty()) {
             airFlow = null;
             return;
         }
 
-        Row lastRow = airflowData.row(airflowData.rowCount() - 1);
+
+        Row lastRow = airFlowData.row(airFlowData.rowCount() - 1);
         double[][] xVelocity = new double[lastRow.getInt(idXCol) + 1][lastRow.getInt(idYCol) + 1];
         double[][] yVelocity = new double[lastRow.getInt(idXCol) + 1][lastRow.getInt(idYCol) + 1];
 
-        for (Row row : airflowData) {
+        for (Row row : airFlowData) {
             xVelocity[row.getInt(idXCol)][row.getInt(idYCol)] = row.getDouble(xVelocityCol);
             yVelocity[row.getInt(idXCol)][row.getInt(idYCol)] = row.getDouble(yVelocityCol);
         }
 
-        airFlow = new AirFlow("", "", 0, 0);
+        airFlow = new AirFlow("", "", 0, 0, 1000, 1000);
         airFlow.setX_velocity(xVelocity);
         airFlow.setY_velocity(yVelocity);
         try {

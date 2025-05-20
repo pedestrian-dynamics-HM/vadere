@@ -35,9 +35,28 @@ public class AirFlowProcessor extends DataProcessor<TopographyGridKey, String> {
         double gridSize = airFlow.getGridSize();
 
         if (xVelocity != null && yVelocity != null) {
-            for (int i = 0; i < xVelocity.length; i++) {
-                for (int j = 0; j < xVelocity[i].length; j++) {
-                    putValue(new TopographyGridKey(j, i), String.format("%.2f %.2f %.2f %.2f %.5f %.5f", j*gridSize, (j+1)*gridSize, i*gridSize, (i+1)*gridSize, xVelocity[i][j], yVelocity[i][j]));
+            double[][] x_velocity = airFlow.getXVelocities();
+            double[][] y_velocity = airFlow.getYVelocities();
+            //state.getTopography().getBounds().width = x_velocity.length;
+
+            int xSteps = (int) Math.ceil(state.getTopography().getBounds().width / gridSize);
+            int ySteps = (int) Math.ceil(state.getTopography().getBounds().height / gridSize);
+
+            for (int i = 0; i < x_velocity.length; i++) {
+                for (int j = 0; j < y_velocity[0].length; j++) {
+                    double xStart = j * gridSize + airFlow.getXmin();
+                    double xEnd = (j + 1) * gridSize + airFlow.getXmin();
+                    double yStart = i * gridSize + airFlow.getYmin();
+                    double yEnd = (i + 1) * gridSize + airFlow.getYmin();
+                    double xCenter = (xStart + xEnd) / 2.0;
+                    double yCenter = (yStart + yEnd) / 2.0;
+                    double xVal = xVelocity[i][j];
+                    double yVal = yVelocity[i][j];
+                    if (xCenter < airFlow.getXmin() || xCenter > airFlow.getXmax() || yCenter < airFlow.getYmin() || yCenter > airFlow.getYmax()) {
+                        xVal = 0.0;
+                        yVal = 0.0;
+                    }
+                    putValue(new TopographyGridKey(j, i), String.format("%.2f %.2f %.2f %.2f %.5f %.5f", xStart, xEnd, yStart, yEnd, xVal, yVal));
                 }
             }
         }

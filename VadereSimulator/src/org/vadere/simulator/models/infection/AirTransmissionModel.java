@@ -88,7 +88,7 @@ public class AirTransmissionModel extends AbstractExposureModel {
 	 */
 	protected static final int STUCK_MAX = 10;
 	protected static final int MOVE_EVERY_N_STEPS = 3;  // Move clouds every 3rd step
-	protected int airflowStepCounter = 0;
+	protected int airFlowStepCounter = 0;
 
 	@Override
 	public void initialize(List<Attributes> attributesList, Domain domain, AttributesAgent attributesPedestrian, Random random) {
@@ -497,8 +497,8 @@ public class AirTransmissionModel extends AbstractExposureModel {
 		if (topography.getAirFlow() == null) {
 			return;
 		}
-		airflowStepCounter++;
-		if (airflowStepCounter >= MOVE_EVERY_N_STEPS) {
+		airFlowStepCounter++;
+		if (airFlowStepCounter >= MOVE_EVERY_N_STEPS) {
 			Collection<AerosolCloud> allAerosolClouds = topography.getAerosolClouds();
 			for (AerosolCloud aerosolCloud : allAerosolClouds) {
 				VPoint center = aerosolCloud.getCenter();
@@ -506,7 +506,7 @@ public class AirTransmissionModel extends AbstractExposureModel {
 				aerosolCloud.shiftShape(windXY[0] * simTimeStepLength * MOVE_EVERY_N_STEPS, 
 									  windXY[1] * simTimeStepLength * MOVE_EVERY_N_STEPS);
 			}
-			airflowStepCounter = 0;
+			airFlowStepCounter = 0;
 		}
 	}
 

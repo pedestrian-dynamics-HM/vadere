@@ -297,7 +297,7 @@ public abstract class DefaultRenderer {
 		graphics.setColor(tmpColor);
 	}
 
-	protected void renderAirflow(final Topography topography, final AirFlow airFlow, final Graphics2D g, final java.util.List<Attributes> modelAttributes, String airflowScale){
+	protected void renderAirflow(final Topography topography, final AirFlow airFlow, final Graphics2D g, final java.util.List<Attributes> modelAttributes, String airFlowScale){
 
 		if (airFlow != null){
 
@@ -378,9 +378,9 @@ public abstract class DefaultRenderer {
 						System.out.println(yVelocities[i][j]);
 					}
 
-					if (airflowScale.equals(Messages.getString("SettingsDialog.chbAirflowScaleSqrt.text"))) {
+					if (airFlowScale.equals(Messages.getString("SettingsDialog.chbAirflowScaleSqrt.text"))) {
 						arrowLength = (Math.sqrt(arrowLength) - Math.sqrt(0)) / (Math.sqrt(1) - Math.sqrt(0));
-					} else if (airflowScale.equals(Messages.getString("SettingsDialog.chbAirflowScaleLog.text"))) {
+					} else if (airFlowScale.equals(Messages.getString("SettingsDialog.chbAirflowScaleLog.text"))) {
 						arrowLength = (Math.log(arrowLength) - Math.log(visTolerance)) / (Math.log(1) - Math.log(visTolerance));
 					}
 					arrowLength = arrowLength * cellSize;
