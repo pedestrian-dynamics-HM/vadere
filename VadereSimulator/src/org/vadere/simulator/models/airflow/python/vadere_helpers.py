@@ -4,17 +4,17 @@ def extract_attributes(topography, attributes_model, parameter_string):
     topo_xmax = topography['attributes']['bounds']['x'] + topography['attributes']['bounds']['width']
     topo_ymax = topography['attributes']['bounds']['y'] + topography['attributes']['bounds']['height']
 
-    airflow_xmin = attributes_model['bounds']['xmin']
-    airflow_xmax = attributes_model['bounds']['xmax']
-    airflow_ymin = attributes_model['bounds']['ymin']
-    airflow_ymax = attributes_model['bounds']['ymax']
+    airflow_xmin = 0#attributes_model['bounds']['xmin']
+    airflow_xmax = 1000#attributes_model['bounds']['xmax']
+    airflow_ymin = 0#attributes_model['bounds']['ymin']
+    airflow_ymax = 1000#attributes_model['bounds']['ymax']
 
     x_min = max(topo_xmin, airflow_xmin)
     x_max = min(topo_xmax, airflow_xmax)
     y_min = max(topo_ymin, airflow_ymin)
     y_max = min(topo_ymax, airflow_ymax)
-    print(x_min, x_max)
-    print(y_min, y_max)
+    #print(x_min, x_max)
+    #print(y_min, y_max)
 
     grid_size = float(attributes_model['gridSize'])
     area_threshold = float(attributes_model['areaThreshold'])
