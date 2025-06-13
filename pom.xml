@@ -51,6 +51,10 @@
                         <source>${maven-compiler.source.version}</source>
                         <target>${maven-compiler.target.version}</target>
                         <release>${maven-compiler.release}</release>
+
+                        <compilerArgs>
+                            <arg>-proc:full</arg>
+                        </compilerArgs>
                     </configuration>
                 </plugin>
                 <!--  Maven Surefire is used to run unit tests. -->
