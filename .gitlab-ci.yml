@@ -190,6 +190,7 @@ stages:
         - echo "foo bar and now foo directly"
         - "echo $FOO"
         - "echo $PATH"
+        - mvn -version
         - ${PYTHON} -m venv ${VADERE_HOME}/venv
         - source ${VADERE_PY_ENV_PATH}
         # The brackets return the working direcory back to previous position. 
