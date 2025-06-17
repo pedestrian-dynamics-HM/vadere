@@ -8,12 +8,12 @@ Vadere is an open source framework for the simulation of microscopic pedestrian 
 
 This software runs on Windows, OS X and Linux.
 
-Vadere has been developed by [Prof. Dr. Gerta Köster's](http://www.cs.hm.edu/die_fakultaet/ansprechpartner/professoren/koester/index.de.html)
+Vadere has been developed by [Prof. Dr. Gerta Köster's](https://hm.edu/kontakte_de/contact_detail_3593.de.html)
 research group at the [Munich University of Applied Sciences](https://www.hm.edu/) at the
 [department for Computer Science and Mathematics](http://cs.hm.edu/).
 However, we welcome contributions from external sources. 
 
-The Vadere framework includes a mesh generator for unstructured high-quality 2D meshes called **EikMesh** which is described [here](https://gitlab.lrz.de/vadere/vadere/wikis/eikmesh/Overview).
+The Vadere framework includes a mesh generator for unstructured high-quality 2D meshes called **EikMesh** which is described [here](https://gitlab.lrz.de/vadere/vadere/-/wikis/eikmesh/EikMesh-Wiki).
 
 If you are using Vadere for your publication, please cite: http://dx.doi.org/10.17815/CD.2019.21. 
 
@@ -26,7 +26,7 @@ All measurements in Vadere are in SI units. That means, meters for the positions
 If you have questions about Vadere, have found a software bug or have a suggestion for improvements, please feel free to either
 
 * [open an issue](https://gitlab.lrz.de/vadere/vadere/issues) (Note: you require an LRZ account), or
-* send an e-mail with your enquiry to our mailing list [vadere@lists.lrz.de](vadere@lists.lrz.de)
+* send an e-mail with your enquiry to our mailing list [vadere@lists.lrz.de](mailto:vadere@lists.lrz.de)
 
 
 ## Pipeline Status
@@ -40,7 +40,7 @@ If you have questions about Vadere, have found a software bug or have a suggesti
 
 ### Dependencies
 
-* Java 17 (OpenJDK recommended -> see [here](http://www.vadere.org/getting-started/) for more information) (not tested for > 17)
+* Java 17.0.11 is supported; later major versions may also be compatible. (OpenJDK recommended -> see [here](http://www.vadere.org/getting-started/) for more information)
 * OpenCL (optional but recommended -> see the [install instructions](https://gitlab.lrz.de/vadere/vadere/tree/master/Documentation/installation/OpenCL-Installation.md) for details)
 
 ### Pre-Built Releases
@@ -59,6 +59,8 @@ The ZIP file contains:
 * **Scenarios** - contains test scenarios for pedestrian locomotion models. Note: The tests are also useful for a "getting started" (see below "Run Built-In Examples" for details).
 
 ### Getting Started
+
+For first-time users, a set of video tutorials are available at https://www.vadere.org/video-tutorials
 
 Running the graphical user interface: Either run the Vadere simulator by
 
@@ -97,7 +99,7 @@ With the following steps, you can run a simulation with one of the built-in exam
 
 ### Dependencies
 
-* Java 17 or above (OpenJDK recommended)
+* Java 17.0.11 or above (OpenJDK recommended)
 * Maven 3.9
 * Git
 * OpenCL (optional but recommended)
