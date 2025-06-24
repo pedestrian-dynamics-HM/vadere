@@ -130,10 +130,11 @@ public class TextView extends JPanel implements IJsonView {
 		JButton btnSaveToFile = new JButton(Messages.getString("TextFileView.btnSaveToFile.text"));
 		btnSaveToFile.addActionListener(saveToFileActionListener);
         btnSaveToFile.setIcon(new ImageIcon(Resources.class.getResource("/icons/floppy.gif")));
-
 		panelTop.add(btnSaveToFile);
+
 		btnLoadFromFile = new JButton(Messages.getString("TextView.btnLoadFromFile.text"));
         btnLoadFromFile.setIcon(new ImageIcon(Resources.class.getResource("/icons/floppy.gif")));
+		btnLoadFromFile.addActionListener(loadFromFileActionListener);
         panelTop.add(btnLoadFromFile);
 
 		jsonValidIndicator = new JsonValidIndicator();
