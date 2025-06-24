@@ -6,6 +6,7 @@ import org.vadere.state.scenario.AirFlow;
 import tech.tablesaw.api.Row;
 import tech.tablesaw.api.Table;
 
+import java.util.ArrayList;
 
 
 public class AirFlowData {
@@ -61,7 +62,7 @@ public class AirFlowData {
             yVelocity[row.getInt(idXCol)][row.getInt(idYCol)] = row.getDouble(yVelocityCol);
         }
 
-        airFlow = new AirFlow("", "", 0, 0, 1000, 1000);
+        airFlow = new AirFlow("", "", 0, 0, 1000, 1000, new ArrayList<>());
         airFlow.setX_velocity(xVelocity);
         airFlow.setY_velocity(yVelocity);
         try {

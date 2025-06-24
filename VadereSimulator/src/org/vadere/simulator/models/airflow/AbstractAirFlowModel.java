@@ -4,10 +4,12 @@ import org.vadere.simulator.models.Model;
 import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.airflow.AttributesAirFlowModel;
+import org.vadere.state.attributes.models.airflow.AttributesInOutLet;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.AirFlow;
 import org.vadere.simulator.context.VadereContext;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -25,13 +27,15 @@ public abstract class AbstractAirFlowModel implements Model {
         double ymin = domain.getTopography().getBounds().y + domain.getTopography().getBoundingBoxWidth();
         double xmax = domain.getTopography().getBounds().x + domain.getTopography().getBounds().width;
         double ymax = domain.getTopography().getBounds().y + domain.getTopography().getBounds().height;
+        ArrayList<AttributesInOutLet> outlets = new ArrayList<AttributesInOutLet>();
         if (attributesAirFlowModel != null) {
             xmin = Math.max(xmin, attributesAirFlowModel.getBounds().getXmin());
             ymin = Math.max(ymin, attributesAirFlowModel.getBounds().getYmin());
             xmax = Math.min(xmax, attributesAirFlowModel.getBounds().getXmax());
             ymax = Math.min(ymax, attributesAirFlowModel.getBounds().getYmax());
+            outlets = attributesAirFlowModel.getOutlets();
         }
-        this.airFlow = new AirFlow(scenarioPath, "", xmin, ymin, xmax, ymax);
+        this.airFlow = new AirFlow(scenarioPath, "", xmin, ymin, xmax, ymax, outlets);
         domain.getTopography().setAirFlow(airFlow);
     }
 

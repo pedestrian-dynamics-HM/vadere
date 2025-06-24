@@ -94,11 +94,11 @@ public class AttributesAirFlowModel extends Attributes {
         return inletVelocity;
     }
 
-    public List<AttributesInOutLet> getInlets() {
+    public ArrayList<AttributesInOutLet> getInlets() {
         return inlets;
     }
 
-    public List<AttributesInOutLet> getOutlets() {
+    public ArrayList<AttributesInOutLet> getOutlets() {
         return outlets;
     }
 
