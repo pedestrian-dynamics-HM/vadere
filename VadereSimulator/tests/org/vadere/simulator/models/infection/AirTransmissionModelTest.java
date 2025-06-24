@@ -59,7 +59,6 @@ public class AirTransmissionModelTest {
         // Initialize AirFlow
         AirFlow airFlow = new AirFlow("test", "test_hash", 0.0, 0.0, 10, 10);
         airFlow.setGridSize(Double.POSITIVE_INFINITY);
-        airFlow.setOutlets(new ArrayList<AttributesInOutLet>());
         topography.setAirFlow(airFlow);
 
         initializeTransmissionModel();
@@ -647,7 +646,6 @@ public class AirTransmissionModelTest {
         airFlow.setX_velocity(xVelocity);
         airFlow.setY_velocity(yVelocity);
         airFlow.setGridSize(Double.POSITIVE_INFINITY);
-        airFlow.setOutlets(new ArrayList<AttributesInOutLet>());
 
         topography.setAirFlow(airFlow);
     }
@@ -668,7 +666,6 @@ public class AirTransmissionModelTest {
         airFlow.setX_velocity(xVelocity);
         airFlow.setY_velocity(yVelocity);
         airFlow.setGridSize(Double.POSITIVE_INFINITY);
-        airFlow.setOutlets(new ArrayList<AttributesInOutLet>());
         topography.setAirFlow(airFlow);
 
         // Initialize model with time step 0.4

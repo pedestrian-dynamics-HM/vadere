@@ -24,8 +24,6 @@ public class AirFlow {
 
     private List<Integer> blockingObstaclesIDs = new ArrayList<Integer>();
 
-    private List<AttributesInOutLet> outlets;
-
     public AirFlow(String scenarioPath, String airflowHash, double xmin, double ymin, double xmax, double ymax) {
         this.scenarioPath = scenarioPath;
         this.airflowHash = airflowHash;
@@ -45,10 +43,6 @@ public class AirFlow {
 
     public void setGridSize(double gridSize) {
         this.gridSize = gridSize;
-    }
-
-    public void setOutlets(ArrayList<AttributesInOutLet> outlets) {
-        this.outlets = outlets;
     }
 
     public String getScenarioPath() {
@@ -75,7 +69,7 @@ public class AirFlow {
         }
 
         if (x < xmin || x > xmax || y < ymin || y > ymax) {
-            return getOutOfBoundsFlowDirection(x, y);
+            return new double[]{0, 0};
         }
 
         int x_idx = (int) Math.round((x - xmin) / gridSize);
@@ -91,38 +85,15 @@ public class AirFlow {
         };
     }
 
-    private double[] getOutOfBoundsFlowDirection(double x, double y) {
-        // check whether aerosol cloud is on outlet -> then move it away - otherwise it gets stuck
-        double dist = gridSize/2;
-        for (AttributesInOutLet outlet : outlets) {
-            switch (outlet.getSide().toLowerCase()) {
-                case "top":
-                    if ((x >= (outlet.getStart() - dist)) && (x <= (outlet.getStart() + outlet.getWidth() + dist))
-                            && (y <= (ymax + gridSize*2))) {
-                        return new double[]{0, 10000};
-                    }
-                    break;
-                case "bottom":
-                    if ((x >= (outlet.getStart() - dist)) && (x <= (outlet.getStart() + outlet.getWidth() + dist))
-                            && (y >= (ymin - gridSize*2))) {
-                        return new double[]{0, -10000};
-                    }
-                    break;
-                case "left":
-                    if ((y >= (outlet.getStart() - dist)) && (y <= (outlet.getStart() + outlet.getWidth() + dist))
-                            && (x >= (xmin - gridSize*2))) {
-                        return new double[]{0, -10000};
-                    }
-                    break;
-                case "right":
-                    if ((y >= (outlet.getStart() - dist)) && (y <= (outlet.getStart() + outlet.getWidth() + dist))
-                            && (x <= (xmax + gridSize*2))) {
-                        return new double[]{0, 10000};
-                    }
-                    break;
+    public boolean shouldRemoveAerosolCloud(double x, double y, double xShift, double yShift) {
+        double newX = x + xShift;
+        double newY = y + yShift;
+        if (newX < xmin || newX > xmax || newY < ymin || newY > ymax) {
+            if (x <= xmax && x >= xmin && y <= ymax && y >= ymin) {
+                return true;
             }
         }
-        return new double[]{0, 0};
+        return false;
     }
 
     public double[][] getXVelocities() {

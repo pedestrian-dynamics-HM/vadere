@@ -19,7 +19,6 @@ public class AirFlowTest {
     public void setUp() {
         airFlow = new AirFlow("testScenario", "testHash", BORDER, 1000, BORDER, 1000);
         airFlow.setGridSize(GRID_SIZE);
-        airFlow.setOutlets(new ArrayList<AttributesInOutLet>());
     }
 
     @Test

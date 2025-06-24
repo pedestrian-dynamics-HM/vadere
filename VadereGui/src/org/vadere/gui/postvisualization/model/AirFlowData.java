@@ -66,7 +66,6 @@ public class AirFlowData {
         airFlow = new AirFlow("", "", 0, 0, 1000, 1000);
         airFlow.setX_velocity(xVelocity);
         airFlow.setY_velocity(yVelocity);
-        airFlow.setOutlets(new ArrayList<AttributesInOutLet>());
         try {
             airFlow.setGridSize(lastRow.getDouble(xPosEndCol) - lastRow.getDouble(xPosStartCol));
         } catch (Exception e) {
