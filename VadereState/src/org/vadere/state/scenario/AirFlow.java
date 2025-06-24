@@ -26,14 +26,13 @@ public class AirFlow {
 
     private List<AttributesInOutLet> outlets;
 
-    public AirFlow(String scenarioPath, String airflowHash, double xmin, double ymin, double xmax, double ymax, ArrayList<AttributesInOutLet> outlets) {
+    public AirFlow(String scenarioPath, String airflowHash, double xmin, double ymin, double xmax, double ymax) {
         this.scenarioPath = scenarioPath;
         this.airflowHash = airflowHash;
         this.xmin = xmin;
         this.ymin = ymin;
         this.xmax = xmax;
         this.ymax = ymax;
-        this.outlets = outlets;
     }
 
     public void setX_velocity(double[][] x_velocity) {
@@ -42,11 +41,14 @@ public class AirFlow {
 
     public void setY_velocity(double[][] y_velocity) {
         this.y_velocity = y_velocity;
-        //applyOutletFlowCorrection();
     }
 
     public void setGridSize(double gridSize) {
         this.gridSize = gridSize;
+    }
+
+    public void setOutlets(ArrayList<AttributesInOutLet> outlets) {
+        this.outlets = outlets;
     }
 
     public String getScenarioPath() {
@@ -61,64 +63,6 @@ public class AirFlow {
         this.airflowHash = airflowHash;
     }
 
-    private void applyOutletFlowCorrection() {
-        double dist = 0.5;
-        // TODO set inletVelocity
-        double inletVelocity = 0.3;
-        for (AttributesInOutLet outlet : outlets) {
-            double dirX = 0;
-            double dirY = 0;
-            double outletAreaXStart = 0;
-            double outletAreaXEnd = 0;
-            double outletAreaYStart = 0;
-            double outletAreaYEnd = 0;
-            switch (outlet.getSide().toLowerCase()) {
-                case "top":
-                    dirY = 1.0;
-                    outletAreaXStart = outlet.getStart() - dist;
-                    outletAreaXEnd = outlet.getStart() + outlet.getWidth() + dist;
-                    outletAreaYStart = ymax - dist;
-                    outletAreaYEnd = ymax;
-                    break;
-                case "bottom":
-                    dirY = -1.0;
-                    outletAreaXStart = outlet.getStart() - dist;
-                    outletAreaXEnd = outlet.getStart() + outlet.getWidth() + dist;
-                    outletAreaYStart = ymin;
-                    outletAreaYEnd = ymin + dist;
-                    break;
-                case "left":
-                    dirX = -1.0;
-                    outletAreaXStart = xmin;
-                    outletAreaXEnd = xmin + dist;
-                    outletAreaYStart = outlet.getStart() - dist;
-                    outletAreaYEnd = outlet.getStart() + outlet.getWidth() + dist;
-                    break;
-                case "right":
-                    dirX = 1.0;
-                    outletAreaXStart = xmax - dist;
-                    outletAreaXEnd = xmax;
-                    outletAreaYStart = outlet.getStart() - dist;
-                    outletAreaYEnd = outlet.getStart() + outlet.getWidth() + dist;
-                    break;
-            }
-            for (int y_idx = 0; y_idx < y_velocity.length; y_idx++) {
-                for (int x_idx = 0; x_idx < x_velocity[0].length; x_idx++) {
-                    double current_x = xmin + x_idx * gridSize + gridSize / 2.0;
-                    double current_y = ymin + y_idx * gridSize + gridSize / 2.0;
-
-                    if ((current_x >= outletAreaXStart) && (current_x <= outletAreaXEnd) &&
-                            (current_y >= outletAreaYStart) && (current_y >= outletAreaYEnd)) {
-                        this.x_velocity[y_idx][x_idx] = dirX * inletVelocity; //this.x_velocity[y_idx][x_idx] + dirX * inletVelocity;
-                        this.y_velocity[y_idx][x_idx] = dirY * inletVelocity; //this.y_velocity[y_idx][x_idx] + dirY * inletVelocity;
-                    }
-                }
-            }
-        }
-    }
-
-
-
     public double[] getFlowDirection(double simTime, double x, double y) {
         // Return velocity components at the nearest grid point
 
@@ -130,8 +74,6 @@ public class AirFlow {
             return new double[]{0, 0};
         }
 
-        // Check bounds
-        // TODO inletVelocity and gridSIZE for threshold
         if (x < xmin || x > xmax || y < ymin || y > ymax) {
             return getOutOfBoundsFlowDirection(x, y);
         }
@@ -156,26 +98,26 @@ public class AirFlow {
             switch (outlet.getSide().toLowerCase()) {
                 case "top":
                     if ((x >= (outlet.getStart() - dist)) && (x <= (outlet.getStart() + outlet.getWidth() + dist))
-                            && (y <= (ymax + gridSize))) {
-                        return new double[]{0, 1000};
+                            && (y <= (ymax + gridSize*2))) {
+                        return new double[]{0, 10000};
                     }
                     break;
                 case "bottom":
                     if ((x >= (outlet.getStart() - dist)) && (x <= (outlet.getStart() + outlet.getWidth() + dist))
-                            && (y >= (ymin - gridSize))) {
-                        return new double[]{0, -1000};
+                            && (y >= (ymin - gridSize*2))) {
+                        return new double[]{0, -10000};
                     }
                     break;
                 case "left":
                     if ((y >= (outlet.getStart() - dist)) && (y <= (outlet.getStart() + outlet.getWidth() + dist))
-                            && (x >= (xmin - gridSize))) {
-                        return new double[]{0, -1000};
+                            && (x >= (xmin - gridSize*2))) {
+                        return new double[]{0, -10000};
                     }
                     break;
                 case "right":
                     if ((y >= (outlet.getStart() - dist)) && (y <= (outlet.getStart() + outlet.getWidth() + dist))
-                            && (x <= (xmax + gridSize))) {
-                        return new double[]{0, 1000};
+                            && (x <= (xmax + gridSize*2))) {
+                        return new double[]{0, 10000};
                     }
                     break;
             }

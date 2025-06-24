@@ -500,12 +500,18 @@ public class AirTransmissionModel extends AbstractExposureModel {
 		airFlowStepCounter++;
 		if (airFlowStepCounter >= MOVE_EVERY_N_STEPS) {
 			Collection<AerosolCloud> allAerosolClouds = topography.getAerosolClouds();
+			Collection<AerosolCloud> toRemove = new ArrayList<>();
 			for (AerosolCloud aerosolCloud : allAerosolClouds) {
 				VPoint center = aerosolCloud.getCenter();
 				double[] windXY = topography.getAirFlow().getFlowDirection(simTimeInSec, center.getX(), center.getY());
 				aerosolCloud.shiftShape(windXY[0] * simTimeStepLength * MOVE_EVERY_N_STEPS, 
 									  windXY[1] * simTimeStepLength * MOVE_EVERY_N_STEPS);
+				// remove aerosol clouds that are shifted outside the topography bounds
+				if (!topography.getBounds().getBounds2D().contains(aerosolCloud.getCenter().getX(), aerosolCloud.getCenter().getY())) {
+					toRemove.add(aerosolCloud);
+				}
 			}
+			allAerosolClouds.removeAll(toRemove);
 			airFlowStepCounter = 0;
 		}
 	}

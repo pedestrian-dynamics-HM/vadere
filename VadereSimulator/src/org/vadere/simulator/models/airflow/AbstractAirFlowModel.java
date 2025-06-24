@@ -35,7 +35,7 @@ public abstract class AbstractAirFlowModel implements Model {
             ymax = Math.min(ymax, attributesAirFlowModel.getBounds().getYmax());
             outlets = attributesAirFlowModel.getOutlets();
         }
-        this.airFlow = new AirFlow(scenarioPath, "", xmin, ymin, xmax, ymax, outlets);
+        this.airFlow = new AirFlow(scenarioPath, "", xmin, ymin, xmax, ymax);
         domain.getTopography().setAirFlow(airFlow);
     }
 

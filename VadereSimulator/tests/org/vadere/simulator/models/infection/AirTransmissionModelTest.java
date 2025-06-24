@@ -10,6 +10,7 @@ import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.osm.OptimalStepsModel;
 import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.Attributes;
+import org.vadere.state.attributes.models.airflow.AttributesInOutLet;
 import org.vadere.state.attributes.models.infection.AttributesAirTransmissionModel;
 import org.vadere.state.attributes.scenario.AttributesAerosolCloud;
 import org.vadere.state.attributes.scenario.AttributesAgent;
@@ -58,6 +59,7 @@ public class AirTransmissionModelTest {
         // Initialize AirFlow
         AirFlow airFlow = new AirFlow("test", "test_hash", 0.0, 0.0, 10, 10);
         airFlow.setGridSize(Double.POSITIVE_INFINITY);
+        airFlow.setOutlets(new ArrayList<AttributesInOutLet>());
         topography.setAirFlow(airFlow);
 
         initializeTransmissionModel();
@@ -645,6 +647,7 @@ public class AirTransmissionModelTest {
         airFlow.setX_velocity(xVelocity);
         airFlow.setY_velocity(yVelocity);
         airFlow.setGridSize(Double.POSITIVE_INFINITY);
+        airFlow.setOutlets(new ArrayList<AttributesInOutLet>());
 
         topography.setAirFlow(airFlow);
     }
@@ -665,6 +668,7 @@ public class AirTransmissionModelTest {
         airFlow.setX_velocity(xVelocity);
         airFlow.setY_velocity(yVelocity);
         airFlow.setGridSize(Double.POSITIVE_INFINITY);
+        airFlow.setOutlets(new ArrayList<AttributesInOutLet>());
         topography.setAirFlow(airFlow);
 
         // Initialize model with time step 0.4

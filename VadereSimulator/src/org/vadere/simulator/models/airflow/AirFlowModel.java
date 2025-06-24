@@ -59,6 +59,7 @@ public class AirFlowModel extends AbstractAirFlowModel {
             airFlow.setX_velocity(readArrayFromFile(f_x_velocity.getAbsolutePath()));
             airFlow.setY_velocity(readArrayFromFile(f_y_velocity.getAbsolutePath()));
             airFlow.setGridSize(attributesAirFlowModel.getGridSize());
+            airFlow.setOutlets(attributesAirFlowModel.getOutlets());
             airFlow.setPeriod(attributesAirFlowModel.getOnPeriod(), attributesAirFlowModel.getOffPeriod());
             airFlow.setBlockingObstaclesIDs(attributesAirFlowModel.getBlockingObstacles());
 
@@ -69,6 +70,7 @@ public class AirFlowModel extends AbstractAirFlowModel {
                 airFlow.setX_velocity(readArrayFromFile(f_x_velocity.getAbsolutePath()));
                 airFlow.setY_velocity(readArrayFromFile(f_y_velocity.getAbsolutePath()));
                 airFlow.setGridSize(attributesAirFlowModel.getGridSize());
+                airFlow.setOutlets(attributesAirFlowModel.getOutlets());
                 airFlow.setPeriod(attributesAirFlowModel.getOnPeriod(), attributesAirFlowModel.getOffPeriod());
                 airFlow.setBlockingObstaclesIDs(attributesAirFlowModel.getBlockingObstacles());
 

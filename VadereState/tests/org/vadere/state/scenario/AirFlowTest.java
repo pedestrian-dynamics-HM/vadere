@@ -2,6 +2,10 @@ package org.vadere.state.scenario;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.vadere.state.attributes.models.airflow.AttributesInOutLet;
+
+import java.util.ArrayList;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class AirFlowTest {
@@ -13,8 +17,9 @@ public class AirFlowTest {
 
     @BeforeEach
     public void setUp() {
-        airFlow = new AirFlow("testScenario", "testHash", BORDER, BORDER);
+        airFlow = new AirFlow("testScenario", "testHash", BORDER, 1000, BORDER, 1000);
         airFlow.setGridSize(GRID_SIZE);
+        airFlow.setOutlets(new ArrayList<AttributesInOutLet>());
     }
 
     @Test

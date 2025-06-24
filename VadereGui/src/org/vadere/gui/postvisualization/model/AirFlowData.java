@@ -2,6 +2,7 @@ package org.vadere.gui.postvisualization.model;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.simulator.projects.io.ColumnNames;
+import org.vadere.state.attributes.models.airflow.AttributesInOutLet;
 import org.vadere.state.scenario.AirFlow;
 import tech.tablesaw.api.Row;
 import tech.tablesaw.api.Table;
@@ -62,9 +63,10 @@ public class AirFlowData {
             yVelocity[row.getInt(idXCol)][row.getInt(idYCol)] = row.getDouble(yVelocityCol);
         }
 
-        airFlow = new AirFlow("", "", 0, 0, 1000, 1000, new ArrayList<>());
+        airFlow = new AirFlow("", "", 0, 0, 1000, 1000);
         airFlow.setX_velocity(xVelocity);
         airFlow.setY_velocity(yVelocity);
+        airFlow.setOutlets(new ArrayList<AttributesInOutLet>());
         try {
             airFlow.setGridSize(lastRow.getDouble(xPosEndCol) - lastRow.getDouble(xPosStartCol));
         } catch (Exception e) {
