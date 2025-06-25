@@ -301,51 +301,63 @@ public abstract class DefaultRenderer {
 
 		if (airFlow != null){
 
-			Rectangle2D.Double bounds = topography.getBounds();
+			double topoXmin = topography.getBounds().getX() + topography.getBoundingBoxWidth();
+			double topoYmin = topography.getBounds().getY() + topography.getBoundingBoxWidth();
+			double topoXmax = topography.getBounds().getX() + topography.getBounds().getWidth();
+			double topoYmax = topography.getBounds().getY() + topography.getBounds().getHeight();
 
 			AttributesAirFlowModel attributesAirFlowModel = Model.findAttributes(modelAttributes, AttributesAirFlowModel.class);
+			double airflowXmin = attributesAirFlowModel.getBounds().getXmin();
+			double airflowYmin = attributesAirFlowModel.getBounds().getYmin();
+			double airflowXmax = attributesAirFlowModel.getBounds().getXmax();
+			double airflowYmax = attributesAirFlowModel.getBounds().getYmax();
 
-			g.setColor(new Color(0, 153, 50)); // green
+			double xMin = Math.max(topoXmin, airflowXmin);
+			double yMin = Math.max(topoYmin, airflowYmin);
+			double xMax = Math.min(topoXmax, airflowXmax);
+			double yMax = Math.min(topoYmax, airflowYmax);
+
+			g.setColor(new Color(0, 130, 70)); // green
 
 			for (AttributesInOutLet inlet : attributesAirFlowModel.getInlets()) {
 				switch (inlet.getSide()) {
 					case "bottom":
-						g.fill(new VRectangle.Double(inlet.getStart(), topography.getBoundingBoxWidth() - 0.1, inlet.getWidth(), 0.1));
+						g.fill(new VRectangle.Double(inlet.getStart(), yMin - 0.1, inlet.getWidth(), 0.1));
 						break;
 					case "top":
-						g.fill(new VRectangle.Double(inlet.getStart(), bounds.getHeight() - topography.getBoundingBoxWidth(), inlet.getWidth(), 0.1));
+						g.fill(new VRectangle.Double(inlet.getStart(), yMax, inlet.getWidth(), 0.1));
 						break;
 					case "left":
-						g.fill(new VRectangle.Double(topography.getBoundingBoxWidth() - 0.1, inlet.getStart(), 0.1, inlet.getWidth()));
+						g.fill(new VRectangle.Double(xMin - 0.1, inlet.getStart(), 0.1, inlet.getWidth()));
 						break;
 					case "right":
-						g.fill(new VRectangle.Double(bounds.getWidth() - topography.getBoundingBoxWidth(), inlet.getStart(), 0.1, inlet.getWidth()));
+						g.fill(new VRectangle.Double(xMax, inlet.getStart(), 0.1, inlet.getWidth()));
 						break;
 				}
 
 			}
 
-			g.setColor(new Color(204, 0, 0)); // red
+			g.setColor(new Color(180, 0, 0)); // red
 
 			for (AttributesInOutLet outlet : attributesAirFlowModel.getOutlets()) {
 				switch (outlet.getSide()) {
 					case "bottom":
-						g.fill(new VRectangle.Double(outlet.getStart(), topography.getBoundingBoxWidth() - 0.1, outlet.getWidth(), 0.1));
+						g.fill(new VRectangle.Double(outlet.getStart(), yMin - 0.1, outlet.getWidth(), 0.1));
 						break;
 					case "top":
-						g.fill(new VRectangle.Double(outlet.getStart(), bounds.getHeight() - topography.getBoundingBoxWidth(), outlet.getWidth(), 0.1));
+						g.fill(new VRectangle.Double(outlet.getStart(), yMax, outlet.getWidth(), 0.1));
 						break;
 					case "left":
-						g.fill(new VRectangle.Double(topography.getBoundingBoxWidth() - 0.1, outlet.getStart(), 0.1, outlet.getWidth()));
+						g.fill(new VRectangle.Double(xMin - 0.1, outlet.getStart(), 0.1, outlet.getWidth()));
 						break;
 					case "right":
-						g.fill(new VRectangle.Double(bounds.getWidth() - topography.getBoundingBoxWidth(), outlet.getStart(), 0.1, outlet.getWidth()));
+						g.fill(new VRectangle.Double(xMax, outlet.getStart(), 0.1, outlet.getWidth()));
 						break;
 				}
 
 			}
 
-			g.setColor(new Color(140, 140, 140)); // gray
+			g.setColor(new Color(100, 100, 100)); // gray
 			g.setStroke(new BasicStroke(2*getLineWidth()));
 
 			double visTolerance = 10e-8;
@@ -373,26 +385,17 @@ public abstract class DefaultRenderer {
 					double arrowLength = Math.abs(Math.pow(xVelocities[i][j], 2) + Math.pow(yVelocities[i][j], 2));
 					arrowLength = arrowLength / maxArrowLength;
 
-					if ((i == 0 || i == xVelocities.length - 1) && (j == 0 || j == xVelocities[i].length - 1)) {
-						System.out.println(xVelocities[i][j]);
-						System.out.println(yVelocities[i][j]);
-					}
-
 					if (airFlowScale.equals(Messages.getString("SettingsDialog.chbAirflowScaleSqrt.text"))) {
-						arrowLength = (Math.sqrt(arrowLength) - Math.sqrt(0)) / (Math.sqrt(1) - Math.sqrt(0));
+						arrowLength = Math.sqrt(arrowLength);
 					} else if (airFlowScale.equals(Messages.getString("SettingsDialog.chbAirflowScaleLog.text"))) {
 						arrowLength = (Math.log(arrowLength) - Math.log(visTolerance)) / (Math.log(1) - Math.log(visTolerance));
 					}
 					arrowLength = arrowLength * cellSize;
 
-					if ((i == 0 || i == xVelocities.length - 1) && (j == 0 || j == xVelocities[i].length - 1)) {
-						System.out.println(arrowLength);
-					}
-
 					if (arrowLength > visTolerance) {
 
-						double mX = i * cellSize + cellSize / 2 + topography.getBoundingBoxWidth();
-						double mY = j * cellSize + cellSize / 2 + topography.getBoundingBoxWidth();
+						double mX = i * cellSize + xMin;
+						double mY = j * cellSize + yMin;
 
 						double angle = Math.atan2(yVelocities[i][j], xVelocities[i][j]);
 
@@ -404,8 +407,8 @@ public abstract class DefaultRenderer {
 	}
 
 	protected void drawLineArrow(Graphics2D g2d, double x1, double y1, double angle, double length) {
-
-		double peek = 0.1;
+		// pull peek length towards 0.1
+		double peek = 0.1 + (length - 0.1) * 0.25;
 
 		double x2 = x1 + Math.cos(angle) * length;
 		double y2 = y1 + Math.sin(angle) * length;
