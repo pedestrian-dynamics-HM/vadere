@@ -126,7 +126,7 @@ def build_mesh(inlets, outlets, obstacles, area_threshold, x_min, x_max, y_min, 
         {"outlet" + str(entry["id"]): get_boundary_lambda(entry["side"], entry["coords"],
                                                           x_min, x_max, y_min, y_max)})
     obstacle_dict = {"obstacle": lambda x: is_on_obstacle_boundary(x, obstacles)}
-    boundary_dict = inlet_dict | outlet_dict | obstacle_dict
+    boundary_dict = {**inlet_dict, **outlet_dict, **obstacle_dict}
     mesh = mesh.with_boundaries(boundary_dict)
 
     return mesh, inlet_dict, outlet_dict, boundary_dict
