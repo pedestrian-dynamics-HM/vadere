@@ -27,13 +27,11 @@ public abstract class AbstractAirFlowModel implements Model {
         double ymin = domain.getTopography().getBounds().y + domain.getTopography().getBoundingBoxWidth();
         double xmax = domain.getTopography().getBounds().x + domain.getTopography().getBounds().width;
         double ymax = domain.getTopography().getBounds().y + domain.getTopography().getBounds().height;
-        ArrayList<AttributesInOutLet> outlets = new ArrayList<AttributesInOutLet>();
         if (attributesAirFlowModel != null) {
             xmin = Math.max(xmin, attributesAirFlowModel.getBounds().getXmin());
             ymin = Math.max(ymin, attributesAirFlowModel.getBounds().getYmin());
             xmax = Math.min(xmax, attributesAirFlowModel.getBounds().getXmax());
             ymax = Math.min(ymax, attributesAirFlowModel.getBounds().getYmax());
-            outlets = attributesAirFlowModel.getOutlets();
         }
         this.airFlow = new AirFlow(scenarioPath, "", xmin, ymin, xmax, ymax);
         domain.getTopography().setAirFlow(airFlow);

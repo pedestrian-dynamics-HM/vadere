@@ -13,8 +13,6 @@ def extract_attributes(topography, attributes_model, parameter_string):
     x_max = min(topo_xmax, airflow_xmax)
     y_min = max(topo_ymin, airflow_ymin)
     y_max = min(topo_ymax, airflow_ymax)
-    #print(x_min, x_max)
-    #print(y_min, y_max)
 
     grid_size = float(attributes_model['gridSize'])
     area_threshold = float(attributes_model['areaThreshold'])
