@@ -6,6 +6,8 @@ import org.vadere.gui.topographycreator.model.IDrawPanelModel;
 import org.vadere.state.attributes.scenario.AttributesVisualElement;
 import org.vadere.state.scenario.ScenarioElement;
 import org.vadere.state.types.ScenarioElementType;
+import org.vadere.util.debugDraw.DebugDraw;
+import org.vadere.util.debugDraw.drawMethods.interfaces.DebugRenderTarget;
 import org.vadere.util.geometry.shapes.VPoint;
 
 import java.awt.*;
@@ -82,8 +84,6 @@ public class TopographyCreatorRenderer  extends DefaultRenderer {
 		if (panelModel.getCursor().getType() == Cursor.DEFAULT_CURSOR) {
 			renderCursor(graphics, panelModel.getGridResolution(), getLineWidth());
 		}
-
-		graphics.dispose();
 	}
 
 	private void renderCursor(Graphics2D g, double resolution, float lineWidth) {
@@ -96,4 +96,17 @@ public class TopographyCreatorRenderer  extends DefaultRenderer {
 		draw(new Line2D.Double(absolutCursorX, absolutCursorY - resolution * 0.2, absolutCursorX, absolutCursorY + resolution * 0.2), g);
 	}
 
+	@Override
+	protected void debugDraw(Graphics2D targetGraphics2D) {
+		DebugRenderTarget debugRenderTarget = (DebugRenderTarget) DebugDraw.topographyCreator();
+
+		debugRenderTarget.informModelRenderListeners(
+				panelModel,
+				targetGraphics2D,
+				getGridLineWidth());
+		debugRenderTarget.drawToGraphics(
+				targetGraphics2D,
+				getGridLineWidth());
+		debugRenderTarget.updateTime(0);
+	}
 }
