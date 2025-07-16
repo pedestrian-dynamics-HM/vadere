@@ -1,9 +1,9 @@
 package org.vadere.meshing.mesh.triangulation.improver.distmesh;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Polygon;
-import com.vividsolutions.jts.triangulate.DelaunayTriangulationBuilder;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Polygon;
+import org.locationtech.jts.triangulate.DelaunayTriangulationBuilder;
 
 import org.apache.commons.lang3.tuple.Triple;
 import org.vadere.meshing.ConstantLineIterator;
@@ -123,7 +123,7 @@ public class Distmesh {
 
 			synchronized (this) {
 				builder.setSites(coords);
-				com.vividsolutions.jts.geom.GeometryCollection multiTris = (com.vividsolutions.jts.geom.GeometryCollection) builder.getTriangles(fact);
+				org.locationtech.jts.geom.GeometryCollection multiTris = (org.locationtech.jts.geom.GeometryCollection) builder.getTriangles(fact);
 
 				HashMap<EikMeshPoint, EikMeshPoint> meshPoints = new HashMap();
 				triangles = new ArrayList<>();
