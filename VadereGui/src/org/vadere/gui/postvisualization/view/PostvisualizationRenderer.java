@@ -9,6 +9,8 @@ import org.vadere.gui.renderer.agent.AgentRender;
 import org.vadere.state.scenario.AerosolCloud;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.simulation.FootStep;
+import org.vadere.util.debugDraw.DebugDraw;
+import org.vadere.util.debugDraw.drawMethods.interfaces.DebugRenderTarget;
 import org.vadere.util.geometry.shapes.VPoint;
 import tech.tablesaw.api.Row;
 import tech.tablesaw.api.Table;
@@ -264,5 +266,19 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 	public LinkedList<BufferedImage> getAgentImages(){
 		SimulationModel simulationModel = (SimulationModel) this.defaultModel;
 		return simulationModel.getConfig().getImage();
+	}
+
+	@Override
+	protected void debugDraw(Graphics2D targetGraphics2D) {
+		DebugRenderTarget debugRenderTarget = (DebugRenderTarget) DebugDraw.postVisualization();
+
+		debugRenderTarget.informModelRenderListeners(
+				model,
+				targetGraphics2D,
+				getGridLineWidth());
+		debugRenderTarget.drawToGraphics(
+				targetGraphics2D,
+				getGridLineWidth());
+		debugRenderTarget.updateTime(0);
 	}
 }
