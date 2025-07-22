@@ -20,11 +20,11 @@ public class EmpiricalDistribution extends VDistribution<AttributesEmpiricalDist
 	@Override
 	protected void setValues(AttributesEmpiricalDistribution parameter, RandomGenerator randomGenerator) {
 		distribution = new org.apache.commons.math3.random.EmpiricalDistribution(randomGenerator);
-		double[] array = new double[parameter.getValues().size()];
-		for (int i = 0; i < array.length; i++) {
-			array[i] = parameter.getValues().get(i);
+		double[] distributionAttributesArray = new double[parameter.getValues().size()];
+		for (int i = 0; i < distributionAttributesArray.length; i++) {
+			distributionAttributesArray[i] = parameter.getValues().get(i);
 		}
-		distribution.load(array);
+		distribution.load(distributionAttributesArray);
 	}
 	@Override
 	public double getNextSample(double timeCurrentEvent) {
