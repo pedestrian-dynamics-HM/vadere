@@ -3,6 +3,8 @@ package org.vadere.util.debugDraw.drawMethods;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Polygon;
 import org.vadere.util.debugDraw.drawInformation.DebugDrawableBase;
 import org.vadere.util.debugDraw.drawInformation.DebugShapeDrawInformation;
 import org.vadere.util.debugDraw.drawInformation.DebugTimeDrawInformation;
@@ -11,13 +13,11 @@ import org.vadere.util.debugDraw.drawMethods.interfaces.DebugDrawModelRenderList
 import org.vadere.util.debugDraw.drawMethods.interfaces.DebugRenderTarget;
 import org.vadere.util.debugDraw.drawMethods.interfaces.TimeDrawMethods;
 import org.vadere.util.geometry.GeometryUtils;
-import org.vadere.util.geometry.shapes.VCircle;
-import org.vadere.util.geometry.shapes.VLine;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.Vector2D;
+import org.vadere.util.geometry.shapes.*;
 import org.vadere.util.math.InterpolationUtil;
 
 import java.awt.*;
+import java.awt.geom.Path2D;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -134,7 +134,72 @@ public class DebugDrawMethodsImpl implements TimeDrawMethods, DebugRenderTarget 
         return drawInformation;
     }
 
+    @Override
+    public DebugTimeDrawInformation polygon(Polygon polygon){
+        Coordinate[] coordinates = polygon.getCoordinates();
+        List<Shape> shapes = new ArrayList<>(coordinates.length);
+        for (int i = 0; i < coordinates.length-1; i++) {
+            Coordinate coordinate = coordinates[i];
+            Coordinate nextCoordinate = coordinates[i+1];
+            if(coordinate.equals(nextCoordinate)){
+                continue;
+            }
 
+            shapes.add(new VLine(new VPoint(coordinate), new VPoint(nextCoordinate)));
+        }
+
+        MultiShapeDrawInformation drawInformation = new MultiShapeDrawInformation(shapes.toArray(new Shape[0]));
+        enqueueDrawShape(drawInformation);
+        return drawInformation;
+    }
+
+    @Override
+    public DebugTimeDrawInformation polygon(VPolygon polygon){
+        List<VPoint> coordinates = polygon.getPoints();
+        List<Shape> shapes = new ArrayList<>(coordinates.size());
+        for (int i = 0; i < coordinates.size()-1; i++) {
+            VPoint coordinate = coordinates.get(i);
+            VPoint nextCoordinate = coordinates.get(i+1);
+            if(coordinate.equals(nextCoordinate)){
+                continue;
+            }
+
+            shapes.add(new VLine(new VPoint(coordinate), new VPoint(nextCoordinate)));
+        }
+
+        MultiShapeDrawInformation drawInformation = new MultiShapeDrawInformation(shapes.toArray(new Shape[0]));
+        enqueueDrawShape(drawInformation);
+        return drawInformation;
+    }
+
+    @Override
+    public DebugTimeDrawInformation polygonFilled(Polygon polygon){
+        Path2D.Double path = new Path2D.Double();
+
+        Coordinate[] coordinates = polygon.getCoordinates();
+        if (coordinates.length == 0) {
+            return DebugShapeDrawInformation.Empty;
+        }
+
+        // Move to the first point
+        path.moveTo(coordinates[0].x, coordinates[0].y);
+
+        // Draw lines to the remaining points
+        for (int i = 1; i < coordinates.length; i++) {
+            path.lineTo(coordinates[i].x, coordinates[i].y);
+        }
+
+        DebugShapeDrawInformation debugShapeDrawInformation = new DebugShapeDrawInformation(new VPolygon(path));
+        enqueueDrawShape(debugShapeDrawInformation);
+        return debugShapeDrawInformation;
+    }
+
+    @Override
+    public DebugTimeDrawInformation polygonFilled(VPolygon polygon){
+        DebugShapeDrawInformation drawInformation = new DebugShapeDrawInformation(polygon);
+        enqueueDrawShape(drawInformation);
+        return drawInformation;
+    }
 
     protected void enqueueDrawShape(DebugDrawableBase drawInformation) {
         synchronized (drawables){

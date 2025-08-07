@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.geom.Point2D;
 import java.math.BigDecimal;
 
+import org.locationtech.jts.geom.Coordinate;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.reflection.VadereAttribute;
 
@@ -46,6 +47,12 @@ public class VPoint implements Cloneable, IPoint {
 	}
 
 	public VPoint(Point copy) {
+		this.x = copy.x;
+		this.y = copy.y;
+		assert !Double.isNaN(x) && !Double.isNaN(y) && Double.isFinite(x) && Double.isFinite(y);
+	}
+
+	public VPoint(Coordinate copy) {
 		this.x = copy.x;
 		this.y = copy.y;
 		assert !Double.isNaN(x) && !Double.isNaN(y) && Double.isFinite(x) && Double.isFinite(y);

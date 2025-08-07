@@ -1,7 +1,10 @@
 package org.vadere.util.debugDraw.drawMethods.interfaces;
 
+import org.locationtech.jts.geom.Polygon;
 import org.vadere.util.debugDraw.drawInformation.DebugDrawInformation;
+import org.vadere.util.debugDraw.drawInformation.DebugTimeDrawInformation;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.Vector2D;
 
 public interface DrawMethods {
@@ -15,6 +18,17 @@ public interface DrawMethods {
 
     DebugDrawInformation circle(VPoint position, double radius);
 
+    /**
+     * Draws a JTS polygon (ignoring holes)
+     */
+    DebugDrawInformation polygon(Polygon polygon);
+    DebugDrawInformation polygon(VPolygon polygon);
+
+    /**
+     * Draws a JTS polygon (ignoring holes)
+     */
+    DebugDrawInformation polygonFilled(Polygon polygon);
+    DebugDrawInformation polygonFilled(VPolygon polygon);
     void clearShapes();
 
     void addRenderListener(DebugDrawModelRenderListener renderListener);
