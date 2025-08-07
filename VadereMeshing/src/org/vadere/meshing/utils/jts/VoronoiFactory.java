@@ -1,7 +1,7 @@
 package org.vadere.meshing.utils.jts;
 
-import com.vividsolutions.jts.geom.*;
-import com.vividsolutions.jts.triangulate.VoronoiDiagramBuilder;
+import org.locationtech.jts.geom.*;
+import org.locationtech.jts.triangulate.VoronoiDiagramBuilder;
 
 import java.util.Collection;
 
