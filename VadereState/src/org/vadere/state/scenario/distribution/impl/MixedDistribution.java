@@ -67,12 +67,7 @@ public class MixedDistribution extends VDistribution<AttributesMixedDistribution
 	}
 
 	private boolean intervallAndTimeIsValidAt(double timeCurrentEvent) {
-		return iscCurrentIntervalInBound() && isEventInCurrentInterval(timeCurrentEvent)
-				&& isTimeInBound(timeCurrentEvent);
-	}
-
-	private boolean isTimeInBound(double timeCurrentEvent) {
-		return !(timeCurrentEvent > switchPoints.get(switchPoints.size() - 1));
+		return iscCurrentIntervalInBound() && isEventInCurrentInterval(timeCurrentEvent);
 	}
 
 	private boolean isEventInCurrentInterval(double timeCurrentEvent) {
