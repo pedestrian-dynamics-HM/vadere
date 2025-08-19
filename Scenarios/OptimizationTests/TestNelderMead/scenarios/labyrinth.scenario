@@ -2,7 +2,6 @@
   "name" : "labyrinth",
   "description" : "Note the specific configuration provided in vadere.conf defined for this project.",
   "release" : "3.0",
-  "commithash" : "a200b4ddd066a581da3fd86d600a9c689f60a145",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ {
