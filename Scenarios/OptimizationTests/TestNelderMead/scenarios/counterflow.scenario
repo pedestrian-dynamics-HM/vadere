@@ -2,7 +2,6 @@
   "name" : "counterflow",
   "description" : "Note the specific configuration provided in vadere.conf defined for this project.",
   "release" : "3.0",
-  "commithash" : "a200b4ddd066a581da3fd86d600a9c689f60a145",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ {
@@ -13,14 +12,14 @@
         "expectedResult" : "SUCCESS",
         "optimizationMetricProcessorId" : 2,
         "testEvacuationProcessorId" : 3,
-        "maxMeanPointDistance" : 0.08040561762371691,
-        "maxMeanDifferenceFuncValue" : 0.025816523634581184,
+        "maxMeanPointDistance" : 0.08686215088049958,
+        "maxMeanDifferenceFuncValue" : 0.024783160079387002,
         "infoMinPointDistanceL2" : 0.0,
-        "infoMaxPointDistanceL2" : 1.1035071661968199,
-        "infoMinFuncDifference" : -8.170203869894976E-6,
-        "infoMaxFuncDifference" : 0.6111443419951987,
-        "infoStddevPointDistance" : 0.11284964344684632,
-        "infoStddevDifferenceFuncValue" : 0.04122660472677614
+        "infoMaxPointDistanceL2" : 1.4451073901146607,
+        "infoMinFuncDifference" : -1.2033621338503053E-5,
+        "infoMaxFuncDifference" : 0.5673214609514217,
+        "infoStddevPointDistance" : 0.13962637700534145,
+        "infoStddevDifferenceFuncValue" : 0.042202483728365964
       }
     }, {
       "type" : "org.vadere.simulator.projects.dataprocessing.processor.PedestrianMetricOptimizationProcessor",
