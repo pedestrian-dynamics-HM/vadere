@@ -9,10 +9,10 @@ import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
-import javax.lang.model.util.ElementScanner7;
+import javax.lang.model.util.ElementScanner14;
 
 // see: https://stackoverflow.com/a/18777229
-public class ImportScanner extends ElementScanner7<Void, Void> {
+public class ImportScanner extends ElementScanner14<Void, Void> {
 
 	private Set<String> types = new HashSet<>();
 
