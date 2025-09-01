@@ -230,7 +230,7 @@ public class ImportSumoGeometryUtils {
         return ((Polygon) union.getGeometryN(0)).getNumInteriorRing() > 0;
     }
 
-    public static LineString shiftLineRight(LineString line, double offsetDistance) {
+    public static LineString translateLineToTheRight(LineString line, double offsetDistance) {
         Coordinate[] lineCoords = line.getCoordinates();
         Coordinate[] shiftedCoords = new Coordinate[lineCoords.length];
 

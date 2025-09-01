@@ -166,7 +166,7 @@ public class SumoRoadNetworkFileParser extends SumoFileParserBase {
         // distance from center of the last road to center of the pedestrian road
         double shiftDistance = sidewalkWidth / 2 + width / 2;
 
-        LineString shiftedLine = ImportSumoGeometryUtils.shiftLineRight(lineString, shiftDistance);
+        LineString shiftedLine = ImportSumoGeometryUtils.translateLineToTheRight(lineString, shiftDistance);
         allLanes.add(new SumoLane(vadereObjectId.incrementAndGet(), edge.getId() + "_Sidewalk", edge, sidewalkWidth, shiftedLine, PEDESTRIAN_ONLY));
     }
 
