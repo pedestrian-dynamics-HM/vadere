@@ -277,6 +277,7 @@ public class VadereConfig {
 		defaultConfig.put("TopographyCreator.dotRadius", "0.5");
 		defaultConfig.put("Vadere.cache.useGlobalCacheBaseDir", "false");
 		defaultConfig.put("Vadere.cache.globalCacheBaseDir", defaultSearchDirectory + "/.cache/vadere");
+		defaultConfig.put("ImportFromSumoDialog.lastPath", defaultSearchDirectory);
 
 		return defaultConfig;
 	}

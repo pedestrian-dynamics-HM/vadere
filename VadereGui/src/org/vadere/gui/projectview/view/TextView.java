@@ -8,10 +8,12 @@ import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rsyntaxtextarea.Theme;
 import org.fife.ui.rtextarea.RTextScrollPane;
 import org.jetbrains.annotations.NotNull;
-import org.vadere.gui.components.control.HelpTextView;
+import org.jetbrains.annotations.Nullable;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.projectview.model.IScenarioChecker;
+import org.vadere.gui.sumoImport.control.SumoImportDialogControl;
+import org.vadere.gui.sumoImport.view.SumoImportDialog;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.dataprocessing.DataProcessingJsonManager;
 import org.vadere.simulator.projects.io.JsonConverter;
@@ -29,13 +31,9 @@ import org.vadere.util.logging.Logger;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -45,6 +43,8 @@ import javax.swing.event.MenuListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.*;
+
+import static org.vadere.gui.projectview.view.AttributeType.TOPOGRAPHY;
 
 /**
  * Shows text like the JSON formatted attributes.
@@ -114,6 +114,54 @@ public class TextView extends JPanel implements IJsonView {
 		}
 	};
 
+	private ActionListener importFromSumoActionListener = new ActionListener() {
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+
+			String lastPath = CONFIG.getString("ImportFromSumoDialog.lastPath");
+			File selectedFolder = chooseSumoFolder(lastPath);
+			if (selectedFolder == null)
+			{
+				return;
+			}
+			CONFIG.setProperty("ImportFromSumoDialog.lastPath", selectedFolder.getAbsolutePath());
+
+			showSumoImportDialog(selectedFolder);
+		}
+
+		private void showSumoImportDialog(File selectedFolder) {
+			try{
+				SumoImportDialogControl control = new SumoImportDialogControl(
+						selectedFolder,
+						json -> TextView.this.textfileTextarea.setText(json));
+
+				SumoImportDialog importSumoDialog = new SumoImportDialog(ProjectView.getMainWindow(), control);
+				importSumoDialog.setSize(1024, 768);
+				importSumoDialog.setLocationRelativeTo(ProjectView.getMainWindow());
+				importSumoDialog.setVisible(true);
+			}catch (Exception e){
+				logger.error("Failed to show sumo import dialog: ", e);
+				JOptionPane.showMessageDialog(ProjectView.getMainWindow(), "Folder is not a valid sumo project folder!",
+						"Sumo import error", JOptionPane.ERROR_MESSAGE);
+			}
+		}
+
+		@Nullable
+		private static File chooseSumoFolder(String lastPath) {
+			JFileChooser chooser = new JFileChooser(lastPath);
+			chooser.setDialogTitle(Messages.getString("ChooseDirectory.text"));
+			chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+			chooser.setAcceptAllFileFilterUsed(false);
+
+			int result = chooser.showOpenDialog(null);
+			if (result != JFileChooser.APPROVE_OPTION) {
+				return null;
+			}
+
+			return chooser.getSelectedFile();
+		}
+	};
+
 	/**
 	 * Create the panel.
 	 */
@@ -136,6 +184,13 @@ public class TextView extends JPanel implements IJsonView {
         btnLoadFromFile.setIcon(new ImageIcon(Resources.class.getResource("/icons/floppy.gif")));
 		btnLoadFromFile.addActionListener(loadFromFileActionListener);
         panelTop.add(btnLoadFromFile);
+
+		if(attributeType == TOPOGRAPHY){
+			JButton btnImportFromSumo = new JButton(Messages.getString("TextFileView.btnImportFromSumo.text"));
+			btnImportFromSumo.addActionListener(importFromSumoActionListener);
+			btnImportFromSumo.setIcon(new ImageIcon(Resources.class.getResource("/icons/floppy.gif")));
+			panelTop.add(btnImportFromSumo);
+		}
 
 		jsonValidIndicator = new JsonValidIndicator();
 		panelTop.add(jsonValidIndicator);
