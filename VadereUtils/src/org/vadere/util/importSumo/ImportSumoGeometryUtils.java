@@ -41,10 +41,12 @@ public class ImportSumoGeometryUtils {
         return calculateInverse(polygonsList, bounds, invertGroupSettings);
     }
 
+    private record BucketCoordinate(CoordinateXY coordinate){}
+
     @NotNull
     public static List<Polygon> calculateInverse(List<Polygon> polygons, Envelope bounds, SumoInvertSettings invertGroupSettings) {
-        Map<CoordinateXY, List<Polygon>> inverseSquares = calculateInverseSquares(polygons, bounds, invertGroupSettings.getCellSize(), invertGroupSettings.getMaxCellsToCombinePerAxis(), invertGroupSettings.getMinResultPolygonDiameter());
-        List<Polygon> merged = mergePolygonsPreventingHoles(inverseSquares);
+        Map<BucketCoordinate, List<Polygon>> inverseSquares = calculateInverseSquares(polygons, bounds, invertGroupSettings.getCellSize(), invertGroupSettings.getMaxCellsToCombinePerAxis(), invertGroupSettings.getMinResultPolygonDiameter());
+        List<Polygon> merged = mergePolygonsInBucketsWhilePreventingHoles(inverseSquares);
 
         Double minPolygonSize = invertGroupSettings.getMinPolygonSize();
         if(minPolygonSize != null){
@@ -59,8 +61,12 @@ public class ImportSumoGeometryUtils {
         return merged;
     }
 
+    /**
+     * Fills the bounds envelope with cells of the <code>cellSize</code>. Then subtracts each polygon from allPolygons from the cells.
+     * Then returns polygons mapped by coordinates in buckets of the size <code>cellSize * maxCellsToCombinePerAxis</code>.
+     */
     @NotNull
-    private static Map<CoordinateXY, List<Polygon>> calculateInverseSquares(List<Polygon> allPolygons, Envelope bounds, double cellSize, @Nullable Integer maxCellsToCombinePerAxis, Double minimumResultPolygonDiameter) {
+    private static Map<BucketCoordinate, List<Polygon>> calculateInverseSquares(List<Polygon> allPolygons, Envelope bounds, double cellSize, @Nullable Integer maxCellsToCombinePerAxis, Double minimumResultPolygonDiameter) {
         Quadtree quadtree = new Quadtree();
 
         int rowCount = (int) Math.ceil((bounds.getMaxY() - bounds.getMinY()) / cellSize);
@@ -136,11 +142,11 @@ public class ImportSumoGeometryUtils {
     }
 
     @NotNull
-    private static Map<CoordinateXY, List<Polygon>> calculateCombineCellBuckets(double cellSize, @Nullable Integer maxCellsToCombinePerAxis, List all) {
-        Map<CoordinateXY, List<Polygon>> result = new Hashtable<>(all.size());
+    private static Map<BucketCoordinate, List<Polygon>> calculateCombineCellBuckets(double cellSize, @Nullable Integer maxCellsToCombinePerAxis, List all) {
+        Map<BucketCoordinate, List<Polygon>> result = new Hashtable<>(all.size());
 
         if(maxCellsToCombinePerAxis == null){
-                CoordinateXY coordinateXY = new CoordinateXY(0,0);
+            BucketCoordinate coordinateXY = new BucketCoordinate(new CoordinateXY(0,0));
             for (Object o : all) {
                 Polygon polygon = (Polygon) o;
                 CollectionUtils.addToValueList(result, coordinateXY, polygon);
@@ -157,17 +163,17 @@ public class ImportSumoGeometryUtils {
             int x = (int) (env.getMinX() / bucketAreaSize);
             int y = (int) (env.getMinY() / bucketAreaSize);
 
-            CoordinateXY coordinateXY = new CoordinateXY(x, y);
-            CollectionUtils.addToValueList(result, coordinateXY, polygon);
+            BucketCoordinate coordinate = new BucketCoordinate(new CoordinateXY(x, y));
+            CollectionUtils.addToValueList(result, coordinate, polygon);
         }
 
         return result;
     }
 
-    private static List<Polygon> mergePolygonsPreventingHoles(Map<CoordinateXY, List<Polygon>> polygonBuckets) {
+    private static List<Polygon> mergePolygonsInBucketsWhilePreventingHoles(Map<BucketCoordinate, List<Polygon>> polygonBuckets) {
         Set<Polygon> allPolygons = new HashSet<>();
 
-        for (Map.Entry<CoordinateXY, List<Polygon>> bucket : polygonBuckets.entrySet()) {
+        for (Map.Entry<BucketCoordinate, List<Polygon>> bucket : polygonBuckets.entrySet()) {
             Map<Coordinate, List<Polygon>> coordinateToPolygons = new Hashtable<>();
 
              for (Polygon polygon : bucket.getValue()) {
