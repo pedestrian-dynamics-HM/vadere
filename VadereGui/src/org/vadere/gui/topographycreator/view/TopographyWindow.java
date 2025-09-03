@@ -286,7 +286,6 @@ public class TopographyWindow extends JPanel {
 				switchToTargetAction,
 				obstacleAndTargetDrawModes);
 
-		JButton targetChangerButton = new JButton();
 		TopographyAction openTargetChangerDialog = new ActionOpenDrawOptionMenu(
 				"TargetChanger",
 				ResourceStrings.ICONS_TARGET_CHANGER_ICON_PNG,
@@ -295,7 +294,6 @@ public class TopographyWindow extends JPanel {
 				obstacleAndTargetDrawModes);
 
 		/* open absorbing area paint method dialog action */
-		JButton absorbingAreaButton = new JButton();
 		TopographyAction openAbsorbingAreaDialog = new ActionOpenDrawOptionMenu(
 				"AbsorbingArea",
 				ResourceStrings.ICONS_EMERGENCY_EXIT_PNG,
@@ -305,7 +303,6 @@ public class TopographyWindow extends JPanel {
 				absorbingAreaDrawModes);
 
 		/* open stairs paint method dialog action */
-		JButton stairsButton = new JButton();
 		TopographyAction openStairsDialog = new ActionOpenDrawOptionMenu(
 				"Stairs",
 				ResourceStrings.ICONS_STAIRS_ICON_PNG,
@@ -343,7 +340,6 @@ public class TopographyWindow extends JPanel {
 				ScenarioElementType.SOURCE, selectDotModeAction);
 
 		/* source */
-		JButton sourceButton = new JButton();
 		TopographyAction openSourceDialog = new ActionOpenDrawOptionMenu(
 				"Source",
 				ResourceStrings.ICONS_SOURCE_ICON_PNG,
