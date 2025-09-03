@@ -2,7 +2,7 @@ package org.vadere.gui.projectview.view;
 
 import javax.swing.*;
 
-import org.vadere.gui.components.utils.Messages;
+import org.vadere.gui.components.utils.Localization;
 import org.vadere.gui.components.utils.Resources;
 
 import java.awt.event.MouseAdapter;
@@ -20,14 +20,14 @@ public class JsonValidIndicator extends JPanel {
 
 		// VALID
 
-		labelJsonValid = new JLabel(Messages.getString("TextView.lbljsonvalid.text"));
+		labelJsonValid = new JLabel(Localization.getString("TextView.lbljsonvalid.text"));
 		add(labelJsonValid);
 		labelJsonValid.setIcon(new ImageIcon(Resources.class.getResource("/icons/Inform.gif")));
 
 		// INVALID
 
-		labelJsonInvalid = new JLabel("<html>" + Messages.getString("TextView.lbljsoninvalid.text") +
-				" <font color=gray size=-1><a href=#>" + Messages.getString("TextView.lbljsoninvalid.showErrorText")
+		labelJsonInvalid = new JLabel("<html>" + Localization.getString("TextView.lbljsoninvalid.text") +
+				" <font color=gray size=-1><a href=#>" + Localization.getString("TextView.lbljsoninvalid.showErrorText")
 				+ "</a></font></html>");
 		add(labelJsonInvalid);
 		labelJsonInvalid.setIcon(new ImageIcon(Resources.class.getResource("/icons/Error.gif")));
@@ -35,7 +35,7 @@ public class JsonValidIndicator extends JPanel {
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				VDialogManager.showMessageDialogWithTextArea(
-						Messages.getString("TextView.lbljsoninvalid.errorMsgPopup.title"),
+						Localization.getString("TextView.lbljsoninvalid.errorMsgPopup.title"),
 						ScenarioPanel.getActiveJsonParsingErrorMsg(),
 						JOptionPane.ERROR_MESSAGE);
 			}

@@ -55,16 +55,16 @@ public class GuiScenarioCheckerMessageFormatter extends AbstractScenarioCheckerM
 		String ret="";
 		switch (type){
 			case TOPOGRAPHY_ERROR: case TOPOGRAPHY_WARN:
-				ret = Messages.getString("Tab.Topography.title");
+				ret = Localization.getString("Tab.Topography.title");
 				break;
 			case DATA_PROCESSOR_ERROR: case DATA_PROCESSOR_WARN:
-				ret = Messages.getString("Tab.OutputProcessors.title");
+				ret = Localization.getString("Tab.OutputProcessors.title");
 				break;
 			case MODEL_ATTR_ERROR: case MODEL_ATTR_WARN:
-				ret = Messages.getString("Tab.Model.title");
+				ret = Localization.getString("Tab.Model.title");
 				break;
 			case SIMULATION_ATTR_ERROR: case SIMULATION_ATTR_WARN:
-				ret = Messages.getString("Tab.Simulation.title");
+				ret = Localization.getString("Tab.Simulation.title");
 				break;
 		}
 		return ret;
@@ -85,7 +85,7 @@ public class GuiScenarioCheckerMessageFormatter extends AbstractScenarioCheckerM
 
 		if (currentTypeChanged){
 			sb.append("<h4>")
-					.append(Messages.getString(msg.getMsgType().getLocalTypeId()))
+					.append(Localization.getString(msg.getMsgType().getLocalTypeId()))
 					.append("</h4>");
 		}
 
@@ -109,7 +109,7 @@ public class GuiScenarioCheckerMessageFormatter extends AbstractScenarioCheckerM
 			sb.append("] ");
 		}
 
-		sb.append("<b>Reason:</b> ").append(Messages.getString(msg.getReason().getLocalMessageId()));
+		sb.append("<b>Reason:</b> ").append(Localization.getString(msg.getReason().getLocalMessageId()));
 		if (!msg.getReasonModifier().isEmpty()) {
 			sb.append(" ").append(msg.getReasonModifier());
 		}

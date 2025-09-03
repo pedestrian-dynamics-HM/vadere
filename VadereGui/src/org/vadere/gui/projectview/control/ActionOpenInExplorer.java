@@ -1,7 +1,6 @@
 package org.vadere.gui.projectview.control;
 
-import org.vadere.gui.components.utils.Messages;
-import org.vadere.gui.components.utils.SwingUtils;
+import org.vadere.gui.components.utils.Localization;
 import org.vadere.gui.projectview.model.ProjectViewModel;
 import org.vadere.util.io.IOUtils;
 import org.vadere.util.logging.Logger;
@@ -39,8 +38,8 @@ public class ActionOpenInExplorer extends AbstractAction {
                 };
                 worker.execute();
             } else {
-                IOUtils.errorBox(Messages.getString("OpenInExplorerErrorMessage.text"),
-                        Messages.getString("OpenInExplorerErrorMessage.title"));
+                IOUtils.errorBox(Localization.getString("OpenInExplorerErrorMessage.text"),
+                        Localization.getString("OpenInExplorerErrorMessage.title"));
                 logger.errorf("Cannot access outputBundle directory for project: %s", outputBundle.getProject().getName());
             }
 

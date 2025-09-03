@@ -1,6 +1,6 @@
 package org.vadere.gui.projectview.view;
 
-import org.vadere.gui.components.utils.Messages;
+import org.vadere.gui.components.utils.Localization;
 import org.vadere.gui.onlinevisualization.OnlineVisualization;
 import org.vadere.gui.postvisualization.view.PostvisualizationWindowInterActive;
 import org.vadere.gui.projectview.control.IProjectChangeListener;
@@ -92,11 +92,11 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 
 			int index = tabbedPane.getSelectedIndex();
 			if (index >= 0 && topographyFileView != null
-					&& index == tabbedPane.indexOfTab(Messages.getString("Tab.Topography.title"))
+					&& index == tabbedPane.indexOfTab(Localization.getString("Tab.Topography.title"))
 					&& scenario != null) {
 				topographyFileView.setVadereScenario(scenario);
 			} else 	if (index >= 0 && topographyCreatorView != null
-					&& index == tabbedPane.indexOfTab(Messages.getString("Tab.TopographyCreator.title"))
+					&& index == tabbedPane.indexOfTab(Localization.getString("Tab.TopographyCreator.title"))
 					&& scenario != null) {
 				setTopography(scenario.getTopography());
 				model.scenarioCheckerStartObserve(topographyCreatorView.getPanelModel());
@@ -110,7 +110,7 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 		attributesSimulationView =
 				new TextView("ProjectView.defaultDirectoryAttributes", AttributeType.SIMULATION);
 		attributesSimulationView.setScenarioChecker(model);
-		tabbedPane.addTab(Messages.getString("Tab.Simulation.title"), attributesSimulationView);
+		tabbedPane.addTab(Localization.getString("Tab.Simulation.title"), attributesSimulationView);
 
 		//Tab
 		attributesModelView = new TextView("ProjectView.defaultDirectoryAttributes", AttributeType.MODEL);
@@ -118,7 +118,7 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 
 		JMenuBar presetMenuBar = new JMenuBar();
 
-		JMenu mnPresetMenu = new JMenu(Messages.getString("Tab.Model.loadTemplateMenu.title"));
+		JMenu mnPresetMenu = new JMenu(Localization.getString("Tab.Model.loadTemplateMenu.title"));
 		presetMenuBar.add(mnPresetMenu);
 
 		menusInTabs.add(mnPresetMenu);
@@ -129,8 +129,8 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						if (JOptionPane.showConfirmDialog(ProjectView.getMainWindow(),
-								Messages.getString("Tab.Model.confirmLoadTemplate.text"),
-								Messages.getString("Tab.Model.confirmLoadTemplate.title"),
+								Localization.getString("Tab.Model.confirmLoadTemplate.text"),
+								Localization.getString("Tab.Model.confirmLoadTemplate.title"),
 								JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
 							try {
 								attributesModelView.setText(StateJsonConverter.serializeModelPreset(modelDefinition));
@@ -141,7 +141,7 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 					}
 				})));
 
-		JMenu mnAttributesMenu = new JMenu(Messages.getString("Tab.Model.addAttributesMenu.title"));
+		JMenu mnAttributesMenu = new JMenu(Localization.getString("Tab.Model.addAttributesMenu.title"));
 		presetMenuBar.add(mnAttributesMenu);
 		menusInTabs.add(mnAttributesMenu);
 		ModelAttributeFactory attributeFactory = ModelAttributeFactory.instance();
@@ -158,7 +158,7 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 					}
 				})));
 
-		JMenu mnHelpAttributesMenu = new JMenu(Messages.getString("Tab.Model.helpAttributesMenu.title"));
+		JMenu mnHelpAttributesMenu = new JMenu(Localization.getString("Tab.Model.helpAttributesMenu.title"));
 		presetMenuBar.add(mnHelpAttributesMenu);
 		menusInTabs.add(mnHelpAttributesMenu);
 		attributeFactory.sortedAttributeStream().forEach(
@@ -169,11 +169,11 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 					}
 				})));
 		
-		JMenu mnModelNameMenu = new JMenu(Messages.getString("Tab.Model.insertModelNameMenu.title"));
+		JMenu mnModelNameMenu = new JMenu(Localization.getString("Tab.Model.insertModelNameMenu.title"));
 		presetMenuBar.add(mnModelNameMenu);
 		menusInTabs.add(mnModelNameMenu);
 		
-		JMenu submenuMainModels = new JMenu(Messages.getString("Tab.Model.insertModelNameSubMenu.title"));
+		JMenu submenuMainModels = new JMenu(Localization.getString("Tab.Model.insertModelNameSubMenu.title"));
 		mnModelNameMenu.add(submenuMainModels);
 
 		ModelHelper.instance().getSortedMainModel()
@@ -202,23 +202,23 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 		});
 	
 		attributesModelView.getPanelTop().add(presetMenuBar, 0); // the 0 puts it at the leftmost position instead of the rightmost
-		tabbedPane.addTab(Messages.getString("Tab.Model.title"), attributesModelView);
+		tabbedPane.addTab(Localization.getString("Tab.Model.title"), attributesModelView);
 
 		attributesPsychologyView =
 				new TextView("ProjectView.defaultDirectoryAttributes", AttributeType.PSYCHOLOGY);
 		attributesPsychologyView.setScenarioChecker(model); // use .isEditable(true); to save time (no check!)
-		tabbedPane.addTab(Messages.getString("Tab.Psychology.title"), attributesPsychologyView);
+		tabbedPane.addTab(Localization.getString("Tab.Psychology.title"), attributesPsychologyView);
 
 		topographyFileView = new TextView("ProjectView.defaultDirectoryScenarios", AttributeType.TOPOGRAPHY);
 		topographyFileView.setScenarioChecker(model);
-		tabbedPane.addTab(Messages.getString("Tab.Topography.title"), topographyFileView);
+		tabbedPane.addTab(Localization.getString("Tab.Topography.title"), topographyFileView);
 
 		perceptionFileView = new TextView( "ProjectView.defaultDirectoryAttributes", AttributeType.PERCEPTION);
 		perceptionFileView.setScenarioChecker(model);
-		tabbedPane.addTab(Messages.getString("Tab.Perception.title"), perceptionFileView);
+		tabbedPane.addTab(Localization.getString("Tab.Perception.title"), perceptionFileView);
 
 		dataProcessingGUIview = new DataProcessingView(model);
-		tabbedPane.addTab(Messages.getString("Tab.OutputProcessors.title"), dataProcessingGUIview);
+		tabbedPane.addTab(Localization.getString("Tab.OutputProcessors.title"), dataProcessingGUIview);
 		
 		// online visualization card...
 		JPanel visualizationCard = new JPanel();
@@ -269,7 +269,7 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 				}
 
 				topographyCreatorView = new TopographyWindow(scenario, model);
-				tabbedPane.addTab(Messages.getString("Tab.TopographyCreator.title"), topographyCreatorView);
+				tabbedPane.addTab(Localization.getString("Tab.TopographyCreator.title"), topographyCreatorView);
 				tabbedPane.validate();
 				tabbedPane.repaint();
 				tabbedPane.setSelectedIndex(index);
@@ -283,7 +283,7 @@ public class ScenarioPanel extends JPanel implements IProjectChangeListener, Pro
 				tabbedPane.removeTabAt(tabbedPane.indexOfComponent(topographyCreatorView));
 			}
 			if (tabbedPane.indexOfComponent(postVisualizationView) < 0) {
-				tabbedPane.addTab(Messages.getString("Tab.PostVisualization.title"), postVisualizationView);
+				tabbedPane.addTab(Localization.getString("Tab.PostVisualization.title"), postVisualizationView);
 				if (topoWasSelected) {
 					tabbedPane.setSelectedComponent(postVisualizationView);
 				}

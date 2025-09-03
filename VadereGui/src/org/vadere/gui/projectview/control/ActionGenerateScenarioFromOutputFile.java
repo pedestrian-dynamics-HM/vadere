@@ -1,7 +1,7 @@
 package org.vadere.gui.projectview.control;
 
 
-import org.vadere.gui.components.utils.Messages;
+import org.vadere.gui.components.utils.Localization;
 import org.vadere.gui.projectview.model.ProjectViewModel;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.io.IOVadere;
@@ -41,7 +41,7 @@ public class ActionGenerateScenarioFromOutputFile extends ActionAbstractAddScena
 		try {
 			FileFilter filter = new FileNameExtensionFilter("Scenario", IOUtils.SCENARIO_FILE_EXTENSION);
 			String path =
-					IOUtils.chooseFile(Messages.getString("LoadOutputText"), model.getCurrentProjectPath(), filter);
+					IOUtils.chooseFile(Localization.getString("LoadOutputText"), model.getCurrentProjectPath(), filter);
 			if (path == null) {
 				return null;
 			}

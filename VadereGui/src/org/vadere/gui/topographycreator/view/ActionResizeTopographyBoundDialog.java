@@ -1,6 +1,6 @@
 package org.vadere.gui.topographycreator.view;
 
-import org.vadere.gui.components.utils.Messages;
+import org.vadere.gui.components.utils.Localization;
 import org.vadere.gui.projectview.view.ProjectView;
 
 import java.awt.*;
@@ -58,7 +58,7 @@ public class ActionResizeTopographyBoundDialog {
 		return JOptionPane.showConfirmDialog(
 				ProjectView.getMainWindow(),
 				textField,
-				Messages.getString("TopographyBoundDialog.title"),
+				Localization.getString("TopographyBoundDialog.title"),
 				JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION;
 	}
 

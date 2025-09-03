@@ -1,7 +1,7 @@
 package org.vadere.gui.projectview.control;
 
 
-import org.vadere.gui.components.utils.Messages;
+import org.vadere.gui.components.utils.Localization;
 import org.vadere.gui.projectview.model.ProjectViewModel;
 import org.vadere.util.io.IOUtils;
 import org.vadere.util.logging.Logger;
@@ -32,8 +32,8 @@ public class ActionRenameProject extends AbstractAction {
 				logger.info("rename project: " + oldProjectName + " => " + projectName);
 			}
 		} else {
-			IOUtils.infoBox(Messages.getString("EmptyProjectErrorMessage.text"),
-					Messages.getString("EmptyProjectErrorMessage.title"));
+			IOUtils.infoBox(Localization.getString("EmptyProjectErrorMessage.text"),
+					Localization.getString("EmptyProjectErrorMessage.title"));
 		}
 	}
 }

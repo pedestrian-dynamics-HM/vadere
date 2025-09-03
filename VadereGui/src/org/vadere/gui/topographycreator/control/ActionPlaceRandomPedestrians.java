@@ -2,7 +2,7 @@ package org.vadere.gui.topographycreator.control;
 
 import org.apache.commons.math3.distribution.BinomialDistribution;
 import org.jetbrains.annotations.NotNull;
-import org.vadere.gui.components.utils.Messages;
+import org.vadere.gui.components.utils.Localization;
 import org.vadere.gui.projectview.view.VDialogManager;
 import org.vadere.gui.topographycreator.model.AgentWrapper;
 import org.vadere.gui.topographycreator.model.IDrawPanelModel;
@@ -140,11 +140,11 @@ public class ActionPlaceRandomPedestrians extends TopographyAction {
 
 	private void showWarning(int numOfPeds, int createdPeds) {
 		String message = String.format("%s: %d\n%s: %d",
-				Messages.getString("TopographyCreator.PlaceRandomPedestrians.couldNotPlaceAllPeds.requested.text"), numOfPeds,
-				Messages.getString("TopographyCreator.PlaceRandomPedestrians.couldNotPlaceAllPeds.placed.text"), createdPeds);
+				Localization.getString("TopographyCreator.PlaceRandomPedestrians.couldNotPlaceAllPeds.requested.text"), numOfPeds,
+				Localization.getString("TopographyCreator.PlaceRandomPedestrians.couldNotPlaceAllPeds.placed.text"), createdPeds);
 
 		VDialogManager.showWarning(
-				Messages.getString("TopographyCreator.PlaceRandomPedestrians.couldNotPlaceAllPeds.title"),
+				Localization.getString("TopographyCreator.PlaceRandomPedestrians.couldNotPlaceAllPeds.title"),
 				message
 		);
 	}

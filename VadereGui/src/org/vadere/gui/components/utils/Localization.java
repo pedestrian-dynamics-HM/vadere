@@ -7,13 +7,9 @@ import org.vadere.util.lang.BundleManager;
 import javax.swing.*;
 import java.util.Locale;
 
-/**
- * Messages class used in localization.
- * 
- */
-public class Messages {
+public class Localization {
 
-	private static final String BUNDLE_NAME = "messages";
+	private static final String BUNDLE_NAME = "localization";
 
 	public static String getString(String key) {
 		return BundleManager.instance().getString(BUNDLE_NAME, key);

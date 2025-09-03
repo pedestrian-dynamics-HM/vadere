@@ -1,7 +1,7 @@
 package org.vadere.gui.topographycreator.control;
 
 
-import org.vadere.gui.components.utils.Messages;
+import org.vadere.gui.components.utils.Localization;
 import org.vadere.gui.components.utils.ResourceStrings;
 import org.vadere.gui.components.utils.Resources;
 import org.vadere.util.config.VadereConfig;
@@ -30,7 +30,7 @@ public class ActionUndo extends AbstractAction {
 
 	public ActionUndo(UndoManager undoManager, final TopographyAction action) {
 		super("undo",Resources.getInstance("global").getIconSVG(ICONS_UNDO_ICON_PNG,ICON_SIZE,ICON_SIZE));
-		putValue(SHORT_DESCRIPTION, Messages.getString(ResourceStrings.TOPOGRAPHY_CREATOR_BTN_UNDO_TOOLTIP));
+		putValue(SHORT_DESCRIPTION, Localization.getString(ResourceStrings.TOPOGRAPHY_CREATOR_BTN_UNDO_TOOLTIP));
 		this.undoManager = undoManager;
 		this.action = action;
 	}

@@ -1,7 +1,7 @@
 package org.vadere.gui.projectview.control;
 
 
-import org.vadere.gui.components.utils.Messages;
+import org.vadere.gui.components.utils.Localization;
 import org.vadere.gui.projectview.model.ProjectViewModel;
 import org.vadere.gui.projectview.view.ProjectView;
 import org.vadere.gui.projectview.view.VDialogManager;
@@ -30,9 +30,9 @@ public class ActionSeeDiscardChanges extends AbstractAction {
 		int[] selectedRows = scenarioTable.getSelectedRows();
 
 		Object[] options = {
-				Messages.getString("ActionSeeDiscardChanges.saveChanges.title"),
-				Messages.getString("ActionSeeDiscardChanges.discardChanges.title"),
-				Messages.getString("ActionSeeDiscardChanges.cancel.title")
+				Localization.getString("ActionSeeDiscardChanges.saveChanges.title"),
+				Localization.getString("ActionSeeDiscardChanges.discardChanges.title"),
+				Localization.getString("ActionSeeDiscardChanges.cancel.title")
 		};
 
 		String singularPlural = "singular";
@@ -42,11 +42,11 @@ public class ActionSeeDiscardChanges extends AbstractAction {
 		int choice = JOptionPane.showOptionDialog(
 				ProjectView.getMainWindow(),
 				VDialogManager.getPanelWithBodyAndTextArea("<html>" +
-						Messages.getString("ActionSeeDiscardChanges.changes." + singularPlural + ".text")
+						Localization.getString("ActionSeeDiscardChanges.changes." + singularPlural + ".text")
 								.replace("%VAR%", String.valueOf(selectedRows.length))
 						+
 						":<br><br></html>", model.getDiffOfSelectedScenarios(selectedRows)),
-				Messages.getString("ActionSeeDiscardChanges.popup.title"),
+				Localization.getString("ActionSeeDiscardChanges.popup.title"),
 				JOptionPane.YES_NO_CANCEL_OPTION,
 				JOptionPane.INFORMATION_MESSAGE, null, options, options[2]);
 

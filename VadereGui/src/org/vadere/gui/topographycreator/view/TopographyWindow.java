@@ -4,7 +4,7 @@ import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.components.control.*;
-import org.vadere.gui.components.utils.Messages;
+import org.vadere.gui.components.utils.Localization;
 import org.vadere.gui.components.utils.ResourceStrings;
 import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.components.view.InfoPanel;
@@ -209,32 +209,32 @@ public class TopographyWindow extends JPanel {
 				ScenarioElementType.MEASUREMENT_AREA, selectRectangleAction);
 
 		/* subtract obstacles from measurementArea */
-		Action subtractMeasurementAreaAction = new ActionSubtractMeasurementArea(Messages.getString("TopographyCreator.btnSubtractMeasurementArea.label"), ICONS_SUBTRACT_PNG, panelModel, undoSupport);
+		Action subtractMeasurementAreaAction = new ActionSubtractMeasurementArea(Localization.getString("TopographyCreator.btnSubtractMeasurementArea.label"), ICONS_SUBTRACT_PNG, panelModel, undoSupport);
 
 		/* Place Random Pedestrians */
-		Action placeRandomPedestrians = new ActionPlaceRandomPedestrians(Messages.getString(
+		Action placeRandomPedestrians = new ActionPlaceRandomPedestrians(Localization.getString(
 				"TopographyCreator.PlaceRandomPedestrians.label"), ICONS_PEDESTRIANS_RND_ICON_PNG, panelModel, undoSupport);
 
 		/* list of actions for the sub-dialog */
 		Action pen = new ActionSwitchSelectionMode(
-				Messages.getString("TopographyCreator.btnConvexHull.label"),
+				Localization.getString("TopographyCreator.btnConvexHull.label"),
 				"convex_hull",
 				"",
 				panelModel, new DrawConvexHullMode(panelModel,
 				undoSupport),
 				basicAction);
 		Action pen2 = new ActionSwitchSelectionMode(
-				Messages.getString("TopographyCreator.btnSimplePolygon.label"),
+				Localization.getString("TopographyCreator.btnSimplePolygon.label"),
 				"simple_polygon","", panelModel, new DrawSimplePolygonMode(panelModel,
 				undoSupport),
 				basicAction);
 		Action rectangle = new ActionSwitchSelectionMode(
-				Messages.getString("TopographyCreator.btnRectangle.label"),
+				Localization.getString("TopographyCreator.btnRectangle.label"),
 				"paint_rectangle","", panelModel, new DrawRectangleMode(
 				panelModel, undoSupport),
 				basicAction);
 		Action dot = new ActionSwitchSelectionMode(
-				Messages.getString("TopographyCreator.btnCircle.label"),
+				Localization.getString("TopographyCreator.btnCircle.label"),
 				"paint_circle","", panelModel, new DrawDotMode(panelModel,
 				undoSupport),
 				basicAction);
