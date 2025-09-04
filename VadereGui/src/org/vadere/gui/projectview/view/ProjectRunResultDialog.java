@@ -9,7 +9,7 @@ import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.StandardXYBarPainter;
 import org.jfree.chart.renderer.xy.XYBarRenderer;
 import org.jfree.data.statistics.HistogramDataset;
-import org.vadere.gui.components.utils.Messages;
+import org.vadere.gui.components.utils.Localization;
 import org.vadere.gui.projectview.model.ProjectViewModel;
 import org.vadere.simulator.projects.ProjectFinishedListener;
 import org.vadere.simulator.projects.SimulationResult;
@@ -26,8 +26,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
-import org.jfree.data.xy.DefaultXYDataset;
-import org.jfree.data.xy.XYDataset;
+
 import org.jfree.chart.ChartPanel;
 
 import javax.swing.*;
@@ -149,9 +148,9 @@ public class ProjectRunResultDialog implements ProjectFinishedListener {
 
 
 
-            btnOk = new Button(Messages.getString("SettingsDialog.btnClose.text"));
+            btnOk = new Button(Localization.getString("SettingsDialog.btnClose.text"));
             btnOk.addActionListener(this::btnOKListener);
-            btnCsv = new Button(Messages.getString("ProjectView.btnExpertCSV"));
+            btnCsv = new Button(Localization.getString("ProjectView.btnExpertCSV"));
             btnPane = new JPanel();
             btnCsv.addActionListener(this::btnCsvListener);
             btnPane.setLayout(new BoxLayout(btnPane, BoxLayout.LINE_AXIS));
@@ -164,7 +163,7 @@ public class ProjectRunResultDialog implements ProjectFinishedListener {
             c.add(main_panel, BorderLayout.CENTER);
             c.add(btnPane, BorderLayout.PAGE_END);
 
-            setTitle(Messages.getString("ProjectView.label.simResults"));
+            setTitle(Localization.getString("ProjectView.label.simResults"));
             setSize(600, 400);
 
         }
@@ -277,7 +276,7 @@ public class ProjectRunResultDialog implements ProjectFinishedListener {
             SimulationResult.addCsvHeader(data.getFirst(), sj, ';');
             data.forEach(simulationResult -> simulationResult.addCsvRow(sj, ';'));
 
-            FileDialog fd = new FileDialog(this, Messages.getString("ProjectView.chooseFile"), FileDialog.SAVE);
+            FileDialog fd = new FileDialog(this, Localization.getString("ProjectView.chooseFile"), FileDialog.SAVE);
 
             fd.setVisible(true);
             Path p = (Paths.get(fd.getDirectory()).resolve(fd.getFile()));

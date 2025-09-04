@@ -1,6 +1,6 @@
 package org.vadere.gui.projectview.model;
 
-import org.vadere.gui.components.utils.Messages;
+import org.vadere.gui.components.utils.Localization;
 
 public enum VadereResult {
 	SUCCESSFUL, FAILED, UNAVAILABLE;
@@ -9,11 +9,11 @@ public enum VadereResult {
 	public String toString() {
 		switch (this) {
 			case SUCCESSFUL:
-				return Messages.getString("Successful.text");
+				return Localization.getString("Successful.text");
 			case FAILED:
-				return Messages.getString("Failed.text");
+				return Localization.getString("Failed.text");
 			case UNAVAILABLE:
-				return Messages.getString("Unavailable.text");
+				return Localization.getString("Unavailable.text");
 			default:
 				return this.toString();
 		}

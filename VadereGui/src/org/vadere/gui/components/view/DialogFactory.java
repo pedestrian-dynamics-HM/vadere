@@ -4,9 +4,7 @@ import javax.swing.*;
 
 import org.vadere.gui.components.model.DefaultSimulationConfig;
 import org.vadere.gui.components.model.SimulationModel;
-import org.vadere.gui.components.utils.Messages;
-import org.vadere.gui.components.utils.SwingUtils;
-import org.vadere.gui.components.view.SettingsDialog;
+import org.vadere.gui.components.utils.Localization;
 import org.vadere.gui.postvisualization.model.PostvisualizationModel;
 
 import java.awt.*;
@@ -17,7 +15,7 @@ public class DialogFactory {
 	private static SettingsDialog settingsDialog;
 
 	public static JFrame createLoadingDialog() {
-		final JFrame frame = new JFrame(Messages.getString("LoadingDialog.title"));
+		final JFrame frame = new JFrame(Localization.getString("LoadingDialog.title"));
 		final JProgressBar progressBar = new JProgressBar();
 		progressBar.setIndeterminate(true);
 		final JPanel contentPane = new JPanel();

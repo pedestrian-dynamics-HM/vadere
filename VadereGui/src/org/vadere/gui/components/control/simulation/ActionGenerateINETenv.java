@@ -4,7 +4,7 @@ package org.vadere.gui.components.control.simulation;
 import org.apache.commons.configuration2.Configuration;
 import org.vadere.gui.components.model.DefaultSimulationConfig;
 import org.vadere.gui.components.model.SimulationModel;
-import org.vadere.gui.components.utils.Messages;
+import org.vadere.gui.components.utils.Localization;
 import org.vadere.gui.components.view.SimulationRenderer;
 import org.vadere.gui.onlinevisualization.view.IRendererChangeListener;
 import org.vadere.gui.postvisualization.utils.InetEnvironmentGenerator;
@@ -40,7 +40,7 @@ public class ActionGenerateINETenv extends AbstractAction implements IRendererCh
 		String formattedDate = formatter.format(todaysDate);
 
 		JFileChooser fileChooser = new JFileChooser(VadereConfig.getConfig().getString("SettingsDialog.snapshotDirectory.path", "."));
-		File outputFile = new File(Messages.getString("FileDialog.filenamePrefix") + formattedDate + ".xml");
+		File outputFile = new File(Localization.getString("FileDialog.filenamePrefix") + formattedDate + ".xml");
 
 		fileChooser.setSelectedFile(outputFile);
 

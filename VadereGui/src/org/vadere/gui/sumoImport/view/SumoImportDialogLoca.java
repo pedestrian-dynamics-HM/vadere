@@ -1,21 +1,21 @@
 package org.vadere.gui.sumoImport.view;
 
-import org.vadere.gui.components.utils.Messages;
+import org.vadere.gui.components.utils.Localization;
 import org.vadere.gui.sumoImport.model.data.SumoImportObjectFlag;
 import org.vadere.gui.sumoImport.model.data.SumoObjectType;
 import org.vadere.util.importSumo.settings.SumoInvertGroup;
 
 public class SumoImportDialogLoca {
-    public final String add = Messages.getString("Add.text");
-    public final String edit = Messages.getString("Edit.text");
-    public final String invertGroup = Messages.getString("SumoImport.Enum.InvertGroup");
-    public final String scenarioElements = Messages.getString("SumoImport.ScenarioElements.text");
-    public final String popupSelectScenarioElementTitle = Messages.getString("SumoImport.Popup.SelectScenarioElement.title ");
+    public final String add = Localization.getString("Add.text");
+    public final String edit = Localization.getString("Edit.text");
+    public final String invertGroup = Localization.getString("SumoImport.Enum.InvertGroup");
+    public final String scenarioElements = Localization.getString("SumoImport.ScenarioElements.text");
+    public final String popupSelectScenarioElementTitle = Localization.getString("SumoImport.Popup.SelectScenarioElement.title ");
 
     public String translate(SumoImportObjectFlag flag) {
         switch (flag) {
             case Obstacle:
-                return Messages.getString("SumoImport.Enum.SumoImportObjectFlag.Obstacle");
+                return Localization.getString("SumoImport.Enum.SumoImportObjectFlag.Obstacle");
             default:
                 throw new IllegalStateException("Unknown importObjectFlag " + flag);
         }
@@ -24,19 +24,19 @@ public class SumoImportDialogLoca {
     public String translate(SumoObjectType sumoObjectType) {
         switch (sumoObjectType) {
             case Roads:
-                return Messages.getString("SumoImport.Enum.SumoObjectType.Roads");
+                return Localization.getString("SumoImport.Enum.SumoObjectType.Roads");
             case RoadJunctions:
-                return Messages.getString("SumoImport.Enum.SumoObjectType.RoadJunctions");
+                return Localization.getString("SumoImport.Enum.SumoObjectType.RoadJunctions");
             case RoadJunctionsWithoutCrossings:
-                return Messages.getString("SumoImport.Enum.SumoObjectType.RoadJunctionsWithoutCrossings");
+                return Localization.getString("SumoImport.Enum.SumoObjectType.RoadJunctionsWithoutCrossings");
             case Structures:
-                return  Messages.getString("SumoImport.Enum.SumoObjectType.Structures");
+                return  Localization.getString("SumoImport.Enum.SumoObjectType.Structures");
             case PedestrianWalkways:
-                return  Messages.getString("SumoImport.Enum.SumoObjectType.PedestrianWalkways");
+                return  Localization.getString("SumoImport.Enum.SumoObjectType.PedestrianWalkways");
             case PedestrianWalkingAreas:
-                return  Messages.getString("SumoImport.Enum.SumoObjectType.PedestrianWalkingAreas");
+                return  Localization.getString("SumoImport.Enum.SumoObjectType.PedestrianWalkingAreas");
             case PedestrianRoadCrossings:
-                return  Messages.getString("SumoImport.Enum.SumoObjectType.PedestrianRoadCrossings");
+                return  Localization.getString("SumoImport.Enum.SumoObjectType.PedestrianRoadCrossings");
             default:
                 throw new IllegalStateException("Unknown SumoObjectType " + sumoObjectType);
         }

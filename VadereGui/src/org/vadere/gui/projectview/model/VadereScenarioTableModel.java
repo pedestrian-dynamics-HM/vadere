@@ -1,7 +1,7 @@
 package org.vadere.gui.projectview.model;
 
 
-import org.vadere.gui.components.utils.Messages;
+import org.vadere.gui.components.utils.Localization;
 import org.vadere.simulator.projects.Scenario;
 import org.vadere.simulator.projects.VadereProject;
 import org.vadere.util.logging.Logger;
@@ -43,8 +43,8 @@ public class VadereScenarioTableModel extends VadereTableModelSorted<VadereScena
 
 	VadereScenarioTableModel() {
 		super(new String[] {
-				Messages.getString("ProjectView.testTable.test.text"),
-				Messages.getString("ProjectView.testTable.state.text")}, 0,
+				Localization.getString("ProjectView.testTable.test.text"),
+				Localization.getString("ProjectView.testTable.state.text")}, 0,
 				(v1, v2) -> v1.scenarioRM.getName().compareTo(v2.scenarioRM.getName()));
 	}
 

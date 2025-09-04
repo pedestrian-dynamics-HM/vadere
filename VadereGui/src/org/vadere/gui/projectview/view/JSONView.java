@@ -4,7 +4,7 @@ package org.vadere.gui.projectview.view;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rsyntaxtextarea.Theme;
-import org.vadere.gui.components.utils.Messages;
+import org.vadere.gui.components.utils.Localization;
 import org.vadere.gui.components.utils.Resources;
 import org.vadere.util.logging.Logger;
 
@@ -47,9 +47,9 @@ public class JSONView extends JPanel {
 		JScrollPane scrollPane = new JScrollPane(txtrTextfiletextarea);
 		add(scrollPane, BorderLayout.CENTER);
 
-		lbljsoninvalid = new JLabel(Messages.getString("TextView.lbljsoninvalid.text"));
+		lbljsoninvalid = new JLabel(Localization.getString("TextView.lbljsoninvalid.text"));
 		lbljsoninvalid.setIcon(new ImageIcon(Resources.class.getResource("/icons/Error.gif")));
-		lbljsonvalid = new JLabel(Messages.getString("TextView.lbljsonvalid.text"));
+		lbljsonvalid = new JLabel(Localization.getString("TextView.lbljsonvalid.text"));
 		lbljsonvalid.setIcon(new ImageIcon(Resources.class.getResource("/icons/Inform.gif")));
 
 		panelTop.add(lbljsoninvalid);

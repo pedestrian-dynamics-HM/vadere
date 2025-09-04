@@ -1,6 +1,6 @@
 package org.vadere.gui.topographycreator.view;
 
-import org.vadere.gui.components.utils.Messages;
+import org.vadere.gui.components.utils.Localization;
 import org.vadere.gui.projectview.view.ProjectView;
 
 import javax.swing.*;
@@ -171,9 +171,9 @@ public class ActionRandomPedestrianDialog {
 
 	private void createTargetRadioButtons() {
 
-		rbTargetEmpty = new JRadioButton(Messages.getString("TopographyCreator.PlaceRandomPedestrians.targetEmptyOption.label"), true);
-		rbTargetRandom = new JRadioButton(Messages.getString("TopographyCreator.PlaceRandomPedestrians.targetRandomOption.label"), false);
-		rbTargetUseList = new JRadioButton(Messages.getString("TopographyCreator.PlaceRandomPedestrians.targetListOption.label"), false);
+		rbTargetEmpty = new JRadioButton(Localization.getString("TopographyCreator.PlaceRandomPedestrians.targetEmptyOption.label"), true);
+		rbTargetRandom = new JRadioButton(Localization.getString("TopographyCreator.PlaceRandomPedestrians.targetRandomOption.label"), false);
+		rbTargetUseList = new JRadioButton(Localization.getString("TopographyCreator.PlaceRandomPedestrians.targetListOption.label"), false);
 		targetsField.setEditable(false);
 
 		ButtonGroup buttonGroupTarget = new ButtonGroup();
@@ -312,7 +312,7 @@ public class ActionRandomPedestrianDialog {
 		int returnValue = JOptionPane.showConfirmDialog(
 				ProjectView.getMainWindow(),
 				panelWindow,
-				Messages.getString("TopographyCreator.PlaceRandomPedestrians.label"),
+				Localization.getString("TopographyCreator.PlaceRandomPedestrians.label"),
 				JOptionPane.OK_CANCEL_OPTION);
 
 		return returnValue == JOptionPane.OK_OPTION;

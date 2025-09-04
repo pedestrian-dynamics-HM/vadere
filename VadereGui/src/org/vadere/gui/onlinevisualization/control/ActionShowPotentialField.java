@@ -3,7 +3,7 @@ package org.vadere.gui.onlinevisualization.control;
 
 import org.vadere.gui.components.model.DefaultSimulationConfig;
 import org.vadere.gui.components.model.SimulationModel;
-import org.vadere.gui.components.utils.Messages;
+import org.vadere.gui.components.utils.Localization;
 import org.vadere.gui.components.view.SimulationRenderer;
 import org.vadere.gui.onlinevisualization.view.IRendererChangeListener;
 import org.vadere.util.logging.Logger;
@@ -28,13 +28,13 @@ public class ActionShowPotentialField extends AbstractAction implements IRendere
     public void actionPerformed(ActionEvent e) {
 
 	    String[] possibilities = {
-	    		Messages.getString("OnlineVis.msgDialogShowPotentialfield.target"),
-			    Messages.getString("OnlineVis.msgDialogShowPotentialfield.overall"),
-			    Messages.getString("OnlineVis.msgDialogShowPotentialfield.none")};
+	    		Localization.getString("OnlineVis.msgDialogShowPotentialfield.target"),
+			    Localization.getString("OnlineVis.msgDialogShowPotentialfield.overall"),
+			    Localization.getString("OnlineVis.msgDialogShowPotentialfield.none")};
 	    String s = (String)JOptionPane.showInputDialog(
 			    null,
-			    Messages.getString("OnlineVis.msgDialogShowPotentialfield.text"),
-			    Messages.getString("OnlineVis.msgDialogShowPotentialfield.title"),
+			    Localization.getString("OnlineVis.msgDialogShowPotentialfield.text"),
+			    Localization.getString("OnlineVis.msgDialogShowPotentialfield.title"),
 			    JOptionPane.PLAIN_MESSAGE,
 			    null,
 			    possibilities,

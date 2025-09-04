@@ -4,7 +4,7 @@ import org.vadere.util.lang.BundleManager;
 
 import java.util.Locale;
 
-public class Messages {
+public class SimulatorLocalization {
 
 	private static final String BUNDLE_NAME = "i18n_simulation";
 
