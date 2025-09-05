@@ -182,7 +182,9 @@ public class PopupScenarioElementTypesCellEditor extends AbstractCellEditor impl
     }
 
     private void removeSelectedItems(JList<ScenarioElementType> jList) {
-        for (int selectedIndex : jList.getSelectedIndices()) {
+        int[] selectedIndices = jList.getSelectedIndices();
+        for (int i = selectedIndices.length - 1; i >= 0; i--) {
+            int selectedIndex = selectedIndices[i];
             values.remove(selectedIndex);
             listModel.remove(selectedIndex);
         }
