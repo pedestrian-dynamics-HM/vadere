@@ -8,17 +8,18 @@ import org.vadere.util.logging.Logger;
 
 import javax.swing.*;
 import java.awt.*;
+import java.text.MessageFormat;
 
 public class SumoImportDialog extends JDialog {
     private static final Logger logger = Logger.getLogger(SumoImportDialog.class);
-    private SumoImportDialogLoca loca = new SumoImportDialogLoca();
+    private static final SumoImportDialogLoca loca = new SumoImportDialogLoca();
 
     private static final SumoImportSettingsPanel basicSettingsPanel = new SumoImportSettingsPanel();
     private static final SumoAdvancedSettingsPanel advancedImportSettingsPanel = new SumoAdvancedSettingsPanel();;
     private final SumoImportDialogControl control;
 
     public SumoImportDialog(Frame owner, SumoImportDialogControl control) {
-        super(owner, "Import Sumo", true);
+        super(owner, loca.popupTitle, true);
         this.control = control;
 
         createUIElements();
@@ -29,8 +30,8 @@ public class SumoImportDialog extends JDialog {
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
         JTabbedPane tabbedPane = new JTabbedPane();
-        tabbedPane.addTab("Import Settings", basicSettingsPanel);
-        tabbedPane.addTab("Advanced Settings", advancedImportSettingsPanel);
+        tabbedPane.addTab(loca.tabImportSettings, basicSettingsPanel);
+        tabbedPane.addTab(loca.tabAdvancedSettings, advancedImportSettingsPanel);
         add(tabbedPane, BorderLayout.CENTER);
         add(createSubmitButton(), BorderLayout.SOUTH);
 
@@ -40,7 +41,7 @@ public class SumoImportDialog extends JDialog {
 
     @NotNull
     private JButton createSubmitButton() {
-        JButton submitButton = new JButton("Start Import");
+        JButton submitButton = new JButton(loca.startImport);
         submitButton.addActionListener(e -> {
             try {
                 submitButton.setEnabled(false);
@@ -51,8 +52,8 @@ public class SumoImportDialog extends JDialog {
                 logger.error("Failed to parse sumo files", ex);
                 JOptionPane.showMessageDialog(
                         null,
-                        "An error occurred: " + ex.getMessage() + " (see logs for more details)",
-                        "Error",
+                        MessageFormat.format(loca.importErrorMessageDialog, ex.getMessage()),
+                        loca.importErrorMessageDialogTitle,
                         JOptionPane.ERROR_MESSAGE
                 );
                 submitButton.setEnabled(true);

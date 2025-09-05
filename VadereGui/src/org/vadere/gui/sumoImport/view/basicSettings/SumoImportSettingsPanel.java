@@ -19,22 +19,22 @@ import java.util.Vector;
 
 public class SumoImportSettingsPanel extends JPanel {
     private SumoImportDialogLoca loca =  new SumoImportDialogLoca();
-    private final SumoSettingsTableModel model = new SumoSettingsTableModel();
-    private final JTable table = new JTable(model);
+    private final SumoSettingsTableModel tableModel = new SumoSettingsTableModel();
+    private final JTable table = new JTable(tableModel);
     private JButton removeSettingButton;
 
     public SumoImportSettingsPanel() {
-        prepopulateSettings();
+        prepopulateDefaultSettings();
         createImportSettingsPanel();
-        model.setCellEditorsOn(table);
+        tableModel.setCellEditorsOn(table);
         addDeleteKeyListener(table);
     }
 
-    private void prepopulateSettings() {
-        model.addSetting(new SumoObjectImportSetting(SumoObjectType.PedestrianWalkways).setTargetInvertGroup(SumoInvertGroup.InvertGroup1));
-        model.addSetting(new SumoObjectImportSetting(SumoObjectType.PedestrianRoadCrossings).setTargetInvertGroup(SumoInvertGroup.InvertGroup1));
-        model.addSetting(new SumoObjectImportSetting(SumoObjectType.PedestrianWalkingAreas).setTargetInvertGroup(SumoInvertGroup.InvertGroup1));
-        model.addSetting(new SumoObjectImportSetting(SumoInvertGroup.InvertGroup1).addFlag(SumoImportObjectFlag.Obstacle));
+    private void prepopulateDefaultSettings() {
+        tableModel.addSetting(new SumoObjectImportSetting(SumoObjectType.PedestrianWalkways).setTargetInvertGroup(SumoInvertGroup.InvertGroup1));
+        tableModel.addSetting(new SumoObjectImportSetting(SumoObjectType.PedestrianRoadCrossings).setTargetInvertGroup(SumoInvertGroup.InvertGroup1));
+        tableModel.addSetting(new SumoObjectImportSetting(SumoObjectType.PedestrianWalkingAreas).setTargetInvertGroup(SumoInvertGroup.InvertGroup1));
+        tableModel.addSetting(new SumoObjectImportSetting(SumoInvertGroup.InvertGroup1).addFlag(SumoImportObjectFlag.Obstacle));
     }
 
     private void createImportSettingsPanel() {
@@ -84,11 +84,36 @@ public class SumoImportSettingsPanel extends JPanel {
     private JComboBox<String> createAddSettingDropdown() {
         Vector<String> elements = new Vector<>();
         elements.add("");
-        elements.addAll(Arrays.stream(SumoObjectType.values()).map(loca::translate).toList());
+        elements.addAll(Arrays.stream(SumoObjectType.values()).map(Enum::name).toList());
         elements.add("");
-        elements.addAll(Arrays.stream(SumoInvertGroup.values()).map(loca::translate).toList());
+        elements.addAll(Arrays.stream(SumoInvertGroup.values()).map(Enum::name).toList());
 
         JComboBox<String> addObjectTypeDropdown = new JComboBox<>(elements);
+
+        addObjectTypeDropdown.setRenderer(new DefaultListCellRenderer(){
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                JLabel label = (JLabel) super.getListCellRendererComponent(
+                        list, value, index, isSelected, cellHasFocus);
+
+                if (!(value instanceof String valueString)) {
+                    return label;
+                }
+
+                SumoObjectType objectType = SumoObjectType.getOrNull(valueString);
+                if (objectType != null) {
+                    label.setText(loca.translate(objectType));
+                }
+
+                SumoInvertGroup invertGroup = SumoInvertGroup.getOrNull(valueString);
+                if (invertGroup != null) {
+                    label.setText(loca.translate(invertGroup));
+                }
+
+                return label;
+            }
+        });
+
         addObjectTypeDropdown.addPopupMenuListener(new PopupMenuListener() {
 
             @Override
@@ -105,13 +130,13 @@ public class SumoImportSettingsPanel extends JPanel {
                 SumoObjectType objectType = SumoObjectType.getOrNull(selected);
                 if (objectType != null) {
                     SumoObjectImportSetting setting = new SumoObjectImportSetting(objectType);
-                    model.addSetting(setting);
+                    tableModel.addSetting(setting);
                 }
 
                 SumoInvertGroup invertGroup = SumoInvertGroup.getOrNull(selected);
                 if (invertGroup != null) {
                     SumoObjectImportSetting setting = new SumoObjectImportSetting(invertGroup);
-                    model.addSetting(setting);
+                    tableModel.addSetting(setting);
                 }
             }
 
@@ -140,7 +165,7 @@ public class SumoImportSettingsPanel extends JPanel {
 
         for (int i = selectedIndices.length - 1; i >= 0; i--) {
             int selectedIndex = selectedIndices[i];
-            model.removeSetting(selectedIndex);
+            tableModel.removeSetting(selectedIndex);
         }
     }
 
@@ -149,6 +174,6 @@ public class SumoImportSettingsPanel extends JPanel {
     }
 
     public List<SumoObjectImportSetting> getImportSettings(){
-        return model.getImportSettings();
+        return tableModel.getImportSettings();
     }
 }

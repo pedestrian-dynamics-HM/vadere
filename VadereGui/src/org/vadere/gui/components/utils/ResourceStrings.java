@@ -1,6 +1,31 @@
 package org.vadere.gui.components.utils;
 
 public final class ResourceStrings {
+    public static class ScenarioElementType {
+        public static final String SOURCE = "ScenarioElement.Source.text";
+        public static final String SOURCE_WITH_ENGLISH = "ScenarioElement.Source.withEnglishText";
+        public static final String TARGET = "ScenarioElement.Target.text";
+        public static final String TARGET_WITH_ENGLISH = "ScenarioElement.Target.withEnglishText";
+        public static final String STAIRS = "ScenarioElement.Stairs.text";
+        public static final String STAIRS_WITH_ENGLISH = "ScenarioElement.Stairs.withEnglishText";
+        public static final String OBSTACLE = "ScenarioElement.Obstacle.text";
+        public static final String OBSTACLE_WITH_ENGLISH = "ScenarioElement.Obstacle.withEnglishText";
+        public static final String PEDESTRIAN = "ScenarioElement.Pedestrian.text";
+        public static final String PEDESTRIAN_WITH_ENGLISH = "ScenarioElement.Pedestrian.withEnglishText";
+        public static final String TARGET_CHANGER = "ScenarioElement.TargetChanger.text";
+        public static final String TARGET_CHANGER_WITH_ENGLISH = "ScenarioElement.TargetChanger.withEnglishText";
+        public static final String ABSORBING_AREA = "ScenarioElement.AbsorbingArea.text";
+        public static final String ABSORBING_AREA_WITH_ENGLISH = "ScenarioElement.AbsorbingArea.withEnglishText";
+        public static final String MEASUREMENT_AREA = "ScenarioElement.MeasurementArea.text";
+        public static final String MEASUREMENT_AREA_WITH_ENGLISH = "ScenarioElement.MeasurementArea.withEnglishText";
+        public static final String TELEPORTER = "ScenarioElement.Teleporter.text";
+        public static final String TELEPORTER_WITH_ENGLISH = "ScenarioElement.Teleporter.withEnglishText";
+        public static final String AEROSOL_CLOUD = "ScenarioElement.AerosolCloud.text";
+        public static final String AEROSOL_CLOUD_WITH_ENGLISH = "ScenarioElement.AerosolCloud.withEnglishText";
+        public static final String DROPLETS = "ScenarioElement.Droplets.text";
+        public static final String DROPLETS_WITH_ENGLISH = "ScenarioElement.Droplets.withEnglishText";
+    }
+
     public static final String ICONS_CUT_SELECT = "cut_select";
     public static final String ICONS_OBSTACLE_ICON_PNG = "obstacle";
     public static final String ICONS_TARGET_ICON_PNG = "target";

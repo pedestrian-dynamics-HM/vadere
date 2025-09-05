@@ -1,8 +1,9 @@
 package org.vadere.gui.sumoImport.view.advancedSettings;
 
 import org.vadere.gui.components.utils.Localization;
+import org.vadere.gui.sumoImport.view.SumoImportDialogLoca;
 
-class SumoAdvancedSettingsLoca {
+class SumoAdvancedSettingsLoca extends SumoImportDialogLoca {
     public final String enabled = Localization.getString("Enabled.text");
     public final String maxAngle = Localization.getString("SumoImport.AdvancedSettings.maxAngle.text");
     public final String maxCrosswalkSnapAngle = Localization.getString("SumoImport.AdvancedSettings.maxCrosswalkSnapAngle.tooltip");

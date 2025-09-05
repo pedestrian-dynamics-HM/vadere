@@ -1,6 +1,7 @@
 package org.vadere.gui.sumoImport.view.basicSettings;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.jetbrains.annotations.NotNull;
+import org.vadere.gui.components.utils.LocalizedStrings;
 import org.vadere.gui.sumoImport.view.SumoImportDialogLoca;
 import org.vadere.state.attributes.AttributesScenarioElement;
 import org.vadere.state.attributes.scenario.AttributesMeasurementArea;
@@ -17,6 +18,7 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
 public class PopupScenarioElementTypesCellEditor extends AbstractCellEditor implements TableCellEditor {
     private SumoImportDialogLoca loca = new SumoImportDialogLoca();
@@ -40,6 +42,21 @@ public class PopupScenarioElementTypesCellEditor extends AbstractCellEditor impl
 
     private void openEditor(Component parent) {
         JList<ScenarioElementType> jList = new JList<>(listModel);
+        jList.setCellRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                // Call super to get default JLabel setup
+                JLabel label = (JLabel) super.getListCellRendererComponent(
+                        list, value, index, isSelected, cellHasFocus);
+
+                if (value instanceof ScenarioElementType elementType) {
+                    // Call your translate method here
+                    label.setText(LocalizedStrings.getScenarioElementWithEnglish(elementType));
+                }
+
+                return label;
+            }
+        });
         addDeleteKeyListener(jList);
 
         JScrollPane scrollPane = new JScrollPane(jList);
@@ -96,11 +113,36 @@ public class PopupScenarioElementTypesCellEditor extends AbstractCellEditor impl
 
     @NotNull
     private JComboBox<ScenarioElementType> createScenarioElementDropdown() {
-        ScenarioElementType[] scenarioElements = Arrays.stream(ScenarioElementType.values())
-                .filter(scenarioElementType -> scenarioElementType!=ScenarioElementType.OBSTACLE)
-                .toArray(ScenarioElementType[]::new);
+        ScenarioElementType[] scenarioElements = Stream.concat(
+                Stream.of((ScenarioElementType) null),
+                Arrays.stream(ScenarioElementType.values())
+                        .filter(scenarioElementType -> scenarioElementType != ScenarioElementType.OBSTACLE)
+        ).toArray(ScenarioElementType[]::new);
         JComboBox<ScenarioElementType> comboBox = new JComboBox<>(scenarioElements);
-        comboBox.addPopupMenuListener(new  PopupMenuListener() {
+
+        comboBox.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(
+                    JList<?> list,
+                    Object value,
+                    int index,
+                    boolean isSelected,
+                    boolean cellHasFocus) {
+
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+
+                if (value == null) {
+                    setText(" ");
+                } else {
+                    ScenarioElementType type = (ScenarioElementType) value;
+                    setText(LocalizedStrings.getScenarioElementWithEnglish(type));
+                }
+
+                return this;
+            }
+        });
+
+        comboBox.addPopupMenuListener(new PopupMenuListener() {
 
             @Override
             public void popupMenuWillBecomeVisible(PopupMenuEvent popupMenuEvent) {

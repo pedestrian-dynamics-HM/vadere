@@ -1,6 +1,7 @@
 package org.vadere.gui.sumoImport.view.basicSettings;
 
 import org.jetbrains.annotations.NotNull;
+import org.vadere.gui.components.utils.LocalizedStrings;
 import org.vadere.gui.sumoImport.model.data.SumoImportObjectFlag;
 import org.vadere.gui.sumoImport.view.SumoImportDialogLoca;
 import org.vadere.util.importSumo.settings.SumoInvertGroup;
@@ -33,6 +34,24 @@ public class SumoSettingsTableModel extends AbstractTableModel {
 
         TableColumn elementTypeSelectionColumn = jTable.getColumnModel().getColumn(scenarioElementTypeColumnIndex);
         elementTypeSelectionColumn.setCellEditor(new PopupScenarioElementTypesCellEditor(loca.popupSelectScenarioElementTitle));
+        elementTypeSelectionColumn.setCellRenderer(new DefaultTableCellRenderer(){
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                JLabel label = (JLabel) super.getTableCellRendererComponent(
+                        table, value, isSelected, hasFocus, row, column);
+
+                if (value instanceof List<?>) {
+                    List<ScenarioElementType> elements = (List<ScenarioElementType>) value;
+                    String displayText = elements.stream()
+                            .map(LocalizedStrings::getScenarioElement)
+                            .reduce((a, b) -> a + ", " + b)
+                            .orElse("");
+                    label.setText("["+displayText+"]");
+                }
+
+                return label;
+            }
+        });
         elementTypeSelectionColumn.setMinWidth(150);
     }
 

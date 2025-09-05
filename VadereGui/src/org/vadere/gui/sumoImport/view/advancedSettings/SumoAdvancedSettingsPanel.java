@@ -67,7 +67,7 @@ public class SumoAdvancedSettingsPanel extends JPanel {
         add(createIncreaseJunctionSizeSettingView());
         add(removeCrossingsFromJunctionsSettings);
         for (SumoInvertGroup invertGroup : SumoInvertGroup.values()) {
-            SumoAdvancedSettingsInvertGroupPanel invertGroupPanel = new SumoAdvancedSettingsInvertGroupPanel(invertGroup.name());
+            SumoAdvancedSettingsInvertGroupPanel invertGroupPanel = new SumoAdvancedSettingsInvertGroupPanel(loca.translate(invertGroup));
             invertGroups.put(invertGroup, invertGroupPanel);
             add(invertGroupPanel);
         }

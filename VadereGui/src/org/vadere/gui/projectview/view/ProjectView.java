@@ -471,7 +471,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						Localization.changeLanguage(Locale.GERMAN);
+						Localization.changeLanguage(Locale.GERMANY);
 					}
 				});
 		mntmLanguageChoiceMenu.add(mntmGermanLocale);
