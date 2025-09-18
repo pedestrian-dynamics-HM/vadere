@@ -249,21 +249,44 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		});
 	}
 
-	private static void checkDependencies(@NotNull final JFrame frame) {
-		try {
-			if (!CLUtils.isOpenCLSupported()) {
-				JOptionPane.showMessageDialog(frame,
-						Messages.getString("ProjectView.warning.opencl.text"),
-						Messages.getString("ProjectView.warning.opencl.title"),
-						JOptionPane.WARNING_MESSAGE);
-			}
-		} catch (UnsatisfiedLinkError linkError) {
-			JOptionPane.showMessageDialog(frame,
-					"[LWJGL]: " + linkError.getMessage(),
-					Messages.getString("ProjectView.warning.lwjgl.title"),
-					JOptionPane.WARNING_MESSAGE);
-		}
-	}
+    private static void showSuppressibleWarning(JFrame frame, String text, String title, String suppress) {
+        if (VadereConfig.getConfig().getBoolean(suppress, false)) {
+            return;
+        }
+
+        JTextArea messageArea = new JTextArea(text);
+        messageArea.setEditable(false);
+        messageArea.setOpaque(false);
+        messageArea.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
+
+        JCheckBox checkToNotShow = new JCheckBox("Don't show this warning again");
+
+        JPanel panel = new JPanel(new BorderLayout(0, 8));
+        panel.add(messageArea, BorderLayout.CENTER);
+        panel.add(checkToNotShow, BorderLayout.SOUTH);
+
+        JOptionPane.showMessageDialog(frame, panel, title, JOptionPane.WARNING_MESSAGE);
+
+        if (checkToNotShow.isSelected()) {
+            VadereConfig.getConfig().setProperty(suppress, true);
+        }
+    }
+
+    private static void checkDependencies(@NotNull final JFrame frame) {
+        try {
+            if (!CLUtils.isOpenCLSupported()) {
+                showSuppressibleWarning(frame,
+                        Messages.getString("ProjectView.warning.opencl.text"),
+                        Messages.getString("ProjectView.warning.opencl.title"),
+                        "Gui.suppressOpenClWarning");
+            }
+        } catch (UnsatisfiedLinkError linkError) {
+            JOptionPane.showMessageDialog(frame,
+                    "[LWJGL]: " + linkError.getMessage(),
+                    Messages.getString("ProjectView.warning.lwjgl.title"),
+                    JOptionPane.WARNING_MESSAGE);
+        }
+    }
 
 	private void openLastUsedProject(final ProjectViewModel model) {
 		String lastUsedProjectPath =
