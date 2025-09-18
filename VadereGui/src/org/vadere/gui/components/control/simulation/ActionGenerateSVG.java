@@ -3,7 +3,7 @@ package org.vadere.gui.components.control.simulation;
 
 import org.vadere.gui.components.model.DefaultSimulationConfig;
 import org.vadere.gui.components.model.SimulationModel;
-import org.vadere.gui.components.utils.Messages;
+import org.vadere.gui.components.utils.Localization;
 import org.vadere.gui.components.view.SimulationRenderer;
 import org.vadere.gui.onlinevisualization.view.IRendererChangeListener;
 import org.vadere.gui.postvisualization.utils.SVGGenerator;
@@ -36,7 +36,7 @@ public class ActionGenerateSVG extends AbstractAction implements IRendererChange
 		String formattedDate = formatter.format(todaysDate);
 
 		JFileChooser fileChooser = new JFileChooser(VadereConfig.getConfig().getString("SettingsDialog.snapshotDirectory.path", "."));
-		File outputFile = new File(Messages.getString("FileDialog.filenamePrefix") + formattedDate + ".svg");
+		File outputFile = new File(Localization.getString("FileDialog.filenamePrefix") + formattedDate + ".svg");
 
 		fileChooser.setSelectedFile(outputFile);
 

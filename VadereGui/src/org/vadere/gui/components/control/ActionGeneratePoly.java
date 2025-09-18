@@ -4,7 +4,7 @@ import org.apache.commons.configuration2.Configuration;
 import org.vadere.gui.components.control.simulation.ActionGeneratePNG;
 import org.vadere.gui.components.model.DefaultModel;
 import org.vadere.gui.components.model.DefaultSimulationConfig;
-import org.vadere.gui.components.utils.Messages;
+import org.vadere.gui.components.utils.Localization;
 import org.vadere.gui.components.utils.ResourceStrings;
 import org.vadere.gui.components.utils.Resources;
 import org.vadere.meshing.mesh.impl.PSLG;
@@ -14,7 +14,6 @@ import org.vadere.util.config.VadereConfig;
 import org.vadere.util.logging.Logger;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -29,8 +28,8 @@ public class ActionGeneratePoly extends AbstractAction {
 	private static final int ICON_SIZE = (int)(VadereConfig.getConfig().getInt("ProjectView.icon.height.value")*VadereConfig.getConfig().getFloat("Gui.scale"));
 
 	public ActionGeneratePoly(final DefaultModel<? extends DefaultSimulationConfig> model) {
-		super(Messages.getString("ProjectView.btnPolySnapshot.tooltip"), RESOURCE.getIconSVG("camera_poly", ICON_SIZE,ICON_SIZE));
-		putValue(SHORT_DESCRIPTION,Messages.getString(ResourceStrings.TOPOGRAPHY_CREATOR_BTN_GENERATE_POLY_TOOLTIP));
+		super(Localization.getString("ProjectView.btnPolySnapshot.tooltip"), RESOURCE.getIconSVG("camera_poly", ICON_SIZE,ICON_SIZE));
+		putValue(SHORT_DESCRIPTION, Localization.getString(ResourceStrings.TOPOGRAPHY_CREATOR_BTN_GENERATE_POLY_TOOLTIP));
 		this.model = model;
 	}
 
@@ -43,7 +42,7 @@ public class ActionGeneratePoly extends AbstractAction {
 		String formattedDate = formatter.format(todaysDate);
 
 
-		File outputFile = new File(Messages.getString("FileDialog.filenamePrefix") + formattedDate + ".poly");
+		File outputFile = new File(Localization.getString("FileDialog.filenamePrefix") + formattedDate + ".poly");
 		fileChooser.setSelectedFile(outputFile);
 
 		int returnVal = fileChooser.showDialog(null, "Save");

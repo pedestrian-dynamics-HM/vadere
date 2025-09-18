@@ -3,7 +3,7 @@ package org.vadere.gui.projectview.model;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.components.control.ActionScenarioChecker;
-import org.vadere.gui.components.utils.Messages;
+import org.vadere.gui.components.utils.Localization;
 import org.vadere.gui.projectview.control.IOutputFileRefreshListener;
 import org.vadere.gui.projectview.control.IProjectChangeListener;
 import org.vadere.gui.projectview.view.ProjectView;
@@ -398,7 +398,7 @@ public class ProjectViewModel implements IScenarioChecker {
 			String response = srm.readyToRunResponse();
 			if (response != null) {
 				VDialogManager.showMessageDialogWithBodyAndTextArea("Error",
-						Messages.getString("RunScenarioNotReadyToRun.text"),
+						Localization.getString("RunScenarioNotReadyToRun.text"),
 						response, JOptionPane.ERROR_MESSAGE);
 				return false;
 			}
@@ -407,8 +407,8 @@ public class ProjectViewModel implements IScenarioChecker {
 		String errorMsg = ScenarioPanel.getActiveJsonParsingErrorMsg();
 		if (errorMsg != null) {
 			VDialogManager.showMessageDialogWithBodyAndTextArea(
-					Messages.getString("RunScenarioJsonErrors.title"),
-					Messages.getString("RunScenarioJsonErrors.text"),
+					Localization.getString("RunScenarioJsonErrors.title"),
+					Localization.getString("RunScenarioJsonErrors.text"),
 					errorMsg, JOptionPane.ERROR_MESSAGE);
 			return false;
 		}
@@ -423,8 +423,8 @@ public class ProjectViewModel implements IScenarioChecker {
 			errorPanel = ScenarioPanel.getActiveTopographyErrorMsg();
 			if (errorPanel != null) {
 				VDialogManager.showMessageDialogWithBodyAndTextEditorPane(
-						Messages.getString("RunScenarioTopographyCheckerErrors.title"),
-						Messages.getString("RunScenarioTopographyCheckerErrors.text"),
+						Localization.getString("RunScenarioTopographyCheckerErrors.title"),
+						Localization.getString("RunScenarioTopographyCheckerErrors.text"),
 						errorPanel, JOptionPane.ERROR_MESSAGE);
 				return false;
 			}

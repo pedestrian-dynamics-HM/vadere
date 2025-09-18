@@ -1,7 +1,7 @@
 package org.vadere.gui.projectview.control;
 
 
-import org.vadere.gui.components.utils.Messages;
+import org.vadere.gui.components.utils.Localization;
 import org.vadere.gui.projectview.model.ProjectViewModel;
 import org.vadere.gui.projectview.view.VTable;
 import org.vadere.util.io.IOUtils;
@@ -27,9 +27,9 @@ public class ActionDeleteScenarios extends AbstractAction {
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
 		if (IOUtils.chooseYesNoCancel(
-				scenarioTable.getSelectedRowCount() > 1 ? Messages.getString("DeleteTestQuestionMultiple.text")
-						: Messages.getString("DeleteTestQuestionOne.text"),
-				Messages.getString("DeleteTestQuestion.title")) == JOptionPane.YES_OPTION) {
+				scenarioTable.getSelectedRowCount() > 1 ? Localization.getString("DeleteTestQuestionMultiple.text")
+						: Localization.getString("DeleteTestQuestionOne.text"),
+				Localization.getString("DeleteTestQuestion.title")) == JOptionPane.YES_OPTION) {
 			model.deleteScenarios(scenarioTable.getSelectedRows());
 		}
 	}

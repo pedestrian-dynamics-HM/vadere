@@ -5,8 +5,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import org.apache.commons.configuration2.Configuration;
 import org.vadere.gui.components.control.*;
 import org.vadere.gui.components.control.simulation.*;
-import org.vadere.gui.components.utils.Messages;
-import org.vadere.gui.components.utils.ResourceStrings;
+import org.vadere.gui.components.utils.Localization;
 import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.components.utils.SwingUtils;
 import org.vadere.gui.components.view.DialogFactory;
@@ -174,25 +173,25 @@ public class OnlineVisualisationWindow extends JPanel implements Observer {
 		OnlinevisualizationRenderer renderer = new OnlinevisualizationRenderer(model);
 		renderer.setLogo(resources.getImage("vadere.png"));
 		ActionGeneratePNG generatePNG = new ActionGeneratePNG(
-				Messages.getString("ProjectView.btnPNGSnapshot.tooltip"),
+				Localization.getString("ProjectView.btnPNGSnapshot.tooltip"),
 				RESOURCE.getIconSVG("camera_png",ICON_SIZE,ICON_SIZE),
 				renderer,
 				model);
 
 		ActionGenerateSVG generateSVG = new ActionGenerateSVG(
-				Messages.getString("ProjectView.btnSVGSnapshot.tooltip"),
+				Localization.getString("ProjectView.btnSVGSnapshot.tooltip"),
 				RESOURCE.getIconSVG("camera_svg",ICON_SIZE,ICON_SIZE),
 				renderer,
 				model);
 
 		ActionGenerateTikz generateTikz = new ActionGenerateTikz(
-				Messages.getString("ProjectView.btnTikZSnapshot.tooltip"),
+				Localization.getString("ProjectView.btnTikZSnapshot.tooltip"),
 				RESOURCE.getIconSVG("camera_tikz",ICON_SIZE,ICON_SIZE),
 				renderer,
 				model);
 
 		ActionGenerateINETenv generateINETenv = new ActionGenerateINETenv(
-				Messages.getString("ProjectView.btnINETSnapshot.tooltip"),
+				Localization.getString("ProjectView.btnINETSnapshot.tooltip"),
 				RESOURCE.getIconSVG("camera_tikz",ICON_SIZE,ICON_SIZE),
 				renderer,
 				model);
@@ -218,17 +217,17 @@ public class OnlineVisualisationWindow extends JPanel implements Observer {
 		mainPanel.addRendererChangeListener(showPotentialField);
 
 		// Pedestrian-related options
-		SwingUtils.addActionToToolbar(toolbar, paintPedestriansAction, Messages.getString("ProjectView.btnShowPedestrian.tooltip"));
-		SwingUtils.addActionToToolbar(toolbar, paintTrajectories, Messages.getString("ProjectView.btnShowTrajectories.tooltip"));
-		SwingUtils.addActionToToolbar(toolbar, paintArrowAction, Messages.getString("ProjectView.btnShowWalkingDirection.tooltip"));
-		SwingUtils.addActionToToolbar(toolbar, showGroupInformationAction, Messages.getString("ProjectView.btnShowGroupInformation.tooltip"));
+		SwingUtils.addActionToToolbar(toolbar, paintPedestriansAction, Localization.getString("ProjectView.btnShowPedestrian.tooltip"));
+		SwingUtils.addActionToToolbar(toolbar, paintTrajectories, Localization.getString("ProjectView.btnShowTrajectories.tooltip"));
+		SwingUtils.addActionToToolbar(toolbar, paintArrowAction, Localization.getString("ProjectView.btnShowWalkingDirection.tooltip"));
+		SwingUtils.addActionToToolbar(toolbar, showGroupInformationAction, Localization.getString("ProjectView.btnShowGroupInformation.tooltip"));
 		toolbar.addSeparator();
 
 		// "Measuring" tools
-		SwingUtils.addActionToToolbar(toolbar, drawVoronoiDiagram, Messages.getString("ProjectView.btnDrawVoronoiDiagram.tooltip"));
-		SwingUtils.addActionToToolbar(toolbar, drawMesh, Messages.getString("ProjectView.btnDrawMesh.tooltip"));
-		SwingUtils.addActionToToolbar(toolbar, paintGridAction, Messages.getString("ProjectView.btnShowGrid.tooltip"));
-		SwingUtils.addActionToToolbar(toolbar, paintDensity, Messages.getString("ProjectView.btnShowDensity.tooltip"));
+		SwingUtils.addActionToToolbar(toolbar, drawVoronoiDiagram, Localization.getString("ProjectView.btnDrawVoronoiDiagram.tooltip"));
+		SwingUtils.addActionToToolbar(toolbar, drawMesh, Localization.getString("ProjectView.btnDrawMesh.tooltip"));
+		SwingUtils.addActionToToolbar(toolbar, paintGridAction, Localization.getString("ProjectView.btnShowGrid.tooltip"));
+		SwingUtils.addActionToToolbar(toolbar, paintDensity, Localization.getString("ProjectView.btnShowDensity.tooltip"));
 		toolbar.addSeparator();
 
 		// Snapshot options
@@ -242,16 +241,16 @@ public class OnlineVisualisationWindow extends JPanel implements Observer {
 		ActionOnlineVisMenu imgDialog = new ActionOnlineVisMenu(
 				"camera_menu",
 				RESOURCE.getIconSVG("camera",ICON_SIZE,ICON_SIZE), imgOptions);
-		JButton imgMenuBtn = SwingUtils.addActionToToolbar(toolbar, imgDialog, Messages.getString("ProjectView.btnSnapshot.tooltip"));
+		JButton imgMenuBtn = SwingUtils.addActionToToolbar(toolbar, imgDialog, Localization.getString("ProjectView.btnSnapshot.tooltip"));
 		imgDialog.setParent(imgMenuBtn);
 
-		SwingUtils.addActionToToolbar(toolbar, showPotentialField, Messages.getString("OnlineVis.btnShowPotentialfield.tooltip"));
-		JButton recordButton = SwingUtils.addActionToToolbar(toolbar, recording, Messages.getString("OnlineVis.btnRecord.tooltip"));
+		SwingUtils.addActionToToolbar(toolbar, showPotentialField, Localization.getString("OnlineVis.btnShowPotentialfield.tooltip"));
+		JButton recordButton = SwingUtils.addActionToToolbar(toolbar, recording, Localization.getString("OnlineVis.btnRecord.tooltip"));
 		recording.setButton(recordButton);
 
 		toolbar.add(Box.createHorizontalGlue());
 
-		SwingUtils.addActionToToolbar(toolbar, openSettingsDialog, Messages.getString("ProjectView.btnSettings.tooltip"));
+		SwingUtils.addActionToToolbar(toolbar, openSettingsDialog, Localization.getString("ProjectView.btnSettings.tooltip"));
 
 		splitPaneForTopographyAndJsonPane = new JSplitPane();
 		splitPaneForTopographyAndJsonPane.setResizeWeight(0.8);

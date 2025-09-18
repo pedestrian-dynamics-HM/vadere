@@ -1,7 +1,7 @@
 package org.vadere.gui.projectview.control;
 
 
-import org.vadere.gui.components.utils.Messages;
+import org.vadere.gui.components.utils.Localization;
 import org.vadere.gui.projectview.model.ProjectViewModel;
 import org.vadere.gui.projectview.model.VadereScenarioTableModel;
 import org.vadere.gui.projectview.model.VadereState;
@@ -34,7 +34,7 @@ public class ActionRenameScenario extends AbstractAction {
 		Scenario scenario = optionalScenarioBundle.getScenario();
 		String oldName = optionalScenarioBundle.getScenario().getName();
 		String newName =
-				JOptionPane.showInputDialog(null, Messages.getString("listMenuRenameButtonAction.title"), oldName);
+				JOptionPane.showInputDialog(null, Localization.getString("listMenuRenameButtonAction.title"), oldName);
 
 		if (newName == null) // clicking the cancel button in InputDialog returns null
 			return; // -> stop executing this method
@@ -68,8 +68,8 @@ public class ActionRenameScenario extends AbstractAction {
 			}
 		} else {
 			JOptionPane.showMessageDialog((Component) event.getSource(),
-					Messages.getString("RenameFileErrorMessage.text"),
-					Messages.getString("RenameFileErrorMessage.title"), JOptionPane.ERROR_MESSAGE);
+					Localization.getString("RenameFileErrorMessage.text"),
+					Localization.getString("RenameFileErrorMessage.title"), JOptionPane.ERROR_MESSAGE);
 		}
 	}
 }

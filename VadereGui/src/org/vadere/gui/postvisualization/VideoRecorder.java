@@ -4,7 +4,7 @@ import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
 import net.sourceforge.argparse4j.inf.Namespace;
 import org.apache.commons.io.FilenameUtils;
-import org.vadere.gui.components.utils.Messages;
+import org.vadere.gui.components.utils.Localization;
 import org.vadere.gui.postvisualization.control.AutoPlayer;
 import org.vadere.gui.postvisualization.model.PostvisualizationModel;
 import org.vadere.gui.postvisualization.utils.MovRecorder;
@@ -89,7 +89,7 @@ public class VideoRecorder extends PostVisualisation {
         Namespace ns = null;
         try {
             ns = vadereArgumentParser.parseArgsAndProcessInitialOptions(args);
-            Messages.loadLanguageFromPreferences(VadereApplication.class);
+            Localization.loadLanguageFromPreferences(VadereApplication.class);
         } catch (ArgumentParserException e) {
             throw new RuntimeException(e);
         }

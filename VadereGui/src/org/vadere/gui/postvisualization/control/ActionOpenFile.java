@@ -3,7 +3,7 @@ package org.vadere.gui.postvisualization.control;
 
 import org.apache.commons.configuration2.Configuration;
 import org.vadere.gui.components.control.simulation.ActionVisualization;
-import org.vadere.gui.components.utils.Messages;
+import org.vadere.gui.components.utils.Localization;
 import org.vadere.gui.components.view.DialogFactory;
 import org.vadere.gui.postvisualization.model.PostvisualizationModel;
 import org.vadere.simulator.projects.Scenario;
@@ -98,9 +98,9 @@ public class ActionOpenFile extends ActionVisualization {
 					logger.error(e.getMessage());
 					JOptionPane.showMessageDialog(
 							null,
-							Messages.getString("InformationDialogFileError") + " - "
+							Localization.getString("InformationDialogFileError") + " - "
 									+ e.getMessage(),
-							Messages.getString("InformationDialogError.title"),
+							Localization.getString("InformationDialogError.title"),
 							JOptionPane.ERROR_MESSAGE);
 				}
 				ActionOpenFile.super.actionPerformed(event);

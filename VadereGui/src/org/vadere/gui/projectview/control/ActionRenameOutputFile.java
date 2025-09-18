@@ -1,7 +1,7 @@
 package org.vadere.gui.projectview.control;
 
 
-import org.vadere.gui.components.utils.Messages;
+import org.vadere.gui.components.utils.Localization;
 import org.vadere.gui.projectview.model.ProjectViewModel;
 import org.vadere.gui.projectview.model.ProjectViewModel.OutputBundle;
 import org.vadere.simulator.projects.io.IOOutput;
@@ -36,7 +36,7 @@ public class ActionRenameOutputFile extends AbstractAction {
 			File directory = outputBundle.getDirectory();
 
 			String newDirectoryName = JOptionPane.showInputDialog((Component) event.getSource(),
-					Messages.getString("listMenuRenameOutputButtonAction.title"),
+					Localization.getString("listMenuRenameOutputButtonAction.title"),
 					directory.getName());
 
 			String directoryName = directory.getName();
@@ -51,8 +51,8 @@ public class ActionRenameOutputFile extends AbstractAction {
 					logger.info("rename output file " + directoryName + " => " + newDirectoryName);
 				} else {
 					logger.info("wrong file name for an output file: " + newDirectoryName);
-					IOUtils.errorBox(Messages.getString("RenameFileErrorMessage.text"),
-							Messages.getString("RenameFileErrorMessage.title"));
+					IOUtils.errorBox(Localization.getString("RenameFileErrorMessage.text"),
+							Localization.getString("RenameFileErrorMessage.title"));
 				}
 			}
 		} catch (IOException e) {
