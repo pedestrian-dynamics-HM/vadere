@@ -3,7 +3,7 @@ package org.vadere.gui.components.control.simulation;
 import org.apache.commons.configuration2.Configuration;
 import org.vadere.gui.components.model.DefaultSimulationConfig;
 import org.vadere.gui.components.model.SimulationModel;
-import org.vadere.gui.components.utils.Messages;
+import org.vadere.gui.components.utils.Localization;
 import org.vadere.gui.components.view.SimulationRenderer;
 import org.vadere.gui.onlinevisualization.view.IRendererChangeListener;
 import org.vadere.gui.postvisualization.utils.ImageGenerator;
@@ -47,7 +47,7 @@ public class ActionGeneratePNG extends AbstractAction implements IRendererChange
 			SimpleDateFormat formatter = new SimpleDateFormat(CONFIG.getString("SettingsDialog.dataFormat"));
 			String formattedDate = formatter.format(todaysDate);
 
-			File outputFile = new File(Messages.getString("FileDialog.filenamePrefix") + formattedDate + ".png");
+			File outputFile = new File(Localization.getString("FileDialog.filenamePrefix") + formattedDate + ".png");
 			fileChooser.setSelectedFile(outputFile);
 
 			int returnVal = fileChooser.showDialog(null, "Save");

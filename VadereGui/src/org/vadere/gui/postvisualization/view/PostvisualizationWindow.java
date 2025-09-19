@@ -9,8 +9,7 @@ import org.vadere.gui.components.control.JViewportChangeListener;
 import org.vadere.gui.components.control.PanelResizeListener;
 import org.vadere.gui.components.control.ViewportChangeListener;
 import org.vadere.gui.components.model.IDefaultModel;
-import org.vadere.gui.components.utils.Messages;
-import org.vadere.gui.components.utils.ResourceStrings;
+import org.vadere.gui.components.utils.Localization;
 import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.components.view.ScenarioElementView;
 import org.vadere.gui.postvisualization.model.PostvisualizationModel;
@@ -19,10 +18,8 @@ import org.vadere.simulator.projects.io.IOOutput;
 import org.vadere.util.config.VadereConfig;
 import org.vadere.util.io.IOUtils;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.Observable;
@@ -60,7 +57,7 @@ public class PostvisualizationWindow extends JPanel implements Observer {
         this.scrollPane = new JScrollPane();
         this.scenarioPanel = new ScenarioPanel(this.renderer, this.scrollPane);
         this.adjustPanel = new AdjustPanel(this.model);
-        this.mRecentFiles = new JMenu(Messages.getString("PostVis.menuRecentFiles.title"));
+        this.mRecentFiles = new JMenu(Localization.getString("PostVis.menuRecentFiles.title"));
         this.menuBar = new JMenuBar();
 
 

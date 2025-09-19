@@ -1,7 +1,7 @@
 package org.vadere.gui.components.control;
 
 import org.jetbrains.annotations.NotNull;
-import org.vadere.gui.components.utils.Messages;
+import org.vadere.gui.components.utils.Localization;
 import org.vadere.gui.components.utils.ResourceStrings;
 import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.projectview.model.ProjectViewModel;
@@ -32,8 +32,8 @@ public class ActionGenerateMesh extends AbstractAction {
 	private static final int ICON_SIZE = (int)(VadereConfig.getConfig().getInt("ProjectView.icon.height.value")*VadereConfig.getConfig().getFloat("Gui.scale"));
 
 	public ActionGenerateMesh(final ProjectViewModel model) {
-		super(Messages.getString("ProjectView.btnGenerateMesh.tooltip"), RESOURCE.getIconSVG("triangulation", ICON_SIZE,ICON_SIZE));
-		putValue(SHORT_DESCRIPTION, Messages.getString(ResourceStrings.TOPOGRAPHY_CREATOR_BTN_GENERATE_MESH_TOOLTIP));
+		super(Localization.getString("ProjectView.btnGenerateMesh.tooltip"), RESOURCE.getIconSVG("triangulation", ICON_SIZE,ICON_SIZE));
+		putValue(SHORT_DESCRIPTION, Localization.getString(ResourceStrings.TOPOGRAPHY_CREATOR_BTN_GENERATE_MESH_TOOLTIP));
 		this.model = model;
 	}
 

@@ -1,7 +1,7 @@
 package org.vadere.gui.projectview.control;
 
 
-import org.vadere.gui.components.utils.Messages;
+import org.vadere.gui.components.utils.Localization;
 import org.vadere.gui.projectview.model.ProjectViewModel;
 import org.vadere.gui.projectview.view.ProjectView;
 import org.vadere.simulator.projects.Scenario;
@@ -47,7 +47,7 @@ public class ActionEditScenarioDescription extends AbstractAction {
 		int ret = JOptionPane.showConfirmDialog(
 				ProjectView.getMainWindow(),
 				scrollPane,
-				Messages.getString("ActionEditScenarioDescription.menu.title"),
+				Localization.getString("ActionEditScenarioDescription.menu.title"),
 				JOptionPane.OK_CANCEL_OPTION);
 
 		if (ret == JOptionPane.OK_OPTION) {

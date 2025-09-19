@@ -8,15 +8,14 @@ import java.util.Observer;
 
 import javax.swing.*;
 
-import org.vadere.gui.components.control.HelpTextView;
-import org.vadere.gui.components.utils.Messages;
+import org.vadere.gui.components.utils.Localization;
 import org.vadere.gui.projectview.view.VDialogManager;
 import org.vadere.gui.topographycreator.model.IDrawPanelModel;
 import org.vadere.state.scenario.ScenarioElement;
 
 public class JLabelObserver extends JLabel implements Observer {
 
-	public static final String DEFAULT_TEXT = Messages.getString("ProjectView.JSONDisplay.label");
+	public static final String DEFAULT_TEXT = Localization.getString("ProjectView.JSONDisplay.label");
 	private static final long serialVersionUID = 9011952047793438028L;
 
 	private IDrawPanelModel panelModel;

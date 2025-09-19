@@ -1,7 +1,7 @@
 package org.vadere.gui.projectview.control;
 
 
-import org.vadere.gui.components.utils.Messages;
+import org.vadere.gui.components.utils.Localization;
 import org.vadere.gui.projectview.model.ProjectViewModel;
 import org.vadere.simulator.projects.ProjectWriter;
 import org.vadere.simulator.projects.Scenario;
@@ -50,8 +50,8 @@ public abstract class ActionAbstractAddScenario extends AbstractAction {
 				logger.error(String.format("topographyError during output loadFromFilesystem: '%s'", e.getLocalizedMessage()));
 			}
 		} else {
-			IOUtils.errorBox(Messages.getString("renameErrorDialog.text"),
-					Messages.getString("renameErrorDialog.title"));
+			IOUtils.errorBox(Localization.getString("renameErrorDialog.text"),
+					Localization.getString("renameErrorDialog.title"));
 		}
 	}
 
@@ -70,7 +70,7 @@ public abstract class ActionAbstractAddScenario extends AbstractAction {
 
 	protected String getScenarioName() {
 		return JOptionPane.showInputDialog(null,
-				Messages.getString("ProjectView.addScenarioDialog.text"),
-				Messages.getString("ProjectView.addScenarioDialog.defaultValue"));
+				Localization.getString("ProjectView.addScenarioDialog.text"),
+				Localization.getString("ProjectView.addScenarioDialog.defaultValue"));
 	}
 }

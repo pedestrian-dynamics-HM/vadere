@@ -1,7 +1,7 @@
 package org.vadere.gui.components.view;
 
 import org.vadere.gui.components.model.IDefaultModel;
-import org.vadere.gui.components.utils.Messages;
+import org.vadere.gui.components.utils.Localization;
 import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.util.StateJsonConverter;
@@ -44,11 +44,11 @@ public class InfoPanel extends JPanel implements Observer {
 	public InfoPanel(final IDefaultModel defaultModel) {
 		this.defaultModel = defaultModel;
 		setLayout(new FlowLayout(FlowLayout.LEFT));
-		lblScenarioSizeLabel = new JLabel(Messages.getString("InfoPanel.ScenarioSize.label") + ":");
-		lblGridResolutionLabel = new JLabel(Messages.getString("InfoPanel.GridResolution.label") + ":");
-		lblCursorPositionLabel = new JLabel(Messages.getString("InfoPanel.CursorPosition.label") + ":");
-		lblScaleFactorLabel = new JLabel(Messages.getString("InfoPanel.ScaleFactor.label") + ":");
-		lblScenarioHashLabel = new JLabel(Messages.getString("InfoPanel.ScenarioHash.label") + ":");
+		lblScenarioSizeLabel = new JLabel(Localization.getString("InfoPanel.ScenarioSize.label") + ":");
+		lblGridResolutionLabel = new JLabel(Localization.getString("InfoPanel.GridResolution.label") + ":");
+		lblCursorPositionLabel = new JLabel(Localization.getString("InfoPanel.CursorPosition.label") + ":");
+		lblScaleFactorLabel = new JLabel(Localization.getString("InfoPanel.ScaleFactor.label") + ":");
+		lblScenarioHashLabel = new JLabel(Localization.getString("InfoPanel.ScenarioHash.label") + ":");
 
 		lblScaleFactorValue = new JLabel();
 		lblScenarioSizeValue = new JLabel();
@@ -88,8 +88,8 @@ public class InfoPanel extends JPanel implements Observer {
 
 	private void setToolTips() {
 		String unitLengthText = String.format("%s: [%s]",
-				Messages.getString("Units.title"),
-				Messages.getString("Units.length"));
+				Localization.getString("Units.title"),
+				Localization.getString("Units.length"));
 
 		lblScenarioSizeLabel.setToolTipText(unitLengthText);
 		lblScenarioSizeValue.setToolTipText(unitLengthText);
@@ -101,8 +101,8 @@ public class InfoPanel extends JPanel implements Observer {
 		lblCursorPositionValue.setToolTipText(unitLengthText);
 
 		String unitDimensionlessText = String.format("%s: [%s]",
-				Messages.getString("Units.title"),
-				Messages.getString("Units.dimensionless"));
+				Localization.getString("Units.title"),
+				Localization.getString("Units.dimensionless"));
 
 		lblScaleFactorLabel.setToolTipText(unitDimensionlessText);
 		lblScaleFactorValue.setToolTipText(unitDimensionlessText);

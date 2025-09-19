@@ -4,11 +4,8 @@ package org.vadere.gui.postvisualization.utils;
 import org.apache.commons.configuration2.Configuration;
 import org.jcodec.api.awt.SequenceEncoder;
 import org.vadere.gui.components.model.SimulationModel;
-import org.vadere.gui.components.utils.Messages;
-import org.vadere.gui.components.utils.Resources;
+import org.vadere.gui.components.utils.Localization;
 import org.vadere.gui.components.view.SimulationRenderer;
-import org.vadere.gui.postvisualization.model.PostvisualizationModel;
-import org.vadere.gui.postvisualization.view.PostvisualizationRenderer;
 import org.vadere.util.config.VadereConfig;
 import org.vadere.util.logging.Logger;
 
@@ -111,7 +108,7 @@ public class MovRecorder implements IRecorder {
 		SimpleDateFormat formatter = new SimpleDateFormat(CONFIG.getString("SettingsDialog.dataFormat"));
 			String formattedDate = formatter.format(todaysDate);
 		JFileChooser fileChooser = new JFileChooser(VadereConfig.getConfig().getString("SettingsDialog.snapshotDirectory.path", "."));
-			outputFile = new File(Messages.getString("FileDialog.filenamePrefix") + formattedDate + ".mov");
+			outputFile = new File(Localization.getString("FileDialog.filenamePrefix") + formattedDate + ".mov");
 			fileChooser.setSelectedFile(outputFile);
 
 			int returnVal = fileChooser.showDialog(null, "Save");

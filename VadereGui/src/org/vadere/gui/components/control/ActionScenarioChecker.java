@@ -1,6 +1,6 @@
 package org.vadere.gui.components.control;
 
-import org.vadere.gui.components.utils.Messages;
+import org.vadere.gui.components.utils.Localization;
 import org.vadere.gui.projectview.view.ScenarioNamePanel;
 import org.vadere.gui.projectview.view.ScenarioPanel;
 import org.vadere.gui.projectview.view.VDialogManager;
@@ -39,14 +39,14 @@ public class ActionScenarioChecker extends AbstractAction implements Observer {
 	public void actionPerformed(ActionEvent e) {
 		if (!VadereConfig.getConfig().getBoolean("Project.ScenarioChecker.active")) {
 			VDialogManager.showMessageDialogWithTextArea(
-					Messages.getString("ProjectView.ScenarioChecker.title"),
-					Messages.getString("ProjectView.ScenarioChecker.deactive.text"),
+					Localization.getString("ProjectView.ScenarioChecker.title"),
+					Localization.getString("ProjectView.ScenarioChecker.deactive.text"),
 					JOptionPane.INFORMATION_MESSAGE
 			);
 		} else {
 			VDialogManager.showMessageDialogWithBodyAndTextEditorPane(
-					Messages.getString("ProjectView.ScenarioChecker.title"),
-					Messages.getString("ProjectView.ScenarioChecker.active.text"),
+					Localization.getString("ProjectView.ScenarioChecker.title"),
+					Localization.getString("ProjectView.ScenarioChecker.active.text"),
 					msgDocument,
 					JOptionPane.INFORMATION_MESSAGE
 			);

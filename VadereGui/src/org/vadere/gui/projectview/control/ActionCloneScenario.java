@@ -1,7 +1,7 @@
 package org.vadere.gui.projectview.control;
 
 
-import org.vadere.gui.components.utils.Messages;
+import org.vadere.gui.components.utils.Localization;
 import org.vadere.gui.projectview.model.ProjectViewModel;
 import org.vadere.simulator.projects.ProjectWriter;
 import org.vadere.simulator.projects.Scenario;
@@ -29,7 +29,7 @@ public class ActionCloneScenario extends AbstractAction {
 
 		Scenario scenario = optionalScenarioBundle.getScenario();
 		Scenario clonedScenario = scenario.clone();
-		String name = scenario.getName() + "_" + Messages.getString("Clone.text") + "_";
+		String name = scenario.getName() + "_" + Localization.getString("Clone.text") + "_";
 		int index = 1;
 		while (model.isScenarioNameInConflict(name + index)) {
 			index++;

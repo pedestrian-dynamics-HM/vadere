@@ -3,7 +3,7 @@ package org.vadere.gui.projectview.view;
 
 import org.apache.commons.configuration2.Configuration;
 import org.vadere.gui.components.control.HelpTextView;
-import org.vadere.gui.components.utils.Messages;
+import org.vadere.gui.components.utils.Localization;
 import org.vadere.util.config.VadereConfig;
 import org.vadere.util.io.IOUtils;
 import org.vadere.util.logging.Logger;
@@ -24,7 +24,7 @@ public class VDialogManager {
 
 	public static String saveProjectDialog() {
 		String filepath =
-				IOUtils.chooseFileOrDirSave(Messages.getString("ChooseProjectSaveDirMessage.title"),
+				IOUtils.chooseFileOrDirSave(Localization.getString("ChooseProjectSaveDirMessage.title"),
 						getDefaultDirectory(), PROJECT_FILTER);
 		return filepath;
 	}
@@ -32,14 +32,14 @@ public class VDialogManager {
 	public static int askSaveProjectDialog(String diffs) {
 		logger.info(String.format("asking user to save the project..."));
 		return showConfirmDialogWithBodyAndTextArea(
-				Messages.getString("SaveBeforeClosing.title"),
-				"<html>" + Messages.getString("SaveBeforeClosing.text") + "<br><br><b>" +
-						Messages.getString("SaveBeforeClosing.unsavedChanges.text") + "</b><br><br></html>",
+				Localization.getString("SaveBeforeClosing.title"),
+				"<html>" + Localization.getString("SaveBeforeClosing.text") + "<br><br><b>" +
+						Localization.getString("SaveBeforeClosing.unsavedChanges.text") + "</b><br><br></html>",
 				diffs, JOptionPane.YES_NO_CANCEL_OPTION);
 	}
 
 	public static String loadProjectDialog() {
-		return IOUtils.chooseFile(Messages.getString("LoadProjectText"), getDefaultDirectory(), PROJECT_FILTER);
+		return IOUtils.chooseFile(Localization.getString("LoadProjectText"), getDefaultDirectory(), PROJECT_FILTER);
 	}
 
 	private static String getDefaultDirectory() {
@@ -140,8 +140,8 @@ public class VDialogManager {
 		String errorMsg = ScenarioPanel.getActiveJsonParsingErrorMsg();
 		if (errorMsg != null) {
 			int ret = VDialogManager.showConfirmDialogWithBodyAndTextArea(
-					Messages.getString("SaveDespiteJsonErrors.title"),
-					"<html>" + Messages.getString("SaveDespiteJsonErrors.text") + "<br><br><html>",
+					Localization.getString("SaveDespiteJsonErrors.title"),
+					"<html>" + Localization.getString("SaveDespiteJsonErrors.text") + "<br><br><html>",
 					errorMsg, JOptionPane.YES_NO_OPTION);
 			if (ret == JOptionPane.YES_OPTION)
 				return false;
@@ -149,8 +149,8 @@ public class VDialogManager {
 		JEditorPane jEditorPane = ScenarioPanel.getActiveTopographyErrorMsg();
 		if (jEditorPane != null) {
 			int ret = VDialogManager.showConfirmDialogWithBodyAndEditorPane(
-					Messages.getString("SaveDespiteScenarioCheckerErrors.title"),
-					"<html>" + Messages.getString("SaveDespiteScenarioCheckerErrors.text") + "<br><br><html>",
+					Localization.getString("SaveDespiteScenarioCheckerErrors.title"),
+					"<html>" + Localization.getString("SaveDespiteScenarioCheckerErrors.text") + "<br><br><html>",
 					jEditorPane, JOptionPane.YES_NO_OPTION);
 			if (ret == JOptionPane.YES_OPTION)
 				return false;

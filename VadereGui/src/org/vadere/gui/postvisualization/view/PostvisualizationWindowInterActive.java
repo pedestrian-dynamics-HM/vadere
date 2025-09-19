@@ -4,8 +4,7 @@ import com.formdev.flatlaf.FlatLightLaf;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.components.control.ActionGeneratePoly;
 import org.vadere.gui.components.control.simulation.*;
-import org.vadere.gui.components.utils.Messages;
-import org.vadere.gui.components.utils.ResourceStrings;
+import org.vadere.gui.components.utils.Localization;
 import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.components.utils.SwingUtils;
 import org.vadere.gui.components.view.DialogFactory;
@@ -128,7 +127,7 @@ public class PostvisualizationWindowInterActive extends PostvisualizationWindow 
                     public void actionPerformed(ActionEvent e1) {
                         if (!model.config.isContactsRecorded()) {
                             JOptionPane.showMessageDialog(ProjectView.getMainWindow(),
-                                    Messages.getString("PostVis.ShowContactsErrorMessage.text"));
+                                    Localization.getString("PostVis.ShowContactsErrorMessage.text"));
                         } else {
                             model.config.setShowContacts(!model.config.isShowContacts());
                             model.notifyObservers();
@@ -148,7 +147,7 @@ public class PostvisualizationWindowInterActive extends PostvisualizationWindow 
                     public void actionPerformed(ActionEvent e1) {
                         if (!model.config.isAerosolCloudsRecorded()) {
                             JOptionPane.showMessageDialog(ProjectView.getMainWindow(),
-                                    Messages.getString("PostVis.ShowAerosolCloudsErrorMessage.text") + "\n" + AerosolCloudDataProcessor.class.getName() + "\n" + TableAerosolCloudData.TABLE_NAME + ".txt");
+                                    Localization.getString("PostVis.ShowAerosolCloudsErrorMessage.text") + "\n" + AerosolCloudDataProcessor.class.getName() + "\n" + TableAerosolCloudData.TABLE_NAME + ".txt");
                         } else {
                             model.config.setShowAerosolClouds(!model.config.isShowAerosolClouds());
                             model.notifyObservers();
@@ -194,13 +193,13 @@ public class PostvisualizationWindowInterActive extends PostvisualizationWindow 
         recordAction.setButton(recordButton);
 
         ArrayList<Action> imgOptions = new ArrayList<>();
-        AbstractAction pngImg = new ActionGeneratePNG(Messages.getString("ProjectView.btnPNGSnapshot.tooltip"),RESOURCE.getIconSVG("camera_png", ICON_SIZE,ICON_SIZE),
+        AbstractAction pngImg = new ActionGeneratePNG(Localization.getString("ProjectView.btnPNGSnapshot.tooltip"),RESOURCE.getIconSVG("camera_png", ICON_SIZE,ICON_SIZE),
                 renderer, model);
-        AbstractAction svgImg = new ActionGenerateSVG(Messages.getString("ProjectView.btnSVGSnapshot.tooltip"),RESOURCE.getIconSVG("camera_svg", ICON_SIZE,ICON_SIZE),
+        AbstractAction svgImg = new ActionGenerateSVG(Localization.getString("ProjectView.btnSVGSnapshot.tooltip"),RESOURCE.getIconSVG("camera_svg", ICON_SIZE,ICON_SIZE),
                 renderer, model);
-        AbstractAction tikzImg = new ActionGenerateTikz(Messages.getString("ProjectView.btnTikZSnapshot.tooltip"), RESOURCE.getIconSVG("camera_tikz", ICON_SIZE,ICON_SIZE),
+        AbstractAction tikzImg = new ActionGenerateTikz(Localization.getString("ProjectView.btnTikZSnapshot.tooltip"), RESOURCE.getIconSVG("camera_tikz", ICON_SIZE,ICON_SIZE),
                 renderer, model);
-        AbstractAction inetImg = new ActionGenerateINETenv(Messages.getString("ProjectView.btnINETSnapshot.tooltip"), RESOURCE.getIconSVG("camera_tikz", ICON_SIZE,ICON_SIZE),
+        AbstractAction inetImg = new ActionGenerateINETenv(Localization.getString("ProjectView.btnINETSnapshot.tooltip"), RESOURCE.getIconSVG("camera_tikz", ICON_SIZE,ICON_SIZE),
                 renderer, model);
 
         AbstractAction polyImg = new ActionGeneratePoly(model);
@@ -215,7 +214,7 @@ public class PostvisualizationWindowInterActive extends PostvisualizationWindow 
                 "camera_menu",
                 RESOURCE.getIconSVG("camera", ICON_SIZE,ICON_SIZE),
                 model, null, imgOptions);
-        addActionMenuToToolbar(toolbar, imgDialog, Messages.getString("ProjectView.btnSnapshot.tooltip"));
+        addActionMenuToToolbar(toolbar, imgDialog, Localization.getString("ProjectView.btnSnapshot.tooltip"));
 
         toolbar.add(Box.createHorizontalGlue());
 
@@ -230,8 +229,8 @@ public class PostvisualizationWindowInterActive extends PostvisualizationWindow 
                 }, "ProjectView.btnSettings.tooltip");
 
 
-        JMenu mFile = new JMenu(Messages.getString("PostVis.menuFile.title"));
-        JMenu mEdit = new JMenu(Messages.getString("PostVis.menuSettings.title"));
+        JMenu mFile = new JMenu(Localization.getString("PostVis.menuFile.title"));
+        JMenu mEdit = new JMenu(Localization.getString("PostVis.menuSettings.title"));
 
 
         menuBar.add(mFile);
@@ -239,9 +238,9 @@ public class PostvisualizationWindowInterActive extends PostvisualizationWindow 
         menuBar.add(mEdit);
 
         JMenuItem miLoadFile =
-                new JMenuItem(new ActionOpenFile(Messages.getString("PostVis.menuOpenFile.title"), model));
+                new JMenuItem(new ActionOpenFile(Localization.getString("PostVis.menuOpenFile.title"), model));
         JMenuItem miCloseFloorFile = new JMenuItem(new ActionRemoveFloorFieldFile(
-                Messages.getString("PostVis.menuCloseFloorFieldFile.title"), model));
+                Localization.getString("PostVis.menuCloseFloorFieldFile.title"), model));
         /*
          * JMenuItem miGenerateHighResolutionImage = new JMenuItem(new
          * ActionGenerateHighResolutionImage(
@@ -285,18 +284,18 @@ public class PostvisualizationWindowInterActive extends PostvisualizationWindow 
 
     private static JButton addActionToToolbar(final JToolBar toolbar, final Action action,
                                               final String toolTipProperty) {
-        return SwingUtils.addActionToToolbar(toolbar, action, Messages.getString(toolTipProperty));
+        return SwingUtils.addActionToToolbar(toolbar, action, Localization.getString(toolTipProperty));
     }
 
     private static JToggleButton addToggleActionToToolbar(final JToolBar toolbar, final Action action,
                                                           final String toolTipProperty) {
-        return SwingUtils.addToggleActionToToolbar(toolbar, action, Messages.getString(toolTipProperty));
+        return SwingUtils.addToggleActionToToolbar(toolbar, action, Localization.getString(toolTipProperty));
     }
 
 
     private static JButton addActionMenuToToolbar(final JToolBar toolbar, final ActionVisualizationMenu menuAction,
                                                   final String toolTipProperty) {
-        JButton btn = SwingUtils.addActionToToolbar(toolbar, menuAction, Messages.getString(toolTipProperty));
+        JButton btn = SwingUtils.addActionToToolbar(toolbar, menuAction, Localization.getString(toolTipProperty));
         menuAction.setParent(btn);
         return btn;
     }
@@ -355,7 +354,7 @@ public class PostvisualizationWindowInterActive extends PostvisualizationWindow 
             model.init(IOOutput.readTrajectories(trajectoryFile.toPath()), additionalTables, scenario, trajectoryFile.getParent());
             model.notifyObservers();
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, ex.getMessage(), Messages.getString("Error.text"), JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, ex.getMessage(), Localization.getString("Error.text"), JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -365,7 +364,7 @@ public class PostvisualizationWindowInterActive extends PostvisualizationWindow 
             model.init(IOOutput.readTrajectories(trajectoryFile.toPath()), scenario, trajectoryFile.getParent());
             model.notifyObservers();
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, ex.getMessage(), Messages.getString("Error.text"), JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, ex.getMessage(), Localization.getString("Error.text"), JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -426,9 +425,9 @@ public class PostvisualizationWindowInterActive extends PostvisualizationWindow 
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(
                     this,
-                    Messages.getString("Gui.DropAction.Error.text") + "\n"
+                    Localization.getString("Gui.DropAction.Error.text") + "\n"
                             + ex.getMessage(),
-                    Messages.getString("InformationDialogError.title"),
+                    Localization.getString("InformationDialogError.title"),
                     JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -459,7 +458,7 @@ public class PostvisualizationWindowInterActive extends PostvisualizationWindow 
                     model.notifyObservers();
                     dialog.dispose();
                 } else {
-                    String errorMessage = String.format("%s\n%s\n%s", Messages.getString("Data.TrajectoryOrScenarioFile.NoData.text"),
+                    String errorMessage = String.format("%s\n%s\n%s", Localization.getString("Data.TrajectoryOrScenarioFile.NoData.text"),
                             trajectoryFile,
                             scenarioFile);
                     throw new IOException(errorMessage);
@@ -468,7 +467,7 @@ public class PostvisualizationWindowInterActive extends PostvisualizationWindow 
                 JOptionPane.showMessageDialog(
                         null,
                         e.getMessage(),
-                        Messages.getString("InformationDialogFileError"),
+                        Localization.getString("InformationDialogFileError"),
                         JOptionPane.ERROR_MESSAGE);
             }
 

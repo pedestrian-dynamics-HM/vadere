@@ -1,6 +1,6 @@
 package org.vadere.gui.topographycreator.control;
 
-import org.vadere.gui.components.utils.Messages;
+import org.vadere.gui.components.utils.Localization;
 import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.topographycreator.model.IDrawPanelModel;
 import org.vadere.util.config.VadereConfig;
@@ -26,12 +26,12 @@ public abstract class TopographyAction extends AbstractAction {
 	}
 	public TopographyAction(final String name, final String iconName, String shortDescription, final IDrawPanelModel<?> panelModel) {
 		super(name, RESOURCE.getIconSVG(iconName, ICON_SIZE,ICON_SIZE));
-		putValue(SHORT_DESCRIPTION, Messages.getString(shortDescription));
+		putValue(SHORT_DESCRIPTION, Localization.getString(shortDescription));
 		this.panelModel = panelModel;
 	}
 	public TopographyAction(final String name, Icon icon, String shortDescription, final IDrawPanelModel<?> panelModel) {
 		super(name, icon);
-		putValue(SHORT_DESCRIPTION, Messages.getString(shortDescription));
+		putValue(SHORT_DESCRIPTION, Localization.getString(shortDescription));
 		this.panelModel = panelModel;
 	}
 

@@ -3,7 +3,7 @@ package org.vadere.gui.projectview.view;
 
 import com.formdev.flatlaf.FlatLightLaf;
 import org.jetbrains.annotations.NotNull;
-import org.vadere.gui.components.utils.Messages;
+import org.vadere.gui.components.utils.Localization;
 import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.postvisualization.control.Player;
 import org.vadere.gui.postvisualization.model.ContactData;
@@ -96,7 +96,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 			scenariosRunning = false;
 			model.refreshOutputTable();
 			setScenariosRunning(false);
-			progressPanel.setData(Messages.getString("ProgressPanelDone.text"), 100);
+			progressPanel.setData(Localization.getString("ProgressPanelDone.text"), 100);
 			scenarioJPanel.showEditScenario();
 			selectCurrentScenarioRunManager();
 		});
@@ -114,7 +114,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 	public void preProjectRun(final VadereProject project) {
 		EventQueue.invokeLater(() -> {
 			setScenariosRunning(true);
-			progressPanel.setData(Messages.getString("ProgressPanelWorking.text"), 0);
+			progressPanel.setData(Localization.getString("ProgressPanelWorking.text"), 0);
 		});
 	}
 
@@ -135,7 +135,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 			// find index of scenario
 			int totalScenariosCount = model.getProject().getScenarios().size();
 			int doneScenariosCount = totalScenariosCount - scenarioLeft;
-			progressPanel.setData(Messages.getString("ProgressPanelWorking.text"), 100 * doneScenariosCount
+			progressPanel.setData(Localization.getString("ProgressPanelWorking.text"), 100 * doneScenariosCount
 					/ totalScenariosCount);
 			logger.info(String.format("scenario %s finished", cloneScenario.getName()));
 		});
@@ -178,10 +178,10 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 
 						String errorTextTemplate = "%s: %s\n\n%s";
 						String errorText = String.format(errorTextTemplate,
-								Messages.getString("ProjectView.simulationRunErrorDialog.text"),
+								Localization.getString("ProjectView.simulationRunErrorDialog.text"),
 								scenario,
 								causingException);
-						IOUtils.errorBox(errorText, Messages.getString("ProjectView.simulationRunErrorDialog.title"));
+						IOUtils.errorBox(errorText, Localization.getString("ProjectView.simulationRunErrorDialog.title"));
 					}).start();
 		});
 	}
@@ -276,14 +276,14 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
         try {
             if (!CLUtils.isOpenCLSupported()) {
                 showSuppressibleWarning(frame,
-                        Messages.getString("ProjectView.warning.opencl.text"),
-                        Messages.getString("ProjectView.warning.opencl.title"),
+                        Localization.getString("ProjectView.warning.opencl.text"),
+                        Localization.getString("ProjectView.warning.opencl.title"),
                         "Gui.suppressOpenClWarning");
             }
         } catch (UnsatisfiedLinkError linkError) {
             JOptionPane.showMessageDialog(frame,
                     "[LWJGL]: " + linkError.getMessage(),
-                    Messages.getString("ProjectView.warning.lwjgl.title"),
+                    Localization.getString("ProjectView.warning.lwjgl.title"),
                     JOptionPane.WARNING_MESSAGE);
         }
     }
@@ -352,10 +352,10 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE); // DO_NOTHING_ON_CLOSE so that the cancel button on the "save project on exit" question does not cause the windows to close.
 
 		ActionCloseApplication closeApplicationAction =
-				new ActionCloseApplication(Messages.getString("ProjectView.mntmExit.text"), model);
+				new ActionCloseApplication(Localization.getString("ProjectView.mntmExit.text"), model);
 		setAcceleratorFromLocalizedShortcut(closeApplicationAction, "ProjectView.mntmExit.shortcut");
 		ActionAddScenario addScenarioAction =
-				new ActionAddScenario(Messages.getString("ProjectView.mntmNew_1.text"), model);
+				new ActionAddScenario(Localization.getString("ProjectView.mntmNew_1.text"), model);
 		setAcceleratorFromLocalizedShortcut(addScenarioAction, "ProjectView.mntmNew_1.shortcut");
 		addToProjectSpecificActions(addScenarioAction);
 
@@ -391,24 +391,24 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
 
-		JMenu mnFile = new JMenu(Messages.getString("ProjectView.mnFile.text"));
+		JMenu mnFile = new JMenu(Localization.getString("ProjectView.mnFile.text"));
 		menuBar.add(mnFile);
 
 		Action createProjectAction =
-				new ActionCreateProject(Messages.getString("ProjectView.mntmNewTestProject.text"), model);
+				new ActionCreateProject(Localization.getString("ProjectView.mntmNewTestProject.text"), model);
 		setAcceleratorFromLocalizedShortcut(createProjectAction, "ProjectView.mntmNewTestProject.shortcut");
 		JMenuItem mntmNewProject = new JMenuItem(createProjectAction);
 
 		Action loadProjectAction =
-				new ActionLoadProject(Messages.getString("ProjectView.mntmLoadTestProject.text"), model);
+				new ActionLoadProject(Localization.getString("ProjectView.mntmLoadTestProject.text"), model);
 		setAcceleratorFromLocalizedShortcut(loadProjectAction, "ProjectView.mntmLoadTestProject.shortcut");
 		JMenuItem mntmLoadProject = new JMenuItem(loadProjectAction);
 
-		mntmRecentProjects = new JMenu(Messages.getString("ProjectView.mntmRecentProjects.text"));
+		mntmRecentProjects = new JMenu(Localization.getString("ProjectView.mntmRecentProjects.text"));
 		mntmRecentProjects.setEnabled(true);
 		updateRecentProjectsMenu();
 
-		Action changeNameAction = new ActionRenameProject(Messages.getString("ProjectView.mntmChangeName.text"), model);
+		Action changeNameAction = new ActionRenameProject(Localization.getString("ProjectView.mntmChangeName.text"), model);
 		setAcceleratorFromLocalizedShortcut(changeNameAction, "ProjectView.mntmChangeName.shortcut");
 		JMenuItem mntmChangeName = new JMenuItem(changeNameAction);
 		addToProjectSpecificActions(changeNameAction);
@@ -421,13 +421,13 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		mnFile.addSeparator();
 
 		Action saveProjectAction =
-				new ActionSaveProject(Messages.getString("ProjectView.mntmSaveTestProject.text"), model);
+				new ActionSaveProject(Localization.getString("ProjectView.mntmSaveTestProject.text"), model);
 		setAcceleratorFromLocalizedShortcut(saveProjectAction, "ProjectView.mntmSaveTestProject.shortcut");
 		JMenuItem mntmSaveProject = new JMenuItem(saveProjectAction);
 		addToProjectSpecificActions(saveProjectAction);
 		mnFile.add(mntmSaveProject);
 
-		Action saveProjectAsAction = new ActionSaveAsProject(Messages.getString("ProjectView.mntmSaveAs.text"), model);
+		Action saveProjectAsAction = new ActionSaveAsProject(Localization.getString("ProjectView.mntmSaveAs.text"), model);
 		setAcceleratorFromLocalizedShortcut(saveProjectAsAction, "ProjectView.mntmSaveAs.shortcut",
 				Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | KeyEvent.SHIFT_DOWN_MASK);
 
@@ -437,14 +437,14 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 
 		// Checkbox menu item to turn off result dialog of project run.
 		mnFile.addSeparator();
-		JCheckBoxMenuItem showResultDialogMenu = new JCheckBoxMenuItem(Messages.getString("ProjectView.mntmSimulationResult.text"), null, model.getShowSimulationResultDialog());
-		Action showResultDialogMenuAction = new ShowResultDialogAction(Messages.getString("ProjectView.mntmSimulationResult.text"), model, showResultDialogMenu);
+		JCheckBoxMenuItem showResultDialogMenu = new JCheckBoxMenuItem(Localization.getString("ProjectView.mntmSimulationResult.text"), null, model.getShowSimulationResultDialog());
+		Action showResultDialogMenuAction = new ShowResultDialogAction(Localization.getString("ProjectView.mntmSimulationResult.text"), model, showResultDialogMenu);
 		showResultDialogMenu.setAction(showResultDialogMenuAction);
 		mnFile.add(showResultDialogMenu);
 
 		// Checkbox menu item to turn off Scenario Checker during  topography creation
-		JCheckBoxMenuItem toggleScenarioCheckerDialogMenu = new JCheckBoxMenuItem(Messages.getString("ProjectView.btnToggleScenarioChecker.text"), null, model.getShowSimulationResultDialog());
-		Action toggleScenarioCheckerMenuAction = new ToggleScenarioManagerAction(Messages.getString("ProjectView.btnToggleScenarioChecker.text"), model, toggleScenarioCheckerDialogMenu);
+		JCheckBoxMenuItem toggleScenarioCheckerDialogMenu = new JCheckBoxMenuItem(Localization.getString("ProjectView.btnToggleScenarioChecker.text"), null, model.getShowSimulationResultDialog());
+		Action toggleScenarioCheckerMenuAction = new ToggleScenarioManagerAction(Localization.getString("ProjectView.btnToggleScenarioChecker.text"), model, toggleScenarioCheckerDialogMenu);
 		toggleScenarioCheckerDialogMenu.setAction(toggleScenarioCheckerMenuAction);
 		mnFile.add(toggleScenarioCheckerDialogMenu);
 
@@ -453,13 +453,13 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		mnFile.addSeparator();
 		mnFile.add(mntmExit);
 
-		JMenu mnScenario = new JMenu(Messages.getString("ProjectView.mnScenario.text"));
+		JMenu mnScenario = new JMenu(Localization.getString("ProjectView.mnScenario.text"));
 		menuBar.add(mnScenario);
 
 		JMenuItem mntmNew_1 = new JMenuItem(addScenarioAction);
 
 		Action generateScenarioFromOutputAction = new ActionGenerateScenarioFromOutputFile(
-				Messages.getString("ProjectView.mntmGenerateScenario.text"), model);
+				Localization.getString("ProjectView.mntmGenerateScenario.text"), model);
 		addToProjectSpecificActions(generateScenarioFromOutputAction);
 		setAcceleratorFromLocalizedShortcut(generateScenarioFromOutputAction,
 				"ProjectView.mntmGenerateScenario.shortcut");
@@ -468,50 +468,50 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		mnScenario.add(mntmNew_1);
 		mnScenario.add(mntmGenerateScenarioFromOutput);
 
-		JMenu mnHelp = new JMenu(Messages.getString("ProjectView.mnHelp.text"));
+		JMenu mnHelp = new JMenu(Localization.getString("ProjectView.mnHelp.text"));
 		menuBar.add(mnHelp);
 
-		Action showAboutAction = new ActionShowAboutDialog(Messages.getString("ProjectView.mntmAbout.text"));
+		Action showAboutAction = new ActionShowAboutDialog(Localization.getString("ProjectView.mntmAbout.text"));
 		JMenuItem mntmAbout = new JMenuItem(showAboutAction);
 
 		mnHelp.add(mntmAbout);
 
-		JMenu mntmLanguageChoiceMenu = new JMenu(Messages.getString("ProjectView.mntmLanguageChoiceMenu.text"));
+		JMenu mntmLanguageChoiceMenu = new JMenu(Localization.getString("ProjectView.mntmLanguageChoiceMenu.text"));
 		mnHelp.add(mntmLanguageChoiceMenu);
 		JRadioButtonMenuItem mntmEnglishLocale =
-				new JRadioButtonMenuItem(new AbstractAction(Messages.getString("ProjectView.mntmEnglishLocale.text")) {
+				new JRadioButtonMenuItem(new AbstractAction(Localization.getString("ProjectView.mntmEnglishLocale.text")) {
 					private static final long serialVersionUID = 1L;
 
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						Messages.changeLanguage(Locale.ENGLISH);
+						Localization.changeLanguage(Locale.ENGLISH);
 					}
 				});
 		mntmLanguageChoiceMenu.add(mntmEnglishLocale);
 		JRadioButtonMenuItem mntmGermanLocale =
-				new JRadioButtonMenuItem(new AbstractAction(Messages.getString("ProjectView.mntmGermanLocale.text")) {
+				new JRadioButtonMenuItem(new AbstractAction(Localization.getString("ProjectView.mntmGermanLocale.text")) {
 					private static final long serialVersionUID = 1L;
 
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						Messages.changeLanguage(Locale.GERMAN);
+						Localization.changeLanguage(Locale.GERMAN);
 					}
 				});
 		mntmLanguageChoiceMenu.add(mntmGermanLocale);
 		ButtonGroup languageChoicesGroup = new ButtonGroup();
 		languageChoicesGroup.add(mntmEnglishLocale);
 		languageChoicesGroup.add(mntmGermanLocale);
-		if (Messages.languageIsGerman())
+		if (Localization.languageIsGerman())
 			mntmGermanLocale.setSelected(true);
 		else
 			mntmEnglishLocale.setSelected(true);
 
-		JMenuItem mntmReapplyMigration = new JMenuItem(new AbstractAction(Messages.getString("ProjectView.mntmReapplyMigration.text")) {
+		JMenuItem mntmReapplyMigration = new JMenuItem(new AbstractAction(Localization.getString("ProjectView.mntmReapplyMigration.text")) {
 			private static final long serialVersionUID = 1L;
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				(new ActionLoadProject(Messages.getString("ProjectView.mntmLoadTestProject.text"), model)).loadProject(true);
+				(new ActionLoadProject(Localization.getString("ProjectView.mntmLoadTestProject.text"), model)).loadProject(true);
 			}
 		});
 		mnHelp.add(mntmReapplyMigration);
@@ -523,7 +523,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 	}
 
 	private void setAcceleratorFromLocalizedShortcut(Action action, String localizedShortcutKey, int mask) {
-		char shortcut = Messages.getString(localizedShortcutKey).charAt(0);
+		char shortcut = Localization.getString(localizedShortcutKey).charAt(0);
 		KeyStroke keyStroke = KeyStroke.getKeyStroke(shortcut, mask);
 		action.putValue(Action.ACCELERATOR_KEY, keyStroke);
 	}
@@ -539,7 +539,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		panel_1.add(progressPanel, BorderLayout.SOUTH);
 		progressPanel.setLayout(new GridLayout(1, 0, 0, 0));
 
-		progressPanel.setData(Messages.getString("ProgressPanelDone.text"), 100);
+		progressPanel.setData(Localization.getString("ProgressPanelDone.text"), 100);
 
 		OutputTableRenderer outputTableRenderer = new OutputTableRenderer();
 		outputTable = model.createOutputTable();
@@ -666,18 +666,18 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 
 	private void buildOutputTablePopup() {
 		ActionDeleteOutputDirectories deleteOutputFileAction = new ActionDeleteOutputDirectories(
-				Messages.getString("ProjectView.mntmDelete.text"), model, outputTable);
+				Localization.getString("ProjectView.mntmDelete.text"), model, outputTable);
 
 		JPopupMenu outputListPopupMenu = new JPopupMenu();
 		outputListPopupMenu.add(new JMenuItem(deleteOutputFileAction));
 		outputListPopupMenu.add(
-				new JMenuItem(new ActionRenameOutputFile(Messages.getString("ProjectView.mntmRename.text"), model)));
+				new JMenuItem(new ActionRenameOutputFile(Localization.getString("ProjectView.mntmRename.text"), model)));
 		outputListPopupMenu.add(new JMenuItem(
-				new ActionOutputToScenario(Messages.getString("ProjectView.mntmOutputToSceneario.text"), model)));
+				new ActionOutputToScenario(Localization.getString("ProjectView.mntmOutputToSceneario.text"), model)));
 		outputListPopupMenu
-				.add(new JMenuItem(new ActionOpenInExplorer(Messages.getString("ProjectView.OpenInExplorer.text"), model)));
+				.add(new JMenuItem(new ActionOpenInExplorer(Localization.getString("ProjectView.OpenInExplorer.text"), model)));
 
-		JMenu copyPath = new JMenu(Messages.getString("ProjectView.mntmCopyOutputDir.text"));
+		JMenu copyPath = new JMenu(Localization.getString("ProjectView.mntmCopyOutputDir.text"));
 		outputTable.getSelectionModel().addListSelectionListener(new TableSelectionListener(outputTable) {
 			@Override
 			public void onSelect(ListSelectionEvent e) {
@@ -714,13 +714,13 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 
 	private void buildScenarioTablePopup(ActionAddScenario addScenarioAction) {
 		ActionDeleteScenarios deleteScenariosAction =
-				new ActionDeleteScenarios(Messages.getString("ProjectView.mntmDelete.text"), model, scenarioTable);
+				new ActionDeleteScenarios(Localization.getString("ProjectView.mntmDelete.text"), model, scenarioTable);
 		ActionRunSelectedScenarios runSelectedScenarios = new ActionRunSelectedScenarios(
-				Messages.getString("ProjectView.mntmRunSelectedTests.text"), model, scenarioTable);
+				Localization.getString("ProjectView.mntmRunSelectedTests.text"), model, scenarioTable);
 		ActionRunRepeatedlyScenarios runRepeatedlyScenarios = new ActionRunRepeatedlyScenarios(
-				Messages.getString("ProjectView.mntmRunRepeatedlyTests.text"), model, scenarioTable, n_repetitions);
+				Localization.getString("ProjectView.mntmRunRepeatedlyTests.text"), model, scenarioTable, n_repetitions);
 		ActionSeeDiscardChanges seeDiscardChangesAction = new ActionSeeDiscardChanges(
-				Messages.getString("ActionSeeDiscardChanges.menu.title"), model, scenarioTable);
+				Localization.getString("ActionSeeDiscardChanges.menu.title"), model, scenarioTable);
 
 		JPopupMenu scenarioListPopupMenu = new JPopupMenu();
 		scenarioListPopupMenu.add(new JMenuItem(addScenarioAction));
@@ -728,11 +728,11 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		scenarioListPopupMenu.add(new JMenuItem(runSelectedScenarios));
 		scenarioListPopupMenu.add(new JMenuItem(seeDiscardChangesAction));
 		scenarioListPopupMenu.add(new JMenuItem(
-				new ActionEditScenarioDescription(Messages.getString("ActionEditScenarioDescription.menu.title"), model)));
+				new ActionEditScenarioDescription(Localization.getString("ActionEditScenarioDescription.menu.title"), model)));
 		scenarioListPopupMenu.add(new JMenuItem(
-				new ActionCloneScenario(Messages.getString("ProjectView.mntmClone.text"), model)));
+				new ActionCloneScenario(Localization.getString("ProjectView.mntmClone.text"), model)));
 		scenarioListPopupMenu.add(new JMenuItem(
-				new ActionRenameScenario(Messages.getString("ProjectView.mntmRename.text"), model)));
+				new ActionRenameScenario(Localization.getString("ProjectView.mntmRename.text"), model)));
 		/*scenarioListPopupMenu.add(new JMenuItem(
 				new ActionConvertScenarioToWMP(Messages.getString("ProjectView.mntmConvertToWMP.text"), model)));*/
 
@@ -752,9 +752,9 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		ButtonGroup mainButtonsGroup = new ButtonGroup();
 
 		ActionRunSelectedScenarios runSelectedScenarios = new ActionRunSelectedScenarios(
-				Messages.getString("ProjectView.mntmRunSelectedTests.text"), model, scenarioTable);
+				Localization.getString("ProjectView.mntmRunSelectedTests.text"), model, scenarioTable);
 		runSelectedScenarios.putValue(Action.SHORT_DESCRIPTION,
-				Messages.getString("ProjectView.btnRunSelectedTest.toolTipText"));
+				Localization.getString("ProjectView.btnRunSelectedTest.toolTipText"));
 		runSelectedScenarios.putValue(Action.LARGE_ICON_KEY,
 				RESOURCE.getIconSVG("transport_play", ICON_SIZE, ICON_SIZE));
 		btnRunSelectedScenario = new JButton(runSelectedScenarios);
@@ -763,7 +763,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		toolBar.add(btnRunSelectedScenario);
 
 		Action runAllScenariosAction =
-				new ActionRunAllScenarios(Messages.getString("ProjectView.btnRunAllTests.text"), model);
+				new ActionRunAllScenarios(Localization.getString("ProjectView.btnRunAllTests.text"), model);
 		runAllScenariosAction.putValue(Action.LARGE_ICON_KEY,
 				RESOURCE.getIconSVG("transport_multiplay", ICON_SIZE, ICON_SIZE));
 		btnRunAllScenarios = new JButton(runAllScenariosAction);
@@ -778,9 +778,9 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		mainButtonsGroup.add(btnRunSelectedScenario);
 
 		ActionRunRepeatedlyScenarios runRepeatedlyScenarios = new ActionRunRepeatedlyScenarios(
-				Messages.getString("ProjectView.mntmRunRepeatedlyTests.text"), model, scenarioTable, n_repetitions);
+				Localization.getString("ProjectView.mntmRunRepeatedlyTests.text"), model, scenarioTable, n_repetitions);
 		runRepeatedlyScenarios.putValue(Action.SHORT_DESCRIPTION,
-				Messages.getString("ProjectView.btnRunRepeatedlyTest.toolTipText"));
+				Localization.getString("ProjectView.btnRunRepeatedlyTest.toolTipText"));
 		runRepeatedlyScenarios.putValue(Action.LARGE_ICON_KEY,
 				RESOURCE.getIconSVG("transport_multiplay", ICON_SIZE, ICON_SIZE));
 		btnRunRepeatedlyScenario = new JButton(runRepeatedlyScenarios);
@@ -791,34 +791,34 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		mainButtonsGroup.add(btnRunRepeatedlyScenario);
 
 		Action interruptScenariosAction =
-				new ActionInterruptScenarios(Messages.getString("ProjectView.btnStopRunningTests.text"), model);
+				new ActionInterruptScenarios(Localization.getString("ProjectView.btnStopRunningTests.text"), model);
 		interruptScenariosAction.putValue(Action.LARGE_ICON_KEY,
 				RESOURCE.getIconSVG("transport_stop", ICON_SIZE, ICON_SIZE));
 		btnStopRunningScenarios = new JButton(interruptScenariosAction);
 		toolBar.add(btnStopRunningScenarios);
 
 		ActionResumeNormalSpeed resumeNormalSpeedAction =
-				new ActionResumeNormalSpeed(Messages.getString("ProjectView.btnResumeNormalSpeed.text"), model);
+				new ActionResumeNormalSpeed(Localization.getString("ProjectView.btnResumeNormalSpeed.text"), model);
 		resumeNormalSpeedAction.putValue(Action.LARGE_ICON_KEY,
 				RESOURCE.getIconSVG("transport_play", ICON_SIZE, ICON_SIZE));
 		btnResumeNormalSpeed = new JButton(resumeNormalSpeedAction);
 		toolBar.add(btnResumeNormalSpeed);
 
 		ActionPauseScenario pauseScenarioAction =
-				new ActionPauseScenario(Messages.getString("ProjectView.btnPauseRunningTests.text"), model);
+				new ActionPauseScenario(Localization.getString("ProjectView.btnPauseRunningTests.text"), model);
 		pauseScenarioAction.putValue(Action.LONG_DESCRIPTION,
-				Messages.getString("ProjectView.btnPauseRunningTests.toolTipText") + " ("
-						+ Messages.getString("ProjectView.pauseTests.shortcut").charAt(0) + ")");
+				Localization.getString("ProjectView.btnPauseRunningTests.toolTipText") + " ("
+						+ Localization.getString("ProjectView.pauseTests.shortcut").charAt(0) + ")");
 		pauseScenarioAction.putValue(Action.LARGE_ICON_KEY,
 				RESOURCE.getIconSVG("transport_pause", ICON_SIZE, ICON_SIZE));
 		btnPauseRunningScenarios = new JButton(pauseScenarioAction);
 		toolBar.add(btnPauseRunningScenarios);
 		toolBar.getInputMap().put(
-				KeyStroke.getKeyStroke(Messages.getString("ProjectView.pauseTests.shortcut").charAt(0)), "pauseTests");
+				KeyStroke.getKeyStroke(Localization.getString("ProjectView.pauseTests.shortcut").charAt(0)), "pauseTests");
 		toolBar.getActionMap().put("pauseTests", pauseScenarioAction);
 
 		ActionNextTimeStep nextTimeStepAction =
-				new ActionNextTimeStep(Messages.getString("ProjectView.btnNextSimulationStep"), model);
+				new ActionNextTimeStep(Localization.getString("ProjectView.btnNextSimulationStep"), model);
 		nextTimeStepAction.putValue(Action.LONG_DESCRIPTION, "Next Step");
 		nextTimeStepAction.putValue(Action.LARGE_ICON_KEY,
 				RESOURCE.getIconSVG("transport_skip", ICON_SIZE, ICON_SIZE));

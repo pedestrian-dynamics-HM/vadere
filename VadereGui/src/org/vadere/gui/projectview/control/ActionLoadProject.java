@@ -1,6 +1,6 @@
 package org.vadere.gui.projectview.control;
 
-import org.vadere.gui.components.utils.Messages;
+import org.vadere.gui.components.utils.Localization;
 import org.vadere.gui.projectview.model.ProjectViewModel;
 import org.vadere.gui.projectview.view.ProjectView;
 import org.vadere.gui.projectview.view.VDialogManager;
@@ -53,14 +53,14 @@ public class ActionLoadProject extends AbstractAction {
 
 				Object[] options = new Object[Version.values().length+1];
 				System.arraycopy(Version.values(),0,options, 0, Version.values().length);
-				options[options.length-1] = Messages.getString("ProjectView.chooseMigrationBaseDialog.defaultOption");
+				options[options.length-1] = Localization.getString("ProjectView.chooseMigrationBaseDialog.defaultOption");
 
 				//TODO: [refactoring]: static call which has side-effect to the following call!
 				if (isRemigrationLoading) {
 					MigrationOptions migrationOptions;
 					Object option = JOptionPane.showInputDialog(null,
-							Messages.getString("ProjectView.chooseMigrationBaseDialog.text"),
-							Messages.getString("ProjectView.chooseMigrationBaseDialog.title"),
+							Localization.getString("ProjectView.chooseMigrationBaseDialog.text"),
+							Localization.getString("ProjectView.chooseMigrationBaseDialog.title"),
 							JOptionPane.INFORMATION_MESSAGE, null,
 							options, options[options.length-1]);
 
@@ -131,17 +131,17 @@ public class ActionLoadProject extends AbstractAction {
 					@Override
 					public Void doInBackground() {
 						String migrationResult = String.format("%s %s:\n\n",
-								Messages.getString("MigrationAssistant.Results.title"),
+								Localization.getString("MigrationAssistant.Results.title"),
 								Version.latest().label());
 						migrationResult += String.join("\n", getMigrationResult(stats));
 
 						if (stats.legacy > 0) {
-							migrationResult += String.format("\n\n%s", Messages.getString("MigrationAssistant.Results.migratedInfo"));
+							migrationResult += String.format("\n\n%s", Localization.getString("MigrationAssistant.Results.migratedInfo"));
 						}
 
 						JOptionPane.showMessageDialog(
 								ProjectView.getMainWindow(),
-								migrationResult, Messages.getString("MigrationAssistant.title"),
+								migrationResult, Localization.getString("MigrationAssistant.title"),
 								JOptionPane.INFORMATION_MESSAGE);
 
 						return null;
@@ -150,7 +150,7 @@ public class ActionLoadProject extends AbstractAction {
 				worker.execute();
 			}
 		} catch (Exception e) {
-			JOptionPane.showMessageDialog(null, e.getMessage(), Messages.getString("MigrationAssistant.title"),
+			JOptionPane.showMessageDialog(null, e.getMessage(), Localization.getString("MigrationAssistant.title"),
 					JOptionPane.ERROR_MESSAGE);
 			logger.error("could not loadFromFilesystem project: " + e.getMessage());
 			e.printStackTrace();
@@ -166,10 +166,10 @@ public class ActionLoadProject extends AbstractAction {
 		List<String> resultArray = new ArrayList<>();
 
 		String resultLineTemplate = "%s: %d";
-		resultArray.add(String.format(resultLineTemplate, Messages.getString("MigrationAssistant.Results.analyzed"), migrationResult.total));
-		resultArray.add(String.format(resultLineTemplate, Messages.getString("MigrationAssistant.Results.migrated"), migrationResult.legacy));
-		resultArray.add(String.format(resultLineTemplate, Messages.getString("MigrationAssistant.Results.upToDate"), migrationResult.upToDate));
-		resultArray.add(String.format(resultLineTemplate, Messages.getString("MigrationAssistant.Results.notMigratable"), migrationResult.notmigratable));
+		resultArray.add(String.format(resultLineTemplate, Localization.getString("MigrationAssistant.Results.analyzed"), migrationResult.total));
+		resultArray.add(String.format(resultLineTemplate, Localization.getString("MigrationAssistant.Results.migrated"), migrationResult.legacy));
+		resultArray.add(String.format(resultLineTemplate, Localization.getString("MigrationAssistant.Results.upToDate"), migrationResult.upToDate));
+		resultArray.add(String.format(resultLineTemplate, Localization.getString("MigrationAssistant.Results.notMigratable"), migrationResult.notmigratable));
 
 		return resultArray;
 	}
