@@ -249,8 +249,8 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		});
 	}
 
-    private static void showSuppressibleWarning(JFrame frame, String text, String title, String suppress) {
-        if (VadereConfig.getConfig().getBoolean(suppress, false)) {
+    private static void showSuppressibleWarning(JFrame frame, String text, String title, String suppressConfigKey) {
+        if (VadereConfig.getConfig().getBoolean(suppressConfigKey, false)) {
             return;
         }
 
@@ -259,7 +259,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
         messageArea.setOpaque(false);
         messageArea.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
 
-        JCheckBox checkToNotShow = new JCheckBox("Don't show this warning again");
+        JCheckBox checkToNotShow = new JCheckBox(Localization.getString("ProjectView.warning.checkToNotShow.text"));
 
         JPanel panel = new JPanel(new BorderLayout(0, 8));
         panel.add(messageArea, BorderLayout.CENTER);
@@ -268,7 +268,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
         JOptionPane.showMessageDialog(frame, panel, title, JOptionPane.WARNING_MESSAGE);
 
         if (checkToNotShow.isSelected()) {
-            VadereConfig.getConfig().setProperty(suppress, true);
+            VadereConfig.getConfig().setProperty(suppressConfigKey, true);
         }
     }
 
