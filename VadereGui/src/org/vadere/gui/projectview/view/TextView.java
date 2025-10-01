@@ -8,8 +8,7 @@ import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rsyntaxtextarea.Theme;
 import org.fife.ui.rtextarea.RTextScrollPane;
 import org.jetbrains.annotations.NotNull;
-import org.vadere.gui.components.control.HelpTextView;
-import org.vadere.gui.components.utils.Messages;
+import org.vadere.gui.components.utils.Localization;
 import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.projectview.model.IScenarioChecker;
 import org.vadere.simulator.projects.Scenario;
@@ -29,13 +28,9 @@ import org.vadere.util.logging.Logger;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -78,7 +73,7 @@ public class TextView extends JPanel implements IJsonView {
 	private ActionListener saveToFileActionListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			String path = IOUtils.chooseJSONFileSave(Messages.getString("TextFileView.btnSaveToFile.text"), CONFIG.getString(default_resource));
+			String path = IOUtils.chooseJSONFileSave(Localization.getString("TextFileView.btnSaveToFile.text"), CONFIG.getString(default_resource));
 
 			if (path == null)
 				return;
@@ -88,7 +83,7 @@ public class TextView extends JPanel implements IJsonView {
 				File file = new File(path);
 				VadereConfig.getConfig().setProperty(default_resource, file.getParentFile().getAbsolutePath());
 			} catch (IOException e1) {
-				IOUtils.errorBox(e1.getLocalizedMessage(), Messages.getString("SaveFileErrorMessage.title"));
+				IOUtils.errorBox(e1.getLocalizedMessage(), Localization.getString("SaveFileErrorMessage.title"));
 				logger.error(e1);
 			}
 		}
@@ -98,7 +93,7 @@ public class TextView extends JPanel implements IJsonView {
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			FileFilter filter = new FileNameExtensionFilter("JSON file", "json");
-			String path = IOUtils.chooseFile(Messages.getString("ChooseFile.text"), CONFIG.getString(default_resource), filter);
+			String path = IOUtils.chooseFile(Localization.getString("ChooseFile.text"), CONFIG.getString(default_resource), filter);
 
 			if (path == null)
 				return;
@@ -127,12 +122,12 @@ public class TextView extends JPanel implements IJsonView {
 
 		generatePresettingsMenu(attributeType);
 
-		JButton btnSaveToFile = new JButton(Messages.getString("TextFileView.btnSaveToFile.text"));
+		JButton btnSaveToFile = new JButton(Localization.getString("TextFileView.btnSaveToFile.text"));
 		btnSaveToFile.addActionListener(saveToFileActionListener);
         btnSaveToFile.setIcon(new ImageIcon(Resources.class.getResource("/icons/floppy.gif")));
 
 		panelTop.add(btnSaveToFile);
-		btnLoadFromFile = new JButton(Messages.getString("TextView.btnLoadFromFile.text"));
+		btnLoadFromFile = new JButton(Localization.getString("TextView.btnLoadFromFile.text"));
         btnLoadFromFile.setIcon(new ImageIcon(Resources.class.getResource("/icons/floppy.gif")));
         panelTop.add(btnLoadFromFile);
 
@@ -159,7 +154,7 @@ public class TextView extends JPanel implements IJsonView {
 
 		add(sp, BorderLayout.CENTER);
 
-		textfileTextarea.setText(Messages.getString("TextFileView.txtrTextfiletextarea.text"));
+		textfileTextarea.setText(Localization.getString("TextFileView.txtrTextfiletextarea.text"));
 		AbstractDocument document = (AbstractDocument)textfileTextarea.getDocument();
 		document.setDocumentFilter(new DocumentFilter(){
 			@Override
@@ -367,7 +362,7 @@ public class TextView extends JPanel implements IJsonView {
 	private void generatePresettingsMenu(final AttributeType attributeType) {
 		if (attributeType == AttributeType.SIMULATION) {
 			JMenuBar presetMenuBar = new JMenuBar();
-			JMenu mnPresetHelpMenu = new JMenu(Messages.getString("ProjectView.mnHelp.text"));
+			JMenu mnPresetHelpMenu = new JMenu(Localization.getString("ProjectView.mnHelp.text"));
 			mnPresetHelpMenu.addMenuListener(new MenuListener() {
 				@Override
 				public void menuSelected(MenuEvent e) {
@@ -387,7 +382,7 @@ public class TextView extends JPanel implements IJsonView {
 		}
 		if (attributeType == AttributeType.PSYCHOLOGY) {
 			JMenuBar presetMenuBar = new JMenuBar();
-			JMenu mnPresetHelpMenu = new JMenu(Messages.getString("ProjectView.mnHelp.text"));
+			JMenu mnPresetHelpMenu = new JMenu(Localization.getString("ProjectView.mnHelp.text"));
 			mnPresetHelpMenu.addMenuListener(new MenuListener() {
 				@Override
 				public void menuSelected(MenuEvent e) {
@@ -407,7 +402,7 @@ public class TextView extends JPanel implements IJsonView {
 		}
 		if (attributeType == AttributeType.PERCEPTION) {
 			JMenuBar presetMenuBar = new JMenuBar();
-			JMenu mnPresetMenu = new JMenu(Messages.getString("TextView.Button.LoadPresettings"));
+			JMenu mnPresetMenu = new JMenu(Localization.getString("TextView.Button.LoadPresettings"));
 			presetMenuBar.add(mnPresetMenu);
 
 			StimulusPresettings.PRESETTINGS_MAP.forEach(
@@ -417,8 +412,8 @@ public class TextView extends JPanel implements IJsonView {
 						@Override
 						public void actionPerformed(ActionEvent e) {
 							if (JOptionPane.showConfirmDialog(ProjectView.getMainWindow(),
-									Messages.getString("Tab.Model.confirmLoadTemplate.text"),
-									Messages.getString("Tab.Model.confirmLoadTemplate.title"),
+									Localization.getString("Tab.Model.confirmLoadTemplate.text"),
+									Localization.getString("Tab.Model.confirmLoadTemplate.title"),
 									JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
 								try {
 									textfileTextarea.setText(jsonString);
@@ -429,7 +424,7 @@ public class TextView extends JPanel implements IJsonView {
 						}
 					})));
 
-			JMenu mnPresetHelpMenu = new JMenu(Messages.getString("ProjectView.mnHelp.text"));
+			JMenu mnPresetHelpMenu = new JMenu(Localization.getString("ProjectView.mnHelp.text"));
 			presetMenuBar.add(mnPresetHelpMenu);
 
 			StimulusPresettings.PRESETTINGS_MAP.forEach(

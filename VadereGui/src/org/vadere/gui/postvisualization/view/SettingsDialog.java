@@ -5,7 +5,7 @@ import com.jgoodies.forms.layout.FormLayout;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.components.model.AgentColoring;
-import org.vadere.gui.components.utils.Messages;
+import org.vadere.gui.components.utils.Localization;
 import org.vadere.gui.postvisualization.model.PostvisualizationModel;
 
 import javax.swing.*;
@@ -22,9 +22,10 @@ public class SettingsDialog extends org.vadere.gui.components.view.SettingsDialo
 	@Override
 	public void initComponents() {
 		super.initComponents();
-		int row = 18; //TODO this is hard coded; must be adapted when further elements are inserted above
+		int row = 20; //TODO this is hard coded; must be adapted when further elements are inserted above
+		/** Remark: rows 1 ... 17 are occupied by objects added in {@link org.vadere.gui.components.view.SettingsDialog}*/
 		CellConstraints cc = new CellConstraints();
-		JRadioButton chShowEvacTimeColor = new JRadioButton(Messages.getString("PostVis.chShowEvacTimeColor.text"));
+		JRadioButton chShowEvacTimeColor = new JRadioButton(Localization.getString("PostVis.chShowEvacTimeColor.text"));
 		agentColorSettingsPane.add(chShowEvacTimeColor, cc.xyw(2, row += NEXT_CELL, 9));
 		chShowEvacTimeColor.addItemListener(e -> {
 			model.setAgentColoring(AgentColoring.EVACUATION_TIMES);
@@ -32,10 +33,10 @@ public class SettingsDialog extends org.vadere.gui.components.view.SettingsDialo
 		});
 
 
-		JRadioButton chShowCriteriaColor = new JRadioButton(Messages.getString("PostVis.chShowCriteriaColor.text") + ":");
+		JRadioButton chShowCriteriaColor = new JRadioButton(Localization.getString("PostVis.chShowCriteriaColor.text") + ":");
 		PedestrianColorPanel pedestrianColorPanel = new PedestrianColorPanel(model);
 		agentColorSettingsPane.add(chShowCriteriaColor, cc.xy(2, row += NEXT_CELL,  CellConstraints.LEFT, CellConstraints.TOP));
-		agentColorSettingsPane.add(pedestrianColorPanel, cc.xyw(4, row, 7));
+		agentColorSettingsPane.add(pedestrianColorPanel, cc.xyw(4, row += NEXT_CELL, 7));
 		chShowCriteriaColor.addItemListener(e -> {
 			model.setAgentColoring(AgentColoring.PREDICATE);
 			model.notifyObservers();
@@ -50,14 +51,14 @@ public class SettingsDialog extends org.vadere.gui.components.view.SettingsDialo
 	protected JLayeredPane getAdditionalOptionPanel() {
 		JLayeredPane additionalLayeredPane = new JLayeredPane();
 		additionalLayeredPane.setBorder(
-				BorderFactory.createTitledBorder(Messages.getString("PostVis.additional.border.text")));
+				BorderFactory.createTitledBorder(Localization.getString("PostVis.additional.border.text")));
 
 		FormLayout additionalLayout = new FormLayout("5dlu, pref, 5dlu", // col
 				"5dlu, pref, 2dlu, pref, 5dlu"); // rows
 		additionalLayeredPane.setLayout(additionalLayout);
 
-		JCheckBox chCleanPed = new JCheckBox(Messages.getString("PostVis.chbHidePedAtTarget.text"));
-		JCheckBox chCleanTrajecties = new JCheckBox(Messages.getString("PostVis.chbHideTrajAtTarget.text"));
+		JCheckBox chCleanPed = new JCheckBox(Localization.getString("PostVis.chbHidePedAtTarget.text"));
+		JCheckBox chCleanTrajecties = new JCheckBox(Localization.getString("PostVis.chbHideTrajAtTarget.text"));
 
 		chCleanPed.setSelected(!model.config.isShowFaydedPedestrians());
 		chCleanPed.addItemListener(e -> {

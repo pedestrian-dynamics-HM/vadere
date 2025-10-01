@@ -6,7 +6,7 @@ import info.clearthought.layout.TableLayout;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rsyntaxtextarea.Theme;
-import org.vadere.gui.components.utils.Messages;
+import org.vadere.gui.components.utils.Localization;
 import org.vadere.gui.components.view.JComboCheckBox;
 import org.vadere.gui.projectview.model.IScenarioChecker;
 import org.vadere.gui.projectview.utils.SimpleDocumentListener;
@@ -21,7 +21,6 @@ import org.vadere.simulator.projects.dataprocessing.store.DataProcessorStore;
 import org.vadere.simulator.projects.dataprocessing.store.OutputFileStore;
 import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.config.VadereConfig;
-import org.vadere.util.io.IOUtils;
 import org.vadere.util.logging.Logger;
 
 import javax.swing.*;
@@ -48,8 +47,8 @@ class DataProcessingView extends JPanel implements IJsonView {
 	private IJsonView activeJsonView; // gui-mode or expert-mode
 	private JLabel switchJsonViewModeLabel = new JLabel();
 	private JPanel viewPanel; // hosts the gui-panel or the expert-panel
-	private static final String guiViewMode = Messages.getString("ProjectView.gui");
-	private static final String jsonViewMode = Messages.getString("ProjectView.json");
+	private static final String guiViewMode = Localization.getString("ProjectView.gui");
+	private static final String jsonViewMode = Localization.getString("ProjectView.json");
 	private boolean inGuiViewMode = true;
 
 	private Scenario currentScenario;
@@ -86,7 +85,7 @@ class DataProcessingView extends JPanel implements IJsonView {
 	}
 
 	private void switchMode() {
-		String link = MessageFormat.format(Messages.getString("ProjectView.JSONSwitch.link"), (inGuiViewMode ? jsonViewMode : guiViewMode));
+		String link = MessageFormat.format(Localization.getString("ProjectView.JSONSwitch.link"), (inGuiViewMode ? jsonViewMode : guiViewMode));
 		switchJsonViewModeLabel.setText("<html><span style='font-size:8px'><font color='blue'>" +
 				link+"</font></span></html>");
 		VadereConfig.getConfig().setProperty("Gui.dataProcessingViewMode",
@@ -123,7 +122,7 @@ class DataProcessingView extends JPanel implements IJsonView {
 	private TextView buildExpertView() {
 		TextView panel = new TextView("ProjectView.defaultDirectoryOutputProcessors", AttributeType.OUTPUTPROCESSOR);
 		JMenuBar processorsMenuBar = new JMenuBar();
-		processorsMenu = new JMenu(Messages.getString("Tab.Model.loadTemplateMenu.title"));
+		processorsMenu = new JMenu(Localization.getString("Tab.Model.loadTemplateMenu.title"));
 		processorsMenu.setEnabled(isEditable);
 		processorsMenuBar.add(processorsMenu);
 
@@ -135,8 +134,8 @@ class DataProcessingView extends JPanel implements IJsonView {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     if (JOptionPane.showConfirmDialog(ProjectView.getMainWindow(),
-                            Messages.getString("Tab.Model.confirmLoadTemplate.text"),
-                            Messages.getString("Tab.Model.confirmLoadTemplate.title"),
+                            Localization.getString("Tab.Model.confirmLoadTemplate.text"),
+                            Localization.getString("Tab.Model.confirmLoadTemplate.title"),
                             JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
                         try {
                             panel.setText(templateJson);
@@ -203,7 +202,7 @@ class DataProcessingView extends JPanel implements IJsonView {
 
 			JPanel filesPanel = new JPanel();
 			filesPanel.setLayout(new BoxLayout(filesPanel, BoxLayout.PAGE_AXIS));
-			isTimestampedCheckBox = new JCheckBox(Messages.getString("DataProcessingView.chbAddTimeStamp"));
+			isTimestampedCheckBox = new JCheckBox(Localization.getString("DataProcessingView.chbAddTimeStamp"));
 			isTimestampedCheckBox.addActionListener(new AbstractAction() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
@@ -215,7 +214,7 @@ class DataProcessingView extends JPanel implements IJsonView {
 			addEditableComponent(isTimestampedCheckBox);
 			filesPanel.add(isTimestampedCheckBox);
 
-			isWriteMetaData = new JCheckBox(Messages.getString("DataProcessingView.chbAddMetaData"));
+			isWriteMetaData = new JCheckBox(Localization.getString("DataProcessingView.chbAddMetaData"));
 			isWriteMetaData.addActionListener(new AbstractAction() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
@@ -227,7 +226,7 @@ class DataProcessingView extends JPanel implements IJsonView {
 			addEditableComponent(isWriteMetaData);
 			filesPanel.add(isWriteMetaData);
 
-			JButton addFileBtn = new JButton(new AbstractAction(Messages.getString("DataProcessingView.btnAdd")) {
+			JButton addFileBtn = new JButton(new AbstractAction(Localization.getString("DataProcessingView.btnAdd")) {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 
@@ -241,12 +240,12 @@ class DataProcessingView extends JPanel implements IJsonView {
 					refreshGUI();
 				}
 			});
-			deleteFileBtn = new JButton(new AbstractAction(Messages.getString("DataProcessingView.btnDelete")) {
+			deleteFileBtn = new JButton(new AbstractAction(Localization.getString("DataProcessingView.btnDelete")) {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					if (selectedOutputFile == null) {
 						JOptionPane.showMessageDialog(ProjectView.getMainWindow(),
-								Messages.getString("DataProcessingView.msgFileSelected"));
+								Localization.getString("DataProcessingView.msgFileSelected"));
 					} else {
 						currentScenario.getDataProcessingJsonManager().getOutputFiles().remove(selectedOutputFile);
 						selectedOutputFile = null;
@@ -261,12 +260,12 @@ class DataProcessingView extends JPanel implements IJsonView {
 
 			setupTables();
 
-			JPanel filesTable = buildPanel(Messages.getString("DataProcessingView.files.label"), outputFilesTable, addFileBtn, deleteFileBtn);
+			JPanel filesTable = buildPanel(Localization.getString("DataProcessingView.files.label"), outputFilesTable, addFileBtn, deleteFileBtn);
 			filesTable.setAlignmentX(Component.LEFT_ALIGNMENT);
 			filesPanel.add(filesTable);
 			tableSide.add(filesPanel);
 
-			JButton addProcessorBtn = new JButton(new AbstractAction(Messages.getString("DataProcessingView.btnAdd")) {
+			JButton addProcessorBtn = new JButton(new AbstractAction(Localization.getString("DataProcessingView.btnAdd")) {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					DataProcessorFactory factory = DataProcessorFactory.instance();
@@ -276,7 +275,7 @@ class DataProcessingView extends JPanel implements IJsonView {
 					JComboBox processorOptions = new JComboBox<>(processors);
 
 					if (JOptionPane.showConfirmDialog(ProjectView.getMainWindow(), processorOptions,
-							Messages.getString("DataProcessingView.dialogChoseProcessor.label"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+							Localization.getString("DataProcessingView.dialogChoseProcessor.label"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
 						String processorClass = processorLableToClass.get(processorOptions.getSelectedItem());
 //						System.out.println("Selected Processor is: " + processorClass);
 						DataProcessor newDataProcessor = null;
@@ -295,11 +294,11 @@ class DataProcessingView extends JPanel implements IJsonView {
 					refreshGUI();
 				}
 			});
-			deleteProcessorBtn = new JButton(new AbstractAction(Messages.getString("DataProcessingView.btnDelete")) {
+			deleteProcessorBtn = new JButton(new AbstractAction(Localization.getString("DataProcessingView.btnDelete")) {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					if (selectedDataProcessor == null) {
-						JOptionPane.showMessageDialog(ProjectView.getMainWindow(), Messages.getString("DataProcessingView.msgFileSelected"));
+						JOptionPane.showMessageDialog(ProjectView.getMainWindow(), Localization.getString("DataProcessingView.msgFileSelected"));
 					} else {
 						Integer id = selectedDataProcessor.getId();
 						currentScenario.getDataProcessingJsonManager().getDataProcessors().remove(selectedDataProcessor);
@@ -317,7 +316,7 @@ class DataProcessingView extends JPanel implements IJsonView {
 					}
 				}
 			});
-			tableSide.add(buildPanel(Messages.getString("DataProcessingView.dialogProcessors.label"), dataProcessorsTable, addProcessorBtn, deleteProcessorBtn));
+			tableSide.add(buildPanel(Localization.getString("DataProcessingView.dialogProcessors.label"), dataProcessorsTable, addProcessorBtn, deleteProcessorBtn));
 
 			// right details side
 
@@ -499,7 +498,7 @@ class DataProcessingView extends JPanel implements IJsonView {
 
 			c.gridx = 0;
 			c.gridy = 0;
-			panel.add(new JLabel(Messages.getString("DataProcessingView.dialogOutputFileSelection.label")+":"), c);
+			panel.add(new JLabel(Localization.getString("DataProcessingView.dialogOutputFileSelection.label")+":"), c);
 
 			c.gridx = 1;
 			c.gridy = 0;
@@ -529,16 +528,16 @@ class DataProcessingView extends JPanel implements IJsonView {
 
 						String msg = "";
 						if (newName.isEmpty()) {
-							msg = Messages.getString("DataProcessingView.msgFileEmpty");
+							msg = Localization.getString("DataProcessingView.msgFileEmpty");
 							newName = getDefaultFilename();
 						} else if (outputFileNameAlreadyExists(newName) > 1) { // is automatically updated.
-							msg = Messages.getString("DataProcessingView.msgFileInUse");
+							msg = Localization.getString("DataProcessingView.msgFileInUse");
 							newName = getDefaultFilename();
 						}
 						if (!msg.isEmpty()) {
 							nameField.setText(newName);
 							JOptionPane.showMessageDialog(ProjectView.getMainWindow(), msg,
-									Messages.getString("DataProcessingView.dialogInvalidFile.label"), JOptionPane.WARNING_MESSAGE);
+									Localization.getString("DataProcessingView.dialogInvalidFile.label"), JOptionPane.WARNING_MESSAGE);
 						}
 					});
 				}
@@ -555,7 +554,7 @@ class DataProcessingView extends JPanel implements IJsonView {
 
 			c.gridx = 0;
 			c.gridy = 1;
-			panel.add(new JLabel(Messages.getString("DataProcessingView.dialogOutputDataKeySelection.label")), c);
+			panel.add(new JLabel(Localization.getString("DataProcessingView.dialogOutputDataKeySelection.label")), c);
 
 			c.gridx = 1;
 			c.gridy = 1;
@@ -585,7 +584,7 @@ class DataProcessingView extends JPanel implements IJsonView {
 
 			c.gridx = 0;
 			c.gridy = 2;
-			panel.add(new JLabel(Messages.getString("DataProcessingView.dialogOutputIndicesSelection.label")+":"), c);
+			panel.add(new JLabel(Localization.getString("DataProcessingView.dialogOutputIndicesSelection.label")+":"), c);
 
 			// Only the indices are shown, not the entire header. > Entire header can be quite a lot of text (which may
 			// not fit in the GUI) + the processors (with the header information) are not inserted and removed on the fly,
@@ -596,7 +595,7 @@ class DataProcessingView extends JPanel implements IJsonView {
 
 			c.gridx = 0;
 			c.gridy = 3;
-			panel.add(new JLabel(Messages.getString("DataProcessingView.dialogProcessors.label")+":"), c);
+			panel.add(new JLabel(Localization.getString("DataProcessingView.dialogProcessors.label")+":"), c);
 
 			c.gridx = 1;
 			c.gridy = 3;
@@ -642,7 +641,7 @@ class DataProcessingView extends JPanel implements IJsonView {
 
 			c.gridx = 0;
 			c.gridy = 1;
-			panel.add(new JLabel(Messages.getString("DataProcessingView.dialogOutputDataKeySelection.label")+":"), c);
+			panel.add(new JLabel(Localization.getString("DataProcessingView.dialogOutputDataKeySelection.label")+":"), c);
 
 			c.gridx = 1;
 			c.gridy = 1;
@@ -651,13 +650,13 @@ class DataProcessingView extends JPanel implements IJsonView {
 			c.gridx = 2;
 			c.gridy = 1;
 			c.anchor = GridBagConstraints.EAST;
-			JLabel jsonInvalidLabel = new JLabel("<html><font color='red'>"+Messages.getString("DataProcessingView.msgInvalidJson")+"</font> <font color=gray size=-2><a href=#>" +
-					Messages.getString("DataProcessingView.msgShowError")+ "</a></font></html>");
+			JLabel jsonInvalidLabel = new JLabel("<html><font color='red'>"+ Localization.getString("DataProcessingView.msgInvalidJson")+"</font> <font color=gray size=-2><a href=#>" +
+					Localization.getString("DataProcessingView.msgShowError")+ "</a></font></html>");
 			jsonInvalidLabel.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseReleased(MouseEvent e) {
 					VDialogManager.showMessageDialogWithTextArea(
-							Messages.getString("TextView.lbljsoninvalid.errorMsgPopup.title"),
+							Localization.getString("TextView.lbljsoninvalid.errorMsgPopup.title"),
 							latestJsonParsingError,
 							JOptionPane.ERROR_MESSAGE);
 				}

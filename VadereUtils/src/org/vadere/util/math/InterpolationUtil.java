@@ -409,4 +409,28 @@ public class InterpolationUtil {
 		 */
 
 	}
+
+	/**
+	 * Performs a simple linear interpolation of the values
+	 * @param a from
+	 * @param b to
+	 * @param t percentage value between zero and one
+	 * @return returns a when t = 0, b when t = 1, and the midpoint between a and b when t = 0.5.
+	 */
+	public static double lerp(double a, double b, double t) {
+		return a + (b - a) * t;
+	}
+
+	/**
+	 * Performs a simple linear interpolation between the two points
+	 * @param a from
+	 * @param b to
+	 * @param t percentage value between zero and one
+	 * @return returns a when t = 0, b when t = 1, and the midpoint between a and b when t = 0.5.
+	 */
+	public static VPoint lerp(VPoint a, VPoint b, double t) {
+		VPoint aScaled = a.scalarMultiply(1 - t);
+		VPoint bScaled = b.scalarMultiply(t);
+		return aScaled.add(bScaled);
+	}
 }

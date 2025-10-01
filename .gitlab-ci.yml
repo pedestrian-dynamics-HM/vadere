@@ -26,9 +26,14 @@ variables:
     VADERE_PACKAGE_NAME_BRANCHES: "vadere.${CI_COMMIT_REF_NAME}.${OPERATING_SYSTEM}.zip"
     VADERE_PACKAGE_NAME_RELEASES: "vadere.${CI_COMMIT_TAG}.${OPERATING_SYSTEM}.zip"
     EIKMESH_PACKAGE_NAME_BRANCHES: "eikmesh.${CI_COMMIT_REF_NAME}.${OPERATING_SYSTEM}.zip"
+    VADERE_HOME: '${CI_PROJECT_DIR}'    # all files relative to this
+    PYTHON: python3.12
+    PIP: pip3.12
+    GIT_DEPTH: 1 # only clone/fetch last commit (no history)
 
 # Stage Definitions
 stages:
+    - build_venv
     - unit_test
     - integration_test
     - seed_test
@@ -74,7 +79,7 @@ stages:
     artifacts:
         when: on_success
         paths:
-            - "*/target/coverage-reports"
+            - ${VADERE_HOME}/**/target/coverage-reports
         expire_in: 1 week
     when: on_success
             
@@ -84,11 +89,12 @@ stages:
         - rm -f ~/.config/vadere.conf
         - mvn clean
         - mvn -Dmaven.test.skip=true package
-        - python3 Tools/ContinuousIntegration/run_vadere_console_with_all_scenario_files.py
+        - source ${VADERE_PY_ENV_PATH}
+        - ${PYTHON} ${VADERE_HOME}/Tools/ContinuousIntegration/run_vadere_console_with_all_scenario_files.py
     artifacts:
         when: on_failure
         paths:
-            - "vadere_logs"
+            - ${VADERE_HOME}/vadere_logs
         expire_in: 1 week
     when: on_success
 
@@ -98,7 +104,8 @@ stages:
         - rm -f ~/.config/vadere.conf
         - mvn clean
         - mvn -Dmaven.test.skip=true package
-        - python3 Tools/ContinuousIntegration/run_vadere_console_with_all_scenario_files.py --exclude \
+        - source ${VADERE_PY_ENV_PATH}
+        - ${PYTHON} ${VADERE_HOME}/Tools/ContinuousIntegration/run_vadere_console_with_all_scenario_files.py --exclude \
           "Scenarios/ModelCalibration" \
           "Scenarios/ModelTests" \
           "Scenarios/OptimizationTests" \
@@ -108,7 +115,7 @@ stages:
     artifacts:
         when: on_failure
         paths:
-            - "vadere_logs"
+            - ${VADERE_HOME}/vadere_logs
         expire_in: 1 week
     when: on_success
 
@@ -118,11 +125,12 @@ stages:
         - rm -f ~/.config/vadere.conf
         - mvn clean
         - mvn -Dmaven.test.skip=true package
-        - python3 Tools/ContinuousIntegration/run_vadere_video.py -d Scenarios --scenarios-specified-in-config-only 
+        - source ${VADERE_PY_ENV_PATH}
+        - ${PYTHON} ${VADERE_HOME}/Tools/ContinuousIntegration/run_vadere_video.py -d Scenarios --scenarios-specified-in-config-only 
     artifacts:
         paths:
-            - "VideoOutput"
-            - "vadere_logs"
+            - ${VADERE_HOME}/VideoOutput
+            - ${VADERE_HOME}/vadere_logs
         expire_in: 1 week
     when: manual
 
@@ -131,9 +139,9 @@ stages:
     script:
         - mvn clean
         - mvn -Dmaven.test.skip=true package
-        - python3 -m zipfile -c ${VADERE_PACKAGE_NAME_BRANCHES} CHANGELOG.md README.md Scenarios/ VadereGui/target/vadere-gui.jar VadereSimulator/target/vadere-console.jar VadereManager/target/vadere-server.jar
+        - ${PYTHON} -m zipfile -c ${VADERE_PACKAGE_NAME_BRANCHES} CHANGELOG.md README.md Scenarios/ VadereGui/target/vadere-gui.jar VadereSimulator/target/vadere-console.jar VadereManager/target/vadere-server.jar
         - scp -o StrictHostKeyChecking=no ${VADERE_PACKAGE_NAME_BRANCHES} di49mur@webdev02-mwn.lrz.de:./webserver/htdocs/builds/master/${VADERE_PACKAGE_NAME_BRANCHES}
-        - python3 -m zipfile -c ${EIKMESH_PACKAGE_NAME_BRANCHES} VadereMeshing/README.md VadereMeshing/target/meshing-0.1-SNAPSHOT.jar
+        - ${PYTHON} -m zipfile -c ${EIKMESH_PACKAGE_NAME_BRANCHES} VadereMeshing/README.md VadereMeshing/target/meshing-0.1-SNAPSHOT.jar
         - scp -o StrictHostKeyChecking=no ${EIKMESH_PACKAGE_NAME_BRANCHES} di49mur@webdev02-mwn.lrz.de:./webserver/htdocs/builds/master/eikmesh/${EIKMESH_PACKAGE_NAME_BRANCHES}
     only:
         refs:
@@ -145,7 +153,7 @@ stages:
     script:
         - mvn clean
         - mvn -Dmaven.test.skip=true package
-        - python3 -m zipfile -c ${VADERE_PACKAGE_NAME_RELEASES} CHANGELOG.md README.md Scenarios/ VadereGui/target/vadere-gui.jar VadereSimulator/target/vadere-console.jar VadereManager/target/vadere-server.jar
+        - ${PYTHON} -m zipfile -c ${VADERE_PACKAGE_NAME_RELEASES} CHANGELOG.md README.md Scenarios/ VadereGui/target/vadere-gui.jar VadereSimulator/target/vadere-console.jar VadereManager/target/vadere-server.jar
         - scp -o StrictHostKeyChecking=no ${VADERE_PACKAGE_NAME_RELEASES} di49mur@webdev02-mwn.lrz.de:./webserver/htdocs/builds/stable/${VADERE_PACKAGE_NAME_RELEASES}
     # Run job only for "tags" (usually on the "stable" branch). Watch out: Multiple "only" tags are ORed together.
     # See: https://gitlab.com/gitlab-org/gitlab-ce/issues/27818
@@ -158,7 +166,7 @@ stages:
     script:
         - mvn clean
         - mvn -Dmaven.test.skip=true package
-        - python3 -m zipfile -c ${VADERE_PACKAGE_NAME_BRANCHES} CHANGELOG.md README.md Scenarios/ VadereGui/target/vadere-gui.jar VadereSimulator/target/vadere-console.jar VadereManager/target/vadere-server.jar
+        - ${PYTHON} -m zipfile -c ${VADERE_PACKAGE_NAME_BRANCHES} CHANGELOG.md README.md Scenarios/ VadereGui/target/vadere-gui.jar VadereSimulator/target/vadere-console.jar VadereManager/target/vadere-server.jar
         - scp -o StrictHostKeyChecking=no ${VADERE_PACKAGE_NAME_BRANCHES} di49mur@webdev02-mwn.lrz.de:./webserver/htdocs/builds/branches/${VADERE_PACKAGE_NAME_BRANCHES}
     when: manual
 
@@ -167,119 +175,212 @@ stages:
     script:
         - mvn clean
         - mvn -Dmaven.test.skip=true package
-        # setup.py install should from the directoty at which the setup.py file is located (working directory). The brackets return the working direcory back to previous position. 
-        - (cd Tools/VadereAnalysisTools/VadereAnalysisTool/ && python3 setup.py install --user)
-        - python3 Tools/ContinuousIntegration/run_seed_comparison_test.py   
+        - source ${VADERE_PY_ENV_PATH}
+        - ${PYTHON} ${VADERE_HOME}/Tools/ContinuousIntegration/run_seed_comparison_test.py
     artifacts:
         when: on_failure
         paths: 
-            - "Tools/ContinuousIntegration/run_seed_comparison_test.d/output"
+            - ${VADERE_HOME}/Tools/ContinuousIntegration/run_seed_comparison_test.d/output
         expire_in: 1 week
     when: on_success
+
+.template_build_venv:
+    stage: build_venv
+    script:
+        - echo "foo bar and now foo directly"
+        - "echo $FOO"
+        - "echo $PATH"
+        - mvn -version
+        - ${PYTHON} -m venv ${VADERE_HOME}/venv
+        - source ${VADERE_PY_ENV_PATH}
+        # The brackets return the working direcory back to previous position. 
+        - (cd Tools/VadereAnalysisTools/VadereAnalysisTool/ && ${PIP} install . )
+    artifacts:
+        when: on_success
+        access: all
+        expire_in: 1 week
+        paths:
+            - ${VADERE_HOME}/venv
+
+
 
 # Job Definitions
 
 ## Jobs for GNU/Linux runner (which is labeled with tag "linux")
 
-run_unit_tests_on_linux:
-    extends: .template_unit_tests
+template_build_venv_on_linux:
+    extends: .template_build_venv
+    variables:
+        VADERE_PY_ENV_PATH: ${VADERE_HOME}/venv/bin/activate
+        OPERATING_SYSTEM: "linux"
     tags:
         - linux
+
+run_unit_tests_on_linux:
+    extends: .template_unit_tests
+    variables:
+        VADERE_PY_ENV_PATH: ${VADERE_HOME}/venv/bin/activate
+        OPERATING_SYSTEM: "linux"
+    tags:
+        - linux
+    dependencies:
+        - template_build_venv_on_linux
 
 run_scenario_files_on_linux:
     extends: .template_scenario_files
+    variables:
+        VADERE_PY_ENV_PATH: ${VADERE_HOME}/venv/bin/activate
+        OPERATING_SYSTEM: "linux"
     tags:
         - linux
+    dependencies:
+        - template_build_venv_on_linux
 
 run_seed_test_on_linux:
     extends: .template_seed_test
+    variables:
+        VADERE_PY_ENV_PATH: ${VADERE_HOME}/venv/bin/activate
+        OPERATING_SYSTEM: "linux"
     tags:
         - linux
+    dependencies:
+        - template_build_venv_on_linux
 
 deploy_master_on_linux:
     extends: .template_deploy_master_automatically
     variables:
+        VADERE_PY_ENV_PATH: ${VADERE_HOME}/venv/bin/activate
         OPERATING_SYSTEM: "linux"
     tags:
         - linux        
     environment:
         name: master/linux
         url: ${VADERE_DEPLOYMENT_BASE_URL}/master/vadere.${CI_COMMIT_REF_NAME}.${OPERATING_SYSTEM}.zip
+    dependencies:
+        - template_build_venv_on_linux
 
 deploy_stable_on_linux:
     extends: .template_deploy_stable_automatically
     variables:
+        VADERE_PY_ENV_PATH: ${VADERE_HOME}/venv/bin/activate
         OPERATING_SYSTEM: "linux"
     tags:
         - linux
     environment:
         name: stable/linux
         url: ${VADERE_DEPLOYMENT_BASE_URL}/stable/vadere.${CI_COMMIT_TAG}.${OPERATING_SYSTEM}.zip
+    dependencies:
+        - template_build_venv_on_linux
 
 deploy_branch_on_linux:
     extends: .template_deploy_branch_manually
     variables:
+        VADERE_PY_ENV_PATH: ${VADERE_HOME}/venv/bin/activate
         OPERATING_SYSTEM: "linux"
     tags:
         - linux        
     environment:
         name: branches/${CI_COMMIT_REF_NAME}/linux
         url: ${VADERE_DEPLOYMENT_BASE_URL}/branches/vadere.${CI_COMMIT_REF_NAME}.${OPERATING_SYSTEM}.zip
+    dependencies:
+        - template_build_venv_on_linux
 
     
 generate_videos_on_linux:
     extends: .template_generate_videos
+    variables:
+        VADERE_PY_ENV_PATH: ${VADERE_HOME}/venv/bin/activate
+        OPERATING_SYSTEM: "linux"
     tags:
         - linux
+    dependencies:
+        - template_build_venv_on_linux
 
 ## Jobs for Windows runner (which is labeled with tag "windows")
 
-run_unit_tests_on_windows:
-    extends: .template_unit_tests
+template_build_venv_on_windows:
+    extends: .template_build_venv
+    variables:
+        VADERE_PY_ENV_PATH: ${VADERE_HOME}/venv/Scripts/activate
+        OPERATING_SYSTEM: "windows"
     tags:
         - windows
+
+run_unit_tests_on_windows:
+    extends: .template_unit_tests
+    variables:
+        VADERE_PY_ENV_PATH: ${VADERE_HOME}/venv/Scripts/activate
+        OPERATING_SYSTEM: "windows"
+    tags:
+        - windows
+    dependencies:
+        - template_build_venv_on_windows
 
 run_scenario_files_on_windows:
     extends: .template_scenario_files
+    variables:
+        VADERE_PY_ENV_PATH: ${VADERE_HOME}/venv/Scripts/activate
+        OPERATING_SYSTEM: "windows"
     tags:
         - windows
+    dependencies:
+        - template_build_venv_on_windows
 
 run_seed_test_on_windows:
     extends: .template_seed_test
+    variables:
+        VADERE_PY_ENV_PATH: ${VADERE_HOME}/venv/Scripts/activate
+        OPERATING_SYSTEM: "windows"
     tags:
         - windows
+    dependencies:
+        - template_build_venv_on_windows
 
 deploy_master_on_windows:
     extends: .template_deploy_master_automatically
     variables:
+        VADERE_PY_ENV_PATH: ${VADERE_HOME}/venv/Scripts/activate
         OPERATING_SYSTEM: "windows"
     tags:
         - windows        
     environment:
         name: master/windows
         url: ${VADERE_DEPLOYMENT_BASE_URL}/master/vadere.${CI_COMMIT_REF_NAME}.${OPERATING_SYSTEM}.zip
+    dependencies:
+        - template_build_venv_on_windows
 
 deploy_stable_on_windows:
     extends: .template_deploy_stable_automatically
     variables:
+        VADERE_PY_ENV_PATH: ${VADERE_HOME}/venv/Scripts/activate
         OPERATING_SYSTEM: "windows"
     tags:
         - windows
     environment:
         name: stable/windows
         url: ${VADERE_DEPLOYMENT_BASE_URL}/stable/vadere.${CI_COMMIT_TAG}.${OPERATING_SYSTEM}.zip
+    dependencies:
+        - template_build_venv_on_windows
 
 deploy_branch_on_windows:
     extends: .template_deploy_branch_manually
     variables:
+        VADERE_PY_ENV_PATH: ${VADERE_HOME}/venv/Scripts/activate
         OPERATING_SYSTEM: "windows"
     tags:
         - windows        
     environment:
         name: branches/${CI_COMMIT_REF_NAME}/windows
         url: ${VADERE_DEPLOYMENT_BASE_URL}/branches/vadere.${CI_COMMIT_REF_NAME}.${OPERATING_SYSTEM}.zip
+    dependencies:
+        - template_build_venv_on_windows
 
 generate_videos_on_windows:
     extends: .template_generate_videos
+    variables:
+        VADERE_PY_ENV_PATH: ${VADERE_HOME}/venv/Scripts/activate
+        OPERATING_SYSTEM: "windows"
     tags:
         - windows
+    dependencies:
+        - template_build_venv_on_windows

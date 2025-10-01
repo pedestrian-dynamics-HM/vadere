@@ -8,19 +8,22 @@ import org.vadere.gui.components.control.simulation.*;
 import org.vadere.gui.components.model.AgentColoring;
 import org.vadere.gui.components.model.DefaultSimulationConfig;
 import org.vadere.gui.components.model.SimulationModel;
-import org.vadere.gui.components.utils.Messages;
+import org.vadere.gui.components.utils.Localization;
 import org.vadere.gui.components.utils.SwingUtils;
 import org.vadere.gui.postvisualization.control.ActionCloseSettingDialog;
+import org.vadere.gui.postvisualization.view.ComboBoxMultiSelect;
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.psychology.information.InformationState;
 import org.vadere.state.scenario.Target;
 import org.vadere.util.config.VadereConfig;
+import org.vadere.util.io.IOUtils;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.Optional;
+import java.util.*;
+import java.util.List;
 
 public class SettingsDialog extends JDialog {
 
@@ -60,7 +63,7 @@ public class SettingsDialog extends JDialog {
 	 * 5. A row containing a close button.
 	 */
 	public void initComponents() {
-		this.setTitle(Messages.getString("SettingsDialog.title"));
+		this.setTitle(Localization.getString("SettingsDialog.title"));
 		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		this.addWindowListener(new WindowAdapter() {
 			@Override
@@ -129,7 +132,7 @@ public class SettingsDialog extends JDialog {
 		JPanel closePane = new JPanel();
 		closePane.setLayout(new FlowLayout(FlowLayout.RIGHT));
 
-		JButton closeButton = new JButton(Messages.getString("SettingsDialog.btnClose.text"));
+		JButton closeButton = new JButton(Localization.getString("SettingsDialog.btnClose.text"));
 		closeButton.addActionListener(new ActionCloseSettingDialog(this));
 
 		closePane.add(closeButton);
@@ -139,7 +142,7 @@ public class SettingsDialog extends JDialog {
 
 	private void initColorSettingsPane(JLayeredPane colorSettingsPane){
 		colorSettingsPane
-				.setBorder(BorderFactory.createTitledBorder(Messages.getString("SettingsDialog.colors.border.text")));
+				.setBorder(BorderFactory.createTitledBorder(Localization.getString("SettingsDialog.colors.border.text")));
 
 		FormLayout colorSettingsLayout = new FormLayout("5dlu, pref:grow, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 5dlu", // col
 				createCellsWithSeparators(9)); // rows
@@ -150,15 +153,15 @@ public class SettingsDialog extends JDialog {
 		int column = 2;
 		CellConstraints cc = new CellConstraints();
 
-		colorSettingsPane.add(new JLabel(Messages.getString("SettingsDialog.lblObstacle.text") + ":"), cc.xy(column, row += NEXT_CELL));
-		colorSettingsPane.add(new JLabel(Messages.getString("SettingsDialog.lblTarget.text") + ":"), cc.xy(column, row += NEXT_CELL));
-		colorSettingsPane.add(new JLabel(Messages.getString("SettingsDialog.lblSource.text") + ":"), cc.xy(column, row += NEXT_CELL));
-		colorSettingsPane.add(new JLabel(Messages.getString("SettingsDialog.lblStair.text") + ":"), cc.xy(column, row += NEXT_CELL));
-		colorSettingsPane.add(new JLabel(Messages.getString("SettingsDialog.lblDensityColor.text") + ":"), cc.xy(column, row += NEXT_CELL));
-		colorSettingsPane.add(new JLabel(Messages.getString("SettingsDialog.lblAbsorbingAreaColor.text") + ":"), cc.xy(column, row += NEXT_CELL));
-		colorSettingsPane.add(new JLabel(Messages.getString("SettingsDialog.lblTargetChanger.text") + ":"), cc.xy(column, row += NEXT_CELL));
-		colorSettingsPane.add(new JLabel(Messages.getString("SettingsDialog.lblAerosolCloudColor.text") + ":"), cc.xy(column, row += NEXT_CELL));
-		colorSettingsPane.add(new JLabel(Messages.getString("SettingsDialog.lblDropletCloudColor.text") + ":"), cc.xy(column, row += NEXT_CELL));
+		colorSettingsPane.add(new JLabel(Localization.getString("SettingsDialog.lblObstacle.text") + ":"), cc.xy(column, row += NEXT_CELL));
+		colorSettingsPane.add(new JLabel(Localization.getString("SettingsDialog.lblTarget.text") + ":"), cc.xy(column, row += NEXT_CELL));
+		colorSettingsPane.add(new JLabel(Localization.getString("SettingsDialog.lblSource.text") + ":"), cc.xy(column, row += NEXT_CELL));
+		colorSettingsPane.add(new JLabel(Localization.getString("SettingsDialog.lblStair.text") + ":"), cc.xy(column, row += NEXT_CELL));
+		colorSettingsPane.add(new JLabel(Localization.getString("SettingsDialog.lblDensityColor.text") + ":"), cc.xy(column, row += NEXT_CELL));
+		colorSettingsPane.add(new JLabel(Localization.getString("SettingsDialog.lblAbsorbingAreaColor.text") + ":"), cc.xy(column, row += NEXT_CELL));
+		colorSettingsPane.add(new JLabel(Localization.getString("SettingsDialog.lblTargetChanger.text") + ":"), cc.xy(column, row += NEXT_CELL));
+		colorSettingsPane.add(new JLabel(Localization.getString("SettingsDialog.lblAerosolCloudColor.text") + ":"), cc.xy(column, row += NEXT_CELL));
+		colorSettingsPane.add(new JLabel(Localization.getString("SettingsDialog.lblDropletCloudColor.text") + ":"), cc.xy(column, row += NEXT_CELL));
 
 		createColorCanvasesAndChangeButtonsOnPane(colorSettingsPane);
 	}
@@ -171,7 +174,7 @@ public class SettingsDialog extends JDialog {
 		int column5 = 10;
 		CellConstraints cc = new CellConstraints();
 
-		final JButton bObstColor = new JButton(Messages.getString("SettingsDialog.btnEditColor.text"));
+		final JButton bObstColor = new JButton(Localization.getString("SettingsDialog.btnEditColor.text"));
 		final JPanel pObstacleColor = new JPanel();
 		pObstacleColor.setBackground(model.config.getObstacleColor());
 		pObstacleColor.setPreferredSize(new Dimension(COLOR_JPANEL_WIDTH, 20));
@@ -179,7 +182,7 @@ public class SettingsDialog extends JDialog {
 		colorSettingsPane.add(pObstacleColor, cc.xy(column4, row += NEXT_CELL));
 		colorSettingsPane.add(bObstColor, cc.xy(column5, row));
 
-		final JButton bTarColor = new JButton(Messages.getString("SettingsDialog.btnEditColor.text"));
+		final JButton bTarColor = new JButton(Localization.getString("SettingsDialog.btnEditColor.text"));
 		final JPanel pTargetColor = new JPanel();
 		pTargetColor.setBackground(model.config.getTargetColor());
 		pTargetColor.setPreferredSize(new Dimension(COLOR_JPANEL_WIDTH, 20));
@@ -187,7 +190,7 @@ public class SettingsDialog extends JDialog {
 		colorSettingsPane.add(pTargetColor, cc.xy(column4, row += NEXT_CELL));
 		colorSettingsPane.add(bTarColor, cc.xy(column5, row));
 
-		final JButton bSrcColor = new JButton(Messages.getString("SettingsDialog.btnEditColor.text"));
+		final JButton bSrcColor = new JButton(Localization.getString("SettingsDialog.btnEditColor.text"));
 		final JPanel pSourceColor = new JPanel();
 		pSourceColor.setBackground(model.config.getSourceColor());
 		pSourceColor.setPreferredSize(new Dimension(COLOR_JPANEL_WIDTH, 20));
@@ -195,7 +198,7 @@ public class SettingsDialog extends JDialog {
 		colorSettingsPane.add(pSourceColor, cc.xy(column4, row += NEXT_CELL));
 		colorSettingsPane.add(bSrcColor, cc.xy(column5, row));
 
-		final JButton bStairsColor = new JButton(Messages.getString("SettingsDialog.btnEditColor.text"));
+		final JButton bStairsColor = new JButton(Localization.getString("SettingsDialog.btnEditColor.text"));
 		final JPanel pStairsColor = new JPanel();
 		pStairsColor.setBackground(model.config.getStairColor());
 		pStairsColor.setPreferredSize(new Dimension(COLOR_JPANEL_WIDTH, 20));
@@ -203,7 +206,7 @@ public class SettingsDialog extends JDialog {
 		colorSettingsPane.add(pStairsColor, cc.xy(column4, row += NEXT_CELL));
 		colorSettingsPane.add(bStairsColor, cc.xy(column5, row));
 
-		final JButton bDensityColor = new JButton(Messages.getString("SettingsDialog.btnEditColor.text"));
+		final JButton bDensityColor = new JButton(Localization.getString("SettingsDialog.btnEditColor.text"));
 		final JPanel pDensityColor = new JPanel();
 		pDensityColor.setBackground(model.config.getDensityColor());
 		pDensityColor.setPreferredSize(new Dimension(COLOR_JPANEL_WIDTH, 20));
@@ -211,7 +214,7 @@ public class SettingsDialog extends JDialog {
 		colorSettingsPane.add(pDensityColor, cc.xy(column4, row += NEXT_CELL));
 		colorSettingsPane.add(bDensityColor, cc.xy(column5, row));
 
-		final JButton bAbsorbingAreaColor = new JButton(Messages.getString("SettingsDialog.btnEditColor.text"));
+		final JButton bAbsorbingAreaColor = new JButton(Localization.getString("SettingsDialog.btnEditColor.text"));
 		final JPanel pAbsorbingAreaColor = new JPanel();
 		pAbsorbingAreaColor.setBackground(model.config.getAbsorbingAreaColor());
 		pAbsorbingAreaColor.setPreferredSize(new Dimension(COLOR_JPANEL_WIDTH, 20));
@@ -219,7 +222,7 @@ public class SettingsDialog extends JDialog {
 		colorSettingsPane.add(pAbsorbingAreaColor, cc.xy(column4, row += NEXT_CELL));
 		colorSettingsPane.add(bAbsorbingAreaColor, cc.xy(column5, row));
 
-		final JButton bTargetChangerColor = new JButton(Messages.getString("SettingsDialog.btnEditColor.text"));
+		final JButton bTargetChangerColor = new JButton(Localization.getString("SettingsDialog.btnEditColor.text"));
 		final JPanel pTargetChangerColor = new JPanel();
 		pTargetChangerColor.setBackground(model.config.getTargetChangerColor());
 		pTargetChangerColor.setPreferredSize(new Dimension(COLOR_JPANEL_WIDTH, 20));
@@ -227,7 +230,7 @@ public class SettingsDialog extends JDialog {
 		colorSettingsPane.add(pTargetChangerColor, cc.xy(column4, row += NEXT_CELL));
 		colorSettingsPane.add(bTargetChangerColor, cc.xy(column5, row));
 
-		final JButton bAerosolCloudColor = new JButton(Messages.getString("SettingsDialog.btnEditColor.text"));
+		final JButton bAerosolCloudColor = new JButton(Localization.getString("SettingsDialog.btnEditColor.text"));
 		final JPanel pAerosolCloudColor = new JPanel();
 		pAerosolCloudColor.setBackground(model.config.getAerosolCloudColor());
 		pAerosolCloudColor.setPreferredSize(new Dimension(COLOR_JPANEL_WIDTH, 20));
@@ -243,10 +246,10 @@ public class SettingsDialog extends JDialog {
 			model.config.setAerosolCloudAlphaMax((int) sModelAerosolCloudAlpha.getValue());
 			model.notifyObservers();
 		});
-		colorSettingsPane.add(new JLabel(Messages.getString("SettingsDialog.lblAerosolCloudAlpha.text") + ":"), cc.xy(column2, row));
+		colorSettingsPane.add(new JLabel(Localization.getString("SettingsDialog.lblAerosolCloudAlpha.text") + ":"), cc.xy(column2, row));
 		colorSettingsPane.add(spinnerAerosolCloudAlpha, cc.xy(column3, row));
 
-		final JButton bDropletCloudColor = new JButton(Messages.getString("SettingsDialog.btnEditColor.text"));
+		final JButton bDropletCloudColor = new JButton(Localization.getString("SettingsDialog.btnEditColor.text"));
 		final JPanel pDropletCloudColor = new JPanel();
 		pDropletCloudColor.setBackground(model.config.getDropletsColor());
 		pDropletCloudColor.setPreferredSize(new Dimension(COLOR_JPANEL_WIDTH, 20));
@@ -262,14 +265,15 @@ public class SettingsDialog extends JDialog {
 				createCellsWithSeparators(nOnlineVisualizationCells + nPostVisualizationCells));
 
 		colorSettingsPane.setLayout(pedColorLayout);
-		colorSettingsPane.setBorder(BorderFactory.createTitledBorder(Messages.getString("SettingsDialog.pedcolors.border.text")));
+		colorSettingsPane.setBorder(BorderFactory.createTitledBorder(Localization.getString("SettingsDialog.pedcolors.border.text")));
 
-		JRadioButton rbTargetColoring = createRadioButtonWithListener(AgentColoring.TARGET, Messages.getString("SettingsDialog.lblTargetColoring.text")+ ":");
-		JRadioButton rbRandomColoring = createRadioButtonWithListener(AgentColoring.RANDOM, Messages.getString("SettingsDialog.chbUseRandomColors.text"));
-		JRadioButton rbGroupColoring = createRadioButtonWithListener(AgentColoring.GROUP, Messages.getString("SettingsDialog.chbGroupColors.text"));
-		JRadioButton rbSelfCategoryColoring = createRadioButtonWithListener(AgentColoring.SELF_CATEGORY, Messages.getString("SettingsDialog.lblSelfCategoryColoring.text")+ ":");
-		JRadioButton rbHealthStatusColoring = createRadioButtonWithListener(AgentColoring.HEALTH_STATUS, Messages.getString("SettingsDialog.lblHealthStatusColoring.text")+ ":");
-		JRadioButton rbInformationColoring = createRadioButtonWithListener(AgentColoring.INFORMATION_STATE, Messages.getString("SettingsDialog.lblInformationColoring.text")+ ":");
+		JRadioButton rbTargetColoring = createRadioButtonWithListener(AgentColoring.TARGET, Localization.getString("SettingsDialog.lblTargetColoring.text")+ ":");
+		JRadioButton rbRandomColoring = createRadioButtonWithListener(AgentColoring.RANDOM, Localization.getString("SettingsDialog.chbUseRandomColors.text"));
+		JRadioButton rbGroupColoring = createRadioButtonWithListener(AgentColoring.GROUP, Localization.getString("SettingsDialog.chbGroupColors.text"));
+		JRadioButton rbSelfCategoryColoring = createRadioButtonWithListener(AgentColoring.SELF_CATEGORY, Localization.getString("SettingsDialog.lblSelfCategoryColoring.text")+ ":");
+		JRadioButton rbHealthStatusColoring = createRadioButtonWithListener(AgentColoring.HEALTH_STATUS, Localization.getString("SettingsDialog.lblHealthStatusColoring.text")+ ":");
+		JRadioButton rbInformationColoring = createRadioButtonWithListener(AgentColoring.INFORMATION_STATE, Localization.getString("SettingsDialog.lblInformationColoring.text")+ ":");
+		JRadioButton rbImageOverlay = createRadioButtonWithListener(AgentColoring.IMAGE_OVERLAY, Localization.getString("SettingsDialog.tfUseImageOverlay.text"));
 
 
 		rbTargetColoring.setSelected(true);
@@ -282,30 +286,32 @@ public class SettingsDialog extends JDialog {
 		group.add(rbSelfCategoryColoring);
 		group.add(rbHealthStatusColoring);
 		group.add(rbInformationColoring);
+		group.add(rbImageOverlay);
+
 
 		JComboBox<Integer> cbTargetIds = createTargetIdsComboBoxAndAddIds();
 		final JPanel pTargetColor = new JPanel();
-		final JButton bChangeTargetColor = new JButton(Messages.getString("SettingsDialog.btnEditColor.text"));
+		final JButton bChangeTargetColor = new JButton(Localization.getString("SettingsDialog.btnEditColor.text"));
 		final JPanel pPedestrianColorNoTarget = new JPanel();
-		final JButton bChangePedestrianColorNoTarget = new JButton(Messages.getString("SettingsDialog.btnEditColor.text"));
+		final JButton bChangePedestrianColorNoTarget = new JButton(Localization.getString("SettingsDialog.btnEditColor.text"));
 
 		initColoringByTargetId(cbTargetIds, pTargetColor, bChangeTargetColor, bChangePedestrianColorNoTarget, pPedestrianColorNoTarget);
 
 		JComboBox<SelfCategory> cbSelfCategories = createSelfCategoriesComboBox();
 		final JPanel pSelfCategoryColor = new JPanel();
-		final JButton bChangeSelfCategoryColor = new JButton(Messages.getString("SettingsDialog.btnEditColor.text"));
+		final JButton bChangeSelfCategoryColor = new JButton(Localization.getString("SettingsDialog.btnEditColor.text"));
 
 		initColoringBySelfCategory(cbSelfCategories, pSelfCategoryColor, bChangeSelfCategoryColor);
 
 		final JPanel pPedestrianColorLowerExposure = new JPanel();
-		final JButton bChangePedestrianColorLowerExposure = new JButton(Messages.getString("SettingsDialog.btnEditColor.text"));
+		final JButton bChangePedestrianColorLowerExposure = new JButton(Localization.getString("SettingsDialog.btnEditColor.text"));
 
 		final JPanel pPedestrianColorUpperExposure = new JPanel();
-		final JButton bChangePedestrianColorUpperExposure = new JButton(Messages.getString("SettingsDialog.btnEditColor.text"));
+		final JButton bChangePedestrianColorUpperExposure = new JButton(Localization.getString("SettingsDialog.btnEditColor.text"));
 
 
 		final JPanel pPedestrianColorInfectious = new JPanel();
-		final JButton bChangePedestrianColorInfectious = new JButton(Messages.getString("SettingsDialog.btnEditColor.text"));
+		final JButton bChangePedestrianColorInfectious = new JButton(Localization.getString("SettingsDialog.btnEditColor.text"));
 
 		initColoringByHealthStatus(bChangePedestrianColorLowerExposure, pPedestrianColorLowerExposure,
 				bChangePedestrianColorUpperExposure, pPedestrianColorUpperExposure,
@@ -333,10 +339,12 @@ public class SettingsDialog extends JDialog {
 
 		JComboBox<InformationState> cbInformationStates = createInformationStateComboBox();
 		final JPanel pInformationStateColor = new JPanel();
-		final JButton bChangeInformationStateColor = new JButton(Messages.getString("SettingsDialog.btnEditColor.text"));
+		final JButton bChangeInformationStateColor = new JButton(Localization.getString("SettingsDialog.btnEditColor.text"));
 
 		initColoringByInformationState(cbInformationStates, pInformationStateColor, bChangeInformationStateColor);
 
+		ComboBoxMultiSelect<String> cbImagePaths = createComboBoxWithImageNames();
+		initImageOverlay(cbImagePaths);
 
 		int row = 0;
 		int column1 = 2;
@@ -351,8 +359,7 @@ public class SettingsDialog extends JDialog {
 		colorSettingsPane.add(cbTargetIds, cc.xy(column2, row));
 		colorSettingsPane.add(pTargetColor, cc.xy(column4, row));
 		colorSettingsPane.add(bChangeTargetColor, cc.xy(column5, row));
-
-		colorSettingsPane.add(new JLabel(Messages.getString("SettingsDialog.lblPedestrianNoTarget.text") + ":"), cc.xy(column2, row += NEXT_CELL));
+		colorSettingsPane.add(new JLabel(Localization.getString("SettingsDialog.lblPedestrianNoTarget.text") + ":"), cc.xy(column2, row += NEXT_CELL));
 		colorSettingsPane.add(pPedestrianColorNoTarget, cc.xy(column4, row));
 		colorSettingsPane.add(bChangePedestrianColorNoTarget, cc.xy(column5, row));
 
@@ -365,17 +372,17 @@ public class SettingsDialog extends JDialog {
 		colorSettingsPane.add(bChangeSelfCategoryColor, cc.xy(column5, row));
 
 		colorSettingsPane.add(rbHealthStatusColoring, cc.xy(column1, row += NEXT_CELL));
-		colorSettingsPane.add(new JLabel(Messages.getString("SettingsDialog.lblPedestrianLowerExposure.text") + ":"), cc.xy(column2, row));
+		colorSettingsPane.add(new JLabel(Localization.getString("SettingsDialog.lblPedestrianLowerExposure.text") + ":"), cc.xy(column2, row));
 		colorSettingsPane.add(spinnerLowerExposure, cc.xy(column3, row));
 		colorSettingsPane.add(pPedestrianColorLowerExposure, cc.xy(column4, row));
 		colorSettingsPane.add(bChangePedestrianColorLowerExposure, cc.xy(column5, row));
 
-		colorSettingsPane.add(new JLabel(Messages.getString("SettingsDialog.lblPedestrianUpperExposure.text") + ":"), cc.xy(column2, row += NEXT_CELL));
+		colorSettingsPane.add(new JLabel(Localization.getString("SettingsDialog.lblPedestrianUpperExposure.text") + ":"), cc.xy(column2, row += NEXT_CELL));
 		colorSettingsPane.add(spinnerUpperExposure, cc.xy(column3, row));
 		colorSettingsPane.add(pPedestrianColorUpperExposure, cc.xy(column4, row));
 		colorSettingsPane.add(bChangePedestrianColorUpperExposure, cc.xy(column5, row));
 
-		colorSettingsPane.add(new JLabel(Messages.getString("SettingsDialog.lblPedestrianInfectious.text") + ":"), cc.xy(column2, row += NEXT_CELL));
+		colorSettingsPane.add(new JLabel(Localization.getString("SettingsDialog.lblPedestrianInfectious.text") + ":"), cc.xy(column2, row += NEXT_CELL));
 		colorSettingsPane.add(pPedestrianColorInfectious, cc.xy(column4, row));
 		colorSettingsPane.add(bChangePedestrianColorInfectious, cc.xy(column5, row));
 
@@ -385,17 +392,29 @@ public class SettingsDialog extends JDialog {
 		colorSettingsPane.add(bChangeInformationStateColor, cc.xy(column5, row));
 
 		// Evacuation time and criteria coloring comes in the next row see "postvisualization/.../SettingsDialog.java".
+
+		// add image overlay as last option
+		// add a horizontal line to make the user aware that overlaying an image is a special type of coloring
+		int additionalSpace = 8; /** leave space for entries added in {@link org.vadere.gui.postvisualization.view.SettingsDialog} */
+		colorSettingsPane.add(new JSeparator(), cc.xyw(column1, row += (NEXT_CELL + additionalSpace), column5 ));
+
+		colorSettingsPane.add(rbImageOverlay, cc.xy(column1, row += NEXT_CELL));
+		colorSettingsPane.add(cbImagePaths, cc.xy(column2, row));
+
+
 	}
 
 	private JRadioButton createRadioButtonWithListener(AgentColoring colorScheme, String buttonText) {
 		JRadioButton radioButton = new JRadioButton(buttonText);
 		radioButton.addItemListener(e -> {
+			model.config.setShowImage(colorScheme.equals(AgentColoring.IMAGE_OVERLAY));
 			model.setAgentColoring(colorScheme);
 			model.notifyObservers();
 		});
 
 		return radioButton;
 	}
+
 
 	private JComboBox<Integer> createTargetIdsComboBoxAndAddIds() {
 		java.util.List<Target> targets = model.getTopography().getTargets();
@@ -420,6 +439,16 @@ public class SettingsDialog extends JDialog {
 		return comboBox;
 	}
 
+	private ComboBoxMultiSelect<String> createComboBoxWithImageNames() {
+		ComboBoxMultiSelect cb = new ComboBoxMultiSelect();
+		List<String> files  =  IOUtils.getFileNameList(config.getImageDirectory(), ".png");
+		for (String f : files) {
+			cb.addItem(f); // each *.png image will be list entry in the combobox
+		}
+		cb.setSelectedElements(files); // default setting: use all images found in the directory
+		return cb;
+	}
+
 	private void initColoringByTargetId(JComboBox<Integer> cbTargetIds, JPanel pTargetColor, JButton bChangeTargetColor, JButton bChangePedestrianColorNoTarget, JPanel pPedestrianColorNoTarget) {
 		cbTargetIds.setSelectedIndex(0);
 
@@ -435,6 +464,7 @@ public class SettingsDialog extends JDialog {
 		// When user changes a color, save it in the model.
 		bChangeTargetColor.addActionListener(new ActionSetPedestrianColor("Set Pedestrian Color", model, pTargetColor,
 				cbTargetIds));
+
 
 		// Retrieve configured color from "model" or use default color.
 		cbTargetIds.addActionListener(e -> {
@@ -466,6 +496,7 @@ public class SettingsDialog extends JDialog {
 		// When user changes a color, save it in the model.
 		bChangeSelfCategoryColor.addActionListener(new ActionSetSelfCategoryColor("Set Self Category Color", model, pSelfCategoryColor,
 				cbSelfCategories));
+
 
 		// Retrieve configured color from "model".
 		cbSelfCategories.addActionListener(e -> {
@@ -520,29 +551,33 @@ public class SettingsDialog extends JDialog {
 		int i;
 	}
 
+	private void initImageOverlay(ComboBoxMultiSelect<String> boxMultiSelect){
+		boxMultiSelect.addActionListener(new ActionSetImageOverlay("Set image", model, boxMultiSelect));
+	}
+
 
 	private void initOtherSettingsPane(JLayeredPane otherSettingsPane) {
 		otherSettingsPane.setBorder(
-				BorderFactory.createTitledBorder(Messages.getString("SettingsDialog.additional.border.text")));
+				BorderFactory.createTitledBorder(Localization.getString("SettingsDialog.additional.border.text")));
 
 		FormLayout otherSettingsLayout = new FormLayout(createCellsWithSeparators(4), // col
 				createCellsWithSeparators(18)); // rows
 		otherSettingsPane.setLayout(otherSettingsLayout);
 
 		// For each scenario element, add a checkbox to toggle its visibility.
-		JCheckBox chInterpolatePositions = new JCheckBox((Messages.getString("SettingsDialog.chbInterpolatePositions.text")));
-		JCheckBox chShowObstacles = new JCheckBox((Messages.getString("SettingsDialog.chbShowObstacles.text")));
-		JCheckBox chShowTargets = new JCheckBox((Messages.getString("SettingsDialog.chbShowTargets.text")));
-		JCheckBox chShowSources = new JCheckBox((Messages.getString("SettingsDialog.chbShowSources.text")));
-		JCheckBox chShowAbsorbingAreas = new JCheckBox((Messages.getString("SettingsDialog.chbShowAbsorbingAreas.text")));
-		JCheckBox chShowAerosolClouds = new JCheckBox((Messages.getString("SettingsDialog.chbShowAerosolClouds.text")));
-		JCheckBox chShowDropletClouds = new JCheckBox((Messages.getString("SettingsDialog.chbShowDropletClouds.text")));
-		JCheckBox chShowMeasurementAreas = new JCheckBox((Messages.getString("SettingsDialog.chbShowMeasurementAreas.text")));
-		JCheckBox chShowStairs = new JCheckBox((Messages.getString("SettingsDialog.chbShowStairs.text")));
-		JCheckBox chShowTargetChangers = new JCheckBox((Messages.getString("SettingsDialog.chbShowTargetChangers.text")));
-		JCheckBox chShowPedIds = new JCheckBox((Messages.getString("SettingsDialog.chbShowPedestrianIds.text")));
-		JCheckBox chShowPedestrianInOutGroup = new JCheckBox((Messages.getString("SettingsDialog.chbShowPedestrianInOutGroup.text")));
-		JCheckBox chHideVoronoiDiagram = new JCheckBox((Messages.getString("SettingsDialog.chbHideVoronoiDiagram.text")));
+		JCheckBox chInterpolatePositions = new JCheckBox((Localization.getString("SettingsDialog.chbInterpolatePositions.text")));
+		JCheckBox chShowObstacles = new JCheckBox((Localization.getString("SettingsDialog.chbShowObstacles.text")));
+		JCheckBox chShowTargets = new JCheckBox((Localization.getString("SettingsDialog.chbShowTargets.text")));
+		JCheckBox chShowSources = new JCheckBox((Localization.getString("SettingsDialog.chbShowSources.text")));
+		JCheckBox chShowAbsorbingAreas = new JCheckBox((Localization.getString("SettingsDialog.chbShowAbsorbingAreas.text")));
+		JCheckBox chShowAerosolClouds = new JCheckBox((Localization.getString("SettingsDialog.chbShowAerosolClouds.text")));
+		JCheckBox chShowDropletClouds = new JCheckBox((Localization.getString("SettingsDialog.chbShowDropletClouds.text")));
+		JCheckBox chShowMeasurementAreas = new JCheckBox((Localization.getString("SettingsDialog.chbShowMeasurementAreas.text")));
+		JCheckBox chShowStairs = new JCheckBox((Localization.getString("SettingsDialog.chbShowStairs.text")));
+		JCheckBox chShowTargetChangers = new JCheckBox((Localization.getString("SettingsDialog.chbShowTargetChangers.text")));
+		JCheckBox chShowPedIds = new JCheckBox((Localization.getString("SettingsDialog.chbShowPedestrianIds.text")));
+		JCheckBox chShowPedestrianInOutGroup = new JCheckBox((Localization.getString("SettingsDialog.chbShowPedestrianInOutGroup.text")));
+		JCheckBox chHideVoronoiDiagram = new JCheckBox((Localization.getString("SettingsDialog.chbHideVoronoiDiagram.text")));
 
 		chInterpolatePositions.setSelected(model.config.isInterpolatePositions());
 		chInterpolatePositions.addItemListener(e -> {
@@ -646,7 +681,7 @@ public class SettingsDialog extends JDialog {
 		otherSettingsPane.add(chShowAerosolClouds, cc.xyw(column, row += NEXT_CELL, colSpan));
 		otherSettingsPane.add(chShowDropletClouds, cc.xyw(column, row += NEXT_CELL, colSpan));
 
-		JCheckBox chChowLogo = new JCheckBox(Messages.getString("SettingsDialog.chbLogo.text"));
+		JCheckBox chChowLogo = new JCheckBox(Localization.getString("SettingsDialog.chbLogo.text"));
 		chChowLogo.setSelected(model.config.isShowLogo());
 		chChowLogo.addItemListener(e -> {
 			model.config.setShowLogo(!model.config.isShowLogo());
@@ -654,7 +689,7 @@ public class SettingsDialog extends JDialog {
 		});
 		otherSettingsPane.add(chChowLogo, cc.xyw(2, row += NEXT_CELL, 5));
 
-		otherSettingsPane.add(new JLabel(Messages.getString("SettingsDialog.lblSnapshotDir.text") + ":"),
+		otherSettingsPane.add(new JLabel(Localization.getString("SettingsDialog.lblSnapshotDir.text") + ":"),
 				cc.xy(2, row += NEXT_CELL));
 
 		// Add text box to change snapshot directory
@@ -662,7 +697,7 @@ public class SettingsDialog extends JDialog {
 		tSnapshotDir.setEditable(false);
 		tSnapshotDir.setPreferredSize(new Dimension(130, 20));
 		otherSettingsPane.add(tSnapshotDir, cc.xy(4, row));
-		final JButton bSnapshotDir = new JButton(Messages.getString("SettingsDialog.btnEditSnapshot.text"));
+		final JButton bSnapshotDir = new JButton(Localization.getString("SettingsDialog.btnEditSnapshot.text"));
 		bSnapshotDir.addActionListener(new ActionSetSnapshotDirectory("Set Snapshot Directory", model, tSnapshotDir, this));
 		otherSettingsPane.add(bSnapshotDir, cc.xy(6, row));
 
@@ -676,7 +711,7 @@ public class SettingsDialog extends JDialog {
 			model.notifyObservers();
 		});
 
-		otherSettingsPane.add(new JLabel(Messages.getString("SettingsDialog.lblCellWidth.text") + ":"),
+		otherSettingsPane.add(new JLabel(Localization.getString("SettingsDialog.lblCellWidth.text") + ":"),
 				cc.xy(2, row += NEXT_CELL));
 		otherSettingsPane.add(spinnerCellWidth, cc.xy(4, row));
 	}

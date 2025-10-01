@@ -1,8 +1,7 @@
 package org.vadere.gui.projectview.control;
 
 
-import org.vadere.gui.components.utils.Messages;
-import org.vadere.gui.projectview.VadereApplication;
+import org.vadere.gui.components.utils.Localization;
 import org.vadere.gui.projectview.model.ProjectViewModel;
 import org.vadere.gui.projectview.utils.ApplicationWriter;
 import org.vadere.gui.projectview.view.VDialogManager;
@@ -12,13 +11,8 @@ import org.vadere.util.logging.Logger;
 
 import javax.swing.*;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.TreeSet;
-import java.util.prefs.BackingStoreException;
-import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 
 public abstract class ActionAbstractSaveProject extends AbstractAction {
@@ -110,15 +104,15 @@ public abstract class ActionAbstractSaveProject extends AbstractAction {
 				updateRecentProjectPreferences(model);
 			} catch (IOException e) {
 				IOUtils.errorBox(
-						Messages.getString("SaveFileErrorMessage.text") + System.lineSeparator()
+						Localization.getString("SaveFileErrorMessage.text") + System.lineSeparator()
 								+ e.getLocalizedMessage(),
-						Messages.getString("SaveFileErrorMessage.title"));
+						Localization.getString("SaveFileErrorMessage.title"));
 				logger.error("could not save project: " + e.getMessage());
 				throw new IOException(e);
 			}
 		} else {
-			IOUtils.infoBox(Messages.getString("EmptyProjectErrorMessage.text"),
-					Messages.getString("EmptyProjectErrorMessage.title"));
+			IOUtils.infoBox(Localization.getString("EmptyProjectErrorMessage.text"),
+					Localization.getString("EmptyProjectErrorMessage.title"));
 		}
 	}
 

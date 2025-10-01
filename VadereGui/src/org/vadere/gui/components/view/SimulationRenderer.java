@@ -7,6 +7,8 @@ import org.vadere.gui.postvisualization.model.PostvisualizationModel;
 import org.vadere.gui.renderer.agent.AgentRender;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
+import org.vadere.util.debugDraw.DebugDraw;
+import org.vadere.util.debugDraw.drawMethods.interfaces.DebugRenderTarget;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VTriangle;
@@ -137,8 +139,6 @@ public abstract class SimulationRenderer extends DefaultRenderer {
         if (hasLogo() && model.config.isShowLogo()) {
             renderLogo(graphics, model.getScaleFactor(), height);
         }
-
-        graphics.dispose();
     }
 
     protected void renderTrajectory(final Graphics2D g, final java.util.List<VPoint> points, final Pedestrian pedestrain) {
@@ -287,10 +287,6 @@ public abstract class SimulationRenderer extends DefaultRenderer {
 
     protected abstract void renderSimulationContent(final Graphics2D g);
 
-    private float getGridLineWidth() {
-        return (float) (0.5 / model.getScaleFactor());
-    }
-
     public AgentRender getAgentRender() {
         return agentRender;
     }
@@ -307,6 +303,8 @@ public abstract class SimulationRenderer extends DefaultRenderer {
 		        return model.config.getColorByTargetId(targetId).orElseGet(model.config::getPedestrianDefaultColor);
 		    case RANDOM:
 		        return model.config.getRandomColor(agent.getId());
+            case IMAGE_OVERLAY:
+                return model.config.getImageOverlay();
             case SELF_CATEGORY:
                 if (agent instanceof Pedestrian) {
                     Pedestrian pedestrian = (Pedestrian) agent;
@@ -333,7 +331,14 @@ public abstract class SimulationRenderer extends DefaultRenderer {
             case HEALTH_STATUS: {
                 if (agent instanceof Pedestrian) {
                     Pedestrian pedestrian = (Pedestrian) agent;
-                    return model.config.getHealthStatusColor(pedestrian.isInfectious(), pedestrian.getDegreeOfExposure());
+
+                    boolean isInfectious = false;
+                    double degreeOfExposure = 0.0;
+                    if (pedestrian.getHealthStatus() != null) {
+                        isInfectious = pedestrian.isInfectious();
+                        degreeOfExposure = pedestrian.getDegreeOfExposure();
+                    }
+                    return model.config.getHealthStatusColor(isInfectious, degreeOfExposure);
                 }
             }
 		    default: return model.config.getPedestrianColor();
@@ -341,4 +346,16 @@ public abstract class SimulationRenderer extends DefaultRenderer {
 	    }
     }
 
+    @Override
+    protected void debugDraw(Graphics2D targetGraphics2D) {
+        DebugRenderTarget debugRenderTarget = (DebugRenderTarget) DebugDraw.simulation();
+        debugRenderTarget.informModelRenderListeners(
+                model,
+                targetGraphics2D,
+                getGridLineWidth());
+        debugRenderTarget.drawToGraphics(
+                targetGraphics2D,
+                getGridLineWidth());
+        debugRenderTarget.updateTime(model.getSimTimeInSec());
+    }
 }

@@ -1,6 +1,6 @@
 package org.vadere.gui.projectview.model;
 
-import org.vadere.gui.components.utils.Messages;
+import org.vadere.gui.components.utils.Localization;
 
 public enum VadereState {
 	RUNNING, PAUSED, INTERRUPTED, INITIALIZED, STEP;
@@ -9,15 +9,15 @@ public enum VadereState {
 	public String toString() {
 		switch (this) {
 			case RUNNING:
-				return Messages.getString("Running.text");
+				return Localization.getString("Running.text");
 			case PAUSED:
-				return Messages.getString("Paused.text");
+				return Localization.getString("Paused.text");
 			case INTERRUPTED:
-				return Messages.getString("Interrupted.text");
+				return Localization.getString("Interrupted.text");
 			case INITIALIZED:
-				return Messages.getString("Initialized.text");
+				return Localization.getString("Initialized.text");
 			case STEP:
-				return Messages.getString("Step.text");
+				return Localization.getString("Step.text");
 			default:
 				throw new IllegalStateException("VadereState. Should not be reached. All enums already tested.");
 		}

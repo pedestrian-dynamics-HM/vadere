@@ -19,6 +19,17 @@
 
 ### Other
 
+## v3.1 (2024-08-06)
+Release 3.1 provides a new GUI feature that allows users to overlay images over agents' torso.
+Default images are provided, such as a sketch of a human body in a top downview.
+
+### Added
+- vadere-postvis: Added a new entry in the `SettingDialog`.
+- GUI: added the class `ComboBoxMultiSelect` that extends `javax.swing.ComboBox`. The extension enables users to select mutliple images.
+
+### Fixed
+- Set default settings in the `SimulationRenderer` if the healthstatus is not defined. This prevents a zero-pointer exception from being raised.
+
 ## v3.0 (2023-10-04)
 Release 3.0 provides a stable version for the new generation of Vadere developers.
 This is the reason for increasing the major release number instead of the minor release number.

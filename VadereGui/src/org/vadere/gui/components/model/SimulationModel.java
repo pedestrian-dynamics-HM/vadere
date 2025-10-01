@@ -115,6 +115,7 @@ public abstract class SimulationModel<T extends DefaultSimulationConfig> extends
 
 	@Override
 	public synchronized void notifyObservers() {
+
 		// synchronized (config) {
 		if (config.hasChanged()) {
 			setChanged();

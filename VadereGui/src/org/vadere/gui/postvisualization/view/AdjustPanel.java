@@ -2,7 +2,7 @@ package org.vadere.gui.postvisualization.view;
 
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
-import org.vadere.gui.components.utils.Messages;
+import org.vadere.gui.components.utils.Localization;
 import org.vadere.gui.postvisualization.control.ActionSetTimeStep;
 import org.vadere.gui.postvisualization.control.EJSliderAction;
 import org.vadere.gui.postvisualization.model.PostvisualizationModel;
@@ -66,10 +66,10 @@ public class AdjustPanel extends JPanel implements Observer {
 		sTimeResolution.setPreferredSize(new Dimension(70, 30));
 
 		String labelTemplate = "%s [%s]:";
-		lblVelocity = new JLabel(String.format(labelTemplate, Messages.getString("AdjustPanel.lblVelocity.text"), "fps"));
-		lblTime = new JLabel(String.format(labelTemplate, Messages.getString("AdjustPanel.lblTime"), "s"));
-		lblStep = new JLabel(String.format(labelTemplate, Messages.getString("AdjustPanel.lblStep.text"), "-"));
-		lblTimeResolution = new JLabel(String.format(labelTemplate, Messages.getString("AdjustPanel.lblTimeResolution.text"), "s"));
+		lblVelocity = new JLabel(String.format(labelTemplate, Localization.getString("AdjustPanel.lblVelocity.text"), "fps"));
+		lblTime = new JLabel(String.format(labelTemplate, Localization.getString("AdjustPanel.lblTime"), "s"));
+		lblStep = new JLabel(String.format(labelTemplate, Localization.getString("AdjustPanel.lblStep.text"), "-"));
+		lblTimeResolution = new JLabel(String.format(labelTemplate, Localization.getString("AdjustPanel.lblTimeResolution.text"), "s"));
 
 		// Arrange the GUI components according to a column-based layout
 		FormLayout layout = new FormLayout(
@@ -124,15 +124,15 @@ public class AdjustPanel extends JPanel implements Observer {
 
 	private void setToolTips() {
 		String unitFramesText = String.format("%s: [%s]",
-				Messages.getString("Units.title"),
-				Messages.getString("Units.fps"));
+				Localization.getString("Units.title"),
+				Localization.getString("Units.fps"));
 
 		lblVelocity.setToolTipText(unitFramesText);
 		sVelocity.setToolTipText(unitFramesText);
 
 		String unitTimeText = String.format("%s: [%s]",
-				Messages.getString("Units.title"),
-				Messages.getString("Units.time"));
+				Localization.getString("Units.title"),
+				Localization.getString("Units.time"));
 
 		lblTime.setToolTipText(unitTimeText);
 		sTime.setToolTipText(unitTimeText);
@@ -141,8 +141,8 @@ public class AdjustPanel extends JPanel implements Observer {
 		sTimeResolution.setToolTipText(unitTimeText);
 
 		String unitSimStepText = String.format("%s: [%s]",
-				Messages.getString("Units.title"),
-				Messages.getString("Units.simStep"));
+				Localization.getString("Units.title"),
+				Localization.getString("Units.simStep"));
 
 		lblStep.setToolTipText(unitSimStepText);
 		sStep.setToolTipText(unitSimStepText);

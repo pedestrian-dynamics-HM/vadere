@@ -1,6 +1,6 @@
 package org.vadere.gui.topographycreator.control;
 
-import org.vadere.gui.components.utils.Messages;
+import org.vadere.gui.components.utils.Localization;
 import org.vadere.gui.components.utils.ResourceStrings;
 import org.vadere.gui.topographycreator.model.IDrawPanelModel;
 import org.vadere.gui.topographycreator.model.TopographyCreatorModel;
@@ -20,7 +20,7 @@ public class ActionResizeTopographyBound extends TopographyAction {
 
 	public ActionResizeTopographyBound(IDrawPanelModel<?> panelModel,
 									   TopographyAction action, final UndoableEditSupport undoSupport) {
-		super(Messages.getString("TopographyBoundDialog.tooltip"), ResourceStrings.ICONS_TOPOGRAPHY_ICON_PNG, ResourceStrings.TOPOGRAPHY_CREATOR_BTN_TOPOGRAPHY_BOUND_TOOLTIP, panelModel);
+		super(Localization.getString("TopographyBoundDialog.tooltip"), ResourceStrings.ICONS_TOPOGRAPHY_ICON_PNG, ResourceStrings.TOPOGRAPHY_CREATOR_BTN_TOPOGRAPHY_BOUND_TOOLTIP, panelModel);
 		this.action = action;
 		this.undoableEditSupport = undoSupport;
 	}

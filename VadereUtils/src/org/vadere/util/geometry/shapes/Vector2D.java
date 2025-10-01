@@ -26,6 +26,10 @@ public class Vector2D extends VPoint {
 		return new Vector2D(x, y);
 	}
 
+	public Vector2D normalize() {
+		return normalize(1.0);
+	}
+
 	public Vector2D normalize(double length) {
 		double rx, ry;
 		double vl = distance(ZERO);
@@ -44,6 +48,9 @@ public class Vector2D extends VPoint {
 
 	public Vector2D multiply(double factor) {
 		return new Vector2D(this.x * factor, this.y * factor);
+	}
+	public Vector2D divide(double factor) {
+		return new Vector2D(this.x / factor, this.y / factor);
 	}
 
 	public double getLength() {

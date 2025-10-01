@@ -1,6 +1,6 @@
 package org.vadere.gui.projectview.control;
 
-import org.vadere.gui.components.utils.Messages;
+import org.vadere.gui.components.utils.Localization;
 import org.vadere.gui.components.utils.Resources;
 import org.vadere.util.version.Version;
 
@@ -18,9 +18,9 @@ public class ActionShowAboutDialog extends AbstractAction {
 
 	@Override
 	public void actionPerformed(final ActionEvent event) {
-		String releaseVersion = String.format("%s: %s", Messages.getString("ProjectView.version.release"), Version.releaseNumber());
-		String versionControlInfo = String.format("%s: %s", Messages.getString("ProjectView.version.commit"), Version.getVersionControlCommitHash());
-		String license = String.format("%s: %s", Messages.getString("ProjectView.license.text"), "GNU Lesser General Public License (LGPL)");
+		String releaseVersion = String.format("%s: %s", Localization.getString("ProjectView.version.release"), Version.releaseNumber());
+		String versionControlInfo = String.format("%s: %s", Localization.getString("ProjectView.version.commit"), Version.getVersionControlCommitHash());
+		String license = String.format("%s: %s", Localization.getString("ProjectView.license.text"), "GNU Lesser General Public License (LGPL)");
 
 		String text = "";
 		text += "<html>";
@@ -32,7 +32,7 @@ public class ActionShowAboutDialog extends AbstractAction {
 		text += "</html>";
 
 		JOptionPane.showMessageDialog(null,
-				text, Messages.getString("ProjectView.aboutDialog.label"),
+				text, Localization.getString("ProjectView.aboutDialog.label"),
 				JOptionPane.INFORMATION_MESSAGE, new ImageIcon(resources.getImage("vadere_small.png")));
 	}
 }

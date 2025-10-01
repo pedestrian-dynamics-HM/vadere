@@ -1,7 +1,7 @@
 package org.vadere.gui.projectview.control;
 
 
-import org.vadere.gui.components.utils.Messages;
+import org.vadere.gui.components.utils.Localization;
 import org.vadere.gui.projectview.model.ProjectViewModel;
 import org.vadere.gui.projectview.view.VTable;
 import org.vadere.util.io.IOUtils;
@@ -30,11 +30,11 @@ public class ActionDeleteOutputDirectories extends AbstractAction {
 	public void actionPerformed(ActionEvent event) {
 		final int selectedCount = outputTable.getSelectedRowCount();
 		final String questionText = selectedCount > 1
-				? Messages.getString("DeleteOutputQuestionMultiple.text")
-				: Messages.getString("DeleteOutputQuestionOne.text");
+				? Localization.getString("DeleteOutputQuestionMultiple.text")
+				: Localization.getString("DeleteOutputQuestionOne.text");
 
 		if (selectedCount > 0 && IOUtils.chooseYesNoCancel(questionText,
-				Messages.getString("DeleteOutputQuestion.title")) == JOptionPane.YES_OPTION) {
+				Localization.getString("DeleteOutputQuestion.title")) == JOptionPane.YES_OPTION) {
 			try {
 				model.deleteOutputFiles(outputTable.getSelectedRows());
 			} catch (IOException e) {

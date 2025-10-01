@@ -11,9 +11,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.Locale;
-import java.util.Optional;
-import java.util.StringJoiner;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Contains utilities for input and output.
@@ -68,6 +67,13 @@ public class IOUtils {
 
 	public static File[] getFileList(final File directory, final String fileExtension) {
 		return directory.listFiles((d, name) -> name.toLowerCase().endsWith(fileExtension));
+	}
+
+	public static List<String> getFileNameList(final File directory, final String fileExtension) {
+		File[] files = getFileList(directory, fileExtension);
+		List<String> stringList = Arrays.stream(files).map(File::getName).collect(Collectors.toList());
+
+		return stringList;
 	}
 
 	public static File[] getScenarioFilesInOutputDirectory(Path outputDir) throws IOException {

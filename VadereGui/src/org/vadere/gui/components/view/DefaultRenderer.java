@@ -15,6 +15,7 @@ import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.math.MathUtil;
 import org.vadere.util.data.cellgrid.CellGrid;
+import org.vadere.util.geometry.RenderGeometryUtils;
 import org.vadere.util.voronoi.Face;
 import org.vadere.util.voronoi.HalfEdge;
 import org.vadere.util.voronoi.RectangleLimits;
@@ -35,7 +36,7 @@ import java.util.Collection;
  */
 public abstract class DefaultRenderer {
 
-	private IDefaultModel defaultModel;
+	protected IDefaultModel defaultModel;
 	private BufferedImage logo;
 	private static final double rotNeg90 = - Math.PI /2;
 	private boolean renderNodes = VadereConfig.getConfig().getBoolean("Gui.showNodes");
@@ -90,8 +91,14 @@ public abstract class DefaultRenderer {
 
 			// (4) render everything which can be rendered after the transformation
 			renderPostTransformation(targetGraphics2D, width, height);
+
+			debugDraw(targetGraphics2D);
+
+			targetGraphics2D.dispose();
 		}
 	}
+
+	protected abstract void debugDraw(Graphics2D targetGraphics2D);
 
 	public BufferedImage renderImage(final int width, final int height) {
 		synchronized (defaultModel) {
@@ -164,44 +171,14 @@ public abstract class DefaultRenderer {
 	}
 
 	public static void fill(@NotNull final Shape shape, @NotNull final Graphics2D g) {
-		if(shape instanceof VCircle) {
-			g.fill(toPolygon((VCircle) shape));
-		}
-		else {
-			g.fill(shape);
-		}
+		RenderGeometryUtils.fill(shape, g);
 	}
 
 	public static void draw(@NotNull final Shape shape, @NotNull final Graphics2D g) {
-		if(shape instanceof VCircle) {
-			g.draw(toPolygon((VCircle) shape));
-		}
-		else {
-			g.draw(shape);
-		}
+		RenderGeometryUtils.draw(shape, g);
 	}
 
-	private static VPolygon toPolygon(final VCircle circle) {
-		int n = 15;
-		double alpha = 2 * Math.PI / n;
-		VPoint p = new VPoint(0, circle.getRadius());
-
-		Path2D.Double path = new Path2D.Double();
-		VPoint center = circle.getCenter();
-
-		path.moveTo(center.x + p.x, center.y + p.y);
-		for(int i = 1; i < n; i++) {
-			p = p.rotate(alpha);
-			path.lineTo(center.x + p.x, center.y + p.y);
-			///path.moveTo(pointList.get(i).x, pointList.get(i).y);
-		}
-
-		//path.closePath();
-
-		return new VPolygon(path);
-	}
-
-	protected  void renderStairs(final Iterable<Stairs> stairs, final Graphics2D g,
+	protected void renderStairs(final Iterable<Stairs> stairs, final Graphics2D g,
 								 final Color color){
 		for (Stairs s : stairs) {
 			renderStair(s, g, color);
@@ -812,7 +789,7 @@ public abstract class DefaultRenderer {
 		graphics2D.translate(0.0, -height);
 	}
 
-	private float getGridLineWidth() {
+	protected float getGridLineWidth() {
 		return (float) (0.5 / defaultModel.getScaleFactor());
 	}
 }
