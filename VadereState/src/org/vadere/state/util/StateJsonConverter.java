@@ -13,6 +13,8 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.vadere.state.attributes.*;
 import org.vadere.state.attributes.models.AttributesFloorField;
+import org.vadere.state.attributes.models.AttributesPotentialCompactSoftshell;
+import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.scenario.*;
 import org.vadere.state.psychology.perception.json.StimulusInfo;
 import org.vadere.state.psychology.perception.json.StimulusInfoStore;
@@ -539,4 +541,48 @@ public abstract class StateJsonConverter {
 		}
 		return DigestUtils.sha1Hex("error");
 	}
+
+
+    public static String getLocomotionHash(final Topography topography,
+                                           final AttributesSimulation attributesSimulation,
+                                           final Attributes attributesFallbackMainModel,
+                                           final AttributesPotentialCompactSoftshell attributesPotentialCompactSoftshell,
+                                           final AttributesFloorField attributesFloorField,
+                                           final List<Attributes> attributesFallback) {
+        try {
+            String topographyStr = mapper
+                    .writerWithDefaultPrettyPrinter()
+                    .withView(Views.CacheView.class)
+                    .writeValueAsString(topography);
+            String attrSimulationStr = mapper
+                    .writerWithDefaultPrettyPrinter()
+                    .withView(Views.CacheView.class)
+                    .writeValueAsString(attributesSimulation);
+            String attrFallbackMainModelStr = mapper
+                    .writerWithDefaultPrettyPrinter()
+                    .withView(Views.CacheView.class)
+                    .writeValueAsString(attributesFallbackMainModel);
+            String attrPotentialCompactSoftshellStr = mapper
+                    .writerWithDefaultPrettyPrinter()
+                    .withView(Views.CacheView.class)
+                    .writeValueAsString(attributesPotentialCompactSoftshell);
+            String attrFloorFieldString = mapper
+                    .writerWithDefaultPrettyPrinter()
+                    .withView(Views.CacheView.class)
+                    .writeValueAsString(attributesFloorField);
+            String attrFallback = mapper
+                    .writerWithDefaultPrettyPrinter()
+                    .withView(Views.CacheView.class)
+                    .writeValueAsString(attributesFallback);
+            String hashIt = topographyStr + "\n" +  attrSimulationStr + "\n" + attrFallbackMainModelStr +
+                    "\n" + attrPotentialCompactSoftshellStr + "\n" +  attrFloorFieldString;
+            String hash = DigestUtils.sha1Hex(hashIt.getBytes());
+            logger.debugf("created locomootion hash: %s", hash);
+            logger.tracef("used String for hash: \n%s", hashIt);
+            return hash;
+        } catch (JsonProcessingException e) {
+            logger.error("cannot create hash of topography and floor field attributes for cache access.");
+        }
+		return DigestUtils.sha1Hex("error");
+    }
 }

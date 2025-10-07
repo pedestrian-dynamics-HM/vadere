@@ -15,8 +15,14 @@ import org.vadere.state.simulation.FootStep;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.logging.Logger;
+import org.vadere.util.reflection.DynamicClassInstantiator;
+
+import java.io.File;
 
 import java.util.*;
+import java.io.*;
+
+import static org.vadere.state.util.StateJsonConverter.getLocomotionHash;
 
 /**
  * @author Kevin Becker
@@ -30,23 +36,59 @@ public class DatabasedStepsModel implements MainModel {
     private Domain domain;
     private final List<Model> models = new LinkedList<>();
     private TrajectoryBuffer trajectoryBuffer;
+    private boolean canExtractStepsFromFile;
+    private MainModel fallbackMainModel;
 
 
     @Override
     public void initialize(List<Attributes> attributesList, Domain domain, AttributesAgent attributesPedestrian, Random random) {
-
         this.domain = domain;
         this.random = random;
         this.attributesPedestrian = attributesPedestrian;
 
         AttributesDSM attributesDSM = Model.findAttributes(attributesList, AttributesDSM.class);
 
-        final SubModelBuilder subModelBuilder = new SubModelBuilder(attributesList, domain, attributesPedestrian, random);
-        subModelBuilder.buildSubModels(attributesDSM.getSubmodels());
-        subModelBuilder.addBuildedSubModelsToList(models);
-        models.add(this);
+        if (attributesDSM.getTrajectoryFile() != null
+                && attributesDSM.getTrajectoryFile().endsWith(".traj")) {
+            this.canExtractStepsFromFile = true;
+        }
+        else {
+            File dir = new File(attributesDSM.getTrajectoryFile());
+            if (attributesDSM.getTrajectoryFile() != null && dir.isDirectory()) {
+                String locomotionHash = "123";//getLocomotionHash(domain.getTopography(),);
+                String trajFileName = "postvis" + locomotionHash + ".traj";
+                File trajFile = new File(dir, trajFileName);
+                if (trajFile.exists()) {
+                    attributesDSM.setTrajectoryFile(trajFileName);
+                    this.canExtractStepsFromFile = true;
+                } else {
+                    this.canExtractStepsFromFile = false;
+                }
+            } else {
+                logger.error("Variable trajectoryFile must be a .traj file or directory");
+                throw new IllegalArgumentException("Invalid argument for trajectoryFile");
+            }
+        }
 
-        trajectoryBuffer = new TrajectoryBuffer(attributesDSM.getTrajectoryFile(), attributesDSM.getBufferedLines());
+        if (this.canExtractStepsFromFile) {
+            final SubModelBuilder subModelBuilder = new SubModelBuilder(attributesList, domain, attributesPedestrian, random);
+            subModelBuilder.buildSubModels(attributesDSM.getSubmodels());
+            subModelBuilder.addBuildedSubModelsToList(models);
+            models.add(this);
+
+            trajectoryBuffer = new TrajectoryBuffer(attributesDSM.getTrajectoryFile(), attributesDSM.getBufferedLines());
+        }
+        else {
+            // attributesList = attributesDSM.getAttributesFallbackModel() + (attributesList - attributesDSM)
+
+            DynamicClassInstantiator<MainModel> instantiator = new DynamicClassInstantiator<>();
+            this.fallbackMainModel = instantiator.createObject(attributesDSM.getFallbackMainModel());
+            this.fallbackMainModel.initialize(attributesList, domain, attributesPedestrian, random);
+
+            if (this.fallbackMainModel.getSubmodels() ) {} // check if non-empty list in AttributesDSM is different from fallbackModel list. if so, error.
+        }
+
+
     }
 
     @Override
