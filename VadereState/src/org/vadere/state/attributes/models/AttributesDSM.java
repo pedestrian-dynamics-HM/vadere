@@ -1,7 +1,10 @@
 package org.vadere.state.attributes.models;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.vadere.annotation.factories.attributes.ModelAttributeClass;
 import org.vadere.state.attributes.Attributes;
+import org.vadere.state.util.StateJsonConverter;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -26,7 +29,7 @@ public class AttributesDSM extends Attributes {
      * the main model if the trajectory file is not found
      */
     private String fallbackMainModel = null;
-    private List<Attributes> attributesFallbackModel = new ArrayList<>();
+    private JsonNode attributesFallbackModel;
 
     public String getTrajectoryFile() {
         return trajectoryFile;
@@ -45,7 +48,11 @@ public class AttributesDSM extends Attributes {
     }
 
     public List<Attributes> getAttributesFallbackModel() {
-        return attributesFallbackModel;
+        try {
+            return StateJsonConverter.deserializeAttributesListFromNode(attributesFallbackModel);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void setTrajectoryFile(String trajectoryFile) {
