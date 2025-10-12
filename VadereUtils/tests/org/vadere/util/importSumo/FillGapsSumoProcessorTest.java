@@ -26,7 +26,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class FillGapsSumoProcessorTest {
 
     private static final GeometryFactory GEOMETRY_FACTORY = new GeometryFactory();
-    private static final double TOLERANCE = 1e-9;
 
     private static Polygon createRectangle(double minX, double minY, double maxX, double maxY) {
         return GEOMETRY_FACTORY.createPolygon(new Coordinate[]{
@@ -72,8 +71,22 @@ public class FillGapsSumoProcessorTest {
         return processor;
     }
 
+    private static void assertSnappingWithinDistanceAndAngle(Coordinate snappedPoint, Coordinate originalPoint, Vector2D normal, double maxSnappingAngle, double maxSnappingDistance) {
+        Vector2D snappingDirection = new Vector2D(snappedPoint.x - originalPoint.x, snappedPoint.y - originalPoint.y);
+        assertTrue(GeometryUtils.smallestAngleBetweenDegree(normal, snappingDirection) <= maxSnappingAngle + GeometryUtils.DOUBLE_EPS, "Snapping direction should be within max angle to boundary normal");
+        double snappingDistance = snappedPoint.distance(originalPoint);
+        assertTrue(snappingDistance <= maxSnappingDistance + GeometryUtils.DOUBLE_EPS, "Distance between original and snapped points should be within max snapping distance");
+    }
+
+    private static void assertCoordinatesEqual(Coordinate[] original, Coordinate[] snapped, int[] pointIndices) {
+        for (int i : pointIndices) {
+            assertEquals(original[i].x, snapped[i].x, GeometryUtils.DOUBLE_EPS, "Point " + i + " x-coordinate should remain unchanged");
+            assertEquals(original[i].y, snapped[i].y, GeometryUtils.DOUBLE_EPS, "Point " + i + " y-coordinate should remain unchanged");
+        }
+    }
+
     @Test
-    void shouldSnapLaneToJunction() {
+    void testSnapLaneToJunction() {
         FillGapsSumoProcessor processor = createProcessor(1, 0, 0);
         Polygon lanePolygon = GEOMETRY_FACTORY.createPolygon(new Coordinate[]{
                 new Coordinate(0.5, 0),
@@ -83,26 +96,25 @@ public class FillGapsSumoProcessorTest {
                 new Coordinate(0.5, 0)
         });
         SumoLane lane = createLaneFromPolygon(lanePolygon, "J_FROM", "J_TO");
+        Coordinate[] originalLane = lane.getPolygon().getCoordinates();
         SumoJunction junction = createSumoJunctionFromPolygon(createRectangle(-5, 0, 0, 5), "J_FROM");
 
         processor.snapLaneToJunction(lane, junction);
 
         Coordinate[] snappedLane = lane.getPolygon().getCoordinates();
-        assertEquals(5, snappedLane.length, "Lane should still have 5 points after snapping");
-        assertEquals(0, snappedLane[0].x, TOLERANCE, "First point x-coordinate should be snapped to junction");
-        assertEquals(0, snappedLane[0].y, TOLERANCE, "First point y-coordinate should be snapped to junction");
-        assertEquals(0, snappedLane[1].x, TOLERANCE, "Second point x-coordinate should be snapped to junction");
-        assertEquals(2, snappedLane[1].y, TOLERANCE, "Second point y-coordinate should be snapped to junction");
-        assertEquals(6, snappedLane[2].x, TOLERANCE, "Third point x-coordinate should remain unchanged");
-        assertEquals(0, snappedLane[2].y, TOLERANCE, "Third point y-coordinate should remain unchanged");
-        assertEquals(5.5, snappedLane[3].x, TOLERANCE, "Fourth point x-coordinate should remain unchanged");
-        assertEquals(-2, snappedLane[3].y, TOLERANCE, "Fourth point y-coordinate should remain unchanged");
-        assertEquals(0, snappedLane[4].x, TOLERANCE, "Last point x-coordinate should be snapped to junction and close the polygon");
-        assertEquals(0, snappedLane[4].y, TOLERANCE, "Last point y-coordinate should be snapped to junction and close the polygon");
+        assertEquals(originalLane.length, snappedLane.length, "Lane should still have 5 points after snapping");
+        assertCoordinatesEqual(originalLane, snappedLane, new int[]{2, 3});
+
+        assertEquals(0, snappedLane[0].x, GeometryUtils.DOUBLE_EPS, "First point x-coordinate should be snapped to junction");
+        assertEquals(0, snappedLane[0].y, GeometryUtils.DOUBLE_EPS, "First point y-coordinate should be snapped to junction");
+        assertEquals(0, snappedLane[1].x, GeometryUtils.DOUBLE_EPS, "Second point x-coordinate should be snapped to junction");
+        assertEquals(2, snappedLane[1].y, GeometryUtils.DOUBLE_EPS, "Second point y-coordinate should be snapped to junction");
+        assertEquals(0, snappedLane[4].x, GeometryUtils.DOUBLE_EPS, "Last point x-coordinate should be snapped to junction and close the polygon");
+        assertEquals(0, snappedLane[4].y, GeometryUtils.DOUBLE_EPS, "Last point y-coordinate should be snapped to junction and close the polygon");
     }
 
     @Test
-    void shouldNotSnapLaneToJunction() {
+    void testNotSnapLaneToJunctionWhenDistanceExceedsMax() {
         FillGapsSumoProcessor processor = createProcessor(0.5, 0, 0);
         Polygon lanePolygon = GEOMETRY_FACTORY.createPolygon(new Coordinate[]{
                 new Coordinate(-0.5, 0),
@@ -119,14 +131,11 @@ public class FillGapsSumoProcessorTest {
 
         Coordinate[] snappedLane = lane.getPolygon().getCoordinates();
         assertEquals(originalLane.length, snappedLane.length, "Lane should still have 5 points after snapping");
-        for (int i = 0; i < originalLane.length; i++) {
-            assertEquals(originalLane[i].x, snappedLane[i].x, TOLERANCE, "Point " + i + " x-coordinate should remain unchanged");
-            assertEquals(originalLane[i].y, snappedLane[i].y, TOLERANCE, "Point " + i + " y-coordinate should remain unchanged");
-        }
+        assertCoordinatesEqual(originalLane, snappedLane, new int[]{0, 1, 2, 3, 4});
     }
 
     @Test
-    void shouldSnapCrosswalkToWalkwayOutBound() {
+    void testSnapCrosswalkToWalkwayOutBound() {
         double maxSnappingAngle = 60;
         double maxSnappingDistance = 1.5;
         FillGapsSumoProcessor processor = createProcessor(0, maxSnappingDistance, maxSnappingAngle);
@@ -139,31 +148,18 @@ public class FillGapsSumoProcessorTest {
 
         Coordinate[] snappedCrosswalk = crosswalk.getPolygon().getCoordinates();
         assertEquals(originalCrosswalk.length, snappedCrosswalk.length, "Crosswalk should still have 5 points after snapping");
-
-        assertEquals(originalCrosswalk[0].x, snappedCrosswalk[0].x, TOLERANCE, "First point x-coordinate should remain unchanged");
-        assertEquals(originalCrosswalk[0].y, snappedCrosswalk[0].y, TOLERANCE, "First point y-coordinate should remain unchanged");
+        assertCoordinatesEqual(originalCrosswalk, snappedCrosswalk, new int[]{0, 3, 4});
 
         Vector2D outBoundNormal = new Vector2D(1, 0);
-        Vector2D snappingDirection1 = new Vector2D(snappedCrosswalk[1].x - originalCrosswalk[1].x, snappedCrosswalk[1].y - originalCrosswalk[1].y);
-        assertTrue(GeometryUtils.smallestAngleBetweenDegree(outBoundNormal, snappingDirection1) <= maxSnappingAngle + TOLERANCE, "Snapping direction should be within max angle to outbound normal");
-        double snappingDistance1 = snappedCrosswalk[1].distance(originalCrosswalk[1]);
-        assertTrue(snappingDistance1 <= maxSnappingDistance + TOLERANCE, "Distance between original crosswalk and snapped point should be within max snapping distance");
-        assertEquals(1, snappedCrosswalk[1].x, TOLERANCE, "Second point should be snapped to walkway's left vertical boundary");
+        assertSnappingWithinDistanceAndAngle(snappedCrosswalk[1], originalCrosswalk[1], outBoundNormal, maxSnappingAngle, maxSnappingDistance);
+        assertEquals(1, snappedCrosswalk[1].x, GeometryUtils.DOUBLE_EPS, "Second point should be snapped to walkway's left vertical boundary");
 
-        Vector2D snappingDirection2 = new Vector2D(snappedCrosswalk[2].x - originalCrosswalk[2].x, snappedCrosswalk[2].y - originalCrosswalk[2].y);
-        assertTrue(GeometryUtils.smallestAngleBetweenDegree(outBoundNormal, snappingDirection2) <= maxSnappingAngle + TOLERANCE, "Snapping direction should be within max angle to outbound normal");
-        double snappingDistance2 = snappedCrosswalk[2].distance(originalCrosswalk[2]);
-        assertTrue(snappingDistance2 <= maxSnappingDistance + TOLERANCE, "Distance between original crosswalk and snapped point should be within max snapping distance");
-        assertEquals(1, snappedCrosswalk[2].x, TOLERANCE, "Third point should be snapped to walkway's left vertical boundary");
-
-        assertEquals(originalCrosswalk[3].x, snappedCrosswalk[3].x, TOLERANCE, "Fourth point x-coordinate should remain unchanged");
-        assertEquals(originalCrosswalk[3].y, snappedCrosswalk[3].y, TOLERANCE, "Fourth point y-coordinate should remain unchanged");
-        assertEquals(originalCrosswalk[4].x, snappedCrosswalk[4].x, TOLERANCE, "Last point x-coordinate should remain unchanged and close the polygon");
-        assertEquals(originalCrosswalk[4].y, snappedCrosswalk[4].y, TOLERANCE, "Last point y-coordinate should remain unchanged and close the polygon");
+        assertSnappingWithinDistanceAndAngle(snappedCrosswalk[2], originalCrosswalk[2], outBoundNormal, maxSnappingAngle, maxSnappingDistance);
+        assertEquals(1, snappedCrosswalk[2].x, GeometryUtils.DOUBLE_EPS, "Third point should be snapped to walkway's left vertical boundary");
     }
 
     @Test
-    void shouldSnapCrosswalkToWalkwayInBound() {
+    void testSnapCrosswalkToWalkwayInBound() {
         double maxSnappingAngle = 50;
         double maxSnappingDistance = 3;
         FillGapsSumoProcessor processor = createProcessor(0, maxSnappingDistance, maxSnappingAngle);
@@ -182,17 +178,15 @@ public class FillGapsSumoProcessorTest {
         processor.snapCrosswalksToWalkways(crosswalk, walkway, false);
 
         Coordinate[] snappedCrosswalk = crosswalk.getPolygon().getCoordinates();
-        for (int i : new int[]{0, 1, 2, 4}) {
-            assertEquals(originalCrosswalk[i].x, snappedCrosswalk[i].x, TOLERANCE, "Point " + i + " x-coordinate should remain unchanged");
-            assertEquals(originalCrosswalk[i].y, snappedCrosswalk[i].y, TOLERANCE, "Point " + i + " y-coordinate should remain unchanged");
-        }
+        assertEquals(originalCrosswalk.length, snappedCrosswalk.length, "Crosswalk should still have 5 points after snapping");
+        assertCoordinatesEqual(originalCrosswalk, snappedCrosswalk, new int[]{0, 1, 2, 4});
 
         double snappingDistance = snappedCrosswalk[3].distance(originalCrosswalk[3]);
         assertTrue(snappingDistance <= 1, "Snapping point is very close to original point, i.e. the distance is smaller equal to 1");
     }
 
     @Test
-    void shouldNotSnapCrosswalkToWalkwayOutbound() {
+    void testNotSnapCrosswalkToWalkwayOutboundWhenDistanceExceedsMax() {
         double maxSnappingAngle = 50;
         double maxSnappingDistance = 0.9;
         FillGapsSumoProcessor processor = createProcessor(0, maxSnappingDistance, maxSnappingAngle);
@@ -211,9 +205,6 @@ public class FillGapsSumoProcessorTest {
 
         Coordinate[] snappedCrosswalk = crosswalk.getPolygon().getCoordinates();
         assertEquals(originalCrosswalk.length, snappedCrosswalk.length, "Crosswalk should still have 5 points after snapping");
-        for (int i = 0; i < originalCrosswalk.length; i++) {
-            assertEquals(originalCrosswalk[i].x, snappedCrosswalk[i].x, TOLERANCE, "Point " + i + " x-coordinate should remain unchanged");
-            assertEquals(originalCrosswalk[i].y, snappedCrosswalk[i].y, TOLERANCE, "Point " + i + " y-coordinate should remain unchanged");
-        }
+        assertCoordinatesEqual(originalCrosswalk, snappedCrosswalk, new int[]{0, 1, 2, 3, 4});
     }
 }
