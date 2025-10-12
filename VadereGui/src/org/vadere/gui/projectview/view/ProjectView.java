@@ -73,7 +73,12 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 	private JSplitPane mainSplitPanel = new JSplitPane();
 	private VTable scenarioTable;
 	private VTable outputTable;
-	private JButton btnRunSelectedScenario;
+    private JToolBar toolBar;
+    private JButton overflowButton;
+    private JPopupMenu overflowMenu;
+    private final List<JButton> runButtons = new ArrayList<>();
+    private final List<JButton> runtimeButtons = new ArrayList<>();
+    private JButton btnRunSelectedScenario;
 	private JButton btnRunRepeatedlyScenario;
 	private JButton btnRunAllScenarios;
 	private JButton btnStopRunningScenarios;
@@ -334,6 +339,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		scenarioTable.clearSelection();
 		outputTable.setEnabled(!flag);
 		outputTable.clearSelection();
+        SwingUtilities.invokeLater(this::updateOverflow);
 	}
 
 	/**
@@ -583,6 +589,8 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		mainSplitPanel.setRightComponent(panel_2);
 		mainSplitPanel.resetToPreferredSizes();
 		contentPane.add(mainSplitPanel, BorderLayout.CENTER);
+
+        SwingUtilities.invokeLater(this::adjustDividerForToolbar);
 	}
 
 	private void buildScenarioTable(OutputTableRenderer outputTableRenderer) {
@@ -746,9 +754,11 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 	}
 
 	private void buildToolBar() {
-		JToolBar toolBar = new JToolBar();
-		toolBar.setLayout(new FlowLayout(FlowLayout.CENTER));
-		controlPanel.add(toolBar,initializeConstraints());
+        toolBar = new JToolBar();
+        toolBar.setFloatable(false);
+        toolBar.setLayout(new BoxLayout(toolBar, BoxLayout.X_AXIS));
+        controlPanel.add(toolBar, initializeConstraints());
+
 		ButtonGroup mainButtonsGroup = new ButtonGroup();
 
 		ActionRunSelectedScenarios runSelectedScenarios = new ActionRunSelectedScenarios(
@@ -761,6 +771,9 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		btnRunSelectedScenario.setVerticalTextPosition(SwingConstants.BOTTOM);
 		btnRunSelectedScenario.setHorizontalTextPosition(SwingConstants.CENTER);
 		toolBar.add(btnRunSelectedScenario);
+        runButtons.add(btnRunSelectedScenario);
+        addToProjectSpecificActions(runSelectedScenarios);
+        mainButtonsGroup.add(btnRunSelectedScenario);
 
 		Action runAllScenariosAction =
 				new ActionRunAllScenarios(Localization.getString("ProjectView.btnRunAllTests.text"), model);
@@ -770,12 +783,9 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		btnRunAllScenarios.setVerticalTextPosition(SwingConstants.BOTTOM);
 		btnRunAllScenarios.setHorizontalTextPosition(SwingConstants.CENTER);
 		toolBar.add(btnRunAllScenarios);
+        runButtons.add(btnRunAllScenarios);
 		addToProjectSpecificActions(runAllScenariosAction);
 		mainButtonsGroup.add(btnRunAllScenarios);
-
-
-		addToProjectSpecificActions(runSelectedScenarios);
-		mainButtonsGroup.add(btnRunSelectedScenario);
 
 		ActionRunRepeatedlyScenarios runRepeatedlyScenarios = new ActionRunRepeatedlyScenarios(
 				Localization.getString("ProjectView.mntmRunRepeatedlyTests.text"), model, scenarioTable, n_repetitions);
@@ -787,6 +797,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		btnRunRepeatedlyScenario.setVerticalTextPosition(SwingConstants.BOTTOM);
 		btnRunRepeatedlyScenario.setHorizontalTextPosition(SwingConstants.CENTER);
 		toolBar.add(btnRunRepeatedlyScenario);
+        runButtons.add(btnRunRepeatedlyScenario);
 		addToProjectSpecificActions(runRepeatedlyScenarios);
 		mainButtonsGroup.add(btnRunRepeatedlyScenario);
 
@@ -796,6 +807,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 				RESOURCE.getIconSVG("transport_stop", ICON_SIZE, ICON_SIZE));
 		btnStopRunningScenarios = new JButton(interruptScenariosAction);
 		toolBar.add(btnStopRunningScenarios);
+        runtimeButtons.add(btnStopRunningScenarios);
 
 		ActionResumeNormalSpeed resumeNormalSpeedAction =
 				new ActionResumeNormalSpeed(Localization.getString("ProjectView.btnResumeNormalSpeed.text"), model);
@@ -803,6 +815,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 				RESOURCE.getIconSVG("transport_play", ICON_SIZE, ICON_SIZE));
 		btnResumeNormalSpeed = new JButton(resumeNormalSpeedAction);
 		toolBar.add(btnResumeNormalSpeed);
+        runtimeButtons.add(btnResumeNormalSpeed);
 
 		ActionPauseScenario pauseScenarioAction =
 				new ActionPauseScenario(Localization.getString("ProjectView.btnPauseRunningTests.text"), model);
@@ -813,6 +826,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 				RESOURCE.getIconSVG("transport_pause", ICON_SIZE, ICON_SIZE));
 		btnPauseRunningScenarios = new JButton(pauseScenarioAction);
 		toolBar.add(btnPauseRunningScenarios);
+        runtimeButtons.add(btnPauseRunningScenarios);
 		toolBar.getInputMap().put(
 				KeyStroke.getKeyStroke(Localization.getString("ProjectView.pauseTests.shortcut").charAt(0)), "pauseTests");
 		toolBar.getActionMap().put("pauseTests", pauseScenarioAction);
@@ -824,8 +838,35 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 				RESOURCE.getIconSVG("transport_skip", ICON_SIZE, ICON_SIZE));
 		btnNextSimulationStep = new JButton(nextTimeStepAction);
 		toolBar.add(btnNextSimulationStep);
+        runtimeButtons.add(btnNextSimulationStep);
 
 		buildKeyboardShortcuts(pauseScenarioAction, interruptScenariosAction);
+
+        toolBar.add(Box.createHorizontalGlue());
+        overflowMenu = new JPopupMenu();
+
+        overflowButton = new JButton("⋮");
+        overflowButton.setFocusable(false);
+        overflowButton.setToolTipText(Localization.getString("ProjectView.btnMoreActions.toolTipText"));
+        overflowMenu.setVisible(false);
+        overflowButton.addActionListener(e -> overflowMenu.show(overflowButton, 0, overflowButton.getHeight()));
+        overflowButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                if (overflowButton.isVisible() && overflowMenu.getComponentCount() > 0) {
+                    overflowMenu.show(overflowButton, 0, overflowButton.getHeight());
+                }
+            }
+        });
+        toolBar.add(overflowButton);
+
+        toolBar.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                updateOverflow();
+            }
+        });
+        SwingUtilities.invokeLater(this::updateOverflow);
 	}
 
 	private JPanel buildRightSidePanel() {
@@ -889,11 +930,13 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 
 	@Override
 	public void validate() {
-		int max_div = scenarioTable.getSize().width + 25;
+        int toolbarWidth = (Objects.nonNull(toolBar)) ? measureToolbarVisibleWidth() : 0;
+        int max_div = Math.max(scenarioTable.getSize().width, toolbarWidth) + 25;
 		super.validate();
 		if (mainSplitPanel.getDividerLocation() > max_div) {
 			mainSplitPanel.setDividerLocation(max_div);
 		}
+        SwingUtilities.invokeLater(this::updateOverflow);
 	}
 
 	private static GridBagConstraints initializeConstraints() {
@@ -905,4 +948,103 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		gbc.weightx = 1;
 		return gbc;
 	}
+
+    private int measureToolbarVisibleWidth() {
+        if (Objects.isNull(toolBar)) {;
+            return 0;
+        }
+
+        int width = 0;
+        for (Component component : toolBar.getComponents()) {
+            if (!component.isVisible()) {
+                continue;
+            }
+            if (component instanceof Box.Filler) {
+                continue;
+            }
+            width += component.getPreferredSize().width;
+        }
+
+        Insets insets = toolBar.getInsets();
+        return width + insets.left + insets.right;
+    }
+
+    private void adjustDividerForToolbar() {
+        if (Objects.isNull(toolBar)) {
+            return;
+        }
+
+        int requiredWidth = measureToolbarVisibleWidth() + 30;
+        int currentWidth = mainSplitPanel.getDividerLocation();
+        if (currentWidth < requiredWidth) {
+            mainSplitPanel.setDividerLocation(requiredWidth);
+        }
+    }
+
+    private void updateOverflow() {
+        if (Objects.isNull(toolBar)) {
+            return;
+        }
+
+        List<JButton> activeButtons = scenariosRunning ? runtimeButtons : runButtons;
+        if (activeButtons.isEmpty()) {
+            return;
+        }
+
+        for (JButton button : activeButtons) {
+            button.setVisible(true);
+        }
+        overflowMenu.removeAll();
+        overflowButton.setVisible(false);
+
+        int toolBarWidth = toolBar.getWidth();
+        if (toolBarWidth <= 0) {
+            return;
+        }
+        Insets insets = toolBar.getInsets();
+        toolBarWidth -= (insets.left + insets.right);
+
+        int requiredWidth = 0;
+        for (Component component : toolBar.getComponents()) {
+            if (!component.isVisible()) {
+                continue;
+            }
+            if (component == overflowButton) {
+                continue;
+            }
+            if (component instanceof Box.Filler) {
+                continue;
+            }
+            requiredWidth += component.getPreferredSize().width;
+        }
+
+        if (requiredWidth <= toolBarWidth) {
+            toolBar.revalidate();
+            toolBar.repaint();
+            return;
+        }
+
+        int overflowButtonWidth = overflowButton.getPreferredSize().width;
+        int usableWidth = Math.max(0, toolBarWidth - overflowButtonWidth);
+        List<JButton> hiddenButtons = new ArrayList<>();
+        for (int i = activeButtons.size() - 1; i >= 0 && requiredWidth > usableWidth; i--) {
+            JButton button = activeButtons.get(i);
+            if (!button.isVisible()) {
+                continue;
+            }
+            button.setVisible(false);
+            hiddenButtons.add(button);
+            requiredWidth -= button.getPreferredSize().width;
+        }
+
+        overflowMenu.removeAll();
+        for (JButton button : hiddenButtons) {
+            overflowMenu.add(new JMenuItem(button.getAction()));
+        }
+        overflowButton.setVisible(!hiddenButtons.isEmpty());
+
+        toolBar.revalidate();
+        toolBar.repaint();
+    }
+
 }
