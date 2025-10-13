@@ -53,6 +53,16 @@ public class Context {
 		}
 	}
 
+    public long getLong(String key){
+        if (!ctxValueMap.containsKey(key))
+            throw new ContextException("no element found in context object for key: " + key);
+        try {
+            return  (long) ctxValueMap.get(key);
+        } catch (ClassCastException e){
+            throw new ContextException("data type of key " + key + " is not of type String", e);
+        }
+    }
+
 	public boolean containsKey(String key){
 		return ctxValueMap.containsKey(key);
 	}

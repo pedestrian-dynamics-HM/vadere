@@ -1,5 +1,6 @@
 package org.vadere.simulator.control.simulation;
 
+import org.vadere.simulator.context.VadereContext;
 import org.vadere.simulator.control.factory.SourceControllerFactory;
 import org.vadere.simulator.control.psychology.cognition.models.ICognitionModel;
 import org.vadere.simulator.control.psychology.perception.StimulusController;
@@ -9,6 +10,7 @@ import org.vadere.simulator.models.DynamicElementFactory;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.bhm.BehaviouralHeuristicsModel;
+import org.vadere.simulator.models.dsm.DatabasedStepsModel;
 import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.simulator.models.potential.PotentialFieldModel;
 import org.vadere.simulator.models.potential.fields.IPotentialField;
@@ -247,6 +249,10 @@ public class Simulation implements ControllerProvider{
 
 		if (attributesSimulation.isWriteSimulationData()) {
 			processorManager.writeOutput();
+            Runnable callback = (Runnable) VadereContext.getCtx(topography).get(DatabasedStepsModel.outputWrittenCallback);
+            if (callback != null) {
+                callback.run();
+            }
 		}
 		logger.info("Finished writing all output files");
 

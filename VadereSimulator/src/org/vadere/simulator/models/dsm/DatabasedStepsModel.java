@@ -2,6 +2,7 @@ package org.vadere.simulator.models.dsm;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.annotation.factories.models.ModelClass;
+import org.vadere.simulator.context.VadereContext;
 import org.vadere.simulator.control.factory.SourceControllerFactory;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.Model;
@@ -27,6 +28,10 @@ import java.io.File;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.io.*;
 import java.util.stream.Collectors;
@@ -43,38 +48,49 @@ public class DatabasedStepsModel implements MainModel {
     private AttributesAgent attributesPedestrian;
     private Random random;
     private Domain domain;
+    private AttributesDSM attributesDSM;
     private final List<Model> models = new LinkedList<>();
     private TrajectoryBuffer trajectoryBuffer;
     private boolean canExtractStepsFromFile;
     private MainModel fallbackMainModel;
-    private EventtimePedestrianIdOutputFile eventtimePedestrianIdOutputFile;
+    public static String outputPath = "outputPath";
+    public static String outputWrittenCallback = "outputWrittenCallback";
+    public static String simulationSeedName = "simulationSeed";
+    protected long simulationSeed;
+    private String locomotionHash = "";
+
 
     @Override
     public void initialize(List<Attributes> attributesList, Domain domain, AttributesAgent attributesPedestrian, Random random) {
         this.domain = domain;
         this.random = random;
         this.attributesPedestrian = attributesPedestrian;
+        this.outputPath = VadereContext.getCtx(domain.getTopography()).getString(outputPath);
+        this.simulationSeed = VadereContext.getCtx(domain.getTopography()).getLong(simulationSeedName);
 
-        AttributesDSM attributesDSM = Model.findAttributes(attributesList, AttributesDSM.class);
+        attributesDSM = Model.findAttributes(attributesList, AttributesDSM.class);
 
         if (attributesDSM.getTrajectoryFile() != null
                 && attributesDSM.getTrajectoryFile().endsWith(".traj")) {
             this.canExtractStepsFromFile = true;
         } else {
-            File dir = new File(attributesDSM.getTrajectoryFile());
-            if (attributesDSM.getTrajectoryFile() != null && dir.isDirectory()) {
-                String locomotionHash = "123";//getLocomotionHash(domain.getTopography(),);
-                String trajFileName = "postvis" + locomotionHash + ".traj";
-                File trajFile = new File(dir, trajFileName);
-                if (trajFile.exists()) {
-                    attributesDSM.setTrajectoryFile(trajFile.getAbsolutePath());
-                    this.canExtractStepsFromFile = true;
+            if (attributesDSM.getTrajectoryFile() != null) {
+                File dir = new File(attributesDSM.getTrajectoryFile());
+                if (dir.isDirectory()) {
+                    locomotionHash = getLocomotionHash(domain.getTopography(), simulationSeed,
+                            attributesDSM.getAttributesFallbackModel());
+                    String trajFileName = "postvis_" + locomotionHash + ".traj";
+                    File trajFile = new File(dir, trajFileName);
+                    if (trajFile.exists()) {
+                        attributesDSM.setTrajectoryFile(trajFile.getAbsolutePath());
+                        this.canExtractStepsFromFile = true;
+                    } else {
+                        this.canExtractStepsFromFile = false;
+                    }
                 } else {
-                    this.canExtractStepsFromFile = false;
+                    logger.error("Variable trajectoryFile must be a .traj file or directory");
+                    throw new IllegalArgumentException("Invalid argument for trajectoryFile");
                 }
-            } else {
-                logger.error("Variable trajectoryFile must be a .traj file or directory");
-                throw new IllegalArgumentException("Invalid argument for trajectoryFile");
             }
         }
 
@@ -111,7 +127,8 @@ public class DatabasedStepsModel implements MainModel {
                 logger.warn("The submodels list in AttributesDSM is not empty but will be ignored. Only the submodels list of the FallbackMainModel is relevant.");
             }
 
-            eventtimePedestrianIdOutputFile = new EventtimePedestrianIdOutputFile();
+            // Register callback in VadereContext to be called after output is written
+            VadereContext.getCtx(domain.getTopography()).put(outputWrittenCallback, (Runnable) this::copyTrajectoryFile);
         }
 
     }
@@ -271,5 +288,27 @@ public class DatabasedStepsModel implements MainModel {
         }
     }
 
+    private void copyTrajectoryFile() {
+        try {
+            Path sourcePath = Paths.get(outputPath, "postvis.traj");
+            if (!Files.exists(sourcePath)) {
+                logger.warn("Source trajectory file not found: " + sourcePath);
+                return;
+            }
 
+            String targetFileName = "postvis_" + locomotionHash + ".traj";
+            File targetDir = new File(attributesDSM.getTrajectoryFile());
+            if (!targetDir.exists()) {
+                targetDir.mkdirs();
+            }
+
+            Path targetPath = Paths.get(targetDir.getAbsolutePath(), targetFileName);
+            Files.copy(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
+
+            logger.info("Trajectory file copied to: " + targetPath);
+        } catch (IOException e) {
+            logger.error("Failed to copy trajectory file: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
 }
