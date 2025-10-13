@@ -546,9 +546,8 @@ public abstract class StateJsonConverter {
     public static String getLocomotionHash(final Topography topography,
                                            final AttributesSimulation attributesSimulation,
                                            final Attributes attributesFallbackMainModel,
-                                           final AttributesPotentialCompactSoftshell attributesPotentialCompactSoftshell,
-                                           final AttributesFloorField attributesFloorField,
                                            final List<Attributes> attributesFallback) {
+        // maybe instead of attributesSimulation use Random seed?? need to check
         try {
             String topographyStr = mapper
                     .writerWithDefaultPrettyPrinter()
@@ -562,20 +561,11 @@ public abstract class StateJsonConverter {
                     .writerWithDefaultPrettyPrinter()
                     .withView(Views.CacheView.class)
                     .writeValueAsString(attributesFallbackMainModel);
-            String attrPotentialCompactSoftshellStr = mapper
-                    .writerWithDefaultPrettyPrinter()
-                    .withView(Views.CacheView.class)
-                    .writeValueAsString(attributesPotentialCompactSoftshell);
-            String attrFloorFieldString = mapper
-                    .writerWithDefaultPrettyPrinter()
-                    .withView(Views.CacheView.class)
-                    .writeValueAsString(attributesFloorField);
             String attrFallback = mapper
                     .writerWithDefaultPrettyPrinter()
                     .withView(Views.CacheView.class)
                     .writeValueAsString(attributesFallback);
-            String hashIt = topographyStr + "\n" +  attrSimulationStr + "\n" + attrFallbackMainModelStr +
-                    "\n" + attrPotentialCompactSoftshellStr + "\n" +  attrFloorFieldString;
+            String hashIt = topographyStr + "\n" +  attrSimulationStr + "\n" + attrFallbackMainModelStr;
             String hash = DigestUtils.sha1Hex(hashIt.getBytes());
             logger.debugf("created locomootion hash: %s", hash);
             logger.tracef("used String for hash: \n%s", hashIt);

@@ -10,6 +10,8 @@ import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
 import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
 import org.vadere.simulator.projects.Domain;
+import org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile;
+import org.vadere.simulator.projects.dataprocessing.processor.PedestrianTrajectoryProcessor;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesDSM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
@@ -45,7 +47,7 @@ public class DatabasedStepsModel implements MainModel {
     private TrajectoryBuffer trajectoryBuffer;
     private boolean canExtractStepsFromFile;
     private MainModel fallbackMainModel;
-
+    private EventtimePedestrianIdOutputFile eventtimePedestrianIdOutputFile;
 
     @Override
     public void initialize(List<Attributes> attributesList, Domain domain, AttributesAgent attributesPedestrian, Random random) {
@@ -106,8 +108,10 @@ public class DatabasedStepsModel implements MainModel {
             this.fallbackMainModel.initialize(attributesListWithoutDSM, domain, attributesPedestrian, random);
 
             if (!attributesDSM.getSubmodels().isEmpty()) {
-                logger.warn("The submodels List in AttributesDSM is not empty. However, only the submodels list of the FallbackMainModel is relevant.");
+                logger.warn("The submodels list in AttributesDSM is not empty but will be ignored. Only the submodels list of the FallbackMainModel is relevant.");
             }
+
+            eventtimePedestrianIdOutputFile = new EventtimePedestrianIdOutputFile();
         }
 
     }
