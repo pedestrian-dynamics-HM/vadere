@@ -11,14 +11,17 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * The model with hash function usage cannot be used together with the psychology layer, if
- * a feature of the psychology layer affects the movement pattern
  * @author Kevin Becker, Sophia Wagner
  */
 @ModelAttributeClass
 public class AttributesDSM extends Attributes {
 
-    private String trajectoryFile = "./temp/postvis.traj";
+    /**
+     * Can be either a .traj file, from which the steps of the pedestrians can be extracted,
+     * or a folder, in which either a .traj file with the corresponding hash is stored or if not,
+     * will be created using the fallbackMainModel and stored in the folder
+     */
+    private String trajectoryFileOrFolder = "./temp/postvis.traj";
     private int bufferedLines = 1000;
     /**
      * This list should only be used if fallbackMainModel is null.
@@ -29,10 +32,15 @@ public class AttributesDSM extends Attributes {
      * the main model if the trajectory file is not found
      */
     private String fallbackMainModel = null;
+    /**
+     * the attributes of the fallback main model if the trajectory file is not found, including all types of attributes
+     * that affect movement patterns of the agents,
+     * e.g. AttributesOSM, AttributesPotentialCompactSoftshell and AttributesFloorField for the OSM
+     */
     private JsonNode attributesFallbackModel;
 
-    public String getTrajectoryFile() {
-        return trajectoryFile;
+    public String getTrajectoryFileOrFolder() {
+        return trajectoryFileOrFolder;
     }
 
     public List<String> getSubmodels() {
@@ -55,7 +63,7 @@ public class AttributesDSM extends Attributes {
         }
     }
 
-    public void setTrajectoryFile(String trajectoryFile) {
-        this.trajectoryFile = trajectoryFile;
+    public void setTrajectoryFileOrFolder(String trajectoryFileOrFolder) {
+        this.trajectoryFileOrFolder = trajectoryFileOrFolder;
     }
 }

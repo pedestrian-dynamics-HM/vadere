@@ -11,8 +11,6 @@ import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
 import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
 import org.vadere.simulator.projects.Domain;
-import org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile;
-import org.vadere.simulator.projects.dataprocessing.processor.PedestrianTrajectoryProcessor;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesDSM;
 import org.vadere.state.attributes.scenario.AttributesAgent;
@@ -39,6 +37,13 @@ import java.util.stream.Collectors;
 import static org.vadere.state.util.StateJsonConverter.getLocomotionHash;
 
 /**
+ *  The DSM either reads steps from a given .traj file, finds a postvis_[hash].traj file with a corresponding hash
+ *  or uses the fallbackMainModel to create a new postvis_[hash].traj file.
+ *  The advantage of this model is that, for multiple simulation runs, we do not have to (expensively) recompute the
+ *  floor field for each run but just read exisiting .traj file, if the locomotion of agents did not change
+ *  (but this only works for parameters that don't affect the locomotion like for the AirTransmissionModel)
+ *  The model with hash function usage cannot (yet) be used together with the psychology layer, if
+ *  a feature of the psychology layer affects the movement pattern.
  * @author Kevin Becker
  */
 @ModelClass(isMainModel = true)
@@ -67,71 +72,80 @@ public class DatabasedStepsModel implements MainModel {
         this.attributesPedestrian = attributesPedestrian;
         this.outputPath = VadereContext.getCtx(domain.getTopography()).getString(outputPath);
         this.simulationSeed = VadereContext.getCtx(domain.getTopography()).getLong(simulationSeedName);
-
         attributesDSM = Model.findAttributes(attributesList, AttributesDSM.class);
 
-        if (attributesDSM.getTrajectoryFile() != null
-                && attributesDSM.getTrajectoryFile().endsWith(".traj")) {
-            this.canExtractStepsFromFile = true;
-        } else {
-            if (attributesDSM.getTrajectoryFile() != null) {
-                File dir = new File(attributesDSM.getTrajectoryFile());
-                if (dir.isDirectory()) {
-                    locomotionHash = getLocomotionHash(domain.getTopography(), simulationSeed,
-                            attributesDSM.getAttributesFallbackModel());
-                    String trajFileName = "postvis_" + locomotionHash + ".traj";
-                    File trajFile = new File(dir, trajFileName);
-                    if (trajFile.exists()) {
-                        attributesDSM.setTrajectoryFile(trajFile.getAbsolutePath());
-                        this.canExtractStepsFromFile = true;
-                    } else {
-                        this.canExtractStepsFromFile = false;
-                    }
-                } else {
-                    logger.error("Variable trajectoryFile must be a .traj file or directory");
-                    throw new IllegalArgumentException("Invalid argument for trajectoryFile");
-                }
-            }
-        }
-
+        this.canExtractStepsFromFile = checkIfCanExtractStepsFromFile();
         if (this.canExtractStepsFromFile) {
             final SubModelBuilder subModelBuilder = new SubModelBuilder(attributesList, domain, attributesPedestrian, random);
             subModelBuilder.buildSubModels(attributesDSM.getSubmodels());
             subModelBuilder.addBuildedSubModelsToList(models);
             models.add(this);
 
-            this.trajectoryBuffer = new TrajectoryBuffer(attributesDSM.getTrajectoryFile(), attributesDSM.getBufferedLines());
+            this.trajectoryBuffer = new TrajectoryBuffer(attributesDSM.getTrajectoryFileOrFolder(), attributesDSM.getBufferedLines());
         } else {
-            List<Attributes> attributesListWithoutDSM = attributesList.stream()
-                    .filter(attr -> !(attr instanceof AttributesDSM))
-                    .collect(Collectors.toList());
-            if (attributesDSM != null) {
-                attributesListWithoutDSM.addAll(attributesDSM.getAttributesFallbackModel());
+            initializeFallbackMainModel(attributesList);
+        }
+    }
+
+    private boolean checkIfCanExtractStepsFromFile() {
+        if (attributesDSM.getTrajectoryFileOrFolder() != null
+                && attributesDSM.getTrajectoryFileOrFolder().endsWith(".traj")) {
+            return true;
+        } else {
+            if (attributesDSM.getTrajectoryFileOrFolder() != null) {
+                File dir = new File(attributesDSM.getTrajectoryFileOrFolder());
+                if (dir.isDirectory()) {
+                    locomotionHash = getLocomotionHash(domain.getTopography(), simulationSeed,
+                            attributesDSM.getAttributesFallbackModel());
+                    String trajFileName = "postvis_" + locomotionHash + ".traj";
+                    File trajFile = new File(dir, trajFileName);
+                    if (trajFile.exists()) {
+                        attributesDSM.setTrajectoryFileOrFolder(trajFile.getAbsolutePath());
+                        return true;
+                    } else {
+                        return false;
+                    }
+                } else {
+                    logger.error("Variable trajectoryFile must be a .traj file or directory");
+                    throw new IllegalArgumentException("Invalid argument for trajectoryFile");
+                }
+            } else {
+                logger.error("Variable trajectoryFile must be a .traj file or directory");
+                throw new IllegalArgumentException("Invalid argument for trajectoryFile");
             }
-            // attributesList = attributesDSM.getAttributesFallbackModel() + (attributesList - attributesDSM)
+        }
+    }
 
-            boolean hasDuplicateSubtypes = attributesListWithoutDSM.stream()
-                    .collect(Collectors.groupingBy(Object::getClass, Collectors.counting()))
-                    .values().stream()
-                    .anyMatch(count -> count > 1);
-            if (hasDuplicateSubtypes) {
-                logger.error("There are duplicate Attributes types in the list of Attributes.");
-                throw new IllegalArgumentException("There are duplicate Attributes types in the list of Attributes.");
-            }
-
-            DynamicClassInstantiator<MainModel> instantiator = new DynamicClassInstantiator<>();
-            this.fallbackMainModel = instantiator.createObject(attributesDSM.getFallbackMainModel());
-            this.fallbackMainModel.initialize(attributesListWithoutDSM, domain, attributesPedestrian, random);
-
-            if (!attributesDSM.getSubmodels().isEmpty()) {
-                logger.warn("The submodels list in AttributesDSM is not empty but will be ignored. Only the submodels list of the FallbackMainModel is relevant.");
-            }
-
-            // Register callback in VadereContext to be called after output is written
-            VadereContext.getCtx(domain.getTopography()).put(outputWrittenCallback, (Runnable) this::copyTrajectoryFile);
+    private void initializeFallbackMainModel(List<Attributes> attributesList) {
+        // attributesListWithoutDSM = attributesDSM.getAttributesFallbackModel() + (attributesList - attributesDSM)
+        List<Attributes> attributesListWithoutDSM = attributesList.stream()
+                .filter(attr -> !(attr instanceof AttributesDSM))
+                .collect(Collectors.toList());
+        if (attributesDSM != null) {
+            attributesListWithoutDSM.addAll(attributesDSM.getAttributesFallbackModel());
         }
 
+        boolean hasDuplicateSubtypes = attributesListWithoutDSM.stream()
+                .collect(Collectors.groupingBy(Object::getClass, Collectors.counting()))
+                .values().stream()
+                .anyMatch(count -> count > 1);
+        if (hasDuplicateSubtypes) {
+            logger.error("There are duplicate Attributes types in the list of Attributes.");
+            throw new IllegalArgumentException("There are duplicate Attributes types in the list of Attributes.");
+        }
+
+        DynamicClassInstantiator<MainModel> instantiator = new DynamicClassInstantiator<>();
+        this.fallbackMainModel = instantiator.createObject(attributesDSM.getFallbackMainModel());
+        this.fallbackMainModel.initialize(attributesListWithoutDSM, domain, attributesPedestrian, random);
+
+        if (!attributesDSM.getSubmodels().isEmpty()) {
+            logger.warn("The submodels list in AttributesDSM is not empty but will be ignored. Only the submodels list of the FallbackMainModel is relevant.");
+        }
+
+        // Register callback in VadereContext to be called after output is written
+        VadereContext.getCtx(domain.getTopography()).put(outputWrittenCallback, (Runnable) this::copyTrajectoryFile);
     }
+
 
     @Override
     public void preLoop(double simTimeInSec) {
@@ -297,7 +311,7 @@ public class DatabasedStepsModel implements MainModel {
             }
 
             String targetFileName = "postvis_" + locomotionHash + ".traj";
-            File targetDir = new File(attributesDSM.getTrajectoryFile());
+            File targetDir = new File(attributesDSM.getTrajectoryFileOrFolder());
             if (!targetDir.exists()) {
                 targetDir.mkdirs();
             }
