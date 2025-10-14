@@ -149,60 +149,45 @@ public class DatabasedStepsModel implements MainModel {
 
     @Override
     public void preLoop(double simTimeInSec) {
-        if (this.canExtractStepsFromFile) {
-            trajectoryBuffer.read();
-        }
-        else {
-            this.fallbackMainModel.preLoop(simTimeInSec);
-        }
+        trajectoryBuffer.read();
     }
 
     @Override
     public void postLoop(double simTimeInSec) {
-        if (this.canExtractStepsFromFile) {
-            trajectoryBuffer.closeReader();
-        }
-        else {
-            this.fallbackMainModel.postLoop(simTimeInSec);
-        }
+        trajectoryBuffer.closeReader();
     }
 
     @Override
     public void update(double simTimeInSec) {
-        if (this.canExtractStepsFromFile) {
-            clearFootSteps();
+        clearFootSteps();
 
-            DSMStep nextStep;
-            while ((nextStep = trajectoryBuffer.getNextStep()) != null && nextStep.getStartTime() < simTimeInSec) {
+        DSMStep nextStep;
+        while ((nextStep = trajectoryBuffer.getNextStep()) != null && nextStep.getStartTime() < simTimeInSec) {
 
-                Pedestrian pedestrian = domain.getTopography().getPedestrianDynamicElements().getElement(nextStep.getPedestrianId());
+            Pedestrian pedestrian = domain.getTopography().getPedestrianDynamicElements().getElement(nextStep.getPedestrianId());
 
-                VPoint startPosition = pedestrian.getPosition();
-                VPoint endPosition = nextStep.getEndPosition();
-                pedestrian.setPosition(endPosition);
+            VPoint startPosition = pedestrian.getPosition();
+            VPoint endPosition = nextStep.getEndPosition();
+            pedestrian.setPosition(endPosition);
 
-                LinkedList<Integer> nextTarget = new LinkedList<>();
-                nextTarget.add(nextStep.getTargetId());
-                pedestrian.setTargets(nextTarget);
+            LinkedList<Integer> nextTarget = new LinkedList<>();
+            nextTarget.add(nextStep.getTargetId());
+            pedestrian.setTargets(nextTarget);
 
-                FootStep currentFootstep = new FootStep(startPosition, endPosition, nextStep.getStartTime(), nextStep.getEndTime());
-                pedestrian.getTrajectory().add(currentFootstep);
+            FootStep currentFootstep = new FootStep(startPosition, endPosition, nextStep.getStartTime(), nextStep.getEndTime());
+            pedestrian.getTrajectory().add(currentFootstep);
 
-                if (!startPosition.equals(nextStep.getStartPosition())) {
-                    logger.warn("Agent spawn positions did not match with the input trajectories");
-                }
-
-                synchronized (domain.getTopography()) {
-                    domain.getTopography().moveElement(pedestrian, startPosition);
-                }
-
-                trajectoryBuffer.removeStep();
+            if (!startPosition.equals(nextStep.getStartPosition())) {
+                logger.warn("Agent spawn positions did not match with the input trajectories");
             }
-            trajectoryBuffer.read();
+
+            synchronized (domain.getTopography()) {
+                domain.getTopography().moveElement(pedestrian, startPosition);
+            }
+
+            trajectoryBuffer.removeStep();
         }
-        else {
-            this.fallbackMainModel.update(simTimeInSec);
-        }
+        trajectoryBuffer.read();
     }
 
     private void clearFootSteps() {
@@ -221,19 +206,20 @@ public class DatabasedStepsModel implements MainModel {
 
     @Override
     public <T extends DynamicElement> DynamicElement createElement(VPoint position, int id, Attributes attr, Class<T> type) {
-        if (this.canExtractStepsFromFile) {
-            AttributesAgent aAttr = (AttributesAgent) attr;
+        AttributesAgent aAttr = (AttributesAgent) attr;
 
-            if (!Pedestrian.class.isAssignableFrom(type))
-                throw new IllegalArgumentException("DBS cannot initialize " + type.getCanonicalName());
+        if (!Pedestrian.class.isAssignableFrom(type))
+            throw new IllegalArgumentException("DBS cannot initialize " + type.getCanonicalName());
 
-            AttributesAgent pedAttributes = new AttributesAgent(aAttr, registerDynamicElementId(domain.getTopography(), id));
+        AttributesAgent pedAttributes = new AttributesAgent(aAttr, registerDynamicElementId(domain.getTopography(), id));
 
-            return createElement(position, pedAttributes);
-        }
-        else {
-            return this.fallbackMainModel.createElement(position, id, attr, type);
-        }
+        return createElement(position, pedAttributes);
+    }
+
+    private Pedestrian createElement(VPoint position, @NotNull final AttributesAgent attributesAgent) {
+        Pedestrian pedestrian = new Pedestrian(attributesAgent, random);
+        pedestrian.setPosition(position);
+        return pedestrian;
     }
 
     @Override
@@ -244,12 +230,6 @@ public class DatabasedStepsModel implements MainModel {
         else {
             return this.fallbackMainModel.getDynamicElementRequiredPlace(position);
         }
-    }
-
-    private Pedestrian createElement(VPoint position, @NotNull final AttributesAgent attributesAgent) {
-        Pedestrian pedestrian = new Pedestrian(attributesAgent, random);
-        pedestrian.setPosition(position);
-        return pedestrian;
     }
 
     @Override
@@ -269,36 +249,6 @@ public class DatabasedStepsModel implements MainModel {
         }
         else {
             return fallbackMainModel.getSourceControllerFactory();
-        }
-    }
-
-    public IPotentialFieldTarget getPotentialFieldTarget() {
-        try {
-            Method method = fallbackMainModel.getClass().getMethod("getPotentialFieldTarget");
-            return (IPotentialFieldTarget) method.invoke(fallbackMainModel);
-        }
-        catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-            throw new RuntimeException("Failed to get PotentialFieldTarget", e);
-        }
-    }
-
-    public PotentialFieldObstacle getPotentialFieldObstacle() {
-        try {
-            Method method = fallbackMainModel.getClass().getMethod("getPotentialFieldObstacle");
-            return (PotentialFieldObstacle) method.invoke(fallbackMainModel);
-        }
-        catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-            throw new RuntimeException("Failed to get getPotentialFieldObstacle", e);
-        }
-    }
-
-    public PotentialFieldAgent getPotentialFieldAgent() {
-        try {
-            Method method = fallbackMainModel.getClass().getMethod("getPotentialFieldAgent");
-            return (PotentialFieldAgent) method.invoke(fallbackMainModel);
-        }
-        catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-            throw new RuntimeException("Failed to get getPotentialFieldAgent", e);
         }
     }
 
