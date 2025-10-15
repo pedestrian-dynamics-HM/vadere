@@ -35,9 +35,10 @@ public class AttributesDSM extends Attributes {
     /**
      * the attributes of the fallback main model if the trajectory file is not found, including all types of attributes
      * that affect movement patterns of the agents,
-     * e.g. AttributesOSM, AttributesPotentialCompactSoftshell and AttributesFloorField for the OSM
+     * e.g. AttributesOSM, AttributesPotentialCompactSoftshell and AttributesFloorField for the OSM.
+     * Same format as attributesModel.
      */
-    private JsonNode attributesFallbackModel;
+    private JsonNode attributesFallbackModel = null;
 
     public String getTrajectoryFileOrFolder() {
         return trajectoryFileOrFolder;
