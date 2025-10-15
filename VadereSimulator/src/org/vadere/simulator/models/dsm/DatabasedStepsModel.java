@@ -70,6 +70,7 @@ public class DatabasedStepsModel implements MainModel {
         this.outputPath = VadereContext.getCtx(domain.getTopography()).getString(outputPath);
         this.simulationSeed = VadereContext.getCtx(domain.getTopography()).getLong(simulationSeedName);
         attributesDSM = Model.findAttributes(attributesList, AttributesDSM.class);
+        this.locomotionHash = getLocomotionHash(this.domain.getTopography(), this.simulationSeed, this.attributesDSM.getAttributesFallbackModel());
 
         this.canExtractStepsFromFile = checkIfCanExtractStepsFromFile();
         if (this.canExtractStepsFromFile) {
@@ -84,7 +85,7 @@ public class DatabasedStepsModel implements MainModel {
         }
     }
 
-    private boolean checkIfCanExtractStepsFromFile() {
+    protected boolean checkIfCanExtractStepsFromFile() {
         if (attributesDSM.getTrajectoryFileOrFolder() != null
                 && attributesDSM.getTrajectoryFileOrFolder().endsWith(".traj")) {
             return true;
@@ -92,8 +93,6 @@ public class DatabasedStepsModel implements MainModel {
             if (attributesDSM.getTrajectoryFileOrFolder() != null) {
                 File dir = new File(attributesDSM.getTrajectoryFileOrFolder());
                 if (dir.isDirectory()) {
-                    locomotionHash = getLocomotionHash(domain.getTopography(), simulationSeed,
-                            attributesDSM.getAttributesFallbackModel());
                     String trajFileName = "postvis_" + locomotionHash + ".traj";
                     File trajFile = new File(dir, trajFileName);
                     if (trajFile.exists()) {
@@ -276,5 +275,13 @@ public class DatabasedStepsModel implements MainModel {
             logger.error("Failed to copy trajectory file: " + e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    protected void setLocomotionHash(String locomotionHash) {
+        this.locomotionHash = locomotionHash;
+    }
+
+    protected void setAttributesDSM(AttributesDSM attributesDSM) {
+        this.attributesDSM = attributesDSM;
     }
 }
