@@ -26,9 +26,9 @@ public class DatabasedStepsModelTest {
             "mainModel" : "org.vadere.simulator.models.dsm.DatabasedStepsModel",
             "attributesModel" : {
               "org.vadere.state.attributes.models.AttributesDSM" : {
-                "trajectoryFile" : "%s",
+                "trajectoryFileOrFolder" : "%s",
                 "submodels" : [ ],
-                "bufferedLines" : 100
+                "bufferedLines" : 1000
               }
             },""";
 
@@ -57,7 +57,7 @@ public class DatabasedStepsModelTest {
 
     @Test
     void testOptimalStepsModel() throws IOException {
-        testModel(Path.of("../Scenarios/ModelTests/TestOSM/scenarios/rimea_14_select_route_pso.scenario"));
+        testModel(Path.of("../Scenarios/ModelTests/TestOSM/scenarios/basic_2_density_pso.scenario"));
     }
 
     @Test

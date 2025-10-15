@@ -165,6 +165,7 @@ public class DatabasedStepsModel implements MainModel {
 
             VPoint startPosition = pedestrian.getPosition();
             VPoint endPosition = nextStep.getEndPosition();
+
             pedestrian.setPosition(endPosition);
 
             LinkedList<Integer> nextTarget = new LinkedList<>();
@@ -176,6 +177,10 @@ public class DatabasedStepsModel implements MainModel {
 
             if (!startPosition.equals(nextStep.getStartPosition())) {
                 logger.warn("Agent spawn positions did not match with the input trajectories");
+                // this happens since the random seed is different in the DatabasedStepsModel than in the other
+                // locomotion model although the simulation seed is the same. This leads to little jumps after an agent
+                // is spawned. However, we ignore this since we only use the DatabasedStepsModel only observing
+                // different parameters in non-locomotion models.
             }
 
             synchronized (domain.getTopography()) {
