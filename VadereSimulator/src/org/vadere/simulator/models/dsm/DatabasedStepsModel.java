@@ -281,4 +281,8 @@ public class DatabasedStepsModel implements MainModel {
     protected void setAttributesDSM(AttributesDSM attributesDSM) {
         this.attributesDSM = attributesDSM;
     }
+
+    protected boolean canExtractStepsFromFile() {
+        return this.canExtractStepsFromFile;
+    }
 }

@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 public class DatabasedStepsModelTest {
@@ -62,7 +63,7 @@ public class DatabasedStepsModelTest {
                       "targetPotentialModel" : "org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid",
                       "pedestrianPotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldPedestrianCompactSoftshell",
                       "obstaclePotentialModel" : "org.vadere.simulator.models.potential.PotentialFieldObstacleCompactSoftshell",
-                      "submodels" : [ "org.vadere.simulator.models.infection.AirTransmissionModel" ]
+                      "submodels" : [ ]
                     },
                     "org.vadere.state.attributes.models.AttributesPotentialCompactSoftshell" : {
                       "pedPotentialIntimateSpaceWidth" : 0.45,
@@ -267,7 +268,67 @@ public class DatabasedStepsModelTest {
     }
 
     @Test
-    public void test3TypesDSM() {
+    public void testDSMFolderInput() throws IOException {
+        Path scenarioFile = Files.createFile(testDir.resolve("scenario.model"));
+        Path scenarioFolder = scenarioFile.toAbsolutePath().getParent();
 
+        // Create scenario JSON
+        Path scenarioPath = Path.of("../Scenarios/ModelTests/TestOSM/scenarios/narrow_passage_pso_ok.scenario");
+        String baseScenario = Files.readString(scenarioPath);
+        String modifiedScenario = insertModelDSM(baseScenario, scenarioFolder);
+
+        Files.writeString(scenarioFile, modifiedScenario);
+        Scenario scenario = ScenarioFactory.createScenarioWithScenarioJson(modifiedScenario);
+        ScenarioCache cache = ScenarioCache.load(scenario, scenarioFolder);
+
+        // Ensure no postvis_*.traj exists yet
+        assertNoTrajFiles(scenarioFolder);
+
+        // Run 1: Since no postvis_*.traj exists yet in the given folder, the DSM will create one by running an OSM
+        ScenarioRun run1 = new ScenarioRun(scenario, outputDir.toString(), null, outputDir, cache);
+        run1.run();
+        Path outputTraj1 = run1.getOutputPath().resolve(TRAJECTORY_FILE_NAME).toAbsolutePath();
+
+        // Check if .traj file was created
+        assertSingleTrajFile(scenarioFolder);
+
+        // Run 2: Since a postvis_*.traj exists now, the DSM will just read the existing .traj file
+        ScenarioRun run2 = new ScenarioRun(scenario, outputDir.toString(), null, outputDir, cache);
+        run2.run();
+        Path outputTraj2 = run2.getOutputPath().resolve(TRAJECTORY_FILE_NAME).toAbsolutePath();
+
+        // Check if there is only one .traj file
+        assertSingleTrajFile(scenarioFolder);
+
+        // Compare outputs
+        compareTrajectoryFiles(Files.readString(outputTraj1), Files.readString(outputTraj2));
+    }
+
+    private void assertNoTrajFiles(Path folder) throws IOException {
+        List<Path> matches = findTrajFiles(folder);
+        assertTrue(matches.isEmpty(), "Expected no postvis_*.traj files, found: " + matches);
+    }
+
+    private void assertSingleTrajFile(Path folder) throws IOException {
+        List<Path> matches = findTrajFiles(folder);
+        assertEquals(1, matches.size(), "Expected exactly one postvis_*.traj file, found: " + matches);
+    }
+
+    private List<Path> findTrajFiles(Path folder) throws IOException {
+        try (var stream = Files.list(folder)) {
+            return stream
+                    .filter(p -> p.getFileName().toString().matches("postvis_[A-Za-z0-9]+\\.traj"))
+                    .collect(Collectors.toList());
+        }
+    }
+
+    private String insertModelDSM(String scenarioJson, Path scenarioFolder) {
+        String[] split1 = scenarioJson.split("\"processWriters\"");
+        String[] split2 = split1[1].split("\"scenario\"");
+        String withProcessors = split1[0] + processors + "\"scenario\"" + split2[1];
+        String myModelDSM = String.format(modelDSMwithFallbackModel, scenarioFolder);
+        String[] split3 = withProcessors.split("\"scenario\"");
+        String[] split4 = split3[1].split("\"attributesSimulation\"");
+        return split3[0] + "\"scenario\": {\n" + myModelDSM + "\"attributesSimulation\"" + split4[1];
     }
 }
