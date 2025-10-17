@@ -7,9 +7,6 @@ import org.vadere.simulator.control.factory.SourceControllerFactory;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.SubModelBuilder;
-import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
-import org.vadere.simulator.models.potential.fields.PotentialFieldAgent;
-import org.vadere.simulator.models.potential.fields.PotentialFieldObstacle;
 import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.AttributesDSM;
@@ -41,7 +38,7 @@ import static org.vadere.state.util.StateJsonConverter.getLocomotionHash;
  *  (but this only works for parameters that don't affect the locomotion like for the AirTransmissionModel)
  *  The model with hash function usage cannot (yet) be used together with the psychology layer, if
  *  a feature of the psychology layer affects the movement pattern.
- * @author Kevin Becker
+ * @author Kevin Becker, Sophia Wagner
  */
 @ModelClass(isMainModel = true)
 public class DatabasedStepsModel implements MainModel {

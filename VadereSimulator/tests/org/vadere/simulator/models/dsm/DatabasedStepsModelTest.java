@@ -137,18 +137,25 @@ public class DatabasedStepsModelTest {
         testModel(Path.of("../Scenarios/ModelTests/TestGNM/scenarios/rimea_12_evacuation_gnm1.scenario"));
     }
 
-    String buildScenario(String scenario) {
-        String[] split1 = scenario.split("\"processWriters\"");
-        String[] split2 = split1[1].split("\"scenario\"");
-        return split1[0] + processors + "\"scenario\"" + split2[1];
-    }
-
     void testModel(Path scenarioPath) throws IOException {
-        String scenarioString = buildScenario(Files.readString(scenarioPath));
+        String[] split1 = Files.readString(scenarioPath).split("\"processWriters\"");
+        String[] split2 = split1[1].split("\"scenario\"");
+        String scenarioString =  split1[0] + processors + "\"scenario\"" + split2[1];
 
         final Path scenarioFile = Files.createFile(testDir.resolve("scenario.model"));
         Files.writeString(scenarioFile, scenarioString);
 
+        Path outputTrajectoryPathLocomotionModel = runLocomotionModel(scenarioFile, scenarioString);
+
+        Path outputTrajectoryPathDSM = runDSM(scenarioString, outputTrajectoryPathLocomotionModel);
+
+        String expected = Files.readString(outputTrajectoryPathLocomotionModel);
+        String actual = Files.readString(outputTrajectoryPathDSM);
+
+        compareTrajectoryFiles(expected, actual);
+    }
+
+    Path runLocomotionModel(Path scenarioFile, String scenarioString) throws IOException {
         Scenario scenario = ScenarioFactory.createScenarioWithScenarioJson(scenarioString);
         ScenarioCache cache = ScenarioCache.load(scenario, scenarioFile.toAbsolutePath().getParent());
         ScenarioRun run = new ScenarioRun(scenario, outputDir.toAbsolutePath().toString(), null, outputDir.toAbsolutePath(), cache);
@@ -156,11 +163,10 @@ public class DatabasedStepsModelTest {
         run.run();
 
         Path outputTrajectoryPath = run.getOutputPath().resolve(TRAJECTORY_FILE_NAME).toAbsolutePath();
-
-        runDSM(scenarioString, outputTrajectoryPath);
+        return outputTrajectoryPath;
     }
 
-    void runDSM(String scenarioString, Path trajectoryFile) throws IOException {
+    Path runDSM(String scenarioString, Path trajectoryFile) throws IOException {
         String myModelDSM = String.format(modelDSM, trajectoryFile.toUri().getPath());
 
         String[] split = scenarioString.split("\"scenario\"");
@@ -177,10 +183,7 @@ public class DatabasedStepsModelTest {
 
         run.run();
 
-        String expected = Files.readString(trajectoryFile);
-        String actual = Files.readString(run.getOutputPath().resolve(TRAJECTORY_FILE_NAME).toAbsolutePath());
-
-        compareTrajectoryFiles(expected, actual);
+        return run.getOutputPath().resolve(TRAJECTORY_FILE_NAME).toAbsolutePath();
     }
 
     void compareTrajectoryFiles(String expected, String actual) {
@@ -261,5 +264,10 @@ public class DatabasedStepsModelTest {
             directTrajFile.delete();
             Files.delete(tempDir);
         }
+    }
+
+    @Test
+    public void test3TypesDSM() {
+
     }
 }
