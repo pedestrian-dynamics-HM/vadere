@@ -49,6 +49,8 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 	private static final Logger logger = Logger.getLogger(ProjectView.class);
 	private static final int ICON_SIZE = (int)(VadereConfig.getConfig().getInt("ProjectView.icon.height.value")*VadereConfig.getConfig().getFloat("Gui.scale"));
     private static final int SMALL_ICON_SIZE = Math.max(16, (int)(ICON_SIZE * 0.7));
+    private static final int MIN_SPLIT_PANEL_DIVIDER_WIDTH = 30;
+    private static final int SPLIT_PANEL_DIVIDER_SAFETY_MARGIN = 25;
 	private final Resources RESOURCE = Resources.getInstance("global");
 	/**
 	 * Store a reference to the main window as "owner" parameter for dialogs.
@@ -591,7 +593,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		mainSplitPanel.resetToPreferredSizes();
 		contentPane.add(mainSplitPanel, BorderLayout.CENTER);
 
-        SwingUtilities.invokeLater(this::adjustDividerForToolbar);
+        SwingUtilities.invokeLater(this::enforceSplitPanelDividerMinWidth);
 	}
 
 	private void buildScenarioTable(OutputTableRenderer outputTableRenderer) {
@@ -955,16 +957,21 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 
 	@Override
 	public void validate() {
-        int toolbarWidth = (Objects.nonNull(toolBar)) ? measureToolbarVisibleWidth() : 0;
-        int max_div = Math.max(scenarioTable.getSize().width, toolbarWidth) + 25;
-		super.validate();
-		if (mainSplitPanel.getDividerLocation() > max_div) {
-			mainSplitPanel.setDividerLocation(max_div);
-		}
+        super.validate();
+        enforceSplitPanelDividerMaxWidth();
         SwingUtilities.invokeLater(this::updateToolbarOverflow);
 	}
 
-	private static GridBagConstraints initializeConstraints() {
+    private void enforceSplitPanelDividerMaxWidth() {
+        int toolbarWidth = (Objects.nonNull(toolBar)) ? measureToolbarVisibleWidth() : 0;
+        int dividerMaxWidth = Math.max(scenarioTable.getSize().width, toolbarWidth) + SPLIT_PANEL_DIVIDER_SAFETY_MARGIN;
+
+        if (mainSplitPanel.getDividerLocation() > dividerMaxWidth) {
+            mainSplitPanel.setDividerLocation(dividerMaxWidth);
+        }
+    }
+
+    private static GridBagConstraints initializeConstraints() {
 		var gbc = new GridBagConstraints();
 		gbc.gridwidth = GridBagConstraints.REMAINDER;
 		gbc.gridheight = GridBagConstraints.REMAINDER;
@@ -994,12 +1001,12 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
         return width + insets.left + insets.right;
     }
 
-    private void adjustDividerForToolbar() {
+    private void enforceSplitPanelDividerMinWidth() {
         if (Objects.isNull(toolBar)) {
             return;
         }
 
-        int requiredWidth = measureToolbarVisibleWidth() + 30;
+        int requiredWidth = measureToolbarVisibleWidth() + MIN_SPLIT_PANEL_DIVIDER_WIDTH;
         int currentWidth = mainSplitPanel.getDividerLocation();
         if (currentWidth < requiredWidth) {
             mainSplitPanel.setDividerLocation(requiredWidth);
