@@ -323,10 +323,12 @@ public class DatabasedStepsModelTest {
     }
 
     private String insertModelDSM(String scenarioJson, Path scenarioFolder) {
+        // Convert scenarioFolder to JSON-friendly format so that it works on windows as well
+        String scenarioFolderSafe = scenarioFolder.toAbsolutePath().toString().replace("\\", "/");
         String[] split1 = scenarioJson.split("\"processWriters\"");
         String[] split2 = split1[1].split("\"scenario\"");
         String withProcessors = split1[0] + processors + "\"scenario\"" + split2[1];
-        String myModelDSM = String.format(modelDSMwithFallbackModel, scenarioFolder);
+        String myModelDSM = String.format(modelDSMwithFallbackModel, scenarioFolderSafe);
         String[] split3 = withProcessors.split("\"scenario\"");
         String[] split4 = split3[1].split("\"attributesSimulation\"");
         return split3[0] + "\"scenario\": {\n" + myModelDSM + "\"attributesSimulation\"" + split4[1];
