@@ -4,7 +4,6 @@ import com.formdev.flatlaf.FlatLightLaf;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.components.control.ActionGeneratePoly;
 import org.vadere.gui.components.control.simulation.*;
-import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.components.utils.Localization;
 import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.components.utils.SwingUtils;

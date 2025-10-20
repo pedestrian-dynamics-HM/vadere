@@ -1,8 +1,8 @@
 package org.vadere.gui.components.view;
+import org.vadere.gui.components.utils.Localization;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.components.model.IDefaultModel;
-import org.vadere.gui.components.utils.Messages;
 import org.vadere.meshing.mesh.gen.MeshRenderer;
 import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.simulator.models.Model;
@@ -385,9 +385,9 @@ public abstract class DefaultRenderer {
 					double arrowLength = Math.abs(Math.pow(xVelocities[i][j], 2) + Math.pow(yVelocities[i][j], 2));
 					arrowLength = arrowLength / maxArrowLength;
 
-					if (airFlowScale.equals(Messages.getString("SettingsDialog.chbAirflowScaleSqrt.text"))) {
+					if (airFlowScale.equals(Localization.getString("SettingsDialog.chbAirflowScaleSqrt.text"))) {
 						arrowLength = Math.sqrt(arrowLength);
-					} else if (airFlowScale.equals(Messages.getString("SettingsDialog.chbAirflowScaleLog.text"))) {
+					} else if (airFlowScale.equals(Localization.getString("SettingsDialog.chbAirflowScaleLog.text"))) {
 						arrowLength = (Math.log(arrowLength) - Math.log(visTolerance)) / (Math.log(1) - Math.log(visTolerance));
 					}
 					arrowLength = arrowLength * cellSize;

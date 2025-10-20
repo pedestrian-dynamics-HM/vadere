@@ -1,4 +1,5 @@
 package org.vadere.gui.components.model;
+import org.vadere.gui.components.utils.Localization;
 
 import java.awt.*;
 import java.io.File;
@@ -8,6 +9,7 @@ import java.util.Optional;
 import java.util.TreeMap;
 
 import org.apache.commons.configuration2.Configuration;
+import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.components.utils.Messages;
 import org.vadere.gui.components.utils.Resources;
 import org.vadere.state.psychology.cognition.SelfCategory;
@@ -52,7 +54,7 @@ public class DefaultSimulationConfig extends DefaultConfig {
 	private boolean showDensity = false;
 	private boolean showGroups = false;
 	private boolean showAirflow = false;
-	private String airFlowScale = Messages.getString("SettingsDialog.chbAirflowScaleLin.text");
+	private String airFlowScale = Localization.getString("SettingsDialog.chbAirflowScaleLin.text");
 	protected final Color pedestrianDefaultColor = new Color(76, 114, 202);
 	private Map<Integer, Color> pedestrianColors = new TreeMap<>();
 	private Map<Integer, Color> randomColors = new HashMap<>();
