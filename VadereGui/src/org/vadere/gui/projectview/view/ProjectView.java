@@ -342,7 +342,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 		scenarioTable.clearSelection();
 		outputTable.setEnabled(!flag);
 		outputTable.clearSelection();
-        SwingUtilities.invokeLater(this::updateToolbarOverflow);
+        SwingUtilities.invokeLater(this::updateOverflowToolbar);
 	}
 
 	/**
@@ -867,10 +867,10 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
         toolBar.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
-                updateToolbarOverflow();
+                updateOverflowToolbar();
             }
         });
-        SwingUtilities.invokeLater(this::updateToolbarOverflow);
+        SwingUtilities.invokeLater(this::updateOverflowToolbar);
 	}
 
     private JButton createOverflowButton() {
@@ -959,7 +959,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 	public void validate() {
         super.validate();
         enforceSplitPanelDividerMaxWidth();
-        SwingUtilities.invokeLater(this::updateToolbarOverflow);
+        SwingUtilities.invokeLater(this::updateOverflowToolbar);
 	}
 
     private void enforceSplitPanelDividerMaxWidth() {
@@ -1013,7 +1013,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
         }
     }
 
-    private void updateToolbarOverflow() {
+    private void updateOverflowToolbar() {
         if (Objects.isNull(toolBar)) {
             return;
         }
@@ -1023,19 +1023,43 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
             return;
         }
 
+        resetOverflowToolbarState(activeButtons);
+
+        int toolBarWidth = calculateToolbarAvailableWidth();
+        if (toolBarWidth <= 0) {
+            return;
+        }
+
+        int requiredWidth = calculateOverflowToolbarRequiredWidth();
+        if (requiredWidth <= toolBarWidth) {
+            updateToolbarLayout();
+            return;
+        }
+
+        List<JButton> hiddenButtons = setHiddenButtons(toolBarWidth, activeButtons, requiredWidth);
+        updateOverflowMenu(hiddenButtons);
+        updateToolbarLayout();
+    }
+
+    private void resetOverflowToolbarState(List<JButton> activeButtons) {
         for (JButton button : activeButtons) {
             button.setVisible(true);
         }
         overflowMenu.removeAll();
         overflowButton.setVisible(false);
+    }
 
+    private int calculateToolbarAvailableWidth() {
         int toolBarWidth = toolBar.getWidth();
         if (toolBarWidth <= 0) {
-            return;
+            return 0;
         }
         Insets insets = toolBar.getInsets();
         toolBarWidth -= (insets.left + insets.right);
+        return toolBarWidth;
+    }
 
+    private int calculateOverflowToolbarRequiredWidth() {
         int requiredWidth = 0;
         for (Component component : toolBar.getComponents()) {
             if (!component.isVisible()) {
@@ -1049,13 +1073,15 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
             }
             requiredWidth += component.getPreferredSize().width;
         }
+        return requiredWidth;
+    }
 
-        if (requiredWidth <= toolBarWidth) {
-            toolBar.revalidate();
-            toolBar.repaint();
-            return;
-        }
+    private void updateToolbarLayout() {
+        toolBar.revalidate();
+        toolBar.repaint();
+    }
 
+    private List<JButton> setHiddenButtons(int toolBarWidth, List<JButton> activeButtons, int requiredWidth) {
         int overflowButtonWidth = overflowButton.getPreferredSize().width;
         int usableWidth = Math.max(0, toolBarWidth - overflowButtonWidth);
         List<JButton> hiddenButtons = new ArrayList<>();
@@ -1068,14 +1094,13 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
             hiddenButtons.add(button);
             requiredWidth -= button.getPreferredSize().width;
         }
+        return hiddenButtons;
+    }
 
+    private void updateOverflowMenu(List<JButton> hiddenButtons) {
         for (JButton button : hiddenButtons) {
             overflowMenu.add(new JMenuItem(button.getAction()));
         }
         overflowButton.setVisible(!hiddenButtons.isEmpty());
-
-        toolBar.revalidate();
-        toolBar.repaint();
     }
-
 }
