@@ -14,14 +14,9 @@ import java.util.Random;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.vadere.util.geometry.shapes.IPoint;
-import org.vadere.util.geometry.shapes.VCircle;
-import org.vadere.util.geometry.shapes.VLine;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VPolygon;
-import org.vadere.util.geometry.shapes.VRectangle;
-import org.vadere.util.geometry.shapes.VShape;
-import org.vadere.util.geometry.shapes.VTriangle;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Polygon;
+import org.vadere.util.geometry.shapes.*;
 import org.vadere.util.logging.Logger;
 import java.awt.geom.Area;
 
@@ -532,12 +527,12 @@ public class GeometryUtils {
 	}
 
 	/**
-	 * Returns the angle3D between the x-axis, p1 and p2.
+	 * Returns the angle3D between the x-axis, and a vector defined by p1 and p2.
 	 *
 	 * @param p1 the first point
 	 * @param p2 the second point
 	 *
-	 * @return the angle3D between the x-axis, p1 and p2
+	 * @return the angle3D between the x-axis, and a vector defined by p1 and p2
 	 */
 	public static double angleTo(@NotNull final VPoint p1, @NotNull final VPoint p2) {
 		double atan2 = Math.atan2(p1.y - p2.y, p1.x - p2.x);
@@ -1488,6 +1483,24 @@ public class GeometryUtils {
 		return (angle1-angle2) < 0 ? (angle1-angle2) + 2*Math.PI :(angle1-angle2);
 	}
 
+	/*
+	 * Returns the smallest angle between two vectors (ignoring cw/ccw)
+	 */
+	public static double smallestAngleBetweenDegree(Vector2D first, Vector2D second){
+		return smallestAngleBetweenRadiant(first, second) * 180 / Math.PI;
+	}
+
+	/*
+	 * Returns the smallest angle between two vectors (ignoring cw/ccw)
+	 */
+	public static double smallestAngleBetweenRadiant(Vector2D first, Vector2D second){
+		double dotProduct = first.dotProduct(second);
+		double lengthFirst = first.getLength();
+		double lengthSecond = second.getLength();
+
+		return Math.acos(dotProduct / (lengthFirst * lengthSecond));
+	}
+
 	/**
 	 * Computes a {@link VRectangle} square which is the tight bounding box of the collection of points.
 	 *
@@ -1968,6 +1981,17 @@ public class GeometryUtils {
 		path2D.lineTo(points[0].getX(), points[0].getY());
 
 		return new VPolygon(path2D);
+	}
+
+	@NotNull
+    public static VPolygon toVaderePolygon(Polygon polygon) {
+		List<IPoint> coordinateList = new ArrayList<>();
+		for (Coordinate coordinate : polygon.getCoordinates()) {
+			coordinateList.add(new VPoint(coordinate.x, coordinate.y));
+		}
+
+		VPolygon vPolygon = GeometryUtils.polygonFromPoints2D(coordinateList);
+		return vPolygon;
 	}
 
 	/**

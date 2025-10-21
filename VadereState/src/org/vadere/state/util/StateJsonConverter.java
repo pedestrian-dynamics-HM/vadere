@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -377,7 +378,7 @@ public abstract class StateJsonConverter {
 
 		JsonNode attributesPedestrianNode = mapper.convertValue(topography.getAttributesPedestrian(), JsonNode.class);
 		topographyNode.set("attributesPedestrian", attributesPedestrianNode);
-		if (attributesPedestrianNode != null)
+		if (attributesPedestrianNode != null && attributesPedestrianNode.getNodeType() != JsonNodeType.NULL)
 			((ObjectNode) attributesPedestrianNode).remove("id");
 
 		AttributesTeleporter attributesTeleporter = null;
