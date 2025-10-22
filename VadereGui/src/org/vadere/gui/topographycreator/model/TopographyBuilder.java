@@ -7,6 +7,7 @@ import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesTopography;
 import org.vadere.state.scenario.*;
 import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 
 import java.awt.geom.Rectangle2D;
@@ -62,7 +63,7 @@ public class TopographyBuilder implements Iterable<ScenarioElement> {
 		absorbingAreas = new LinkedList<>();
 		topographyElements = new LinkedList<>();
 		attributes = new AttributesTopography();
-
+		attributesPedestrian = new AttributesAgent();
 		idProvider = new AtomicInteger(1);
 	}
 
@@ -140,10 +141,6 @@ public class TopographyBuilder implements Iterable<ScenarioElement> {
 		return field.get(topography);
 	}
 
-	public AttributesTopography getAttributes() {
-		return attributes;
-	}
-
 	public Topography build() {
 		Topography topography = new Topography(attributes, attributesPedestrian);
 
@@ -195,6 +192,39 @@ public class TopographyBuilder implements Iterable<ScenarioElement> {
 		return null;
 	}
 
+	public void addElement(final ScenarioElement element) {
+		this.topographyElements.add(element);
+
+		switch (element.getType()) {
+			case OBSTACLE:
+				obstacles.add((Obstacle) element);
+				break;
+			case STAIRS:
+				stairs.add((Stairs) element);
+				break;
+			case PEDESTRIAN:
+				pedestrians.add((AgentWrapper) element);
+				break;
+			case TARGET:
+				targets.add((Target) element);
+				break;
+			case TARGET_CHANGER:
+				targetChangers.add((TargetChanger) element);
+				break;
+			case ABSORBING_AREA:
+				 absorbingAreas.add((AbsorbingArea) element);
+				break;
+			case SOURCE:
+				sources.add((Source) element);
+				break;
+			case MEASUREMENT_AREA:
+				measurementAreas.add((MeasurementArea) element);
+				break;
+			default:
+				throw new IllegalStateException("Unknown element type: " + element.getType());
+		}
+	}
+
 	public boolean removeElement(final ScenarioElement element) {
 		this.topographyElements.remove(element);
 
@@ -225,8 +255,20 @@ public class TopographyBuilder implements Iterable<ScenarioElement> {
 		return teleporter;
 	}
 
+	public AttributesTopography getAttributes() {
+		return attributes;
+	}
+
 	public void setAttributes(AttributesTopography attributes) {
 		this.attributes = attributes;
+	}
+
+	public AttributesAgent getAttributesPedestrian() {
+		return attributesPedestrian;
+	}
+
+	public void setAttributesPedestrian(AttributesAgent attributesPedestrian) {
+		this.attributesPedestrian = attributesPedestrian;
 	}
 
 	public void setTeleporter(Teleporter teleporter) {
@@ -329,6 +371,19 @@ public class TopographyBuilder implements Iterable<ScenarioElement> {
 		Teleporter teleporter = this.teleporter;
 		setTeleporter(null);
 		return teleporter;
+	}
+
+	public VRectangle calculateBoundsFromElements() {
+		if(topographyElements.isEmpty()){
+			return null;
+		}
+
+		Rectangle2D bounds = topographyElements.getFirst().getShape().getBounds2D();
+        for (int i = 1; i < topographyElements.size(); i++) {
+            ScenarioElement topographyElement = topographyElements.get(i);
+			bounds.add(topographyElement.getShape().getBounds2D());
+        }
+		return new VRectangle(bounds);
 	}
 
 	public Iterator<Obstacle> getObstacleIterator() {

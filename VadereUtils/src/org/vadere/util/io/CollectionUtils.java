@@ -4,12 +4,8 @@ import com.google.common.collect.Iterables;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -122,5 +118,80 @@ public class CollectionUtils {
         }
     }
 
+	/**
+	 * Adds a value to the <code>list</code> associated with the specified key in the given map.
+	 *
+	 * <p>Example usage:</p>
+	 * <pre>{@code
+	 * Map<String, List<Integer>> map = new HashMap<>();
+	 * addToValueList(map, "numbers", 1);
+	 * addToValueList(map, "numbers", 2);
+	 *
+	 * // map now contains: {"numbers" = [1, 2]}
+	 * }</pre>
+	 **/
+	public static<K,V> void addToValueList(@NotNull Map<K,List<V>> map, K key, V value){
+		addToValue(map, key, value, ArrayList::new);
+	}
 
+	/**
+	 * Adds a value to the <code>set</code> associated with the specified key in the given map.
+	 *
+	 * <p>Example usage:</p>
+	 * <pre>{@code
+	 * Map<String, Set<Integer>> map = new HashMap<>();
+	 * addToValueList(map, "numbers", 1);
+	 * addToValueList(map, "numbers", 2);
+	 *
+	 * // map now contains: {"numbers" = [1, 2]}
+	 * }</pre>
+	 **/
+	public static<K,V> void addToValueSet(@NotNull Map<K,Set<V>> map, K key, V value){
+		addToValue(map, key, value, HashSet::new);
+	}
+
+	/**
+	 * Adds a value to a <code>Collection</code> associated with the specified key in the given map.
+	 *
+	 * <p>Example usage:</p>
+	 * <pre>{@code
+	 * Map<String, Set<Integer>> map = new HashMap<>();
+	 * addToValue(map, "numbers", 1, ArrayList::new);
+	 * addToValue(map, "numbers", 2, ArrayList::new);
+	 *
+	 * // map now contains: {"numbers" = [1, 2]}
+	 * }</pre>
+	 **/
+	public static<K,V, C extends Collection<V>> void addToValue(@NotNull Map<K,C> map, K key, V value, Supplier<C> collectionFactory){
+		C collection = map.computeIfAbsent(key, k -> collectionFactory.get());
+		collection.add(value);
+	}
+
+	/**
+	 * Removes a value from the collection associated with the specified key in the given map.
+	 * When a collection becomes empty due to the removal, it is removed from the map.
+	 *
+	 * <p>Example usage:</p>
+	 * <pre>{@code
+	 * Map<String, Set<Integer>> map = new HashMap<>();
+	 * map.put("numbers", new HashSet<>(Arrays.asList(1, 2, 3)));
+	 *
+	 * removeFromValue(map, "numbers", 2);
+	 * // map now contains: {"numbers" = [1, 3]}
+	 *
+	 * removeFromValue(map, "numbers", 1);
+	 * removeFromValue(map, "numbers", 3);
+	 * // map is now empty since "numbers" collection became empty
+	 * }</pre>
+	 */
+	public static <K, V, C extends Collection<V>> void removeFromValue(@NotNull Map<K, C> map, K key, V value) {
+		C collection = map.get(key);
+		if (collection == null) {
+			return;
+		}
+		collection.remove(value);
+		if (collection.isEmpty()) {
+			map.remove(key);
+		}
+	}
 }

@@ -112,8 +112,8 @@ public class MainPanel extends ScaleablePanel implements Observer {
 	 * new Coordinate(rect.getX(), rect.getY())}), geoFac);
 	 * 
 	 * Polygon polygon = new Polygon(shell, new LinearRing[0], geoFac);
-	 * com.vividsolutions.jts.geom.Geometry[] geoArray = new
-	 * com.vividsolutions.jts.geom.Geometry[voronoiGeometry.getNumGeometries()];
+	 * org.locationtech.jts.geom.Geometry[] geoArray = new
+	 * org.locationtech.jts.geom.Geometry[voronoiGeometry.getNumGeometries()];
 	 * for(int i = 0; i < voronoiGeometry.getNumGeometries(); i++) {
 	 * geoArray[i] = voronoiGeometry.getGeometryN(i).difference(polygon);
 	 * }

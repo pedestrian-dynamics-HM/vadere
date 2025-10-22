@@ -1,19 +1,14 @@
 package org.vadere.util.geometry.shapes;
 
-import com.github.davidmoten.rtree.geometry.Circle;
 import com.github.davidmoten.rtree.geometry.Geometries;
 import com.github.davidmoten.rtree.geometry.Geometry;
-import com.github.davidmoten.rtree.geometry.Line;
-import com.github.davidmoten.rtree.geometry.Point;
 import com.github.davidmoten.rtree.geometry.Rectangle;
-import com.github.davidmoten.rtree.geometry.internal.GeometryUtil;
 import com.github.davidmoten.rtree.internal.RectangleUtil;
 
 import java.awt.geom.Line2D;
 import java.util.stream.Stream;
 
 import org.vadere.util.geometry.GeometryUtils;
-import org.vadere.util.geometry.shapes.Vector2D;
 
 
 @SuppressWarnings("serial")

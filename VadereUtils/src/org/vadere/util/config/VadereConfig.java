@@ -244,7 +244,8 @@ public class VadereConfig {
 		defaultConfig.put("Gui.toolbar.size", "40");
 		defaultConfig.put("Gui.scale", "1.0");
 		defaultConfig.put("Gui.lastSavePoint", defaultSearchDirectory);
-		defaultConfig.put("History.lastUsedProject", "");
+        defaultConfig.put("Gui.suppressOpenClWarning", "false");
+        defaultConfig.put("History.lastUsedProject", "");
 		defaultConfig.put("History.recentProjects", "");
 		defaultConfig.put("Messages.language", Locale.ENGLISH.getLanguage());
 		defaultConfig.put("Pedestrian.radius", "0.195");
@@ -277,6 +278,7 @@ public class VadereConfig {
 		defaultConfig.put("TopographyCreator.dotRadius", "0.5");
 		defaultConfig.put("Vadere.cache.useGlobalCacheBaseDir", "false");
 		defaultConfig.put("Vadere.cache.globalCacheBaseDir", defaultSearchDirectory + "/.cache/vadere");
+		defaultConfig.put("ImportFromSumoDialog.lastPath", defaultSearchDirectory);
 
 		return defaultConfig;
 	}
