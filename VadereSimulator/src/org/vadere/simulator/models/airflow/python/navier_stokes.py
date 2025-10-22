@@ -1,4 +1,10 @@
-import time 
+import os
+os.environ['OPENBLAS_NUM_THREADS'] = '1'
+os.environ['MKL_NUM_THREADS'] = '1'
+os.environ['NUMEXPR_NUM_THREADS'] = '1'
+
+
+import time
 start_time = time.time()
 from skfem import *
 from skfem.models.poisson import vector_laplace
@@ -15,9 +21,9 @@ import json
 
 # Navier Stokes parameters
 nu = 0.01 # viscosity
-num_iterations = 50
+num_iterations = 100
 tolerance = 1e-3
-relaxation = 0.5
+relaxation = 0.3
 
 
 if __name__ == '__main__':

@@ -15,6 +15,13 @@ public class AttributesBounds extends Attributes {
         this.ymax = 1000.0;
     }
 
+    public AttributesBounds(double xmin, double xmax, double ymin, double ymax) {
+        this.xmin = xmin;
+        this.xmax = xmax;
+        this.ymin = ymin;
+        this.ymax = ymax;
+    }
+
     public double getXmin() { return xmin; }
     public void setXmin(double xmin) { this.xmin = xmin; }
     public double getXmax() { return xmax; }
