@@ -120,11 +120,11 @@ public class AirFlowModel extends AbstractAirFlowModel {
             System.out.println(attributesAirFlowModel.getCondaPath() + " " +  "run" + " " + "-n" + " " + attributesAirFlowModel.getCondaEnv() + " " +
                     "python" + " " + attributesAirFlowModel.getPythonPath() + " " + airFlow.getScenarioPath() + " " + hash);
 
-            // BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            // logger.info(reader.lines().collect(Collectors.toList()));
-
             int exitCode = process.waitFor();
             logger.info("Finished python script with exitCode: {}", exitCode);
+            if (exitCode != 0) {
+                throw new RuntimeException("Python script returned non-zero exit code: " + exitCode);
+            }
         } catch (InterruptedException | IOException e) {
             logger.error(e.getMessage());
         }
