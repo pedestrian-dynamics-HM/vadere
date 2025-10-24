@@ -44,7 +44,7 @@ public class TrajectoryBufferTest {
         // close inputStream on file
         trajectoryBuffer.closeReader();
 
-        String expected = trajectoryFileValidData.substring(trajectoryFileValidData.indexOf('\n') + 1);
+        String expected = trajectoryFileValidData.substring(trajectoryFileValidData.indexOf('\n') + "\n".length());
         String actual = actualBuilder.toString().stripTrailing();
 
         assertEquals(expected, actual);

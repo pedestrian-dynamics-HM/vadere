@@ -32,6 +32,10 @@ public class TrajectoryBuffer {
             String line;
             while (trajectoryBuffer.size() < bufferedLines && (line = reader.readLine()) != null) {
                 String[] values = line.split(" ");
+                if (values.length < 8) {
+                    logger.error("Input trajectory file does not have enough columns (should have at least 8 columns)");
+                    throw new IllegalArgumentException("Input trajectory file does not have enough columns (should have at least 8 columns)");
+                }
                 int pedestrianId = Integer.parseInt(values[0]);
                 double startTime = Double.parseDouble(values[1]);
                 double endTime = Double.parseDouble(values[2]);

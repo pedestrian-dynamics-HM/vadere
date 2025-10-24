@@ -568,7 +568,7 @@ public abstract class StateJsonConverter {
             return hash;
         } catch (JsonProcessingException e) {
             logger.error("cannot create hash of topography and floor field attributes for cache access.");
+            return DigestUtils.sha1Hex("error");
         }
-		return DigestUtils.sha1Hex("error");
     }
 }

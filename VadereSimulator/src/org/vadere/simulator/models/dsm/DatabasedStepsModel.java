@@ -83,29 +83,25 @@ public class DatabasedStepsModel implements MainModel {
     }
 
     protected boolean checkIfCanExtractStepsFromFile() {
-        if (attributesDSM.getTrajectoryFileOrFolder() != null
-                && attributesDSM.getTrajectoryFileOrFolder().endsWith(".traj")) {
+        if (attributesDSM.getTrajectoryFileOrFolder() == null) {
+            logger.error("Variable trajectoryFileOrFolder must be a .traj file or directory");
+            throw new IllegalArgumentException("Invalid argument for trajectoryFile");
+        }
+        if (attributesDSM.getTrajectoryFileOrFolder().endsWith(".traj")) {
+            return true;
+        }
+        File dir = new File(attributesDSM.getTrajectoryFileOrFolder());
+        if (!dir.isDirectory()) {
+            logger.error("Variable trajectoryFileOrFolder must be a .traj file or directory");
+            throw new IllegalArgumentException("Invalid argument for trajectoryFile");
+        }
+        String trajFileName = "postvis_" + locomotionHash + ".traj";
+        File trajFile = new File(dir, trajFileName);
+        if (trajFile.exists()) {
+            attributesDSM.setTrajectoryFileOrFolder(trajFile.getAbsolutePath());
             return true;
         } else {
-            if (attributesDSM.getTrajectoryFileOrFolder() != null) {
-                File dir = new File(attributesDSM.getTrajectoryFileOrFolder());
-                if (dir.isDirectory()) {
-                    String trajFileName = "postvis_" + locomotionHash + ".traj";
-                    File trajFile = new File(dir, trajFileName);
-                    if (trajFile.exists()) {
-                        attributesDSM.setTrajectoryFileOrFolder(trajFile.getAbsolutePath());
-                        return true;
-                    } else {
-                        return false;
-                    }
-                } else {
-                    logger.error("Variable trajectoryFile must be a .traj file or directory");
-                    throw new IllegalArgumentException("Invalid argument for trajectoryFile");
-                }
-            } else {
-                logger.error("Variable trajectoryFile must be a .traj file or directory");
-                throw new IllegalArgumentException("Invalid argument for trajectoryFile");
-            }
+            return false;
         }
     }
 

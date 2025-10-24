@@ -195,6 +195,7 @@ public class DatabasedStepsModelTest {
 
         for (int i=1; i < actualLines.size(); i++) {
             String[] actualLineSplit = actualLines.get(i).split(" ");
+            assertTrue(actualLineSplit.length >= 8);
             Integer pedId = Integer.parseInt(actualLineSplit[0]);
             if (spawnedPedestrians.contains(pedId)) {
                 assertEquals(expectedLines.get(i), actualLines.get(i));
@@ -202,6 +203,7 @@ public class DatabasedStepsModelTest {
             else {
                 spawnedPedestrians.add(pedId);
                 String[] expectedLineSplit = actualLines.get(i).split(" ");
+                assertTrue(expectedLineSplit.length >= 8);
                 assertEquals(expectedLineSplit[0], actualLineSplit[0]);
                 assertEquals(expectedLineSplit[1], actualLineSplit[1]);
                 assertEquals(expectedLineSplit[2], actualLineSplit[2]);
