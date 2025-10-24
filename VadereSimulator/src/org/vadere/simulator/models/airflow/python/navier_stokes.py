@@ -22,7 +22,7 @@ import json
 # Navier Stokes parameters
 nu = 0.01 # viscosity
 num_iterations = 100
-tolerance = 1e-3
+tolerance = 1e-20
 relaxation = 0.3
 
 
