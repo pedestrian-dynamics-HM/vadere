@@ -4,7 +4,7 @@
 
 ## In Progress:
 ### Added
-
+- Added new `DatabasedStepsModel` as implementation of `MainModel`. This model allows to reconstruct the movement behaviour of agents from a trajectory file.
 ### Removed
 
 ### Changed

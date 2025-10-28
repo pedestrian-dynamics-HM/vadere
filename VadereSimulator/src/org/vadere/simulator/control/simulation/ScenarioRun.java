@@ -19,6 +19,7 @@ import org.vadere.simulator.control.psychology.perception.StimulusController;
 import org.vadere.simulator.control.scenarioelements.TargetChangerController;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.MainModelBuilder;
+import org.vadere.simulator.models.dsm.DatabasedStepsModel;
 import org.vadere.simulator.models.infection.AirTransmissionModel;
 import org.vadere.simulator.models.potential.solver.EikonalSolverCacheProvider;
 import org.vadere.simulator.projects.Domain;
@@ -123,6 +124,8 @@ public class ScenarioRun implements Runnable {
 
 		ctx.put("cache", scenarioCache);
 		ctx.put(AirTransmissionModel.simStepLength, scenario.getAttributesSimulation().getSimTimeStepLength());
+        ctx.put(DatabasedStepsModel.outputPath, outputPath.toString());
+        ctx.put(DatabasedStepsModel.simulationSeedName, scenario.getAttributesSimulation().getSimulationSeed());
 
 		VadereContext.add(scenarioName, ctx);
 		logger.info("scenario context initialized.");

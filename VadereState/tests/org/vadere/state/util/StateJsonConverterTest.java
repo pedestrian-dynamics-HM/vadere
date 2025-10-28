@@ -4,18 +4,23 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.distributions.AttributesBinomialDistribution;
+import org.vadere.state.attributes.distributions.AttributesDistribution;
 import org.vadere.state.attributes.models.AttributesFloorField;
+import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesObstacle;
+import org.vadere.state.attributes.scenario.AttributesSource;
 import org.vadere.state.attributes.scenario.AttributesTarget;
+import org.vadere.state.attributes.spawner.AttributesRegularSpawner;
+import org.vadere.state.attributes.spawner.AttributesSpawner;
 import org.vadere.state.psychology.perception.json.StimulusInfo;
 import org.vadere.state.psychology.perception.json.StimulusInfoStore;
 import org.vadere.state.psychology.perception.types.Stimulus;
 import org.vadere.state.psychology.perception.types.Timeframe;
 import org.vadere.state.psychology.perception.types.WaitInArea;
-import org.vadere.state.scenario.Obstacle;
-import org.vadere.state.scenario.Target;
-import org.vadere.state.scenario.Topography;
+import org.vadere.state.scenario.*;
+import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.geometry.shapes.VRectangle;
 
 import java.util.ArrayList;
@@ -148,6 +153,71 @@ public class StateJsonConverterTest {
         attrTarget.setShape(new VRectangle(2,2,2,2));
         String hash3 = StateJsonConverter.getFloorFieldHash(topography, attr);
         assertNotEquals(hash1, hash3,"Hashes must differ");
+    }
+
+    @Test
+    public void getLocomotionHashTest() {
+        // Setup initial topography
+        Topography topography = new Topography();
+        topography.addObstacle(new Obstacle(new AttributesObstacle(3, new VRectangle(1, 1, 3, 3))));
+
+        AttributesTarget attrTarget = new AttributesTarget(-1, new VRectangle(1, 1, 1, 1));
+        Target t = new Target(attrTarget);
+        topography.addTarget(t);
+
+        // Setup source
+        AttributesSource attrSource = new AttributesSource(-1);
+        attrSource.setShape(new VRectangle(5, 5, 2, 2));
+        Source source = new Source(attrSource);
+        topography.addSource(source);
+
+        long simulationSeed = 12345L;
+        List<Attributes> attributesFallbackModel = new ArrayList<>();
+        // Add appropriate fallback model attributes based on your locomotion model
+        // Example: attributesFallbackModel.add(new AttributesOSM());
+
+        String hash1 = StateJsonConverter.getLocomotionHash(topography, simulationSeed, attributesFallbackModel);
+
+        // Changes that should not change the locomotion hash (CacheViewExclude properties)
+        topography.addAerosolCloud(new AerosolCloud());
+
+        String hash2 = StateJsonConverter.getLocomotionHash(topography, simulationSeed, attributesFallbackModel);
+        assertEquals(hash1, hash2, "Hashes must be equal - source spawn parameters should not affect locomotion hash");
+
+        // Changes that SHOULD change the locomotion hash
+
+        // Test 1: Changing source shape (affects topography structure)
+        attrSource.setShape(new VRectangle(6, 6, 3, 3));
+        String hash3 = StateJsonConverter.getLocomotionHash(topography, simulationSeed, attributesFallbackModel);
+        assertNotEquals(hash1, hash3, "Hashes must differ - source shape affects locomotion");
+        // Reset shape
+        attrSource.setShape(new VRectangle(5, 5, 2, 2));
+
+        // Test 2: Changing simulation seed
+        long differentSeed = 54321L;
+        String hash4 = StateJsonConverter.getLocomotionHash(topography, differentSeed, attributesFallbackModel);
+        assertNotEquals(hash1, hash4, "Hashes must differ - simulation seed affects locomotion");
+
+        // Test 3: Changing topography structure (obstacle)
+        topography.addObstacle(new Obstacle(new AttributesObstacle(4, new VRectangle(10, 10, 2, 2))));
+        String hash5 = StateJsonConverter.getLocomotionHash(topography, simulationSeed, attributesFallbackModel);
+        assertNotEquals(hash1, hash5, "Hashes must differ - topography structure affects locomotion");
+
+        // Test 4: Changing fallback model attributes
+        List<Attributes> differentFallbackModel = new ArrayList<>();
+        // Add different attributes or modify existing ones
+        String hash6 = StateJsonConverter.getLocomotionHash(topography, simulationSeed, differentFallbackModel);
+        assertNotEquals(hash1, hash6, "Hashes must differ - fallback model attributes affect locomotion");
+
+        // Test 5: Changing spawner attributes
+        attrSource.setId(99);
+        AttributesRegularSpawner attrSpawn = new AttributesRegularSpawner();
+        attrSpawn.setConstraintsElementsMax(130);
+        attrSpawn.setConstraintsTimeEnd(2.0);
+        attrSpawn.setConstraintsTimeEnd(20.0);
+        attrSource.setSpawnerAttributes(attrSpawn);
+        String hash7 = StateJsonConverter.getLocomotionHash(topography, simulationSeed, differentFallbackModel);
+        assertNotEquals(hash1, hash7, "Hashes must differ - spawner attributes affect locomotion");
     }
 
     @Test

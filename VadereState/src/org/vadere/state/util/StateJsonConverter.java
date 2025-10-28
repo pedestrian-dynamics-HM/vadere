@@ -14,7 +14,10 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.vadere.state.attributes.*;
 import org.vadere.state.attributes.models.AttributesFloorField;
+import org.vadere.state.attributes.models.AttributesPotentialCompactSoftshell;
+import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.scenario.*;
+import org.vadere.state.attributes.spawner.AttributesSpawner;
 import org.vadere.state.psychology.perception.json.StimulusInfo;
 import org.vadere.state.psychology.perception.json.StimulusInfoStore;
 import org.vadere.state.scenario.*;
@@ -540,4 +543,32 @@ public abstract class StateJsonConverter {
 		}
 		return DigestUtils.sha1Hex("error");
 	}
+
+
+    public static String getLocomotionHash(final Topography topography,
+                                           final long simulationSeed,
+                                           final List<Attributes> attributesFallbackModel) {
+        try {
+            String topographyStr = mapper
+                    .writerWithDefaultPrettyPrinter()
+                    .withView(Views.CacheView.class)
+                    .writeValueAsString(topography);
+            String sourcesStr = mapper
+                    .writerWithDefaultPrettyPrinter()
+                    .withView(Views.CacheViewExclude.class)
+                    .writeValueAsString(topography.getSources());;
+            String attrFallbackMainModelStr = mapper
+                    .writerWithDefaultPrettyPrinter()
+                    .withView(Views.CacheView.class)
+                    .writeValueAsString(attributesFallbackModel);
+            String hashIt = topographyStr + "\n" + sourcesStr + "\n" +  simulationSeed + "\n" + attrFallbackMainModelStr;
+            String hash = DigestUtils.sha1Hex(hashIt.getBytes());
+            logger.debugf("created locomootion hash: %s", hash);
+            logger.tracef("used String for hash: \n%s", hashIt);
+            return hash;
+        } catch (JsonProcessingException e) {
+            logger.error("cannot create hash of topography and floor field attributes for cache access.");
+            return DigestUtils.sha1Hex("error");
+        }
+    }
 }
