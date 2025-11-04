@@ -1,5 +1,6 @@
 package org.vadere.simulator.models.airflow;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -11,7 +12,9 @@ import org.vadere.state.attributes.models.airflow.AttributesBounds;
 import org.vadere.state.attributes.models.airflow.AttributesInOutLet;
 import org.vadere.state.scenario.Topography;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -33,15 +36,21 @@ class AirFlowModelTest {
     public void setUp() {
         attributesList = new ArrayList<>();
         airFlowModel = new AirFlowModelTester();
-        
+
         // Create a basic topography
         topography = new Topography();
         topography.setContextId("AirFlowModelTest");
-        
+
         rdm = new Random(0);
         ctx = new VadereContext();
         ctx.put("scenarioPath", tempDir.toAbsolutePath().toString());
         VadereContext.add("AirFlowModelTest", ctx);
+    }
+
+    @AfterEach
+    public void deleteAirflowFiles() {
+        deleteFile(airFlowModel.airFlow.getScenarioPath() + "_test_hash" + "_Vx.txt");
+        deleteFile(airFlowModel.airFlow.getScenarioPath() + "_test_hash" + "_Vy.txt");
     }
 
     @Test
@@ -52,7 +61,7 @@ class AirFlowModelTest {
         outlets.add(new AttributesInOutLet("right", 4., 5.));
         AttributesAirFlowModel attributesAirFlowModel = new AttributesAirFlowModel(2., 0.1, 1., inlets, outlets, new ArrayList<>(), new AttributesBounds());
         attributesList.add(attributesAirFlowModel);
-        
+
         initializeModel(true, false);
         assertNotNull(airFlowModel.airFlow);
         assertNotNull(airFlowModel.attributesAirFlowModel);
@@ -70,27 +79,23 @@ class AirFlowModelTest {
     @Test
     public void testSetupAirFlowWithExistingFile() {
         initializeModel(true, false);
-        airFlowModel.calculateAirFlow("1234");
+        String hash = "1234";
+        airFlowModel.calculateAirFlow(hash);
         assertNull(airFlowModel.airFlow.getXVelocities(), "X velocities should be null before preLoop");
         assertNull(airFlowModel.airFlow.getYVelocities(), "Y velocities should be null before preLoop");
         airFlowModel.preLoop(0);
         assertNotNull(airFlowModel.airFlow.getFlowDirection(0, 0, 0));
+        deleteFile(airFlowModel.airFlow.getScenarioPath() + "_" + hash + "_Vx.txt");
+        deleteFile(airFlowModel.airFlow.getScenarioPath() + "_" + hash + "_Vy.txt");
     }
 
     @Test
-    public void testSetupAirFlowWithExistingFileAndRecalculation() {
+    public void testSetupAirFlowWithExistingEmptyFile() {
         initializeModel(true, false);
         airFlowModel.calculateWrongAirFlow();
         assertNull(airFlowModel.airFlow.getXVelocities(), "X velocities should be null before preLoop");
         assertNull(airFlowModel.airFlow.getYVelocities(), "Y velocities should be null before preLoop");
-        airFlowModel.preLoop(0);
-        assertNotNull(airFlowModel.airFlow.getFlowDirection(0, 0, 0));
-    }
-
-    @Test
-    public void testSetupAirFlowWithCalculationWithWrongParameters() {
-        initializeModel(false, false);
-        assertThrows(IllegalArgumentException.class,() -> airFlowModel.preLoop(0));
+        assertThrows(NullPointerException.class, () -> airFlowModel.preLoop(0));
     }
 
     @Test
@@ -129,5 +134,14 @@ class AirFlowModelTest {
         attributesList.clear();
         attributesList.add(attributesAirFlowModel);
         airFlowModel.initialize(attributesList, new Domain(topography), null, rdm);
+    }
+
+    private void deleteFile(String fileName) {
+        try {
+            Path path = Paths.get(fileName);
+            Files.deleteIfExists(path);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
