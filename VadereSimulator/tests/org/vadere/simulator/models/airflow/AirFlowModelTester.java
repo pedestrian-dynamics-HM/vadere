@@ -61,7 +61,7 @@ public class AirFlowModelTester extends AirFlowModel {
             file2.createNewFile();
             PrintWriter w1 = new PrintWriter(new FileWriter(file1));
             PrintWriter w2 = new PrintWriter(new FileWriter(file2));
-            w1.print(airflowVxText);
+            w1.println(airflowVxText);
             w2.println(airflowVyText);
             w1.close();
             w2.close();
@@ -79,7 +79,7 @@ public class AirFlowModelTester extends AirFlowModel {
             file2.createNewFile();
             PrintWriter w1 = new PrintWriter(new FileWriter(file1));
             PrintWriter w2 = new PrintWriter(new FileWriter(file2));
-            w1.print("# 5_5_3.0-0.1-0.5-left[1.0,2.0]-right[4.0,5.0]-[]");
+            w1.println("# 5_5_3.0-0.1-0.5-left[1.0,2.0]-right[4.0,5.0]-[]");
             w2.println("# 5_5_3.0-0.1-0.5-left[1.0,2.0]-right[4.0,5.0]-[]");
             w1.close();
             w2.close();
