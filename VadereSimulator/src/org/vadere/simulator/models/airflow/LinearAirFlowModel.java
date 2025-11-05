@@ -2,11 +2,14 @@ package org.vadere.simulator.models.airflow;
 
 
 import org.vadere.annotation.factories.models.ModelClass;
+import org.vadere.simulator.context.VadereContext;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.Attributes;
+import org.vadere.state.attributes.models.airflow.AttributesAirFlowModel;
 import org.vadere.state.attributes.models.airflow.AttributesLinearAirFlowModel;
 import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.scenario.AirFlow;
 import org.vadere.util.logging.Logger;
 
 import java.util.List;
@@ -21,8 +24,15 @@ public class LinearAirFlowModel extends AbstractAirFlowModel {
 
     @Override
     public void initialize(List<Attributes> attributesList, Domain domain, AttributesAgent attributesPedestrian, Random random) {
-        super.initialize(attributesList, domain, attributesPedestrian, random);
+        String scenarioPath = VadereContext.getCtx(domain.getTopography()).getString("scenarioPath");
         this.attributesLinearAirFlowModel = Model.findAttributes(attributesList, AttributesLinearAirFlowModel.class);
+        double xmin = domain.getTopography().getBounds().x + domain.getTopography().getBoundingBoxWidth();
+        double ymin = domain.getTopography().getBounds().y + domain.getTopography().getBoundingBoxWidth();
+        double xmax = domain.getTopography().getBounds().x + domain.getTopography().getBounds().width;
+        double ymax = domain.getTopography().getBounds().y + domain.getTopography().getBounds().height;
+        this.airFlow = new AirFlow(scenarioPath, "", xmin, ymin, xmax, ymax);
+        domain.getTopography().setAirFlow(airFlow);
+
         // Initialize airFlow with null velocities
         airFlow.setX_velocity(null);
         airFlow.setY_velocity(null);

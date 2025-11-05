@@ -17,7 +17,7 @@ public class AirFlowTest {
 
     @BeforeEach
     public void setUp() {
-        airFlow = new AirFlow("testScenario", "testHash", BORDER, 1000, BORDER, 1000);
+        airFlow = new AirFlow("testScenario", "testHash", BORDER, BORDER, 1000, 1000);
         airFlow.setGridSize(GRID_SIZE);
     }
 
@@ -38,7 +38,7 @@ public class AirFlowTest {
         airFlow.setX_velocity(xVel);
         airFlow.setY_velocity(yVel);
 
-        double[] result = airFlow.getFlowDirection(1.0, 1.0, 0);
+        double[] result = airFlow.getFlowDirection(1.0, 1.0, 1.0);
         assertArrayEquals(new double[]{2.0, 1.0}, result, DELTA);
     }
 
@@ -117,7 +117,7 @@ public class AirFlowTest {
         assertArrayEquals(new double[]{2.0, 1.0}, farPoint, DELTA);
         
         double[] negativePoint = airFlow.getFlowDirection(0, -100.0, -100.0);
-        assertArrayEquals(new double[]{2.0, 1.0}, negativePoint, DELTA);
+        assertArrayEquals(new double[]{0.0, 0.0}, negativePoint, DELTA);
 
         double[] cornerPoint = airFlow.getFlowDirection(0, 0.0, 0.0);
         assertArrayEquals(new double[]{2.0, 1.0}, cornerPoint, DELTA);

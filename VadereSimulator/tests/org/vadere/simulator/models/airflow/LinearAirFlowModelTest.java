@@ -61,7 +61,7 @@ public class LinearAirFlowModelTest {
     public void testXYVelocities() {
         initializeModel();
         airFlowModel.preLoop(0);
-        double[] result = airFlowModel.airFlow.getFlowDirection(0, 0, 0);
+        double[] result = airFlowModel.airFlow.getFlowDirection(0, 1, 1);
         assertEquals(Math.atan2(result[1], result[0]), airFlowModel.attributesLinearAirFlowModel.getWindDirection());
         assertEquals(Math.sqrt(Math.pow(result[0], 2) + Math.pow(result[1], 2)), airFlowModel.attributesLinearAirFlowModel.getWindSpeed());
     }
