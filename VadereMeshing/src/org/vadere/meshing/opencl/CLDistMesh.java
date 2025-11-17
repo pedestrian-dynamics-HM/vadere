@@ -3,18 +3,13 @@ package org.vadere.meshing.opencl;
 import org.apache.commons.lang3.time.StopWatch;
 
 import org.lwjgl.system.Configuration;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.*;
 import org.vadere.util.logging.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.PointerBuffer;
-import org.lwjgl.opencl.*;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
 import org.vadere.meshing.mesh.iterators.EdgeIterator;
-import org.vadere.meshing.mesh.gen.AFace;
-import org.vadere.meshing.mesh.gen.AHalfEdge;
-import org.vadere.meshing.mesh.gen.AMesh;
-import org.vadere.meshing.mesh.gen.AVertex;
-import org.vadere.meshing.mesh.gen.CLGatherer;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.opencl.CLInfo;
 import org.vadere.util.opencl.CLOperation;
@@ -133,7 +128,7 @@ public class CLDistMesh extends CLOperation {
     private List<IPoint> result;
     private boolean hasToRead = false;
 
-    public CLDistMesh(@NotNull final AMesh mesh) {
+    public CLDistMesh(@NotNull final AMeshWithDataStorage meshWithDataStorage) {
     	super(CL_DEVICE_TYPE_GPU);
     	profiling = true;
         if(profiling) {
@@ -143,8 +138,9 @@ public class CLDistMesh extends CLOperation {
             Configuration.DEBUG_STACK.set(true);
         }
 
-        this.mesh = mesh;
-        this.mesh.garbageCollection();
+        AMeshBuilder builder = new AMeshBuilder(meshWithDataStorage);
+        builder.getOptimizer().garbageCollection();
+        this.mesh = (AMesh) builder.build().getMesh();
         if(doublePrecision) {
             this.vD = CLGatherer.getVerticesD(mesh);
         }
@@ -838,12 +834,12 @@ public class CLDistMesh extends CLOperation {
      * Assumption: There is only one Platform with a GPU.
      */
     public static void main(String... args) throws OpenCLException {
-        AMesh mesh = AMesh.createSimpleTriMesh();
+        AMeshWithDataStorage withDataStorage = AMesh.createSimpleTriMesh();
         log.info("before");
-        Collection<AVertex> vertices = mesh.getVertices();
+        Collection<AVertex> vertices = withDataStorage.getMesh().getVertices();
         log.info(vertices);
 
-        CLDistMesh clDistMesh = new CLDistMesh(mesh);
+        CLDistMesh clDistMesh = new CLDistMesh(withDataStorage);
         clDistMesh.init();
 
         clDistMesh.printTri();

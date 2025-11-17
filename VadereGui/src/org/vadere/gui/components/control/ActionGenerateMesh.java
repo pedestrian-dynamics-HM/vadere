@@ -6,11 +6,12 @@ import org.vadere.gui.components.utils.ResourceStrings;
 import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.projectview.model.ProjectViewModel;
 import org.vadere.gui.topographycreator.view.ActionTranslateTopographyDialog;
-import org.vadere.meshing.mesh.gen.PFace;
-import org.vadere.meshing.mesh.gen.PHalfEdge;
-import org.vadere.meshing.mesh.gen.PVertex;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.PFace;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.PHalfEdge;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.PVertex;
 import org.vadere.meshing.mesh.impl.PSLG;
-import org.vadere.meshing.mesh.inter.IMesh;
+import org.vadere.meshing.mesh.inter.mesh.IMesh;
+import org.vadere.meshing.mesh.inter.mesh.IMeshWithDataStorage;
 import org.vadere.meshing.utils.MeshConstructor;
 import org.vadere.meshing.utils.io.poly.MeshPolyWriter;
 import org.vadere.simulator.utils.pslg.PSLGConverter;
@@ -79,14 +80,14 @@ public class ActionGenerateMesh extends AbstractAction {
 		}
 	}
 
-	private void saveFloorFieldMesh(@NotNull final IMesh<PVertex, PHalfEdge, PFace> mesh, final String ending) {
-		logger.info("generate mesh (" + mesh.getMinEdgeLen() + ", " + mesh.getMaxEdgeLen() + ")");
+	private void saveFloorFieldMesh(@NotNull final IMeshWithDataStorage<PVertex, PHalfEdge, PFace> meshWithDataStorage, final String ending) {
+		logger.info("generate mesh (" + meshWithDataStorage.getMesh().getMinEdgeLen() + ", " + meshWithDataStorage.getMesh().getMaxEdgeLen() + ")");
 
 		File meshDir = new File(model.getCurrentProjectPath().concat("/" + IOUtils.SCENARIO_DIR + "/" + IOUtils.MESH_DIR));
 		File outputFile = new File(meshDir.getAbsoluteFile() + "/" +  model.getCurrentScenario().getName() + ending + ".poly");
 
 		MeshPolyWriter<PVertex, PHalfEdge, PFace> meshPolyWriter = new MeshPolyWriter<>();
-		String meshString = meshPolyWriter.to2DPoly(mesh);
+		String meshString = meshPolyWriter.to2DPoly(meshWithDataStorage);
 
 		if(!meshDir.exists()) {
 			meshDir.mkdir();

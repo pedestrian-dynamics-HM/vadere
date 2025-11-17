@@ -2,14 +2,11 @@ package org.vadere.meshing.mesh.triangulation.improver;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.IllegalMeshException;
-import org.vadere.meshing.mesh.inter.IFace;
-import org.vadere.meshing.mesh.inter.IHalfEdge;
-import org.vadere.meshing.mesh.inter.IMesh;
+import org.vadere.meshing.mesh.inter.mesh.*;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
-import org.vadere.meshing.mesh.inter.IVertex;
+import org.vadere.meshing.mesh.inter.mesh.data.IMeshDataStorage;
 import org.vadere.meshing.mesh.triangulation.improver.distmesh.Parameters;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.IEikMeshImprover;
-import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VTriangle;
 import org.vadere.util.math.IDistanceFunction;
 
@@ -35,6 +32,8 @@ public interface IMeshImprover<V extends IVertex, E extends IHalfEdge, F extends
 	default IMesh<V,E,F> getMesh() {
 		return getTriangulation().getMesh();
 	}
+	default IMeshDataStorage<V,E,F> getDataStorage() { return getTriangulation().getMeshDataStorage(); }
+	default IMeshWithDataStorage<V, E, F> getMeshWithDataStorage() { return getTriangulation().getMeshWithDataStorage(); }
 
 	default Predicate<F> outsidePredicate(@NotNull final IDistanceFunction distanceFunc) {
 		return f -> distanceFunc.apply(getMesh().toTriangle(f).midPoint()) > 0;

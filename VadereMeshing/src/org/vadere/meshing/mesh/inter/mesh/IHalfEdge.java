@@ -1,4 +1,4 @@
-package org.vadere.meshing.mesh.inter;
+package org.vadere.meshing.mesh.inter.mesh;
 
 /**
  * A half-edge {@link IHalfEdge} is part of a specific face and one part of a full-edge the other

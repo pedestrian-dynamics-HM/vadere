@@ -3,15 +3,12 @@ package org.vadere.simulator.projects.dataprocessing.processor;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
-import org.vadere.meshing.WeilerAtherton;
 import org.vadere.meshing.mesh.gen.MeshRenderer;
-import org.vadere.meshing.mesh.gen.PFace;
-import org.vadere.meshing.mesh.gen.PHalfEdge;
-import org.vadere.meshing.mesh.gen.PMesh;
-import org.vadere.meshing.mesh.gen.PVertex;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.*;
 import org.vadere.meshing.mesh.impl.PMeshPanel;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
-import org.vadere.meshing.mesh.inter.IMesh;
+import org.vadere.meshing.mesh.inter.mesh.IMesh;
+import org.vadere.meshing.mesh.inter.mesh.IMeshWithDataStorage;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.GenEikMesh;
 import org.vadere.meshing.utils.io.poly.MeshPolyWriter;
 import org.vadere.simulator.control.simulation.SimulationState;
@@ -21,11 +18,8 @@ import org.vadere.simulator.projects.dataprocessing.datakey.NoDataKey;
 import org.vadere.simulator.projects.migration.GeometryCleaner;
 import org.vadere.state.attributes.processor.AttributesMeshProcessor;
 import org.vadere.state.scenario.MeasurementArea;
-import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.VPolygon;
-import org.vadere.util.geometry.shapes.VRectangle;
-import org.vadere.util.math.DistanceFunction;
 import org.vadere.util.math.IDistanceFunction;
 
 import java.awt.*;
@@ -38,10 +32,9 @@ import java.util.stream.Collectors;
  * @author Benedikt Zoennchen
  */
 @DataProcessorClass(label = "MeshProcessor")
-public class MeshProcessor extends NoDataKeyProcessor<IMesh<PVertex, PHalfEdge, PFace>> {
+public class MeshProcessor extends NoDataKeyProcessor<IMeshWithDataStorage<PVertex, PHalfEdge, PFace>> {
 
-	private IMesh<PVertex, PHalfEdge, PFace> mesh;
-	private IIncrementalTriangulation<PVertex, PHalfEdge, PFace> triangulation;
+    private IIncrementalTriangulation<PVertex, PHalfEdge, PFace> triangulation;
 	private MeasurementArea measurementArea;
 
 	public MeshProcessor() {
@@ -66,12 +59,12 @@ public class MeshProcessor extends NoDataKeyProcessor<IMesh<PVertex, PHalfEdge, 
 
 	@Override
 	public void postLoopAddResultInfo(@NotNull final SimulationState state, @NotNull final SimulationResult result){
-		result.addData(getSimulationResultHeader(), getTriangulation().getMesh().getMeshInformations());
+		result.addData(getSimulationResultHeader(), getTriangulation().getMeshWithDataStorage().getMesh().getMeshInformations());
 	}
 
 	@Override
 	public String getSimulationResultHeader() {
-		return "mesh (" + getTriangulation().getMesh().hashCode() + ")";
+		return "mesh (" + getTriangulation().getMeshWithDataStorage().hashCode() + ")";
 	}
 
 	@Override
@@ -106,39 +99,13 @@ public class MeshProcessor extends NoDataKeyProcessor<IMesh<PVertex, PHalfEdge, 
 				getAttributes().getEdgeLength(),
 				GeometryUtils.boundRelative(measurementPolygon.getPoints()),
 				allPolygons,
-				() -> new PMesh()
+				PMeshWithDataStorage::constructEmpty
 		);
-
-
-		/*Function<PVertex, Color> vertexColorFunction = v -> {
-			if(meshImprover.isSlidePoint(v)){
-				return Colors.BLUE;
-			} else if(meshImprover.isFixPoint(v)) {
-				return Colors.RED;
-			} else {
-				return Color.BLACK;
-			}
-		};
-
-
-		var meshRenderer = new MeshRenderer<>(meshImprover.getMesh(), f -> false, f -> Color.WHITE, e -> Color.GRAY, vertexColorFunction);
-		var meshPanel = new PMeshPanel(meshRenderer, 1000, 800);
-		meshPanel.display();
-		meshImprover.improve();
-		while (!meshImprover.isFinished()) {
-			synchronized (meshImprover.getMesh()) {
-				meshImprover.improve();
-			}
-			//Thread.sleep(500);
-			meshPanel.repaint();
-		}*/
-
 
 		triangulation = meshImprover.generate();
 		triangulation = meshImprover.getTriangulation();
-		mesh = triangulation.getMesh();
-
-		this.putValue(NoDataKey.key() ,mesh);
+		IMeshWithDataStorage<PVertex, PHalfEdge, PFace> meshWithDataStorage = triangulation.getMeshWithDataStorage();
+		this.putValue(NoDataKey.key() , meshWithDataStorage);
 
 		var meshRenderer = new MeshRenderer<>(meshImprover.getMesh(), f -> false, f -> Color.WHITE, e -> Color.GRAY);
 		var meshPanel = new PMeshPanel(meshRenderer, 300, 300);

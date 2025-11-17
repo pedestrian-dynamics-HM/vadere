@@ -1,11 +1,9 @@
 package org.vadere.meshing.mesh.triangulation.triangulator.gen;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.vadere.meshing.mesh.inter.IFace;
-import org.vadere.meshing.mesh.inter.IHalfEdge;
-import org.vadere.meshing.mesh.inter.IMesh;
+import org.vadere.meshing.mesh.inter.mesh.*;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
-import org.vadere.meshing.mesh.inter.IVertex;
+import org.vadere.meshing.mesh.inter.mesh.data.IMeshDataStorage;
 import org.vadere.meshing.mesh.triangulation.triangulator.inter.ITriangulator;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.math.IDistanceFunction;
@@ -50,7 +48,7 @@ public class UniformSFCTriangulator<V extends IVertex, E extends IHalfEdge, F ex
 
         this.distFunc = distFunc;
         this.triangulation = triangulation;
-        this.mesh = triangulation.getMesh();
+        this.mesh = triangulation.getMeshWithDataStorage().getMesh();
         this.boundary = boundary;
         this.lenFunc = lenFunc;
         this.bbox = bound;
@@ -163,7 +161,17 @@ public class UniformSFCTriangulator<V extends IVertex, E extends IHalfEdge, F ex
 		return mesh;
 	}
 
-	private void removeTrianglesOutsideBBox() {
+    @Override
+    public IMeshDataStorage<V, E, F> getMeshDataStorage() {
+        return triangulation.getMeshDataStorage();
+    }
+
+    @Override
+    public IMeshWithDataStorage<V, E, F> getMeshWithDataStorage() {
+        return triangulation.getMeshWithDataStorage();
+    }
+
+    private void removeTrianglesOutsideBBox() {
         boolean removedSome = true;
 
         while (removedSome) {

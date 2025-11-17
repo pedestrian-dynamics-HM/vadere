@@ -2,10 +2,7 @@ package org.vadere.meshing.utils.io.poly;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.vadere.meshing.mesh.inter.IFace;
-import org.vadere.meshing.mesh.inter.IHalfEdge;
-import org.vadere.meshing.mesh.inter.IMesh;
-import org.vadere.meshing.mesh.inter.IVertex;
+import org.vadere.meshing.mesh.inter.mesh.*;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -33,27 +30,30 @@ public class MeshPSLGWriter<V extends IVertex, E extends IHalfEdge, F extends IF
 	/**
 	 * Transforms a {@link IMesh} into a PSLG-{@link String}. Note that in the PSLG-format faces aren't saved explicit.
 	 *
-	 * @param mesh  the mesh
+	 * @param meshWithDataStorage  the meshWithDataStorage
 	 *
 	 * @return a PSLG-{@link String}
 	 */
-	public String toPSLG(@NotNull final IMesh<V, E, F> mesh) {
-		return toPSLG(mesh, 0, null);
+	public String toPSLG(@NotNull final IMeshWithDataStorage<V, E, F> meshWithDataStorage) {
+		return toPSLG(meshWithDataStorage, 0, null);
 	}
 	/**
 	 * Transforms a {@link IMesh} into a PSLG-{@link String}. Note that in the PSLG-format faces aren't saved explicit.
 	 *
-	 * @param mesh          the mesh
+	 * @param meshWithDataStorage          the mesh
 	 * @param nAttributes   number of vertex attributes
 	 * @param attrNameFunc  a function attributeIndex -> attributeName
 	 *
 	 * @return a PSLG-{@link String}
 	 */
 	public String toPSLG(
-			@NotNull final IMesh<V, E, F> mesh,
+			@NotNull final IMeshWithDataStorage<V, E, F> meshWithDataStorage,
 			int nAttributes,
 			@Nullable final Function<Integer, String> attrNameFunc){
 		assert nAttributes <= 0 || attrNameFunc != null;
+
+		IMesh<V, E, F> mesh = meshWithDataStorage.getMesh();
+
 		int boundaryMarker = 0; // no boundary marker
 		StringBuilder builder = new StringBuilder();
 		builder.append("#node\n");
@@ -66,7 +66,7 @@ public class MeshPSLGWriter<V extends IVertex, E extends IHalfEdge, F extends IF
 			builder.append(String.format(Locale.US, "%d" + SEPARATOR +"%f" + SEPARATOR + "%f", id, v.getX(), v.getY()));
 
 			for(int j = 1; j <= nAttributes; j++) {
-				builder.append(String.format(Locale.US, SEPARATOR + "%f", mesh.getDoubleData(v, attrNameFunc.apply(j))));
+				builder.append(String.format(Locale.US, SEPARATOR + "%f", meshWithDataStorage.getDataStorage().getDoubleData(v, attrNameFunc.apply(j))));
 			}
 			builder.append("\n");
 			id++;

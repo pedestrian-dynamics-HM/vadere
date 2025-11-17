@@ -2,10 +2,10 @@ package org.vadere.simulator.models.potential.timeCostFunction;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.vadere.meshing.mesh.inter.IFace;
-import org.vadere.meshing.mesh.inter.IHalfEdge;
+import org.vadere.meshing.mesh.inter.mesh.IFace;
+import org.vadere.meshing.mesh.inter.mesh.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
-import org.vadere.meshing.mesh.inter.IVertex;
+import org.vadere.meshing.mesh.inter.mesh.IVertex;
 import org.vadere.meshing.mesh.inter.IVertexContainerDouble;
 import org.vadere.meshing.utils.math.GeometryUtilsMesh;
 import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
@@ -56,7 +56,7 @@ public class TimeCostPedestrianDensityQueueingMesh<V extends IVertex, E extends 
 		this.loadingStrategy = loadingStrategy;
 		this.triangulation = triangulation;
 		this.topography = topography;
-		this.densities = triangulation.getMesh().getDoubleVertexContainer(nameObstacleDensity);
+		this.densities = triangulation.getMeshDataStorage().getDoubleVertexContainer(nameObstacleDensity);
 		this.updated = false;
 
 		//TODO duplicated code
@@ -103,7 +103,7 @@ public class TimeCostPedestrianDensityQueueingMesh<V extends IVertex, E extends 
 	@Override
 	public void update() {
 		long ms = System.currentTimeMillis();
-		var mesh = triangulation.getMesh();
+		var meshWithDataStorage = triangulation.getMeshWithDataStorage();
 		densities.reset();
 
 		for (Pedestrian element : topography.getPedestrianDynamicElements().getElements()) {
@@ -112,11 +112,11 @@ public class TimeCostPedestrianDensityQueueingMesh<V extends IVertex, E extends 
 
 			if (optional.isPresent()) {
 				F pedFace = optional.get();
-				Predicate<V> predicate = v -> GeometryUtils.lengthSq(mesh.getX(v) - element.getPosition().x,
-						mesh.getY(v) - element.getPosition().y) < influenceRadius * influenceRadius;
+				Predicate<V> predicate = v -> GeometryUtils.lengthSq(meshWithDataStorage.getMesh().getX(v) - element.getPosition().x,
+						meshWithDataStorage.getMesh().getY(v) - element.getPosition().y) < influenceRadius * influenceRadius;
 				Set<V> closeVertices = triangulation.getVertices(element.getPosition().getX(), element.getPosition().getY(), pedFace, predicate);
 				for (V v : closeVertices) {
-					double density = densities.getValue(v) + density(element.getPosition().x, element.getPosition().y, mesh.getX(v), mesh.getY(v), element);
+					double density = densities.getValue(v) + density(element.getPosition().x, element.getPosition().y, meshWithDataStorage.getMesh().getX(v), meshWithDataStorage.getMesh().getY(v), element);
 					densities.setValue(v, density);
 				}
 			}

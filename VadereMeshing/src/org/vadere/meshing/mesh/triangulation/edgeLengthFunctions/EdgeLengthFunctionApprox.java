@@ -1,12 +1,14 @@
 package org.vadere.meshing.mesh.triangulation.edgeLengthFunctions;
 
 import org.jetbrains.annotations.NotNull;
-import org.vadere.meshing.mesh.gen.PFace;
-import org.vadere.meshing.mesh.gen.PHalfEdge;
-import org.vadere.meshing.mesh.gen.PVertex;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.PFace;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.PHalfEdge;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.PVertex;
 import org.vadere.meshing.mesh.impl.PSLG;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
-import org.vadere.meshing.mesh.inter.IMesh;
+import org.vadere.meshing.mesh.inter.mesh.IMesh;
+import org.vadere.meshing.mesh.inter.mesh.IMeshWithDataStorage;
+import org.vadere.meshing.mesh.inter.mesh.MeshPythonUtils;
 import org.vadere.meshing.mesh.triangulation.triangulator.impl.PRuppertsTriangulator;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.IPoint;
@@ -14,8 +16,6 @@ import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.math.InterpolationUtil;
 
-import java.util.Comparator;
-import java.util.PriorityQueue;
 import java.util.function.Function;
 
 public class EdgeLengthFunctionApprox implements IEdgeLengthFunction {
@@ -49,13 +49,14 @@ public class EdgeLengthFunctionApprox implements IEdgeLengthFunction {
 
 		// compute and set the local feature size
 		var vertices = triangulation.getMesh().getVertices();
-		var mesh = triangulation.getMesh();
+		var meshWithDataStorage = triangulation.getMeshWithDataStorage();
+		var dataStorage = meshWithDataStorage.getDataStorage();
 		for(var v : vertices) {
 			double minEdgeLen = Double.MAX_VALUE;
 			for(var e : triangulation.getMesh().getEdges(v)) {
-				if(!mesh.getBooleanData(mesh.getFace(e), "boundary")
-						|| !mesh.getBooleanData(mesh.getTwinFace(e), "boundary")) {
-					var u = triangulation.getMesh().getTwinVertex(e);
+				if(!dataStorage.getBooleanData(meshWithDataStorage.getMesh().getFace(e), "boundary")
+						|| !dataStorage.getBooleanData(meshWithDataStorage.getMesh().getTwinFace(e), "boundary")) {
+					var u = triangulation.getMeshWithDataStorage().getMesh().getTwinVertex(e);
 					double len = v.distance(u) * (1.0 / (Math.sqrt(2) * 1.2/*4.0*/));
 					if(len < minEdgeLen) {
 						minEdgeLen = len;
@@ -63,7 +64,7 @@ public class EdgeLengthFunctionApprox implements IEdgeLengthFunction {
 				}
 			}
 
-			triangulation.getMesh().setDoubleData(v, propName, Math.min(edgeLengthFunction.apply(v), minEdgeLen));
+			triangulation.getMeshWithDataStorage().getDataStorage().setDoubleData(v, propName, Math.min(edgeLengthFunction.apply(v), minEdgeLen));
 		}
 	}
 
@@ -84,9 +85,9 @@ public class EdgeLengthFunctionApprox implements IEdgeLengthFunction {
 	@Override
 	public Double apply(@NotNull final IPoint p) {
 		var face = triangulation.locateFace(new VPoint(p.getX(), p.getY())).get();
-		var mesh = triangulation.getMesh();
+		var mesh = triangulation.getMeshWithDataStorage();
 
-		if(mesh.isBoundary(face)) {
+		if(mesh.getMesh().isBoundary(face)) {
 			return Double.POSITIVE_INFINITY;
 		}
 		else {
@@ -103,19 +104,8 @@ public class EdgeLengthFunctionApprox implements IEdgeLengthFunction {
 	}
 
 	public void printPython() {
-		String str = triangulation.getMesh().toPythonTriangulation(v -> triangulation.getMesh().getDoubleData(v, propName));
+		IMeshWithDataStorage<PVertex, PHalfEdge, PFace> meshWithDataStorage = triangulation.getMeshWithDataStorage();
+		String str = MeshPythonUtils.toPythonTriangulation(meshWithDataStorage, propName);
 		System.out.println(str);
-		/*var points = triangulation.getMesh().getPoints();
-		System.out.print("[");
-		for(var dataPoint : points) {
-			System.out.print("["+dataPoint.getX()+","+dataPoint.getY()+"],");
-		}
-		System.out.println("]\n\n");
-
-		System.out.print("[");
-		for(var dataPoint : points) {
-			System.out.print(dataPoint.getData()+",");
-		}
-		System.out.println("]");*/
 	}
 }

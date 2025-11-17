@@ -1,11 +1,12 @@
 package org.vadere.simulator.examples.Meshing;
 
 import org.jetbrains.annotations.NotNull;
-import org.vadere.meshing.mesh.gen.PFace;
-import org.vadere.meshing.mesh.gen.PHalfEdge;
-import org.vadere.meshing.mesh.gen.PVertex;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.PFace;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.PHalfEdge;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.PVertex;
 import org.vadere.meshing.mesh.impl.PSLG;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
+import org.vadere.meshing.mesh.inter.mesh.MeshPythonUtils;
 import org.vadere.meshing.mesh.triangulation.triangulator.impl.PRuppertsTriangulator;
 import org.vadere.simulator.models.potential.solver.calculators.mesh.MeshEikonalSolverFMM;
 import org.vadere.util.geometry.GeometryUtils;
@@ -80,7 +81,7 @@ public class DistanceFunctionApproxFMM implements IDistanceFunctionCached {
 	}
 
 	public void printPython() {
-		System.out.println(triangulation.getMesh().toPythonTriangulation(v -> eikSolver.getPotential(v)));
+		System.out.println(MeshPythonUtils.toPythonTriangulation(triangulation.getMeshWithDataStorage(), v -> eikSolver.getPotential(v)));
 		/*var points = triangulation.getMesh().getPoints();
 		System.out.print("[");
 		for(var dataPoint : points) {
@@ -102,9 +103,9 @@ public class DistanceFunctionApproxFMM implements IDistanceFunctionCached {
 	}
 
 	private double apply(@NotNull final IPoint p, @NotNull final PFace face) {
-		var mesh = triangulation.getMesh();
+		var meshWithDataStorage = triangulation.getMeshWithDataStorage();
 
-		if(mesh.isBoundary(face)) {
+		if(meshWithDataStorage.getMesh().isBoundary(face)) {
 			return Double.NEGATIVE_INFINITY;
 		}
 		else {

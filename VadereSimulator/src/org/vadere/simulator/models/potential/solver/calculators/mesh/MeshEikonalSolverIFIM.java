@@ -3,10 +3,10 @@ package org.vadere.simulator.models.potential.solver.calculators.mesh;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
 import org.jetbrains.annotations.NotNull;
-import org.vadere.meshing.mesh.inter.IFace;
-import org.vadere.meshing.mesh.inter.IHalfEdge;
+import org.vadere.meshing.mesh.inter.mesh.IFace;
+import org.vadere.meshing.mesh.inter.mesh.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
-import org.vadere.meshing.mesh.inter.IVertex;
+import org.vadere.meshing.mesh.inter.mesh.IVertex;
 import org.vadere.meshing.mesh.inter.IVertexContainerBoolean;
 import org.vadere.meshing.mesh.inter.IVertexContainerDouble;
 import org.vadere.meshing.mesh.inter.IVertexContainerObject;
@@ -104,12 +104,12 @@ public class MeshEikonalSolverIFIM<V extends IVertex, E extends IHalfEdge, F ext
 		super(identifier, triangulation, timeCostFunction);
 		this.identifier = identifier;
 		this.activeList = new LinkedList<>();
-		this.oldDefiningSimplex = getMesh().getObjectVertexContainer(identifier + "_" + nameOldDefiningSimplex, Pair.class);
-		this.definingSimplex = getMesh().getObjectVertexContainer(identifier + "_" + nameDefiningSimplex, Pair.class);
+		this.oldDefiningSimplex = getMeshDataStorage().getObjectVertexContainer(identifier + "_" + nameOldDefiningSimplex, Pair.class);
+		this.definingSimplex = getMeshDataStorage().getObjectVertexContainer(identifier + "_" + nameDefiningSimplex, Pair.class);
 
-		this.oldPotential = getMesh().getDoubleVertexContainer(identifier + "_" + nameOldPotential);
-		this.oldTimeCosts = getMesh().getDoubleVertexContainer(identifier + "_" + nameOldSpeed);
-		this.speedChange = getMesh().getBooleanVertexContainer(identifier + "_" + nameSpeedChanged);
+		this.oldPotential = getMeshDataStorage().getDoubleVertexContainer(identifier + "_" + nameOldPotential);
+		this.oldTimeCosts = getMeshDataStorage().getDoubleVertexContainer(identifier + "_" + nameOldSpeed);
+		this.speedChange = getMeshDataStorage().getBooleanVertexContainer(identifier + "_" + nameSpeedChanged);
 		setInitialVertices(findInitialVertices(targetShapes), IDistanceFunction.createToTargets(targetShapes));
 
 		/*File dir = new File("/Users/bzoennchen/Development/workspaces/hmRepo/PersZoennchen/PhD/trash/generated/floorFieldPlot/");

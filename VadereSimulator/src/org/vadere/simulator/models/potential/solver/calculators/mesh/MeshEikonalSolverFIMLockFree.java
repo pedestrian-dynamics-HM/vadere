@@ -1,10 +1,10 @@
 package org.vadere.simulator.models.potential.solver.calculators.mesh;
 
 import org.jetbrains.annotations.NotNull;
-import org.vadere.meshing.mesh.inter.IFace;
-import org.vadere.meshing.mesh.inter.IHalfEdge;
+import org.vadere.meshing.mesh.inter.mesh.IFace;
+import org.vadere.meshing.mesh.inter.mesh.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
-import org.vadere.meshing.mesh.inter.IVertex;
+import org.vadere.meshing.mesh.inter.mesh.IVertex;
 import org.vadere.meshing.mesh.inter.IVertexContainerObject;
 import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
 import org.vadere.util.geometry.shapes.VShape;
@@ -86,7 +86,7 @@ public class MeshEikonalSolverFIMLockFree<V extends IVertex, E extends IHalfEdge
 		logger.debug("parallel fim using " + nThreds + " threads.");
 		this.activeLists = new ArrayList<>(nThreds);
 		this.forkJoinPool = new ForkJoinPool(nThreds);
-		this.atomicBooleans = getMesh().getObjectVertexContainer(identifier + "_" + nameAtomicBoolean, AtomicBoolean.class);
+		this.atomicBooleans = getMeshDataStorage().getObjectVertexContainer(identifier + "_" + nameAtomicBoolean, AtomicBoolean.class);
 
 		for(int i = 0; i < nThreds; i++) {
 			activeLists.add(new LinkedList<>());

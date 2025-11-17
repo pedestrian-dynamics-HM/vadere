@@ -2,20 +2,12 @@ package org.vadere.meshing.mesh.triangulation;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.gen.IncrementalTriangulation;
-import org.vadere.meshing.mesh.gen.PFace;
-import org.vadere.meshing.mesh.gen.PHalfEdge;
-import org.vadere.meshing.mesh.gen.PMesh;
-import org.vadere.meshing.mesh.gen.PVertex;
 import org.vadere.meshing.mesh.impl.PSLG;
-import org.vadere.meshing.mesh.inter.IFace;
-import org.vadere.meshing.mesh.inter.IHalfEdge;
+import org.vadere.meshing.mesh.inter.mesh.*;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
-import org.vadere.meshing.mesh.inter.IMesh;
-import org.vadere.meshing.mesh.inter.IMeshSupplier;
-import org.vadere.meshing.mesh.inter.IVertex;
+import org.vadere.meshing.mesh.inter.IEmptyMeshSupplier;
 import org.vadere.meshing.mesh.inter.IVertexContainerDouble;
 import org.vadere.meshing.mesh.triangulation.triangulator.gen.GenRuppertsTriangulator;
-import org.vadere.meshing.mesh.triangulation.triangulator.impl.PRuppertsTriangulator;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -32,14 +24,14 @@ public class DistanceFunctionApproxBF<V extends IVertex, E extends IHalfEdge, F 
 	private IVertexContainerDouble<V, E, F> distances;
 
 	public DistanceFunctionApproxBF(
-			@NotNull final IMesh<V, E, F> mesh,
+			@NotNull final IMeshWithDataStorage<V, E, F> meshWithDataStorage,
 			@NotNull final IDistanceFunction exactDistanceFunc) {
 
-		this.triangulation = new IncrementalTriangulation<>(mesh);
+		this.triangulation = IncrementalTriangulation.fromMesh(meshWithDataStorage);
 		this.triangulation.enableCache();
 		//TODO: maybe transform into an immutable triangulation / mesh!
 		this.triangulation.setCanIllegalPredicate(e -> true);
-		this.distances = triangulation.getMesh().getDoubleVertexContainer(propName);
+		this.distances = triangulation.getMeshDataStorage().getDoubleVertexContainer(propName);
 		// compute and set the local feature size
 		var vertices = triangulation.getMesh().getVertices();
 
@@ -53,7 +45,7 @@ public class DistanceFunctionApproxBF<V extends IVertex, E extends IHalfEdge, F 
 			@NotNull final PSLG pslg,
 			@NotNull final Function<IPoint, Double> circumRadiusFunc,
 			@NotNull final IDistanceFunction exactDistanceFunc,
-			@NotNull final IMeshSupplier<V, E, F> meshSupplier) {
+			@NotNull final IEmptyMeshSupplier<V, E, F> meshSupplier) {
 		//IPointConstructor<DataPoint<Double>> pointConstructor = (x, y) -> new DataPoint<>(x, y);
 		/**
 		 * Add a bound around so the edge function is also defined outside.
@@ -64,21 +56,21 @@ public class DistanceFunctionApproxBF<V extends IVertex, E extends IHalfEdge, F 
 		var ruppertsTriangulator = new GenRuppertsTriangulator<V, E, F>(meshSupplier, boundedPSLG,10, circumRadiusFunc, false, false);
 		this.triangulation = ruppertsTriangulator.generate();
 		this.triangulation.enableCache();
-		this.distances = triangulation.getMesh().getDoubleVertexContainer(propName);
+		this.distances = triangulation.getMeshDataStorage().getDoubleVertexContainer(propName);
 
 		//TODO: maybe transform into an immutable triangulation / mesh!
 		this.triangulation.setCanIllegalPredicate(e -> true);
 
 		// compute and set the local feature size
-		var vertices = triangulation.getMesh().getVertices();
+		var vertices = triangulation.getVertices();
 
 		for(var v : vertices) {
 			double distance = exactDistanceFunc.apply(v);
-			this.triangulation.getMesh().setDoubleData(v, propName, distance);
+			this.triangulation.getMeshDataStorage().setDoubleData(v, propName, distance);
 		}
 	}
 
-	public DistanceFunctionApproxBF(@NotNull final PSLG pslg, @NotNull final IDistanceFunction exactDistanceFunc, @NotNull final IMeshSupplier<V, E, F> meshSupplier) {
+	public DistanceFunctionApproxBF(@NotNull final PSLG pslg, @NotNull final IDistanceFunction exactDistanceFunc, @NotNull final IEmptyMeshSupplier<V, E, F> meshSupplier) {
 		this(pslg, p -> Double.POSITIVE_INFINITY, exactDistanceFunc, meshSupplier);
 		//IPointConstructor<DataPoint<Double>> pointConstructor = (x, y) -> new DataPoint<>(x, y);
 	}
@@ -90,19 +82,7 @@ public class DistanceFunctionApproxBF<V extends IVertex, E extends IHalfEdge, F 
 	}
 
 	public void printPython() {
-		System.out.println(triangulation.getMesh().toPythonTriangulation(v -> triangulation.getMesh().getDoubleData(v, propName)));
-		/*var points = triangulation.getMesh().getPoints();
-		System.out.print("[");
-		for(var dataPoint : points) {
-			System.out.print("["+dataPoint.getX()+","+dataPoint.getY()+"],");
-		}
-		System.out.println("]\n\n");
-
-		System.out.print("[");
-		for(var dataPoint : points) {
-			System.out.print(dataPoint.getData()+",");
-		}
-		System.out.println("]");*/
+		System.out.println(MeshPythonUtils.toPythonTriangulation(triangulation.getMeshWithDataStorage(), propName));
 	}
 
 	@Override
@@ -116,9 +96,9 @@ public class DistanceFunctionApproxBF<V extends IVertex, E extends IHalfEdge, F 
 	}
 
 	private double apply(@NotNull final IPoint p, @NotNull final F face) {
-		var mesh = triangulation.getMesh();
+		var mesh = triangulation.getMeshWithDataStorage();
 
-		if(mesh.isBoundary(face)) {
+		if(mesh.getMesh().isBoundary(face)) {
 			return Double.POSITIVE_INFINITY;
 		}
 		else {
@@ -142,20 +122,4 @@ public class DistanceFunctionApproxBF<V extends IVertex, E extends IHalfEdge, F 
 			return InterpolationUtil.barycentricInterpolation(x1, y1, val1, x2, y2, val2, x3, y3, val3, totalArea, p.getX(), p.getY());
 		}
 	}
-
-	/*private double apply(@NotNull final IPoint p, @NotNull final F face) {
-		var mesh = triangulation.getMesh();
-
-		if(mesh.isBoundary(face)) {
-			return Double.POSITIVE_INFINITY;
-		}
-		else {
-			double x[] = new double[3];
-			double y[] = new double[3];
-			double z[] = new double[3];
-			triangulation.getTriPoints(face, x, y, z, distances);
-			double totalArea = GeometryUtils.areaOfPolygon(x, y);
-			return InterpolationUtil.barycentricInterpolation(x, y, z, totalArea, p.getX(), p.getY());
-		}
-	}*/
 }

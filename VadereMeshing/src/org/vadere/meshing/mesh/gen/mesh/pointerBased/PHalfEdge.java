@@ -1,7 +1,7 @@
-package org.vadere.meshing.mesh.gen;
+package org.vadere.meshing.mesh.gen.mesh.pointerBased;
 
 import org.jetbrains.annotations.NotNull;
-import org.vadere.meshing.mesh.inter.IHalfEdge;
+import org.vadere.meshing.mesh.inter.mesh.IHalfEdge;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
 

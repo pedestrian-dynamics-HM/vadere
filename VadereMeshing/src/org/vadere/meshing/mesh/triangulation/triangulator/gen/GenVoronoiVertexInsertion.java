@@ -2,12 +2,10 @@ package org.vadere.meshing.mesh.triangulation.triangulator.gen;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.impl.PSLG;
-import org.vadere.meshing.mesh.inter.IFace;
-import org.vadere.meshing.mesh.inter.IHalfEdge;
+import org.vadere.meshing.mesh.inter.mesh.*;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
-import org.vadere.meshing.mesh.inter.IMesh;
-import org.vadere.meshing.mesh.inter.IMeshSupplier;
-import org.vadere.meshing.mesh.inter.IVertex;
+import org.vadere.meshing.mesh.inter.IEmptyMeshSupplier;
+import org.vadere.meshing.mesh.inter.mesh.data.IMeshDataStorage;
 import org.vadere.meshing.mesh.triangulation.triangulator.inter.IRefiner;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VLine;
@@ -64,7 +62,7 @@ public class GenVoronoiVertexInsertion<V extends IVertex, E extends IHalfEdge, F
 	private DelaunayPlacement<V, E, F> placementStrategy;
 
 	public GenVoronoiVertexInsertion(@NotNull final PSLG pslg,
-	                                 @NotNull final IMeshSupplier<V, E, F> meshSupplier,
+	                                 @NotNull final IEmptyMeshSupplier<V, E, F> meshSupplier,
 	                                 final boolean createHoles,
 	                                 @NotNull Function<IPoint, Double> circumRadiusFunc) {
 
@@ -197,6 +195,16 @@ public class GenVoronoiVertexInsertion<V extends IVertex, E extends IHalfEdge, F
 	@Override
 	public IMesh<V, E, F> getMesh() {
 		return cdt.getMesh();
+	}
+
+	@Override
+	public IMeshDataStorage<V, E, F> getMeshDataStorage() {
+		return cdt.getMeshDataStorage();
+	}
+
+	@Override
+	public IMeshWithDataStorage<V, E, F> getMeshWithDataStorage() {
+		return cdt.getMeshWithDataStorage();
 	}
 
 	private void add(@NotNull final F face) {

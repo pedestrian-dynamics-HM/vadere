@@ -3,12 +3,10 @@ package org.vadere.meshing.mesh.triangulation.triangulator.gen;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.impl.PSLG;
-import org.vadere.meshing.mesh.inter.IFace;
-import org.vadere.meshing.mesh.inter.IHalfEdge;
+import org.vadere.meshing.mesh.inter.mesh.*;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
-import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.ITriEventListener;
-import org.vadere.meshing.mesh.inter.IVertex;
+import org.vadere.meshing.mesh.inter.mesh.data.IMeshDataStorage;
 import org.vadere.meshing.mesh.triangulation.triangulator.inter.IPlacementStrategy;
 import org.vadere.meshing.mesh.triangulation.triangulator.inter.ITriangulator;
 import org.vadere.util.geometry.GeometryUtils;
@@ -123,7 +121,7 @@ public class GenRuppertsTriangulator<V extends IVertex, E extends IHalfEdge, F e
 
 
 	public GenRuppertsTriangulator(
-			@NotNull final Supplier<IMesh<V, E, F>> meshSupplier,
+			@NotNull final Supplier<IMeshWithDataStorage<V, E, F>> meshSupplier,
 			@NotNull final PSLG pslg,
 			final double minAngle,
 			@NotNull Function<IPoint, Double> circumRadiusFunc,
@@ -132,7 +130,7 @@ public class GenRuppertsTriangulator<V extends IVertex, E extends IHalfEdge, F e
 	}
 
 	public GenRuppertsTriangulator(
-			@NotNull final Supplier<IMesh<V, E, F>> meshSupplier,
+			@NotNull final Supplier<IMeshWithDataStorage<V, E, F>> meshSupplier,
 			@NotNull final PSLG pslg,
 			final double minAngle,
 			@NotNull Function<IPoint, Double> circumRadiusFunc,
@@ -142,7 +140,7 @@ public class GenRuppertsTriangulator<V extends IVertex, E extends IHalfEdge, F e
 	}
 
 	public GenRuppertsTriangulator(
-			@NotNull final Supplier<IMesh<V, E, F>> meshSupplier,
+			@NotNull final Supplier<IMeshWithDataStorage<V, E, F>> meshSupplier,
 			@NotNull final PSLG pslgBound,
 			@NotNull final PSLG pslg,
 			final double minAngle,
@@ -170,7 +168,7 @@ public class GenRuppertsTriangulator<V extends IVertex, E extends IHalfEdge, F e
 	}
 
 	public GenRuppertsTriangulator(
-			@NotNull final Supplier<IMesh<V, E, F>> meshSupplier,
+			@NotNull final Supplier<IMeshWithDataStorage<V, E, F>> meshSupplier,
 			@NotNull final PSLG pslg) {
 		this(meshSupplier, pslg, MIN_ANGLE_TO_TERMINATE, p -> Double.POSITIVE_INFINITY, true);
 	}
@@ -186,6 +184,16 @@ public class GenRuppertsTriangulator<V extends IVertex, E extends IHalfEdge, F e
 	@Override
 	public IMesh<V, E, F> getMesh() {
 		return cdt.getMesh();
+	}
+
+	@Override
+	public IMeshDataStorage<V, E, F> getMeshDataStorage() {
+		return cdt.getMeshDataStorage();
+	}
+
+	@Override
+	public IMeshWithDataStorage<V, E, F> getMeshWithDataStorage() {
+		return cdt.getMeshWithDataStorage();
 	}
 
 	/**
@@ -598,11 +606,11 @@ public class GenRuppertsTriangulator<V extends IVertex, E extends IHalfEdge, F e
 	}
 
 	private boolean isMarked(@NotNull final F face) {
-		return getMesh().getBooleanData(face, "boundary");
+		return getMeshDataStorage().getBooleanData(face, "boundary");
 	}
 
 	private void mark(@NotNull final F face) {
-		getMesh().setBooleanData(face, "boundary", true);
+		getMeshDataStorage().setBooleanData(face, "boundary", true);
 	}
 
     /*private boolean isEncroached(@NotNull final E segment) {

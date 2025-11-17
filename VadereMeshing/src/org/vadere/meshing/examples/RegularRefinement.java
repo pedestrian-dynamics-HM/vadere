@@ -1,26 +1,18 @@
 package org.vadere.meshing.examples;
 
-import org.vadere.meshing.mesh.gen.AFace;
-import org.vadere.meshing.mesh.gen.AHalfEdge;
-import org.vadere.meshing.mesh.gen.AVertex;
 import org.vadere.meshing.mesh.gen.MeshPanel;
-import org.vadere.meshing.mesh.gen.PFace;
-import org.vadere.meshing.mesh.gen.PHalfEdge;
-import org.vadere.meshing.mesh.gen.PVertex;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.PFace;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.PHalfEdge;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.PVertex;
 import org.vadere.meshing.mesh.impl.PMeshPanel;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.impl.PEikMesh;
 import org.vadere.meshing.mesh.triangulation.triangulator.gen.GenRegularRefinement;
-import org.vadere.meshing.mesh.triangulation.triangulator.gen.GenRivaraRefinement;
-import org.vadere.meshing.mesh.triangulation.triangulator.impl.ADelaunayTriangulator;
 import org.vadere.meshing.mesh.triangulation.triangulator.impl.PDelaunayTriangulator;
 import org.vadere.util.geometry.shapes.VPoint;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -77,7 +69,7 @@ public class RegularRefinement {
 						(!refinement.isGreen(e) || triangulation.getMesh().toLine(e).length() > 0.5);
 
 		//refinement.setEdgeRefinementPredicate(edgeSplitPredicate);
-		synchronized (triangulation.getMesh()) {
+		synchronized (triangulation.getMeshWithDataStorage()) {
 			refinement.refine();
 		}
 

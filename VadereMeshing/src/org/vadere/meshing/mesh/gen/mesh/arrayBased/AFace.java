@@ -1,6 +1,6 @@
-package org.vadere.meshing.mesh.gen;
+package org.vadere.meshing.mesh.gen.mesh.arrayBased;
 
-import org.vadere.meshing.mesh.inter.IFace;
+import org.vadere.meshing.mesh.inter.mesh.IFace;
 
 /**
  * An array-based implementation of {@link IFace}.

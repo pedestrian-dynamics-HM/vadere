@@ -2,12 +2,9 @@ package org.vadere.simulator.models.potential.solver.calculators.mesh;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.gen.IncrementalTriangulation;
-import org.vadere.meshing.mesh.inter.IFace;
-import org.vadere.meshing.mesh.inter.IHalfEdge;
+import org.vadere.meshing.mesh.inter.mesh.*;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
-import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.ITriEventListener;
-import org.vadere.meshing.mesh.inter.IVertex;
 import org.vadere.meshing.mesh.triangulation.triangulator.gen.GenRegularRefinement;
 import org.vadere.meshing.utils.math.GeometryUtilsMesh;
 import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
@@ -111,7 +108,7 @@ public class MeshEikonalSolverFMMIterative<V extends IVertex, E extends IHalfEdg
 	private IIncrementalTriangulation<V, E, F> refine(@NotNull final IIncrementalTriangulation<V, E, F> triangulation) {
 
 		// (1) copy triangulation
-		IIncrementalTriangulation<V, E, F> clone = new IncrementalTriangulation<>(triangulation.getMesh().clone(), e -> true);
+		IIncrementalTriangulation<V, E, F> clone = IncrementalTriangulation.fromMesh(triangulation.getMeshWithDataStorage().clone(), e -> true);
 
 		// (2) refine if necessary
 		final Predicate<E> predicate = new PredicateRefinement<>(triangulation, clone, MIN_EDGE_LEN, 0.3);
@@ -137,7 +134,7 @@ public class MeshEikonalSolverFMMIterative<V extends IVertex, E extends IHalfEdg
 		if (!calculationFinished) {
 			List<V> list = solver.getTriangulation().getMesh().getBoundaryVertices();
 			solver.solve();
-			System.out.println(solver.getTriangulation().getMesh().toPythonTriangulation(v -> solver.getPotential(v)));
+			System.out.println(MeshPythonUtils.toPythonTriangulation(solver.getTriangulation().getMeshWithDataStorage(), v -> solver.getPotential(v)));
 			level = 1;
 			double lastMaxCurvature = 0;
 			maxCurrentCurvature = Double.MAX_VALUE;
@@ -159,7 +156,7 @@ public class MeshEikonalSolverFMMIterative<V extends IVertex, E extends IHalfEdg
 				}
 				solver.solve();
 
-				System.out.println(solver.getTriangulation().getMesh().toPythonTriangulation(v -> solver.getPotential(v)));
+				System.out.println(MeshPythonUtils.toPythonTriangulation(solver.getTriangulation().getMeshWithDataStorage(), v -> solver.getPotential(v)));
 				level++;
 			}
 
@@ -203,7 +200,7 @@ public class MeshEikonalSolverFMMIterative<V extends IVertex, E extends IHalfEdg
 		double maxCurvature = 0;
 		for(var v : background.getMesh().getVertices()) {
 			double[] result = GeometryUtilsMesh.curvature(background.getMesh(), v, vertex -> solver.getPotential(vertex));
-			background.getMesh().setDoubleData(v, MeshEikonalSolverFMMIterative.nameCurvature, result[0]);
+			background.getMeshWithDataStorage().getDataStorage().setDoubleData(v, MeshEikonalSolverFMMIterative.nameCurvature, result[0]);
 			//System.out.println("Curvature: " + result[0]);
 			//System.out.println("Gaussian curvature: " + result[1]);
 			maxCurvature = Math.max(maxCurvature, result[0]);

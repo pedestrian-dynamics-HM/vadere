@@ -1,10 +1,10 @@
 package org.vadere.meshing.mesh.triangulation.edgeLengthFunctions;
 
 import org.jetbrains.annotations.NotNull;
-import org.vadere.meshing.mesh.inter.IFace;
-import org.vadere.meshing.mesh.inter.IHalfEdge;
+import org.vadere.meshing.mesh.inter.mesh.IFace;
+import org.vadere.meshing.mesh.inter.mesh.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
-import org.vadere.meshing.mesh.inter.IVertex;
+import org.vadere.meshing.mesh.inter.mesh.IVertex;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -20,13 +20,13 @@ public class EdgeLengthFunctionTri<V extends IVertex, E extends IHalfEdge, F ext
 
 		// compute and set the local feature size
 		var vertices = triangulation.getMesh().getVertices();
-		var mesh = triangulation.getMesh();
+		var meshWithDatastorage = triangulation.getMeshWithDataStorage();
 		for(var v : vertices) {
 			double minEdgeLen = Double.MAX_VALUE;
-			for(var e : triangulation.getMesh().getEdges(v)) {
-				if(!mesh.getBooleanData(mesh.getFace(e), "boundary")
-						|| !mesh.getBooleanData(mesh.getTwinFace(e), "boundary")) {
-					var u = triangulation.getMesh().getTwinVertex(e);
+			for(var e : meshWithDatastorage.getMesh().getEdges(v)) {
+				if(!meshWithDatastorage.getDataStorage().getBooleanData(meshWithDatastorage.getMesh().getFace(e), "boundary")
+						|| !meshWithDatastorage.getDataStorage().getBooleanData(meshWithDatastorage.getMesh().getTwinFace(e), "boundary")) {
+					var u = meshWithDatastorage.getMesh().getTwinVertex(e);
 					double len = v.distance(u);
 					if(len < minEdgeLen) {
 						minEdgeLen = len;
@@ -34,7 +34,7 @@ public class EdgeLengthFunctionTri<V extends IVertex, E extends IHalfEdge, F ext
 				}
 			}
 
-			triangulation.getMesh().setDoubleData(v, propName, minEdgeLen);
+			triangulation.getMeshWithDataStorage().getDataStorage().setDoubleData(v, propName, minEdgeLen);
 		}
 	}
 
@@ -69,7 +69,7 @@ public class EdgeLengthFunctionTri<V extends IVertex, E extends IHalfEdge, F ext
 			V v1 = triangulation.getMesh().getVertex(edge);
 			V v2 = triangulation.getMesh().getTwinVertex(edge);
 
-			return (triangulation.getMesh().getDoubleData(v1, propName) + triangulation.getMesh().getDoubleData(v2, propName)) / 2.0;
+			return (triangulation.getMeshDataStorage().getDoubleData(v1, propName) + triangulation.getMeshDataStorage().getDoubleData(v2, propName)) / 2.0;
 		}
 		else {
 			double x[] = new double[3];

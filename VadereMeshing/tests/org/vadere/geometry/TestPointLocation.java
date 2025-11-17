@@ -3,15 +3,10 @@ package org.vadere.geometry;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.vadere.meshing.mesh.gen.PFace;
-import org.vadere.meshing.mesh.gen.PHalfEdge;
-import org.vadere.meshing.mesh.gen.PMesh;
-import org.vadere.meshing.mesh.gen.PVertex;
-import org.vadere.meshing.mesh.inter.IFace;
-import org.vadere.meshing.mesh.inter.IHalfEdge;
-import org.vadere.meshing.mesh.inter.IMesh;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.*;
+import org.vadere.meshing.mesh.inter.mesh.*;
 import org.vadere.meshing.mesh.inter.ITriConnectivity;
-import org.vadere.meshing.mesh.inter.IVertex;
+import org.vadere.meshing.mesh.inter.mesh.data.IMeshDataStorage;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 
@@ -32,6 +27,7 @@ public class TestPointLocation {
 	private static double EPSILON = 1.0e-6;
 	private IMesh<PVertex, PHalfEdge, PFace> mesh;
 	private ITriConnectivity<PVertex, PHalfEdge, PFace> triConnectivity;
+	private IMeshWithDataStorage<PVertex, PHalfEdge, PFace> meshWithDataStorage;
 
 	/**
 	 * Sets up a mesh consisting of 2 triangles and 1 border face.
@@ -40,7 +36,8 @@ public class TestPointLocation {
 	 */
 	@BeforeEach
 	public void setUp() throws Exception {
-		mesh = new PMesh();
+		meshWithDataStorage = PMeshWithDataStorage.constructEmpty();
+		mesh = meshWithDataStorage.getMesh();
 		face1 = mesh.createFace();
 		face2 = mesh.createFace();
 		border = mesh.getBorder();
@@ -115,8 +112,13 @@ public class TestPointLocation {
 			}
 
 			@Override
-			public IMesh<PVertex, PHalfEdge, PFace> getMesh() {
-				return mesh;
+			public IMeshWithDataStorage<PVertex, PHalfEdge, PFace> getMeshWithDataStorage() {
+				return meshWithDataStorage;
+			}
+
+			@Override
+			public IMeshDataStorage<PVertex, PHalfEdge, PFace> getMeshDataStorage() {
+				return meshWithDataStorage.getDataStorage();
 			}
 
 			@Override

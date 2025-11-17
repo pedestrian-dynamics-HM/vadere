@@ -2,6 +2,8 @@ package org.vadere.meshing.mesh.inter;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.IllegalMeshException;
+import org.vadere.meshing.mesh.inter.mesh.*;
+import org.vadere.meshing.mesh.inter.mesh.data.IMeshDataStorage;
 import org.vadere.meshing.mesh.iterators.EdgeIterator;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.meshing.mesh.gen.IncrementalTriangulation;
@@ -48,7 +50,25 @@ public interface IPolyConnectivity<V extends IVertex, E extends IHalfEdge, F ext
 	 *
 	 * @return the mesh of this IPolyConnectivity
 	 */
-	IMesh<V, E, F> getMesh();
+	IMeshWithDataStorage<V, E, F> getMeshWithDataStorage();
+
+	/**
+	 * <p>Returns the mesh of this poly-connectivity {@link IPolyConnectivity}.</p>
+	 *
+	 * <p>Does not change the connectivity.</p>
+	 *
+	 * @return the mesh of this IPolyConnectivity
+	 */
+	default IMesh<V, E, F> getMesh(){
+		return getMeshWithDataStorage().getMesh();
+	}
+
+	/**
+	 * <p>Returns the mesh of this poly-connectivity {@link IPolyConnectivity}.</p>
+	 *
+	 * <p>Does not change the connectivity.</p>
+	 */
+	IMeshDataStorage<V, E, F> getMeshDataStorage();
 
 	default boolean isAtBoundary(@NotNull final E halfEdge) {
 		IMesh<V, E, F> mesh = getMesh();

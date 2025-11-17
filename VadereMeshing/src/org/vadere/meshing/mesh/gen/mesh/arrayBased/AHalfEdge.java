@@ -1,6 +1,6 @@
-package org.vadere.meshing.mesh.gen;
+package org.vadere.meshing.mesh.gen.mesh.arrayBased;
 
-import org.vadere.meshing.mesh.inter.IHalfEdge;
+import org.vadere.meshing.mesh.inter.mesh.IHalfEdge;
 
 /**
  * An array-based implementation of {@link IHalfEdge}.

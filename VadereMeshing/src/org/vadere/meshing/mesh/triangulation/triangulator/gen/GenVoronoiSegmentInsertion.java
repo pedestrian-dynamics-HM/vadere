@@ -2,12 +2,10 @@ package org.vadere.meshing.mesh.triangulation.triangulator.gen;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.impl.PSLG;
-import org.vadere.meshing.mesh.inter.IFace;
-import org.vadere.meshing.mesh.inter.IHalfEdge;
+import org.vadere.meshing.mesh.inter.mesh.*;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
-import org.vadere.meshing.mesh.inter.IMesh;
-import org.vadere.meshing.mesh.inter.IMeshSupplier;
-import org.vadere.meshing.mesh.inter.IVertex;
+import org.vadere.meshing.mesh.inter.IEmptyMeshSupplier;
+import org.vadere.meshing.mesh.inter.mesh.data.IMeshDataStorage;
 import org.vadere.meshing.mesh.triangulation.triangulator.inter.IRefiner;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.IPoint;
@@ -58,7 +56,7 @@ public class GenVoronoiSegmentInsertion<V extends IVertex, E extends IHalfEdge, 
 	private VoronoiSegPlacement<V, E, F> placementStrategy;
 
 	public GenVoronoiSegmentInsertion(@NotNull final PSLG pslg,
-	                                  @NotNull final IMeshSupplier<V, E, F> meshSupplier,
+	                                  @NotNull final IEmptyMeshSupplier<V, E, F> meshSupplier,
 	                                  final boolean createHoles,
 	                                  @NotNull Function<IPoint, Double> edgeLenFunction) {
 		this.initialized = false;
@@ -269,6 +267,16 @@ public class GenVoronoiSegmentInsertion<V extends IVertex, E extends IHalfEdge, 
 	@Override
 	public IMesh<V, E, F> getMesh() {
 		return getTriangulation().getMesh();
+	}
+
+	@Override
+	public IMeshDataStorage<V, E, F> getMeshDataStorage() {
+		return getTriangulation().getMeshDataStorage();
+	}
+
+	@Override
+	public IMeshWithDataStorage<V, E, F> getMeshWithDataStorage() {
+		return getTriangulation().getMeshWithDataStorage();
 	}
 
 	private boolean isAccepted(@NotNull final F face) {

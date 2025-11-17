@@ -5,13 +5,12 @@ import org.jetbrains.annotations.Nullable;
 import org.vadere.gui.onlinevisualization.model.OnlineVisualizationModel;
 import org.vadere.gui.onlinevisualization.view.MainPanel;
 import org.vadere.gui.onlinevisualization.view.OnlineVisualisationWindow;
-import org.vadere.meshing.mesh.inter.IMesh;
+import org.vadere.meshing.mesh.inter.mesh.IMesh;
 import org.vadere.simulator.control.simulation.PassiveCallback;
 import org.vadere.simulator.models.potential.fields.IPotentialField;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.simulator.projects.Domain;
 import org.vadere.state.scenario.Agent;
-import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.shapes.VRectangle;
 
 import java.util.function.Function;

@@ -4,10 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.vadere.meshing.examples.MeshExamples;
 import org.vadere.meshing.mesh.gen.IncrementalTriangulation;
-import org.vadere.meshing.mesh.gen.PFace;
-import org.vadere.meshing.mesh.gen.PHalfEdge;
-import org.vadere.meshing.mesh.gen.PMesh;
-import org.vadere.meshing.mesh.gen.PVertex;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.*;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.utils.io.poly.MeshPolyReader;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -31,9 +28,9 @@ public class TestPointLocation {
 	@BeforeEach
 	public void setUp() throws Exception {
 		final InputStream inputStream = MeshExamples.class.getResourceAsStream("/poly/kaiserslautern_tri.poly");
-		MeshPolyReader<PVertex, PHalfEdge, PFace> meshPolyReader = new MeshPolyReader<>(() -> new PMesh());
+		MeshPolyReader<PVertex, PHalfEdge, PFace> meshPolyReader = new MeshPolyReader<>(PMeshWithDataStorage::constructEmpty);
 		var mesh = meshPolyReader.readMesh(inputStream);
-		triangulation = new IncrementalTriangulation<>(mesh);
+		triangulation = IncrementalTriangulation.fromMesh(mesh);
 		random = new Random(0);
 	}
 

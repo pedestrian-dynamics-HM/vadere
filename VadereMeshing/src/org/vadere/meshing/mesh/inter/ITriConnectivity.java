@@ -1,11 +1,15 @@
 package org.vadere.meshing.mesh.inter;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.commons.lang3.tuple.Triple;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.vadere.meshing.mesh.gen.DelaunayHierarchy;
 import org.vadere.meshing.mesh.gen.GenEar;
+import org.vadere.meshing.mesh.inter.mesh.IFace;
+import org.vadere.meshing.mesh.inter.mesh.IHalfEdge;
+import org.vadere.meshing.mesh.inter.mesh.IMesh;
+import org.vadere.meshing.mesh.inter.mesh.IVertex;
+import org.vadere.meshing.mesh.inter.mesh.data.IMeshDataStorage;
 import org.vadere.util.data.Node;
 import org.vadere.util.data.NodeLinkedList;
 import org.vadere.util.geometry.GeometryUtils;
@@ -2371,7 +2375,6 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 	 * @param q
 	 * @param p
 	 * @param stopCondition
-	 * @param visitedEdges
 	 * @return
 	 */
 	default E rayCastingPolygon(@NotNull final E inEdge,
@@ -3341,21 +3344,24 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 	default void getTriPoints(@NotNull final F face, double[] x, double[] y, double[] z, @NotNull final String name){
 		assert x.length == y.length && y.length == z.length && x.length == 3;
 
-		E edge = getMesh().getEdge(face);
-		V v = getMesh().getVertex(edge);
-		x[0] = getMesh().getX(v);
-		y[0] = getMesh().getY(v);
-		z[0] = getMesh().getDoubleData(v, name);
+		IMesh<V, E, F> mesh = getMesh();
+		IMeshDataStorage<V, E, F>  dataStorage = getMeshDataStorage();
 
-		v = getMesh().getVertex(getMesh().getNext(edge));
-		x[1] = getMesh().getX(v);
-		y[1] = getMesh().getY(v);
-		z[1] = getMesh().getDoubleData(v, name);
+		E edge = mesh.getEdge(face);
+		V v = mesh.getVertex(edge);
+		x[0] = mesh.getX(v);
+		y[0] = mesh.getY(v);
+		z[0] = dataStorage.getDoubleData(v, name);
 
-		v = getMesh().getVertex(getMesh().getPrev(edge));
-		x[2] = getMesh().getX(v);
-		y[2] = getMesh().getY(v);
-		z[2] = getMesh().getDoubleData(v, name);
+		v = mesh.getVertex(mesh.getNext(edge));
+		x[1] = mesh.getX(v);
+		y[1] = mesh.getY(v);
+		z[1] = dataStorage.getDoubleData(v, name);
+
+		v = mesh.getVertex(mesh.getPrev(edge));
+		x[2] = mesh.getX(v);
+		y[2] = mesh.getY(v);
+		z[2] = dataStorage.getDoubleData(v, name);
 	}
 
 	default void getTriPoints(@NotNull final F face, double[] x, double[] y, double[] z, Function<V, Double> func){

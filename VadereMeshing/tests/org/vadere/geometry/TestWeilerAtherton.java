@@ -4,8 +4,9 @@ import org.apache.commons.math3.util.Pair;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.vadere.meshing.WeilerAtherton;
-import org.vadere.meshing.mesh.gen.PFace;
-import org.vadere.meshing.mesh.gen.PMesh;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.PFace;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.PMesh;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.PMeshWithDataStorage;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
@@ -111,8 +112,8 @@ public class TestWeilerAtherton {
 
 		WeilerAtherton weilerAtherton = new WeilerAtherton(originalList);
 		Pair<PFace, PFace> pair = weilerAtherton.constructIntersectionFaces(
-				poly1, new PMesh(),
-				poly2, new PMesh()
+				poly1, PMeshWithDataStorage.constructEmpty(),
+				poly2, PMeshWithDataStorage.constructEmpty()
 		);
 
 		PFace face1 = pair.getFirst();
@@ -143,8 +144,8 @@ public class TestWeilerAtherton {
 
 		WeilerAtherton weilerAtherton = new WeilerAtherton(originalList);
 		Pair<PFace, PFace> pair = weilerAtherton.constructIntersectionFaces(
-				poly1, new PMesh(),
-				poly2, new PMesh()
+				poly1, PMeshWithDataStorage.constructEmpty(),
+				poly2, PMeshWithDataStorage.constructEmpty()
 		);
 
 		PFace face1 = pair.getFirst();

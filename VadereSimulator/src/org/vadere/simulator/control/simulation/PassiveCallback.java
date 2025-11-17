@@ -1,7 +1,7 @@
 package org.vadere.simulator.control.simulation;
 
 import org.jetbrains.annotations.Nullable;
-import org.vadere.meshing.mesh.gen.PMesh;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.PMesh;
 import org.vadere.simulator.models.potential.fields.IPotentialField;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTarget;
 import org.vadere.simulator.projects.Domain;

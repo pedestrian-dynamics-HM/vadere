@@ -2,11 +2,11 @@ package org.vadere.meshing.utils.io.tex;
 
 import org.vadere.util.visualization.ColorHelper;
 import org.vadere.meshing.utils.color.ColorFunctions;
-import org.vadere.meshing.mesh.inter.IFace;
+import org.vadere.meshing.mesh.inter.mesh.IFace;
 import org.vadere.meshing.utils.debug.TriCanvas;
-import org.vadere.meshing.mesh.inter.IHalfEdge;
-import org.vadere.meshing.mesh.inter.IMesh;
-import org.vadere.meshing.mesh.inter.IVertex;
+import org.vadere.meshing.mesh.inter.mesh.IHalfEdge;
+import org.vadere.meshing.mesh.inter.mesh.IMesh;
+import org.vadere.meshing.mesh.inter.mesh.IVertex;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VPolygon;

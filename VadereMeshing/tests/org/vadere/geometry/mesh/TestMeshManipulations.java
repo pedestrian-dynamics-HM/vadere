@@ -2,7 +2,7 @@ package org.vadere.geometry.mesh;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.vadere.meshing.mesh.gen.PFace;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.PFace;
 import org.vadere.meshing.mesh.impl.PTriangulation;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -76,7 +76,7 @@ public class TestMeshManipulations {
 		assertEquals(0, triangulation.getMesh().getNumberOfFaces());
 		assertEquals(0, triangulation.getMesh().getNumberOfHoles());
 		assertEquals(0, triangulation.getMesh().getNumberOfVertices());
-		triangulation.getMesh().garbageCollection();
+		triangulation.getMeshWithDataStorage().toMutableMesh().getOptimizer().garbageCollection();
 		assertEquals(0, triangulation.getMesh().getNumberOfEdges());
 	}
 }

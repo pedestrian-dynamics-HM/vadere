@@ -3,10 +3,8 @@ package org.vadere.simulator.examples.Meshing;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.vadere.meshing.mesh.gen.MeshPanel;
-import org.vadere.meshing.mesh.gen.PFace;
-import org.vadere.meshing.mesh.gen.PHalfEdge;
-import org.vadere.meshing.mesh.gen.PMesh;
-import org.vadere.meshing.mesh.gen.PVertex;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.*;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.*;
 import org.vadere.meshing.mesh.triangulation.edgeLengthFunctions.IEdgeLengthFunction;
 import org.vadere.meshing.utils.io.poly.PSLGGenerator;
 import org.vadere.meshing.utils.io.tex.TexGraphGenerator;
@@ -17,10 +15,6 @@ import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.scenario.Obstacle;
 import org.vadere.state.scenario.Topography;
 import org.vadere.state.util.StateJsonConverter;
-import org.vadere.meshing.mesh.gen.AFace;
-import org.vadere.meshing.mesh.gen.AHalfEdge;
-import org.vadere.meshing.mesh.gen.AMesh;
-import org.vadere.meshing.mesh.gen.AVertex;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;
@@ -2921,7 +2915,7 @@ public class RealWorldPlot {
 				5.0,
 				bound,
 				topography.getObstacles().stream().map(obs -> new VPolygon(obs.getShape())).collect(Collectors.toList()),
-				() -> new PMesh());
+				PMeshWithDataStorage::constructEmpty);
 
 		MeshPanel<PVertex, PHalfEdge, PFace> meshPanel = new MeshPanel<>(
 				meshGenerator.getMesh(), 1000, 800);
@@ -3003,7 +2997,7 @@ public class RealWorldPlot {
 				p -> Math.min(1.0 + Math.max(approxDistance.apply(p)*approxDistance.apply(p), 0)*0.5, 5.0),
 				0.4,
 				bound,topography.getObstacles().stream().map(obs -> obs.getShape()).collect(Collectors.toList()),
-				() -> new AMesh());
+				AMeshWithDataStorage::constructEmpty);
 
 		MeshPanel<AVertex, AHalfEdge, AFace> meshPanel = new MeshPanel<>(
 				meshGenerator.getMesh(), 1000, 800);

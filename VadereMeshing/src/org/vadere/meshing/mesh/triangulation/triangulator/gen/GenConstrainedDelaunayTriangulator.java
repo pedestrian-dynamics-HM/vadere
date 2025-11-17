@@ -6,11 +6,9 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.gen.IncrementalTriangulation;
 import org.vadere.meshing.mesh.impl.PSLG;
-import org.vadere.meshing.mesh.inter.IFace;
-import org.vadere.meshing.mesh.inter.IHalfEdge;
+import org.vadere.meshing.mesh.inter.mesh.*;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
-import org.vadere.meshing.mesh.inter.IMesh;
-import org.vadere.meshing.mesh.inter.IVertex;
+import org.vadere.meshing.mesh.inter.mesh.data.IMeshDataStorage;
 import org.vadere.meshing.mesh.triangulation.triangulator.inter.ITriangulator;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.IPoint;
@@ -60,10 +58,10 @@ public class GenConstrainedDelaunayTriangulator<V extends IVertex, E extends IHa
 	private boolean allowSegmentFaces;
 
 	public GenConstrainedDelaunayTriangulator(
-			@NotNull final Supplier<IMesh<V, E, F>> meshSupply,
+			@NotNull final Supplier<IMeshWithDataStorage<V, E, F>> meshSupply,
 			@NotNull final PSLG pslg,
 			final boolean confirming) {
-		this(new IncrementalTriangulation<>(meshSupply.get(), pslg.getBoundingBox()), pslg, confirming);
+		this(IncrementalTriangulation.fromEmptyMesh(meshSupply.get(), pslg.getBoundingBox()), pslg, confirming);
 	}
 
 	public GenConstrainedDelaunayTriangulator(
@@ -223,6 +221,16 @@ public class GenConstrainedDelaunayTriangulator<V extends IVertex, E extends IHa
 	@Override
 	public IMesh<V, E, F> getMesh() {
 		return triangulation.getMesh();
+	}
+
+	@Override
+	public IMeshDataStorage<V, E, F> getMeshDataStorage() {
+		return triangulation.getMeshDataStorage();
+	}
+
+	@Override
+	public IMeshWithDataStorage<V, E, F> getMeshWithDataStorage() {
+		return triangulation.getMeshWithDataStorage();
 	}
 
 	public Collection<E> getConstrains() {

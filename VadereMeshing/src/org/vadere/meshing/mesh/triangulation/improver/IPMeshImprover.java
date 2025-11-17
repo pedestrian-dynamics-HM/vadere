@@ -1,9 +1,8 @@
 package org.vadere.meshing.mesh.triangulation.improver;
 
-import org.vadere.meshing.mesh.gen.PFace;
-import org.vadere.meshing.mesh.gen.PHalfEdge;
-import org.vadere.meshing.mesh.gen.PVertex;
-import org.vadere.util.geometry.shapes.IPoint;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.PFace;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.PHalfEdge;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.PVertex;
 
 /**
  *

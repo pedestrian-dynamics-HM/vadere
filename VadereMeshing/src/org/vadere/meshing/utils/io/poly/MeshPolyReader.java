@@ -3,10 +3,8 @@ package org.vadere.meshing.utils.io.poly;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.vadere.meshing.mesh.inter.IFace;
-import org.vadere.meshing.mesh.inter.IHalfEdge;
-import org.vadere.meshing.mesh.inter.IMesh;
-import org.vadere.meshing.mesh.inter.IVertex;
+import org.vadere.meshing.mesh.inter.mesh.*;
+import org.vadere.meshing.mesh.inter.mesh.data.IMeshDataStorage;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -47,9 +45,9 @@ public class MeshPolyReader<V extends IVertex, E extends IHalfEdge, F extends IF
 	 */
 	private IMesh<V, E, F> mesh;
 
-	private final Supplier<IMesh<V, E, F>> meshSupplier;
+	private final Supplier<IMeshWithDataStorage<V, E, F>> meshSupplier;
 
-	public MeshPolyReader(@NotNull final Supplier<IMesh<V, E, F>> meshSupplier) {
+	public MeshPolyReader(@NotNull final Supplier<IMeshWithDataStorage<V, E, F>> meshSupplier) {
 		this.meshSupplier = meshSupplier;
 		this.edges = new HashMap<>();
 		this.vertices = new HashMap<>();
@@ -111,12 +109,11 @@ public class MeshPolyReader<V extends IVertex, E extends IHalfEdge, F extends IF
 	 *
 	 * @throws IOException
 	 */
-	public IMesh<V, E, F> readMesh(@NotNull final InputStream inputStream) throws IOException {
+	public IMeshWithDataStorage<V,E,F> readMesh(@NotNull final InputStream inputStream) throws IOException {
 		return toMesh(inputStream, null);
 	}
 
-
-	public IMesh<V, E, F> readMesh(@NotNull final InputStream inputStream, @NotNull final Function<Integer, String> attrNameFunc) throws IOException {
+	public IMeshWithDataStorage<V,E,F> readMesh(@NotNull final InputStream inputStream, @NotNull final Function<Integer, String> attrNameFunc) throws IOException {
 		return toMesh(inputStream, attrNameFunc);
 	}
 
@@ -128,10 +125,12 @@ public class MeshPolyReader<V extends IVertex, E extends IHalfEdge, F extends IF
 	 *
 	 * @throws IOException
 	 */
-	private IMesh<V, E, F> toMesh(
+	private IMeshWithDataStorage<V,E,F> toMesh(
 			@NotNull final InputStream inputStream,
 			@Nullable final Function<Integer, String> attrNameFunc) throws IOException {
-		mesh = meshSupplier.get();
+		IMeshWithDataStorage<V, E, F> meshWithDataStorage = meshSupplier.get();
+		mesh = meshWithDataStorage.getMesh();
+		IMeshDataStorage<V, E, F> dataStorage = meshWithDataStorage.getDataStorage();
 		BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
 
 		String line = readLine(reader);
@@ -160,7 +159,7 @@ public class MeshPolyReader<V extends IVertex, E extends IHalfEdge, F extends IF
 			// TODO: ? boundaryMark?
 			if(attrNameFunc != null) {
 				for(int j = 1; j <= nAttributes; j++) {
-					mesh.setDoubleData(vertex, attrNameFunc.apply(j), Double.parseDouble(split[4+j]));
+					dataStorage.setDoubleData(vertex, attrNameFunc.apply(j), Double.parseDouble(split[4+j]));
 				}
 			}
 		}
@@ -190,7 +189,7 @@ public class MeshPolyReader<V extends IVertex, E extends IHalfEdge, F extends IF
 		vertices.clear();
 
 		assert mesh.isValid();
-		return mesh;
+		return meshWithDataStorage;
 	}
 
 	private static String readLine(@NotNull final BufferedReader reader) throws IOException {

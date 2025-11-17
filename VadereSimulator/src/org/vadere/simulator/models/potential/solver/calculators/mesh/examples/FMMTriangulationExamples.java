@@ -1,17 +1,17 @@
 package org.vadere.simulator.models.potential.solver.calculators.mesh.examples;
 
 import org.vadere.meshing.examples.MeshExamples;
-import org.vadere.meshing.mesh.gen.PFace;
-import org.vadere.meshing.mesh.gen.PHalfEdge;
-import org.vadere.meshing.mesh.gen.PVertex;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.PFace;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.PHalfEdge;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.PVertex;
 import org.vadere.meshing.mesh.impl.PMeshPanel;
 import org.vadere.meshing.mesh.impl.PSLG;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
+import org.vadere.meshing.mesh.inter.mesh.MeshPythonUtils;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.impl.PEikMesh;
 import org.vadere.meshing.utils.io.poly.PSLGGenerator;
 import org.vadere.meshing.utils.io.tex.TexGraphGenerator;
-import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
 import org.vadere.simulator.models.potential.solver.calculators.mesh.MeshEikonalSolverFMM;
 import org.vadere.simulator.models.potential.solver.calculators.mesh.PotentialPoint;
 import org.vadere.simulator.models.potential.solver.timecost.UnitTimeCostFunction;
@@ -60,7 +60,7 @@ public class FMMTriangulationExamples {
 		log.info("FFM finished");
 
 		if(systemprint) {
-			System.out.println(triangulation.getMesh().toPythonTriangulation(vertex -> solver.getPotential(vertex)));
+			System.out.println(MeshPythonUtils.toPythonTriangulation(triangulation.getMeshWithDataStorage(), vertex -> solver.getPotential(vertex)));
 		}
 
 	}

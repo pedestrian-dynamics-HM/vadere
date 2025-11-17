@@ -3,18 +3,12 @@ package org.vadere.meshing.mesh.triangulation.triangulator.gen;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.gen.MeshPanel;
-import org.vadere.meshing.mesh.gen.MeshRenderer;
-import org.vadere.meshing.mesh.inter.IFace;
-import org.vadere.meshing.mesh.inter.IHalfEdge;
+import org.vadere.meshing.mesh.inter.mesh.*;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
-import org.vadere.meshing.mesh.inter.IMesh;
-import org.vadere.meshing.mesh.inter.IVertex;
+import org.vadere.meshing.mesh.inter.mesh.data.IMeshDataStorage;
 import org.vadere.meshing.mesh.triangulation.triangulator.inter.IRefiner;
-import org.vadere.meshing.utils.color.Colors;
-import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.logging.Logger;
 
-import java.awt.*;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -272,6 +266,16 @@ public class GenRegularRefinement<V extends IVertex, E extends IHalfEdge, F exte
 	@Override
 	public IMesh<V, E, F> getMesh() {
 		return triangulation.getMesh();
+	}
+
+	@Override
+	public IMeshDataStorage<V, E, F> getMeshDataStorage() {
+		return triangulation.getMeshDataStorage();
+	}
+
+	@Override
+	public IMeshWithDataStorage<V, E, F> getMeshWithDataStorage() {
+		return triangulation.getMeshWithDataStorage();
 	}
 
 	private boolean isGBGBMerge(@NotNull final V v) {
@@ -804,11 +808,11 @@ public class GenRegularRefinement<V extends IVertex, E extends IHalfEdge, F exte
 	}
 
 	private int getLevel(@NotNull final V vertex) {
-		return getMesh().getIntegerData(vertex, propertyLevel);
+		return getMeshDataStorage().getIntegerData(vertex, propertyLevel);
 	}
 
 	public int getLevel(@NotNull final E edge) {
-		int level = getMesh().getIntegerData(edge, propertyLevel);;
+		int level = getMeshDataStorage().getIntegerData(edge, propertyLevel);;
 		return level;
 	}
 
@@ -827,17 +831,17 @@ public class GenRegularRefinement<V extends IVertex, E extends IHalfEdge, F exte
 	}
 
 	public void setLevel(@NotNull final V vertex, final int level) {
-		getMesh().setIntegerData(vertex, propertyLevel, level);
+		getMeshDataStorage().setIntegerData(vertex, propertyLevel, level);
 	}
 
 	public void setLevel(@NotNull final E edge, final int level) {
-		getMesh().setIntegerData(edge, propertyLevel, level);
-		getMesh().setIntegerData(getMesh().getTwin(edge), propertyLevel, level);
+		getMeshDataStorage().setIntegerData(edge, propertyLevel, level);
+		getMeshDataStorage().setIntegerData(getMesh().getTwin(edge), propertyLevel, level);
 	}
 
 	public void setFlipable(@NotNull final E edge, final boolean flipable) {
-		getMesh().setBooleanData(edge, propertyFlipable, flipable);
-		getMesh().setBooleanData(getMesh().getTwin(edge), propertyFlipable, flipable);
+		getMeshDataStorage().setBooleanData(edge, propertyFlipable, flipable);
+		getMeshDataStorage().setBooleanData(getMesh().getTwin(edge), propertyFlipable, flipable);
 	}
 
 	/**
@@ -848,33 +852,33 @@ public class GenRegularRefinement<V extends IVertex, E extends IHalfEdge, F exte
 	 * @return true if the edge is not part of any edge of the base triangulation, false otherwise
 	 */
 	private boolean isFlipable(@NotNull final E edge){
-		return getMesh().getBooleanData(edge, propertyFlipable);
+		return getMeshDataStorage().getBooleanData(edge, propertyFlipable);
 	}
 
 	private Coloring getColor(@NotNull final V vertex) {
-		return getMesh().getData(vertex, propertyColor, Coloring.class).orElse(Coloring.GREEN);
+		return getMeshDataStorage().getData(vertex, propertyColor, Coloring.class).orElse(Coloring.GREEN);
 	}
 
 	private Coloring getColor(@NotNull final E edge) {
-		Optional<Coloring> color = getMesh().getData(edge, propertyColor, Coloring.class);
+		Optional<Coloring> color = getMeshDataStorage().getData(edge, propertyColor, Coloring.class);
 		return color.orElse(Coloring.GREEN);
 	}
 
 	private Coloring getColor(@NotNull final F face) {
-		return getMesh().getData(face, propertyColor, Coloring.class).orElse(Coloring.GREEN);
+		return getMeshDataStorage().getData(face, propertyColor, Coloring.class).orElse(Coloring.GREEN);
 	}
 
 	private void setColor(@NotNull final V vertex, final Coloring coloring) {
-		getMesh().setData(vertex, propertyColor, coloring);
+		getMeshDataStorage().setData(vertex, propertyColor, coloring);
 	}
 
 	private void setColor(@NotNull final E edge, final Coloring coloring) {
-		getMesh().setData(edge, propertyColor, coloring);
-		getMesh().setData(getMesh().getTwin(edge), propertyColor, coloring);
+		getMeshDataStorage().setData(edge, propertyColor, coloring);
+		getMeshDataStorage().setData(getMesh().getTwin(edge), propertyColor, coloring);
 	}
 
 	private void setColor(@NotNull final F face, final Coloring coloring) {
-		getMesh().setData(face, propertyColor, coloring);
+		getMeshDataStorage().setData(face, propertyColor, coloring);
 	}
 
 	public void setMaxLevel(int maxLevel) {

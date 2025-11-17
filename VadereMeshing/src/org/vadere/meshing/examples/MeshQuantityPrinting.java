@@ -1,18 +1,15 @@
 package org.vadere.meshing.examples;
 
 import org.jetbrains.annotations.NotNull;
-import org.vadere.meshing.mesh.gen.AFace;
-import org.vadere.meshing.mesh.gen.AHalfEdge;
-import org.vadere.meshing.mesh.gen.AVertex;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.AFace;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.AHalfEdge;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.AVertex;
 import org.vadere.meshing.mesh.gen.MeshPanel;
 import org.vadere.meshing.mesh.gen.MeshRenderer;
-import org.vadere.meshing.mesh.gen.PFace;
-import org.vadere.meshing.mesh.gen.PHalfEdge;
-import org.vadere.meshing.mesh.gen.PMesh;
-import org.vadere.meshing.mesh.gen.PVertex;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.*;
 import org.vadere.meshing.mesh.impl.PMeshPanel;
 import org.vadere.meshing.mesh.impl.PSLG;
-import org.vadere.meshing.mesh.inter.IMesh;
+import org.vadere.meshing.mesh.inter.mesh.IMesh;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
 import org.vadere.meshing.mesh.triangulation.DistanceFunctionApproxBF;
 import org.vadere.meshing.mesh.triangulation.edgeLengthFunctions.EdgeLengthFunctionApprox;
@@ -249,7 +246,7 @@ public class MeshQuantityPrinting {
 		edgeLengthFunctionApprox.smooth(0.2);
 		IDistanceFunction distanceFunction = IDistanceFunction.create(pslg.getSegmentBound(), pslg.getHoles());
 
-		GenEikMesh<PVertex, PHalfEdge, PFace> meshImprover = new GenEikMesh<>(distanceFunction, edgeLengthFunctionApprox, h0, pslg.getBoundingBox(), pslg.getAllPolygons(), () -> new PMesh());
+		GenEikMesh<PVertex, PHalfEdge, PFace> meshImprover = new GenEikMesh<>(distanceFunction, edgeLengthFunctionApprox, h0, pslg.getBoundingBox(), pslg.getAllPolygons(), PMeshWithDataStorage::constructEmpty);
 		var meshPanel = new PMeshPanel(meshImprover.getMesh(), 1000, 1000);
 		meshPanel.display("Airfoil");
 		int it = 1;
@@ -315,7 +312,7 @@ public class MeshQuantityPrinting {
 		Collection<VPolygon> holes = pslg.getHoles();
 		VPolygon segmentBound = pslg.getSegmentBound();
 		IDistanceFunction distanceFunction = IDistanceFunction.create(segmentBound, holes);
-		IDistanceFunction distanceFunctionApproximation = new DistanceFunctionApproxBF(pslg, distanceFunction, () -> new PMesh());
+		IDistanceFunction distanceFunctionApproximation = new DistanceFunctionApproxBF(pslg, distanceFunction, PMeshWithDataStorage::constructEmpty);
 
 		IEdgeLengthFunction edgeLengthFunction = p -> h0 + smoothness * Math.abs((distanceFunctionApproximation).apply(p));
 		EdgeLengthFunctionApprox edgeLengthFunctionApprox = new EdgeLengthFunctionApprox(pslg, edgeLengthFunction);
@@ -396,7 +393,7 @@ public class MeshQuantityPrinting {
 		Collection<VPolygon> holes = pslg.getHoles();
 		VPolygon segmentBound = pslg.getSegmentBound();
 		IDistanceFunction distanceFunction = IDistanceFunction.create(segmentBound, holes);
-		IDistanceFunction distanceFunctionApproximation = new DistanceFunctionApproxBF(pslg, distanceFunction, () -> new PMesh());
+		IDistanceFunction distanceFunctionApproximation = new DistanceFunctionApproxBF(pslg, distanceFunction, PMeshWithDataStorage::constructEmpty);
 
 		IEdgeLengthFunction edgeLengthFunction = p -> h0 + smoothness * Math.abs((distanceFunctionApproximation).apply(p));
 		EdgeLengthFunctionApprox edgeLengthFunctionApprox = new EdgeLengthFunctionApprox(pslg, edgeLengthFunction);
@@ -587,7 +584,7 @@ public class MeshQuantityPrinting {
 
 		BufferedWriter writer = IOUtils.getWriter("bridge.poly", new File("/Users/bzoennchen/Development/workspaces/hmRepo/PersZoennchen/PhD/trash/generated/eikmesh/"));
 		MeshPolyWriter<AVertex, AHalfEdge, AFace> meshPolyWriter = new MeshPolyWriter<>();
-		writer.write(meshPolyWriter.to2DPoly(meshImprover.getMesh()));
+		writer.write(meshPolyWriter.to2DPoly(meshImprover.getMeshWithDataStorage()));
 		writer.close();
 	}
 

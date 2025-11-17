@@ -1,11 +1,8 @@
 package org.vadere.meshing.mesh.triangulation.plots;
 
 import org.apache.commons.lang3.time.StopWatch;
-import org.vadere.meshing.mesh.gen.AFace;
-import org.vadere.meshing.mesh.gen.AHalfEdge;
-import org.vadere.meshing.mesh.gen.AMesh;
-import org.vadere.meshing.mesh.gen.AVertex;
-import org.vadere.meshing.mesh.inter.IMeshSupplier;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.*;
+import org.vadere.meshing.mesh.inter.IEmptyMeshSupplier;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
 import org.vadere.meshing.mesh.triangulation.edgeLengthFunctions.IEdgeLengthFunction;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.GenEikMesh;
@@ -45,7 +42,7 @@ public class EikMeshPlots {
 	 * A circle with radius 10.0 meshed using a uniform mesh.
 	 */
 	private static void uniformCircle(final double initialEdgeLength) {
-		IMeshSupplier<AVertex, AHalfEdge, AFace> supplier = () -> new AMesh();
+		IEmptyMeshSupplier<AVertex, AHalfEdge, AFace> supplier = AMeshWithDataStorage::constructEmpty;
 		IDistanceFunction distanceFunc = p -> Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY()) - 1;
 		List<VShape> obstacles = new ArrayList<>();
 		IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + Math.abs(distanceFunc.apply(p)) * 2;
@@ -87,7 +84,7 @@ public class EikMeshPlots {
 	 * A ring innter radius 4.0 and outer radius 10.0 meshed using a uniform mesh.
 	 */
 	private static void uniformRing() {
-		IMeshSupplier<AVertex, AHalfEdge, AFace> supplier = () -> new AMesh();
+		IEmptyMeshSupplier<AVertex, AHalfEdge, AFace> supplier = AMeshWithDataStorage::constructEmpty;
 		IDistanceFunction distanceFunc = p -> Math.abs(0.7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 0.3;
 		List<VShape> obstacles = new ArrayList<>();
 		IEdgeLengthFunction edgeLengthFunc = uniformEdgeLength;
@@ -125,7 +122,7 @@ public class EikMeshPlots {
 	 * A circle with radius 10.0 meshed using a uniform mesh.
 	 */
 	private static void adaptiveRing(final double initialEdgeLength) {
-		IMeshSupplier<AVertex, AHalfEdge, AFace> supplier = () -> new AMesh();
+		IEmptyMeshSupplier<AVertex, AHalfEdge, AFace> supplier = AMeshWithDataStorage::constructEmpty;;
 		IDistanceFunction distanceFunc = p -> Math.abs(0.7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 0.3;
 		List<VShape> obstacles = new ArrayList<>();
 		IEdgeLengthFunction edgeLengthFunc = p -> initialEdgeLength + Math.abs(distanceFunc.apply(p));
@@ -165,7 +162,7 @@ public class EikMeshPlots {
 	private static void uniformRect() {
 		VRectangle rect = new VRectangle(-0.4, -0.4, 0.8, 0.8);
 
-		IMeshSupplier<AVertex, AHalfEdge, AFace> supplier = () -> new AMesh();
+		IEmptyMeshSupplier<AVertex, AHalfEdge, AFace> supplier = AMeshWithDataStorage::constructEmpty;;
 		IDistanceFunction distanceFunc = IDistanceFunction.intersect(p -> Math.max(Math.abs(p.getX()), Math.abs(p.getY())) - 1.0, IDistanceFunction.create(bbox, rect));
 		List<VShape> obstacles = new ArrayList<>();
 		IEdgeLengthFunction edgeLengthFunc = uniformEdgeLength;
@@ -221,7 +218,7 @@ public class EikMeshPlots {
 	private static void uniformHex() {
 		VPolygon hex = VShape.generateHexagon(0.4);
 
-		IMeshSupplier<AVertex, AHalfEdge, AFace> supplier = () -> new AMesh();
+		IEmptyMeshSupplier<AVertex, AHalfEdge, AFace> supplier = AMeshWithDataStorage::constructEmpty;;
 		IDistanceFunction distanceFunc = IDistanceFunction.intersect(p -> Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY()) - 1.0, IDistanceFunction.create(bbox, hex));
 		List<VShape> obstacles = new ArrayList<>();
 		IEdgeLengthFunction edgeLengthFunc = uniformEdgeLength;
@@ -263,7 +260,7 @@ public class EikMeshPlots {
 	private static void adaptiveRect(final double initialEdgeLength) {
 		VPolygon hex = VShape.generateHexagon(0.4);
 
-		IMeshSupplier<AVertex, AHalfEdge, AFace> supplier = () -> new AMesh();
+		IEmptyMeshSupplier<AVertex, AHalfEdge, AFace> supplier = AMeshWithDataStorage::constructEmpty;
 		IDistanceFunction distanceFunc = IDistanceFunction.intersect(p -> Math.max(Math.abs(p.getX()), Math.abs(p.getY()))- 1.0, IDistanceFunction.create(bbox, hex));
 		List<VShape> obstacles = new ArrayList<>();
 		IEdgeLengthFunction edgeLengthFunction = p -> 1.0 + Math.max(-distanceFunc.apply(p), 0) * 8.0;

@@ -1,14 +1,13 @@
 package org.vadere.meshing.mesh.triangulation.triangulator.gen;
 
 import org.jetbrains.annotations.NotNull;
-import org.vadere.meshing.mesh.inter.IFace;
-import org.vadere.meshing.mesh.inter.IHalfEdge;
-import org.vadere.meshing.mesh.inter.IMesh;
-import org.vadere.meshing.mesh.inter.IMeshSupplier;
+import org.vadere.meshing.mesh.inter.mesh.*;
+import org.vadere.meshing.mesh.inter.IEmptyMeshSupplier;
 import org.vadere.meshing.mesh.inter.IPointLocator;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.ITriEventListener;
-import org.vadere.meshing.mesh.inter.IVertex;
+import org.vadere.meshing.mesh.inter.mesh.builder.IMeshBuilder;
+import org.vadere.meshing.mesh.inter.mesh.data.IMeshDataStorage;
 import org.vadere.meshing.mesh.triangulation.triangulator.inter.IRefiner;
 import org.vadere.meshing.utils.io.tex.TexGraphGenerator;
 import org.vadere.util.geometry.GeometryUtils;
@@ -58,7 +57,7 @@ public class GenUniformRefinementTriangulatorSFC<V extends IVertex, E extends IH
 
 	/**
 	 * The relative edge length function. If a uniform triangulation should be computed set
-	 * lenFunc equlas to edge -> 1.0.
+	 * lenFunc to edge -> 1.0.
 	 */
 	private final IEdgeLengthFunction lenFunc;
 
@@ -70,7 +69,7 @@ public class GenUniformRefinementTriangulatorSFC<V extends IVertex, E extends IH
 	/**
 	 * The mesh supplier to construct an empty mesh which containing the data (points, vertices, edges, faces).
 	 */
-	private final IMeshSupplier<V, E, F> meshSupplier;
+	private final IEmptyMeshSupplier<V, E, F> meshSupplier;
 
 	private final Map<V, VLine> projections;
 
@@ -109,10 +108,12 @@ public class GenUniformRefinementTriangulatorSFC<V extends IVertex, E extends IH
 	 */
 	private final GenSpaceFillingCurve<V, E, F> sfc;
 
+	private final IMeshWithDataStorage<V, E, F> meshWithDataStorage;
 	/**
 	 * The mesh which containing the data (points, vertices, edges, faces).
 	 */
 	private final IMesh<V, E, F> mesh;
+	private final IMeshDataStorage<V, E, F> dataStorage;
 
 	private boolean initialized;
 
@@ -126,7 +127,7 @@ public class GenUniformRefinementTriangulatorSFC<V extends IVertex, E extends IH
 
 	/**
 	 * <p>The default constructor.</p>
-	 *  @param meshSupplier          a {@link IMeshSupplier} required to generate a new and empty mesh.
+	 *  @param meshSupplier          a {@link IEmptyMeshSupplier} required to generate a new and empty mesh.
 	 * @param bound                 the bounding box containing all boundaries and the topography with respect to the distance function distFunc
 	 * @param boundary              the boundaries e.g. obstacles
 	 * @param lenFunc               an edge length function
@@ -134,7 +135,7 @@ public class GenUniformRefinementTriangulatorSFC<V extends IVertex, E extends IH
 	 * @param fixPoints             a collection of fix points
 	 */
 	public GenUniformRefinementTriangulatorSFC(
-			final IMeshSupplier<V, E, F> meshSupplier,
+			final IEmptyMeshSupplier<V, E, F> meshSupplier,
 			final VRectangle bound,
 			final Collection<? extends VShape> boundary,
 			final IEdgeLengthFunction lenFunc,
@@ -145,7 +146,7 @@ public class GenUniformRefinementTriangulatorSFC<V extends IVertex, E extends IH
 	}
 
 	public GenUniformRefinementTriangulatorSFC(
-			final IMeshSupplier<V, E, F> meshSupplier,
+			final IEmptyMeshSupplier<V, E, F> meshSupplier,
 			final VRectangle bound,
 			final Collection<? extends VShape> boundary,
 			final IEdgeLengthFunction lenFunc,
@@ -164,7 +165,9 @@ public class GenUniformRefinementTriangulatorSFC<V extends IVertex, E extends IH
 		this.points = new HashSet<>();
 		this.candidates = new ArrayList<>();
 		this.sfc = new GenSpaceFillingCurve<>();
-		this.mesh = meshSupplier.get();
+		this.meshWithDataStorage = meshSupplier.get();
+		this.mesh = meshWithDataStorage.getMesh();
+		this.dataStorage = meshWithDataStorage.getDataStorage();
 		this.insertedFixPoints = new ArrayList<>();
 		this.projections = new HashMap<>();
 		this.constrains = new ArrayList<>();
@@ -172,7 +175,7 @@ public class GenUniformRefinementTriangulatorSFC<V extends IVertex, E extends IH
 	}
 
 	public GenUniformRefinementTriangulatorSFC(
-			final IMeshSupplier<V, E, F> meshSupplier,
+			final IEmptyMeshSupplier<V, E, F> meshSupplier,
 			final VRectangle bound,
 			final Collection<? extends VShape> boundary,
 			final IEdgeLengthFunction lenFunc,
@@ -181,7 +184,7 @@ public class GenUniformRefinementTriangulatorSFC<V extends IVertex, E extends IH
 	}
 
 	public GenUniformRefinementTriangulatorSFC(
-			final IMeshSupplier<V, E, F> meshSupplier,
+			final IEmptyMeshSupplier<V, E, F> meshSupplier,
 			final VRectangle bound,
 			final IEdgeLengthFunction lenFunc,
 			final IDistanceFunction distFunc,
@@ -190,7 +193,7 @@ public class GenUniformRefinementTriangulatorSFC<V extends IVertex, E extends IH
 	}
 
 	public GenUniformRefinementTriangulatorSFC(
-			final IMeshSupplier<V, E, F> meshSupplier,
+			final IEmptyMeshSupplier<V, E, F> meshSupplier,
 			final VRectangle bound,
 			final IEdgeLengthFunction lenFunc,
 			final IDistanceFunction distFunc) {
@@ -264,7 +267,7 @@ public class GenUniformRefinementTriangulatorSFC<V extends IVertex, E extends IH
 	    candidates.add(node2);
 	    sfc.insertFirst(node1);
 	    sfc.insertNext(node2, node1);
-	    triangulation = mesh.toTriangulation(IPointLocator.Type.JUMP_AND_WALK);
+	    triangulation = meshWithDataStorage.toTriangulation(IPointLocator.Type.JUMP_AND_WALK);
 	    return triangulation;
     }
 
@@ -272,6 +275,16 @@ public class GenUniformRefinementTriangulatorSFC<V extends IVertex, E extends IH
     public IMesh<V, E, F> getMesh() {
     	return mesh;
     }
+
+	@Override
+	public IMeshDataStorage<V, E, F> getMeshDataStorage() {
+		return dataStorage;
+	}
+
+	@Override
+	public IMeshWithDataStorage<V, E, F> getMeshWithDataStorage() {
+		return meshWithDataStorage;
+	}
 
 	/**
 	 * <p>Applies one iteration in the construction of the space filling curve i.e. the next level will be
@@ -534,9 +547,12 @@ public class GenUniformRefinementTriangulatorSFC<V extends IVertex, E extends IH
 				sierpinksyFaceOrder.addAll(holes);
 				logger.info("#sier-faces:" + sierpinksyFaceOrder.size() + ", #vertices" + getMesh().getNumberOfVertices());
 
-				getMesh().arrangeMemory(sierpinksyFaceOrder);
+				// todo hh: improve once making mesh immutable
+				IMeshBuilder<V, E, F> mutableMesh = getMeshWithDataStorage().toMutableMesh();
+				mutableMesh.getOptimizer().arrangeMemory(sierpinksyFaceOrder);
 				triangulation.removeTriEventListener(this);
-				getMesh().garbageCollection();
+				mutableMesh.getOptimizer().garbageCollection();
+
 				logger.info("#sier-faces:" + sierpinksyFaceOrder.size() + ", #faces" + getMesh().getNumberOfFaces());
 			}
 		}
@@ -548,7 +564,7 @@ public class GenUniformRefinementTriangulatorSFC<V extends IVertex, E extends IH
 			V vertex = getMesh().createVertex(point);
 			//assert getMesh().getFaces().stream().noneMatch(f -> getNode(f) == null) : "count " + count;
 			V insertedVertex = getMesh().getVertex(getTriangulation().insertVertex(vertex, false));
-			getMesh().setBooleanData(vertex, "fixPoint", true);
+			dataStorage.setBooleanData(vertex, "fixPoint", true);
 			//getMesh().getFaces().stream().filter(f -> getNode(f) == null).forEach(f -> System.out.println(f));
 			//assert getMesh().getFaces().stream().noneMatch(f -> getNode(f) == null) : "count " + count;
 			//count++;
@@ -557,7 +573,7 @@ public class GenUniformRefinementTriangulatorSFC<V extends IVertex, E extends IH
 
 	@Override
 	public Collection<V> getFixPoints() {
-		return getMesh().streamVertices().filter(v -> getMesh().getBooleanData(v, "fixPoint")).collect(Collectors.toList());
+		return getMesh().streamVertices().filter(v -> dataStorage.getBooleanData(v, "fixPoint")).collect(Collectors.toList());
 	}
 
 

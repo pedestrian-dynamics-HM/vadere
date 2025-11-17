@@ -1,13 +1,9 @@
 package org.vadere.meshing.mesh.triangulation.triangulator.inter;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
-import org.vadere.meshing.mesh.inter.IFace;
-import org.vadere.meshing.mesh.inter.IHalfEdge;
+import org.vadere.meshing.mesh.inter.mesh.*;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
-import org.vadere.meshing.mesh.inter.IMesh;
-import org.vadere.meshing.mesh.inter.IVertex;
-import org.vadere.util.geometry.shapes.IPoint;
+import org.vadere.meshing.mesh.inter.mesh.data.IMeshDataStorage;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
 
@@ -48,6 +44,8 @@ public interface ITriangulator<V extends IVertex, E extends IHalfEdge, F extends
 	IIncrementalTriangulation<V, E, F> generate(boolean finalize);
 
 	IMesh<V, E, F> getMesh();
+	IMeshDataStorage<V, E, F> getMeshDataStorage();
+	IMeshWithDataStorage<V, E, F> getMeshWithDataStorage();
 
 	//TODO this should be in an abstract class and it might be slow!
 	default V split(@NotNull final E segment, @NotNull final Collection<E> segments) {

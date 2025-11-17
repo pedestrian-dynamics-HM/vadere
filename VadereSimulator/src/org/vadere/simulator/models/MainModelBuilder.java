@@ -2,8 +2,8 @@ package org.vadere.simulator.models;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.vadere.meshing.mesh.gen.AMesh;
-import org.vadere.meshing.mesh.gen.PMesh;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.AMesh;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.AMeshWithDataStorage;
 import org.vadere.simulator.projects.Domain;
 import org.vadere.simulator.projects.ScenarioStore;
 import org.vadere.state.attributes.AttributesSimulation;
@@ -24,7 +24,7 @@ public class MainModelBuilder {
 	private Domain domain;
 	private Random random;
 
-	public MainModelBuilder(@NotNull final ScenarioStore scenarioStore, @Nullable final AMesh floorFieldMesh, @Nullable final AMesh backgroundMesh) {
+	public MainModelBuilder(@NotNull final ScenarioStore scenarioStore, @Nullable final AMeshWithDataStorage floorFieldMesh, @Nullable final AMeshWithDataStorage backgroundMesh) {
 		this.scenarioStore = scenarioStore;
 		this.domain = new Domain(floorFieldMesh, backgroundMesh, scenarioStore.getTopography());
 	}

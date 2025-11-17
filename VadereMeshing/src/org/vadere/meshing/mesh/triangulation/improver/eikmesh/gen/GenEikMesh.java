@@ -4,14 +4,13 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.IllegalMeshException;
 import org.vadere.meshing.mesh.inter.IEdgeContainerBoolean;
-import org.vadere.meshing.mesh.inter.IFace;
-import org.vadere.meshing.mesh.inter.IHalfEdge;
-import org.vadere.meshing.mesh.inter.IMesh;
-import org.vadere.meshing.mesh.inter.IMeshSupplier;
+import org.vadere.meshing.mesh.inter.mesh.*;
+import org.vadere.meshing.mesh.inter.IEmptyMeshSupplier;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
-import org.vadere.meshing.mesh.inter.IVertex;
 import org.vadere.meshing.mesh.inter.IVertexContainerBoolean;
 import org.vadere.meshing.mesh.inter.IVertexContainerDouble;
+import org.vadere.meshing.mesh.inter.mesh.builder.IMeshBuilder;
+import org.vadere.meshing.mesh.inter.mesh.data.IMeshDataStorage;
 import org.vadere.meshing.mesh.iterators.EdgeIterator;
 import org.vadere.meshing.mesh.iterators.EdgeIteratorReverse;
 import org.vadere.meshing.mesh.triangulation.improver.IMeshImprover;
@@ -161,11 +160,12 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 			@NotNull final IEdgeLengthFunction edgeLengthFunc,
 			@NotNull final IIncrementalTriangulation<V, E, F> triangulation,
 			final boolean refine) {
-		this.fixpointC = triangulation.getMesh().getBooleanVertexContainer(propFixPoint);
-		this.constraintC = triangulation.getMesh().getBooleanEdgeContainer(propConstrained);
-		this.velocityXC = triangulation.getMesh().getDoubleVertexContainer(propVelocityX);
-		this.velocityYC = triangulation.getMesh().getDoubleVertexContainer(propVelocityY);
-		this.absVelocityC = triangulation.getMesh().getDoubleVertexContainer(propAbsVelocity);
+		IMeshDataStorage<V, E, F> dataStorage = triangulation.getMeshDataStorage();
+		this.fixpointC = dataStorage.getBooleanVertexContainer(propFixPoint);
+		this.constraintC = dataStorage.getBooleanEdgeContainer(propConstrained);
+		this.velocityXC = dataStorage.getDoubleVertexContainer(propVelocityX);
+		this.velocityYC = dataStorage.getDoubleVertexContainer(propVelocityY);
+		this.absVelocityC = dataStorage.getDoubleVertexContainer(propAbsVelocity);
 		this.shapes = new ArrayList<>();
 		this.bound = null;
 		this.edgeLengthFunc = edgeLengthFunc;
@@ -260,11 +260,12 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 		this.useSlidingLines = false;
 		this.smoothBorder = true;
 
-		this.fixpointC = triangulation.getMesh().getBooleanVertexContainer(propFixPoint);
-		this.constraintC = triangulation.getMesh().getBooleanEdgeContainer(propConstrained);
-		this.velocityXC = triangulation.getMesh().getDoubleVertexContainer(propVelocityX);
-		this.velocityYC = triangulation.getMesh().getDoubleVertexContainer(propVelocityY);
-		this.absVelocityC = triangulation.getMesh().getDoubleVertexContainer(propAbsVelocity);
+		IMeshDataStorage<V, E, F> dataStorage = triangulation.getMeshDataStorage();
+		this.fixpointC = dataStorage.getBooleanVertexContainer(propFixPoint);
+		this.constraintC = dataStorage.getBooleanEdgeContainer(propConstrained);
+		this.velocityXC = dataStorage.getDoubleVertexContainer(propVelocityX);
+		this.velocityYC = dataStorage.getDoubleVertexContainer(propVelocityY);
+		this.absVelocityC = dataStorage.getDoubleVertexContainer(propAbsVelocity);
 	}
 
 	/**
@@ -288,7 +289,7 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 			final double initialEdgeLen,
 			@NotNull final VRectangle bound,
 			@NotNull final Collection<? extends VShape> shapes,
-			@NotNull final IMeshSupplier<V, E, F> meshSupplier) {
+			@NotNull final IEmptyMeshSupplier<V, E, F> meshSupplier) {
 		this.shapes = shapes;
 		this.bound = bound;
 		this.distanceFunc = distanceFunc;
@@ -310,11 +311,12 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 				distanceFunc,
 				generateFixPoints());
 
-		this.fixpointC = refiner.getMesh().getBooleanVertexContainer(propFixPoint);
-		this.constraintC = refiner.getMesh().getBooleanEdgeContainer(propConstrained);
-		this.velocityXC = refiner.getMesh().getDoubleVertexContainer(propVelocityX);
-		this.velocityYC = refiner.getMesh().getDoubleVertexContainer(propVelocityY);
-		this.absVelocityC = refiner.getMesh().getDoubleVertexContainer(propAbsVelocity);
+		IMeshDataStorage<V, E, F> dataStorage = refiner.getMeshDataStorage();
+		this.fixpointC = dataStorage.getBooleanVertexContainer(propFixPoint);
+		this.constraintC = dataStorage.getBooleanEdgeContainer(propConstrained);
+		this.velocityXC = dataStorage.getDoubleVertexContainer(propVelocityX);
+		this.velocityYC = dataStorage.getDoubleVertexContainer(propVelocityY);
+		this.absVelocityC = dataStorage.getDoubleVertexContainer(propAbsVelocity);
 	}
 
 	public GenEikMesh(
@@ -323,7 +325,7 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 			final double initialEdgeLen,
 			@NotNull final VRectangle bound,
 			@NotNull final Collection<? extends VShape> shapes,
-			@NotNull final IMeshSupplier<V, E, F> meshSupplier) {
+			@NotNull final IEmptyMeshSupplier<V, E, F> meshSupplier) {
 		this(distanceFunc, edgeLengthFunc, Collections.EMPTY_LIST, initialEdgeLen, bound, shapes, meshSupplier);
 	}
 
@@ -332,14 +334,14 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 			@NotNull final IEdgeLengthFunction edgeLengthFunc,
 			final double initialEdgeLen,
 			@NotNull final VRectangle bound,
-			@NotNull final IMeshSupplier<V, E, F> meshSupplier) {
+			@NotNull final IEmptyMeshSupplier<V, E, F> meshSupplier) {
 		this(distanceFunc, edgeLengthFunc, initialEdgeLen, bound, Collections.EMPTY_LIST, meshSupplier);
 	}
 
 	public GenEikMesh(@NotNull final VPolygon segmentBound,
 	                  final double initialEdgeLen,
 	                  @NotNull final Collection<? extends VShape> shapes,
-	                  @NotNull final IMeshSupplier<V, E, F> meshSupplier){
+	                  @NotNull final IEmptyMeshSupplier<V, E, F> meshSupplier){
 		this(new DistanceFunction(segmentBound, shapes), p -> initialEdgeLen, initialEdgeLen, GeometryUtils.boundRelative(segmentBound.getPoints()), shapes, meshSupplier);
 	}
 
@@ -415,7 +417,10 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 
 		if(finalize) {
 			finish();
-			getMesh().garbageCollection();
+
+			// todo hh: rework when making mesh immutable
+			IMeshBuilder<V, E, F> mutableMesh = getMeshWithDataStorage().toMutableMesh();
+			mutableMesh.getOptimizer().garbageCollection();
 		}
 
 		return getTriangulation();
@@ -438,13 +443,28 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 		return getTriangulation().getMesh();
 	}
 
+	@Override
+	public IMeshDataStorage<V, E, F> getDataStorage() {
+		return getTriangulation().getMeshDataStorage();
+	}
+
+	@Override
+	public IMeshWithDataStorage<V, E, F> getMeshWithDataStorage() {
+		return getTriangulation().getMeshWithDataStorage();
+	}
+
+	@Override
+	public IMeshDataStorage<V, E, F> getMeshDataStorage() {
+		return getTriangulation().getMeshDataStorage();
+	}
+
 	/**
 	 * Convert vertices to fix points if their surrounding faces have a good enough quality.
 	 */
 	private void freezeVertices() {
 		if(freezeVertices) {
 			getMesh().streamVertices().filter(v -> getMesh().streamFaces(v).filter(f -> !getMesh().isBoundary(f)).allMatch(f -> faceToQuality(f) > Parameters.qualityMeasurement)).forEach(v -> setFixPoint(v, true));
-			getMesh().streamFaces().filter(f -> getMesh().streamVertices(f).allMatch(v -> isFixPoint(v))).forEach(f -> getMesh().setBooleanData(f, "frozen", true));
+			getMesh().streamFaces().filter(f -> getMesh().streamVertices(f).allMatch(v -> isFixPoint(v))).forEach(f -> getDataStorage().setBooleanData(f, "frozen", true));
 		}
 	}
 

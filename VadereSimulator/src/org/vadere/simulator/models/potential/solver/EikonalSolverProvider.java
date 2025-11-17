@@ -2,9 +2,9 @@
 package org.vadere.simulator.models.potential.solver;
 
 import org.jetbrains.annotations.NotNull;
-import org.vadere.meshing.mesh.gen.AFace;
-import org.vadere.meshing.mesh.gen.AHalfEdge;
-import org.vadere.meshing.mesh.gen.AVertex;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.AFace;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.AHalfEdge;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.AVertex;
 import org.vadere.meshing.mesh.gen.IncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.simulator.models.potential.fields.IPotentialField;
@@ -52,7 +52,7 @@ public abstract class EikonalSolverProvider  {
 			final AttributesFloorField attributesPotential);
 
 	protected EikonalSolver buildBase(final Domain domain, @NotNull final List<VShape> targetShapes) {
-		var triangulation = new IncrementalTriangulation<>(domain.getFloorFieldMesh());
+		var triangulation = IncrementalTriangulation.fromMesh(domain.getFloorFieldMesh());
 
 		ITimeCostFunction timeCost = new UnitTimeCostFunction();
 		EikonalSolver eikonalSolver = new MeshEikonalSolverFMM(
@@ -142,7 +142,7 @@ public abstract class EikonalSolverProvider  {
 			}
 		} else {
 			if(domain.getFloorFieldMesh() != null) {
-				IIncrementalTriangulation<AVertex, AHalfEdge, AFace> triangulation = new IncrementalTriangulation<>(domain.getFloorFieldMesh());
+				var triangulation = IncrementalTriangulation.fromMesh(domain.getFloorFieldMesh());
 
 				ITimeCostFunction timeCost = TimeCostFunctionFactory.create(
 						attributesPotential.getTimeCostAttributes(),

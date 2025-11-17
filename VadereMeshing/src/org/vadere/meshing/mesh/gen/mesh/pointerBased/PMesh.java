@@ -1,10 +1,13 @@
-package org.vadere.meshing.mesh.gen;
+package org.vadere.meshing.mesh.gen.mesh.pointerBased;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.vadere.meshing.mesh.inter.IMesh;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.AMesh;
+import org.vadere.meshing.mesh.inter.mesh.IMesh;
 import org.vadere.meshing.mesh.inter.IPointLocator;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
+import org.vadere.meshing.mesh.inter.mesh.builder.IMeshBuilder;
+import org.vadere.meshing.mesh.inter.mesh.data.IMeshDataStorage;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.logging.Logger;
@@ -15,22 +18,23 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
+ * A Pointer based mesh implementation. More straight forward than the array based implementation {@link AMesh}
+ * but mainly used for debugging and testing.
  * @author Benedikt Zoennchen
  */
 public class PMesh implements IMesh<PVertex, PHalfEdge, PFace> {
-
 	private static Logger log = Logger.getLogger(PMesh.class);
 
-	private int numberOfEdges;
-	private int numberOfFaces;
-	private int numberOfHoles;
-	private int numberOfVertices;
+	int numberOfEdges;
+	int numberOfFaces;
+	int numberOfHoles;
+	int numberOfVertices;
 
-	private List<PFace> faces;
-	private List<PFace> holes;
-	private PFace boundary;
-	private List<PHalfEdge> edges;
-	private List<PVertex> vertices;
+	List<PFace> faces;
+	List<PFace> holes;
+	PFace boundary;
+	List<PHalfEdge> edges;
+	List<PVertex> vertices;
 
 	public PMesh() {
 		clear();
@@ -50,15 +54,8 @@ public class PMesh implements IMesh<PVertex, PHalfEdge, PFace> {
 	}
 
 	@Override
-	public PMesh construct() {
+	public PMesh constructEmpty() {
 		return new PMesh();
-	}
-
-	@Override
-	public void garbageCollection() {
-		faces = faces.stream().filter(f -> !isDestroyed(f)).collect(Collectors.toList());
-		edges = edges.stream().filter(e -> !isDestroyed(e)).collect(Collectors.toList());
-		vertices = vertices.stream().filter(v -> !isDestroyed(v)).collect(Collectors.toList());
 	}
 
 	@Override
@@ -119,36 +116,6 @@ public class PMesh implements IMesh<PVertex, PHalfEdge, PFace> {
 	@Override
 	public IPoint getPoint(@NotNull final PVertex vertex) {
 		return vertex.getPoint();
-	}
-
-	@Override
-	public <CV> Optional<CV> getData(@NotNull final PVertex vertex, @NotNull final String name, @NotNull final Class<CV> clazz) {
-		return Optional.ofNullable(vertex.getData(name, clazz));
-	}
-
-	@Override
-	public <CV> void setData(@NotNull final PVertex vertex, @NotNull final String name, final CV data) {
-		vertex.setData(name, data);
-	}
-
-	@Override
-	public <CE> Optional<CE> getData(@NotNull final PHalfEdge edge, @NotNull final String name, @NotNull final Class<CE> clazz) {
-		return Optional.ofNullable(edge.getData(name, clazz));
-	}
-
-	@Override
-	public <CE> void setData(@NotNull final PHalfEdge edge, @NotNull final String name, @Nullable final CE data) {
-		edge.setData(name, data);
-	}
-
-	@Override
-	public <CF> Optional<CF> getData(@NotNull final PFace face, @NotNull final String name, @NotNull final Class<CF> clazz) {
-		return Optional.ofNullable(face.getData(name, clazz));
-	}
-
-	@Override
-	public <CF> void setData(@NotNull final PFace face, @NotNull final String name, @Nullable final CF data) {
-		face.setData(name, data);
 	}
 
 	@Override
@@ -457,17 +424,8 @@ public class PMesh implements IMesh<PVertex, PHalfEdge, PFace> {
 	}
 
 	@Override
-	public IIncrementalTriangulation<PVertex, PHalfEdge, PFace> toTriangulation(@NotNull final IPointLocator.Type type) {
-		return IIncrementalTriangulation.createPTriangulation(type, this);
-	}
-
-	@Override
-	public void arrangeMemory(@NotNull final Iterable<PFace> faceOrder) {
-		try {
-			throw new UnsupportedOperationException("not jet implemented.");
-		} catch (UnsupportedOperationException e) {
-			log.warn(e.getMessage());
-		}
+	public IMeshDataStorage<PVertex, PHalfEdge, PFace> createEmptyDataStorage() {
+		return new PMeshDataStorage(this);
 	}
 
 	@Override

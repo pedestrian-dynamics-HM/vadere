@@ -1,11 +1,8 @@
 package org.vadere.meshing.mesh.triangulation.improver;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.vadere.meshing.mesh.gen.PFace;
-import org.vadere.meshing.mesh.gen.PHalfEdge;
-import org.vadere.meshing.mesh.gen.PMesh;
-import org.vadere.meshing.mesh.gen.PVertex;
-import org.vadere.meshing.mesh.inter.IMesh;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.*;
+import org.vadere.meshing.mesh.inter.mesh.IMesh;
 import org.vadere.meshing.mesh.inter.IPointLocator;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
@@ -55,7 +52,6 @@ public class LaplacianSmother implements IPMeshImprover {
         this.initialEdgeLen = initialEdgeLen;
         this.obstacleShapes = obstacleShapes;
 
-        PMesh mesh = new PMesh();
         /**
          * Start with a uniform refined triangulation
          */
@@ -63,7 +59,7 @@ public class LaplacianSmother implements IPMeshImprover {
         //UniformRefinementTriangulator uniformRefinementTriangulator = new UniformRefinementTriangulator(triangulation, bound, obstacleShapes, p -> edgeLengthFunc.apply(p) * initialEdgeLen, distanceFunc);
         //uniformRefinementTriangulator.generate();
 
-        GenRandomPointsSetTriangulator randomTriangulator = new GenRandomPointsSetTriangulator(mesh, 3000, bound, distanceFunc);
+        GenRandomPointsSetTriangulator randomTriangulator = new GenRandomPointsSetTriangulator(PMeshWithDataStorage::constructEmpty,3000, bound, distanceFunc);
 	    triangulation = randomTriangulator.generate();
         removeTrianglesInsideObstacles();
         log.info("##### (end) generate a uniform refined triangulation #####");
@@ -130,7 +126,7 @@ public class LaplacianSmother implements IPMeshImprover {
 	    IPoint inflate = laplacian(vertex).subtract(p).scalarMultiply(-beta);
 
         //getMesh().getPoint(vertex).setVelocity(p.add(shrink.add(inflate)));
-	    getMesh().setData(vertex, "velocity", p.add(shrink));
+	    getDataStorage().setData(vertex, "velocity", p.add(shrink));
     }
 
     private void inflateForce(final PVertex vertex) {
@@ -144,11 +140,11 @@ public class LaplacianSmother implements IPMeshImprover {
 	    IPoint inflate = laplacian(vertex).subtract(p).scalarMultiply(-beta);
 
         //getMesh().getPoint(vertex).setVelocity(p.add(shrink.add(inflate)));
-	    getMesh().setData(vertex, "velocity", p.add(inflate));
+        getDataStorage().setData(vertex, "velocity", p.add(inflate));
     }
 
     private void applyLaplacian(final PVertex vertex) {
-        IPoint force = getMesh().getData(vertex, "velocity", IPoint.class).get();
+        IPoint force = getDataStorage().getData(vertex, "velocity", IPoint.class).get();
         getMesh().setCoords(vertex, force.getX(), force.getY());
     }
 

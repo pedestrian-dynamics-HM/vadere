@@ -2,10 +2,7 @@ package org.vadere.meshing.examples;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.gen.MeshRenderer;
-import org.vadere.meshing.mesh.gen.PFace;
-import org.vadere.meshing.mesh.gen.PHalfEdge;
-import org.vadere.meshing.mesh.gen.PMesh;
-import org.vadere.meshing.mesh.gen.PVertex;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.*;
 import org.vadere.meshing.mesh.impl.PMeshPanel;
 import org.vadere.meshing.mesh.impl.PSLG;
 import org.vadere.meshing.mesh.triangulation.DistanceFunctionApproxBF;
@@ -52,7 +49,7 @@ public class EikMeshPoly {
 		Collection<VPolygon> holes = pslg.getHoles();
 		VPolygon segmentBound = pslg.getSegmentBound();
 		IDistanceFunction distanceFunction = IDistanceFunction.create(segmentBound, holes);
-		IDistanceFunction distanceFunctionApproximation = new DistanceFunctionApproxBF(pslg, distanceFunction, () -> new PMesh());
+		IDistanceFunction distanceFunctionApproximation = new DistanceFunctionApproxBF(pslg, distanceFunction, PMeshWithDataStorage::constructEmpty);
 
 		var ruppert = new PRuppertsTriangulator(
 				pslg,
@@ -110,23 +107,23 @@ public class EikMeshPoly {
 		System.out.println("Writing Poly file...");
 		MeshPolyWriter<PVertex, PHalfEdge, PFace> meshPolyWriter = new MeshPolyWriter<>();
 		String[] splitName = fileName.split("\\.");
-		write(meshPolyWriter.to2DPoly(meshImprover.getMesh()), fileName + "_tri.poly");
+		write(meshPolyWriter.to2DPoly(meshImprover.getMeshWithDataStorage()), fileName + "_tri.poly");
 		System.out.println("Writing Poly file finished.");
 	}
 
 	public static void displayPolyFile(@NotNull final String fileName) throws IOException {
 		final InputStream inputStream = MeshExamples.class.getResourceAsStream(fileName);
-		MeshPolyReader<PVertex, PHalfEdge, PFace> meshPolyWriter = new MeshPolyReader<>(() -> new PMesh());
-		var mesh = meshPolyWriter.readMesh(inputStream);
-		var meshPanel = new PMeshPanel(mesh, 1000, 800);
+		MeshPolyReader<PVertex, PHalfEdge, PFace> meshPolyWriter = new MeshPolyReader<>(PMeshWithDataStorage::constructEmpty);
+		var meshWithDatastorage = meshPolyWriter.readMesh(inputStream);
+		var meshPanel = new PMeshPanel(meshWithDatastorage.getMesh(), 1000, 800);
 		meshPanel.display("");
 	}
 
 	public static void fmmPolyFile(@NotNull final String fileName) throws IOException {
 		final InputStream inputStream = MeshExamples.class.getResourceAsStream(fileName);
-		MeshPolyReader<PVertex, PHalfEdge, PFace> meshPolyWriter = new MeshPolyReader<>(() -> new PMesh());
-		var mesh = meshPolyWriter.readMesh(inputStream);
-		var meshPanel = new PMeshPanel(mesh, 1000, 800);
+		MeshPolyReader<PVertex, PHalfEdge, PFace> meshPolyWriter = new MeshPolyReader<>(PMeshWithDataStorage::constructEmpty);
+		var meshWithDataStorage = meshPolyWriter.readMesh(inputStream);
+		var meshPanel = new PMeshPanel(meshWithDataStorage.getMesh(), 1000, 800);
 		meshPanel.display("");
 	}
 

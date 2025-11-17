@@ -1,4 +1,4 @@
-package org.vadere.meshing.mesh.inter;
+package org.vadere.meshing.mesh.inter.mesh;
 
 /**
  * A face {@link IFace} is a generic 2D-face i.e. a polygon consisting of points

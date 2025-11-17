@@ -3,10 +3,10 @@ package org.vadere.simulator.models.potential.timeCostFunction;
 import org.apache.commons.math3.special.Erf;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.vadere.meshing.mesh.inter.IFace;
-import org.vadere.meshing.mesh.inter.IHalfEdge;
+import org.vadere.meshing.mesh.inter.mesh.IFace;
+import org.vadere.meshing.mesh.inter.mesh.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
-import org.vadere.meshing.mesh.inter.IVertex;
+import org.vadere.meshing.mesh.inter.mesh.IVertex;
 import org.vadere.meshing.mesh.inter.IVertexContainerDouble;
 import org.vadere.meshing.utils.math.GeometryUtilsMesh;
 import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
@@ -50,7 +50,7 @@ public class TimeCostObstacleDensityMesh<V extends IVertex, E extends IHalfEdge,
 		this.attributesTimeCost = attributesTimeCost;
 		this.triangulation = triangulation;
 		this.distanceFunction = distanceFunction;
-		this.densities = triangulation.getMesh().getDoubleVertexContainer(nameObstacleDensity);
+		this.densities = triangulation.getMeshDataStorage().getDoubleVertexContainer(nameObstacleDensity);
 		this.updated = false;
 
 		//TODO duplicated code

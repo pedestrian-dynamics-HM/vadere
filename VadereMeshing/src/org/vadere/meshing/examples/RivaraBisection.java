@@ -1,8 +1,8 @@
 package org.vadere.meshing.examples;
 
-import org.vadere.meshing.mesh.gen.AFace;
-import org.vadere.meshing.mesh.gen.AHalfEdge;
-import org.vadere.meshing.mesh.gen.AVertex;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.AFace;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.AHalfEdge;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.AVertex;
 import org.vadere.meshing.mesh.gen.MeshPanel;
 import org.vadere.meshing.mesh.triangulation.triangulator.gen.GenRivaraRefinement;
 import org.vadere.meshing.mesh.triangulation.triangulator.impl.ADelaunayTriangulator;
@@ -35,7 +35,7 @@ public class RivaraBisection {
 		panel.display();
 
 		while (!refinement.isFinished()) {
-			synchronized (triangulation.getMesh()) {
+			synchronized (triangulation.getMeshWithDataStorage()) {
 				refinement.refine();
 			}
 			panel.repaint();

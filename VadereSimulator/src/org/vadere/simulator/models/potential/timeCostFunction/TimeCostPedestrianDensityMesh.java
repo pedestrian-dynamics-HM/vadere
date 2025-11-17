@@ -2,11 +2,13 @@ package org.vadere.simulator.models.potential.timeCostFunction;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.vadere.meshing.mesh.inter.IFace;
-import org.vadere.meshing.mesh.inter.IHalfEdge;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.AMeshBuilder;
+import org.vadere.meshing.mesh.inter.mesh.IFace;
+import org.vadere.meshing.mesh.inter.mesh.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
-import org.vadere.meshing.mesh.inter.IVertex;
+import org.vadere.meshing.mesh.inter.mesh.IVertex;
 import org.vadere.meshing.mesh.inter.IVertexContainerDouble;
+import org.vadere.meshing.mesh.inter.mesh.MeshPythonUtils;
 import org.vadere.meshing.mesh.triangulation.triangulator.gen.GenRegularRefinement;
 import org.vadere.meshing.utils.io.IOUtils;
 import org.vadere.meshing.utils.math.GeometryUtilsMesh;
@@ -62,7 +64,7 @@ public class TimeCostPedestrianDensityMesh<V extends IVertex, E extends IHalfEdg
 		this.loadingStrategy = loadingStrategy;
 		this.triangulation = triangulation;
 		this.topography = topography;
-		this.densities = triangulation.getMesh().getDoubleVertexContainer(nameAgentDensity);
+		this.densities = triangulation.getMeshDataStorage().getDoubleVertexContainer(nameAgentDensity);
 		this.updated = false;
 		this.refiner = new GenRegularRefinement<>(triangulation, e -> false);
 		this.refiner.setCoarsePredicate(v -> coarse(v));
@@ -86,7 +88,10 @@ public class TimeCostPedestrianDensityMesh<V extends IVertex, E extends IHalfEdg
 		//debugPanel.paintImmediately(0, 0, debugPanel.getWidth(), debugPanel.getHeight());
 		refiner.refine();
 		long runTime = System.currentTimeMillis() - ms;
-		refiner.getMesh().garbageCollection();
+
+		// todo hh: rework when making mesh immutable
+		refiner.getMeshWithDataStorage().toMutableMesh().getOptimizer().garbageCollection();
+
 		//debugPanel.paintImmediately(0, 0, debugPanel.getWidth(), debugPanel.getHeight());
 		//System.out.println("runTime refinement = " + runTime);
 	}
@@ -153,7 +158,7 @@ public class TimeCostPedestrianDensityMesh<V extends IVertex, E extends IHalfEdg
 		//long ms = System.currentTimeMillis();
 
 
-		var mesh = triangulation.getMesh();
+		var meshWithDataStorage = triangulation.getMeshWithDataStorage();
 		densities.reset();
 
 		for (Pedestrian element : topography.getPedestrianDynamicElements().getElements()) {
@@ -162,8 +167,8 @@ public class TimeCostPedestrianDensityMesh<V extends IVertex, E extends IHalfEdg
 
 			if (optional.isPresent()) {
 				F pedFace = optional.get();
-				Predicate<V> predicate = v -> GeometryUtils.lengthSq(mesh.getX(v) - element.getPosition().x,
-						mesh.getY(v) - element.getPosition().y) < influenceRadius * influenceRadius;
+				Predicate<V> predicate = v -> GeometryUtils.lengthSq(meshWithDataStorage.getMesh().getX(v) - element.getPosition().x,
+						meshWithDataStorage.getMesh().getY(v) - element.getPosition().y) < influenceRadius * influenceRadius;
 				Set<V> closeVertices = triangulation.getVertices(element.getPosition().getX(), element.getPosition().getY(), pedFace, predicate);
 				for (V v : closeVertices) {
 					double density = densities.getValue(v) + loadingStrategy.calculateLoading(element) / (influenceRadius * influenceRadius * Math.PI);
@@ -173,7 +178,7 @@ public class TimeCostPedestrianDensityMesh<V extends IVertex, E extends IHalfEdg
 		}
 
 		try {
-			this.meshWriter.write(triangulation.getMesh().toPythonValues(v -> densities.getValue(v) + triangulation.getMesh().getDoubleData(v, TimeCostObstacleDensityMesh.nameObstacleDensity)));
+			this.meshWriter.write(MeshPythonUtils.toPythonTriangulation(triangulation.getMeshWithDataStorage(), v -> densities.getValue(v) + triangulation.getMeshDataStorage().getDoubleData(v, TimeCostObstacleDensityMesh.nameObstacleDensity)));
 			this.meshWriter.flush();
 		} catch (IOException e) {
 			e.printStackTrace();

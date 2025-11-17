@@ -1,13 +1,10 @@
 package org.vadere.meshing.mesh.triangulation.plots;
 
 import org.apache.commons.lang3.time.StopWatch;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.*;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.math.IDistanceFunction;
-import org.vadere.meshing.mesh.gen.AFace;
-import org.vadere.meshing.mesh.gen.AHalfEdge;
-import org.vadere.meshing.mesh.gen.AMesh;
-import org.vadere.meshing.mesh.gen.AVertex;
-import org.vadere.meshing.mesh.inter.IMeshSupplier;
+import org.vadere.meshing.mesh.inter.IEmptyMeshSupplier;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
@@ -33,7 +30,7 @@ public class  TriangleQuality{
 	private static final double initialEdgeLength = 1.5;
 
 	private static void stepUniformRing(double startLen) {
-		IMeshSupplier<AVertex, AHalfEdge, AFace> supplier = () -> new AMesh();
+		IEmptyMeshSupplier<AVertex, AHalfEdge, AFace> supplier = AMeshWithDataStorage::constructEmpty;
 		IDistanceFunction distanceFunc = p -> Math.abs(7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 3;
 		List<VShape> obstacles = new ArrayList<>();
 
@@ -85,7 +82,7 @@ public class  TriangleQuality{
 	}
 
 	private static void resultUniformRing(double startLen) {
-		IMeshSupplier<AVertex, AHalfEdge, AFace> supplier = () -> new AMesh();
+		IEmptyMeshSupplier<AVertex, AHalfEdge, AFace> supplier = AMeshWithDataStorage::constructEmpty;
 		IDistanceFunction distanceFunc = p -> Math.abs(7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 3;
 		List<VShape> obstacles = new ArrayList<>();
 
@@ -133,7 +130,7 @@ public class  TriangleQuality{
 	}
 
 	private static void resultAdaptiveRing(double startLen) {
-		IMeshSupplier<AVertex, AHalfEdge, AFace> supplier = () -> new AMesh();
+		IEmptyMeshSupplier<AVertex, AHalfEdge, AFace> supplier = AMeshWithDataStorage::constructEmpty;;
 		IDistanceFunction distanceFunc = p -> Math.abs(7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 3;
 		List<VShape> obstacles = new ArrayList<>();
 		IEdgeLengthFunction edgeLengthFunc = p -> initialEdgeLength + Math.abs(distanceFunc.apply(p)) * 0.5;
@@ -182,7 +179,7 @@ public class  TriangleQuality{
 	}
 
 	private static void stepAdativeRing(double startLen) {
-		IMeshSupplier<AVertex, AHalfEdge, AFace> supplier = () -> new AMesh();
+		IEmptyMeshSupplier<AVertex, AHalfEdge, AFace> supplier = AMeshWithDataStorage::constructEmpty;;
 		IDistanceFunction distanceFunc = p -> Math.abs(7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 3;
 		List<VShape> obstacles = new ArrayList<>();
 

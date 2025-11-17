@@ -1,12 +1,13 @@
 package org.vadere.simulator.models.potential.solver.calculators.mesh;
 
 import org.jetbrains.annotations.NotNull;
-import org.vadere.meshing.mesh.inter.IFace;
-import org.vadere.meshing.mesh.inter.IHalfEdge;
+import org.vadere.meshing.mesh.inter.mesh.IFace;
+import org.vadere.meshing.mesh.inter.mesh.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
-import org.vadere.meshing.mesh.inter.IVertex;
+import org.vadere.meshing.mesh.inter.mesh.IVertex;
 import org.vadere.meshing.mesh.inter.IVertexContainerBoolean;
 import org.vadere.meshing.mesh.inter.IVertexContainerDouble;
+import org.vadere.meshing.mesh.inter.mesh.data.IMeshDataStorage;
 import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.IPoint;
@@ -84,9 +85,10 @@ public class MeshEikonalSolverDFMM<V extends IVertex, E extends IHalfEdge, F ext
 		super(identifier, triangulation, timeCostFunction);
 		this.identifier = identifier;
 		//this.distToDest = IDistanceFunction.createToTargets(destinations);
-		this.oldPotential = getMesh().getDoubleVertexContainer(identifier + "_" + nameOldPotential);
-		this.oldTimeCosts = getMesh().getDoubleVertexContainer(identifier + "_" + nameOldSpeed);
-		this.speedChange = getMesh().getBooleanVertexContainer(identifier + "_" + nameSpeedChanged);
+		IMeshDataStorage<V, E, F> dataStorage = getMeshDataStorage();
+		this.oldPotential = dataStorage.getDoubleVertexContainer(identifier + "_" + nameOldPotential);
+		this.oldTimeCosts = dataStorage.getDoubleVertexContainer(identifier + "_" + nameOldSpeed);
+		this.speedChange = dataStorage.getBooleanVertexContainer(identifier + "_" + nameSpeedChanged);
 
 		this.timeCostFunction = timeCostFunction;
 		this.order = new LinkedList<>();
@@ -505,10 +507,10 @@ public class MeshEikonalSolverDFMM<V extends IVertex, E extends IHalfEdge, F ext
 	}
 
 	private double angle(@NotNull final E p1, @NotNull final E p, @NotNull final E p2) {
-		double angle =  getMesh().getDoubleData(p, "angle3D");
+		double angle =  getMeshDataStorage().getDoubleData(p, "angle3D");
 		if(angle == 0) {
 			angle = GeometryUtils.angle(getMesh().getVertex(p1), getMesh().getVertex(p), getMesh().getVertex(p2));
-			getMesh().setDoubleData(p, "angle3D", angle);
+			getMeshDataStorage().setDoubleData(p, "angle3D", angle);
 			return angle;
 		}
 		else {

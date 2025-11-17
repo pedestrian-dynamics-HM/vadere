@@ -2,11 +2,11 @@ package org.vadere.simulator.models.potential.solver.calculators.mesh;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.vadere.meshing.mesh.inter.IFace;
-import org.vadere.meshing.mesh.inter.IHalfEdge;
+import org.vadere.meshing.mesh.inter.mesh.IFace;
+import org.vadere.meshing.mesh.inter.mesh.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
-import org.vadere.meshing.mesh.inter.IMesh;
-import org.vadere.meshing.mesh.inter.IVertex;
+import org.vadere.meshing.mesh.inter.mesh.IMesh;
+import org.vadere.meshing.mesh.inter.mesh.IVertex;
 import org.vadere.meshing.mesh.inter.IVertexContainerDouble;
 import org.vadere.simulator.models.potential.timeCostFunction.loading.IPedestrianLoadingStrategy;
 import org.vadere.state.scenario.IMoveDynamicElementListener;
@@ -42,7 +42,7 @@ public class DensityUpdater<V extends IVertex, E extends IHalfEdge, F extends IF
 
 	public DensityUpdater(@NotNull final IIncrementalTriangulation<V, E, F> triangulation, @Nullable final IPedestrianLoadingStrategy loadingStrategy) {
 		this.triangulation = triangulation;
-		this.densities = triangulation.getMesh().getDoubleVertexContainer(nameAgentDensity);
+		this.densities = triangulation.getMeshDataStorage().getDoubleVertexContainer(nameAgentDensity);
 		this.loadingStrategy = loadingStrategy;
 	}
 

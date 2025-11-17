@@ -3,12 +3,9 @@ package org.vadere.simulator.models.potential.solver.calculators.mesh;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.vadere.meshing.mesh.inter.IFace;
-import org.vadere.meshing.mesh.inter.IHalfEdge;
+import org.vadere.meshing.mesh.inter.mesh.*;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
-import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.ITriEventListener;
-import org.vadere.meshing.mesh.inter.IVertex;
 import org.vadere.meshing.mesh.triangulation.triangulator.gen.GenRegularRefinement;
 import org.vadere.meshing.utils.math.GeometryUtilsMesh;
 import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
@@ -520,6 +517,10 @@ public class MeshEikonalSolverFMMRefined<V extends IVertex, E extends IHalfEdge,
 		return triangulation.getMesh();
 	}
 
+	IMeshWithDataStorage<V, E, F> getMeshWithDataStorage() {
+		return triangulation.getMeshWithDataStorage();
+	}
+
 	/**
 	 * Updates the the traveling times T of all neighbours of <tt>vertex</tt>.
 	 *
@@ -652,7 +653,7 @@ public class MeshEikonalSolverFMMRefined<V extends IVertex, E extends IHalfEdge,
 	}
 
 	private boolean isNonAcute(@NotNull final F face) {
-		return getMesh().getBooleanData(face, nameNonAccuteEdge);
+		return getMeshWithDataStorage().getDataStorage().getBooleanData(face, nameNonAccuteEdge);
 	}
 
 	/**
@@ -991,27 +992,27 @@ public class MeshEikonalSolverFMMRefined<V extends IVertex, E extends IHalfEdge,
 	}
 
 	private PathFindingTag getPathFindingTag(@NotNull final V vertex) {
-		return triangulation.getMesh().getData(vertex, identifier + "_" + namePathFindingTag, PathFindingTag.class).get();
+		return triangulation.getMeshWithDataStorage().getDataStorage().getData(vertex, identifier + "_" + namePathFindingTag, PathFindingTag.class).get();
 	}
 
 	private void setPathFindingTag(@NotNull final V vertex, final PathFindingTag tag) {
-		triangulation.getMesh().setData(vertex, identifier + "_" + namePathFindingTag, tag);
+		triangulation.getMeshWithDataStorage().getDataStorage().setData(vertex, identifier + "_" + namePathFindingTag, tag);
 	}
 
 	public double getPotential(@NotNull final V vertex) {
-		return triangulation.getMesh().getDoubleData(vertex, identifier + "_" + namePotential);
+		return triangulation.getMeshWithDataStorage().getDataStorage().getDoubleData(vertex, identifier + "_" + namePotential);
 	}
 
 	private void setPotential(@NotNull final V vertex, final double potential) {
-		triangulation.getMesh().setDoubleData(vertex, identifier + "_" + namePotential, potential);
+		triangulation.getMeshWithDataStorage().getDataStorage().setDoubleData(vertex, identifier + "_" + namePotential, potential);
 	}
 
 	private void setNonAccuteEdge(@NotNull final E edge) {
-		getMesh().setBooleanData(edge, nameNonAccuteEdge, true);
+		getMeshWithDataStorage().getDataStorage().setBooleanData(edge, nameNonAccuteEdge, true);
 	}
 
 	private void setVirtualSupport(@NotNull final E edge, @NotNull final List<Pair<V, V>> list) {
-		getMesh().setData(edge, nameVirtualSupport, list);
+		getMeshWithDataStorage().getDataStorage().setData(edge, nameVirtualSupport, list);
 	}
 
 	private List<Pair<V, V>> getVirtualSupport(@NotNull final E edge) {
@@ -1332,10 +1333,10 @@ public class MeshEikonalSolverFMMRefined<V extends IVertex, E extends IHalfEdge,
 	}
 
 	private double sinPhi(@NotNull final E p1, @NotNull final E p, @NotNull final E p2) {
-		double sinPhi = getMesh().getDoubleData(p, "sinPhis");
+		double sinPhi = getMeshWithDataStorage().getDataStorage().getDoubleData(p, "sinPhis");
 		if(sinPhi == 0) {
 			sinPhi = Math.sin(angle(p1, p, p2));
-			getMesh().setDoubleData(p, "sinPhis", sinPhi);
+			getMeshWithDataStorage().getDataStorage().setDoubleData(p, "sinPhis", sinPhi);
 			return sinPhi;
 		}
 		else {
@@ -1352,10 +1353,10 @@ public class MeshEikonalSolverFMMRefined<V extends IVertex, E extends IHalfEdge,
 	}
 
 	private double cosPhi(@NotNull final E p1, @NotNull final E p, @NotNull final E p2) {
-		double cosPhi = getMesh().getDoubleData(p, "cosPhis");
+		double cosPhi = getMeshWithDataStorage().getDataStorage().getDoubleData(p, "cosPhis");
 		if(cosPhi == 0) {
 			cosPhi = Math.cos(angle(p1, p, p2));
-			getMesh().setDoubleData(p, "cosPhis", cosPhi);
+			getMeshWithDataStorage().getDataStorage().setDoubleData(p, "cosPhis", cosPhi);
 			return cosPhi;
 		}
 		else {
@@ -1364,10 +1365,10 @@ public class MeshEikonalSolverFMMRefined<V extends IVertex, E extends IHalfEdge,
 	}
 
 	private double angle(@NotNull final E p1, @NotNull final E p, @NotNull final E p2) {
-		double angle =  getMesh().getDoubleData(p, "angle3D");
+		double angle =  getMeshWithDataStorage().getDataStorage().getDoubleData(p, "angle3D");
 		if(angle == 0) {
 			angle = GeometryUtils.angle(getMesh().getVertex(p1), getMesh().getVertex(p), getMesh().getVertex(p2));
-			getMesh().setDoubleData(p, "angle3D", angle);
+			getMeshWithDataStorage().getDataStorage().setDoubleData(p, "angle3D", angle);
 			return angle;
 		}
 		else {

@@ -1,7 +1,7 @@
-package org.vadere.meshing.mesh.gen;
+package org.vadere.meshing.mesh.gen.mesh.pointerBased;
 
 import org.jetbrains.annotations.NotNull;
-import org.vadere.meshing.mesh.inter.IFace;
+import org.vadere.meshing.mesh.inter.mesh.IFace;
 
 import java.util.HashMap;
 import java.util.Map;

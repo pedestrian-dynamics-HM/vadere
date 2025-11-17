@@ -4,12 +4,9 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.vadere.meshing.mesh.gen.PFace;
-import org.vadere.meshing.mesh.gen.PHalfEdge;
-import org.vadere.meshing.mesh.gen.PMesh;
-import org.vadere.meshing.mesh.gen.PVertex;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.*;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
-import org.vadere.meshing.mesh.inter.IMeshSupplier;
+import org.vadere.meshing.mesh.inter.IEmptyMeshSupplier;
 import org.vadere.meshing.mesh.triangulation.edgeLengthFunctions.IEdgeLengthFunction;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.GenEikMesh;
 import org.vadere.meshing.utils.io.tex.TexGraphGenerator;
@@ -69,7 +66,7 @@ public class TestFFMNonUniformTriangulation {
     private GenEikMesh<PVertex, PHalfEdge, PFace> createEikMesh(
     		@NotNull final IEdgeLengthFunction edgeLengthFunc,
 		    final double initialEdgeLen) {
-	    IMeshSupplier<PVertex, PHalfEdge, PFace> meshSupplier = () -> new PMesh();
+	    IEmptyMeshSupplier<PVertex, PHalfEdge, PFace> meshSupplier = PMeshWithDataStorage::constructEmpty;
 	    GenEikMesh<PVertex, PHalfEdge, PFace> eikMesh = new GenEikMesh<>(
 			    distanceFunc,
 			    edgeLengthFunc,
@@ -165,11 +162,11 @@ public class TestFFMNonUniformTriangulation {
         log.info("max distance to boundary: " + triangulation.getMesh().getBoundaryVertices().stream().map(p -> Math.abs(distanceFunc.apply(p))).max(Comparator.comparingDouble(d -> d)));
         //log.info("L2-Error: " + computeL2Error(triangulation, distanceFunc));
         log.info("max error: " + maxError);
-        log.info("max error-2: " + triangulation.getMesh().getVertices().stream().map(p -> Math.abs(Math.abs(triangulation.getMesh().getDoubleData(p, MeshEikonalSolverFMM.namePotential) + distanceFunc.apply(p)))).max(Comparator.comparingDouble(d -> d)));
+        log.info("max error-2: " + triangulation.getMesh().getVertices().stream().map(p -> Math.abs(Math.abs(triangulation.getMeshDataStorage().getDoubleData(p, MeshEikonalSolverFMM.namePotential) + distanceFunc.apply(p)))).max(Comparator.comparingDouble(d -> d)));
 
         log.info("L2-error: " + Math.sqrt(sum / counter));
         log.info("L2-error-2: " + Math.sqrt(triangulation.getMesh().getVertices().stream()
-                .map(p -> Math.abs(Math.abs(triangulation.getMesh().getDoubleData(p, MeshEikonalSolverFMM.namePotential) + distanceFunc.apply(p))))
+                .map(p -> Math.abs(Math.abs(triangulation.getMeshDataStorage().getDoubleData(p, MeshEikonalSolverFMM.namePotential) + distanceFunc.apply(p))))
                 .map(val -> val * val)
                 .reduce(0.0, (d1, d2) -> d1 + d2) / triangulation.getMesh().getNumberOfVertices()));
         //assertTrue(0.0 == solver.getValue(5, 5));
@@ -327,7 +324,7 @@ public class TestFFMNonUniformTriangulation {
     private double computeL2Error(@NotNull final IIncrementalTriangulation<PVertex, PHalfEdge, PFace> triangulation, final IDistanceFunction distanceFunc) {
         double sum = 0.0;
         for(PVertex vertex : triangulation.getMesh().getVertices()) {
-            double diff = triangulation.getMesh().getDoubleData(vertex, MeshEikonalSolverFMM.namePotential) + distanceFunc.apply(vertex);
+            double diff = triangulation.getMeshDataStorage().getDoubleData(vertex, MeshEikonalSolverFMM.namePotential) + distanceFunc.apply(vertex);
             sum += diff * diff;
         }
         return Math.sqrt(sum);

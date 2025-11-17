@@ -4,12 +4,8 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.WeilerAtherton;
 import org.vadere.meshing.mesh.gen.IncrementalTriangulation;
-import org.vadere.meshing.mesh.gen.PFace;
-import org.vadere.meshing.mesh.gen.PHalfEdge;
-import org.vadere.meshing.mesh.gen.PMesh;
-import org.vadere.meshing.mesh.gen.PVertex;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.*;
 import org.vadere.meshing.mesh.triangulation.triangulator.gen.GenConstrainedDelaunayTriangulator;
-import org.vadere.state.scenario.Topography;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.PlanarGraphGenerator;
 import org.vadere.util.geometry.shapes.IPoint;
@@ -61,7 +57,7 @@ public class GeometryCleaner {
 	 */
 	private List<VPolygon> magnet() {
 		List<VPolygon> clone = new ArrayList<>(polygons.size());
-		IncrementalTriangulation<PVertex, PHalfEdge, PFace> dt = new IncrementalTriangulation<>(new PMesh(), boundingBox);
+		IncrementalTriangulation<PVertex, PHalfEdge, PFace> dt = IncrementalTriangulation.fromEmptyMesh(PMeshWithDataStorage.constructEmpty(), boundingBox);
 
 		for(int i = 0; i < polygons.size(); i++) {
 			List<VPoint> points = polygons.get(i).getPoints();
@@ -130,7 +126,7 @@ public class GeometryCleaner {
 	private Pair<VPolygon, List<VPolygon>> mergePolygons(@NotNull final Collection<VLine> lines, @NotNull final List<VPolygon> polygons) {
 
 		// 1. compute the contrained Delaunay triangulation (all non-intersecting lines are constrained)
-		IncrementalTriangulation<PVertex, PHalfEdge, PFace> dt = new IncrementalTriangulation<>(new PMesh(), boundingBox);
+		IncrementalTriangulation<PVertex, PHalfEdge, PFace> dt = IncrementalTriangulation.fromEmptyMesh(PMeshWithDataStorage.constructEmpty(), boundingBox);
 		GenConstrainedDelaunayTriangulator<PVertex, PHalfEdge, PFace> cdt = new GenConstrainedDelaunayTriangulator<>(dt, lines, false);
 		cdt.generate(false);
 		var triangulation = cdt.getTriangulation();

@@ -1,11 +1,8 @@
 package org.vadere.meshing.mesh.triangulation.plots.qualities;
 
 import org.apache.commons.lang3.time.StopWatch;
-import org.vadere.meshing.mesh.gen.AFace;
-import org.vadere.meshing.mesh.gen.AHalfEdge;
-import org.vadere.meshing.mesh.gen.AMesh;
-import org.vadere.meshing.mesh.gen.AVertex;
-import org.vadere.meshing.mesh.inter.IMeshSupplier;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.*;
+import org.vadere.meshing.mesh.inter.IEmptyMeshSupplier;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
 import org.vadere.meshing.mesh.triangulation.improver.distmesh.DistmeshPanel;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.GenEikMesh;
@@ -45,7 +42,7 @@ public class RunTimeCPU extends JFrame {
 
 
     private static void overallUniformRing() {
-	    IMeshSupplier<AVertex, AHalfEdge, AFace> supplier = () -> new AMesh();
+	    IEmptyMeshSupplier<AVertex, AHalfEdge, AFace> supplier = AMeshWithDataStorage::constructEmpty;
 	    IDistanceFunction distanceFunc = p -> Math.abs(0.7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 0.3;
 	    List<VShape> obstacles = new ArrayList<>();
 
@@ -83,7 +80,7 @@ public class RunTimeCPU extends JFrame {
 	}
 
 	private static void stepAdaptiveRingEikMesh(double startLen, double endLen, double stepLen) {
-		IMeshSupplier<AVertex, AHalfEdge, AFace> supplier = () -> new AMesh();
+		IEmptyMeshSupplier<AVertex, AHalfEdge, AFace> supplier = AMeshWithDataStorage::constructEmpty;
 		IDistanceFunction distanceFunc = p -> Math.abs(0.7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 0.3;
 		List<VShape> obstacles = new ArrayList<>();
 
@@ -170,7 +167,7 @@ public class RunTimeCPU extends JFrame {
 	}
 
 	private static void stepAdaptiveRingDistMesh(double startLen, double endLen, double stepLen) {
-		IMeshSupplier<AVertex, AHalfEdge, AFace> supplier = () -> new AMesh();
+		IEmptyMeshSupplier<AVertex, AHalfEdge, AFace> supplier = AMeshWithDataStorage::constructEmpty;
 		IDistanceFunction distanceFunc = p -> Math.abs(0.7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 0.3;
 		//IEdgeLengthFunction adaptiveEdgeLength =  p -> 1.0 + Math.max(-distanceFunc.apply(p), 0) * 0.4;
 		List<VShape> obstacles = new ArrayList<>();

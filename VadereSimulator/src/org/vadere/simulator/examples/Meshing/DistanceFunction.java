@@ -1,7 +1,8 @@
 package org.vadere.simulator.examples.Meshing;
 
 import org.vadere.meshing.examples.ElementSizeFunction;
-import org.vadere.meshing.mesh.gen.PMesh;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.PMesh;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.PMeshWithDataStorage;
 import org.vadere.meshing.mesh.impl.PSLG;
 import org.vadere.meshing.mesh.triangulation.DistanceFunctionApproxBF;
 import org.vadere.meshing.utils.io.poly.PSLGGenerator;
@@ -26,7 +27,7 @@ public class DistanceFunction {
 		System.out.println("minY = " + pslg.getAllPoints().stream().mapToDouble(p -> p.getY()).min().getAsDouble());
 		System.out.println("maxX = " + pslg.getAllPoints().stream().mapToDouble(p -> p.getX()).max().getAsDouble());
 		System.out.println("maxY = " + pslg.getAllPoints().stream().mapToDouble(p -> p.getY()).max().getAsDouble());
-		DistanceFunctionApproxBF distanceFunctionApproxBF = new DistanceFunctionApproxBF(pslg, IDistanceFunction.create(pslg.getSegmentBound(), pslg.getHoles()), () -> new PMesh());
+		DistanceFunctionApproxBF distanceFunctionApproxBF = new DistanceFunctionApproxBF(pslg, IDistanceFunction.create(pslg.getSegmentBound(), pslg.getHoles()), PMeshWithDataStorage::constructEmpty);
 		distanceFunctionApproxBF.printPython();
 	}
 

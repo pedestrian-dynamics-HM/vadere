@@ -1,13 +1,12 @@
 package org.vadere.meshing.mesh.triangulation.improver.eikmesh.opencl;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.vadere.meshing.mesh.gen.AFace;
-import org.vadere.meshing.mesh.gen.AHalfEdge;
-import org.vadere.meshing.mesh.gen.AMesh;
-import org.vadere.meshing.mesh.gen.AVertex;
-import org.vadere.meshing.mesh.gen.PFace;
-import org.vadere.meshing.mesh.inter.IMeshSupplier;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.*;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.PFace;
+import org.vadere.meshing.mesh.inter.IEmptyMeshSupplier;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
+import org.vadere.meshing.mesh.inter.mesh.IMeshWithDataStorage;
+import org.vadere.meshing.mesh.inter.mesh.data.IMeshDataStorage;
 import org.vadere.meshing.mesh.triangulation.improver.distmesh.Parameters;
 import org.vadere.meshing.mesh.triangulation.triangulator.inter.ITriangulator;
 import org.vadere.meshing.mesh.triangulation.triangulator.gen.GenUniformRefinementTriangulatorSFC;
@@ -33,7 +32,7 @@ public class CLEikMeshHE implements IMeshImprover<AVertex, AHalfEdge, AFace>, IT
     private boolean illegalMovement = false;
     private IDistanceFunction distanceFunc;
     private IEdgeLengthFunction edgeLengthFunc;
-    private final IMeshSupplier<AVertex, AHalfEdge, AFace> meshSupplier;
+    private final IEmptyMeshSupplier<AVertex, AHalfEdge, AFace> meshSupplier;
     private IIncrementalTriangulation<AVertex, AHalfEdge, AFace> triangulation;
     private Collection<? extends VShape> obstacleShapes;
     private ArrayList<Pair<EikMeshPoint, EikMeshPoint>> edges;
@@ -68,7 +67,7 @@ public class CLEikMeshHE implements IMeshImprover<AVertex, AHalfEdge, AFace>, IT
             final double initialEdgeLen,
             final VRectangle bound,
             final Collection<? extends VShape> obstacleShapes,
-            final IMeshSupplier<AVertex, AHalfEdge, AFace> meshSupplier) {
+            final IEmptyMeshSupplier<AVertex, AHalfEdge, AFace> meshSupplier) {
 
         this.bound = bound;
         this.distanceFunc = distanceFunc;
@@ -102,7 +101,7 @@ public class CLEikMeshHE implements IMeshImprover<AVertex, AHalfEdge, AFace>, IT
         triangulation = uniformRefinementTriangulation.generate();
 
         // TODO: dirty cast.
-        clDistMesh = new CLDistMeshHE((AMesh)triangulation.getMesh());
+        clDistMesh = new CLDistMeshHE((AMeshWithDataStorage) triangulation.getMeshWithDataStorage());
         clDistMesh.init();
         clDistMesh.refresh();
         initialized = true;
@@ -191,7 +190,26 @@ public class CLEikMeshHE implements IMeshImprover<AVertex, AHalfEdge, AFace>, IT
             clDistMesh.refresh();
         }
         // TODO: dirty casting
-        return (AMesh) triangulation.getMesh();
+        return (AMesh) triangulation.getMeshWithDataStorage();
+    }
+
+    @Override
+    public IMeshDataStorage<AVertex, AHalfEdge, AFace> getDataStorage() {
+        return triangulation.getMeshDataStorage();
+    }
+
+    @Override
+    public IMeshWithDataStorage<AVertex, AHalfEdge, AFace> getMeshWithDataStorage() {
+        return triangulation.getMeshWithDataStorage();
+    }
+
+    @Override
+    public synchronized IMeshDataStorage<AVertex, AHalfEdge, AFace> getMeshDataStorage() {
+        if(hasToRead) {
+            hasToRead = false;
+            clDistMesh.refresh();
+        }
+        return triangulation.getMeshDataStorage();
     }
 
     public double faceToQuality(final AFace face) {

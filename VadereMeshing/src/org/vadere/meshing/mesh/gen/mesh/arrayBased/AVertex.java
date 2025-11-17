@@ -1,7 +1,8 @@
-package org.vadere.meshing.mesh.gen;
+package org.vadere.meshing.mesh.gen.mesh.arrayBased;
 
 import org.jetbrains.annotations.NotNull;
-import org.vadere.meshing.mesh.inter.IVertex;
+import org.vadere.meshing.mesh.gen.DelaunayHierarchy;
+import org.vadere.meshing.mesh.inter.mesh.IVertex;
 import org.vadere.util.geometry.shapes.IPoint;
 
 import java.util.concurrent.locks.Lock;

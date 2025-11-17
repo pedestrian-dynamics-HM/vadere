@@ -2,14 +2,12 @@ package org.vadere.meshing.utils;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.gen.MeshRenderer;
-import org.vadere.meshing.mesh.gen.PFace;
-import org.vadere.meshing.mesh.gen.PHalfEdge;
-import org.vadere.meshing.mesh.gen.PMesh;
-import org.vadere.meshing.mesh.gen.PVertex;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.*;
 import org.vadere.meshing.mesh.impl.PMeshPanel;
 import org.vadere.meshing.mesh.impl.PSLG;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
-import org.vadere.meshing.mesh.inter.IMesh;
+import org.vadere.meshing.mesh.inter.mesh.IMesh;
+import org.vadere.meshing.mesh.inter.mesh.IMeshWithDataStorage;
 import org.vadere.meshing.mesh.triangulation.DistanceFunctionApproxBF;
 import org.vadere.meshing.mesh.triangulation.edgeLengthFunctions.EdgeLengthFunctionApprox;
 import org.vadere.meshing.mesh.triangulation.edgeLengthFunctions.IEdgeLengthFunction;
@@ -30,7 +28,7 @@ import java.util.function.Function;
 public class MeshConstructor {
 	private static Logger logger = Logger.getLogger(MeshConstructor.class);
 
-	public IMesh<PVertex, PHalfEdge, PFace> pslgToCoarsePMesh(@NotNull final PSLG pslg, final Function<IPoint, Double> circumRadiusFunc, final boolean viszalize) {
+	public IMeshWithDataStorage<PVertex, PHalfEdge, PFace> pslgToCoarsePMesh(@NotNull final PSLG pslg, final Function<IPoint, Double> circumRadiusFunc, final boolean viszalize) {
 		VRectangle bound = GeometryUtils.boundRelativeSquared(pslg.getSegmentBound().getPoints(), 0.3);
 		PSLG boundedPSLG = pslg.conclose(bound);
 
@@ -53,10 +51,10 @@ public class MeshConstructor {
 			triangulation = ruppertsTriangulator.generate();
 		}
 
-		return triangulation.getMesh();
+		return triangulation.getMeshWithDataStorage();
 	}
 
-	public IMesh<PVertex, PHalfEdge, PFace> pslgToAdaptivePMesh(
+	public IMeshWithDataStorage<PVertex, PHalfEdge, PFace> pslgToAdaptivePMesh(
 			@NotNull final PSLG pslg, final double hmin, final double hmax, final boolean viszalize) {
 
 		double smoothness = 0.4;
@@ -64,7 +62,7 @@ public class MeshConstructor {
 		VPolygon segmentBound = pslg.getSegmentBound();
 		IDistanceFunction distanceFunction = IDistanceFunction.create(segmentBound, holes);
 		logger.info("construct distance function");
-		IDistanceFunction distanceFunctionApproximation = new DistanceFunctionApproxBF(pslg, distanceFunction, () -> new PMesh());
+		IDistanceFunction distanceFunctionApproximation = new DistanceFunctionApproxBF(pslg, distanceFunction, PMeshWithDataStorage::constructEmpty);
 
 		IEdgeLengthFunction edgeLengthFunction = p -> hmin + smoothness * Math.abs((distanceFunctionApproximation).apply(p));
 		EdgeLengthFunctionApprox edgeLengthFunctionApprox = new EdgeLengthFunctionApprox(pslg, edgeLengthFunction, p -> hmax);
@@ -111,7 +109,7 @@ public class MeshConstructor {
 		} else {
 			meshImprover.generate();
 		}
-		return meshImprover.getMesh();
+		return meshImprover.getMeshWithDataStorage();
 	}
 
 	public IMesh<PVertex, PHalfEdge, PFace> pslgToUniformPMesh(@NotNull final PSLG pslg, final double h0, final boolean viszalize) {
@@ -119,7 +117,7 @@ public class MeshConstructor {
 		VPolygon segmentBound = pslg.getSegmentBound();
 		IDistanceFunction distanceFunction = IDistanceFunction.create(segmentBound, holes);
 		logger.info("construct distance function");
-		IDistanceFunction distanceFunctionApproximation = new DistanceFunctionApproxBF(pslg, distanceFunction, () -> new PMesh());
+		IDistanceFunction distanceFunctionApproximation = new DistanceFunctionApproxBF(pslg, distanceFunction, PMeshWithDataStorage::constructEmpty);
 
 
 		Collection<VPolygon> polygons = pslg.getAllPolygons();
@@ -167,7 +165,7 @@ public class MeshConstructor {
 		VPolygon segmentBound = pslg.getSegmentBound();
 		IDistanceFunction distanceFunction = IDistanceFunction.create(segmentBound, holes);
 		logger.info("construct distance function");
-		IDistanceFunction distanceFunctionApproximation = new DistanceFunctionApproxBF(pslg, distanceFunction, () -> new PMesh());
+		IDistanceFunction distanceFunctionApproximation = new DistanceFunctionApproxBF(pslg, distanceFunction, PMeshWithDataStorage::constructEmpty);
 		((DistanceFunctionApproxBF) distanceFunctionApproximation).printPython();
 
 		//IEdgeLengthFunction circumRadiusFunc = p -> h0 / 2.0;

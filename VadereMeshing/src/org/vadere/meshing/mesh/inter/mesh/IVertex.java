@@ -1,4 +1,4 @@
-package org.vadere.meshing.mesh.inter;
+package org.vadere.meshing.mesh.inter.mesh;
 
 import org.vadere.util.geometry.shapes.IPoint;
 

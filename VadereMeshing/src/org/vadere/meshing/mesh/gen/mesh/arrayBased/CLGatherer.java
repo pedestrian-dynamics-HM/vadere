@@ -1,8 +1,8 @@
-package org.vadere.meshing.mesh.gen;
+package org.vadere.meshing.mesh.gen.mesh.arrayBased;
 
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.system.MemoryUtil;
-import org.vadere.util.geometry.shapes.IPoint;
+import org.vadere.meshing.mesh.inter.mesh.IMesh;
 
 import java.nio.Buffer;
 import java.nio.DoubleBuffer;
@@ -108,7 +108,7 @@ public class CLGatherer {
 	 * @param mesh          the mesh receiving the indices
 	 * @param edgeBuffer    the heap memory from which the indices will be read
 	 */
-	public static void scatterHalfEdges(@NotNull final AMesh mesh, @NotNull final IntBuffer edgeBuffer) {
+	public static void scatterHalfEdges(@NotNull final IMesh<AVertex, AHalfEdge, AFace> mesh, @NotNull final IntBuffer edgeBuffer) {
         List<AHalfEdge> edges = mesh.getEdges();
 
         int index = 0;
@@ -131,7 +131,7 @@ public class CLGatherer {
 
 	/**
 	 * <p>Gathers / writes the indices of all half-edges ({@link AHalfEdge}) of a {@link AMesh} to the heap memory {@link IntBuffer}
-	 * in order of the mesh-ordering. This is the reverse operation of {@link CLGatherer#scatterHalfEdges(AMesh, IntBuffer)}</p>
+	 * in order of the mesh-ordering. This is the reverse operation of {@link CLGatherer#scatterHalfEdges(IMesh, IntBuffer)}</p>
 	 *
 	 * @param mesh  the mesh from which the indices will be received
 	 * @return the heap memory {@link IntBuffer} containing all indices of all half-edges
@@ -164,7 +164,7 @@ public class CLGatherer {
 	 * @param mesh          the mesh receiving the indices
 	 * @param faceBuffer    the heap memory from which the indices will be read
 	 */
-    public static void scatterFaces(@NotNull final AMesh mesh, @NotNull final IntBuffer faceBuffer) {
+    public static void scatterFaces(@NotNull final IMesh<AVertex, AHalfEdge, AFace> mesh, @NotNull final IntBuffer faceBuffer) {
         Collection<AFace> faces = mesh.getFaces();
 
         int index = 0;
@@ -177,7 +177,7 @@ public class CLGatherer {
 
 	/**
 	 * <p>Gathers / writes the indices of all faces ({@link AFace}) of a {@link AMesh} to the heap memory {@link IntBuffer}
-	 * in order of the mesh-ordering. This is the reverse operation of {@link CLGatherer#scatterFaces(AMesh, IntBuffer)},
+	 * in order of the mesh-ordering. This is the reverse operation of {@link CLGatherer#scatterFaces(IMesh, IntBuffer)},
 	 * except the border information is set to -1, i.e. ignored</p>
 	 *
 	 * @param mesh  the mesh from which the indices will be received
@@ -207,7 +207,7 @@ public class CLGatherer {
 	 * @param mesh          the mesh receiving the indices
 	 * @param edgeOfVertex  the heap memory from which the indices will be read
 	 */
-    public static void scatterEdgeOfVertex(@NotNull final AMesh mesh, @NotNull final  IntBuffer edgeOfVertex) {
+    public static void scatterEdgeOfVertex(@NotNull final IMesh<AVertex, AHalfEdge, AFace> mesh, @NotNull final  IntBuffer edgeOfVertex) {
         Collection<AVertex> vertices = mesh.getVertices();
 
         int index = 0;
@@ -220,7 +220,7 @@ public class CLGatherer {
 
 	/**
 	 * <p>Gathers / writes all edge-indices of all vertices ({@link AVertex}) of a {@link AMesh} to the heap memory {@link IntBuffer}
-	 * in order of the mesh-ordering. This is the reverse operation of {@link CLGatherer#scatterEdgeOfVertex(AMesh, IntBuffer)}</p>
+	 * in order of the mesh-ordering. This is the reverse operation of {@link CLGatherer#scatterEdgeOfVertex(IMesh, IntBuffer)}</p>
 	 *
 	 * @param mesh  the mesh from which the indices will be received
 	 * @return      the heap memory {@link IntBuffer} containing all edge-indices of all vertices

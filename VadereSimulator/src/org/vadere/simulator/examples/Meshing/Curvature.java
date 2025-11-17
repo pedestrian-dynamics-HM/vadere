@@ -2,11 +2,9 @@ package org.vadere.simulator.examples.Meshing;
 
 import org.vadere.meshing.WeilerAtherton;
 import org.vadere.meshing.mesh.gen.IncrementalTriangulation;
-import org.vadere.meshing.mesh.gen.PFace;
-import org.vadere.meshing.mesh.gen.PHalfEdge;
-import org.vadere.meshing.mesh.gen.PMesh;
-import org.vadere.meshing.mesh.gen.PVertex;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.*;
 import org.vadere.meshing.mesh.impl.PMeshPanel;
+import org.vadere.meshing.mesh.inter.mesh.MeshPythonUtils;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.GenEikMesh;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.impl.PEikMesh;
 import org.vadere.meshing.mesh.triangulation.triangulator.gen.GenRegularRefinement;
@@ -30,7 +28,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -116,7 +113,7 @@ public class Curvature {
 					p -> Math.abs(distanceFunction.apply(p)));
 			solver.solve();
 			System.out.println(solver.getPotential(5,5));
-			meshWriter.write(tri.getMesh().toPythonTriangulation(v -> solver.getPotential(v)));
+			meshWriter.write(MeshPythonUtils.toPythonTriangulation(tri.getMeshWithDataStorage(), v -> solver.getPotential(v)));
 			meshWriter.write("\n");
 
 
@@ -125,7 +122,7 @@ public class Curvature {
 				double[] result = GeometryUtilsMesh.curvature(tri.getMesh(), v, vertex -> solver.getPotential(vertex));
 				//System.out.println("Curvature: " + result[0]);
 				//System.out.println("Gaussian curvature: " + result[1]);
-				tri.getMesh().setDoubleData(v, "curvature", result[0]);
+				tri.getMeshDataStorage().setDoubleData(v, "curvature", result[0]);
 				//if(!Double.isNaN(result[0])) {
 					maxCurvature = Math.max(maxCurvature, result[0]);
 				//}
@@ -149,7 +146,7 @@ public class Curvature {
 				return len > minEdgeLen && curvature > 0.25;
 			};
 
-			var triangulation = new IncrementalTriangulation<>(tri.getMesh().clone(), e -> true);
+			var triangulation = IncrementalTriangulation.fromMesh(tri.getMeshWithDataStorage().clone());
 			GenRegularRefinement<PVertex, PHalfEdge, PFace> refinement = new GenRegularRefinement<>(triangulation, edgePredicate, i+1);
 			refinement.setMaxLevel(i+1);
 			refinement.refine();
@@ -248,7 +245,8 @@ public class Curvature {
 				improver.getTriangulation().getMesh().getBoundaryVertices(),
 				p -> 0.0);
 		solver.solve();
-		meshWriter.write(solver.getTriangulation().getMesh().toPythonTriangulation(v -> solver.getPotential(v)));
+
+		meshWriter.write(MeshPythonUtils.toPythonTriangulation(solver.getTriangulation().getMeshWithDataStorage(), v -> solver.getPotential(v)));
 		meshWriter.close();
 		System.out.println("finished");
 	}
@@ -274,7 +272,7 @@ public class Curvature {
 				0.1,
 				GeometryUtils.boundRelative(bound.getPoints()),
 				Arrays.asList(bound),
-				() -> new PMesh());
+				PMeshWithDataStorage::constructEmpty);
 
 		improver.initialize();
 		for(int i = 0; i < 100; i++) {
@@ -309,7 +307,7 @@ public class Curvature {
 				//improver.getTriangulation().getMesh().getBoundaryVertices(),
 				p -> 0.0);
 		solver.solve();
-		meshWriter.write(solver.getTriangulation().getMesh().toPythonTriangulation(v -> solver.getPotential(v)));
+		meshWriter.write(MeshPythonUtils.toPythonTriangulation(solver.getTriangulation().getMeshWithDataStorage(), v -> solver.getPotential(v)));
 		meshWriter.close();
 		System.out.println("finished");
 	}

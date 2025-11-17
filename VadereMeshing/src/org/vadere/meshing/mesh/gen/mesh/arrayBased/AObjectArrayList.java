@@ -1,4 +1,4 @@
-package org.vadere.meshing.mesh.gen;
+package org.vadere.meshing.mesh.gen.mesh.arrayBased;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 

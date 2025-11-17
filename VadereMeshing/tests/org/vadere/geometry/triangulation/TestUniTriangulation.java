@@ -1,14 +1,12 @@
 package org.vadere.geometry.triangulation;
 
 import org.apache.commons.lang3.time.StopWatch;
-import org.vadere.meshing.mesh.gen.AFace;
-import org.vadere.meshing.mesh.gen.AHalfEdge;
-import org.vadere.meshing.mesh.gen.AMesh;
-import org.vadere.meshing.mesh.gen.AVertex;
-import org.vadere.meshing.mesh.inter.IMeshSupplier;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.*;
+import org.vadere.meshing.mesh.inter.IEmptyMeshSupplier;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.gen.MeshPanel;
+import org.vadere.meshing.mesh.inter.mesh.IMesh;
 import org.vadere.meshing.mesh.triangulation.triangulator.gen.GenUniformRefinementTriangulatorSFC;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.math.IDistanceFunction;
@@ -43,7 +41,7 @@ public class TestUniTriangulation extends JFrame {
 	    IPointConstructor<VPoint> pointConstructor = (x, y) -> new VPoint(x, y);
 
 	    // a mesh supplier for a default mesh
-	    IMeshSupplier<AVertex, AHalfEdge, AFace> supplier = () -> new AMesh();
+	    IEmptyMeshSupplier<AVertex, AHalfEdge, AFace> supplier = AMeshWithDataStorage::constructEmpty;
 
 	    // the mesh refinement triangulator
         GenUniformRefinementTriangulatorSFC<AVertex, AHalfEdge, AFace> uniformRefinementTriangulation =
@@ -58,7 +56,10 @@ public class TestUniTriangulation extends JFrame {
 	    IIncrementalTriangulation<AVertex, AHalfEdge, AFace> triangulation = uniformRefinementTriangulation.init();
 	    Function<AFace, Color> colorFunction = f -> new Color(Color.HSBtoRGB((float)(f.getId() / (1.0f * triangulation.getMesh().getNumberOfFaces())), 1f, 0.75f));
         MeshPanel<AVertex, AHalfEdge, AFace> meshPanel =
-                new MeshPanel<>(triangulation.getMesh(), f -> triangulation.getMesh().isHole(f), 1000, 800, colorFunction);
+                new MeshPanel<>(triangulation.getMesh(), f -> {
+                    IMesh<AVertex, AHalfEdge, AFace> mesh = triangulation.getMesh();
+                    return mesh.isHole(f);
+                }, 1000, 800, colorFunction);
         JFrame frame = meshPanel.display();
         frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
         frame.setVisible(true);

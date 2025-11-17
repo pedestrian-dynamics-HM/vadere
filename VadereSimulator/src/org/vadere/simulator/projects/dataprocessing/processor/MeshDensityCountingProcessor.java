@@ -1,11 +1,12 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
 import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
-import org.vadere.meshing.mesh.gen.PFace;
-import org.vadere.meshing.mesh.gen.PHalfEdge;
-import org.vadere.meshing.mesh.gen.PVertex;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.PFace;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.PHalfEdge;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.PVertex;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
-import org.vadere.meshing.mesh.inter.IMesh;
+import org.vadere.meshing.mesh.inter.mesh.IMesh;
+import org.vadere.meshing.mesh.inter.mesh.data.IMeshDataStorage;
 import org.vadere.simulator.control.simulation.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.TimestepFaceIdKey;
@@ -36,6 +37,10 @@ public class MeshDensityCountingProcessor extends DataProcessor<TimestepFaceIdKe
 		return meshProcessor.getTriangulation().getMesh();
 	}
 
+	protected IMeshDataStorage <PVertex, PHalfEdge, PFace> getMeshDataStorage(){
+		return meshProcessor.getTriangulation().getMeshDataStorage();
+	}
+
 	protected MeasurementArea getMeasurementArea() {
 		return meshProcessor.getMeasurementArea();
 	}
@@ -47,8 +52,8 @@ public class MeshDensityCountingProcessor extends DataProcessor<TimestepFaceIdKe
 	protected void doUpdateOnPed(Pedestrian ped){
 		if(getMeasurementArea().asPolygon().contains(ped.getPosition())) {
 			PFace f = getTriangulation().locate(ped.getPosition(), ped).get();
-			int n = getMesh().getIntegerData(f, propertyNameNumberOfPedestrians) + 1;
-			getMesh().setIntegerData(f, propertyNameNumberOfPedestrians, n);
+			int n = getMeshDataStorage().getIntegerData(f, propertyNameNumberOfPedestrians) + 1;
+			getMeshDataStorage().setIntegerData(f, propertyNameNumberOfPedestrians, n);
 			assert !getMesh().isBoundary(f);
 		}
 	}
@@ -56,7 +61,7 @@ public class MeshDensityCountingProcessor extends DataProcessor<TimestepFaceIdKe
 	protected void reset_count(){
 		// reset count
 		for(PFace f : getMesh().getFaces()) {
-			getMesh().setIntegerData(f, propertyNameNumberOfPedestrians, 0);
+			getMeshDataStorage().setIntegerData(f, propertyNameNumberOfPedestrians, 0);
 		}
 	}
 
@@ -64,7 +69,7 @@ public class MeshDensityCountingProcessor extends DataProcessor<TimestepFaceIdKe
 		// write count
 		int faceId = 1;
 		for(PFace f : getMesh().getFaces()) {
-			int n = getMesh().getIntegerData(f, propertyNameNumberOfPedestrians);
+			int n = getMeshDataStorage().getIntegerData(f, propertyNameNumberOfPedestrians);
 			this.putValue(new TimestepFaceIdKey(state.getStep(), faceId), n);
 			faceId++;
 		}

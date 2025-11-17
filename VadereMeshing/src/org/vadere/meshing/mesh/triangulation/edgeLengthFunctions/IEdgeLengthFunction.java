@@ -1,16 +1,14 @@
 package org.vadere.meshing.mesh.triangulation.edgeLengthFunctions;
 
 import org.jetbrains.annotations.NotNull;
-import org.vadere.meshing.mesh.gen.PFace;
-import org.vadere.meshing.mesh.gen.PHalfEdge;
-import org.vadere.meshing.mesh.gen.PVertex;
 import org.vadere.meshing.mesh.impl.DataPoint;
 import org.vadere.meshing.mesh.impl.PSLG;
-import org.vadere.meshing.mesh.inter.IFace;
-import org.vadere.meshing.mesh.inter.IHalfEdge;
+import org.vadere.meshing.mesh.inter.mesh.IFace;
+import org.vadere.meshing.mesh.inter.mesh.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
-import org.vadere.meshing.mesh.inter.IVertex;
+import org.vadere.meshing.mesh.inter.mesh.IVertex;
+import org.vadere.meshing.mesh.inter.mesh.data.IMeshDataStorage;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.GenEikMesh;
 import org.vadere.meshing.mesh.triangulation.triangulator.impl.PRuppertsTriangulator;
 import org.vadere.meshing.mesh.triangulation.triangulator.inter.ITriangulator;
@@ -73,43 +71,26 @@ public interface IEdgeLengthFunction extends Function<IPoint,Double> {
 		assert g > 0;
 		// smooth the function based such that it is g-Lipschitz
 		var mesh = triangulation.getMesh();
+		IMeshDataStorage<V, E, F> dataStorage = triangulation.getMeshDataStorage();
 		PriorityQueue<V> heap = new PriorityQueue<>(
-				Comparator.comparingDouble(v1 -> mesh.getDoubleData(v1, propName))
+				Comparator.comparingDouble(v1 -> dataStorage.getDoubleData(v1, propName))
 		);
 		heap.addAll(mesh.getVertices());
 
 		while (!heap.isEmpty()) {
 			var v = heap.poll();
-			double hv = mesh.getDoubleData(v, propName);
+			double hv = dataStorage.getDoubleData(v, propName);
 			for (var u : mesh.getAdjacentVertexIt(v)) {
-				double hu = mesh.getDoubleData(u, propName);
+				double hu = dataStorage.getDoubleData(u, propName);
 				double min = Math.min(hu, hv + g * v.distance(u));
 
 				// update heap
 				if (min < hu) {
 					heap.remove(u);
-					mesh.setDoubleData(u, propName, min);
+					dataStorage.setDoubleData(u, propName, min);
 					heap.add(u);
 				}
 			}
 		}
 	}
-
-	/*static IEdgeLengthFunction smooth(double g) {
-
-		PriorityQueue<PVertex<DataPoint<Double>,Object, Object>> heap = new PriorityQueue<>();
-		while (heap.isEmpty()) {
-			var u = heap.poll();
-			var dataPoint = mesh.getPoint(u);
-
-			for(var v : mesh.getAdjacentVertexIt(u)) {
-				double hv = Math.min(mesh.getPoint(v).getData(), dataPoint.getData() + g * dataPoint.distance(v.getX(), v.getY()));
-				if(hv < mesh.getPoint(v).getData()) {
-					heap.remove(v);
-					mesh.getPoint(v).setData(hv);
-					heap.add(v);
-				}
-			}
-		}
-	}*/
 }

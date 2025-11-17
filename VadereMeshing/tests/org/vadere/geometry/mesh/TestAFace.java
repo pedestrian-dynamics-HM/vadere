@@ -2,11 +2,9 @@ package org.vadere.geometry.mesh;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.vadere.meshing.mesh.gen.AFace;
-import org.vadere.meshing.mesh.gen.AHalfEdge;
-import org.vadere.meshing.mesh.gen.AMesh;
-import org.vadere.meshing.mesh.gen.AVertex;
-import org.vadere.meshing.mesh.inter.IMesh;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.*;
+import org.vadere.meshing.mesh.inter.mesh.IMesh;
+import org.vadere.meshing.mesh.inter.mesh.IMeshWithDataStorage;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,7 +37,8 @@ public class TestAFace {
 
     @BeforeEach
     public void setUp() throws Exception {
-        mesh = new AMesh();
+        IMeshWithDataStorage<AVertex, AHalfEdge, AFace> meshWithDataStorage = AMeshWithDataStorage.constructEmpty();
+        mesh = meshWithDataStorage.getMesh();
         border = mesh.createFace(true);
 
         // first triangle xyz

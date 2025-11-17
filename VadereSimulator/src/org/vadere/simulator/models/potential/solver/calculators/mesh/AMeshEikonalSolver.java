@@ -9,14 +9,12 @@ import org.jetbrains.annotations.Nullable;
 import org.vadere.meshing.mesh.inter.IEdgeContainerBoolean;
 import org.vadere.meshing.mesh.inter.IEdgeContainerDouble;
 import org.vadere.meshing.mesh.inter.IEdgeContainerObject;
-import org.vadere.meshing.mesh.inter.IFace;
-import org.vadere.meshing.mesh.inter.IHalfEdge;
+import org.vadere.meshing.mesh.inter.mesh.*;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
-import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.ITriEventListener;
-import org.vadere.meshing.mesh.inter.IVertex;
 import org.vadere.meshing.mesh.inter.IVertexContainerBoolean;
 import org.vadere.meshing.mesh.inter.IVertexContainerDouble;
+import org.vadere.meshing.mesh.inter.mesh.data.IMeshDataStorage;
 import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
 import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunctionMesh;
 import org.vadere.util.geometry.GeometryUtils;
@@ -105,15 +103,16 @@ public abstract class AMeshEikonalSolver<V extends IVertex, E extends IHalfEdge,
 		this.triangulation.addTriEventListener(this);
 
 		// get access to containers
-		this.burned = getMesh().getBooleanVertexContainer(identifier + "_" + nameBurned);
-		this.burning = getMesh().getBooleanVertexContainer(identifier + "_" + nameBurning);
-		this.potential = getMesh().getDoubleVertexContainer(identifier + "_" + namePotential);
-		this.cosPhi = getMesh().getDoubleEdgeContainer(identifier + "_" + nameCosPhi);
-		this.initialVertex = getMesh().getBooleanVertexContainer(identifier + "_" + nameInitialVertex);
-		this.nonAccute = getMesh().getBooleanEdgeContainer(identifier + "_" + nameNonAccuteEdge);
-		this.virtualSupport = getMesh().getObjectEdgeContainer(identifier + "_" + nameVirtualSupport, List.class);
-		this.virtualSupportCosPhi = getMesh().getObjectEdgeContainer(identifier + "_" + nameVirtualSupportCosPhi, DoubleArrayList.class);
-		this.timeCosts = getMesh().getDoubleVertexContainer(identifier + "_" + nameTimeCost);
+		IMeshDataStorage<V, E, F> dataStorage = getMeshDataStorage();
+		this.burned = dataStorage.getBooleanVertexContainer(identifier + "_" + nameBurned);
+		this.burning = dataStorage.getBooleanVertexContainer(identifier + "_" + nameBurning);
+		this.potential = dataStorage.getDoubleVertexContainer(identifier + "_" + namePotential);
+		this.cosPhi = dataStorage.getDoubleEdgeContainer(identifier + "_" + nameCosPhi);
+		this.initialVertex = dataStorage.getBooleanVertexContainer(identifier + "_" + nameInitialVertex);
+		this.nonAccute = dataStorage.getBooleanEdgeContainer(identifier + "_" + nameNonAccuteEdge);
+		this.virtualSupport = dataStorage.getObjectEdgeContainer(identifier + "_" + nameVirtualSupport, List.class);
+		this.virtualSupportCosPhi = dataStorage.getObjectEdgeContainer(identifier + "_" + nameVirtualSupportCosPhi, DoubleArrayList.class);
+		this.timeCosts = dataStorage.getDoubleVertexContainer(identifier + "_" + nameTimeCost);
 	}
 
 	/**
@@ -193,6 +192,10 @@ public abstract class AMeshEikonalSolver<V extends IVertex, E extends IHalfEdge,
 	@Override
 	public IMesh<V, E, F> getMesh() {
 		return triangulation.getMesh();
+	}
+
+	public IMeshDataStorage<V, E, F> getMeshDataStorage() {
+		return triangulation.getMeshDataStorage();
 	}
 
 	@Override
@@ -442,7 +445,8 @@ public abstract class AMeshEikonalSolver<V extends IVertex, E extends IHalfEdge,
 	@Override
 	public Function<IPoint, Double> getPotentialField() {
 		IIncrementalTriangulation<V, E, F> clone = triangulation.clone();
-		IVertexContainerDouble<V, E, F> containerDouble = clone.getMesh().getDoubleVertexContainer(identifier + "_" + namePotential);
+		IMeshWithDataStorage<V, E, F> meshWithDataStorage = clone.getMeshWithDataStorage();
+		IVertexContainerDouble<V, E, F> containerDouble = meshWithDataStorage.getDataStorage().getDoubleVertexContainer(identifier + "_" + namePotential);
 		return p -> getInterpolatedPotential(clone, containerDouble, p.getX(), p.getY(), null);
 	}
 

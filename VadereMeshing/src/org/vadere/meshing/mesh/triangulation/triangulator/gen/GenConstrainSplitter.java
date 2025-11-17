@@ -3,15 +3,11 @@ package org.vadere.meshing.mesh.triangulation.triangulator.gen;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.vadere.meshing.SpaceFillingCurve;
 import org.vadere.meshing.mesh.gen.IncrementalTriangulation;
 import org.vadere.meshing.mesh.impl.PSLG;
-import org.vadere.meshing.mesh.inter.IFace;
-import org.vadere.meshing.mesh.inter.IHalfEdge;
+import org.vadere.meshing.mesh.inter.mesh.*;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
-import org.vadere.meshing.mesh.inter.IMesh;
-import org.vadere.meshing.mesh.inter.ITriEventListener;
-import org.vadere.meshing.mesh.inter.IVertex;
+import org.vadere.meshing.mesh.inter.mesh.data.IMeshDataStorage;
 import org.vadere.meshing.mesh.triangulation.triangulator.inter.ITriangulator;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.IPoint;
@@ -27,7 +23,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -46,10 +41,10 @@ public class GenConstrainSplitter<V extends IVertex, E extends IHalfEdge, F exte
 
 
 	public GenConstrainSplitter(
-			@NotNull final Supplier<IMesh<V, E, F>> meshSupply,
+			@NotNull final Supplier<IMeshWithDataStorage<V, E, F>> meshSupply,
 			@NotNull final PSLG pslg,
 			final double tol) {
-		this(new IncrementalTriangulation<>(meshSupply.get(), pslg.getBoundingBox()), pslg, tol);
+		this(IncrementalTriangulation.fromEmptyMesh(meshSupply.get(), pslg.getBoundingBox()), pslg, tol);
 	}
 
 	public GenConstrainSplitter(
@@ -212,5 +207,15 @@ public class GenConstrainSplitter<V extends IVertex, E extends IHalfEdge, F exte
 	@Override
 	public IMesh<V, E, F> getMesh() {
 		return triangulation.getMesh();
+	}
+
+	@Override
+	public IMeshDataStorage<V, E, F> getMeshDataStorage() {
+		return triangulation.getMeshDataStorage();
+	}
+
+	@Override
+	public IMeshWithDataStorage<V, E, F> getMeshWithDataStorage() {
+		return triangulation.getMeshWithDataStorage();
 	}
 }

@@ -1,11 +1,11 @@
 package org.vadere.meshing.examples;
 
 import org.jetbrains.annotations.NotNull;
-import org.vadere.meshing.mesh.gen.AFace;
-import org.vadere.meshing.mesh.gen.AHalfEdge;
-import org.vadere.meshing.mesh.gen.PFace;
-import org.vadere.meshing.mesh.gen.PHalfEdge;
-import org.vadere.meshing.mesh.gen.PMesh;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.AFace;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.AHalfEdge;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.PFace;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.PHalfEdge;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.PMesh;
 import org.vadere.meshing.mesh.impl.PMeshPanel;
 import org.vadere.meshing.mesh.impl.PSLG;
 import org.vadere.meshing.mesh.inter.IMeshDistanceFunction;
@@ -184,10 +184,10 @@ public class MeshExamples {
 		String propertyName = "area";
 		LinkedList<AHalfEdge> visitedEdges = delaunayTriangulator.generate().straightGatherWalk2D(5, 5, delaunayTriangulator.getMesh().getFace());
 		for(AFace f : delaunayTriangulator.getMesh().getFaces()) {
-			delaunayTriangulator.getMesh().setData(f, propertyName, delaunayTriangulator.getMesh().toTriangle(f).getArea());
+			delaunayTriangulator.getMeshDataStorage().setData(f, propertyName, delaunayTriangulator.getMesh().toTriangle(f).getArea());
 		}
 
-		double areaSum = delaunayTriangulator.getMesh().streamFaces().mapToDouble(f -> delaunayTriangulator.getMesh().getData(f, propertyName, Double.class).get()).sum();
+		double areaSum = delaunayTriangulator.getMesh().streamFaces().mapToDouble(f -> delaunayTriangulator.getMeshDataStorage().getData(f, propertyName, Double.class).get()).sum();
 		double averageArea = areaSum / delaunayTriangulator.getMesh().getNumberOfFaces();
 		System.out.println("Triangulated area = " + areaSum);
 		System.out.println("Average triangle area = " + averageArea);
