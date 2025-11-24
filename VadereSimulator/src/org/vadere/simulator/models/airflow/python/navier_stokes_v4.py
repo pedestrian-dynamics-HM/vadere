@@ -15,22 +15,21 @@ from matplotlib import pyplot as plt
 from matplotlib.tri import LinearTriInterpolator, Triangulation
 from skfem.helpers import dot, grad, sym_grad, inner
 from build_mesh import build_mesh
-from plot_results import plot_results
 from skfem_helpers import *
 from vadere_helpers import extract_attributes
+from plot_results import plot_results
 import numpy as np
 import argparse
 import json
 
 # Navier Stokes parameters
-nu = 1.5e-3  # kinematic viscosity of air at 20°C [m²/s]
-num_iterations = 50
-tolerance = 1e-8
-relaxation = 0.3  # Slightly higher for lower viscosity
+nu = 1.5e-5  # kinematic viscosity of air at 20°C [m²/s]
+num_iterations = 100
+tolerance = 1e-5
+relaxation = 0.2  # Slightly higher for lower viscosity
 use_supg = True  # Enable SUPG stabilization
-supg_parameter = 0.5  # SUPG parameter (0.5-1.0 typical)
+supg_parameter = 1.0  # SUPG parameter (0.5-1.0 typical)
 use_pspg = False
-dt = 0.1
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -50,7 +49,7 @@ if __name__ == '__main__':
         attributes_model = data['scenario']['attributesModel']['org.vadere.state.attributes.models.airflow.AttributesAirFlowModel']
         grid_size, area_threshold, x_min, x_max, y_min, y_max, inlet_velocity, inlets, outlets, obstacles, parameter_string = extract_attributes(topography, attributes_model, parameter_string)
 
-        area_threshold = 0.02
+        area_threshold = 0.3
 
         mesh, inlet_dict, outlet_dict, boundary_dict = build_mesh(inlets, outlets, obstacles, area_threshold, x_min, x_max, y_min, y_max)
 
@@ -75,34 +74,6 @@ if __name__ == '__main__':
             #return dot(dot(w['w'], grad(u)), v)
             #return 0.5*(dot(dot(w['w'], grad(u)), v) - dot(dot(w['w'], grad(v)), u))
             return (dot(dot(w['w'], grad(u)), v) - dot(dot(w['w'], grad(v)), u)) / 2.0
-
-        @BilinearForm
-        def mass_matrix(u, v, w):
-            return dot(u, v) / dt
-
-
-        @BilinearForm
-        def stokes_turbulent(u, v, w):
-            # Calculate Strain Rate Tensor magnitude |S|
-            # S = 0.5 * (grad(u) + grad(u).T)
-            # simplified for 2D: approx proportional to grad(u) magnitude
-
-            # Get gradient of previous solution
-            du = grad(w['w'])
-            shear_rate = (inner(du, du) + 1e-12)**0.5
-
-            # Smagorinsky-style Turbulent Viscosity
-            # Cs is a constant (usually 0.1 to 0.2)
-            # h is element size
-            Cs = 0.15
-            h = w.h
-            nu_turbulent = (Cs * h)**2 * shear_rate
-
-            # Total effective viscosity
-            nu_eff = nu + nu_turbulent
-
-            # Standard Stokes term with variable viscosity
-            return nu_eff * inner(sym_grad(u), sym_grad(v))
 
         @BilinearForm
         def supg_stabilization(u, v, w):
@@ -158,8 +129,6 @@ if __name__ == '__main__':
         B = -asm(divergence, basis['u'], basis['p'])
         K_stokes = bmat([[A_stokes, B.T], [B, None]], 'csr')
 
-        current_time = 0.0
-
         inlet_basis = define_inlet_basis(basis, mesh, inlets, inlet_velocity)
         outlet_basis = basis['p'].zeros()
 
@@ -168,83 +137,88 @@ if __name__ == '__main__':
             outlet_basis,
         ))
         uvp_stokes = solve(*condense(K_stokes, x=uvp, D=D))
-        uvp_stokes = np.zeros(len(uvp_stokes), dtype=float)
         u0, p0 = np.split(uvp_stokes, K_stokes.blocks)
         uvp_fixed_bc = uvp
 
-        u_prev = u0
+        print(f"Starting Picard iteration with nu={nu:.2e} m²/s")
+        print(f"SUPG stabilization: {'ENABLED' if use_supg else 'DISABLED'}")
 
-        # --- CONFIGURATION FOR CHAOS ---
-        dt = 0.02             # Needs to be smaller for Crank-Nicolson stability
-        theta = 0.5           # 0.5 = Crank-Nicolson (Energy Conserving), 1.0 = Backward Euler (Dissipative)
-        nu = 0.001            # Low viscosity (Re ~ 5,000)
-        max_inlet_vel = inlet_velocity
+        # Target viscosity
+        target_nu = 1.5e-5
 
-        # Define Mass Matrix once
-        M = asm(mass_matrix, basis['u'])
+        # Start with "Honey" (Very thick air)
+        nu = 1.0e-2
 
-        print("Starting Crank-Nicolson Solver with Inlet Jitter...")
+        # Decrease factor per step
+        decay = 0.95
+
+        u_sum = np.zeros_like(u0)
+        start_averaging_at = 50  # Let the flow develop first
+        count_avg = 0
 
         for iteration in range(num_iterations):
-            current_t = iteration * dt
+            # 1. Update viscosity
+            #nu = max(target_nu, nu * decay)
 
-            # --- 1. CREATE INLET JITTER ---
-            # We modulate the inlet velocity slightly over time.
-            # This prevents the flow from ever becoming perfectly symmetric.
-            jitter = 0.15 * np.sin(10 * current_t) + 0.1 * np.random.normal()
-            current_inlet_mag = max_inlet_vel * (1.0 + jitter)
-
-            # Re-define Dirichlet BCs for this specific time step
-            # (You need to update your inlet_basis or D vector here depending on your helper functions)
-            # This acts as a continuous "kick" to the system.
-            # For simplicity, we assume you can scale your existing boundary vector:
-            uvp_current_bc = uvp_fixed_bc.copy()
-            # Note: You need to know which indices correspond to the inlet to scale them.
-            # If that's too hard, skip the jitter for now and focus on Crank-Nicolson below.
-
-            # --- 2. PREPARE SYSTEM ---
+            # Interpolate velocity field for current iteration
             w_field = basis['u'].interpolate(u0.squeeze())
 
-            # Assemble current physics matrices
+            # Assemble convection term
             A_conv = asm(convection, basis['u'], w=w_field)
 
-            # Use minimal SUPG or none. For Crank-Nicolson, try turning it OFF first.
-            A_stokes_curr = asm(stokes_visc, basis['u']) # uses the global 'nu'
+            # Add SUPG stabilization if enabled
+            if use_supg:
+                A_supg = asm(supg_stabilization, basis['u'], w=w_field)
+                A = A_stokes + A_conv + A_supg
+            else:
+                A = A_stokes + A_conv
 
-            A_step = A_stokes_curr + A_conv
+            # Assemble saddle point system
+            #K = bmat([[A, B.T], [B, None]], 'csr')
 
-            # --- 3. CRANK-NICOLSON ASSEMBLY ---
-            # Equation: [M/dt + theta*A] * u_new = [M/dt - (1-theta)*A] * u_old
+            if use_pspg:
+                # PSPG modifies the pressure block (lower-right block of saddle point system)
+                C_pspg = asm(pspg_stabilization, basis['p'], w=w_field)
+                # Assemble saddle point system with PSPG
+                K = bmat([[A, B.T], [B, -C_pspg]], 'csr')  # Note the negative sign
+            else:
+                K = bmat([[A, B.T], [B, None]], 'csr')
 
-            # LHS Matrix
-            LHS_A = (1/dt) * M + theta * A_step
-
-            # RHS Vector (The History Term)
-            # This is the crucial part: We take the previous flow state and apply the physics
-            # "halfway" backwards.
-            RHS_vector_u = ((1/dt) * M - (1-theta) * A_step) @ u0
-
-            # Pad for pressure (0s)
-            RHS_total = np.concatenate([RHS_vector_u, np.zeros(basis['p'].N)])
-
-            # --- 4. SOLVE SADDLE POINT SYSTEM ---
-            # [ LHS_A   B.T ] [ u ] = [ RHS ]
-            # [ B       0   ] [ p ]   [  0  ]
-
-            K = bmat([[LHS_A, B.T], [B, None]], 'csr')
-
-            # Solve
-            uvp = solve(*condense(K, b=RHS_total, x=uvp_fixed_bc, D=D))
+            # Solve linear system
+            uvp = solve(*condense(K, x=uvp_fixed_bc, D=D))
             u_new = uvp[:basis['u'].N]
+            p_new = uvp[basis['u'].N:]
 
-            # --- 5. MONITOR ---
-            diff = np.linalg.norm(u_new - u0)/np.linalg.norm(u_new)
-            print(f"Step {iteration}: Time {current_t:.3f}, Change: {diff:.4e}")
+            # Apply relaxation for stability
+            u_relaxed = relaxation * u_new + (1.0 - relaxation) * u0
 
-            u0 = u_new
+            # Compute convergence metric
+            diff_u = np.linalg.norm(u_relaxed.ravel() - u0.ravel()) / (np.linalg.norm(u_relaxed.ravel()) + 1e-12)
 
-        #else:
-        #    print(f"\n⚠ Maximum iterations ({num_iterations}) reached. Final residual: {diff_u:.2e}")
+            # Update solution
+            u0 = u_relaxed
+            p0 = p_new
+
+            # Print progress every 10 iterations
+            #if (iteration + 1) % 10 == 0:
+            print(f"Iteration {iteration+1:3d}: ||Δu||/||u|| = {diff_u:.2e}")
+
+            if iteration >= start_averaging_at:
+                u_sum += u0
+                count_avg += 1
+
+            # Check convergence
+            if diff_u < tolerance:
+                print(f"\n✓ Converged after {iteration+1} iterations (||Δu||/||u|| = {diff_u:.2e})")
+                break
+        else:
+            print(f"\n⚠ Maximum iterations ({num_iterations}) reached. Final residual: {diff_u:.2e}")
+
+        if count_avg > 0:
+            print(f"Averaging solution over last {count_avg} steps...")
+            u_final = u_sum / count_avg
+        else:
+            u_final = u0
 
         # Post-process solution
         uv = u0.ravel()

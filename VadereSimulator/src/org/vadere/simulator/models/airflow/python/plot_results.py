@@ -67,7 +67,7 @@ def plot_results(mesh, X, Y, Vx, Vy, vel_mag, obstacles):
     # --- Plot 3: Vectors (Right) ---
     cf2 = ax_quiver.contourf(X, Y, vel_mag, levels=levels, cmap='viridis')
     # Scale: Adjust 'scale' (higher is shorter arrows) and 'width' as needed
-    ax_quiver.quiver(X, Y, Vx, Vy, color='white', scale=30, width=0.003, alpha=0.8)
+    ax_quiver.quiver(X, Y, Vx, Vy, color='white', scale=10, width=0.003, alpha=0.8)
     draw_obstacles(ax_quiver)
     ax_quiver.set_title("Velocity Vectors")
 
