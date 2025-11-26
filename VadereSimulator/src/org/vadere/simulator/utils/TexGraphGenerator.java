@@ -76,11 +76,11 @@ public class TexGraphGenerator extends org.vadere.meshing.utils.io.tex.TexGraphG
 			builder.append("\\filldraw[color=black,fill=cPedestrian](" + pedestrian.getPosition().getX() + "," + pedestrian.getPosition().getY() + ") circle (" + pedestrian.getRadius() + ")");
 		}
 
-		for(F face : mesh.getFaces()) {
+		for(F face : mesh.faces()) {
 			Color c = coloring.apply(face);
 			String tikzColor = "{rgb,255:red,"+c.getRed()+";green,"+c.getGreen()+";blue,"+c.getBlue()+"}";
-			V first = mesh.streamVertices(face).findFirst().get();
-			String poly = mesh.streamVertices(face).map(v -> "("+v.getX()+","+v.getY()+")").reduce((s1, s2) -> s1 + "--" + s2).get() + "-- ("+first.getX()+","+first.getY()+")";
+			V first = mesh.vertices().streamVerticesOf(face).findFirst().get();
+			String poly = mesh.vertices().streamVerticesOf(face).map(v -> "("+v.getX()+","+v.getY()+")").reduce((s1, s2) -> s1 + "--" + s2).get() + "-- ("+first.getX()+","+first.getY()+")";
 
 			//builder.append("\\fill[fill="+tikzColor+"]" + poly + ";\n");
 			builder.append("\\filldraw[color=black,fill="+tikzColor+"]" + poly + ";\n");

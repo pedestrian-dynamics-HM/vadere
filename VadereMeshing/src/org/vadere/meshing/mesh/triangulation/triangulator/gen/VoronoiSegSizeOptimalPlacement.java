@@ -35,7 +35,7 @@ public class VoronoiSegSizeOptimalPlacement<P extends IPoint, CE, CF, V extends 
 
 	@Override
 	public VPoint computePlacement(@NotNull final E edge, @Nullable final VTriangle triangle) {
-		VLine line = getMesh().toLine(edge);
+		VLine line = getMesh().edges().toLine(edge);
 		VPoint midpoint = line.midPoint();
 		VPoint c = triangle.getCircumcenter();
 		double d = 0.5 * line.length() / Math.tan(0.5 * qmin);
@@ -43,8 +43,8 @@ public class VoronoiSegSizeOptimalPlacement<P extends IPoint, CE, CF, V extends 
 		VPoint e;
 		VPoint x;
 		VPoint cc;
-		if(!getMesh().isAtBoundary(edge)) {
-			cc = getMesh().toTriangle(getMesh().getTwinFace(edge)).getCircumcenter();
+		if(!getMesh().edges().isAtBoundary(edge)) {
+			cc = getMesh().faces().toTriangle(getMesh().faces().getTwin(edge)).getCircumcenter();
 		} else {
 			double incircleRadius = Math.sqrt(3) / 6.0 * line.length();
 			VPoint dir = line.asVPoint().rotate(Math.PI * 0.5).setMagnitude(incircleRadius);

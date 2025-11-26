@@ -47,8 +47,8 @@ public interface IEdgeLengthFunction extends Function<IPoint,Double> {
 		var mesh = triangulation.getMesh();
 
 		IEdgeLengthFunction edgeLengthFunction = p -> {
-			var face = triangulation.locate(p.getX(), p.getY()).get();
-			if(mesh.isBoundary(face)) {
+			var face = mesh.readConnectivity().locate(p.getX(), p.getY()).get();
+			if(mesh.faces().isBoundary(face)) {
 				return Double.POSITIVE_INFINITY;
 			}
 			else {
@@ -57,7 +57,7 @@ public interface IEdgeLengthFunction extends Function<IPoint,Double> {
 				double y[] = new double[3];
 				double z[] = new double[3];
 
-				triangulation.getTriPoints(face, x, y, z, propName);
+				mesh.readConnectivity().getTriPoints(face, x, y, z, propName, triangulation.getMeshDataStorage());
 
 				double totalArea = GeometryUtils.areaOfPolygon(x, y);
 
@@ -75,12 +75,12 @@ public interface IEdgeLengthFunction extends Function<IPoint,Double> {
 		PriorityQueue<V> heap = new PriorityQueue<>(
 				Comparator.comparingDouble(v1 -> dataStorage.getDoubleData(v1, propName))
 		);
-		heap.addAll(mesh.getVertices());
+		heap.addAll(mesh.vertices().getAll());
 
 		while (!heap.isEmpty()) {
 			var v = heap.poll();
 			double hv = dataStorage.getDoubleData(v, propName);
-			for (var u : mesh.getAdjacentVertexIt(v)) {
+			for (var u : mesh.vertices().adjacentIterableFor(v)) {
 				double hu = dataStorage.getDoubleData(u, propName);
 				double min = Math.min(hu, hv + g * v.distance(u));
 

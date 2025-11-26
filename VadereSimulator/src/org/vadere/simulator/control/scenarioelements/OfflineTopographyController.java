@@ -46,7 +46,7 @@ public class OfflineTopographyController extends ScenarioElementController  {
 
 		if(domain.getBackgroundMesh() != null) {
 			IDistanceFunction exactDistance = IDistanceFunction.create(new VRectangle(getTopography().getBounds()), getTopography().getObstacleShapes());
-			IDistanceFunctionCached distanceFunction = new DistanceFunctionApproxBF(domain.getBackgroundMesh(), exactDistance);
+			IDistanceFunctionCached distanceFunction = new DistanceFunctionApproxBF(domain.getBackgroundMesh().modify(), exactDistance);
 
 			//TODO use the cached caller
 			//IDistanceFunction distanceFunction = p -> eikonalSolver.getPotential(p, null);

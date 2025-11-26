@@ -3,7 +3,10 @@ package org.vadere.meshing.mesh.triangulation.plots;
 import org.apache.commons.lang3.time.StopWatch;
 import org.vadere.meshing.mesh.gen.mesh.arrayBased.*;
 import org.vadere.meshing.mesh.gen.MeshPanel;
-import org.vadere.meshing.mesh.inter.IEmptyMeshSupplier;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AFace;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AHalfEdge;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AVertex;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.triangles.ATriangleMeshBuilder;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
 import org.vadere.meshing.mesh.triangulation.edgeLengthFunctions.IEdgeLengthFunction;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
@@ -29,11 +32,10 @@ public class VisualTestGPUVertexBased {
 
 	private static void overallUniformRing() throws OpenCLException {
 
-		IEmptyMeshSupplier<AVertex, AHalfEdge, AFace> supplier = AMeshWithDataStorage::constructEmpty;
 		IDistanceFunction distanceFunc = p -> Math.abs(7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 3;
 		List<VShape> obstacles = new ArrayList<>();
 
-		CLEikMeshHE meshGenerator = new CLEikMeshHE(distanceFunc, uniformEdgeLength, initialEdgeLength, bbox, new ArrayList<>(), supplier);
+		CLEikMeshHE meshGenerator = new CLEikMeshHE(distanceFunc, uniformEdgeLength, initialEdgeLength, bbox, new ArrayList<>(), ATriangleMeshBuilder::new);
 		meshGenerator.initialize();
 
 		MeshPanel<AVertex, AHalfEdge, AFace> distmeshPanel = new MeshPanel(meshGenerator.getMesh(), f -> false, 1000, 800);
@@ -64,9 +66,9 @@ public class VisualTestGPUVertexBased {
 		overAllTime.stop();
 		meshGenerator.finish();
 
-		System.out.println("#vertices: " + meshGenerator.getMesh().getVertices().size());
-		System.out.println("#edges: " + meshGenerator.getMesh().getEdges().size());
-		System.out.println("#faces: " + meshGenerator.getMesh().getFaces().size());
+		System.out.println("#vertices: " + meshGenerator.getMesh().vertices().count());
+		System.out.println("#edges: " + meshGenerator.getMesh().edges().count());
+		System.out.println("#faces: " + meshGenerator.getMesh().faces().count());
 		System.out.println("quality: " + meshGenerator.getQuality());
 		System.out.println("overall time: " + overAllTime.getTime() + "[ms]");
 	}

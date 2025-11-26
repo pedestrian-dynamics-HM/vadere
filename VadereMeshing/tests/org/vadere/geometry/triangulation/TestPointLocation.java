@@ -4,8 +4,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.vadere.meshing.examples.MeshExamples;
 import org.vadere.meshing.mesh.gen.IncrementalTriangulation;
-import org.vadere.meshing.mesh.gen.mesh.pointerBased.*;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PFace;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PHalfEdge;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PVertex;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.triangles.PTriangleMeshBuilder;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
+import org.vadere.meshing.mesh.inter.mesh.ITriangleMeshWithDataStorage;
 import org.vadere.meshing.utils.io.poly.MeshPolyReader;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.logging.Logger;
@@ -28,9 +32,9 @@ public class TestPointLocation {
 	@BeforeEach
 	public void setUp() throws Exception {
 		final InputStream inputStream = MeshExamples.class.getResourceAsStream("/poly/kaiserslautern_tri.poly");
-		MeshPolyReader<PVertex, PHalfEdge, PFace> meshPolyReader = new MeshPolyReader<>(PMeshWithDataStorage::constructEmpty);
-		var mesh = meshPolyReader.readMesh(inputStream);
-		triangulation = IncrementalTriangulation.fromMesh(mesh);
+		MeshPolyReader<PVertex, PHalfEdge, PFace> meshPolyReader = new MeshPolyReader<>(PTriangleMeshBuilder::new);
+		var mesh = (ITriangleMeshWithDataStorage<PVertex, PHalfEdge, PFace>) meshPolyReader.readMesh(inputStream);
+		triangulation = IncrementalTriangulation.fromMeshBuilder(mesh.modify());
 		random = new Random(0);
 	}
 
@@ -39,10 +43,10 @@ public class TestPointLocation {
 		double x =279.2008581655762;
 		double y = 480.5370815358783;
 
-		Optional<PFace> face = triangulation.locate(x, y);
+		Optional<PFace> face = triangulation.getMesh().readConnectivity().locate(x, y);
 		assertTrue(face.isPresent() &&
-						(triangulation.getMesh().isBorder(face.get()) && !triangulation.getMesh().toPolygon(face.get()).contains(x,y) ||
-								!triangulation.getMesh().isBorder(face.get()) && triangulation.getMesh().toPolygon(face.get()).contains(x,y)),
+						(triangulation.getMesh().faces().isOuterBorder(face.get()) && !triangulation.getMesh().faces().toPolygon(face.get()).contains(x,y) ||
+								!triangulation.getMesh().faces().isOuterBorder(face.get()) && triangulation.getMesh().faces().toPolygon(face.get()).contains(x,y)),
 				"point location failed for (" + x + "," + y + ")" + face.get());
 
 	}
@@ -54,35 +58,12 @@ public class TestPointLocation {
 			double y = triangulation.getMesh().getBound().getMinY() + random.nextDouble() * triangulation.getMesh().getBound().getHeight();
 
 			//System.out.println("point location for (" + x + "," + y +")" );
-			Optional<PFace> face = triangulation.locate(x, y);
+			Optional<PFace> face = triangulation.getMesh().readConnectivity().locate(x, y);
 			assertTrue(face.isPresent() &&
-							(triangulation.getMesh().isBorder(face.get()) && !triangulation.getMesh().toPolygon(face.get()).contains(x,y) ||
-									!triangulation.getMesh().isBorder(face.get()) && triangulation.getMesh().toPolygon(face.get()).contains(x,y)),
+							(triangulation.getMesh().faces().isOuterBorder(face.get()) && !triangulation.getMesh().faces().toPolygon(face.get()).contains(x,y) ||
+									!triangulation.getMesh().faces().isOuterBorder(face.get()) && triangulation.getMesh().faces().toPolygon(face.get()).contains(x,y)),
 					i + " point location failed for (" + x + "," + y + ")" + face.get());
 		}
-
-		/*double x = 93.34105388798974;
-		double y = 113.51983761577478;
-
-		double x1 = 201.51868233333335;
-		double y1 = 149.22382266666665;
-
-		//[200.684407,149.712169],[201.526798,148.332516],[202.344842,149.626783]
-
-		PFace startFace = triangulation.locate(x1, y1).get();
-
-		assertTrue( "point location failed for (" + x + "," + y + ")",
-						(triangulation.getMesh().isBorder(startFace) && !triangulation.getMesh().toPolygon(startFace).contains(x,y) ||
-								!triangulation.getMesh().isBorder(startFace) && triangulation.getMesh().toPolygon(startFace).contains(x,y)));
-
-		System.out.println(startFace);
-
-		Optional<PFace> face = triangulation.locate(x, y, startFace);
-		assertTrue( "point location failed for (" + x + "," + y + ")" + face.get(),
-				face.isPresent() &&
-						(triangulation.getMesh().isBorder(face.get()) && !triangulation.getMesh().toPolygon(face.get()).contains(x,y) ||
-								!triangulation.getMesh().isBorder(face.get()) && triangulation.getMesh().toPolygon(face.get()).contains(x,y)));*/
-
 	}
 
 	@Test
@@ -98,8 +79,8 @@ public class TestPointLocation {
 			//System.out.println(triangulation.getMesh().toPolygon(face.get()).contains(x,y));
 
 			assertTrue(face.isPresent() &&
-							(triangulation.getMesh().isBorder(face.get()) && !triangulation.getMesh().toPolygon(face.get()).contains(x,y) ||
-									!triangulation.getMesh().isBorder(face.get()) && triangulation.getMesh().toPolygon(face.get()).contains(x,y)),
+							(triangulation.getMesh().faces().isOuterBorder(face.get()) && !triangulation.getMesh().faces().toPolygon(face.get()).contains(x,y) ||
+									!triangulation.getMesh().faces().isOuterBorder(face.get()) && triangulation.getMesh().faces().toPolygon(face.get()).contains(x,y)),
 					i + " point location failed for (" + x + "," + y + ")" + face.get());
 		}
 

@@ -61,7 +61,7 @@ public class ColorFunctions
 	 * @return the quality in (0;1) of the triangle
 	 */
 	public static <P extends IPoint, CE, CF, V extends IVertex, E extends IHalfEdge, F extends IFace> double faceToQuality(final IMesh<V, E, F> mesh, final F face) {
-		VLine[] lines = mesh.toTriangle(face).getLines();
+		VLine[] lines = mesh.faces().toTriangle(face).getLines();
 		double a = lines[0].length();
 		double b = lines[1].length();
 		double c = lines[2].length();
@@ -89,7 +89,7 @@ public class ColorFunctions
 	 * @return gray scale color object
 	 */
 	public static <P extends IPoint, CE, CF, V extends IVertex, E extends IHalfEdge, F extends IFace> Color qualityToGrayScale(final IMesh<V, E, F> mesh, final F face) {
-		if(!mesh.isBoundary(face)) {
+		if(!mesh.faces().isBoundary(face)) {
 			float quality = (float) faceToQuality(mesh, face);
 			if(quality <= 1 && quality >= 0) {
 				return new Color(quality, quality, quality);

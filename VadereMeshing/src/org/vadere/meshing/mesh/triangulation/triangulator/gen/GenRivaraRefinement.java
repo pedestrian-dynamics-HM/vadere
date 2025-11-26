@@ -3,6 +3,7 @@ package org.vadere.meshing.mesh.triangulation.triangulator.gen;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.inter.mesh.*;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
+import org.vadere.meshing.mesh.inter.mesh.builder.ITriangleMeshBuilder;
 import org.vadere.meshing.mesh.inter.mesh.data.IMeshDataStorage;
 import org.vadere.meshing.mesh.triangulation.triangulator.inter.IRefiner;
 
@@ -25,7 +26,8 @@ import java.util.function.Predicate;
  *
  * @author Benedikt Zoennchen
  */
-public class GenRivaraRefinement<V extends IVertex, E extends IHalfEdge, F extends IFace> implements IRefiner<V, E, F> {
+public class GenRivaraRefinement<V extends IVertex, E extends IHalfEdge, F extends IFace>
+		implements IRefiner<V, E, F> {
 
 	private final IIncrementalTriangulation<V, E, F> triangulation;
 	private final Predicate<E> edgeRefinePredicates;
@@ -69,11 +71,11 @@ public class GenRivaraRefinement<V extends IVertex, E extends IHalfEdge, F exten
 	public void refine() {
 		refined = false;
 		if(!finished) {
-			for(E edge : getMesh().getEdges()) {
-				if(!getMesh().isBoundary(edge)) {
+			for(E edge : getMesh().edges().getAll()) {
+				if(!getMesh().edges().isBoundary(edge)) {
 					if(edgeRefinePredicates.test(edge)) {
 						refined = true;
-						refine(getMesh().getFace(edge));
+						refine(getMesh().faces().getOf(edge));
 					}
 				}
 			}
@@ -92,26 +94,20 @@ public class GenRivaraRefinement<V extends IVertex, E extends IHalfEdge, F exten
 		return finished;
 	}
 
-	@Override
-	public IMesh<V, E, F> getMesh() {
-		return triangulation.getMesh();
-	}
+	public ITriangleMeshBuilder<V, E, F> getMeshBuilder() {	return triangulation.getMeshBuilder(); }
 
 	@Override
 	public IMeshDataStorage<V, E, F> getMeshDataStorage() {
 		return triangulation.getMeshDataStorage();
 	}
 
-	@Override
-	public IMeshWithDataStorage<V, E, F> getMeshWithDataStorage() { return triangulation.getMeshWithDataStorage(); }
-
 	private void refine(@NotNull final F face) {
-		assert !getMesh().isBoundary(face);
-		refine(triangulation.getLongestHalfEdge(face));
+		assert !getMesh().faces().isBoundary(face);
+		refine(triangulation.getMesh().readConnectivity().getLongestHalfEdge(face));
 	}
 
 	private void refine(@NotNull final E edge) {
-		assert triangulation.isLongestHalfEdge(edge);
+		assert triangulation.getMesh().readConnectivity().isLongestHalfEdge(edge);
 		LinkedList<E> longestEdges = new LinkedList<>();
 		longestEdges.addFirst(edge);
 
@@ -119,18 +115,18 @@ public class GenRivaraRefinement<V extends IVertex, E extends IHalfEdge, F exten
 		while (!longestEdges.isEmpty()) {
 			//System.out.println(count++);
 			E longestHe = longestEdges.peekFirst();
-			if(getMesh().isBoundary(longestHe)) {
+			if(getMesh().edges().isBoundary(longestHe)) {
 				longestEdges.removeFirst();
-				triangulation.splitEdge(longestHe, false);
+				triangulation.getMeshBuilder().changeConnectivity().splitEdge(longestHe, false);
 			} else {
-				E twin = getMesh().getTwin(longestHe);
-				if(triangulation.isLongestHalfEdge(twin)) {
+				E twin = getMesh().edges().getTwin(longestHe);
+				if(triangulation.getMesh().readConnectivity().isLongestHalfEdge(twin)) {
 					longestEdges.removeFirst();
-					triangulation.splitEdge(longestHe, false);
+					triangulation.getMeshBuilder().changeConnectivity().splitEdge(longestHe, false);
 				}
 				else {
-					F twinFace = getMesh().getTwinFace(longestHe);
-					E e = triangulation.getLongestHalfEdge(twinFace);
+					F twinFace = getMesh().faces().getTwin(longestHe);
+					E e = triangulation.getMesh().readConnectivity().getLongestHalfEdge(twinFace);
 					longestEdges.addFirst(e);
 				}
 			}

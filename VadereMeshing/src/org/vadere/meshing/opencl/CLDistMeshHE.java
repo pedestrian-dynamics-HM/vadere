@@ -2,6 +2,8 @@ package org.vadere.meshing.opencl;
 
 
 import org.vadere.meshing.mesh.gen.mesh.arrayBased.*;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.*;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.triangles.ATriangleMeshBuilder;
 import org.vadere.meshing.mesh.inter.mesh.IMesh;
 import org.vadere.meshing.mesh.inter.mesh.IMeshWithDataStorage;
 import org.vadere.meshing.mesh.inter.mesh.MeshUtils;
@@ -121,7 +123,7 @@ public class CLDistMeshHE extends CLOperation {
     private PointerBuffer retSize;
     private ByteBuffer source;
 
-    private AMeshWithDataStorage meshWithDataStorage;
+    private AMeshBuilder meshBuilder;
 
     private boolean doublePrecision = true;
     private boolean hasToRead = false;
@@ -131,8 +133,8 @@ public class CLDistMeshHE extends CLOperation {
         AMeshBuilder meshBuilder = new AMeshBuilder(toCopy);
         meshBuilder.getOptimizer().garbageCollection();
 
-        this.meshWithDataStorage = meshBuilder.build();
-        AMesh mesh = (AMesh) meshWithDataStorage.getMesh();
+        this.meshBuilder = meshBuilder;
+        AMesh mesh = this.meshBuilder.getMesh();
         if(doublePrecision) {
             this.vD = CLGatherer.getVerticesD(mesh);
         }
@@ -144,9 +146,9 @@ public class CLDistMeshHE extends CLOperation {
         this.vToE = CLGatherer.getEdgeOfVertex(mesh);
         this.borderV = CLGatherer.getBorderVertices(mesh);
 
-        this.numberOfVertices = meshWithDataStorage.getMesh().getNumberOfVertices();
-        this.numberOfEdges = meshWithDataStorage.getMesh().getNumberOfEdges();
-        this.numberOfFaces = meshWithDataStorage.getMesh().getNumberOfFaces();
+        this.numberOfVertices = this.meshBuilder.getMesh().vertices().count();
+        this.numberOfEdges = this.meshBuilder.getMesh().edges().count();
+        this.numberOfFaces = this.meshBuilder.getMesh().faces().count();
         this.edgeLabels = MemoryUtil.memAllocInt(numberOfEdges);
 
         for(int i = 0; i < numberOfEdges; i++) {
@@ -491,20 +493,20 @@ public class CLDistMeshHE extends CLOperation {
         List<IPoint> pointSet = new ArrayList<>(numberOfVertices);
         if(doublePrecision) {
             for(int i = 0; i < numberOfVertices*2; i+=2) {
-                pointSet.add(meshWithDataStorage.getMesh().createPoint(vD.get(i), vD.get(i+1)));
+                pointSet.add(meshBuilder.getMesh().createPoint(vD.get(i), vD.get(i+1)));
             }
         }
         else {
             for(int i = 0; i < numberOfVertices*2; i+=2) {
-                pointSet.add(meshWithDataStorage.getMesh().createPoint(vF.get(i), vF.get(i+1)));
+                pointSet.add(meshBuilder.getMesh().createPoint(vF.get(i), vF.get(i+1)));
             }
         }
 
         // scatter data
-        ((AMesh)meshWithDataStorage.getMesh()).setPositions(pointSet);
-        CLGatherer.scatterFaces(meshWithDataStorage.getMesh(), t);
-        CLGatherer.scatterHalfEdges(meshWithDataStorage.getMesh(), e);
-        CLGatherer.scatterEdgeOfVertex(meshWithDataStorage.getMesh(), vToE);
+        meshBuilder.vertices().setAllVertexPositions(pointSet);
+        CLGatherer.scatterFaces(meshBuilder.getMesh(), t);
+        CLGatherer.scatterHalfEdges(meshBuilder.getMesh(), e);
+        CLGatherer.scatterEdgeOfVertex(meshBuilder.getMesh(), vToE);
     }
 
     private int ceilPowerOf2(int value) {
@@ -617,13 +619,13 @@ public class CLDistMeshHE extends CLOperation {
      * Assumption: There is only one Platform with a GPU.
      */
     public static void main(String... args) throws OpenCLException {
-        // todo hh: rework when making mesh immutable
-        IMeshWithDataStorage<AVertex, AHalfEdge, AFace> meshWithDataStorage = AMeshWithDataStorage.constructEmpty();
+        ATriangleMeshBuilder triangleMeshBuilder = new ATriangleMeshBuilder();
+        IMeshWithDataStorage<AVertex, AHalfEdge, AFace> meshWithDataStorage = triangleMeshBuilder.getMeshWithDataStorage();
         IMesh<AVertex, AHalfEdge, AFace> mesh = meshWithDataStorage.getMesh();
-        MeshUtils.createSimpleTriMesh(mesh);
+        MeshUtils.createSimpleTriMesh(triangleMeshBuilder);
 
         log.info("before");
-        Collection<AVertex> vertices = mesh.getVertices();
+        Collection<AVertex> vertices = mesh.vertices().getAll();
         log.info(vertices);
 
         CLDistMeshHE clDistMesh = new CLDistMeshHE((AMeshWithDataStorage) meshWithDataStorage);

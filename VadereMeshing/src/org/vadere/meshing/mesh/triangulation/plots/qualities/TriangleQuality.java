@@ -2,7 +2,10 @@ package org.vadere.meshing.mesh.triangulation.plots.qualities;
 
 import org.apache.commons.lang3.time.StopWatch;
 import org.vadere.meshing.mesh.gen.mesh.arrayBased.*;
-import org.vadere.meshing.mesh.inter.IEmptyMeshSupplier;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AFace;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AHalfEdge;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AVertex;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.triangles.ATriangleMeshBuilder;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.GenEikMesh;
 import org.vadere.meshing.mesh.gen.MeshPanel;
@@ -89,7 +92,6 @@ public class TriangleQuality {
 	}
 
 	private static void adaptiveDiscEikMesh(double startLen) {
-		IEmptyMeshSupplier<AVertex, AHalfEdge, AFace> supplier = AMeshWithDataStorage::constructEmpty;
 		IDistanceFunction distanceFunc = p -> Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY()) - 1.0;
 		IEdgeLengthFunction edgeLengthFunction = p -> 1.0 + Math.max(-distanceFunc.apply(p), 0) * 2.0;
 		List<VShape> obstacles = new ArrayList<>();
@@ -105,7 +107,7 @@ public class TriangleQuality {
 				edgeLengthFunction,
 				initialEdgeLength,
 				bbox, obstacles,
-				supplier);
+				ATriangleMeshBuilder::new);
 
 		//79 480
 		StopWatch overAllTime = new StopWatch();
@@ -123,9 +125,9 @@ public class TriangleQuality {
 			step++;
 		} while (!meshGenerator.isFinished());
 
-		log.info("#vertices: " + meshGenerator.getMesh().getVertices().size());
-		log.info("#edges: " + meshGenerator.getMesh().getEdges().size());
-		log.info("#faces: " + meshGenerator.getMesh().getFaces().size());
+		log.info("#vertices: " + meshGenerator.getMesh().vertices().count());
+		log.info("#edges: " + meshGenerator.getMesh().edges().count());
+		log.info("#faces: " + meshGenerator.getMesh().faces().count());
 		log.info("quality: " + meshGenerator.getQuality());
 		log.info("#step: " + steps);
 		log.info("overall time: " + overAllTime.getTime() + "[ms]");
@@ -200,7 +202,6 @@ public class TriangleQuality {
 
 
 	private static void adaptiveRingEikMesh(double startLen) {
-		IEmptyMeshSupplier<AVertex, AHalfEdge, AFace> supplier = AMeshWithDataStorage::constructEmpty;
 		IDistanceFunction distanceFunc = p -> Math.abs(0.7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 0.3;
 		IEdgeLengthFunction edgeLengthFunction = p -> 1.0 + Math.max(-distanceFunc.apply(p), 0) * 2.0;
 		List<VShape> obstacles = new ArrayList<>();
@@ -216,7 +217,7 @@ public class TriangleQuality {
 				edgeLengthFunction,
 				initialEdgeLength,
 				bbox, obstacles,
-				supplier);
+				ATriangleMeshBuilder::new);
 
 		//79 480
 		StopWatch overAllTime = new StopWatch();
@@ -234,9 +235,9 @@ public class TriangleQuality {
 			step++;
 		} while (!meshGenerator.isFinished());
 
-		log.info("#vertices: " + meshGenerator.getMesh().getVertices().size());
-		log.info("#edges: " + meshGenerator.getMesh().getEdges().size());
-		log.info("#faces: " + meshGenerator.getMesh().getFaces().size());
+		log.info("#vertices: " + meshGenerator.getMesh().vertices().count());
+		log.info("#edges: " + meshGenerator.getMesh().edges().count());
+		log.info("#faces: " + meshGenerator.getMesh().faces().count());
 		log.info("quality: " + meshGenerator.getQuality());
 		log.info("#step: " + steps);
 		log.info("overall time: " + overAllTime.getTime() + "[ms]");
@@ -318,7 +319,6 @@ public class TriangleQuality {
 
 	private static void adaptiveHexEikMesh(double startLen) {
 		VPolygon hex = VShape.generateHexagon(0.4);
-		IEmptyMeshSupplier<AVertex, AHalfEdge, AFace> supplier = AMeshWithDataStorage::constructEmpty;
 		IDistanceFunction quader = p -> Math.max(Math.abs(p.getX()), Math.abs(p.getY())) - 1.0;
 		IDistanceFunction circ = p -> Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY()) - 1.0;
 		IDistanceFunction distanceFunc = IDistanceFunction.intersect(quader, IDistanceFunction.create(bbox, hex));
@@ -340,7 +340,7 @@ public class TriangleQuality {
 				edgeLengthFunction,
 				initialEdgeLength,
 				bbox, obstacles,
-				supplier);
+				ATriangleMeshBuilder::new);
 
 		//79 480
 		StopWatch overAllTime = new StopWatch();
@@ -358,9 +358,9 @@ public class TriangleQuality {
 			step++;
 		} while (!meshGenerator.isFinished());
 
-		log.info("#vertices: " + meshGenerator.getMesh().getVertices().size());
-		log.info("#edges: " + meshGenerator.getMesh().getEdges().size());
-		log.info("#faces: " + meshGenerator.getMesh().getFaces().size());
+		log.info("#vertices: " + meshGenerator.getMesh().vertices().count());
+		log.info("#edges: " + meshGenerator.getMesh().edges().count());
+		log.info("#faces: " + meshGenerator.getMesh().faces().count());
 		log.info("quality: " + meshGenerator.getQuality());
 		log.info("#step: " + steps);
 		log.info("overall time: " + overAllTime.getTime() + "[ms]");

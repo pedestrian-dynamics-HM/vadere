@@ -1,10 +1,8 @@
 package org.vadere.simulator.models.potential.solver.calculators.mesh;
 
 import org.jetbrains.annotations.NotNull;
-import org.vadere.meshing.mesh.inter.mesh.IFace;
-import org.vadere.meshing.mesh.inter.mesh.IHalfEdge;
-import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
-import org.vadere.meshing.mesh.inter.mesh.IVertex;
+import org.vadere.meshing.mesh.inter.ITriangleMeshPointLocator;
+import org.vadere.meshing.mesh.inter.mesh.*;
 import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VShape;
@@ -40,10 +38,11 @@ public class MeshEikonalSolverFMM<V extends IVertex, E extends IHalfEdge, F exte
 	// Note: The order of arguments in the constructors are exactly as they are since the generic type of a collection is only known at run-time!
 
 	public MeshEikonalSolverFMM(@NotNull final MeshEikonalSolverFMM<V, E, F> solver,
-	                            @NotNull final IIncrementalTriangulation<V, E, F> triangulation,
-	                            @NotNull final List<V> initialVertices
+								@NotNull final ITriangleMeshWithDataStorage<V, E, F> triangulation,
+								@NotNull final ITriangleMeshPointLocator<V, E, F> pointLocator,
+								@NotNull final List<V> initialVertices
 	) {
-		super(solver.identifier, triangulation, solver.getTimeCostFunction());
+		super(solver.identifier, triangulation, pointLocator.withCache(), solver.getTimeCostFunction());
 		this.identifier = solver.identifier;
 		setInitialVertices(initialVertices, p -> 0.0);
 	}
@@ -58,27 +57,28 @@ public class MeshEikonalSolverFMM<V extends IVertex, E extends IHalfEdge, F exte
 	public MeshEikonalSolverFMM(@NotNull final String identifier,
 	                            @NotNull final ITimeCostFunction timeCostFunction,
 	                            @NotNull final Collection<? extends IPoint> targetPoints,
-	                            @NotNull final IIncrementalTriangulation<V, E, F> triangulation
+	                            @NotNull final ITriangleMeshWithDataStorage<V, E, F> triangulation,
+								@NotNull final ITriangleMeshPointLocator<V, E, F> pointLocator
 	) {
-		super(identifier, triangulation, timeCostFunction);
+		super(identifier, triangulation,pointLocator.withCache(), timeCostFunction);
 		this.identifier = identifier;
 
 		HashSet<V> targetVertices = new HashSet<>();
 		IDistanceFunction distFunc = p -> IDistanceFunction.createToTargetPoints(targetPoints).apply(p);
 
 		for(IPoint point : targetPoints) {
-			F face = triangulation.locateFace(point).get();
-			assert !getMesh().isBoundary(face);
+			F face = getPointLocator().locatePoint(point);
+			assert !getMesh().faces().isBoundary(face);
 
-			if(!getMesh().isBoundary(face)) {
+			if(!getMesh().faces().isBoundary(face)) {
 
-				for(V v : getMesh().getVertexIt(face)) {
+				for(V v : getMesh().vertices().iterableFor(face)) {
 					targetVertices.add(v);
 				}
 
-				for(F neighbourFace : getMesh().getFaceIt(face)) {
-					if(!getMesh().isBoundary(neighbourFace)) {
-						for(V v : getMesh().getVertexIt(neighbourFace)) {
+				for(F neighbourFace : getMesh().faces().surroundingIterableFor(face)) {
+					if(!getMesh().faces().isBoundary(neighbourFace)) {
+						for(V v : getMesh().vertices().iterableFor(neighbourFace)) {
 							targetVertices.add(v);
 						}
 					}
@@ -90,9 +90,10 @@ public class MeshEikonalSolverFMM<V extends IVertex, E extends IHalfEdge, F exte
 
 	public MeshEikonalSolverFMM(@NotNull final ITimeCostFunction timeCostFunction,
 	                            @NotNull final Collection<? extends IPoint> targetPoints,
-	                            @NotNull final IIncrementalTriangulation<V, E, F> triangulation
+	                            @NotNull final ITriangleMeshWithDataStorage<V, E, F> triangulation,
+								@NotNull final ITriangleMeshPointLocator<V, E, F> pointLocator
 	) {
-		this("", timeCostFunction, targetPoints, triangulation);
+		this("", timeCostFunction, targetPoints, triangulation, pointLocator.withCache());
 	}
 
 	/**
@@ -105,19 +106,21 @@ public class MeshEikonalSolverFMM<V extends IVertex, E extends IHalfEdge, F exte
 	 */
 	public MeshEikonalSolverFMM(@NotNull final String identifier,
 	                            @NotNull final ITimeCostFunction timeCostFunction,
-	                            @NotNull final IIncrementalTriangulation<V, E, F> triangulation,
+	                            @NotNull final ITriangleMeshWithDataStorage<V, E, F> triangulation,
+								@NotNull final ITriangleMeshPointLocator<V, E, F> pointLocator,
 	                            @NotNull final Collection<V> initialVertices
 	) {
-		super(identifier, triangulation, timeCostFunction);
+		super(identifier, triangulation, pointLocator.withCache(), timeCostFunction);
 		this.identifier = identifier;
 		setInitialVertices(initialVertices, p -> 0.0);
 	}
 
 	public MeshEikonalSolverFMM(@NotNull final ITimeCostFunction timeCostFunction,
-	                            @NotNull final IIncrementalTriangulation<V, E, F> triangulation,
+	                            @NotNull final ITriangleMeshWithDataStorage<V, E, F> triangulation,
+								@NotNull final ITriangleMeshPointLocator<V, E, F> pointLocator,
 	                            @NotNull final Collection<V> targetVertices
 	) {
-		this("", timeCostFunction, triangulation, targetVertices);
+		this("", timeCostFunction, triangulation, pointLocator.withCache(), targetVertices);
 	}
 
 	/**
@@ -131,18 +134,20 @@ public class MeshEikonalSolverFMM<V extends IVertex, E extends IHalfEdge, F exte
 	public MeshEikonalSolverFMM(@NotNull final String identifier,
 	                            @NotNull final Collection<VShape> targetShapes,
 	                            @NotNull final ITimeCostFunction timeCostFunction,
-	                            @NotNull final IIncrementalTriangulation<V, E, F> triangulation
+	                            @NotNull final ITriangleMeshWithDataStorage<V, E, F> triangulation,
+								@NotNull final ITriangleMeshPointLocator<V, E, F> pointLocator
 	) {
-		super(identifier, triangulation, timeCostFunction);
+		super(identifier, triangulation, pointLocator.withCache(), timeCostFunction);
 		this.identifier = identifier;
 		setInitialVertices(findInitialVertices(targetShapes), IDistanceFunction.createToTargets(targetShapes));
 	}
 
 	public MeshEikonalSolverFMM(@NotNull final Collection<VShape> targetShapes,
 	                            @NotNull final ITimeCostFunction timeCostFunction,
-	                            @NotNull final IIncrementalTriangulation<V, E, F> triangulation
+	                            @NotNull final ITriangleMeshWithDataStorage<V, E, F> triangulation,
+								@NotNull final ITriangleMeshPointLocator<V, E, F> pointLocator
 	) {
-		this("", targetShapes, timeCostFunction, triangulation);
+		this("", targetShapes, timeCostFunction, triangulation, pointLocator.withCache());
 	}
 
 	/**
@@ -156,21 +161,23 @@ public class MeshEikonalSolverFMM<V extends IVertex, E extends IHalfEdge, F exte
 	 */
 	public MeshEikonalSolverFMM(@NotNull final String identifier,
 	                            @NotNull final ITimeCostFunction timeCostFunction,
-	                            @NotNull final IIncrementalTriangulation<V, E, F> triangulation,
+	                            @NotNull final ITriangleMeshWithDataStorage<V, E, F> triangulation,
+								@NotNull final ITriangleMeshPointLocator<V, E, F> pointLocator,
 	                            @NotNull final Collection<V> initialVertices,
 	                            @NotNull final IDistanceFunction distFunc
 	) {
-		super(identifier, triangulation, timeCostFunction);
+		super(identifier, triangulation, pointLocator.withCache(), timeCostFunction);
 		this.identifier = identifier;
 		setInitialVertices(initialVertices, distFunc);
 	}
 
 	public MeshEikonalSolverFMM(@NotNull final ITimeCostFunction timeCostFunction,
-	                            @NotNull final IIncrementalTriangulation<V, E, F> triangulation,
+	                            @NotNull final ITriangleMeshWithDataStorage<V, E, F> triangulation,
+								@NotNull final ITriangleMeshPointLocator<V, E, F> pointLocator,
 	                            @NotNull final Collection<V> targetVertices,
 	                            @NotNull final IDistanceFunction distFunc
 	) {
-		this("", timeCostFunction, triangulation, targetVertices, distFunc);
+		this("", timeCostFunction, triangulation, pointLocator.withCache(), targetVertices, distFunc);
 	}
 
 	/**
@@ -180,7 +187,6 @@ public class MeshEikonalSolverFMM<V extends IVertex, E extends IHalfEdge, F exte
 	@Override
 	public void solve() {
 		double ms = System.currentTimeMillis();
-		getTriangulation().enableCache();
 
 		if(!solved || needsUpdate()) {
 			if(!solved) {

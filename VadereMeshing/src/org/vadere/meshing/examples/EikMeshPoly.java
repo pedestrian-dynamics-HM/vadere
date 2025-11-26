@@ -2,7 +2,11 @@ package org.vadere.meshing.examples;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.gen.MeshRenderer;
-import org.vadere.meshing.mesh.gen.mesh.pointerBased.*;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PFace;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PHalfEdge;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PMeshBuilder;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PVertex;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.triangles.PTriangleMeshBuilder;
 import org.vadere.meshing.mesh.impl.PMeshPanel;
 import org.vadere.meshing.mesh.impl.PSLG;
 import org.vadere.meshing.mesh.triangulation.DistanceFunctionApproxBF;
@@ -49,7 +53,7 @@ public class EikMeshPoly {
 		Collection<VPolygon> holes = pslg.getHoles();
 		VPolygon segmentBound = pslg.getSegmentBound();
 		IDistanceFunction distanceFunction = IDistanceFunction.create(segmentBound, holes);
-		IDistanceFunction distanceFunctionApproximation = new DistanceFunctionApproxBF(pslg, distanceFunction, PMeshWithDataStorage::constructEmpty);
+		IDistanceFunction distanceFunctionApproximation = new DistanceFunctionApproxBF(pslg, distanceFunction, PTriangleMeshBuilder::new);
 
 		var ruppert = new PRuppertsTriangulator(
 				pslg,
@@ -84,7 +88,7 @@ public class EikMeshPoly {
 		};
 
 		Predicate<PFace> alertPredicate = f ->{
-			return !meshImprover.getMesh().isBoundary(f) && distanceFunction.apply(meshImprover.getMesh().toTriangle(f).midPoint()) > 0;
+			return !meshImprover.getMesh().faces().isBoundary(f) && distanceFunction.apply(meshImprover.getMesh().faces().toTriangle(f).midPoint()) > 0;
 		};
 
 		var meshRenderer = new MeshRenderer<>(meshImprover.getMesh(), f -> false, f -> Color.WHITE, e -> Color.GRAY, vertexColorFunction);
@@ -92,28 +96,28 @@ public class EikMeshPoly {
 		meshPanel.display("Combined distance functions " + h0);
 		meshImprover.improve();
 		while (!meshImprover.isFinished()) {
-			synchronized (meshImprover.getMesh()) {
+			synchronized (meshImprover.getMeshBuilder()) {
 				meshImprover.improve();
 			}
 			//Thread.sleep(500);
 			meshPanel.repaint();
 		}
-		System.out.println(String.format("Mesh generation complete: %d vertices", meshImprover.getMesh().getNumberOfVertices()));
+		System.out.println(String.format("Mesh generation complete: %d vertices", meshImprover.getMesh().vertices().count()));
 
 		System.out.println("Writing TikZ file...");
-		write(toTexDocument(TexGraphGenerator.toTikz(meshImprover.getMesh(),  f-> lightBlue, null, vertexColorFunction,1.0f, true)), fileName + ".tex");
+		write(toTexDocument(TexGraphGenerator.toTikz(meshImprover.getMesh(), f-> lightBlue, null, vertexColorFunction,1.0f, true)), fileName + ".tex");
 		System.out.println("Writing TikZ file finished");
 
 		System.out.println("Writing Poly file...");
 		MeshPolyWriter<PVertex, PHalfEdge, PFace> meshPolyWriter = new MeshPolyWriter<>();
 		String[] splitName = fileName.split("\\.");
-		write(meshPolyWriter.to2DPoly(meshImprover.getMeshWithDataStorage()), fileName + "_tri.poly");
+		write(meshPolyWriter.to2DPoly(meshImprover.getMeshBuilder().getMeshWithDataStorage()), fileName + "_tri.poly");
 		System.out.println("Writing Poly file finished.");
 	}
 
 	public static void displayPolyFile(@NotNull final String fileName) throws IOException {
 		final InputStream inputStream = MeshExamples.class.getResourceAsStream(fileName);
-		MeshPolyReader<PVertex, PHalfEdge, PFace> meshPolyWriter = new MeshPolyReader<>(PMeshWithDataStorage::constructEmpty);
+		MeshPolyReader<PVertex, PHalfEdge, PFace> meshPolyWriter = new MeshPolyReader<>(PMeshBuilder::new);
 		var meshWithDatastorage = meshPolyWriter.readMesh(inputStream);
 		var meshPanel = new PMeshPanel(meshWithDatastorage.getMesh(), 1000, 800);
 		meshPanel.display("");
@@ -121,7 +125,7 @@ public class EikMeshPoly {
 
 	public static void fmmPolyFile(@NotNull final String fileName) throws IOException {
 		final InputStream inputStream = MeshExamples.class.getResourceAsStream(fileName);
-		MeshPolyReader<PVertex, PHalfEdge, PFace> meshPolyWriter = new MeshPolyReader<>(PMeshWithDataStorage::constructEmpty);
+		MeshPolyReader<PVertex, PHalfEdge, PFace> meshPolyWriter = new MeshPolyReader<>(PMeshBuilder::new);
 		var meshWithDataStorage = meshPolyWriter.readMesh(inputStream);
 		var meshPanel = new PMeshPanel(meshWithDataStorage.getMesh(), 1000, 800);
 		meshPanel.display("");

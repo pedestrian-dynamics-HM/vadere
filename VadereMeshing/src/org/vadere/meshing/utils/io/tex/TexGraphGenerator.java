@@ -185,7 +185,7 @@ public class TexGraphGenerator {
 		Map<Color, String> bidiMap = new HashMap<>();
 
 		int counter = 1;
-		for(F face : mesh.getFaces()) {
+		for(F face : mesh.faces().getAll()) {
 			Color c = coloring.apply(face);
 			if(!bidiMap.containsKey(c)) {
 				bidiMap.put(c, "faceColor"+counter);
@@ -205,7 +205,7 @@ public class TexGraphGenerator {
 			bidiMap.put(DEFAULT_EDGE_COLOR, "edgeColor"+1);
 		} else {
 			int counter = 1;
-			for(E edge : mesh.getEdges()) {
+			for(E edge : mesh.edges().getAll()) {
 				Color c = coloring.apply(edge);
 				if(!bidiMap.containsKey(c)) {
 					bidiMap.put(c, "edgeColor"+counter);
@@ -227,7 +227,7 @@ public class TexGraphGenerator {
 			bidiMap.put(DEFAULT_VERTEX_COLOR, "vertexColor"+1);
 		} else {
 			int counter = 1;
-			for(V vertex : mesh.getVertices()) {
+			for(V vertex : mesh.vertices().getAll()) {
 				Color c = coloring.apply(vertex);
 				if(!bidiMap.containsKey(c)) {
 					bidiMap.put(c, "vertexColor"+counter);
@@ -322,12 +322,14 @@ public class TexGraphGenerator {
 
 		prolog(builder, faceColorBidiMap, edgeColorBidiMap, vertexColorBidiMap);
 
-		for(F face : mesh.getFaces()) {
+		for(F face : mesh.faces().getAll()) {
 			Color c = coloring.apply(face);
 			String colorName = faceColorBidiMap.get(c);
 			//String tikzColor = "{rgb,255:red,"+c.getRed()+";green,"+c.getGreen()+";blue,"+c.getBlue()+"}";
-			V first = mesh.streamVertices(face).findFirst().get();
-			String poly = mesh.streamVertices(face).map(v -> "("+toString(v.getX())+","+toString(v.getY())+")").reduce((s1, s2) -> s1 + "--" + s2).get() + "-- ("+toString(first.getX())+","+toString(first.getY())+")";
+			V first = mesh.vertices().streamVerticesOf(face).findFirst().get();
+			String poly = mesh.vertices().streamVerticesOf(face)
+					.map(v -> "("+toString(v.getX())+","+toString(v.getY())+")")
+					.reduce((s1, s2) -> s1 + "--" + s2).get() + "-- ("+toString(first.getX())+","+toString(first.getY())+")";
 
 			//builder.append("\\fill[fill="+tikzColor+"]" + poly + ";\n");
 			if(edgeColorFunction != null) {
@@ -339,17 +341,17 @@ public class TexGraphGenerator {
 		}
 
 
-		for (E edge : mesh.getEdges()) {
+		for (E edge : mesh.edges().getAll()) {
 			Color c = edgeColorFunction != null ? edgeColorFunction.apply(edge) : DEFAULT_EDGE_COLOR;
 			String colorName = edgeColorBidiMap.get(c);
-			VLine line = mesh.toLine(edge);
+			VLine line = mesh.edges().toLine(edge);
 			//String tikzColor = "{rgb,255:red,"+c.getRed()+";green,"+c.getGreen()+";blue,"+c.getBlue()+"}";
 			builder.append("\\draw[color="+colorName+"]("+toString(line.getX1())+","+toString(line.getY1())+") -- ("+toString(line.getX2())+","+toString(line.getY2())+");\n");
 		}
 
 
 		if(drawVertices) {
-			for(V vertex : mesh.getVertices()) {
+			for(V vertex : mesh.vertices().getAll()) {
 				Color c = vertexColorFunction != null ? vertexColorFunction.apply(vertex) : DEFAULT_VERTEX_COLOR;
 				String colorName = vertexColorBidiMap.get(c);
 				//String tikzColor = "{rgb,255:red,"+c.getRed()+";green,"+c.getGreen()+";blue,"+c.getBlue()+"}";
@@ -414,11 +416,13 @@ public class TexGraphGenerator {
 		StringBuilder builder = new StringBuilder();
 		builder.append("\\begin{tikzpicture}[scale="+scaling+"]\n");
 
-		for(F face : mesh.getFaces()) {
+		for(F face : mesh.faces().getAll()) {
 			Color c = coloring.apply(face);
 			String tikzColor = "{rgb,255:red,"+c.getRed()+";green,"+c.getGreen()+";blue,"+c.getBlue()+"}";
-			V first = mesh.streamVertices(face).findFirst().get();
-			String poly = mesh.streamVertices(face).map(v -> "("+toString(v.getX())+","+toString(v.getY())+")").reduce((s1, s2) -> s1 + "--" + s2).get() + "-- ("+toString(first.getX())+","+toString(first.getY())+")";
+			V first = mesh.vertices().streamVerticesOf(face).findFirst().get();
+			String poly = mesh.vertices().streamVerticesOf(face)
+					.map(v -> "("+toString(v.getX())+","+toString(v.getY())+")")
+					.reduce((s1, s2) -> s1 + "--" + s2).get() + "-- ("+toString(first.getX())+","+toString(first.getY())+")";
 
 			//builder.append("\\fill[fill="+tikzColor+"]" + poly + ";\n");
 			builder.append("\\filldraw[color=gray,fill="+tikzColor+"]" + poly + ";\n");
@@ -574,7 +578,7 @@ public class TexGraphGenerator {
 		builder.append("\\draw[curveColor, thick] ");
 
 		for(F face : faces) {
-			List<VLine> lines = mesh.streamEdges(face).map(e -> mesh.toLine(e)).collect(Collectors.toList());
+			List<VLine> lines = mesh.edges().streamEdgesOf(face).map(e -> mesh.edges().toLine(e)).collect(Collectors.toList());
 
 			for(VLine line : lines) {
 				builder.append("("+toString(line.getX1())+","+toString(line.getY1())+") -- ("+toString(line.getX2())+","+toString(line.getY2())+")\n");
@@ -589,11 +593,11 @@ public class TexGraphGenerator {
 		VLine firstLine = null;
 		VLine lastLine = null;
 		for(F face : faces) {
-			List<E> edges = mesh.getEdges(face);
+			List<E> edges = mesh.edges().getAllOf(face);
 
 			// is triangle
 			if(edges.size() == 3) {
-				VTriangle triangle = mesh.toTriangle(face);
+				VTriangle triangle = mesh.faces().toTriangle(face);
 				VPoint incenter = triangle.getIncenter();
 
 				if(prefIncenter != null) {

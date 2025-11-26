@@ -28,10 +28,10 @@ public class FaceIterator<V extends IVertex, E extends IHalfEdge, F extends IFac
 	public FaceIterator(final IMesh<V, E, F> mesh, final Predicate<F> facePredicate) {
 		this.mesh = mesh;
 		this.facesToVisit = new LinkedList<>();
-		F face = mesh.getFace();
-		F startFace = mesh.isBoundary(face) ? mesh.getTwinFace(mesh.getEdge(face)) : face;
+		F face = mesh.faces().getFirst();
+		F startFace = mesh.faces().isBoundary(face) ? mesh.faces().getTwin(mesh.edges().getAnyOf(face)) : face;
 
-		if(mesh.isDestroyed(startFace)) {
+		if(mesh.faces().isDestroyed(startFace)) {
 			throw new IllegalArgumentException("this face is already destroyed.");
 		}
 
@@ -54,10 +54,10 @@ public class FaceIterator<V extends IVertex, E extends IHalfEdge, F extends IFac
 		F nextFace = facesToVisit.removeFirst();
 		visitedFaces.add(nextFace);
 
-		for(E he : mesh.getEdgeIt(nextFace)) {
-			F twinFace = mesh.getTwinFace(he);
+		for(E he : mesh.edges().iterableFor(nextFace)) {
+			F twinFace = mesh.faces().getTwin(he);
 
- 			if(mesh.isBoundary(twinFace) || mesh.isDestroyed(twinFace) || !facePredicate.test(twinFace)) {
+ 			if(mesh.faces().isBoundary(twinFace) || mesh.faces().isDestroyed(twinFace) || !facePredicate.test(twinFace)) {
 				visitedFaces.add(twinFace);
 			}
 

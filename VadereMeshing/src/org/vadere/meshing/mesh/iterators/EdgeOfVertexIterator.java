@@ -22,7 +22,7 @@ public class EdgeOfVertexIterator<V extends IVertex, E extends IHalfEdge, F exte
 	private final IMesh<V, E, F> mesh;
 
 	public EdgeOfVertexIterator(final IMesh<V, E, F> mesh, final V vertex){
-		this.edgeIterator = new IncidentEdgeIterator<>(mesh, mesh.getEdge(vertex));
+		this.edgeIterator = new IncidentEdgeIterator<>(mesh, mesh.edges().getOf(vertex));
 		this.mesh = mesh;
 	}
 
@@ -33,6 +33,6 @@ public class EdgeOfVertexIterator<V extends IVertex, E extends IHalfEdge, F exte
 
 	@Override
 	public E next() {
-		return mesh.getTwin(edgeIterator.next());
+		return mesh.edges().getTwin(edgeIterator.next());
 	}
 }

@@ -5,6 +5,9 @@ import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AFace;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AHalfEdge;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AVertex;
 import org.vadere.meshing.mesh.inter.*;
 import org.vadere.meshing.mesh.inter.mesh.IMesh;
 import org.vadere.meshing.mesh.inter.mesh.data.IMeshDataStorage;
@@ -15,16 +18,16 @@ import java.util.Map;
 import java.util.Optional;
 
 public class AMeshDataStorage implements IMeshDataStorage<AVertex, AHalfEdge, AFace> {
-    Map<String, AObjectArrayList<?>> verticesData;
-    Map<String, AObjectArrayList<?>> halfEdgesData;
-    Map<String, AObjectArrayList<?>> facesData;
-    ArrayList<DoubleArrayList> verticesIndexedDoubleData;
-    Map<String, DoubleArrayList> verticesDoubleData;
-    Map<String, DoubleArrayList> facesDoubleData;
-    Map<String, DoubleArrayList> halfEdgesDoubleData;
-    Map<String, BooleanArrayList> verticesBooleanData;
-    Map<String, BooleanArrayList> facesBooleanData;
-    Map<String, BooleanArrayList> halfEdgesBooleanData;
+    public Map<String, AObjectArrayList<?>> verticesData;
+    public Map<String, AObjectArrayList<?>> halfEdgesData;
+    public Map<String, AObjectArrayList<?>> facesData;
+    public ArrayList<DoubleArrayList> verticesIndexedDoubleData;
+    public Map<String, DoubleArrayList> verticesDoubleData;
+    public Map<String, DoubleArrayList> facesDoubleData;
+    public Map<String, DoubleArrayList> halfEdgesDoubleData;
+    public Map<String, BooleanArrayList> verticesBooleanData;
+    public Map<String, BooleanArrayList> facesBooleanData;
+    public Map<String, BooleanArrayList> halfEdgesBooleanData;
 
     private IMesh<AVertex, AHalfEdge, AFace> mesh;
 
@@ -90,7 +93,7 @@ public class AMeshDataStorage implements IMeshDataStorage<AVertex, AHalfEdge, AF
             return false;
         } else {
             BooleanArrayList dataArray = verticesBooleanData.get(name);
-            assert dataArray.size() == mesh.getVertices().size();
+            assert dataArray.size() == mesh.vertices().getAll().size();
             return dataArray.getBoolean(vertex.getId());
         }
     }
@@ -101,7 +104,7 @@ public class AMeshDataStorage implements IMeshDataStorage<AVertex, AHalfEdge, AF
             return 0.0;
         } else {
             DoubleArrayList dataArray = verticesDoubleData.get(name);
-            assert dataArray.size() == mesh.getVertices().size();
+            assert dataArray.size() == mesh.vertices().getAll().size();
             return dataArray.getDouble(vertex.getId());
         }
     }
@@ -112,7 +115,7 @@ public class AMeshDataStorage implements IMeshDataStorage<AVertex, AHalfEdge, AF
             return 0.0;
         } else {
             DoubleArrayList dataArray = verticesIndexedDoubleData.get(index);
-            assert dataArray.size() == mesh.getVertices().size();
+            assert dataArray.size() == mesh.vertices().getAll().size();
             return dataArray.getDouble(vertex.getId());
         }
     }
@@ -123,7 +126,7 @@ public class AMeshDataStorage implements IMeshDataStorage<AVertex, AHalfEdge, AF
             return false;
         } else {
             BooleanArrayList dataArray = halfEdgesBooleanData.get(name);
-            assert dataArray.size() == mesh.getEdges().size();
+            assert dataArray.size() == mesh.edges().getAll().size();
             return dataArray.getBoolean(edge.getId());
         }
     }
@@ -134,7 +137,7 @@ public class AMeshDataStorage implements IMeshDataStorage<AVertex, AHalfEdge, AF
             return 0.0;
         } else {
             DoubleArrayList dataArray = halfEdgesDoubleData.get(name);
-            assert dataArray.size() == mesh.getEdges().size();
+            assert dataArray.size() == mesh.edges().getAll().size();
             return dataArray.getDouble(edge.getId());
         }
     }
@@ -145,7 +148,7 @@ public class AMeshDataStorage implements IMeshDataStorage<AVertex, AHalfEdge, AF
             return false;
         } else {
             BooleanArrayList dataArray = facesBooleanData.get(name);
-            assert dataArray.size() == mesh.getFaces().size();
+            assert dataArray.size() == mesh.faces().getAll().size();
             return dataArray.getBoolean(face.getId());
         }
     }
@@ -156,7 +159,7 @@ public class AMeshDataStorage implements IMeshDataStorage<AVertex, AHalfEdge, AF
             return 0.0;
         } else {
             DoubleArrayList dataArray = facesDoubleData.get(name);
-            assert dataArray.size() == mesh.getFaces().size();
+            assert dataArray.size() == mesh.faces().getAll().size();
             return dataArray.getDouble(face.getId());
         }
     }
@@ -167,7 +170,7 @@ public class AMeshDataStorage implements IMeshDataStorage<AVertex, AHalfEdge, AF
             return Optional.ofNullable(null);
         } else {
             ObjectArrayList<CV> dataArray = (ObjectArrayList<CV>) verticesData.get(name);
-            assert dataArray.size() == mesh.getVertices().size();
+            assert dataArray.size() == mesh.vertices().getAll().size();
             return Optional.ofNullable(dataArray.get(vertex.getId()));
         }
     }
@@ -176,11 +179,11 @@ public class AMeshDataStorage implements IMeshDataStorage<AVertex, AHalfEdge, AF
     public <CV> void setData(@NotNull final AVertex vertex, @NotNull final String name, @Nullable final CV data) {
         if(!verticesData.containsKey(name)) {
             AObjectArrayList<CV> dataArray = new AObjectArrayList<>();
-            fill(dataArray, mesh.getVertices().size());
+            fill(dataArray, mesh.vertices().getAll().size());
             verticesData.put(name, dataArray);
         }
         AObjectArrayList<CV> dataArray = (AObjectArrayList<CV>) verticesData.get(name);
-        assert dataArray.size() == mesh.getVertices().size();
+        assert dataArray.size() == mesh.vertices().getAll().size();
         dataArray.set(vertex.getId(), data);
     }
 
@@ -190,7 +193,7 @@ public class AMeshDataStorage implements IMeshDataStorage<AVertex, AHalfEdge, AF
             return Optional.ofNullable(null);
         } else {
             AObjectArrayList<CE> dataArray = (AObjectArrayList<CE>) halfEdgesData.get(name);
-            assert dataArray.size() == mesh.getEdges().size();
+            assert dataArray.size() == mesh.edges().getAll().size();
             return Optional.ofNullable(dataArray.get(edge.getId()));
         }
     }
@@ -199,11 +202,11 @@ public class AMeshDataStorage implements IMeshDataStorage<AVertex, AHalfEdge, AF
     public <CE> void setData(@NotNull final AHalfEdge edge, @NotNull final String name, @Nullable final CE data) {
         if(!halfEdgesData.containsKey(name)) {
             AObjectArrayList<CE> dataArray = new AObjectArrayList<>();
-            fill(dataArray, mesh.getEdges().size());
+            fill(dataArray, mesh.edges().getAll().size());
             halfEdgesData.put(name, dataArray);
         }
         AObjectArrayList<CE> dataArray = (AObjectArrayList<CE>) halfEdgesData.get(name);
-        assert dataArray.size() == mesh.getEdges().size();
+        assert dataArray.size() == mesh.edges().getAll().size();
         dataArray.set(edge.getId(), data);
     }
 
@@ -213,7 +216,7 @@ public class AMeshDataStorage implements IMeshDataStorage<AVertex, AHalfEdge, AF
             return Optional.ofNullable(null);
         } else {
             AObjectArrayList<CF> dataArray = (AObjectArrayList<CF>) facesData.get(name);
-            assert dataArray.size() == mesh.getFaces().size();
+            assert dataArray.size() == mesh.faces().getAll().size();
             return Optional.ofNullable(dataArray.get(face.getId()));
         }
     }
@@ -222,35 +225,35 @@ public class AMeshDataStorage implements IMeshDataStorage<AVertex, AHalfEdge, AF
     public <CF> void setData(@NotNull final AFace face, @NotNull final String name, @Nullable final CF data) {
         if(!facesData.containsKey(name)) {
             AObjectArrayList<CF> dataArray = new AObjectArrayList<>();
-            fill(dataArray, mesh.getFaces().size());
+            fill(dataArray, mesh.faces().getAll().size());
             facesData.put(name, dataArray);
         }
         AObjectArrayList<CF> dataArray = (AObjectArrayList<CF>) facesData.get(name);
-        assert dataArray.size() == mesh.getFaces().size();
+        assert dataArray.size() == mesh.faces().getAll().size();
         dataArray.set(face.getId(), data);
     }
 
     @Override
     public void setDoubleData(@NotNull final AFace face, @NotNull final String name, final double data) {
         if(!facesDoubleData.containsKey(name)) {
-            DoubleArrayList dataArray = new DoubleArrayList(mesh.getFaces().size());
-            dataArray.size(mesh.getFaces().size());
+            DoubleArrayList dataArray = new DoubleArrayList(mesh.faces().getAll().size());
+            dataArray.size(mesh.faces().getAll().size());
             facesDoubleData.put(name, dataArray);
         }
         DoubleArrayList dataArray = facesDoubleData.get(name);
-        assert dataArray.size() == mesh.getFaces().size();
+        assert dataArray.size() == mesh.faces().getAll().size();
         dataArray.set(face.getId(), data);
     }
 
     @Override
     public void setDoubleData(@NotNull final AVertex vertex, @NotNull final String name, final double data) {
         if(!verticesDoubleData.containsKey(name)) {
-            DoubleArrayList dataArray = new DoubleArrayList(mesh.getVertices().size());
-            dataArray.size(mesh.getVertices().size());
+            DoubleArrayList dataArray = new DoubleArrayList(mesh.vertices().getAll().size());
+            dataArray.size(mesh.vertices().getAll().size());
             verticesDoubleData.put(name, dataArray);
         }
         DoubleArrayList dataArray = verticesDoubleData.get(name);
-        assert dataArray.size() == mesh.getVertices().size();
+        assert dataArray.size() == mesh.vertices().getAll().size();
         dataArray.set(vertex.getId(), data);
     }
 
@@ -258,13 +261,13 @@ public class AMeshDataStorage implements IMeshDataStorage<AVertex, AHalfEdge, AF
     public void setDoubleData(@NotNull final AVertex vertex, @NotNull final int index, final double data) {
         if(verticesIndexedDoubleData.size() <= index) {
             for(int i = verticesIndexedDoubleData.size(); i <= index; i++) {
-                DoubleArrayList dataArray = new DoubleArrayList(mesh.getVertices().size());
-                dataArray.size(mesh.getVertices().size());
+                DoubleArrayList dataArray = new DoubleArrayList(mesh.vertices().getAll().size());
+                dataArray.size(mesh.vertices().getAll().size());
                 verticesIndexedDoubleData.add(dataArray);
             }
         }
         DoubleArrayList dataArray = verticesIndexedDoubleData.get(index);
-        assert dataArray.size() == mesh.getVertices().size();
+        assert dataArray.size() == mesh.vertices().getAll().size();
         dataArray.set(vertex.getId(), data);
     }
 
@@ -272,43 +275,43 @@ public class AMeshDataStorage implements IMeshDataStorage<AVertex, AHalfEdge, AF
     @Override
     public void setDoubleData(@NotNull final AHalfEdge edge, @NotNull final String name, final double data) {
         DoubleArrayList dataArray = getDoubleArrayEdge(name);
-        assert dataArray.size() == mesh.getEdges().size();
+        assert dataArray.size() == mesh.edges().getAll().size();
         dataArray.set(edge.getId(), data);
     }
 
     @Override
     public void setBooleanData(@NotNull final AFace face, @NotNull final String name, final boolean data) {
         if(!facesBooleanData.containsKey(name)) {
-            BooleanArrayList dataArray = new BooleanArrayList(mesh.getFaces().size());
-            dataArray.size(mesh.getFaces().size());
+            BooleanArrayList dataArray = new BooleanArrayList(mesh.faces().getAll().size());
+            dataArray.size(mesh.faces().getAll().size());
             facesBooleanData.put(name, dataArray);
         }
         BooleanArrayList dataArray = facesBooleanData.get(name);
-        assert dataArray.size() == mesh.getFaces().size();
+        assert dataArray.size() == mesh.faces().getAll().size();
         dataArray.set(face.getId(), data);
     }
 
     @Override
     public void setBooleanData(@NotNull final AVertex vertex, @NotNull final String name, final boolean data) {
         if(!verticesBooleanData.containsKey(name)) {
-            BooleanArrayList dataArray = new BooleanArrayList(mesh.getVertices().size());
-            dataArray.size(mesh.getVertices().size());
+            BooleanArrayList dataArray = new BooleanArrayList(mesh.vertices().getAll().size());
+            dataArray.size(mesh.vertices().getAll().size());
             verticesBooleanData.put(name, dataArray);
         }
         BooleanArrayList dataArray = verticesBooleanData.get(name);
-        assert dataArray.size() == mesh.getVertices().size();
+        assert dataArray.size() == mesh.vertices().getAll().size();
         dataArray.set(vertex.getId(), data);
     }
 
     @Override
     public void setBooleanData(@NotNull final AHalfEdge edge, @NotNull final String name, final boolean data) {
         if(!halfEdgesBooleanData.containsKey(name)) {
-            BooleanArrayList dataArray = new BooleanArrayList(mesh.getEdges().size());
-            dataArray.size(mesh.getEdges().size());
+            BooleanArrayList dataArray = new BooleanArrayList(mesh.edges().getAll().size());
+            dataArray.size(mesh.edges().getAll().size());
             halfEdgesBooleanData.put(name, dataArray);
         }
         BooleanArrayList dataArray = halfEdgesBooleanData.get(name);
-        assert dataArray.size() == mesh.getEdges().size();
+        assert dataArray.size() == mesh.edges().getAll().size();
         dataArray.set(edge.getId(), data);
     }
 
@@ -321,7 +324,7 @@ public class AMeshDataStorage implements IMeshDataStorage<AVertex, AHalfEdge, AF
     private <CE> AObjectArrayList<CE> getObjectArrayEdge(@NotNull final String name, @NotNull final Class<CE> clazz) {
         if(!halfEdgesData.containsKey(name)) {
             AObjectArrayList<CE> dataArray = new AObjectArrayList<>();
-            fill(dataArray, mesh.getEdges().size());
+            fill(dataArray, mesh.edges().getAll().size());
             halfEdgesData.put(name, dataArray);
         }
         return (AObjectArrayList<CE>)halfEdgesData.get(name);
@@ -330,7 +333,7 @@ public class AMeshDataStorage implements IMeshDataStorage<AVertex, AHalfEdge, AF
     private <CE> AObjectArrayList<CE> getObjectArrayVertex(@NotNull final String name, @NotNull final Class<CE> clazz) {
         if(!verticesData.containsKey(name)) {
             AObjectArrayList<CE> dataArray = new AObjectArrayList<>();
-            fill(dataArray, mesh.getVertices().size());
+            fill(dataArray, mesh.vertices().getAll().size());
             verticesData.put(name, dataArray);
         }
         return (AObjectArrayList<CE>)verticesData.get(name);
@@ -338,8 +341,8 @@ public class AMeshDataStorage implements IMeshDataStorage<AVertex, AHalfEdge, AF
 
     private DoubleArrayList getDoubleArrayEdge(@NotNull final String name) {
         if(!halfEdgesDoubleData.containsKey(name)) {
-            DoubleArrayList dataArray = new DoubleArrayList(mesh.getEdges().size());
-            dataArray.size(mesh.getEdges().size());
+            DoubleArrayList dataArray = new DoubleArrayList(mesh.edges().getAll().size());
+            dataArray.size(mesh.edges().getAll().size());
             halfEdgesDoubleData.put(name, dataArray);
         }
         return halfEdgesDoubleData.get(name);
@@ -347,8 +350,8 @@ public class AMeshDataStorage implements IMeshDataStorage<AVertex, AHalfEdge, AF
 
     private DoubleArrayList getDoubleArrayVertex(@NotNull final String name) {
         if(!verticesDoubleData.containsKey(name)) {
-            DoubleArrayList dataArray = new DoubleArrayList(mesh.getVertices().size());
-            dataArray.size(mesh.getVertices().size());
+            DoubleArrayList dataArray = new DoubleArrayList(mesh.vertices().getAll().size());
+            dataArray.size(mesh.vertices().getAll().size());
             verticesDoubleData.put(name, dataArray);
         }
         return verticesDoubleData.get(name);
@@ -356,8 +359,8 @@ public class AMeshDataStorage implements IMeshDataStorage<AVertex, AHalfEdge, AF
 
     private DoubleArrayList getDoubleArrayFace(@NotNull final String name) {
         if(!facesDoubleData.containsKey(name)) {
-            DoubleArrayList dataArray = new DoubleArrayList(mesh.getFaces().size());
-            dataArray.size(mesh.getFaces().size());
+            DoubleArrayList dataArray = new DoubleArrayList(mesh.faces().getAll().size());
+            dataArray.size(mesh.faces().getAll().size());
             facesDoubleData.put(name, dataArray);
         }
         return facesDoubleData.get(name);
@@ -365,8 +368,8 @@ public class AMeshDataStorage implements IMeshDataStorage<AVertex, AHalfEdge, AF
 
     private BooleanArrayList getBooleanArrayEdge(@NotNull final String name) {
         if(!halfEdgesBooleanData.containsKey(name)) {
-            BooleanArrayList dataArray = new BooleanArrayList(mesh.getEdges().size());
-            dataArray.size(mesh.getEdges().size());
+            BooleanArrayList dataArray = new BooleanArrayList(mesh.edges().getAll().size());
+            dataArray.size(mesh.edges().getAll().size());
             halfEdgesBooleanData.put(name, dataArray);
         }
         return halfEdgesBooleanData.get(name);
@@ -374,8 +377,8 @@ public class AMeshDataStorage implements IMeshDataStorage<AVertex, AHalfEdge, AF
 
     private BooleanArrayList getBooleanArrayVertex(@NotNull final String name) {
         if(!verticesBooleanData.containsKey(name)) {
-            BooleanArrayList dataArray = new BooleanArrayList(mesh.getVertices().size());
-            dataArray.size(mesh.getVertices().size());
+            BooleanArrayList dataArray = new BooleanArrayList(mesh.vertices().getAll().size());
+            dataArray.size(mesh.vertices().getAll().size());
             verticesBooleanData.put(name, dataArray);
         }
         return verticesBooleanData.get(name);
@@ -383,8 +386,8 @@ public class AMeshDataStorage implements IMeshDataStorage<AVertex, AHalfEdge, AF
 
     private BooleanArrayList getBooleanArrayFace(@NotNull final String name) {
         if(!facesBooleanData.containsKey(name)) {
-            BooleanArrayList dataArray = new BooleanArrayList(mesh.getFaces().size());
-            dataArray.size(mesh.getFaces().size());
+            BooleanArrayList dataArray = new BooleanArrayList(mesh.faces().getAll().size());
+            dataArray.size(mesh.faces().getAll().size());
             facesBooleanData.put(name, dataArray);
         }
         return facesBooleanData.get(name);
@@ -496,11 +499,6 @@ public class AMeshDataStorage implements IMeshDataStorage<AVertex, AHalfEdge, AF
     }
 
     @Override
-    public IMesh<AVertex, AHalfEdge, AFace> getMesh() {
-        return mesh;
-    }
-
-    @Override
     public IEdgeContainerDouble<AVertex, AHalfEdge, AFace> getDoubleEdgeContainer(@NotNull final String name) {
         return new IEdgeContainerDouble<>() {
             private final DoubleArrayList list = getDoubleArrayEdge(name);
@@ -518,7 +516,7 @@ public class AMeshDataStorage implements IMeshDataStorage<AVertex, AHalfEdge, AF
     }
 
     @Override
-    public IVertexContainerDouble<AVertex, AHalfEdge, AFace> getDoubleVertexContainer(@NotNull final String name) {
+    public IVertexContainerDouble<AVertex, AHalfEdge, AFace> getDoubleVertexContainer(@NotNull final String name, IMesh<AVertex, AHalfEdge, AFace> mesh) {
         return new IVertexContainerDouble<>() {
             private DoubleArrayList list = getDoubleArrayVertex(name);
 

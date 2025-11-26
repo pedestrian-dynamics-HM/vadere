@@ -5,6 +5,13 @@ import it.unimi.dsi.fastutil.io.FastBufferedInputStream;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.vadere.meshing.mesh.gen.mesh.arrayBased.*;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AFace;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AHalfEdge;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AMeshBuilder;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AVertex;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.triangles.ATriangleMeshBuilder;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.triangles.ATriangleMeshWithDataStorage;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PMeshBuilder;
 import org.vadere.meshing.utils.io.poly.MeshPolyReader;
 import org.vadere.meshing.utils.io.poly.MeshPolyWriter;
 import org.vadere.simulator.context.VadereContext;
@@ -149,8 +156,8 @@ public class ScenarioRun implements Runnable {
 				scenarioStore.getTopography().reset();
 				initializeVadereContext();
 
-				AMeshWithDataStorage floorFieldMesh = loadFloorFieldMesh().orElse(null);
-				AMeshWithDataStorage backgroundMesh = loadBackgrounddMesh().orElse(null);
+				ATriangleMeshWithDataStorage floorFieldMesh = loadFloorFieldMesh().orElse(null);
+				ATriangleMeshWithDataStorage backgroundMesh = loadBackgrounddMesh().orElse(null);
 				MainModelBuilder modelBuilder = new MainModelBuilder(scenarioStore, floorFieldMesh, backgroundMesh);
 				modelBuilder.createModelAndRandom();
 
@@ -211,20 +218,20 @@ public class ScenarioRun implements Runnable {
 		}
 	}
 
-	private Optional<AMeshWithDataStorage> loadFloorFieldMesh() {
+	private Optional<ATriangleMeshWithDataStorage> loadFloorFieldMesh() {
 		return loadMesh(scenario.getName()+".poly");
 	}
 
-	private Optional<AMeshWithDataStorage> loadBackgrounddMesh() {
+	private Optional<ATriangleMeshWithDataStorage> loadBackgrounddMesh() {
 		return loadMesh(scenario.getName()+IOUtils.BACKGROUND_MESH_ENDING+".poly");
 	}
 
-	private Optional<AMeshWithDataStorage> loadMesh(@NotNull final String fileName) {
-		AMeshWithDataStorage meshWithDataStorage = null;
+	private Optional<ATriangleMeshWithDataStorage> loadMesh(@NotNull final String fileName) {
+		ATriangleMeshWithDataStorage meshWithDataStorage = null;
 		try {
-			var meshReader = new MeshPolyReader<>(AMeshWithDataStorage::constructEmpty);
+			var meshReader = new MeshPolyReader<>(ATriangleMeshBuilder::new);
 			Path path = scenarioFilePath.getParent().resolve(IOUtils.MESH_DIR + "/" + fileName);
-			meshWithDataStorage = (AMeshWithDataStorage) meshReader.readMesh(new FastBufferedInputStream(new FileInputStream(path.toFile())));
+			meshWithDataStorage = (ATriangleMeshWithDataStorage) meshReader.readMesh(new FastBufferedInputStream(new FileInputStream(path.toFile())));
 		} catch (FileNotFoundException e) {
 			logger.info("no mesh " + fileName + " was found.");
 		} catch (IOException e) {
@@ -234,15 +241,15 @@ public class ScenarioRun implements Runnable {
 		return Optional.ofNullable(meshWithDataStorage);
 	}
 
-	private void writeFloorFieldMeshToOutput(@NotNull final AMeshWithDataStorage aMeshWithDataStorage) {
+	private void writeFloorFieldMeshToOutput(@NotNull final ATriangleMeshWithDataStorage aMeshWithDataStorage) {
 		writeMeshToOutput(outputPath, scenario.getName()+".poly", aMeshWithDataStorage);
 	}
 
-	private void writeBackgroundMeshToOutput(@NotNull final AMeshWithDataStorage aMeshWithDataStorage) {
+	private void writeBackgroundMeshToOutput(@NotNull final ATriangleMeshWithDataStorage aMeshWithDataStorage) {
 		writeMeshToOutput(outputPath, scenario.getName()+IOUtils.BACKGROUND_MESH_ENDING+".poly", aMeshWithDataStorage);
 	}
 
-	private void writeMeshToOutput(@NotNull final Path output, @NotNull final String fileName, @NotNull final AMeshWithDataStorage aMeshWithDataStorage) {
+	private void writeMeshToOutput(@NotNull final Path output, @NotNull final String fileName, @NotNull final ATriangleMeshWithDataStorage aMeshWithDataStorage) {
 		try (PrintWriter out = new PrintWriter(Paths.get(output.toString(), fileName).toString())) {
 			MeshPolyWriter<AVertex, AHalfEdge, AFace> meshWriter = new MeshPolyWriter<>();
 			meshWriter.to2DPoly(aMeshWithDataStorage, 0, null, v -> false, out);

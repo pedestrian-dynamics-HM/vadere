@@ -1,9 +1,10 @@
 package org.vadere.simulator.examples.Meshing;
 
 import org.jetbrains.annotations.NotNull;
-import org.vadere.meshing.mesh.gen.mesh.pointerBased.PFace;
-import org.vadere.meshing.mesh.gen.mesh.pointerBased.PHalfEdge;
-import org.vadere.meshing.mesh.gen.mesh.pointerBased.PVertex;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PFace;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PHalfEdge;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PVertex;
+import org.vadere.meshing.mesh.gen.pointLocator.JumpAndWalkPointLocator;
 import org.vadere.meshing.mesh.impl.PSLG;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.mesh.MeshPythonUtils;
@@ -43,20 +44,20 @@ public class DistanceFunctionApproxFMM implements IDistanceFunctionCached {
 		triangulation.setCanIllegalPredicate(e -> true);
 
 		// compute and set the local feature size
-		var vertices = ruppertsTriangulator.getSegments().stream().map(e -> triangulation.getMesh().getVertex(e)).collect(Collectors.toList());
+		var vertices = ruppertsTriangulator.getSegments().stream().map(e -> triangulation.getMesh().vertices().getEndOf(e)).collect(Collectors.toList());
 
 		/*for(var v : vertices) {
 			double distance = exactDistanceFunc.apply(v);
 			triangulation.getMesh().setDoubleData(v, propName, distance);
 		}*/
 
-		eikSolver = new MeshEikonalSolverFMM(p -> 1, triangulation, vertices);
+		eikSolver = new MeshEikonalSolverFMM<>(p -> 1, triangulation.getMeshBuilder().getMeshWithDataStorage(), new JumpAndWalkPointLocator<>(triangulation.getMesh()), vertices);
 		eikSolver.solve();
 
 		// the distance is negative inside holes and outside the domain
 		// TODO this is very slow and should be implemented much more efficiently
-		for(var v : triangulation.getMesh().getVertices()) {
-			VPoint p = triangulation.getMesh().toPoint(v);
+		for(var v : triangulation.getMesh().vertices()) {
+			VPoint p = triangulation.getMesh().vertices().toPoint(v);
 			if(pslg.getSegmentBound().contains(v) && pslg.getHoles().stream().noneMatch(poly -> poly.contains(p))) {
 				eikSolver.setPotential(v, -eikSolver.getPotential(v));
 			}
@@ -81,7 +82,7 @@ public class DistanceFunctionApproxFMM implements IDistanceFunctionCached {
 	}
 
 	public void printPython() {
-		System.out.println(MeshPythonUtils.toPythonTriangulation(triangulation.getMeshWithDataStorage(), v -> eikSolver.getPotential(v)));
+		System.out.println(MeshPythonUtils.toPythonTriangulation(triangulation.getMeshBuilder().getMeshWithDataStorage(), v -> eikSolver.getPotential(v)));
 		/*var points = triangulation.getMesh().getPoints();
 		System.out.print("[");
 		for(var dataPoint : points) {
@@ -103,9 +104,9 @@ public class DistanceFunctionApproxFMM implements IDistanceFunctionCached {
 	}
 
 	private double apply(@NotNull final IPoint p, @NotNull final PFace face) {
-		var meshWithDataStorage = triangulation.getMeshWithDataStorage();
+		var meshWithDataStorage = triangulation.getMeshBuilder();
 
-		if(meshWithDataStorage.getMesh().isBoundary(face)) {
+		if(meshWithDataStorage.getMesh().faces().isBoundary(face)) {
 			return Double.NEGATIVE_INFINITY;
 		}
 		else {
@@ -113,7 +114,7 @@ public class DistanceFunctionApproxFMM implements IDistanceFunctionCached {
 			double y[] = new double[3];
 			double z[] = new double[3];
 
-			triangulation.getTriPoints(face, x, y, z, MeshEikonalSolverFMM.namePotential);
+			triangulation.getMesh().readConnectivity().getTriPoints(face, x, y, z, MeshEikonalSolverFMM.namePotential, triangulation.getMeshDataStorage());
 
 			double totalArea = GeometryUtils.areaOfPolygon(x, y);
 

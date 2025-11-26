@@ -12,8 +12,6 @@ import java.util.List;
 public interface IMeshDataStorage<V extends IVertex, E extends IHalfEdge, F extends IFace>
         extends IMeshDataStorageReader<V,E,F>, IMeshDataStorageWriter<V, E, F> {
 
-    IMesh<V,E,F> getMesh();
-
     default IEdgeContainerDouble<V, E, F> getDoubleEdgeContainer(@NotNull final String name) {
         return new IEdgeContainerDouble<>() {
             @Override
@@ -28,7 +26,7 @@ public interface IMeshDataStorage<V extends IVertex, E extends IHalfEdge, F exte
         };
     }
 
-    default IVertexContainerDouble<V, E, F> getDoubleVertexContainer(@NotNull final String name) {
+    default IVertexContainerDouble<V, E, F> getDoubleVertexContainer(@NotNull final String name, IMesh<V, E, F> mesh) {
         return new IVertexContainerDouble<>() {
             @Override
             public double getValue(@NotNull V vertex) {
@@ -42,7 +40,7 @@ public interface IMeshDataStorage<V extends IVertex, E extends IHalfEdge, F exte
 
             @Override
             public void reset() {
-                for(V v : getMesh().getVertices()) {
+                for(V v : mesh.vertices().getAll()) {
                     setValue(v, 0.0);
                 }
             }

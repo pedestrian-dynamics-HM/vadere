@@ -2,9 +2,11 @@ package org.vadere.simulator.models.potential.timeCostFunction;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.vadere.meshing.mesh.gen.IncrementalTriangulation;
+import org.vadere.meshing.mesh.inter.ITriangleMeshPointLocator;
 import org.vadere.meshing.mesh.inter.mesh.IFace;
 import org.vadere.meshing.mesh.inter.mesh.IHalfEdge;
-import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
+import org.vadere.meshing.mesh.inter.mesh.ITriangleMeshWithDataStorage;
 import org.vadere.meshing.mesh.inter.mesh.IVertex;
 import org.vadere.meshing.mesh.inter.IVertexContainerDouble;
 import org.vadere.meshing.mesh.triangulation.triangulator.gen.GenRegularRefinement;
@@ -43,9 +45,11 @@ public class TimeCostGaussianPedestrianDensityMesh<V extends IVertex, E extends 
 
 	private final ITimeCostFunctionMesh<V> timeCostFunction;
 	private final Topography topography;
-	private final IIncrementalTriangulation<V, E, F> triangulation;
+	private final ITriangleMeshWithDataStorage<V, E, F> triangulation;
+    private final ITriangleMeshPointLocator<V, E, F> pointLocator;
 	private final IVertexContainerDouble<V, E, F> densities;
-	private final IPedestrianLoadingStrategy loadingStrategy;
+    @NotNull
+    private final IPedestrianLoadingStrategy loadingStrategy;
 	private boolean updated;
 	private GenRegularRefinement<V, E, F> refiner;
 
@@ -65,17 +69,19 @@ public class TimeCostGaussianPedestrianDensityMesh<V extends IVertex, E extends 
 
 	public TimeCostGaussianPedestrianDensityMesh(
 			@NotNull final ITimeCostFunctionMesh<V> timeCostFunction,
-			@NotNull final IIncrementalTriangulation<V, E, F> triangulation,
+			@NotNull final ITriangleMeshWithDataStorage<V, E, F> triangulation,
 			@NotNull final IPedestrianLoadingStrategy loadingStrategy,
 			final AttributesAgent attributesAgent,
 			final Topography topography){
 		this.timeCostFunction = timeCostFunction;
-		this.loadingStrategy = loadingStrategy;
+        this.loadingStrategy = loadingStrategy;
 		this.triangulation = triangulation;
 		this.topography = topography;
-		this.densities = triangulation.getMeshDataStorage().getDoubleVertexContainer(nameAgentDensity);
+		this.densities = triangulation.getDataStorage().getDoubleVertexContainer(nameAgentDensity, triangulation.getMesh());
 		this.updated = false;
-		this.refiner = new GenRegularRefinement<>(triangulation, e -> false);
+		IncrementalTriangulation<V, E, F> incrementalTriangulation = IncrementalTriangulation.fromMeshBuilder(triangulation.modify());
+        this.pointLocator = incrementalTriangulation.getPointLocator();
+		this.refiner = new GenRegularRefinement<>(incrementalTriangulation, e -> false);
 		this.refiner.setCoarsePredicate(v -> coarse(v));
 		this.refiner.setEdgeRefinementPredicate(e -> refine(e));
 		this.step = 0;
@@ -100,8 +106,7 @@ public class TimeCostGaussianPedestrianDensityMesh<V extends IVertex, E extends 
 		//debugPanel.paintImmediately(0, 0, debugPanel.getWidth(), debugPanel.getHeight());
 		refiner.refine();
 		long runTime = System.currentTimeMillis() - ms;
-		// todo hh: refine after making mesh immutable
-		refiner.getMeshWithDataStorage().toMutableMesh().getOptimizer().garbageCollection();
+		refiner.getMeshBuilder().getOptimizer().garbageCollection();
 		//debugPanel.paintImmediately(0, 0, debugPanel.getWidth(), debugPanel.getHeight());
 		//System.out.println("runTime refinement = " + runTime);
 	}
@@ -118,9 +123,9 @@ public class TimeCostGaussianPedestrianDensityMesh<V extends IVertex, E extends 
 
 	private boolean refine(@NotNull final E e) {
 		//return refiner.getLevel(e) < 2;
-		if(!triangulation.getMesh().isBoundary(e)) {
-			VTriangle triangle = triangulation.getMesh().toTriangle(triangulation.getMesh().getFace(e));
-			if(/*!refiner.isGreen(e) || */triangulation.getMesh().toLine(e).length() > h_max) {
+		if(!triangulation.getMesh().edges().isBoundary(e)) {
+			VTriangle triangle = triangulation.getMesh().faces().toTriangle(triangulation.getMesh().faces().getOf(e));
+			if(/*!refiner.isGreen(e) || */triangulation.getMesh().edges().toLine(e).length() > h_max) {
 				for(Pedestrian pedestrian : topography.getPedestrianDynamicElements().getElements()) {
 					// influenceRadius is cutoff radius for the mesh refinement is 4 times the density cutoff radius, i.e. we have to refine every time an agent travles more than the influenceRadius.
 					if(pedestrian.getPosition().distanceSq(triangle.midPoint()) < influenceRadius * influenceRadius * 4) {
@@ -150,9 +155,9 @@ public class TimeCostGaussianPedestrianDensityMesh<V extends IVertex, E extends 
 
 	@Override
 	public double costAt(@NotNull final IPoint p) {
-		F face = triangulation.locate(p).get();
+		F face = triangulation.getMesh().readConnectivity().locateNonBoundaryByFullScan(p).get();
 		double cost = 0;
-		if (!triangulation.getMesh().isBoundary(face)) {
+		if (!triangulation.getMesh().faces().isBoundary(face)) {
 			cost = GeometryUtilsMesh.barycentricInterpolation(face, triangulation.getMesh(),
 					v -> densities.getValue(v), p.getX(), p.getY());
 		}
@@ -176,20 +181,20 @@ public class TimeCostGaussianPedestrianDensityMesh<V extends IVertex, E extends 
 		//long ms = System.currentTimeMillis();
 
 
-		var meshWithDataStorage = triangulation.getMeshWithDataStorage();
+		var mesh = triangulation.getMesh();
 		densities.reset();
 
 		for (Pedestrian element : topography.getPedestrianDynamicElements().getElements()) {
-			Optional<F> optional = triangulation.locateFace(element.getPosition(), element);
+			Optional<F> optional = pointLocator.locate(element.getPosition(), element);
 			assert optional.isPresent();
 
 			if (optional.isPresent()) {
 				F pedFace = optional.get();
-				Predicate<V> predicate = v -> GeometryUtils.lengthSq(meshWithDataStorage.getMesh().getX(v) - element.getPosition().x,
-						meshWithDataStorage.getMesh().getY(v) - element.getPosition().y) < influenceRadius * influenceRadius;
-				Set<V> closeVertices = triangulation.getVertices(element.getPosition().getX(), element.getPosition().getY(), pedFace, predicate);
+				Predicate<V> predicate = v -> GeometryUtils.lengthSq(mesh.vertices().getX(v) - element.getPosition().x,
+						mesh.vertices().getY(v) - element.getPosition().y) < influenceRadius * influenceRadius;
+				Set<V> closeVertices = triangulation.getMesh().readConnectivity().getVertices(element.getPosition().getX(), element.getPosition().getY(), pedFace, predicate);
 				for (V v : closeVertices) {
-					double density = densities.getValue(v) + density(element.getPosition().x, element.getPosition().y, meshWithDataStorage.getMesh().getX(v), meshWithDataStorage.getMesh().getY(v), element);
+					double density = densities.getValue(v) + density(element.getPosition().x, element.getPosition().y, mesh.vertices().getX(v), mesh.vertices().getY(v), element);
 					densities.setValue(v, density);
 				}
 			}

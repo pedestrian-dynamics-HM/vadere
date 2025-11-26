@@ -4,14 +4,14 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.triangulate.DelaunayTriangulationBuilder;
 
-import org.vadere.meshing.mesh.gen.mesh.arrayBased.AFace;
-import org.vadere.meshing.mesh.gen.mesh.arrayBased.AHalfEdge;
-import org.vadere.meshing.mesh.gen.mesh.arrayBased.AVertex;
-import org.vadere.meshing.mesh.gen.mesh.pointerBased.PFace;
-import org.vadere.meshing.mesh.gen.mesh.pointerBased.PHalfEdge;
-import org.vadere.meshing.mesh.gen.mesh.pointerBased.PVertex;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AFace;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AHalfEdge;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AVertex;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PFace;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PHalfEdge;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PVertex;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
-import org.vadere.meshing.mesh.inter.IPointLocator;
+import org.vadere.meshing.mesh.inter.ITriangleMeshPointLocator;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.logging.Logger;
@@ -54,35 +54,35 @@ public class PerformanceTest {
 
 	private static void testPointerWalk() {
 		long ms = System.currentTimeMillis();
-		IIncrementalTriangulation<PVertex, PHalfEdge, PFace> delaunay = IIncrementalTriangulation.createPTriangulation(IPointLocator.Type.BASE, points);
+		IIncrementalTriangulation<PVertex, PHalfEdge, PFace> delaunay = IIncrementalTriangulation.createPTriangulation(ITriangleMeshPointLocator.Type.BASE, points);
 		delaunay.finish();
 		log.info("runtime of the Walk method, #vertices = " + delaunay.getVertices().size() + " is " + (System.currentTimeMillis() - ms) + " [ms]");
 	}
 
 	private static void testArrayJumpAndWalk() {
 		long ms = System.currentTimeMillis();
-		IIncrementalTriangulation<AVertex, AHalfEdge, AFace> delaunay = IIncrementalTriangulation.createATriangulation(IPointLocator.Type.JUMP_AND_WALK, points);
+		IIncrementalTriangulation<AVertex, AHalfEdge, AFace> delaunay = IIncrementalTriangulation.createATriangulation(ITriangleMeshPointLocator.Type.JUMP_AND_WALK, points);
 		delaunay.finish();
 		log.info("runtime of the Jump & Walk method (Array), #vertices = " + delaunay.getVertices().size() + " is " + (System.currentTimeMillis() - ms) + " [ms]");
 	}
 
 	private static void testPointerJumpAndWalk() {
 		long ms = System.currentTimeMillis();
-		IIncrementalTriangulation<PVertex, PHalfEdge, PFace> delaunay = IIncrementalTriangulation.createPTriangulation(IPointLocator.Type.JUMP_AND_WALK, points);
+		IIncrementalTriangulation<PVertex, PHalfEdge, PFace> delaunay = IIncrementalTriangulation.createPTriangulation(ITriangleMeshPointLocator.Type.JUMP_AND_WALK, points);
 		delaunay.finish();
 		log.info("runtime of the Jump & Walk method (Pointer), #vertices = " + delaunay.getVertices().size() + " is " + (System.currentTimeMillis() - ms) + " [ms]");
 	}
 
 	private static void testPointerDelaunayHierarchy() {
 		long ms = System.currentTimeMillis();
-		IIncrementalTriangulation<PVertex, PHalfEdge, PFace> delaunay = IIncrementalTriangulation.createPTriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, points);
+		IIncrementalTriangulation<PVertex, PHalfEdge, PFace> delaunay = IIncrementalTriangulation.createPTriangulation(ITriangleMeshPointLocator.Type.DELAUNAY_HIERARCHY, points);
 		delaunay.finish();
 		log.info("runtime of the Delaunay-Hierarchy (Pointer), #vertices = " + delaunay.getVertices().size() + " is " + (System.currentTimeMillis() - ms) + " [ms]");
 	}
 
 	private static void testArrayDelaunayHierarchy() {
 		long ms = System.currentTimeMillis();
-		IIncrementalTriangulation<AVertex, AHalfEdge, AFace> delaunay = IIncrementalTriangulation.createATriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, points);
+		IIncrementalTriangulation<AVertex, AHalfEdge, AFace> delaunay = IIncrementalTriangulation.createATriangulation(ITriangleMeshPointLocator.Type.DELAUNAY_HIERARCHY, points);
 		delaunay.finish();
 		log.info("runtime of the Delaunay-Hierarchy (Array), #vertices = " + delaunay.getVertices().size() + " is " + (System.currentTimeMillis() - ms) + " [ms]");
 	}

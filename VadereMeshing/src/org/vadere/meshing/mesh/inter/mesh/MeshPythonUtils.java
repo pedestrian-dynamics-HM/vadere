@@ -12,7 +12,7 @@ import java.util.function.Function;
 public final class MeshPythonUtils {
     public static <V extends IVertex, E extends IHalfEdge, F extends IFace> String toPythonValues(IMesh<V, E, F> mesh, @NotNull final Function<V, Double> evalPoint) {
         StringBuilder builder = new StringBuilder();
-        List<V> vertices = mesh.getVertices();
+        List<V> vertices = mesh.vertices().getAll();
         for(V v : vertices) {
             builder.append(evalPoint.apply(v) + ",");
         }
@@ -42,15 +42,14 @@ public final class MeshPythonUtils {
      * @return a string representing the mesh
      */
     public static <V extends IVertex, E extends IHalfEdge, F extends IFace> String toPythonTriangulation(IMeshWithDataStorage<V, E, F> toPrint, @Nullable final Function<V, Double> evalPoint) {
-        // todo hh: improve after making mesh immutable
-        IMeshBuilder<V, E, F> meshBuilder = toPrint.toMutableMesh();
+        IMeshBuilder<V, E, F> meshBuilder = toPrint.modify();
         meshBuilder.getOptimizer().garbageCollection();
 
-        IMeshWithDataStorage<V, E, F> meshWithDataStorage = meshBuilder.build();
+        IMeshWithDataStorage<V, E, F> meshWithDataStorage = meshBuilder.getMeshWithDataStorage();
         IMesh<V, E, F> mesh = meshWithDataStorage.getMesh();
 
         StringBuilder builder = new StringBuilder();
-        List<V> vertices = mesh.getVertices();
+        List<V> vertices = mesh.vertices().getAll();
         Map<V, Integer> indexMap = new HashMap<>();
 
         // [x1, x2, ...]
@@ -82,11 +81,11 @@ public final class MeshPythonUtils {
         }
 
         // [[vId1, vId2, vId3], ...]
-        List<F> faces = mesh.getFaces();
+        List<F> faces = mesh.faces().getAll();
         builder.append("TRIS.append([");
         for(F face : faces) {
             builder.append("[");
-            for(V v : mesh.getVertexIt(face)) {
+            for(V v : mesh.vertices().iterableFor(face)) {
                 int index = indexMap.get(v);
                 builder.append(index + ",");
             }

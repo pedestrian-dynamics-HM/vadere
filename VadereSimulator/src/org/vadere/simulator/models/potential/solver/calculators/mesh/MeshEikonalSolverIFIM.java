@@ -3,13 +3,11 @@ package org.vadere.simulator.models.potential.solver.calculators.mesh;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
 import org.jetbrains.annotations.NotNull;
+import org.vadere.meshing.mesh.inter.*;
 import org.vadere.meshing.mesh.inter.mesh.IFace;
 import org.vadere.meshing.mesh.inter.mesh.IHalfEdge;
-import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
+import org.vadere.meshing.mesh.inter.mesh.ITriangleMeshWithDataStorage;
 import org.vadere.meshing.mesh.inter.mesh.IVertex;
-import org.vadere.meshing.mesh.inter.IVertexContainerBoolean;
-import org.vadere.meshing.mesh.inter.IVertexContainerDouble;
-import org.vadere.meshing.mesh.inter.IVertexContainerObject;
 import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.logging.Logger;
@@ -98,17 +96,17 @@ public class MeshEikonalSolverIFIM<V extends IVertex, E extends IHalfEdge, F ext
 	public MeshEikonalSolverIFIM(@NotNull final String identifier,
 	                             @NotNull final Collection<VShape> targetShapes,
 	                             @NotNull final ITimeCostFunction timeCostFunction,
-	                             @NotNull final IIncrementalTriangulation<V, E, F> triangulation/*,
-	                             @NotNull final Collection<VShape> destinations*/
+								 @NotNull final ITriangleMeshWithDataStorage<V, E, F> triangulation,
+								 @NotNull final ITriangleMeshPointLocator<V, E, F> pointLocator
 	) {
-		super(identifier, triangulation, timeCostFunction);
+		super(identifier, triangulation, pointLocator.withCache(), timeCostFunction);
 		this.identifier = identifier;
 		this.activeList = new LinkedList<>();
 		this.oldDefiningSimplex = getMeshDataStorage().getObjectVertexContainer(identifier + "_" + nameOldDefiningSimplex, Pair.class);
 		this.definingSimplex = getMeshDataStorage().getObjectVertexContainer(identifier + "_" + nameDefiningSimplex, Pair.class);
 
-		this.oldPotential = getMeshDataStorage().getDoubleVertexContainer(identifier + "_" + nameOldPotential);
-		this.oldTimeCosts = getMeshDataStorage().getDoubleVertexContainer(identifier + "_" + nameOldSpeed);
+		this.oldPotential = getMeshDataStorage().getDoubleVertexContainer(identifier + "_" + nameOldPotential, getMesh());
+		this.oldTimeCosts = getMeshDataStorage().getDoubleVertexContainer(identifier + "_" + nameOldSpeed, getMesh());
 		this.speedChange = getMeshDataStorage().getBooleanVertexContainer(identifier + "_" + nameSpeedChanged);
 		setInitialVertices(findInitialVertices(targetShapes), IDistanceFunction.createToTargets(targetShapes));
 
@@ -124,7 +122,6 @@ public class MeshEikonalSolverIFIM<V extends IVertex, E extends IHalfEdge, F ext
 	@Override
 	public void solve() {
 		double ms = System.currentTimeMillis();
-		getTriangulation().enableCache();
 		nUpdates = 0;
 		//narrowBandSizes.add(new ArrayList<>());
 
@@ -146,7 +143,7 @@ public class MeshEikonalSolverIFIM<V extends IVertex, E extends IHalfEdge, F ext
 		double runTime = (System.currentTimeMillis() - ms);
 		logger.debug("ifim run time = " + runTime);
 		logger.debug("#nUpdates = " + nUpdates);
-		logger.debug("#nVertices = " + (getMesh().getNumberOfVertices() - (int)getMesh().streamVertices().filter(v -> isInitialVertex(v)).count()));
+		logger.debug("#nVertices = " + (vertices.count() - (int)vertices.stream().filter(v -> isInitialVertex(v)).count()));
 		/*if(iteration % 100 == 0) {
 			writeNarrowBandSize();
 		}
@@ -254,7 +251,7 @@ public class MeshEikonalSolverIFIM<V extends IVertex, E extends IHalfEdge, F ext
 					setBurned(x);
 					setUnburning(x);
 					// check adjacent neighbors
-					for(V xn : getMesh().getAdjacentVertexIt(x)) {
+					for(V xn : vertices.adjacentIterableFor(x)) {
 						/*if(!isInitialVertex(xn)) {
 							boolean rdy = isReady(xn);
 							rdy = isReady(xn);
@@ -305,12 +302,12 @@ public class MeshEikonalSolverIFIM<V extends IVertex, E extends IHalfEdge, F ext
 		}*/
 
 		// copy the values
-		getMesh().streamVerticesParallel().forEach(v -> oldDefiningSimplex.setValue(v, definingSimplex.getValue(v)));
+		vertices.streamParallel().forEach(v -> oldDefiningSimplex.setValue(v, definingSimplex.getValue(v)));
 		// clear might not be necessary
-		getMesh().streamVerticesParallel().forEach(v -> definingSimplex.setValue(v, null));
+		vertices.streamParallel().forEach(v -> definingSimplex.setValue(v, null));
 
-		getMesh().streamVerticesParallel().forEach(v -> setOldPotential(v, getPotential(v)));
-		getMesh().streamVerticesParallel().forEach(v -> setOldTimeCost(v, getTimeCost(v)));
+		vertices.streamParallel().forEach(v -> setOldPotential(v, getPotential(v)));
+		vertices.streamParallel().forEach(v -> setOldTimeCost(v, getTimeCost(v)));
 
 		//System.out.println(i+"#update / #vertices: " + nUpdates + " / " + getMesh().getNumberOfVertices());
 		i++;
@@ -403,7 +400,7 @@ public class MeshEikonalSolverIFIM<V extends IVertex, E extends IHalfEdge, F ext
 	}
 
 	private boolean requiresUpdate(@NotNull final V v) {
-		for(V neighbour : getMesh().getAdjacentVertexIt(v)) {
+		for(V neighbour : vertices.adjacentIterableFor(v)) {
 			if(hasChanged(getOldPotential(v), neighbour)) {
 				return true;
 			}

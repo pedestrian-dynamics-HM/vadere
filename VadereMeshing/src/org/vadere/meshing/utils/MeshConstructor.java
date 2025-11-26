@@ -2,7 +2,10 @@ package org.vadere.meshing.utils;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.gen.MeshRenderer;
-import org.vadere.meshing.mesh.gen.mesh.pointerBased.*;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PFace;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PHalfEdge;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PVertex;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.triangles.PTriangleMeshBuilder;
 import org.vadere.meshing.mesh.impl.PMeshPanel;
 import org.vadere.meshing.mesh.impl.PSLG;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
@@ -41,7 +44,7 @@ public class MeshConstructor {
 			var meshPanel = new PMeshPanel(meshRenderer, 600, 600);
 			meshPanel.display("Ruppert's algorithm");
 			while(!ruppertsTriangulator.isFinished()) {
-				synchronized (ruppertsTriangulator.getMesh()) {
+				synchronized (ruppertsTriangulator.getMeshBuilder()) {
 					ruppertsTriangulator.step();
 				}
 				meshPanel.repaint();
@@ -51,7 +54,7 @@ public class MeshConstructor {
 			triangulation = ruppertsTriangulator.generate();
 		}
 
-		return triangulation.getMeshWithDataStorage();
+		return triangulation.getMeshBuilder().getMeshWithDataStorage();
 	}
 
 	public IMeshWithDataStorage<PVertex, PHalfEdge, PFace> pslgToAdaptivePMesh(
@@ -62,7 +65,7 @@ public class MeshConstructor {
 		VPolygon segmentBound = pslg.getSegmentBound();
 		IDistanceFunction distanceFunction = IDistanceFunction.create(segmentBound, holes);
 		logger.info("construct distance function");
-		IDistanceFunction distanceFunctionApproximation = new DistanceFunctionApproxBF(pslg, distanceFunction, PMeshWithDataStorage::constructEmpty);
+		IDistanceFunction distanceFunctionApproximation = new DistanceFunctionApproxBF(pslg, distanceFunction, PTriangleMeshBuilder::new);
 
 		IEdgeLengthFunction edgeLengthFunction = p -> hmin + smoothness * Math.abs((distanceFunctionApproximation).apply(p));
 		EdgeLengthFunctionApprox edgeLengthFunctionApprox = new EdgeLengthFunctionApprox(pslg, edgeLengthFunction, p -> hmax);
@@ -98,7 +101,7 @@ public class MeshConstructor {
 			meshPanel.display("EikMesh h0 = " + h0);
 
 			while (!meshImprover.isFinished()) {
-				synchronized (meshImprover.getMesh()) {
+				synchronized (meshImprover.getMeshBuilder()) {
 					meshImprover.improve();
 					logger.info("quality = " + meshImprover.getQuality());
 				}
@@ -109,7 +112,7 @@ public class MeshConstructor {
 		} else {
 			meshImprover.generate();
 		}
-		return meshImprover.getMeshWithDataStorage();
+		return meshImprover.getMeshBuilder().getMeshWithDataStorage();
 	}
 
 	public IMesh<PVertex, PHalfEdge, PFace> pslgToUniformPMesh(@NotNull final PSLG pslg, final double h0, final boolean viszalize) {
@@ -117,7 +120,7 @@ public class MeshConstructor {
 		VPolygon segmentBound = pslg.getSegmentBound();
 		IDistanceFunction distanceFunction = IDistanceFunction.create(segmentBound, holes);
 		logger.info("construct distance function");
-		IDistanceFunction distanceFunctionApproximation = new DistanceFunctionApproxBF(pslg, distanceFunction, PMeshWithDataStorage::constructEmpty);
+		IDistanceFunction distanceFunctionApproximation = new DistanceFunctionApproxBF(pslg, distanceFunction, PTriangleMeshBuilder::new);
 
 
 		Collection<VPolygon> polygons = pslg.getAllPolygons();
@@ -148,7 +151,7 @@ public class MeshConstructor {
 			meshPanel.display("EikMesh uniform h0 = " + h0);
 
 			while (!meshImprover.isFinished()) {
-				synchronized (meshImprover.getMesh()) {
+				synchronized (meshImprover.getMeshBuilder()) {
 					meshImprover.improve();
 				}
 				meshPanel.repaint();
@@ -165,7 +168,7 @@ public class MeshConstructor {
 		VPolygon segmentBound = pslg.getSegmentBound();
 		IDistanceFunction distanceFunction = IDistanceFunction.create(segmentBound, holes);
 		logger.info("construct distance function");
-		IDistanceFunction distanceFunctionApproximation = new DistanceFunctionApproxBF(pslg, distanceFunction, PMeshWithDataStorage::constructEmpty);
+		IDistanceFunction distanceFunctionApproximation = new DistanceFunctionApproxBF(pslg, distanceFunction, PTriangleMeshBuilder::new);
 		((DistanceFunctionApproxBF) distanceFunctionApproximation).printPython();
 
 		//IEdgeLengthFunction circumRadiusFunc = p -> h0 / 2.0;
@@ -202,7 +205,7 @@ public class MeshConstructor {
 			meshPanel.display("EikMesh h0 = " + h0);
 
 			while (!meshImprover.isFinished()) {
-				synchronized (meshImprover.getMesh()) {
+				synchronized (meshImprover.getMeshBuilder()) {
 					meshImprover.improve();
 					logger.info("quality = " + meshImprover.getQuality());
 				}

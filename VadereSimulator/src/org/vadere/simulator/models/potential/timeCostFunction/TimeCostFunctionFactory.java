@@ -1,8 +1,10 @@
 package org.vadere.simulator.models.potential.timeCostFunction;
 
+import org.vadere.meshing.mesh.gen.pointLocator.JumpAndWalkPointLocator;
 import org.vadere.meshing.mesh.inter.mesh.IFace;
 import org.vadere.meshing.mesh.inter.mesh.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
+import org.vadere.meshing.mesh.inter.mesh.ITriangleMeshWithDataStorage;
 import org.vadere.meshing.mesh.inter.mesh.IVertex;
 import org.vadere.simulator.models.density.IGaussianFilter;
 import org.vadere.simulator.models.potential.timeCostFunction.loading.IPedestrianLoadingStrategy;
@@ -150,7 +152,7 @@ public class TimeCostFunctionFactory {
 			final AttributesTimeCost timeCostAttributes,
 			final AttributesAgent attributesPedestrian,
 			final Topography topography, final int targetId,
-			IIncrementalTriangulation<V, E, F> triangulation) {
+			ITriangleMeshWithDataStorage<V, E, F> triangulation) {
 
 		switch (timeCostAttributes.getType()) {
 			case NAVIGATION: {
@@ -193,6 +195,7 @@ public class TimeCostFunctionFactory {
 				TimeCostPedestrianDensityQueueingMesh<V, E, F> timeCostPedestrianDensityQueueingMesh = new TimeCostPedestrianDensityQueueingMesh<>(
 						timeCostObstacleDensity,
 						triangulation,
+						new JumpAndWalkPointLocator<>(triangulation.getMesh()),
 						IPedestrianLoadingStrategy.create(timeCostAttributes.getQueueWidthLoading()),
 						attributesPedestrian,
 						topography

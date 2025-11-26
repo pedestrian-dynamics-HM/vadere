@@ -3,7 +3,7 @@ package org.vadere.simulator.models.potential.solver.calculators.cartesian;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
 import org.jetbrains.annotations.NotNull;
-import org.vadere.meshing.mesh.gen.mesh.pointerBased.PMesh;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PMesh;
 import org.vadere.meshing.mesh.inter.mesh.IMesh;
 import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
 import org.vadere.simulator.utils.cache.CacheException;

@@ -1,9 +1,10 @@
 package org.vadere.simulator.models.potential.solver.calculators.mesh;
 
 import org.jetbrains.annotations.NotNull;
+import org.vadere.meshing.mesh.inter.ITriangleMeshPointLocator;
 import org.vadere.meshing.mesh.inter.mesh.IFace;
 import org.vadere.meshing.mesh.inter.mesh.IHalfEdge;
-import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
+import org.vadere.meshing.mesh.inter.mesh.ITriangleMeshWithDataStorage;
 import org.vadere.meshing.mesh.inter.mesh.IVertex;
 import org.vadere.meshing.mesh.inter.IVertexContainerObject;
 import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
@@ -77,9 +78,10 @@ public class MeshEikonalSolverFIMLockFree<V extends IVertex, E extends IHalfEdge
 	public MeshEikonalSolverFIMLockFree(@NotNull final String identifier,
 	                                    @NotNull final Collection<VShape> targetShapes,
 	                                    @NotNull final ITimeCostFunction timeCostFunction,
-	                                    @NotNull final IIncrementalTriangulation<V, E, F> triangulation
+										@NotNull final ITriangleMeshWithDataStorage<V, E, F> triangulation,
+										@NotNull final ITriangleMeshPointLocator<V, E, F> pointLocator
 	) {
-		super(identifier, triangulation, timeCostFunction);
+		super(identifier, triangulation, pointLocator.withCache(), timeCostFunction);
 		this.identifier = identifier;
 		this.forkJoinPool = ForkJoinPool.commonPool();
 		//this.nThreds = forkJoinPool.getParallelism();
@@ -95,10 +97,10 @@ public class MeshEikonalSolverFIMLockFree<V extends IVertex, E extends IHalfEdge
 		//TODO a more clever init!
 		List<V> initialVertices = new ArrayList<>();
 		for(VShape shape : targetShapes) {
-			getMesh().streamVertices()
-					.filter(v -> shape.contains(getMesh().toPoint(v)))
+			vertices.stream()
+					.filter(v -> shape.contains(vertices.toPoint(v)))
 					.forEach(v -> {
-						for(V u : getMesh().getAdjacentVertexIt(v)) {
+						for(V u : vertices.adjacentIterableFor(v)) {
 							initialVertices.add(u);
 							setAsInitialVertex(u);
 						}
@@ -114,7 +116,6 @@ public class MeshEikonalSolverFIMLockFree<V extends IVertex, E extends IHalfEdge
 	public void solve() {
 		try {
 			double ms = System.currentTimeMillis();
-			getTriangulation().enableCache();
 			nUpdates = 0;
 
 			if(!solved || needsUpdate()) {
@@ -135,7 +136,7 @@ public class MeshEikonalSolverFIMLockFree<V extends IVertex, E extends IHalfEdge
 			double runTime = (System.currentTimeMillis() - ms);
 			logger.debug("fim parallel run time with " + nThreds + " threads = " + runTime);
 			logger.debug("#nUpdates = " + nUpdates);
-			logger.debug("#nVertices = " + getMesh().getNumberOfVertices());
+			logger.debug("#nVertices = " + vertices.count());
 			//logger.debug(getMesh().toPythonTriangulation(v -> getPotential(v)));
 		} catch (ExecutionException e) {
 			e.printStackTrace();
@@ -146,11 +147,11 @@ public class MeshEikonalSolverFIMLockFree<V extends IVertex, E extends IHalfEdge
 
 	@Override
 	protected void unsolve() {
-		getMesh().streamVerticesParallel().forEach(v -> {
+		vertices.streamParallel().forEach(v -> {
 			atomicBooleans.setValue(v, new AtomicBoolean(true));
 		});
 
-		getMesh().streamVerticesParallel().filter(v -> !isInitialVertex(v)).forEach(v -> {
+		vertices.streamParallel().filter(v -> !isInitialVertex(v)).forEach(v -> {
 			setUndefined(v);
 			setPotential(v, Double.MAX_VALUE);
 			setUnburning(v);
@@ -163,7 +164,7 @@ public class MeshEikonalSolverFIMLockFree<V extends IVertex, E extends IHalfEdge
 		// run the task for exactly nThread thread
 		List<List<V>> partition = CollectionUtils.split(getInitialVertices(), nThreds);
 		forkJoinPool.submit(() -> IntStream.range(0, activeLists.size()).parallel().forEach(i -> {
-					partition.get(i).stream().flatMap(v -> getMesh().streamVertices(v)).forEach(v -> {
+					partition.get(i).stream().flatMap(v -> vertices.streamVerticesOf(v)).forEach(v -> {
 					if(isUndefined(v)) {
 						updatePotential(v, i);
 					}
@@ -224,7 +225,7 @@ public class MeshEikonalSolverFIMLockFree<V extends IVertex, E extends IHalfEdge
 					// converged
 					else {
 						// check adjacent neighbors
-						for(V xn : getMesh().getAdjacentVertexIt(x)) {
+						for(V xn : vertices.adjacentIterableFor(x)) {
 							if(getPotential(xn) > getPotential(x) && !isBurining(xn)) {
 								p = getPotential(xn);
 								q = recomputePotential(xn);

@@ -2,7 +2,11 @@ package org.vadere.meshing.mesh.triangulation.plots;
 
 import org.apache.commons.lang3.time.StopWatch;
 import org.vadere.meshing.mesh.gen.mesh.arrayBased.*;
-import org.vadere.meshing.mesh.inter.IEmptyMeshSupplier;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AFace;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AHalfEdge;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AMeshBuilder;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AVertex;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.triangles.ATriangleMeshBuilder;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
 import org.vadere.meshing.mesh.triangulation.edgeLengthFunctions.IEdgeLengthFunction;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.GenEikMesh;
@@ -42,7 +46,6 @@ public class EikMeshPlots {
 	 * A circle with radius 10.0 meshed using a uniform mesh.
 	 */
 	private static void uniformCircle(final double initialEdgeLength) {
-		IEmptyMeshSupplier<AVertex, AHalfEdge, AFace> supplier = AMeshWithDataStorage::constructEmpty;
 		IDistanceFunction distanceFunc = p -> Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY()) - 1;
 		List<VShape> obstacles = new ArrayList<>();
 		IEdgeLengthFunction edgeLengthFunc = p -> 1.0 + Math.abs(distanceFunc.apply(p)) * 2;
@@ -52,21 +55,21 @@ public class EikMeshPlots {
 				edgeLengthFunc,
 				initialEdgeLength,
 				bbox, obstacles,
-				supplier);
+				ATriangleMeshBuilder::new);
 
 		StopWatch overAllTime = new StopWatch();
 		overAllTime.start();
 		meshGenerator.generate();
 		overAllTime.stop();
 
-		log.info("#vertices:" + meshGenerator.getMesh().getVertices().size());
-		log.info("#edges:" + meshGenerator.getMesh().getEdges().size());
+		log.info("#vertices:" + meshGenerator.getMeshBuilder().getMesh().vertices().count());
+		log.info("#edges:" + meshGenerator.getMeshBuilder().getMesh().edges().count());
 		log.info("overall time: " + overAllTime.getTime() + "[ms]");
 		log.info("quality:" + meshGenerator.getQuality());
 		log.info("min-quality: " + meshGenerator.getMinQuality());
 
 		Predicate<AFace> predicate = f ->  meshGenerator.faceToQuality(f) < 0.9;
-		MeshPanel<AVertex, AHalfEdge, AFace> distmeshPanel = new MeshPanel(meshGenerator.getMesh(),
+		MeshPanel<AVertex, AHalfEdge, AFace> distmeshPanel = new MeshPanel(meshGenerator.getMeshBuilder().getMesh(),
 				predicate, 1000, 800);
 		JFrame frame = distmeshPanel.display();
 		frame.setVisible(true);
@@ -84,7 +87,6 @@ public class EikMeshPlots {
 	 * A ring innter radius 4.0 and outer radius 10.0 meshed using a uniform mesh.
 	 */
 	private static void uniformRing() {
-		IEmptyMeshSupplier<AVertex, AHalfEdge, AFace> supplier = AMeshWithDataStorage::constructEmpty;
 		IDistanceFunction distanceFunc = p -> Math.abs(0.7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 0.3;
 		List<VShape> obstacles = new ArrayList<>();
 		IEdgeLengthFunction edgeLengthFunc = uniformEdgeLength;
@@ -94,19 +96,20 @@ public class EikMeshPlots {
 				edgeLengthFunc,
 				initialEdgeLength,
 				bbox, obstacles,
-				supplier);
+				ATriangleMeshBuilder::new);
 
 		StopWatch overAllTime = new StopWatch();
 		overAllTime.start();
 		meshGenerator.generate();
 		overAllTime.stop();
 
-		log.info("#vertices:" + meshGenerator.getMesh().getVertices().size());
-		log.info("#edges:" + meshGenerator.getMesh().getEdges().size());
+		log.info("#vertices:" + meshGenerator.getMeshBuilder().getMesh().vertices().count());
+		log.info("#edges:" + meshGenerator.getMeshBuilder().getMesh().edges().count());
 		log.info("overall time: " + overAllTime.getTime() + "[ms]");
 		log.info("min-quality: " + meshGenerator.getMinQuality());
 
-		MeshPanel<AVertex, AHalfEdge, AFace> distmeshPanel = new MeshPanel(meshGenerator.getMesh(), f -> false, 1000, 800);
+		MeshPanel<AVertex, AHalfEdge, AFace> distmeshPanel = new MeshPanel(
+				meshGenerator.getMeshBuilder().getMesh(), f -> false, 1000, 800);
 		JFrame frame = distmeshPanel.display();
 		frame.setVisible(true);
 		frame.setTitle("uniformRing()");
@@ -115,14 +118,13 @@ public class EikMeshPlots {
 
 		System.out.println();
 		System.out.println();
-		System.out.println(TexGraphGenerator.toTikz(meshGenerator.getMesh()));
+		System.out.println(TexGraphGenerator.toTikz(meshGenerator.getMeshBuilder().getMesh()));
 	}
 
 	/**
 	 * A circle with radius 10.0 meshed using a uniform mesh.
 	 */
 	private static void adaptiveRing(final double initialEdgeLength) {
-		IEmptyMeshSupplier<AVertex, AHalfEdge, AFace> supplier = AMeshWithDataStorage::constructEmpty;;
 		IDistanceFunction distanceFunc = p -> Math.abs(0.7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 0.3;
 		List<VShape> obstacles = new ArrayList<>();
 		IEdgeLengthFunction edgeLengthFunc = p -> initialEdgeLength + Math.abs(distanceFunc.apply(p));
@@ -132,19 +134,19 @@ public class EikMeshPlots {
 				edgeLengthFunc,
 				initialEdgeLength,
 				bbox, obstacles,
-				supplier);
+				ATriangleMeshBuilder::new);
 
 		StopWatch overAllTime = new StopWatch();
 		overAllTime.start();
 		meshGenerator.generate();
 		overAllTime.stop();
 
-		log.info("#vertices:" + meshGenerator.getMesh().getVertices().size());
-		log.info("#edges:" + meshGenerator.getMesh().getEdges().size());
+		log.info("#vertices:" + meshGenerator.getMeshBuilder().getMesh().vertices().count());
+		log.info("#edges:" + meshGenerator.getMeshBuilder().getMesh().edges().count());
 		log.info("overall time: " + overAllTime.getTime() + "[ms]");
 		log.info("min-quality: " + meshGenerator.getMinQuality());
 
-		MeshPanel<AVertex, AHalfEdge, AFace> distmeshPanel = new MeshPanel(meshGenerator.getMesh(), f -> false, 1000, 800);
+		MeshPanel<AVertex, AHalfEdge, AFace> distmeshPanel = new MeshPanel(meshGenerator.getMeshBuilder().getMesh(), f -> false, 1000, 800);
 		JFrame frame = distmeshPanel.display();
 		frame.setVisible(true);
 		frame.setTitle("adaptiveCircle("+ initialEdgeLength + ")");
@@ -162,7 +164,6 @@ public class EikMeshPlots {
 	private static void uniformRect() {
 		VRectangle rect = new VRectangle(-0.4, -0.4, 0.8, 0.8);
 
-		IEmptyMeshSupplier<AVertex, AHalfEdge, AFace> supplier = AMeshWithDataStorage::constructEmpty;;
 		IDistanceFunction distanceFunc = IDistanceFunction.intersect(p -> Math.max(Math.abs(p.getX()), Math.abs(p.getY())) - 1.0, IDistanceFunction.create(bbox, rect));
 		List<VShape> obstacles = new ArrayList<>();
 		IEdgeLengthFunction edgeLengthFunc = uniformEdgeLength;
@@ -174,19 +175,19 @@ public class EikMeshPlots {
 				edgeLengthFunc,
 				initialEdgeLength,
 				bbox, obstacles,
-				supplier);
+				ATriangleMeshBuilder::new);
 
 		/*StopWatch overAllTime = new StopWatch();
 		overAllTime.start();
 		meshGenerator.generate();
 		overAllTime.stop();*/
 
-		log.info("#vertices:" + meshGenerator.getMesh().getVertices().size());
-		log.info("#edges:" + meshGenerator.getMesh().getEdges().size());
+		log.info("#vertices:" + meshGenerator.getMeshBuilder().getMesh().vertices().count());
+		log.info("#edges:" + meshGenerator.getMeshBuilder().getMesh().edges().count());
 		//log.info("overall time: " + overAllTime.getTime() + "[ms]");
 		log.info("min-quality: " + meshGenerator.getMinQuality());
 
-		MeshPanel<AVertex, AHalfEdge, AFace> distmeshPanel = new MeshPanel(meshGenerator.getMesh(), f -> false, 1000, 800);
+		MeshPanel<AVertex, AHalfEdge, AFace> distmeshPanel = new MeshPanel(meshGenerator.getMeshBuilder().getMesh(), f -> false, 1000, 800);
 		JFrame frame = distmeshPanel.display();
 		frame.setVisible(true);
 		frame.setTitle("uniformRect()");
@@ -209,7 +210,7 @@ public class EikMeshPlots {
 
 		System.out.println();
 		System.out.println();
-		System.out.println(TexGraphGenerator.toTikz(meshGenerator.getMesh()));
+		System.out.println(TexGraphGenerator.toTikz(meshGenerator.getMeshBuilder().getMesh()));
 	}
 
 	/**
@@ -218,7 +219,6 @@ public class EikMeshPlots {
 	private static void uniformHex() {
 		VPolygon hex = VShape.generateHexagon(0.4);
 
-		IEmptyMeshSupplier<AVertex, AHalfEdge, AFace> supplier = AMeshWithDataStorage::constructEmpty;;
 		IDistanceFunction distanceFunc = IDistanceFunction.intersect(p -> Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY()) - 1.0, IDistanceFunction.create(bbox, hex));
 		List<VShape> obstacles = new ArrayList<>();
 		IEdgeLengthFunction edgeLengthFunc = uniformEdgeLength;
@@ -230,19 +230,19 @@ public class EikMeshPlots {
 				edgeLengthFunc,
 				initialEdgeLength,
 				bbox, obstacles,
-				supplier);
+				ATriangleMeshBuilder::new);
 
 		StopWatch overAllTime = new StopWatch();
 		overAllTime.start();
 		meshGenerator.generate();
 		overAllTime.stop();
 
-		log.info("#vertices:" + meshGenerator.getMesh().getVertices().size());
-		log.info("#edges:" + meshGenerator.getMesh().getEdges().size());
+		log.info("#vertices:" + meshGenerator.getMeshBuilder().getMesh().vertices().count());
+		log.info("#edges:" + meshGenerator.getMeshBuilder().getMesh().edges().count());
 		log.info("overall time: " + overAllTime.getTime() + "[ms]");
 		log.info("min-quality: " + meshGenerator.getMinQuality());
 
-		MeshPanel<AVertex, AHalfEdge, AFace> distmeshPanel = new MeshPanel(meshGenerator.getMesh(), f -> false, 1000, 800);
+		MeshPanel<AVertex, AHalfEdge, AFace> distmeshPanel = new MeshPanel(meshGenerator.getMeshBuilder().getMesh(), f -> false, 1000, 800);
 		JFrame frame = distmeshPanel.display();
 		frame.setVisible(true);
 		frame.setTitle("uniformHex()");
@@ -251,7 +251,7 @@ public class EikMeshPlots {
 
 		System.out.println();
 		System.out.println();
-		System.out.println(TexGraphGenerator.toTikz(meshGenerator.getMesh()));
+		System.out.println(TexGraphGenerator.toTikz(meshGenerator.getMeshBuilder().getMesh()));
 	}
 
 	/**
@@ -260,7 +260,6 @@ public class EikMeshPlots {
 	private static void adaptiveRect(final double initialEdgeLength) {
 		VPolygon hex = VShape.generateHexagon(0.4);
 
-		IEmptyMeshSupplier<AVertex, AHalfEdge, AFace> supplier = AMeshWithDataStorage::constructEmpty;
 		IDistanceFunction distanceFunc = IDistanceFunction.intersect(p -> Math.max(Math.abs(p.getX()), Math.abs(p.getY()))- 1.0, IDistanceFunction.create(bbox, hex));
 		List<VShape> obstacles = new ArrayList<>();
 		IEdgeLengthFunction edgeLengthFunction = p -> 1.0 + Math.max(-distanceFunc.apply(p), 0) * 8.0;
@@ -273,19 +272,19 @@ public class EikMeshPlots {
 				edgeLengthFunction,
 				initialEdgeLength,
 				bbox, obstacles,
-				supplier);
+				ATriangleMeshBuilder::new);
 
 		StopWatch overAllTime = new StopWatch();
 		overAllTime.start();
 		meshGenerator.generate();
 		overAllTime.stop();
 
-		log.info("#vertices:" + meshGenerator.getMesh().getVertices().size());
-		log.info("#edges:" + meshGenerator.getMesh().getEdges().size());
+		log.info("#vertices:" + meshGenerator.getMeshBuilder().getMesh().vertices().count());
+		log.info("#edges:" + meshGenerator.getMeshBuilder().getMesh().edges().count());
 		log.info("overall time: " + overAllTime.getTime() + "[ms]");
 		log.info("min-quality: " + meshGenerator.getMinQuality());
 
-		MeshPanel<AVertex, AHalfEdge, AFace> distmeshPanel = new MeshPanel(meshGenerator.getMesh(), f -> false, 1000, 800);
+		MeshPanel<AVertex, AHalfEdge, AFace> distmeshPanel = new MeshPanel(meshGenerator.getMeshBuilder().getMesh(), f -> false, 1000, 800);
 		JFrame frame = distmeshPanel.display();
 		frame.setVisible(true);
 		frame.setTitle("uniformHex()");
@@ -294,7 +293,7 @@ public class EikMeshPlots {
 
 		System.out.println();
 		System.out.println();
-		System.out.println(TexGraphGenerator.toTikz(meshGenerator.getMesh()));
+		System.out.println(TexGraphGenerator.toTikz(meshGenerator.getMeshBuilder().getMesh()));
 	}
 
 	private EikMeshPlots() {

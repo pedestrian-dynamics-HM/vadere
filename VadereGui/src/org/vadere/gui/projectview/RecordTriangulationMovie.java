@@ -7,9 +7,9 @@ import org.vadere.meshing.mesh.triangulation.improver.eikmesh.impl.AEikMesh;
 import org.vadere.util.logging.StdOutErrLog;
 import org.vadere.util.visualization.ColorHelper;
 import org.vadere.util.geometry.GeometryUtils;
-import org.vadere.meshing.mesh.gen.mesh.arrayBased.AFace;
-import org.vadere.meshing.mesh.gen.mesh.arrayBased.AHalfEdge;
-import org.vadere.meshing.mesh.gen.mesh.arrayBased.AVertex;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AFace;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AHalfEdge;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AVertex;
 import org.vadere.util.geometry.shapes.VDisc;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
@@ -58,7 +58,7 @@ public class RecordTriangulationMovie {
 		};
 
 		Function<AFace, Color> colorFunction2 = f -> {
-			return ColorHelper.numberToHurColor((float)f.getId() / meshImprover.getMesh().getNumberOfFaces());
+			return ColorHelper.numberToHurColor((float)f.getId() / meshImprover.getMesh().faces().count());
 		};
 		//ColorHelper.numberToHurColor((float)f.getId() / meshImprover.getMesh().getNumberOfFaces());
 		//new ColorHelper(meshImprover.getMesh().getNumberOfFaces()).numberToColor(f.getId());

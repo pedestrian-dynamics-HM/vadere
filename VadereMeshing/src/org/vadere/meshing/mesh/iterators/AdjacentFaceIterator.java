@@ -34,6 +34,6 @@ public class AdjacentFaceIterator<V extends IVertex, E extends IHalfEdge, F exte
 
 	@Override
 	public F next() {
-		return mesh.getFace(neighbourIterator.next());
+		return mesh.faces().getOf(neighbourIterator.next());
 	}
 }

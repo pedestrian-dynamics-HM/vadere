@@ -32,6 +32,6 @@ public class VertexIterator<V extends IVertex, E extends IHalfEdge, F extends IF
 
 	@Override
 	public V next() {
-		return mesh.getVertex(edgeIterator.next());
+		return mesh.vertices().getEndOf(edgeIterator.next());
 	}
 }

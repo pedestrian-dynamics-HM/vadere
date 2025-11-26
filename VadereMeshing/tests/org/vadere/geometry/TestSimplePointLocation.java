@@ -2,12 +2,9 @@ package org.vadere.geometry;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.vadere.meshing.mesh.gen.mesh.pointerBased.PFace;
-import org.vadere.meshing.mesh.gen.mesh.pointerBased.PHalfEdge;
-import org.vadere.meshing.mesh.gen.mesh.pointerBased.PMesh;
-import org.vadere.meshing.mesh.gen.mesh.pointerBased.PVertex;
-import org.vadere.meshing.mesh.inter.mesh.IMesh;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.*;
 import org.vadere.meshing.mesh.gen.PointLocation;
+import org.vadere.meshing.mesh.inter.mesh.builder.IMeshBuilder;
 import org.vadere.util.geometry.shapes.VPoint;
 
 import java.util.Arrays;
@@ -24,73 +21,73 @@ public class TestSimplePointLocation {
 	private static PFace face2;
 	private static PFace border;
 	private static double EPSILON = 1.0e-10;
-	private IMesh<PVertex, PHalfEdge, PFace> mesh;
+	private IMeshBuilder<PVertex, PHalfEdge, PFace> meshBuilder;
 
 	@BeforeEach
 	public void setUp() throws Exception {
-		mesh = new PMesh();
-		face1 = mesh.createFace();
-		face2 = mesh.createFace();
-		border = mesh.createFace(true);
+		meshBuilder = new PMeshBuilder();
+		face1 = meshBuilder.faces().createAndInsert();
+		face2 = meshBuilder.faces().createAndInsert();
+		border = meshBuilder.faces().createAndInsertHole();
 
 
-		PVertex x = mesh.createVertex(0,0);
-		PVertex y = mesh.createVertex(3,0);
-		PVertex z = mesh.createVertex(1.5,3.0);
-		PVertex w = mesh.createVertex(4.5,3.0);
+		PVertex x = meshBuilder.vertices().createAndInsert(0,0);
+		PVertex y = meshBuilder.vertices().createAndInsert(3,0);
+		PVertex z = meshBuilder.vertices().createAndInsert(1.5,3.0);
+		PVertex w = meshBuilder.vertices().createAndInsert(4.5,3.0);
 
 
-		PHalfEdge zx = mesh.createEdge(x, face1);
-		PHalfEdge xz = mesh.createEdge(z, border);
-		mesh.setTwin(zx, xz);
-		mesh.setEdge(x, zx);
+		PHalfEdge zx = meshBuilder.edges().createAndInsert(x, face1);
+		PHalfEdge xz = meshBuilder.edges().createAndInsert(z, border);
+		meshBuilder.edges().setTwin(zx, xz);
+		meshBuilder.vertices().setEdge(x, zx);
 
 
-		PHalfEdge xy = mesh.createEdge(y, face1);
-		PHalfEdge yx = mesh.createEdge(x, border);
-		mesh.setTwin(xy, yx);
-		mesh.setEdge(y, xy);
+		PHalfEdge xy = meshBuilder.edges().createAndInsert(y, face1);
+		PHalfEdge yx = meshBuilder.edges().createAndInsert(x, border);
+		meshBuilder.edges().setTwin(xy, yx);
+		meshBuilder.vertices().setEdge(y, xy);
 
 
-		PHalfEdge yz = mesh.createEdge(z, face1);
-		PHalfEdge zy = mesh.createEdge(y, face2);
-		mesh.setTwin(zy, yz);
-		mesh.setEdge(z, yz);
+		PHalfEdge yz = meshBuilder.edges().createAndInsert(z, face1);
+		PHalfEdge zy = meshBuilder.edges().createAndInsert(y, face2);
+		meshBuilder.edges().setTwin(zy, yz);
+		meshBuilder.vertices().setEdge(z, yz);
 
 
-		PHalfEdge yw = mesh.createEdge(w, face2);
-		PHalfEdge wy = mesh.createEdge(y, border);
-		mesh.setTwin(yw, wy);
-		mesh.setEdge(w, yw);
+		PHalfEdge yw = meshBuilder.edges().createAndInsert(w, face2);
+		PHalfEdge wy = meshBuilder.edges().createAndInsert(y, border);
+		meshBuilder.edges().setTwin(yw, wy);
+		meshBuilder.vertices().setEdge(w, yw);
 
-		PHalfEdge wz = mesh.createEdge(z, face2);
-		PHalfEdge zw = mesh.createEdge(w, face2);
-		mesh.setTwin(wz, zw);
+		PHalfEdge wz = meshBuilder.edges().createAndInsert(z, face2);
+		PHalfEdge zw = meshBuilder.edges().createAndInsert(w, face2);
+		meshBuilder.edges().setTwin(wz, zw);
 
-		mesh.setNext(zy, yw);
-		mesh.setNext(yw, wz);
-		mesh.setNext(wz, zy);
+		meshBuilder.edges().setNext(zy, yw);
+		meshBuilder.edges().setNext(yw, wz);
+		meshBuilder.edges().setNext(wz, zy);
 
-		mesh.setEdge(face2, zy);
+		meshBuilder.faces().setEdge(face2, zy);
 
-		mesh.setNext(zx, xy);
-		mesh.setNext(xy, yz);
-		mesh.setNext(yz, zx);
+		meshBuilder.edges().setNext(zx, xy);
+		meshBuilder.edges().setNext(xy, yz);
+		meshBuilder.edges().setNext(yz, zx);
 
 
-		mesh.setNext(xz, zw);
-		mesh.setNext(zw, wy);
-		mesh.setNext(wy, yx);
-		mesh.setNext(yx, xz);
+		meshBuilder.edges().setNext(xz, zw);
+		meshBuilder.edges().setNext(zw, wy);
+		meshBuilder.edges().setNext(wy, yx);
+		meshBuilder.edges().setNext(yx, xz);
 
-		mesh.setEdge(face1, zx);
+		meshBuilder.faces().setEdge(face1, zx);
 
-		mesh.setEdge(border, xz);
+		meshBuilder.faces().setEdge(border, xz);
 	}
 
 	@Test
 	public void testFaceIterator() {
-		PointLocation pointLocation = new PointLocation(Arrays.asList(face1, face2), mesh);
+		PointLocation pointLocation = new PointLocation(Arrays.asList(face1, face2), meshBuilder.getMesh());
 
 		assertEquals(face1, pointLocation.getFace(new VPoint(0,0)).get());
 

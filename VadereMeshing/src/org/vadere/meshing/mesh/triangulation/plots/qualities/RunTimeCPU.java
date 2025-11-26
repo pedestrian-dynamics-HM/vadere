@@ -2,7 +2,10 @@ package org.vadere.meshing.mesh.triangulation.plots.qualities;
 
 import org.apache.commons.lang3.time.StopWatch;
 import org.vadere.meshing.mesh.gen.mesh.arrayBased.*;
-import org.vadere.meshing.mesh.inter.IEmptyMeshSupplier;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AFace;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AHalfEdge;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AVertex;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.triangles.ATriangleMeshBuilder;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
 import org.vadere.meshing.mesh.triangulation.improver.distmesh.DistmeshPanel;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.GenEikMesh;
@@ -42,7 +45,6 @@ public class RunTimeCPU extends JFrame {
 
 
     private static void overallUniformRing() {
-	    IEmptyMeshSupplier<AVertex, AHalfEdge, AFace> supplier = AMeshWithDataStorage::constructEmpty;
 	    IDistanceFunction distanceFunc = p -> Math.abs(0.7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 0.3;
 	    List<VShape> obstacles = new ArrayList<>();
 
@@ -55,16 +57,16 @@ public class RunTimeCPU extends JFrame {
 				    uniformEdgeLength,
 				    initialEdgeLength,
 				    bbox, obstacles,
-				    supplier);
+				    ATriangleMeshBuilder::new);
 
 		    StopWatch overAllTime = new StopWatch();
 		    overAllTime.start();
 		    meshGenerator.generate();
 		    overAllTime.stop();
 
-		    log.info("#vertices: " + meshGenerator.getMesh().getVertices().size());
-		    log.info("#edges: " + meshGenerator.getMesh().getEdges().size());
-		    log.info("#faces: " + meshGenerator.getMesh().getFaces().size());
+			log.info("#vertices: " + meshGenerator.getMeshBuilder().getMesh().vertices().count());
+			log.info("#edges: " + meshGenerator.getMeshBuilder().getMesh().edges().count());
+			log.info("#faces: " + meshGenerator.getMeshBuilder().getMesh().faces().count());
 		    log.info("quality" + meshGenerator.getQuality());
 		    log.info("overall time: " + overAllTime.getTime() + "[ms]");
 
@@ -80,7 +82,6 @@ public class RunTimeCPU extends JFrame {
 	}
 
 	private static void stepAdaptiveRingEikMesh(double startLen, double endLen, double stepLen) {
-		IEmptyMeshSupplier<AVertex, AHalfEdge, AFace> supplier = AMeshWithDataStorage::constructEmpty;
 		IDistanceFunction distanceFunc = p -> Math.abs(0.7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 0.3;
 		List<VShape> obstacles = new ArrayList<>();
 
@@ -103,7 +104,7 @@ public class RunTimeCPU extends JFrame {
 					adaptiveEdgeLength,
 					initialEdgeLength,
 					bbox, obstacles,
-					supplier);
+					ATriangleMeshBuilder::new);
 
 			while (!meshGenerator.isInitialized()) {
 				meshGenerator.initialize();
@@ -121,15 +122,15 @@ public class RunTimeCPU extends JFrame {
 				steps++;
 			} while (!meshGenerator.isFinished());
 
-			log.info("#vertices: " + meshGenerator.getMesh().getVertices().size());
-			log.info("#edges: " + meshGenerator.getMesh().getEdges().size());
-			log.info("#faces: " + meshGenerator.getMesh().getFaces().size());
+			log.info("#vertices: " + meshGenerator.getMeshBuilder().getMesh().vertices().count());
+			log.info("#edges: " + meshGenerator.getMeshBuilder().getMesh().edges().count());
+			log.info("#faces: " + meshGenerator.getMeshBuilder().getMesh().faces().count());
 			log.info("quality: " + meshGenerator.getQuality());
 			log.info("#step: " + steps);
 			log.info("overall time: " + overAllTime.getTime() + "[ms]");
 			log.info("step avg time: " + overAllTime.getTime() / steps + "[ms]");
 
-			nVertices.add(meshGenerator.getMesh().getVertices().size());
+			nVertices.add(meshGenerator.getMesh().vertices().count());
 			qualities.add(meshGenerator.getQuality());
 			minQualities.add(meshGenerator.getMinQuality());
 			runTimes.add( overAllTime.getTime());
@@ -167,7 +168,6 @@ public class RunTimeCPU extends JFrame {
 	}
 
 	private static void stepAdaptiveRingDistMesh(double startLen, double endLen, double stepLen) {
-		IEmptyMeshSupplier<AVertex, AHalfEdge, AFace> supplier = AMeshWithDataStorage::constructEmpty;
 		IDistanceFunction distanceFunc = p -> Math.abs(0.7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 0.3;
 		//IEdgeLengthFunction adaptiveEdgeLength =  p -> 1.0 + Math.max(-distanceFunc.apply(p), 0) * 0.4;
 		List<VShape> obstacles = new ArrayList<>();

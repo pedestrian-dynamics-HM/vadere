@@ -1,89 +1,95 @@
 package org.vadere.meshing.mesh.inter.mesh;
 
 import org.jetbrains.annotations.NotNull;
+import org.vadere.meshing.mesh.inter.mesh.builder.IMeshBuilderEdges;
+import org.vadere.meshing.mesh.inter.mesh.builder.IMeshBuilderFaces;
+import org.vadere.meshing.mesh.inter.mesh.builder.IMeshBuilderVertices;
+import org.vadere.meshing.mesh.inter.mesh.builder.ITriangleMeshBuilder;
 
 public final class MeshUtils {
     /**
      * Creates a very simple mesh consisting of two triangles ((-100, 0), (100, 0), (0, 1)) and ((0, -1), (-100, 0), (100, 0))
      *
-     * @param mesh  the mesh used to create the triangle. This mesh should be empty.
-     * @param <V>   the type of the vertex
-     * @param <E>   the type of the edge
-     * @param <F>   the type of the face
+     *       z
+     *      / \
+     *     /   \
+     *   x ----- y
+     *     \   /
+     *      \ /
+     *       w
+     *
+     * @param meshBuilder the mesh used to create the triangle. This mesh should be empty.
+     * @param <V>         the type of the vertex
+     * @param <E>         the type of the edge
+     * @param <F>         the type of the face
      */
-   public static <V extends IVertex, E extends IHalfEdge, F extends IFace> void createSimpleTriMesh(
-            @NotNull final IMesh<V, E, F> mesh
+    public static <V extends IVertex, E extends IHalfEdge, F extends IFace> void createSimpleTriMesh(
+            @NotNull final ITriangleMeshBuilder<V, E, F>  meshBuilder
     ) {
-        F face1;
-        F face2;
-        F border;
         V x, y, z, w;
-        E zx ;
-        E xy;
-        E yz;
 
-        E wx;
-        E xz;
-        E yw;
-        E zy;
-
-        border = mesh.getBorder();
+        F border = meshBuilder.getMesh().faces().getOuterBorder();
 
         // first triangle xyz
-        face1 = mesh.createFace();
-        x = mesh.insertVertex(-100, 0);
-        y = mesh.insertVertex(100, 0);
-        z = mesh.insertVertex(0, 1);
+        IMeshBuilderFaces<V, E, F> faces = meshBuilder.faces();
+        IMeshBuilderVertices<V, E, F> vertices = meshBuilder.vertices();
+        IMeshBuilderEdges<V, E, F> edges = meshBuilder.edges();
 
-        zx = mesh.createEdge(x, face1);
-        mesh.setEdge(x, zx);
-        xy = mesh.createEdge(y, face1);
-        mesh.setEdge(y, xy);
-        yz = mesh.createEdge(z, face1);
-        mesh.setEdge(z, yz);
+        F face1 = faces.createAndInsert();
 
-        mesh.setNext(zx, xy);
-        mesh.setNext(xy, yz);
-        mesh.setNext(yz, zx);
+        x = vertices.createAndInsert(-100, 0);
+        y = vertices.createAndInsert(100, 0);
+        z = vertices.createAndInsert(0, 1);
 
-        mesh.setEdge(face1, xy);
+        E zx = edges.createAndInsert(x, face1);
+        vertices.setEdge(x, zx);
+        E xy = edges.createAndInsert(y, face1);
+        vertices.setEdge(y, xy);
+        E yz = edges.createAndInsert(z, face1);
+        vertices.setEdge(z, yz);
+
+        edges.setNext(zx, xy);
+        edges.setNext(xy, yz);
+        edges.setNext(yz, zx);
+
+        faces.setEdge(face1, xy);
 
 
         // second triangle yxw
-        face2 = mesh.createFace();
-        w = mesh.insertVertex(0, -1);
+        F face2 = faces.createAndInsert();
+        w = vertices.createAndInsert(0, -1);
 
-        E yx = mesh.createEdge(x, face2);
-        E xw = mesh.createEdge(w, face2);
-        E wy = mesh.createEdge(y, face2);
+        E yx = edges.createAndInsert(x, face2);
+        E xw = edges.createAndInsert(w, face2);
+        E wy = edges.createAndInsert(y, face2);
 
-        mesh.setNext(yx, xw);
-        mesh.setNext(xw, wy);
-        mesh.setNext(wy, yx);
+        edges.setNext(yx, xw);
+        edges.setNext(xw, wy);
+        edges.setNext(wy, yx);
 
-        mesh.setEdge(face2, yx);
+        faces.setEdge(face2, yx);
 
-        mesh.setTwin(xy, yx);
+        edges.setTwin(xy, yx); // edge shared by both triangles
 
-        // border twins
-        zy = mesh.createEdge(y, border);
-        xz = mesh.createEdge(z, border);
+        // construct border
+        E zy = edges.createAndInsert(y, border);
+        E xz = edges.createAndInsert(z, border);
 
-        mesh.setTwin(yz, zy);
-        mesh.setTwin(zx, xz);
+        edges.setTwin(yz, zy);
+        edges.setTwin(zx, xz);
 
-        wx = mesh.createEdge(x, border);
-        yw = mesh.createEdge(w, border);
-        mesh.setEdge(w, yw);
+        E wx = edges.createAndInsert(x, border);
+        E yw = edges.createAndInsert(w, border);
+        vertices.setEdge(w, yw);
 
-        mesh.setEdge(border, wx);
-        mesh.setTwin(xw, wx);
-        mesh.setTwin(wy, yw);
+        faces.setEdge(border, wx);
+        edges.setTwin(xw, wx);
+        edges.setTwin(wy, yw);
 
 
-        mesh.setNext(zy, yw);
-        mesh.setNext(yw, wx);
-        mesh.setNext(wx, xz);
-        mesh.setNext(xz, zy);
+        edges.setNext(zy, yw);
+        edges.setNext(yw, wx);
+        edges.setNext(wx, xz);
+        edges.setNext(xz, zy);
     }
 }

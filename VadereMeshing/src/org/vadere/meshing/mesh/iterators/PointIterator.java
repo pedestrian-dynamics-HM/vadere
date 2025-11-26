@@ -30,7 +30,7 @@ public class PointIterator<V extends IVertex, E extends IHalfEdge, F extends IFa
 
 	@Override
 	public IPoint next() {
-		return mesh.getPoint(vertexIterator.next());
+		return mesh.vertices().toMutablePoint(vertexIterator.next());
 	}
 }
 

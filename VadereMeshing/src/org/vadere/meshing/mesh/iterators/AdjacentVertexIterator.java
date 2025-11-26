@@ -25,7 +25,7 @@ public class AdjacentVertexIterator<V extends IVertex, E extends IHalfEdge, F ex
 
 	public AdjacentVertexIterator(final IMesh<V, E, F> mesh, final V vertex) {
 		this.mesh = mesh;
-		this.incidentEdgeIterator = new IncidentEdgeIterator<>(mesh, mesh.getEdge(vertex));
+		this.incidentEdgeIterator = new IncidentEdgeIterator<>(mesh, mesh.edges().getOf(vertex));
 	}
 
 	@Override
@@ -35,7 +35,7 @@ public class AdjacentVertexIterator<V extends IVertex, E extends IHalfEdge, F ex
 
 	@Override
 	public V next() {
-		return mesh.getVertex(incidentEdgeIterator.next());
+		return mesh.vertices().getEndOf(incidentEdgeIterator.next());
 	}
 }
 

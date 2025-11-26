@@ -3,15 +3,15 @@ package org.vadere.geometry;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.vadere.meshing.mesh.gen.mesh.pointerBased.PFace;
-import org.vadere.meshing.mesh.gen.mesh.pointerBased.PHalfEdge;
-import org.vadere.meshing.mesh.gen.mesh.pointerBased.PVertex;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PFace;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PHalfEdge;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PVertex;
 import org.vadere.meshing.mesh.impl.PTriangulation;
 import org.vadere.meshing.mesh.inter.mesh.IFace;
 import org.vadere.meshing.mesh.inter.mesh.IHalfEdge;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.mesh.IMesh;
-import org.vadere.meshing.mesh.inter.IPointLocator;
+import org.vadere.meshing.mesh.inter.ITriangleMeshPointLocator;
 import org.vadere.meshing.mesh.inter.mesh.IVertex;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.IPoint;
@@ -59,9 +59,9 @@ public class TestBoyerWatson {
 
 		List<IIncrementalTriangulation<PVertex, PHalfEdge, PFace>> triangulationList = new ArrayList<>();
 
-		triangulationList.add(IIncrementalTriangulation.createPTriangulation(IPointLocator.Type.BASE, points));
-		triangulationList.add(IIncrementalTriangulation.createPTriangulation(IPointLocator.Type.DELAUNAY_TREE, points));
-		triangulationList.add(IIncrementalTriangulation.createPTriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, points));
+		triangulationList.add(IIncrementalTriangulation.createPTriangulation(ITriangleMeshPointLocator.Type.BASE, points));
+		triangulationList.add(IIncrementalTriangulation.createPTriangulation(ITriangleMeshPointLocator.Type.DELAUNAY_TREE, points));
+		triangulationList.add(IIncrementalTriangulation.createPTriangulation(ITriangleMeshPointLocator.Type.DELAUNAY_HIERARCHY, points));
 
 		for(IIncrementalTriangulation<PVertex, PHalfEdge, PFace> delaunayTriangulation : triangulationList) {
 			delaunayTriangulation.finish();
@@ -114,15 +114,15 @@ public class TestBoyerWatson {
 		points.add(p2);
 		points.add(p3);
 
-		IIncrementalTriangulation<PVertex, PHalfEdge, PFace> delaunayTriangulation = IIncrementalTriangulation.createPTriangulation(IPointLocator.Type.BASE, points);
+		IIncrementalTriangulation<PVertex, PHalfEdge, PFace> delaunayTriangulation = IIncrementalTriangulation.createPTriangulation(ITriangleMeshPointLocator.Type.BASE, points);
 		PFace face = delaunayTriangulation.locateFace(centerPoint).get();
 		IMesh<PVertex, PHalfEdge, PFace> mesh = delaunayTriangulation.getMesh();
-		PHalfEdge edge = mesh.getEdge(face);
+		PHalfEdge edge = mesh.edges().getAnyOf(face);
 
 		// triangulations are always ccwRobust ordered!
-		assertTrue(GeometryUtils.isCCW(mesh.getVertex(edge), mesh.getVertex(mesh.getNext(edge)), mesh.getVertex(mesh.getPrev(edge))));
+		assertTrue(GeometryUtils.isCCW(mesh.vertices().getEndOf(edge), mesh.vertices().getEndOf(mesh.edges().getNext(edge)), mesh.vertices().getEndOf(mesh.edges().getPrev(edge))));
 
-		delaunayTriangulation.splitTriangle(face, centerPoint, false);
+		delaunayTriangulation.getMeshBuilder().changeConnectivity().splitTriangle(face, centerPoint, false);
 		delaunayTriangulation.finish();
 
 		Set<VTriangle> triangles = delaunayTriangulation.streamTriangles().collect(Collectors.toSet());
@@ -187,9 +187,9 @@ public class TestBoyerWatson {
 
 	private static <V extends IVertex, E extends IHalfEdge, F extends IFace> boolean hasCorrectEdgeVertexRealtion(final IIncrementalTriangulation<V, E, F> triangulation) {
 		return triangulation.getMesh()
-				.streamVertices()
-				.filter(v -> triangulation.getMesh().isAlive(v))
-				.noneMatch(v -> triangulation.getMesh().getVertex(triangulation.getMesh().getEdge(v)) != v);
+				.vertices().stream()
+				.filter(v -> triangulation.getMesh().vertices().isAlive(v))
+				.noneMatch(v -> triangulation.getMesh().vertices().getEndOf(triangulation.getMesh().edges().getOf(v)) != v);
 	}
 
 	private static boolean testTriangleEquality(final VTriangle triangle1, final VTriangle triangle2) {

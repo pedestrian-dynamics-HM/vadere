@@ -3,8 +3,13 @@ package org.vadere.geometry.mesh;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.vadere.meshing.mesh.gen.mesh.arrayBased.*;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AFace;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AHalfEdge;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AVertex;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.triangles.ATriangleMeshBuilder;
 import org.vadere.meshing.mesh.inter.mesh.IMesh;
 import org.vadere.meshing.mesh.inter.mesh.IMeshWithDataStorage;
+import org.vadere.meshing.mesh.inter.mesh.builder.ITriangleMeshBuilder;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,88 +42,91 @@ public class TestAFace {
 
     @BeforeEach
     public void setUp() throws Exception {
-        IMeshWithDataStorage<AVertex, AHalfEdge, AFace> meshWithDataStorage = AMeshWithDataStorage.constructEmpty();
-        mesh = meshWithDataStorage.getMesh();
-        border = mesh.createFace(true);
+        ITriangleMeshBuilder<AVertex, AHalfEdge, AFace> meshBuilder = new ATriangleMeshBuilder();
+        mesh = meshBuilder.getMesh();
+        border = meshBuilder.faces().createAndInsertHole();
 
         // first triangle xyz
-        face1 = mesh.createFace();
-        x = mesh.insertVertex(0, 0);
-        y = mesh.insertVertex(3, 0);
-        z = mesh.insertVertex(1.5,3.0);
+        face1 = meshBuilder.faces().createAndInsert();
+        x = meshBuilder.vertices().createAndInsert(0, 0);
+        y = meshBuilder.vertices().createAndInsert(3, 0);
+        z = meshBuilder.vertices().createAndInsert(1.5,3.0);
 
-        zx = mesh.createEdge(x, face1);
-        mesh.setEdge(x, zx);
-        xy = mesh.createEdge(y, face1);
-        mesh.setEdge(y, xy);
-        yz = mesh.createEdge(z, face1);
-        mesh.setEdge(z, yz);
+        zx = meshBuilder.edges().createAndInsert(x, face1);
+        meshBuilder.vertices().setEdge(x, zx);
+        xy = meshBuilder.edges().createAndInsert(y, face1);
+        meshBuilder.vertices().setEdge(y, xy);
+        yz = meshBuilder.edges().createAndInsert(z, face1);
+        meshBuilder.vertices().setEdge(z, yz);
 
-        mesh.setNext(zx, xy);
-        mesh.setNext(xy, yz);
-        mesh.setNext(yz, zx);
+        meshBuilder.edges().setNext(zx, xy);
+        meshBuilder.edges().setNext(xy, yz);
+        meshBuilder.edges().setNext(yz, zx);
 
-        mesh.setEdge(face1, xy);
+        meshBuilder.faces().setEdge(face1, xy);
 
         // second triangle yxw
-        face2 = mesh.createFace();
-        w = mesh.insertVertex(1.5,-1.5);
+        face2 = meshBuilder.faces().createAndInsert();
+        w = meshBuilder.vertices().createAndInsert(1.5,-1.5);
 
-        AHalfEdge yx = mesh.createEdge(x, face2);
-        AHalfEdge xw = mesh.createEdge(w, face2);
-        AHalfEdge wy = mesh.createEdge(y, face2);
+        AHalfEdge yx = meshBuilder.edges().createAndInsert(x, face2);
+        AHalfEdge xw = meshBuilder.edges().createAndInsert(w, face2);
+        AHalfEdge wy = meshBuilder.edges().createAndInsert(y, face2);
 
-        mesh.setNext(yx, xw);
-        mesh.setNext(xw, wy);
-        mesh.setNext(wy, yx);
+        meshBuilder.edges().setNext(yx, xw);
+        meshBuilder.edges().setNext(xw, wy);
+        meshBuilder.edges().setNext(wy, yx);
 
-        mesh.setEdge(face2, yx);
+        meshBuilder.faces().setEdge(face2, yx);
 
-        mesh.setTwin(xy, yx);
+        meshBuilder.edges().setTwin(xy, yx);
 
         // border twins
-        zy = mesh.createEdge(y, border);
-        xz = mesh.createEdge(z, border);
+        zy = meshBuilder.edges().createAndInsert(y, border);
+        xz = meshBuilder.edges().createAndInsert(z, border);
 
-        mesh.setTwin(yz, zy);
-        mesh.setTwin(zx, xz);
+        meshBuilder.edges().setTwin(yz, zy);
+        meshBuilder.edges().setTwin(zx, xz);
 
-        wx = mesh.createEdge(x, border);
-        yw = mesh.createEdge(w, border);
-        mesh.setEdge(w, yw);
+        wx = meshBuilder.edges().createAndInsert(x, border);
+        yw = meshBuilder.edges().createAndInsert(w, border);
+        meshBuilder.vertices().setEdge(w, yw);
 
-        mesh.setEdge(border, wx);
-        mesh.setTwin(xw, wx);
-        mesh.setTwin(wy, yw);
+        meshBuilder.faces().setEdge(border, wx);
+        meshBuilder.edges().setTwin(xw, wx);
+        meshBuilder.edges().setTwin(wy, yw);
 
 
-        mesh.setNext(zy, yw);
-        mesh.setNext(yw, wx);
-        mesh.setNext(wx, xz);
-        mesh.setNext(xz, zy);
+        meshBuilder.edges().setNext(zy, yw);
+        meshBuilder.edges().setNext(yw, wx);
+        meshBuilder.edges().setNext(wx, xz);
+        meshBuilder.edges().setNext(xz, zy);
     }
 
     @Test
     public void testFaceIterator() {
-        mesh.getAdjacentFacesIt(xy);
-        List<AFace> incidentFaces = mesh.getAdjacentFaces(xy);;
+        mesh.faces().getAdjacentFacesIt(xy);
+        List<AFace> incidentFaces = mesh.faces().getAdjacentOf(xy);
         assertEquals(incidentFaces.size(), 3);
     }
 
 
     @Test
     public void testPointIterator() {
-        assertEquals(new ArrayList(Arrays.asList(y, z, x)), mesh.getVertices(face1));
+        assertEquals(new ArrayList(Arrays.asList(y, z, x)), mesh.vertices().getAllOf(face1));
     }
 
     @Test
     public void testEdgeOfVertex() {
-        mesh.streamEdges().forEach(edge -> assertEquals(mesh.getVertex(edge), mesh.getVertex(mesh.getEdge(mesh.getVertex(edge)))));
+        mesh.edges().stream().forEach(
+                edge -> assertEquals(
+                        mesh.vertices().getEndOf(edge),
+                        mesh.vertices().getEndOf(mesh.edges().getOf(mesh.vertices().getEndOf(edge)))));
     }
 
     @Test
     public void testEdgeIterator() {
-        List<AVertex> adjacentVertices = mesh.getAdjacentVertices(zx);
+        List<AVertex> adjacentVertices = mesh.vertices().getAdjacentVertices(zx);
         Set<AVertex> neighbours = new HashSet<>(adjacentVertices);
         Set<AVertex> expectedNeighbours = new HashSet<>();
         expectedNeighbours.add(z);

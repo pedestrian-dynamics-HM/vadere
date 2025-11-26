@@ -2,12 +2,11 @@ package org.vadere.simulator.models.potential.solver.calculators.mesh;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.vadere.meshing.mesh.inter.mesh.IFace;
-import org.vadere.meshing.mesh.inter.mesh.IHalfEdge;
-import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
-import org.vadere.meshing.mesh.inter.mesh.IMesh;
-import org.vadere.meshing.mesh.inter.mesh.IVertex;
+import org.vadere.meshing.mesh.inter.ITriangleMeshPointLocator;
+import org.vadere.meshing.mesh.inter.mesh.*;
 import org.vadere.meshing.mesh.inter.IVertexContainerDouble;
+import org.vadere.meshing.mesh.inter.mesh.triangle.ITriangleMeshVertices;
+import org.vadere.meshing.mesh.inter.meshConnectivity.IReadOnlyTriConnectivity;
 import org.vadere.simulator.models.potential.timeCostFunction.loading.IPedestrianLoadingStrategy;
 import org.vadere.state.scenario.IMoveDynamicElementListener;
 import org.vadere.state.scenario.Pedestrian;
@@ -33,49 +32,57 @@ import java.util.function.Predicate;
 public class DensityUpdater<V extends IVertex, E extends IHalfEdge, F extends IFace> implements IMoveDynamicElementListener {
 
 	public static final String nameAgentDensity = "agent_density";
-	private final IIncrementalTriangulation<V, E, F> triangulation;
+
+	private final ITriangleMeshWithDataStorage<V, E, F> triangulation;
+	private ITriangleMeshVertices<V, E, F> vertices;
+	private IReadOnlyTriConnectivity<V, E, F> connectivity;
+
 	private double influenceRadius = 9;
 	private IVertexContainerDouble<V, E, F> densities;
-	private IPedestrianLoadingStrategy loadingStrategy;
+    private ITriangleMeshPointLocator<V, E, F> pointLocator;
+    private IPedestrianLoadingStrategy loadingStrategy;
 
 	private final static double R = 0.7;
 
-	public DensityUpdater(@NotNull final IIncrementalTriangulation<V, E, F> triangulation, @Nullable final IPedestrianLoadingStrategy loadingStrategy) {
+	public DensityUpdater(@NotNull final ITriangleMeshWithDataStorage<V, E, F> triangulation, @NotNull ITriangleMeshPointLocator<V, E, F> pointLocator, @Nullable final IPedestrianLoadingStrategy loadingStrategy) {
 		this.triangulation = triangulation;
-		this.densities = triangulation.getMeshDataStorage().getDoubleVertexContainer(nameAgentDensity);
-		this.loadingStrategy = loadingStrategy;
+		this.densities = triangulation.getDataStorage().getDoubleVertexContainer(nameAgentDensity, triangulation.getMesh());
+        this.pointLocator = pointLocator;
+        this.loadingStrategy = loadingStrategy;
+		this.vertices = triangulation.getMesh().vertices();
+		connectivity = triangulation.getMesh().readConnectivity();
 	}
 
-	public DensityUpdater(@NotNull final IIncrementalTriangulation<V, E, F> triangulation) {
-		this(triangulation, IPedestrianLoadingStrategy.create(1.0));
+	public DensityUpdater(@NotNull final ITriangleMeshWithDataStorage<V, E, F> triangulation, @NotNull ITriangleMeshPointLocator<V, E, F> pointLocator) {
+		this(triangulation, pointLocator, IPedestrianLoadingStrategy.create(1.0));
 	}
 
 	@Override
 	public void moveElement(@NotNull final Pedestrian element, @NotNull final VPoint oldPosition) {
-		Optional<F> optional = triangulation.locateFace(oldPosition, element);
+		Optional<F> optional = pointLocator.locate(oldPosition, element);
 		if (optional.isPresent()) {
 			F pedFace = optional.get();
 
-			Predicate<V> predicate = v -> GeometryUtils.lengthSq(getMesh().getX(v) - oldPosition.getX(),
-						getMesh().getY(v) - oldPosition.getY()) < influenceRadius * influenceRadius;
+			Predicate<V> predicate = v -> GeometryUtils.lengthSq(vertices.getX(v) - oldPosition.getX(),
+					vertices.getY(v) - oldPosition.getY()) < influenceRadius * influenceRadius;
 
-			Set<V> closeVertices = triangulation.getVertices(oldPosition.x, oldPosition.y, pedFace, predicate);
+			Set<V> closeVertices = connectivity.getVertices(oldPosition.x, oldPosition.y, pedFace, predicate);
 			for (V v : closeVertices) {
-				double density = densities.getValue(v) - density(oldPosition.x, oldPosition.y, getMesh().getX(v), getMesh().getY(v), element);
+				double density = densities.getValue(v) - density(oldPosition.x, oldPosition.y, vertices.getX(v), vertices.getY(v), element);
 				densities.setValue(v, Math.max(0, density));
 			}
 		}
 
-		optional = triangulation.locateFace (element.getPosition(), element);
+		optional = pointLocator.locate(element.getPosition(), element);
 		if (optional.isPresent()) {
 			F pedFace = optional.get();
 
-			Predicate<V> predicate = v -> GeometryUtils.lengthSq(getMesh().getX(v) - element.getPosition().x,
-						getMesh().getY(v) - element.getPosition().y) < influenceRadius * influenceRadius;
+			Predicate<V> predicate = v -> GeometryUtils.lengthSq(vertices.getX(v) - element.getPosition().x,
+					vertices.getY(v) - element.getPosition().y) < influenceRadius * influenceRadius;
 
-			Set<V> closeVertices = triangulation.getVertices(element.getPosition().getX(), element.getPosition().getY(), pedFace, predicate);
+			Set<V> closeVertices = connectivity.getVertices(element.getPosition().getX(), element.getPosition().getY(), pedFace, predicate);
 			for (V v : closeVertices) {
-				double density = densities.getValue(v) + density(element.getPosition().x, element.getPosition().y, getMesh().getX(v), getMesh().getY(v), element);
+				double density = densities.getValue(v) + density(element.getPosition().x, element.getPosition().y, vertices.getX(v), vertices.getY(v), element);
 				densities.setValue(v, density);
 			}
 		}

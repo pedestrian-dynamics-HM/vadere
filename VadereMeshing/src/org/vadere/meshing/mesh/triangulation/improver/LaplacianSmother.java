@@ -1,9 +1,12 @@
 package org.vadere.meshing.mesh.triangulation.improver;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.vadere.meshing.mesh.gen.mesh.pointerBased.*;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PFace;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PHalfEdge;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PVertex;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.triangles.PTriangleMeshBuilder;
 import org.vadere.meshing.mesh.inter.mesh.IMesh;
-import org.vadere.meshing.mesh.inter.IPointLocator;
+import org.vadere.meshing.mesh.inter.ITriangleMeshPointLocator;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
 import org.vadere.meshing.mesh.triangulation.triangulator.gen.GenRandomPointsSetTriangulator;
@@ -59,7 +62,7 @@ public class LaplacianSmother implements IPMeshImprover {
         //UniformRefinementTriangulator uniformRefinementTriangulator = new UniformRefinementTriangulator(triangulation, bound, obstacleShapes, p -> edgeLengthFunc.apply(p) * initialEdgeLen, distanceFunc);
         //uniformRefinementTriangulator.generate();
 
-        GenRandomPointsSetTriangulator randomTriangulator = new GenRandomPointsSetTriangulator(PMeshWithDataStorage::constructEmpty,3000, bound, distanceFunc);
+        GenRandomPointsSetTriangulator randomTriangulator = new GenRandomPointsSetTriangulator(PTriangleMeshBuilder::new,3000, bound, distanceFunc);
 	    triangulation = randomTriangulator.generate();
         removeTrianglesInsideObstacles();
         log.info("##### (end) generate a uniform refined triangulation #####");
@@ -73,8 +76,8 @@ public class LaplacianSmother implements IPMeshImprover {
 
     @Override
     public void improve() {
-        streamVertices().filter(v -> !getMesh().isAtBoundary(v)).forEach(v -> shrinkForce(v));
-        streamVertices().filter(v -> !getMesh().isAtBoundary(v)).forEach(v -> applyLaplacian(v));
+        streamVertices().filter(v -> !getMesh().vertices().isAtBoundary(v)).forEach(v -> shrinkForce(v));
+        streamVertices().filter(v -> !getMesh().vertices().isAtBoundary(v)).forEach(v -> applyLaplacian(v));
         //streamVertices().filter(v -> !getMesh().isAtBoundary(v)).forEach(v -> inflateForce(v));
         //streamVertices().filter(v -> !getMesh().isAtBoundary(v)).forEach(v -> applyLaplacian(v));
         retriangulate();
@@ -87,15 +90,15 @@ public class LaplacianSmother implements IPMeshImprover {
 	}
 
 	private IPoint laplacian(final PVertex vertex) {
-        IPoint p = getMesh().getPoint(vertex);
-        long numberOfNeighbours = StreamSupport.stream(getMesh().getAdjacentVertexIt(vertex).spliterator(), false).count();
+        IPoint p = getMesh().vertices().toPoint(vertex);
+        long numberOfNeighbours = StreamSupport.stream(getMesh().vertices().adjacentIterableFor(vertex).spliterator(), false).count();
 
-        double weightsSum = StreamSupport.stream(getMesh().getAdjacentVertexIt(vertex).spliterator(), false)
-                .map(v -> getMesh().getPoint(v))
+        double weightsSum = StreamSupport.stream(getMesh().vertices().adjacentIterableFor(vertex).spliterator(), false)
+                .map(v -> getMesh().vertices().toPoint(v))
                 .mapToDouble(m -> 1.0 / m.distance(p)).sum();
 
-        IPoint laplacian = StreamSupport.stream(getMesh().getAdjacentVertexIt(vertex).spliterator(), false)
-                .map(v -> getMesh().getPoint(v))
+        IPoint laplacian = StreamSupport.stream(getMesh().vertices().adjacentIterableFor(vertex).spliterator(), false)
+                .map(v -> getMesh().vertices().toPoint(v))
                 .map(m -> m.scalarMultiply(1.0 / m.distance(p)))
                 .reduce(new VPoint(0,0), (p1, p2) -> p1.add(p2))
                 .scalarMultiply(1.0 / weightsSum);
@@ -106,8 +109,8 @@ public class LaplacianSmother implements IPMeshImprover {
     private IPoint laplacianSquare(final PVertex vertex) {
 	    IPoint laplacian = laplacian(vertex);
 
-        long numberOfNeighbours = StreamSupport.stream(getMesh().getAdjacentVertexIt(vertex).spliterator(), false).count();
-	    IPoint laplacianSquare = StreamSupport.stream(getMesh().getAdjacentVertexIt(vertex).spliterator(), false)
+        long numberOfNeighbours = StreamSupport.stream(getMesh().vertices().adjacentIterableFor(vertex).spliterator(), false).count();
+	    IPoint laplacianSquare = StreamSupport.stream(getMesh().vertices().adjacentIterableFor(vertex).spliterator(), false)
                 .map(v -> laplacian(v).subtract(laplacian))
                 .reduce(new VPoint(0, 0), (p1, p2) -> p1.add(p2))
                 .scalarMultiply(1.0 / numberOfNeighbours);
@@ -116,7 +119,7 @@ public class LaplacianSmother implements IPMeshImprover {
     }
 
     private void shrinkForce(final PVertex vertex) {
-	    IPoint p = getMesh().getPoint(vertex);
+	    IPoint p = getMesh().vertices().toPoint(vertex);
 
 
         double alpha = 0.05;
@@ -126,11 +129,11 @@ public class LaplacianSmother implements IPMeshImprover {
 	    IPoint inflate = laplacian(vertex).subtract(p).scalarMultiply(-beta);
 
         //getMesh().getPoint(vertex).setVelocity(p.add(shrink.add(inflate)));
-	    getDataStorage().setData(vertex, "velocity", p.add(shrink));
+	    getMeshDataStorage().setData(vertex, "velocity", p.add(shrink));
     }
 
     private void inflateForce(final PVertex vertex) {
-	    IPoint p = getMesh().getPoint(vertex);
+	    IPoint p = getMesh().vertices().toPoint(vertex);
 
 
         double alpha = 1;
@@ -140,30 +143,30 @@ public class LaplacianSmother implements IPMeshImprover {
 	    IPoint inflate = laplacian(vertex).subtract(p).scalarMultiply(-beta);
 
         //getMesh().getPoint(vertex).setVelocity(p.add(shrink.add(inflate)));
-        getDataStorage().setData(vertex, "velocity", p.add(inflate));
+        getMeshDataStorage().setData(vertex, "velocity", p.add(inflate));
     }
 
     private void applyLaplacian(final PVertex vertex) {
-        IPoint force = getDataStorage().getData(vertex, "velocity", IPoint.class).get();
-        getMesh().setCoords(vertex, force.getX(), force.getY());
+        IPoint force = getMeshDataStorage().getData(vertex, "velocity", IPoint.class).get();
+        getTriangulation().getMeshBuilder().vertices().setCoords(vertex, force.getX(), force.getY());
     }
 
     private void removeTrianglesInsideObstacles() {
-        List<PFace> faces = triangulation.getMesh().getFaces();
+        List<PFace> faces = triangulation.getMesh().faces().getAll();
         for(PFace face : faces) {
-            if(!triangulation.getMesh().isDestroyed(face) && distanceFunc.apply(triangulation.getMesh().toTriangle(face).midPoint()) > 0) {
-                triangulation.removeFaceAtBorder(face, true);
+            if(!triangulation.getMesh().faces().isDestroyed(face) && distanceFunc.apply(triangulation.getMesh().faces().toTriangle(face).midPoint()) > 0) {
+                triangulation.getMeshBuilder().changeConnectivity().removeFaceAtBorder(face, true);
             }
         }
     }
 
     // helper methods
     private Stream<PHalfEdge> streamEdges() {
-        return runParallel ? getMesh().streamEdgesParallel() : getMesh().streamEdges();
+        return runParallel ? getMesh().edges().streamParallel() : getMesh().edges().stream();
     }
 
     private Stream<PVertex> streamVertices() {
-        return runParallel ? getMesh().streamVerticesParallel() : getMesh().streamVertices();
+        return runParallel ? getMesh().vertices().streamParallel() : getMesh().vertices().stream();
     }
 
     @Override
@@ -173,7 +176,7 @@ public class LaplacianSmother implements IPMeshImprover {
 
     // TODO: parallize the whole triangulation
     public void retriangulate() {
-        triangulation = IIncrementalTriangulation.createPTriangulation(IPointLocator.Type.DELAUNAY_HIERARCHY, getMesh().getPoints());
+        triangulation = IIncrementalTriangulation.createPTriangulation(ITriangleMeshPointLocator.Type.DELAUNAY_HIERARCHY, getMesh().vertices().toPoints());
         removeTrianglesInsideObstacles();
         triangulation.finish();
     }

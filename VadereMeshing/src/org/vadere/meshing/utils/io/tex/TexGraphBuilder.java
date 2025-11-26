@@ -154,7 +154,7 @@ public class TexGraphBuilder<P extends IPoint, CE, CF, V extends IVertex, E exte
 	 * by the {@link ColorFunctions} field
 	 */
 	private void drawFaces() {
-		for (F face : mesh.getFaces()) {
+		for (F face : mesh.faces()) {
 			sb.append(drawFace.apply(mesh, face));
 		}
 	}
@@ -166,9 +166,9 @@ public class TexGraphBuilder<P extends IPoint, CE, CF, V extends IVertex, E exte
 	 */
 	private void drawFacesWithId() {
 		int id = 0;
-		for (F face : mesh.getFaces()) {
+		for (F face : mesh.faces()) {
 			sb.append("%id: ").append(Integer.toString(id)).append("\n");
-			VPolygon p = mesh.toPolygon(face);
+			VPolygon p = mesh.faces().toPolygon(face);
 			VPoint x = p.getCentroid();
 			sb.append(drawFace.apply(mesh, face));
 			Color c = ColorHelper.getContrasColor(colorFunctions.faceFillColor(mesh, face));
@@ -193,8 +193,8 @@ public class TexGraphBuilder<P extends IPoint, CE, CF, V extends IVertex, E exte
 	 * Draw circles as {@link IMesh} vertices.
 	 */
 	private void drawVertex() {
-		for (F face : mesh.getFaces()) {
-			VPolygon polygon = mesh.toPolygon(face);
+		for (F face : mesh.faces()) {
+			VPolygon polygon = mesh.faces().toPolygon(face);
 			polygon.getPoints().forEach(p -> {
 				sb.append(point("red", p.getX(), p.getY(), 0.1));
 			});
@@ -267,8 +267,9 @@ public class TexGraphBuilder<P extends IPoint, CE, CF, V extends IVertex, E exte
 
 	public StringBuilder shape(IMesh<V, E, F> mesh, F face) {
 		StringBuilder sb = new StringBuilder();
-		V first = mesh.streamVertices(face).findFirst().get();
-		String poly = mesh.streamVertices(face).map(v -> "(" + v.getX() + "," + v.getY() + ")").reduce((s1, s2) -> s1 + "--" + s2).get() + "-- (" + first.getX() + "," + first.getY() + ")";
+		V first = mesh.vertices().streamVerticesOf(face).findFirst().get();
+		String poly = mesh.vertices().streamVerticesOf(face).map(
+				v -> "(" + v.getX() + "," + v.getY() + ")").reduce((s1, s2) -> s1 + "--" + s2).get() + "-- (" + first.getX() + "," + first.getY() + ")";
 		sb.append(poly);
 		return sb;
 	}

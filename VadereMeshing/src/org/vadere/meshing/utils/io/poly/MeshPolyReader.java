@@ -4,6 +4,10 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.vadere.meshing.mesh.inter.mesh.*;
+import org.vadere.meshing.mesh.inter.mesh.builder.IMeshBuilder;
+import org.vadere.meshing.mesh.inter.mesh.builder.IMeshBuilderEdges;
+import org.vadere.meshing.mesh.inter.mesh.builder.IMeshBuilderFaces;
+import org.vadere.meshing.mesh.inter.mesh.builder.IMeshBuilderVertices;
 import org.vadere.meshing.mesh.inter.mesh.data.IMeshDataStorage;
 
 import java.io.BufferedReader;
@@ -43,61 +47,20 @@ public class MeshPolyReader<V extends IVertex, E extends IHalfEdge, F extends IF
 	/**
 	 * the mesh for which the face will be added
 	 */
+	private IMeshBuilder<V, E, F> meshBuilder;
+
 	private IMesh<V, E, F> mesh;
 
-	private final Supplier<IMeshWithDataStorage<V, E, F>> meshSupplier;
 
-	public MeshPolyReader(@NotNull final Supplier<IMeshWithDataStorage<V, E, F>> meshSupplier) {
-		this.meshSupplier = meshSupplier;
+	private final Supplier<IMeshBuilder<V, E, F>> meshBuilderSupplier;
+	private IMeshBuilderEdges<V, E, F> edgeWriter;
+	private IMeshBuilderVertices<V, E, F> vertexWriter;
+	private IMeshBuilderFaces<V, E, F> faceWriter;
+
+	public MeshPolyReader(@NotNull final Supplier<IMeshBuilder<V, E, F>> meshBuilderSupplier) {
+		this.meshBuilderSupplier = meshBuilderSupplier;
 		this.edges = new HashMap<>();
 		this.vertices = new HashMap<>();
-	}
-
-	/**
-	 * Adds a face to the mesh by parsing the String <tt>line</tt> which should represent a face.
-	 *
-	 * @param line a String that represents the face
-	 * @param face the face object which was already be added
-	 */
-	private void addFace(@NotNull final String line, @NotNull final F face) {
-
-		String[] split = line.split(SPLITTER);
-		int nVertices = Integer.parseInt(split[0].strip());
-		assert nVertices == split.length-1;
-		List<Integer> vertexIds = new ArrayList<>(nVertices);
-		for(int i = 0; i < nVertices; i++) {
-			vertexIds.add(Integer.parseInt(split[i+1].strip()));
-		}
-
-		List<E> ccwEdges = new ArrayList<>(nVertices);
-		for(int i = 0; i < nVertices; i++) {
-			int i1 = vertexIds.get(i);
-			int i2 = vertexIds.get((i+1) % nVertices);
-			V v1 = vertices.get(i1);
-			V v2 = vertices.get(i2);
-			E edge = mesh.createEdge(v2);
-			mesh.setFace(edge, face);
-			mesh.setEdge(face, edge);
-
-			if(mesh.getEdge(v2) == null || !mesh.isBoundary(mesh.getEdge(v2))) {
-				mesh.setEdge(v2, edge);
-			}
-
-			edges.put(Pair.of(i1, i2), edge);
-
-			if(edges.containsKey(Pair.of(i2, i1))) {
-				E twin = edges.get(Pair.of(i2, i1));
-				mesh.setTwin(edge, twin);
-			}
-
-			ccwEdges.add(edge);
-		}
-
-		for(int i = 0; i < nVertices; i++) {
-			E edge = ccwEdges.get(i);
-			E next = ccwEdges.get((i+1)%nVertices);
-			mesh.setNext(edge, next);
-		}
 	}
 
 	/**
@@ -128,9 +91,13 @@ public class MeshPolyReader<V extends IVertex, E extends IHalfEdge, F extends IF
 	private IMeshWithDataStorage<V,E,F> toMesh(
 			@NotNull final InputStream inputStream,
 			@Nullable final Function<Integer, String> attrNameFunc) throws IOException {
-		IMeshWithDataStorage<V, E, F> meshWithDataStorage = meshSupplier.get();
-		mesh = meshWithDataStorage.getMesh();
-		IMeshDataStorage<V, E, F> dataStorage = meshWithDataStorage.getDataStorage();
+		meshBuilder = meshBuilderSupplier.get();
+		mesh = meshBuilder.getMesh();
+		edgeWriter = meshBuilder.edges();
+		vertexWriter = meshBuilder.vertices();
+		faceWriter = meshBuilder.faces();
+
+		IMeshDataStorage<V, E, F> dataStorage = meshBuilder.getDataStorage();
 		BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
 
 		String line = readLine(reader);
@@ -154,7 +121,7 @@ public class MeshPolyReader<V extends IVertex, E extends IHalfEdge, F extends IF
 			double x = Double.parseDouble(split[3].strip());
 			double y = Double.parseDouble(split[4].strip());
 
-			V vertex = mesh.insertVertex(x, y);
+			V vertex = vertexWriter.createAndInsert(x, y);
 			vertices.put(id, vertex);
 			// TODO: ? boundaryMark?
 			if(attrNameFunc != null) {
@@ -169,19 +136,19 @@ public class MeshPolyReader<V extends IVertex, E extends IHalfEdge, F extends IF
 		String nBorderString = readLine(reader);
 		assert Integer.parseInt(nBorderString.strip()) == 1;
 		String borderVertices = readLine(reader);
-		addFace(borderVertices, mesh.getBorder());
+		addFace(borderVertices, mesh.faces().getOuterBorder());
 
 		// triangles
 		Integer nTriangles = Integer.parseInt(readLine(reader).strip());
 		for(int i = 0; i < nTriangles; i++) {
-			F face = mesh.createFace();
+			F face = faceWriter.createAndInsert();
 			addFace(readLine(reader), face);
 		}
 
 		// holes
 		Integer nHoles = Integer.parseInt(readLine(reader).strip());
 		for(int i = 0; i < nHoles; i++) {
-			F face = mesh.createFace(true);
+			F face = faceWriter.createAndInsertHole();
 			addFace(readLine(reader), face);
 		}
 
@@ -189,7 +156,54 @@ public class MeshPolyReader<V extends IVertex, E extends IHalfEdge, F extends IF
 		vertices.clear();
 
 		assert mesh.isValid();
-		return meshWithDataStorage;
+		return meshBuilder.getMeshWithDataStorage();
+	}
+
+	/**
+	 * Adds a face to the mesh by parsing the String <tt>line</tt> which should represent a face.
+	 *
+	 * @param line a String that represents the face
+	 * @param face the face object which was already be added
+	 */
+	private void addFace(@NotNull final String line, @NotNull final F face) {
+
+		String[] split = line.split(SPLITTER);
+		int nVertices = Integer.parseInt(split[0].strip());
+		assert nVertices == split.length-1;
+		List<Integer> vertexIds = new ArrayList<>(nVertices);
+		for(int i = 0; i < nVertices; i++) {
+			vertexIds.add(Integer.parseInt(split[i+1].strip()));
+		}
+
+		List<E> ccwEdges = new ArrayList<>(nVertices);
+		for(int i = 0; i < nVertices; i++) {
+			int i1 = vertexIds.get(i);
+			int i2 = vertexIds.get((i+1) % nVertices);
+			V v1 = vertices.get(i1);
+			V v2 = vertices.get(i2);
+			E edge = meshBuilder.edges().createAndInsert(v2);
+			meshBuilder.edges().setFace(edge, face);
+			meshBuilder.faces().setEdge(face, edge);
+
+			if(meshBuilder.getMesh().edges().getOf(v2) == null || !mesh.edges().isBoundary(mesh.edges().getOf(v2))) {
+				vertexWriter.setEdge(v2, edge);
+			}
+
+			edges.put(Pair.of(i1, i2), edge);
+
+			if(edges.containsKey(Pair.of(i2, i1))) {
+				E twin = edges.get(Pair.of(i2, i1));
+				edgeWriter.setTwin(edge, twin);
+			}
+
+			ccwEdges.add(edge);
+		}
+
+		for(int i = 0; i < nVertices; i++) {
+			E edge = ccwEdges.get(i);
+			E next = ccwEdges.get((i+1)%nVertices);
+			edgeWriter.setNext(edge, next);
+		}
 	}
 
 	private static String readLine(@NotNull final BufferedReader reader) throws IOException {

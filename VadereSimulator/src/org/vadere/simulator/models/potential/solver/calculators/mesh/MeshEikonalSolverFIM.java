@@ -1,9 +1,10 @@
 package org.vadere.simulator.models.potential.solver.calculators.mesh;
 
 import org.jetbrains.annotations.NotNull;
+import org.vadere.meshing.mesh.inter.ITriangleMeshPointLocator;
 import org.vadere.meshing.mesh.inter.mesh.IFace;
 import org.vadere.meshing.mesh.inter.mesh.IHalfEdge;
-import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
+import org.vadere.meshing.mesh.inter.mesh.ITriangleMeshWithDataStorage;
 import org.vadere.meshing.mesh.inter.mesh.IVertex;
 import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
 import org.vadere.util.geometry.shapes.VShape;
@@ -67,20 +68,21 @@ public class MeshEikonalSolverFIM<V extends IVertex, E extends IHalfEdge, F exte
 	public MeshEikonalSolverFIM(@NotNull final String identifier,
 	                            @NotNull final Collection<VShape> targetShapes,
 	                            @NotNull final ITimeCostFunction timeCostFunction,
-	                            @NotNull final IIncrementalTriangulation<V, E, F> triangulation
+								@NotNull final ITriangleMeshWithDataStorage<V, E, F> triangulation,
+								@NotNull final ITriangleMeshPointLocator<V, E, F> pointLocator
 	                            //@NotNull final Collection<VShape> destinations
 	) {
-		super(identifier, triangulation, timeCostFunction);
+		super(identifier, triangulation, pointLocator.withCache(), timeCostFunction);
 		this.identifier = identifier;
 		this.activeList = new LinkedList<>();
 
 		//TODO a more clever init!
 		List<V> initialVertices = new ArrayList<>();
 		for(VShape shape : targetShapes) {
-			getMesh().streamVertices()
-					.filter(v -> shape.contains(getMesh().toPoint(v)))
+			getMesh().vertices().stream()
+					.filter(v -> shape.contains(vertices.toPoint(v)))
 					.forEach(v -> {
-						for(V u : getMesh().getAdjacentVertexIt(v)) {
+						for(V u : vertices.adjacentIterableFor(v)) {
 							initialVertices.add(u);
 							setAsInitialVertex(u);
 						}
@@ -95,7 +97,6 @@ public class MeshEikonalSolverFIM<V extends IVertex, E extends IHalfEdge, F exte
 	@Override
 	public void solve() {
 		double ms = System.currentTimeMillis();
-		getTriangulation().enableCache();
 		nUpdates = 0;
 
 		if(!solved || needsUpdate()) {
@@ -115,7 +116,7 @@ public class MeshEikonalSolverFIM<V extends IVertex, E extends IHalfEdge, F exte
 		double runTime = (System.currentTimeMillis() - ms);
 		logger.debug("fim run time = " + runTime);
 		logger.debug("#nUpdates = " + nUpdates);
-		logger.debug("#nVertices = " + (getMesh().getNumberOfVertices() - (int)getMesh().streamVertices().filter(v -> isInitialVertex(v)).count()));
+		logger.debug("#nVertices = " + (vertices.count() - (int)vertices.stream().filter(v -> isInitialVertex(v)).count()));
 		iteration++;
 	}
 
@@ -144,7 +145,7 @@ public class MeshEikonalSolverFIM<V extends IVertex, E extends IHalfEdge, F exte
 					setBurned(x);
 					setUnburning(x);
 					// check adjacent neighbors
-					for(V xn : getMesh().getAdjacentVertexIt(x)) {
+					for(V xn : vertices.adjacentIterableFor(x)) {
 						if(getPotential(xn) > getPotential(x) && !isInitialVertex(xn) && !isBurining(xn)) {
 							p = getPotential(xn);
 							q = recomputePotential(xn);

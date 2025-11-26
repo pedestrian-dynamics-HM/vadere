@@ -4,7 +4,15 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.vadere.meshing.mesh.gen.MeshPanel;
 import org.vadere.meshing.mesh.gen.mesh.arrayBased.*;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AFace;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AHalfEdge;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AVertex;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.triangles.ATriangleMeshBuilder;
 import org.vadere.meshing.mesh.gen.mesh.pointerBased.*;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PFace;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PHalfEdge;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PVertex;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.triangles.PTriangleMeshBuilder;
 import org.vadere.meshing.mesh.triangulation.edgeLengthFunctions.IEdgeLengthFunction;
 import org.vadere.meshing.utils.io.poly.PSLGGenerator;
 import org.vadere.meshing.utils.io.tex.TexGraphGenerator;
@@ -2915,7 +2923,7 @@ public class RealWorldPlot {
 				5.0,
 				bound,
 				topography.getObstacles().stream().map(obs -> new VPolygon(obs.getShape())).collect(Collectors.toList()),
-				PMeshWithDataStorage::constructEmpty);
+				PTriangleMeshBuilder::new);
 
 		MeshPanel<PVertex, PHalfEdge, PFace> meshPanel = new MeshPanel<>(
 				meshGenerator.getMesh(), 1000, 800);
@@ -2950,9 +2958,9 @@ public class RealWorldPlot {
 		}
 		overAllTime.stop();
 
-		log.info("#vertices: " + meshGenerator.getMesh().getVertices().size());
-		log.info("#edges: " + meshGenerator.getMesh().getEdges().size());
-		log.info("#faces: " + meshGenerator.getMesh().getFaces().size());
+		log.info("#vertices: " + meshGenerator.getMesh().vertices().count());
+		log.info("#edges: " + meshGenerator.getMesh().edges().count());
+		log.info("#faces: " + meshGenerator.getMesh().faces().count());
 		log.info("quality: " + meshGenerator.getQuality());
 		log.info("min-quality: " + meshGenerator.getMinQuality());
 		log.info("overall time: " + overAllTime.getTime() + "[ms]");
@@ -2963,7 +2971,7 @@ public class RealWorldPlot {
 		};*/
 		log.info(TexGraphGenerator.toTikz(meshGenerator.getMesh(), 1.0f));
 		log.info(PSLGGenerator.to3DPoly(meshGenerator.getMesh()));
-		log.info("#vertices: " + meshGenerator.getMesh().getVertices().size());
+		log.info("#vertices: " + meshGenerator.getMesh().vertices().count());
 	}
 
 	private static void realWorldExampleEikMesh() throws IOException {
@@ -2997,7 +3005,7 @@ public class RealWorldPlot {
 				p -> Math.min(1.0 + Math.max(approxDistance.apply(p)*approxDistance.apply(p), 0)*0.5, 5.0),
 				0.4,
 				bound,topography.getObstacles().stream().map(obs -> obs.getShape()).collect(Collectors.toList()),
-				AMeshWithDataStorage::constructEmpty);
+				ATriangleMeshBuilder::new);
 
 		MeshPanel<AVertex, AHalfEdge, AFace> meshPanel = new MeshPanel<>(
 				meshGenerator.getMesh(), 1000, 800);
@@ -3030,9 +3038,9 @@ public class RealWorldPlot {
 		}
 		overAllTime.stop();
 
-		log.info("#vertices: " + meshGenerator.getMesh().getVertices().size());
-		log.info("#edges: " + meshGenerator.getMesh().getEdges().size());
-		log.info("#faces: " + meshGenerator.getMesh().getFaces().size());
+		log.info("#vertices: " + meshGenerator.getMesh().vertices().count());
+		log.info("#edges: " + meshGenerator.getMesh().edges().count());
+		log.info("#faces: " + meshGenerator.getMesh().faces().count());
 		log.info("quality: " + meshGenerator.getQuality());
 		log.info("min-quality: " + meshGenerator.getMinQuality());
 		log.info("overall time: " + overAllTime.getTime() + "[ms]");

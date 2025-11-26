@@ -2,16 +2,21 @@ package org.vadere.simulator.examples.Meshing;
 
 import org.vadere.meshing.WeilerAtherton;
 import org.vadere.meshing.mesh.gen.IncrementalTriangulation;
-import org.vadere.meshing.mesh.gen.mesh.pointerBased.*;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PFace;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PHalfEdge;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PVertex;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.triangles.PTriangleMeshBuilder;
+import org.vadere.meshing.mesh.gen.pointLocator.JumpAndWalkPointLocator;
 import org.vadere.meshing.mesh.impl.PMeshPanel;
+import org.vadere.meshing.mesh.inter.mesh.ITriangleMeshWithDataStorage;
 import org.vadere.meshing.mesh.inter.mesh.MeshPythonUtils;
+import org.vadere.meshing.mesh.inter.mesh.triangle.ITriangleMesh;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.GenEikMesh;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.impl.PEikMesh;
 import org.vadere.meshing.mesh.triangulation.triangulator.gen.GenRegularRefinement;
 import org.vadere.meshing.utils.io.IOUtils;
 import org.vadere.meshing.utils.math.GeometryUtilsMesh;
 import org.vadere.simulator.models.potential.solver.calculators.mesh.MeshEikonalSolverFMM;
-import org.vadere.simulator.models.potential.solver.calculators.mesh.MeshEikonalSolverFMMIterative;
 import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
 import org.vadere.simulator.models.potential.solver.timecost.UnitTimeCostFunction;
 import org.vadere.util.geometry.GeometryUtils;
@@ -96,29 +101,31 @@ public class Curvature {
 		for(int i = 0; i < 4; i++) {
 
 			var curTri = tri;
-			List<PVertex> list = tri.getMesh().getBoundaryVertices();
+			List<PVertex> list = tri.getMesh().vertices().getBoundaryVertices();
 			Set<PVertex> initialVertices = new HashSet<>();
 			initialVertices.addAll(list);
-			list.stream().forEach(v -> curTri.getMesh().getAdjacentVertexIt(v).forEach(u -> initialVertices.add(u)));
+			list.stream().forEach(v -> curTri.getMesh().vertices().adjacentIterableFor(v).forEach(u -> initialVertices.add(u)));
 
 			Set<PVertex> initialVertices2 = new HashSet<>();
-			initialVertices.stream().forEach(v -> curTri.getMesh().getAdjacentVertexIt(v).forEach(u -> initialVertices2.add(u)));
+			initialVertices.stream().forEach(v -> curTri.getMesh().vertices().adjacentIterableFor(v).forEach(u -> initialVertices2.add(u)));
 			initialVertices2.addAll(initialVertices);
 
-			var solver = new MeshEikonalSolverFMM<>(
+			ITriangleMeshWithDataStorage<PVertex, PHalfEdge, PFace> meshWithDataStorage = tri.getMeshBuilder().getMeshWithDataStorage();
+			var solver = new MeshEikonalSolverFMM<PVertex, PHalfEdge, PFace>(
 					p -> 1,
 					//Arrays.asList(new VPoint(5, 5)),
-					tri,
+					meshWithDataStorage,
+					new JumpAndWalkPointLocator<>(tri.getMesh()),
 					initialVertices2,
 					p -> Math.abs(distanceFunction.apply(p)));
 			solver.solve();
 			System.out.println(solver.getPotential(5,5));
-			meshWriter.write(MeshPythonUtils.toPythonTriangulation(tri.getMeshWithDataStorage(), v -> solver.getPotential(v)));
+			meshWriter.write(MeshPythonUtils.toPythonTriangulation(tri.getMeshBuilder().getMeshWithDataStorage(), v -> solver.getPotential(v)));
 			meshWriter.write("\n");
 
 
 			double maxCurvature = 0;
-			for(var v : tri.getMesh().getVertices()) {
+			for(var v : tri.getMesh().vertices()) {
 				double[] result = GeometryUtilsMesh.curvature(tri.getMesh(), v, vertex -> solver.getPotential(vertex));
 				//System.out.println("Curvature: " + result[0]);
 				//System.out.println("Gaussian curvature: " + result[1]);
@@ -132,7 +139,7 @@ public class Curvature {
 			final double minEdgeLen = 0.1;
 			final var pTri = tri;
 			Predicate<PHalfEdge> edgePredicate = e -> {
-				VLine line = pTri.getMesh().toLine(e);
+				VLine line = pTri.getMesh().edges().toLine(e);
 				double len = line.length();
 				double x[] = new double[3];
 				double y[] = new double[3];
@@ -140,13 +147,13 @@ public class Curvature {
 
 				VPoint p = line.midPoint();
 				var face = pTri.locateFace(p).get();
-				pTri.getTriPoints(face, x, y, z, "curvature");
+				pTri.getMesh().readConnectivity().getTriPoints(face, x, y, z, "curvature", pTri.getMeshDataStorage());
 				double totalArea = GeometryUtils.areaOfPolygon(x, y);
 				double curvature = InterpolationUtil.barycentricInterpolation(x, y, z, totalArea, p.getX(), p.getY());
 				return len > minEdgeLen && curvature > 0.25;
 			};
 
-			var triangulation = IncrementalTriangulation.fromMesh(tri.getMeshWithDataStorage().clone());
+			var triangulation = IncrementalTriangulation.fromMeshBuilder(tri.getMeshBuilder().copy());
 			GenRegularRefinement<PVertex, PHalfEdge, PFace> refinement = new GenRegularRefinement<>(triangulation, edgePredicate, i+1);
 			refinement.setMaxLevel(i+1);
 			refinement.refine();
@@ -218,19 +225,19 @@ public class Curvature {
 			//panel.repaint();
 		}
 
-		var boundaryEdges = improver.getTriangulation().getMesh().getBoundaryEdges();
+		var boundaryEdges = improver.getTriangulation().getMesh().edges().getBoundaryEdges();
 		for(var e : boundaryEdges) {
-			var edge = improver.getTriangulation().getMesh().getTwin(e);
-			VPoint p1 = improver.getTriangulation().getMesh().toPoint(edge);
-			VPoint p2 = improver.getTriangulation().getMesh().toPoint(improver.getTriangulation().getMesh().getNext(edge));
-			VPoint p3 = improver.getTriangulation().getMesh().toPoint(improver.getTriangulation().getMesh().getPrev(edge));
+			var edge = improver.getTriangulation().getMesh().edges().getTwin(e);
+			VPoint p1 = improver.getTriangulation().getMesh().edges().endToPoint(edge);
+			VPoint p2 = improver.getTriangulation().getMesh().edges().endToPoint(improver.getTriangulation().getMesh().edges().getNext(edge));
+			VPoint p3 = improver.getTriangulation().getMesh().edges().endToPoint(improver.getTriangulation().getMesh().edges().getPrev(edge));
 
 			double angle1 = GeometryUtils.angle(p1, p2, p3);
 
 			// non-acute triangle
 			double rightAngle = Math.PI/2;
 			if(angle1 > rightAngle + GeometryUtils.DOUBLE_EPS) {
-				improver.getTriangulation().splitEdge(edge, false);
+				improver.getTriangulation().getMeshBuilder().changeConnectivity().splitEdge(edge, false);
 			}
 		}
 
@@ -238,15 +245,16 @@ public class Curvature {
 		points.add(new VPoint(5, 5));
 		points.add(new VPoint(25, 25));
 
-		var solver = new MeshEikonalSolverFMMIterative<>(
+		var solver = new MeshEikonalSolverFMM<>(
 				new UnitTimeCostFunction(),
-				improver.getTriangulation(),
+				improver.getTriangulation().getMeshBuilder().getMeshWithDataStorage(),
+				new JumpAndWalkPointLocator<>(improver.getMesh()),
 				//points,
-				improver.getTriangulation().getMesh().getBoundaryVertices(),
+				improver.getTriangulation().getMesh().vertices().getBoundaryVertices(),
 				p -> 0.0);
 		solver.solve();
 
-		meshWriter.write(MeshPythonUtils.toPythonTriangulation(solver.getTriangulation().getMeshWithDataStorage(), v -> solver.getPotential(v)));
+		meshWriter.write(MeshPythonUtils.toPythonTriangulation(solver.getMeshWithDataStorage(), v -> solver.getPotential(v)));
 		meshWriter.close();
 		System.out.println("finished");
 	}
@@ -272,7 +280,7 @@ public class Curvature {
 				0.1,
 				GeometryUtils.boundRelative(bound.getPoints()),
 				Arrays.asList(bound),
-				PMeshWithDataStorage::constructEmpty);
+				PTriangleMeshBuilder::new);
 
 		improver.initialize();
 		for(int i = 0; i < 100; i++) {
@@ -300,14 +308,17 @@ public class Curvature {
 		ArrayList<IPoint> points = new ArrayList<>();
 		points.add(q);
 
-		var solver = new MeshEikonalSolverFMMIterative<>(
+		ITriangleMeshWithDataStorage<PVertex, PHalfEdge, PFace> withDataStorage = improver.getTriangulation().getMeshBuilder().getMeshWithDataStorage();
+		ITriangleMesh<PVertex, PHalfEdge, PFace> mesh = improver.getMesh();
+		JumpAndWalkPointLocator<PVertex, PHalfEdge, PFace> pointLocator = new JumpAndWalkPointLocator<>(mesh);
+		var solver = new MeshEikonalSolverFMM<>(
 				timeCostFunction,
 				points,
-				improver.getTriangulation(),
-				//improver.getTriangulation().getMesh().getBoundaryVertices(),
-				p -> 0.0);
+				//improver.getTriangulation().getMesh().getBoundaryVertices(),,
+				withDataStorage,
+				pointLocator);
 		solver.solve();
-		meshWriter.write(MeshPythonUtils.toPythonTriangulation(solver.getTriangulation().getMeshWithDataStorage(), v -> solver.getPotential(v)));
+		meshWriter.write(MeshPythonUtils.toPythonTriangulation(solver.getMeshWithDataStorage(), v -> solver.getPotential(v)));
 		meshWriter.close();
 		System.out.println("finished");
 	}

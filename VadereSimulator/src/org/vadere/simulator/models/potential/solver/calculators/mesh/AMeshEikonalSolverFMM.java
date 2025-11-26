@@ -1,10 +1,8 @@
 package org.vadere.simulator.models.potential.solver.calculators.mesh;
 
 import org.jetbrains.annotations.NotNull;
-import org.vadere.meshing.mesh.inter.mesh.IFace;
-import org.vadere.meshing.mesh.inter.mesh.IHalfEdge;
-import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
-import org.vadere.meshing.mesh.inter.mesh.IVertex;
+import org.vadere.meshing.mesh.inter.ITriangleMeshPointLocator;
+import org.vadere.meshing.mesh.inter.mesh.*;
 import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
 
 import java.util.Comparator;
@@ -20,9 +18,10 @@ public abstract class AMeshEikonalSolverFMM<V extends IVertex, E extends IHalfEd
 
 	public AMeshEikonalSolverFMM(
 			@NotNull final String identifier,
-			@NotNull final IIncrementalTriangulation<V, E, F> triangulation,
+			@NotNull final ITriangleMeshWithDataStorage<V, E, F> triangulation,
+			@NotNull final ITriangleMeshPointLocator<V, E, F> pointLocator,
 			@NotNull final ITimeCostFunction timeCostFunction) {
-		super(identifier, triangulation, timeCostFunction);
+		super(identifier, triangulation, pointLocator, timeCostFunction);
 
 		Comparator<V> pointComparator = (v1, v2) -> {
 			double alpha = 0.3;
@@ -45,10 +44,11 @@ public abstract class AMeshEikonalSolverFMM<V extends IVertex, E extends IHalfEd
 
 	public AMeshEikonalSolverFMM(
 			@NotNull final String identifier,
-			@NotNull final IIncrementalTriangulation<V, E, F> triangulation,
+			@NotNull final ITriangleMeshWithDataStorage<V, E, F> triangulation,
+			@NotNull final ITriangleMeshPointLocator<V, E, F> pointLocator,
 			@NotNull final ITimeCostFunction timeCostFunction,
 			@NotNull final Comparator<V> comparator) {
-		super(identifier, triangulation, timeCostFunction);
+		super(identifier, triangulation, pointLocator, timeCostFunction);
 		this.narrowBand = new PriorityQueue<>(comparator);
 	}
 
@@ -107,7 +107,7 @@ public abstract class AMeshEikonalSolverFMM<V extends IVertex, E extends IHalfEd
 	 * @param vertex the vertex
 	 */
 	protected void updatePotentialOfNeighbours(@NotNull final V vertex) {
-		for(V neighbour : getMesh().getAdjacentVertexIt(vertex)) {
+		for(V neighbour : getMesh().vertices().adjacentIterableFor(vertex)) {
 			if(!isBurned(neighbour) && !isInitialVertex(neighbour)) {
 				updatePotential(neighbour);
 			}

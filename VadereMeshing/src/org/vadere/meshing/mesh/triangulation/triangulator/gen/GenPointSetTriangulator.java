@@ -1,8 +1,9 @@
 package org.vadere.meshing.mesh.triangulation.triangulator.gen;
 
-import org.vadere.meshing.mesh.gen.IncrementalTriangulation;
+import org.vadere.meshing.mesh.inter.ITriangleMeshPointLocator;
 import org.vadere.meshing.mesh.inter.mesh.*;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
+import org.vadere.meshing.mesh.inter.mesh.builder.ITriangleMeshBuilder;
 import org.vadere.meshing.mesh.inter.mesh.data.IMeshDataStorage;
 import org.vadere.meshing.mesh.triangulation.triangulator.inter.ITriangulator;
 import org.vadere.util.geometry.shapes.IPoint;
@@ -46,10 +47,10 @@ public class GenPointSetTriangulator<V extends IVertex, E extends IHalfEdge, F e
 	/**
 	 * <p>The default constructor.</p>
 	 *  @param points        the collection of points P
-	 * @param meshWithDataStorage          an empty mesh
+	 * @param meshBuilder          an empty mesh
 	 */
-	public GenPointSetTriangulator(final Collection<IPoint> points, final IMeshWithDataStorage<V, E, F> meshWithDataStorage) {
-		this.triangulation = meshWithDataStorage.toTriangulation();
+	public GenPointSetTriangulator(final Collection<IPoint> points, final ITriangleMeshBuilder<V, E, F> meshBuilder) {
+		this.triangulation = IIncrementalTriangulation.createTriangulation(ITriangleMeshPointLocator.Type.JUMP_AND_WALK, meshBuilder);
 		this.points = points;
 		this.generated = false;
 	}
@@ -81,15 +82,10 @@ public class GenPointSetTriangulator<V extends IVertex, E extends IHalfEdge, F e
 	}
 
 	@Override
-	public IMesh<V, E, F> getMesh() {
-		return triangulation.getMesh();
-	}
-
-	@Override
 	public IMeshDataStorage<V, E, F> getMeshDataStorage() {
 		return triangulation.getMeshDataStorage();
 	}
 
 	@Override
-	public IMeshWithDataStorage<V, E, F> getMeshWithDataStorage() { return triangulation.getMeshWithDataStorage(); }
+	public ITriangleMeshBuilder<V, E, F> getMeshBuilder() { return triangulation.getMeshBuilder(); }
 }

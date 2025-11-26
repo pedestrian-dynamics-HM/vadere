@@ -1,6 +1,6 @@
 package org.vadere.simulator.models.potential.solver.calculators;
 
-import org.vadere.meshing.mesh.gen.mesh.pointerBased.PMesh;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PMesh;
 import org.vadere.meshing.mesh.inter.mesh.IMesh;
 import org.vadere.util.geometry.shapes.IPoint;
 

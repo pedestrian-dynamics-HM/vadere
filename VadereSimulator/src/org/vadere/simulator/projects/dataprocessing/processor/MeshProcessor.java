@@ -4,10 +4,12 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
 import org.vadere.meshing.mesh.gen.MeshRenderer;
-import org.vadere.meshing.mesh.gen.mesh.pointerBased.*;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PFace;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PHalfEdge;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PVertex;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.triangles.PTriangleMeshBuilder;
 import org.vadere.meshing.mesh.impl.PMeshPanel;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
-import org.vadere.meshing.mesh.inter.mesh.IMesh;
 import org.vadere.meshing.mesh.inter.mesh.IMeshWithDataStorage;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.GenEikMesh;
 import org.vadere.meshing.utils.io.poly.MeshPolyWriter;
@@ -59,12 +61,12 @@ public class MeshProcessor extends NoDataKeyProcessor<IMeshWithDataStorage<PVert
 
 	@Override
 	public void postLoopAddResultInfo(@NotNull final SimulationState state, @NotNull final SimulationResult result){
-		result.addData(getSimulationResultHeader(), getTriangulation().getMeshWithDataStorage().getMesh().getMeshInformations());
+		result.addData(getSimulationResultHeader(), getTriangulation().getMeshBuilder().getMesh().getMeshInformations());
 	}
 
 	@Override
 	public String getSimulationResultHeader() {
-		return "mesh (" + getTriangulation().getMeshWithDataStorage().hashCode() + ")";
+		return "mesh (" + getTriangulation().getMeshBuilder().hashCode() + ")";
 	}
 
 	@Override
@@ -99,12 +101,12 @@ public class MeshProcessor extends NoDataKeyProcessor<IMeshWithDataStorage<PVert
 				getAttributes().getEdgeLength(),
 				GeometryUtils.boundRelative(measurementPolygon.getPoints()),
 				allPolygons,
-				PMeshWithDataStorage::constructEmpty
+				PTriangleMeshBuilder::new
 		);
 
 		triangulation = meshImprover.generate();
 		triangulation = meshImprover.getTriangulation();
-		IMeshWithDataStorage<PVertex, PHalfEdge, PFace> meshWithDataStorage = triangulation.getMeshWithDataStorage();
+		IMeshWithDataStorage<PVertex, PHalfEdge, PFace> meshWithDataStorage = triangulation.getMeshBuilder().getMeshWithDataStorage();
 		this.putValue(NoDataKey.key() , meshWithDataStorage);
 
 		var meshRenderer = new MeshRenderer<>(meshImprover.getMesh(), f -> false, f -> Color.WHITE, e -> Color.GRAY);

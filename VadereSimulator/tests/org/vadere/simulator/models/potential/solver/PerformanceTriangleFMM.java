@@ -1,8 +1,9 @@
 package org.vadere.simulator.models.potential.solver;
 
-import org.vadere.meshing.mesh.gen.mesh.pointerBased.PFace;
-import org.vadere.meshing.mesh.gen.mesh.pointerBased.PHalfEdge;
-import org.vadere.meshing.mesh.gen.mesh.pointerBased.PVertex;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PFace;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PHalfEdge;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PVertex;
+import org.vadere.meshing.mesh.gen.pointLocator.JumpAndWalkPointLocator;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.impl.PEikMesh;
 import org.vadere.util.geometry.shapes.VRectangle;
@@ -54,14 +55,15 @@ public class PerformanceTriangleFMM {
 		/**
 		 * (2) define target points
 		 */
-		List<PVertex> targetVertices = triangulation.getMesh().getBoundaryVertices().stream().collect(Collectors.toList());
+		List<PVertex> targetVertices = triangulation.getMesh().vertices().getBoundaryVertices().stream().collect(Collectors.toList());
 
 		/**
 		 * (3) solve the eikonal equation on the mesh
 		 */
 		MeshEikonalSolverFMM<PVertex, PHalfEdge, PFace> solver = new MeshEikonalSolverFMM(
 				new UnitTimeCostFunction(),
-				triangulation,
+				triangulation.getMeshBuilder().getMeshWithDataStorage(),
+				new JumpAndWalkPointLocator(triangulation.getMesh()),
 				targetVertices,
 				distanceFunc);
 
@@ -76,7 +78,7 @@ public class PerformanceTriangleFMM {
 				e.printStackTrace();
 			}*/
 			solve(solver);
-			System.out.println("nPoints: " + (triangulation.getMesh().getNumberOfVertices()));
+			System.out.println("nPoints: " + (triangulation.getMesh().vertices().count()));
 		}
 	}
 }

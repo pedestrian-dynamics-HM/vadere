@@ -14,8 +14,8 @@ import org.vadere.gui.components.model.AgentColoring;
 import org.vadere.gui.components.model.DefaultSimulationConfig;
 import org.vadere.gui.components.model.SimulationModel;
 import org.vadere.gui.onlinevisualization.OnlineVisualization;
-import org.vadere.meshing.mesh.gen.mesh.arrayBased.AMesh;
 import org.vadere.meshing.mesh.gen.mesh.arrayBased.AMeshWithDataStorage;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AMeshBuilder;
 import org.vadere.meshing.mesh.inter.mesh.IMesh;
 import org.vadere.simulator.models.potential.fields.IPotentialField;
 import org.vadere.simulator.projects.Domain;
@@ -227,7 +227,7 @@ public class OnlineVisualizationModel extends SimulationModel<DefaultSimulationC
 		if(domain.getFloorFieldMesh() != null) {
 			return domain.getFloorFieldMesh().getMesh();
 		} else {
-			return AMeshWithDataStorage.constructEmpty().getMesh();
+			return new AMeshBuilder().getMesh();
 		}
 	}
 

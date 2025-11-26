@@ -57,11 +57,11 @@ public class MeshPSLGWriter<V extends IVertex, E extends IHalfEdge, F extends IF
 		int boundaryMarker = 0; // no boundary marker
 		StringBuilder builder = new StringBuilder();
 		builder.append("#node\n");
-		builder.append(mesh.getNumberOfVertices() + SEPARATOR + DIMENSION + SEPARATOR + nAttributes + SEPARATOR + boundaryMarker + "\n");
+		builder.append(mesh.vertices().count() + SEPARATOR + DIMENSION + SEPARATOR + nAttributes + SEPARATOR + boundaryMarker + "\n");
 
 		Map<V, Integer> map = new HashMap<>();
 		int id = 1;
-		for(V v : mesh.getVertices()) {
+		for(V v : mesh.vertices()) {
 			map.put(v, id);
 			builder.append(String.format(Locale.US, "%d" + SEPARATOR +"%f" + SEPARATOR + "%f", id, v.getX(), v.getY()));
 
@@ -72,7 +72,7 @@ public class MeshPSLGWriter<V extends IVertex, E extends IHalfEdge, F extends IF
 			id++;
 		}
 
-		List<VLine> lines = mesh.getLines().stream().collect(Collectors.toList());
+		List<VLine> lines = mesh.edges().getLines().stream().collect(Collectors.toList());
 		builder.append("\n" + lines.size() + SEPARATOR + boundaryMarker);
 		for(int index = 1; index <= lines.size(); index++) {
 			VLine line = lines.get(index-1);
@@ -91,13 +91,13 @@ public class MeshPSLGWriter<V extends IVertex, E extends IHalfEdge, F extends IF
 			builder.append("\n" + index + SEPARATOR + from + SEPARATOR + to);
 		}
 		builder.append("#holes\n");
-		List<F> holes = mesh.getHoles();
+		List<F> holes = mesh.faces().getHoles();
 		builder.append(holes.size()+"\n");
 
 		builder.append("#interior points for each hole\n");
 		id = 1;
 		for(F hole : holes) {
-			VPolygon polygon = mesh.toPolygon(hole);
+			VPolygon polygon = mesh.faces().toPolygon(hole);
 			VPoint p = GeometryUtils.getInteriorPoint(polygon);
 			builder.append(String.format(Locale.US, "%d" + SEPARATOR +"%f" + SEPARATOR + "%f\n", id, p.getX(), p.getY()));
 		}

@@ -4,7 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.impl.PSLG;
 import org.vadere.meshing.mesh.inter.mesh.*;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
-import org.vadere.meshing.mesh.inter.IEmptyMeshSupplier;
+import org.vadere.meshing.mesh.inter.mesh.builder.ITriangleMeshBuilder;
 import org.vadere.meshing.mesh.inter.mesh.data.IMeshDataStorage;
 import org.vadere.meshing.mesh.triangulation.triangulator.inter.IRefiner;
 import org.vadere.util.geometry.GeometryUtils;
@@ -26,6 +26,7 @@ import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 public class GenVoronoiSegmentInsertion<V extends IVertex, E extends IHalfEdge, F extends IFace> implements IRefiner<V, E, F> {
 
@@ -56,7 +57,7 @@ public class GenVoronoiSegmentInsertion<V extends IVertex, E extends IHalfEdge, 
 	private VoronoiSegPlacement<V, E, F> placementStrategy;
 
 	public GenVoronoiSegmentInsertion(@NotNull final PSLG pslg,
-	                                  @NotNull final IEmptyMeshSupplier<V, E, F> meshSupplier,
+	                                  @NotNull final Supplier<ITriangleMeshBuilder<V, E, F>> meshSupplier,
 	                                  final boolean createHoles,
 	                                  @NotNull Function<IPoint, Double> edgeLenFunction) {
 		this.initialized = false;
@@ -74,7 +75,7 @@ public class GenVoronoiSegmentInsertion<V extends IVertex, E extends IHalfEdge, 
 		 * This prevent the flipping of constrained edges
 		 */
 		this.cdt = new GenConstrainedDelaunayTriangulator<>(meshSupplier, pslg, false);
-		this.placementStrategy = new VoronoiSegPlacement<>(cdt.getMesh(), edgeLenFunction);
+		this.placementStrategy = new VoronoiSegPlacement<>(cdt.getMeshBuilder().getMesh(), edgeLenFunction);
 	}
 
 	public GenVoronoiSegmentInsertion(@NotNull final IIncrementalTriangulation<V, E, F> triangulation,
@@ -91,18 +92,18 @@ public class GenVoronoiSegmentInsertion<V extends IVertex, E extends IHalfEdge, 
 		this.pslg = null;
 		this.cdt = null;
 		this.segmentBound = GeometryUtils.polygonFromPoints2D(
-				getTriangulation().getMesh().getVertices(triangulation.getMesh().getBorder()));
+				getTriangulation().getMeshBuilder().getMesh().vertices().getAllOf(triangulation.getMesh().faces().getOuterBorder()));
 		this.placementStrategy = new VoronoiSegPlacement<>(triangulation.getMesh(), circumRadiusFunc);
 	}
 
 	private boolean isAccepted(@NotNull final E edge) {
-		return edgeLenFunction.apply(getMesh().toLine(edge).midPoint()) / getMesh().toTriangle(getMesh().getFace(edge)).getCircumscribedRadius() < 1.5;
+		return edgeLenFunction.apply(getMesh().edges().toLine(edge).midPoint()) / getMesh().faces().toTriangle(getMesh().faces().getOf(edge)).getCircumscribedRadius() < 1.5;
 	}
 
 	private void scan() {
-		for(F face : getTriangulation().getMesh().getFaces()) {
+		for(F face : getMesh().faces().getAll()) {
 			if(!isAccepted(face) && isActive(face)) {
-				triangles.put(face, getMesh().toTriangle(face));
+				triangles.put(face, getMesh().faces().toTriangle(face));
 				active.add(face);
 				activeSet.add(face);
 			}
@@ -113,11 +114,11 @@ public class GenVoronoiSegmentInsertion<V extends IVertex, E extends IHalfEdge, 
 		boolean split;
 		do {
 			split = false;
-			List<E> boundaryEdges = getMesh().getBoundaryEdges();
+			List<E> boundaryEdges = getMesh().edges().getBoundaryEdges();
 			for(E edge : boundaryEdges) {
-				VLine line = getMesh().toLine(edge);
+				VLine line = getMesh().edges().toLine(edge);
 				if(line.length() > edgeLenFunction.apply(line.midPoint())) {
-					getTriangulation().splitEdge(edge, true);
+					getMeshBuilder().changeConnectivity().splitEdge(edge, true);
 					split = true;
 				}
 			}
@@ -153,32 +154,35 @@ public class GenVoronoiSegmentInsertion<V extends IVertex, E extends IHalfEdge, 
 	private void refine(@NotNull final F face) {
 		E shortestEdge = null;
 		VLine shortestLine = null;
-		for(E edge : getMesh().getEdgeIt(face)) {
-			VLine tmpLine = getMesh().toLine(edge);
-			if(isAccepted(getMesh().getTwinFace(edge)) && (shortestEdge == null || shortestLine.length() > tmpLine.length())) {
+		var edges = getMesh().edges();
+		var faces = getMesh().faces();
+
+		for(E edge : edges.iterableFor(face)) {
+			VLine tmpLine = edges.toLine(edge);
+			if(isAccepted(faces.getTwin(edge)) && (shortestEdge == null || shortestLine.length() > tmpLine.length())) {
 				shortestEdge = edge;
 				shortestLine = tmpLine;
 			}
 		}
 
 		VPoint x = placementStrategy.computePlacement(shortestEdge, triangles.get(face));
-		Optional<F> optionalF = getTriangulation().locateMarch(x.getX(), x.getY(), getMesh().getFace(shortestEdge));
+		Optional<F> optionalF = getMesh().readConnectivity().locateMarch(x.getX(), x.getY(), faces.getOf(shortestEdge));
 
-		if(optionalF.isPresent() && !getMesh().isBoundary(optionalF.get())) {
-			V v = getMesh().createVertex(x.getX(), x.getY());
+		if(optionalF.isPresent() && !faces.isBoundary(optionalF.get())) {
+			V v = getMeshBuilder().vertices().create(x.getX(), x.getY());
 			getTriangulation().insertVertex(v, optionalF.get());
 
 			// no point was inserted
-			if(getMesh().getEdge(v) == null) {
+			if(edges.getOf(v) == null) {
 				accepted.add(face);
 
-				for(F f : getMesh().getFaceIt(face)) {
+				for(F f : faces.surroundingIterableFor(face)) {
 					if(activeSet.remove(f)) {
 						active.remove(f);
 					}
 
 					if(!isAccepted(f) && isActive(f)) {
-						triangles.put(f, getMesh().toTriangle(f));
+						triangles.put(f, getMeshBuilder().getMesh().faces().toTriangle(f));
 						active.add(f);
 						activeSet.add(f);
 					}
@@ -186,18 +190,18 @@ public class GenVoronoiSegmentInsertion<V extends IVertex, E extends IHalfEdge, 
 
 			} else {
 				// update triangles
-				for(E ev : getMesh().getEdgeIt(v)) {
+				for(E ev : edges.iterableFor(v)) {
 
-					E eRing = getMesh().getPrev(ev);
-					F f1 = getMesh().getFace(eRing);
-					F f2 = getMesh().getTwinFace(eRing);
+					E eRing = edges.getPrev(ev);
+					F f1 = faces.getOf(eRing);
+					F f2 = faces.getTwin(eRing);
 
 					if(activeSet.remove(f1)) {
 						active.remove(f1);
 					}
 
 					if(!isAccepted(f1) && isActive(f1)) {
-						triangles.put(f1, getMesh().toTriangle(f1));
+						triangles.put(f1, faces.toTriangle(f1));
 						active.add(f1);
 						activeSet.add(f1);
 					}
@@ -207,7 +211,7 @@ public class GenVoronoiSegmentInsertion<V extends IVertex, E extends IHalfEdge, 
 					}
 
 					if(!isAccepted(f2) && isActive(f2)) {
-						triangles.put(f2, getMesh().toTriangle(f2));
+						triangles.put(f2, faces.toTriangle(f2));
 						active.add(f2);
 						activeSet.add(f2);
 					}
@@ -222,7 +226,7 @@ public class GenVoronoiSegmentInsertion<V extends IVertex, E extends IHalfEdge, 
 	}
 
 	private boolean refinementFinished() {
-		return initialized == true && (active.isEmpty() || getMesh().getNumberOfVertices() >= MAX_POINTS);
+		return initialized == true && (active.isEmpty() || getMesh().vertices().count() >= MAX_POINTS);
 	}
 
 	@Override
@@ -247,16 +251,15 @@ public class GenVoronoiSegmentInsertion<V extends IVertex, E extends IHalfEdge, 
 	public void removeTriangles() {
 		if(createHoles) {
 			for(VPolygon hole : pslg.getHoles()) {
-				Predicate<F> mergeCondition = f -> hole.contains(getMesh().toTriangle(f).midPoint());
-				Optional<F> optFace = getMesh().streamFaces().filter(mergeCondition).findAny();
+				Predicate<F> mergeCondition = f -> hole.contains(getMesh().faces().toTriangle(f).midPoint());
+				Optional<F> optFace = getMesh().faces().stream().filter(mergeCondition).findAny();
 				if(optFace.isPresent()) {
-					Optional<F> optionalF = getTriangulation().createHole(optFace.get(), mergeCondition, true);
+					Optional<F> optionalF = getMeshBuilder().changeConnectivity().createHole(optFace.get(), mergeCondition, true);
 				}
 			}
 
-			Predicate<F> mergeCondition = f -> !pslg.getSegmentBound().contains(getMesh().toTriangle(f).midPoint());
-			getTriangulation().shrinkBorder(mergeCondition, true);
-
+			Predicate<F> mergeCondition = f -> !pslg.getSegmentBound().contains(getMesh().faces().toTriangle(f).midPoint());
+			getMeshBuilder().changeConnectivity().shrinkBorder(mergeCondition, true);
 		}
 	}
 
@@ -264,9 +267,8 @@ public class GenVoronoiSegmentInsertion<V extends IVertex, E extends IHalfEdge, 
 		return triangulation;
 	}
 
-	@Override
-	public IMesh<V, E, F> getMesh() {
-		return getTriangulation().getMesh();
+	public ITriangleMeshBuilder<V, E, F> getMeshBuilder() {
+		return getTriangulation().getMeshBuilder();
 	}
 
 	@Override
@@ -274,18 +276,13 @@ public class GenVoronoiSegmentInsertion<V extends IVertex, E extends IHalfEdge, 
 		return getTriangulation().getMeshDataStorage();
 	}
 
-	@Override
-	public IMeshWithDataStorage<V, E, F> getMeshWithDataStorage() {
-		return getTriangulation().getMeshWithDataStorage();
-	}
-
 	private boolean isAccepted(@NotNull final F face) {
-		if(getMesh().isBoundary(face) || accepted.contains(face)) {
+		if(getMesh().faces().isBoundary(face) || accepted.contains(face)) {
 			return true;
 		}
 		else {
-			double r = getMesh().toTriangle(face).getCircumscribedRadius();
-			boolean accepted =  r * Math.sqrt(3) <= edgeLenFunction.apply(getMesh().toTriangle(face).midPoint())  /*&& getTriangulation().faceToQuality(face) >= minQuality*/;
+			double r = getMesh().faces().toTriangle(face).getCircumscribedRadius();
+			boolean accepted =  r * Math.sqrt(3) <= edgeLenFunction.apply(getMesh().faces().toTriangle(face).midPoint())  /*&& getTriangulation().faceToQuality(face) >= minQuality*/;
 			if(accepted) {
 				this.accepted.add(face);
 			}
@@ -294,16 +291,16 @@ public class GenVoronoiSegmentInsertion<V extends IVertex, E extends IHalfEdge, 
 	}
 
 	private boolean isActive(@NotNull final F face) {
-		if(getMesh().isBoundary(face)) {
+		if(getMesh().faces().isBoundary(face)) {
 			return false;
 		}
 
 		// This might be expensive!
-		if(!segmentBound.contains(getMesh().toTriangle(face).midPoint())) {
+		if(!segmentBound.contains(getMesh().faces().toTriangle(face).midPoint())) {
 			return false;
 		}
 
-		for(F neighbour : getMesh().getFaceIt(face)) {
+		for(F neighbour : getMesh().faces().surroundingIterableFor(face)) {
 			if(isAccepted(neighbour)) {
 				return true;
 			}

@@ -22,7 +22,7 @@ public interface IPlacementStrategy<V extends IVertex, E extends IHalfEdge, F ex
 	IMesh<V, E, F> getMesh();
 
 	default VPoint computePlacement(@NotNull final E edge) {
-		return computePlacement(edge, getMesh().toTriangle(getMesh().getFace(edge)));
+		return computePlacement(edge, getMesh().faces().toTriangle(getMesh().faces().getOf(edge)));
 	}
 
 

@@ -1,9 +1,9 @@
 package org.vadere.meshing.examples;
 
 import org.vadere.meshing.mesh.gen.MeshPanel;
-import org.vadere.meshing.mesh.gen.mesh.pointerBased.PFace;
-import org.vadere.meshing.mesh.gen.mesh.pointerBased.PHalfEdge;
-import org.vadere.meshing.mesh.gen.mesh.pointerBased.PVertex;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PFace;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PHalfEdge;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PVertex;
 import org.vadere.meshing.mesh.impl.PMeshPanel;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.impl.PEikMesh;
 import org.vadere.meshing.mesh.triangulation.triangulator.gen.GenRegularRefinement;
@@ -45,7 +45,7 @@ public class RegularRefinement {
 			meshImprover.improve();
 			Thread.sleep(10);
 			System.out.println("quality = " + meshImprover.getQuality());
-			System.out.println("boundary edges = " + meshImprover.getMesh().getBoundaryEdges().size());
+			System.out.println("boundary edges = " + meshImprover.getMesh().edges().getBoundaryEdges().size());
 			meshPanel.repaint();
 		}
 
@@ -64,12 +64,12 @@ public class RegularRefinement {
 				3);
 
 		Predicate<PHalfEdge> edgeSplitPredicate = e ->
-				!triangulation.getMesh().isBoundary(e) &&
-						triangulation.getMesh().toTriangle(triangulation.getMesh().getFace(e)).midPoint().distance(p) < 3.0 &&
-						(!refinement.isGreen(e) || triangulation.getMesh().toLine(e).length() > 0.5);
+				!triangulation.getMesh().edges().isBoundary(e) &&
+						triangulation.getMesh().faces().toTriangle(triangulation.getMesh().faces().getOf(e)).midPoint().distance(p) < 3.0 &&
+						(!refinement.isGreen(e) || triangulation.getMesh().edges().toLine(e).length() > 0.5);
 
 		//refinement.setEdgeRefinementPredicate(edgeSplitPredicate);
-		synchronized (triangulation.getMeshWithDataStorage()) {
+		synchronized (triangulation.getMeshBuilder()) {
 			refinement.refine();
 		}
 

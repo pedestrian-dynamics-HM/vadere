@@ -2,7 +2,7 @@ package org.vadere.geometry.mesh;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.vadere.meshing.mesh.gen.mesh.pointerBased.PFace;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PFace;
 import org.vadere.meshing.mesh.impl.PTriangulation;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -46,10 +46,10 @@ public class TestMeshManipulations {
 
 	@Test
 	public void testRemoveSomeFacesByHoleCreation() {
-		int numberOfFaces = triangulation.getMesh().getNumberOfFaces();
+		int numberOfFaces = triangulation.getMesh().faces().count();
 
 		// locate a face / triangle containing (4, 5)
-		PFace face = triangulation.locate(6, 6).get();
+		PFace face = triangulation.getMesh().readConnectivity().locate(6, 6).get();
 
 		// merge faces until infinity, therefore consumes all faces!
 		Predicate<PFace> mergePredicate = f -> true;
@@ -57,26 +57,26 @@ public class TestMeshManipulations {
 		int maxDept = 1;
 
 		// since max dept is equal to 1 we merge 4 (the face and its 3 neighbours) triangles into 1 polygon
-		assertTrue(triangulation.mergeFaces(face, mergePredicate, true, maxDept).isPresent());
+		assertTrue(triangulation.getMeshBuilder().changeConnectivity().mergeFaces(face, mergePredicate, true, maxDept).isPresent());
 
 		// and therefore the number of faces decreases by 3!
-		assertEquals(numberOfFaces-3, triangulation.getMesh().getNumberOfFaces());
+		assertEquals(numberOfFaces-3, triangulation.getMesh().faces().count());
 	}
 
 	@Test
 	public void testRemoveAllFaces() {
 		// locate a face / triangle containing (4, 5)
-		PFace face = triangulation.locate(4, 5).get();
+		PFace face = triangulation.getMesh().readConnectivity().locate(4, 5).get();
 
 		// merge faces until infinity, therefore consumes all faces!
 		Predicate<PFace> shrinkCondition = f -> true;
 
-		triangulation.shrinkBorder(shrinkCondition, true);
+		triangulation.getMeshBuilder().changeConnectivity().shrinkBorder(shrinkCondition, true);
 
-		assertEquals(0, triangulation.getMesh().getNumberOfFaces());
-		assertEquals(0, triangulation.getMesh().getNumberOfHoles());
-		assertEquals(0, triangulation.getMesh().getNumberOfVertices());
-		triangulation.getMeshWithDataStorage().toMutableMesh().getOptimizer().garbageCollection();
-		assertEquals(0, triangulation.getMesh().getNumberOfEdges());
+		assertEquals(0, triangulation.getMesh().faces().count());
+		assertEquals(0, triangulation.getMesh().faces().getNumberOfHoles());
+		assertEquals(0, triangulation.getMesh().vertices().count());
+		triangulation.getMeshBuilder().getOptimizer().garbageCollection();
+		assertEquals(0, triangulation.getMesh().edges().count());
 	}
 }

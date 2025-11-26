@@ -35,7 +35,7 @@ public class FrontalPlacement<P extends IPoint, CE, CF, V extends IVertex, E ext
 
 	@Override
 	public VPoint computePlacement(@NotNull final E edge, final VTriangle triangle) {
-		VLine line = getMesh().toLine(edge);
+		VLine line = getMesh().edges().toLine(edge);
 		VPoint midpoint = line.midPoint();
 		VPoint x1 = delaunayPlacement.computePlacement(edge, triangle);
 		VPoint x2 = voronoiSegPlacement.computePlacement(edge, triangle);

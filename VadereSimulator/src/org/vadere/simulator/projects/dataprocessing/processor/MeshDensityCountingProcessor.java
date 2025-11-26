@@ -1,9 +1,9 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
 import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
-import org.vadere.meshing.mesh.gen.mesh.pointerBased.PFace;
-import org.vadere.meshing.mesh.gen.mesh.pointerBased.PHalfEdge;
-import org.vadere.meshing.mesh.gen.mesh.pointerBased.PVertex;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PFace;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PHalfEdge;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PVertex;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.mesh.IMesh;
 import org.vadere.meshing.mesh.inter.mesh.data.IMeshDataStorage;
@@ -51,16 +51,16 @@ public class MeshDensityCountingProcessor extends DataProcessor<TimestepFaceIdKe
 
 	protected void doUpdateOnPed(Pedestrian ped){
 		if(getMeasurementArea().asPolygon().contains(ped.getPosition())) {
-			PFace f = getTriangulation().locate(ped.getPosition(), ped).get();
+			PFace f = getTriangulation().getMesh().readConnectivity().locateNonBoundaryByFullScan(ped.getPosition(), ped).get();
 			int n = getMeshDataStorage().getIntegerData(f, propertyNameNumberOfPedestrians) + 1;
 			getMeshDataStorage().setIntegerData(f, propertyNameNumberOfPedestrians, n);
-			assert !getMesh().isBoundary(f);
+			assert !getMesh().faces().isBoundary(f);
 		}
 	}
 
 	protected void reset_count(){
 		// reset count
-		for(PFace f : getMesh().getFaces()) {
+		for(PFace f : getMesh().faces()) {
 			getMeshDataStorage().setIntegerData(f, propertyNameNumberOfPedestrians, 0);
 		}
 	}
@@ -68,7 +68,7 @@ public class MeshDensityCountingProcessor extends DataProcessor<TimestepFaceIdKe
 	protected void write_count(SimulationState state){
 		// write count
 		int faceId = 1;
-		for(PFace f : getMesh().getFaces()) {
+		for(PFace f : getMesh().faces()) {
 			int n = getMeshDataStorage().getIntegerData(f, propertyNameNumberOfPedestrians);
 			this.putValue(new TimestepFaceIdKey(state.getStep(), faceId), n);
 			faceId++;

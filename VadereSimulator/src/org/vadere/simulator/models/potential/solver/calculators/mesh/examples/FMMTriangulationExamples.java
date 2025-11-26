@@ -1,9 +1,10 @@
 package org.vadere.simulator.models.potential.solver.calculators.mesh.examples;
 
 import org.vadere.meshing.examples.MeshExamples;
-import org.vadere.meshing.mesh.gen.mesh.pointerBased.PFace;
-import org.vadere.meshing.mesh.gen.mesh.pointerBased.PHalfEdge;
-import org.vadere.meshing.mesh.gen.mesh.pointerBased.PVertex;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PFace;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PHalfEdge;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PVertex;
+import org.vadere.meshing.mesh.gen.pointLocator.JumpAndWalkPointLocator;
 import org.vadere.meshing.mesh.impl.PMeshPanel;
 import org.vadere.meshing.mesh.impl.PSLG;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
@@ -54,13 +55,13 @@ public class FMMTriangulationExamples {
 				new VPoint(32.300000000046566, 6.0),
 				new VPoint(36.40000000002328, 4.900000000372529));
 
-		MeshEikonalSolverFMM solver = new MeshEikonalSolverFMM(Arrays.asList(targetShape), new UnitTimeCostFunction(), triangulation);
+		MeshEikonalSolverFMM solver = new MeshEikonalSolverFMM(Arrays.asList(targetShape), new UnitTimeCostFunction(), triangulation.getMeshBuilder().getMeshWithDataStorage(), new JumpAndWalkPointLocator(triangulation.getMesh()));
 		log.info("start FFM");
 		solver.solve();
 		log.info("FFM finished");
 
 		if(systemprint) {
-			System.out.println(MeshPythonUtils.toPythonTriangulation(triangulation.getMeshWithDataStorage(), vertex -> solver.getPotential(vertex)));
+			System.out.println(MeshPythonUtils.toPythonTriangulation(triangulation.getMeshBuilder().getMeshWithDataStorage(), vertex -> solver.getPotential(vertex)));
 		}
 
 	}
@@ -88,14 +89,14 @@ public class FMMTriangulationExamples {
 				pslg.getHoles()
 		);
 
-		var mesh = meshImprover.getMesh();
+		var meshBuilder = meshImprover.getMeshBuilder();
 
 
 		Color green = new Color(85, 168, 104);
 		Color red = new Color(196,78,82);
 		Color blue = new Color(76,114,202);
 		Function<PFace, Color> colorFunction = f -> {
-			VPoint midpoint = mesh.toTriangle(f).midPoint();
+			VPoint midpoint = meshBuilder.getMesh().faces().toTriangle(f).midPoint();
 			if(midpoint.getY() < 46  && midpoint.getX() < 10) {
 				return blue;
 			}
@@ -123,7 +124,7 @@ public class FMMTriangulationExamples {
 		// display the mesh
 
 		if(systemprint) {
-			System.out.println(TexGraphGenerator.toTikz(mesh, colorFunction, null, 1.0f, true));
+			System.out.println(TexGraphGenerator.toTikz(meshBuilder.getMesh(), colorFunction, null, 1.0f, true));
 		}
 
 		return meshImprover.getTriangulation();

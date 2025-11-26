@@ -3,7 +3,8 @@ package org.vadere.meshing.mesh.gen;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.inter.mesh.IFace;
 import org.vadere.meshing.mesh.inter.mesh.IHalfEdge;
-import org.vadere.meshing.mesh.inter.ITriConnectivity;
+import org.vadere.meshing.mesh.inter.meshConnectivity.IReadOnlyTriConnectivity;
+import org.vadere.meshing.mesh.inter.meshConnectivity.ITriConnectivity;
 import org.vadere.meshing.mesh.inter.mesh.IVertex;
 import org.vadere.util.geometry.shapes.IPoint;
 
@@ -13,10 +14,10 @@ import java.util.Optional;
 
 public class BackgroundMesh<V extends IVertex, E extends IHalfEdge, F extends IFace> {
 
-	private ITriConnectivity<V, E, F> triConnectivity;
+	private IReadOnlyTriConnectivity<V, E, F> triConnectivity;
 	private Map<Object, F> cache;
 
-	public BackgroundMesh(@NotNull final ITriConnectivity<V, E, F> triConnectivity) {
+	public BackgroundMesh(@NotNull final IReadOnlyTriConnectivity<V, E, F> triConnectivity) {
 		this.triConnectivity = triConnectivity;
 		this.cache = new HashMap<>();
 	}

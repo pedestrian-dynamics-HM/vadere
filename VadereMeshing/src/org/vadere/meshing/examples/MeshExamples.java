@@ -1,11 +1,12 @@
 package org.vadere.meshing.examples;
 
 import org.jetbrains.annotations.NotNull;
-import org.vadere.meshing.mesh.gen.mesh.arrayBased.AFace;
-import org.vadere.meshing.mesh.gen.mesh.arrayBased.AHalfEdge;
-import org.vadere.meshing.mesh.gen.mesh.pointerBased.PFace;
-import org.vadere.meshing.mesh.gen.mesh.pointerBased.PHalfEdge;
-import org.vadere.meshing.mesh.gen.mesh.pointerBased.PMesh;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AFace;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AHalfEdge;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PFace;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PHalfEdge;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PMesh;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PMeshBuilder;
 import org.vadere.meshing.mesh.impl.PMeshPanel;
 import org.vadere.meshing.mesh.impl.PSLG;
 import org.vadere.meshing.mesh.inter.IMeshDistanceFunction;
@@ -113,24 +114,25 @@ public class MeshExamples {
 	}
 
 	public static void square() {
-		var mesh = new PMesh();
+		var meshBuilder = new PMeshBuilder();
 
-		assert mesh.getNumberOfFaces() == 0;
+		PMesh mesh = meshBuilder.getMesh();
+		assert mesh.vertices().count() == 0;
 
-		mesh.toFace(
+		meshBuilder.faces().createAndInsert(
 				new VPoint(0,0),
 				new VPoint(1, 0),
 				new VPoint(1, 1),
 				new VPoint(0, 1));
 
-		assert mesh.getNumberOfFaces() == 1;
+		assert mesh.faces().count() == 1;
 
 		var panel = new PMeshPanel(mesh, 500, 500);
 		panel.display("A square mesh");
 		panel.repaint();
 
-		mesh.getNext(mesh.getEdge(mesh.getFace()));
-		mesh.streamPoints(mesh.getBorder()).parallel();
+		mesh.edges().getNext(mesh.edges().getAnyOf(mesh.faces().getFirst()));
+		mesh.vertices().streamPoints(mesh.faces().getOuterBorder()).parallel();
 
 
 		System.out.println(TexGraphGenerator.toTikz(mesh));
@@ -157,11 +159,11 @@ public class MeshExamples {
 
 		var face = triangulation.locateFace(new VPoint(5,5)).get();
 		var mesh = triangulation.getMesh();
-		var deletePoints = mesh.getVertices(face);
-		var surroundingFaces = mesh.getFaces(deletePoints.get(0));
-		var ringEdges = mesh
-				.streamEdges(deletePoints.get(0))
-				.map(edge -> mesh.getPrev(edge)).collect(Collectors.toList());
+		var deletePoints = mesh.vertices().getAllOf(face);
+		var surroundingFaces = mesh.faces().getAdjacentOf(deletePoints.get(0));
+		var ringEdges = mesh.edges()
+				.streamEdgesOf(deletePoints.get(0))
+				.map(edge -> mesh.edges().getPrev(edge)).collect(Collectors.toList());
 		/*System.out.println(TexGraphGenerator.toTikz(
 				delaunayTriangulator.getMesh(),
 				f -> surroundingFaces.contains(f) ? red : Color.WHITE,
@@ -173,7 +175,7 @@ public class MeshExamples {
 		//triangulation.remove(deletePoints.get(0));
 
 		var face2 = triangulation.locateFace(new VPoint(5,5)).get();
-		var list = ringEdges.stream().map(e -> mesh.getFace(e)).collect(Collectors.toList());
+		var list = ringEdges.stream().map(e -> mesh.faces().getOf(e)).collect(Collectors.toList());
 		surroundingFaces.addAll(list);
 		System.out.println(TexGraphGenerator.toTikz(
 				delaunayTriangulator.getMesh(),
@@ -182,20 +184,20 @@ public class MeshExamples {
 
 
 		String propertyName = "area";
-		LinkedList<AHalfEdge> visitedEdges = delaunayTriangulator.generate().straightGatherWalk2D(5, 5, delaunayTriangulator.getMesh().getFace());
-		for(AFace f : delaunayTriangulator.getMesh().getFaces()) {
-			delaunayTriangulator.getMeshDataStorage().setData(f, propertyName, delaunayTriangulator.getMesh().toTriangle(f).getArea());
+		LinkedList<AHalfEdge> visitedEdges = delaunayTriangulator.generate().getMeshBuilder().getMesh().readConnectivity().straightGatherWalk2D(5, 5, delaunayTriangulator.getMesh().faces().getFirst());
+		for(AFace f : delaunayTriangulator.getMeshBuilder().getMesh().faces()) {
+			delaunayTriangulator.getMeshDataStorage().setData(f, propertyName, delaunayTriangulator.getMesh().faces().toTriangle(f).getArea());
 		}
 
-		double areaSum = delaunayTriangulator.getMesh().streamFaces().mapToDouble(f -> delaunayTriangulator.getMeshDataStorage().getData(f, propertyName, Double.class).get()).sum();
-		double averageArea = areaSum / delaunayTriangulator.getMesh().getNumberOfFaces();
+		double areaSum = delaunayTriangulator.getMeshBuilder().getMesh().faces().stream().mapToDouble(f -> delaunayTriangulator.getMeshDataStorage().getData(f, propertyName, Double.class).get()).sum();
+		double averageArea = areaSum / delaunayTriangulator.getMesh().faces().count();
 		System.out.println("Triangulated area = " + areaSum);
 		System.out.println("Average triangle area = " + averageArea);
 		System.out.println("Area triangulated = " + (100 * (areaSum / (width * height))) + " %");
 
 
-		VPoint q = delaunayTriangulator.getMesh().toTriangle(delaunayTriangulator.getMesh().getFace(visitedEdges.peekFirst())).midPoint();
-		Set<AFace> faceSet = visitedEdges.stream().map(e -> delaunayTriangulator.getMesh().getFace(e)).collect(Collectors.toSet());
+		VPoint q = delaunayTriangulator.getMeshBuilder().getMesh().faces().toTriangle(delaunayTriangulator.getMeshBuilder().getMesh().faces().getOf(visitedEdges.peekFirst())).midPoint();
+		Set<AFace> faceSet = visitedEdges.stream().map(e -> delaunayTriangulator.getMeshBuilder().getMesh().faces().getOf(e)).collect(Collectors.toSet());
 
 		//\definecolor{myred}{RGB}{196,78,82}
 
@@ -269,14 +271,14 @@ public class MeshExamples {
 		dt.generate();
 
 		Function<PFace, Color> colorFunction = f ->  {
-			return !dt.getTriangulation().isValid(f) ? Color.RED : Color.WHITE;
+			return !dt.getTriangulation().getMeshBuilder().getMesh().readConnectivity().isValid(f) ? Color.RED : Color.WHITE;
 			//return new Color(quality, quality, quality);
 		};
 
 		PMeshPanel panel = new PMeshPanel(dt.getMesh(), 1000, 1000);
 		panel.display(" Voronoi Vertex Insertion");
 
-		VPolygon bound = dt.getMesh().toPolygon(dt.getMesh().getBorder());
+		VPolygon bound = dt.getMesh().faces().toPolygon(dt.getMesh().faces().getOuterBorder());
 		var eikMesh = new PEikMesh(
 				p -> 1.0 /*+ Math.abs(bound.distance(p))*/,
 				dt.getTriangulation()
@@ -290,7 +292,7 @@ public class MeshExamples {
 				e.printStackTrace();
 			}
 
-			synchronized (eikMesh.getMesh()) {
+			synchronized (eikMesh.getMeshBuilder()) {
 				eikMesh.improve();
 			}
 			panel.repaint();
@@ -329,7 +331,7 @@ public class MeshExamples {
 				e.printStackTrace();
 			}
 
-			synchronized (ruppert.getMesh()) {
+			synchronized (ruppert.getMeshBuilder()) {
 				ruppert.step();
 			}
 			panel.repaint();
@@ -379,7 +381,7 @@ public class MeshExamples {
 				e.printStackTrace();
 			}
 
-			synchronized (ruppert.getMesh()) {
+			synchronized (ruppert.getMeshBuilder()) {
 				ruppert.step();
 			}
 			panel.repaint();
@@ -424,7 +426,7 @@ public class MeshExamples {
 
 
 		Function<PFace, Color> colorFunction = f ->  {
-			float quality = ruppert.getMesh().isBoundary(f) ? 1.0f : (float)GeometryUtils.qualityOf(ruppert.getMesh().toTriangle(f));
+			float quality = ruppert.getMesh().faces().isBoundary(f) ? 1.0f : (float)GeometryUtils.qualityOf(ruppert.getMesh().faces().toTriangle(f));
 			return new Color(quality, quality, quality);
 		};
 		final var coinstrains = ruppert.getSegments();
@@ -439,7 +441,7 @@ public class MeshExamples {
 				e.printStackTrace();
 			}
 
-			synchronized (ruppert.getMesh()) {
+			synchronized (ruppert.getMeshBuilder()) {
 				ruppert.step();
 			}
 			panel.repaint();
@@ -467,7 +469,7 @@ public class MeshExamples {
 //		edgeLengthFunctionApprox.printPython();
 
 		Function<PFace, Color> colorFunction = f ->  {
-			float quality = ruppert.getMesh().isBoundary(f) ? 1.0f : (float)GeometryUtils.qualityOf(ruppert.getMesh().toTriangle(f));
+			float quality = ruppert.getMesh().faces().isBoundary(f) ? 1.0f : (float)GeometryUtils.qualityOf(ruppert.getMesh().faces().toTriangle(f));
 			return new Color(quality, quality, quality);
 		};
 
@@ -483,7 +485,7 @@ public class MeshExamples {
 				e.printStackTrace();
 			}
 
-			synchronized (ruppert.getMesh()) {
+			synchronized (ruppert.getMeshBuilder()) {
 				ruppert.step();
 			}
 			panel.repaint();
@@ -516,7 +518,7 @@ public class MeshExamples {
 
 
 		Function<PFace, Color> colorFunction = f ->  {
-			float quality = ruppertsTriangulator.getMesh().isBoundary(f) ? 1.0f : (float)GeometryUtils.qualityOf(ruppertsTriangulator.getMesh().toTriangle(f));
+			float quality = ruppertsTriangulator.getMesh().faces().isBoundary(f) ? 1.0f : (float)GeometryUtils.qualityOf(ruppertsTriangulator.getMesh().faces().toTriangle(f));
 			return new Color(quality, quality, quality);
 		};
 		System.out.println(TexGraphGenerator.toTikz(ruppertsTriangulator.getMesh(), colorFunction, 1.0f));
@@ -709,7 +711,7 @@ public class MeshExamples {
 
 
 		while (!meshImprover.isFinished()) {
-			synchronized (meshImprover.getMesh()) {
+			synchronized (meshImprover.getMeshBuilder()) {
 				meshImprover.improve();
 			}
 			panel.repaint();
@@ -835,7 +837,7 @@ public class MeshExamples {
 
 
 		while (!eikMesh.isFinished()) {
-			synchronized (eikMesh.getMesh()) {
+			synchronized (eikMesh.getMeshBuilder()) {
 				eikMesh.improve();
 			}
 			panel.repaint();
@@ -864,7 +866,7 @@ public class MeshExamples {
 				p -> 0.01);
 
 		Function<PFace, Color> colorFunction = f ->  {
-			float quality = delaunayRefinement.getMesh().isBoundary(f) ? 1.0f : (float)GeometryUtils.qualityOf(delaunayRefinement.getMesh().toTriangle(f));
+			float quality = delaunayRefinement.getMesh().faces().isBoundary(f) ? 1.0f : (float)GeometryUtils.qualityOf(delaunayRefinement.getMesh().faces().toTriangle(f));
 			return new Color(quality, quality, quality);
 		};
 
@@ -872,7 +874,7 @@ public class MeshExamples {
 		panel.display("Dirichlet Refinement");
 
 		while (!delaunayRefinement.isFinished()) {
-			synchronized (delaunayRefinement.getMesh()) {
+			synchronized (delaunayRefinement.getMeshBuilder()) {
 				delaunayRefinement.refine();
 			}
 
@@ -896,7 +898,7 @@ public class MeshExamples {
 				p -> 0.01);
 
 		Function<PFace, Color> colorFunction = f ->  {
-			float quality = frontalMethod.getMesh().isBoundary(f) ? 1.0f : (float)GeometryUtils.qualityOf(frontalMethod.getMesh().toTriangle(f));
+			float quality = frontalMethod.getMeshBuilder().getMesh().faces().isBoundary(f) ? 1.0f : (float)GeometryUtils.qualityOf(frontalMethod.getMesh().faces().toTriangle(f));
 			return new Color(quality, quality, quality);
 		};
 
@@ -904,11 +906,11 @@ public class MeshExamples {
 		panel.display("Delaunay Refinement");
 
 		//frontalMethod.generate();
-		synchronized (frontalMethod.getMesh()) {
+		synchronized (frontalMethod.getMeshBuilder()) {
 			frontalMethod.refine();
 		}
 		while (!frontalMethod.isFinished()) {
-			synchronized (frontalMethod.getMesh()) {
+			synchronized (frontalMethod.getMeshBuilder()) {
 				frontalMethod.refine();
 			}
 

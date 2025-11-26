@@ -93,12 +93,12 @@ public class MeshPolyWriter<V extends IVertex, E extends IHalfEdge, F extends IF
 		int targetMarker = 2;
 		IMesh<V, E, F> mesh = meshWithDataStorage.getMesh();
 		appender.append("#nVertices dimension boundaryMarker targetMarker nAttributes\n");
-		appender.append(mesh.getNumberOfVertices() + SEPARATOR + dimension + SEPARATOR + boundaryMarker + SEPARATOR + targetMarker + SEPARATOR + nAttributes + "\n");
+		appender.append(mesh.vertices().count() + SEPARATOR + dimension + SEPARATOR + boundaryMarker + SEPARATOR + targetMarker + SEPARATOR + nAttributes + "\n");
 
 		Map<V, Integer> map = new HashMap<>();
 		int id = 1;
-		for(V v : mesh.getVertices()) {
-			int boundary = mesh.isAtBoundary(v) ? 1 : 0;
+		for(V v : mesh.vertices()) {
+			int boundary = mesh.vertices().isAtBoundary(v) ? 1 : 0;
 			int target = targetPredicate.test(v) ? targetMarker : 0;
 			map.put(v, id);
 			appender.append(String.format(Locale.US, "%d" + SEPARATOR + "%d" + SEPARATOR + "%d" + SEPARATOR + "%f" + SEPARATOR + "%f", id, boundary, target, v.getX(), v.getY()));
@@ -112,33 +112,33 @@ public class MeshPolyWriter<V extends IVertex, E extends IHalfEdge, F extends IF
 		// 1 boundary
 		appender.append("# nBorders\n");
 		appender.append(1+"\n");
-		appender.append(mesh.getPoints(mesh.getBorder()).size() + "");
-		for(V v : mesh.getVertices(mesh.getBorder())) {
+		appender.append(mesh.faces().getPoints(mesh.faces().getOuterBorder()).size() + "");
+		for(V v : mesh.vertices().getAllOf(mesh.faces().getOuterBorder())) {
 			appender.append(SEPARATOR + map.get(v).toString());
 		}
 		appender.append("\n");
 
 		appender.append("# nTriangels\n");
-		appender.append(mesh.getNumberOfFaces()+"\n");
+		appender.append(mesh.faces().count()+"\n");
 
 		appender.append("# nVertices vertexIds\n");
-		for(F face : mesh.getFaces()) {
+		for(F face : mesh.faces()) {
 			//builder.append("1 0\n");
-			appender.append(mesh.getPoints(face).size() + "");
-			for(V v : mesh.getVertices(face)) {
+			appender.append(mesh.faces().getPoints(face).size() + "");
+			for(V v : mesh.vertices().getAllOf(face)) {
 				appender.append(SEPARATOR + map.get(v));
 			}
 			appender.append("\n");
 		}
 		appender.append("# nHoles\n");
-		List<F> holes = mesh.getHoles();
+		List<F> holes = mesh.faces().getHoles();
 		appender.append(holes.size()+"\n");
 
 		//
 		for(F hole : holes) {
-			int size = mesh.getPoints(hole).size();
+			int size = mesh.faces().getPoints(hole).size();
 			appender.append(size + "");
-			for(V V : mesh.getVertices(hole)) {
+			for(V V : mesh.vertices().getAllOf(hole)) {
 				appender.append(SEPARATOR + map.get(V));
 			}
 			appender.append("\n");
@@ -146,7 +146,7 @@ public class MeshPolyWriter<V extends IVertex, E extends IHalfEdge, F extends IF
 		appender.append("# interior points for each hole\n");
 		id = 1;
 		for(F hole : holes) {
-			VPolygon polygon = mesh.toPolygon(hole);
+			VPolygon polygon = mesh.faces().toPolygon(hole);
 			VPoint p = GeometryUtils.getInteriorPoint(polygon);
 			appender.append(String.format(Locale.US, "%d" + SEPARATOR +"%f" + SEPARATOR + "%f\n", id, p.getX(), p.getY()));
 		}

@@ -5,6 +5,10 @@ import it.unimi.dsi.fastutil.io.FastBufferedOutputStream;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.gen.mesh.pointerBased.*;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PFace;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PHalfEdge;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PMeshBuilder;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PVertex;
 import org.vadere.meshing.utils.io.poly.MeshPolyReader;
 import org.vadere.meshing.utils.io.poly.MeshPolyWriter;
 import org.vadere.simulator.models.potential.solver.calculators.mesh.MeshEikonalSolverFMM;
@@ -31,7 +35,7 @@ public class MeshTxtCacheObject extends AbstractCacheObject implements IMeshCach
 	@Override
 	public void initializeObjectFromCache(@NotNull final PMeshWithDataStorage mesh) throws CacheException {
 		try {
-			MeshPolyReader<PVertex, PHalfEdge, PFace> meshPolyReader = new MeshPolyReader<>(PMeshWithDataStorage::constructEmpty);
+			MeshPolyReader<PVertex, PHalfEdge, PFace> meshPolyReader = new MeshPolyReader<>(PMeshBuilder::new);
 			InputStream fastInputStream = new FastBufferedInputStream(inputStream);
 			meshPolyReader.readMesh(fastInputStream, i -> MeshEikonalSolverFMM.namePotential);
 		} catch (IOException e) {

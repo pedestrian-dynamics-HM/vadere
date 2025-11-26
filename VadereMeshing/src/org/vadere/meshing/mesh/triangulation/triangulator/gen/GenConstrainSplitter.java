@@ -7,6 +7,7 @@ import org.vadere.meshing.mesh.gen.IncrementalTriangulation;
 import org.vadere.meshing.mesh.impl.PSLG;
 import org.vadere.meshing.mesh.inter.mesh.*;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
+import org.vadere.meshing.mesh.inter.mesh.builder.ITriangleMeshBuilder;
 import org.vadere.meshing.mesh.inter.mesh.data.IMeshDataStorage;
 import org.vadere.meshing.mesh.triangulation.triangulator.inter.ITriangulator;
 import org.vadere.util.geometry.GeometryUtils;
@@ -39,12 +40,11 @@ public class GenConstrainSplitter<V extends IVertex, E extends IHalfEdge, F exte
 	private final double tol;
 	private final GenSpaceFillingCurve<V, E, F> sfc;
 
-
 	public GenConstrainSplitter(
-			@NotNull final Supplier<IMeshWithDataStorage<V, E, F>> meshSupply,
+			@NotNull final Supplier<ITriangleMeshBuilder<V, E, F>> meshBuilder,
 			@NotNull final PSLG pslg,
 			final double tol) {
-		this(IncrementalTriangulation.fromEmptyMesh(meshSupply.get(), pslg.getBoundingBox()), pslg, tol);
+		this(IncrementalTriangulation.fromBuilderFactory(meshBuilder, pslg.getBoundingBox()), pslg, tol);
 	}
 
 	public GenConstrainSplitter(
@@ -77,7 +77,7 @@ public class GenConstrainSplitter<V extends IVertex, E extends IHalfEdge, F exte
 		/**
 		 * This prevent the flipping of constrained edges
 		 */
-		Predicate<E> canIllegal = e -> !eConstrains.contains(e) && !eConstrains.contains(getMesh().getTwin(e));
+		Predicate<E> canIllegal = e -> !eConstrains.contains(e) && !eConstrains.contains(getMesh().edges().getTwin(e));
 		this.triangulation = triangulation;
 		this.triangulation.setCanIllegalPredicate(canIllegal);
 	}
@@ -97,13 +97,17 @@ public class GenConstrainSplitter<V extends IVertex, E extends IHalfEdge, F exte
 			generated = true;
 		}
 
+		var vertices = getMesh().vertices();
+		var edges = getMesh().edges();
+
 		for(Pair<V, V> constrain : vConstrains) {
 			V v1 = constrain.getLeft();
 			V v2 = constrain.getRight();
-			for(E e : getMesh().getEdgeIt(v1)) {
-				if(getMesh().getTwinVertex(e).equals(v2)) {
+
+			for(E e : edges.iterableFor(v1)) {
+				if(vertices.getTwin(e).equals(v2)) {
 					eConstrains.add(e);
-					eConstrains.add(getMesh().getTwin(e));
+					eConstrains.add(edges.getTwin(e));
 					break;
 				}
 			}
@@ -129,12 +133,15 @@ public class GenConstrainSplitter<V extends IVertex, E extends IHalfEdge, F exte
 		V v2 = constrain.getRight();
 
 		// this may also contain co-linear edges!
-		LinkedList<E> intersectingEdges = triangulation.getIntersectingEdges(v1, v2);
+		LinkedList<E> intersectingEdges = getMesh().readConnectivity().getIntersectingEdges(v1, v2);
+
+		var vertices = getMesh().vertices();
+		var edges = getMesh().edges();
 
 		for(E edge : intersectingEdges) {
-			VLine vEdge = triangulation.getMesh().toLine(edge);
-			V v11 = getMesh().getVertex(edge);
-			V v22 = getMesh().getVertex(getMesh().getPrev(edge));
+			VLine vEdge = edges.toLine(edge);
+			V v11 = vertices.getEndOf(edge);
+			V v22 = vertices.getEndOf(edges.getPrev(edge));
 
 			// to be save, TODO inconsistent geometry check which may lead to a deadlock (isLeftOfRobust is "robust" while intersectLineSegment is not")
 			if(GeometryUtils.intersectLineSegment(vEdge.x1, vEdge.y1, vEdge.x2, vEdge.y2, v1.getX(), v1.getY(), v2.getX(), v2.getY())) {
@@ -150,8 +157,8 @@ public class GenConstrainSplitter<V extends IVertex, E extends IHalfEdge, F exte
 					//getMesh().setPoint(v22, intersectionPoint);
 					projectionMap.put(v22, vEdge);
 				} else {
-					V vertex = getMesh().createVertex(intersectionPoint);
-					triangulation.splitEdge(vertex, edge, false);
+					V vertex = triangulation.getMeshBuilder().vertices().create(intersectionPoint);
+					triangulation.getMeshBuilder().changeConnectivity().splitEdge(vertex, edge, false);
 					projectionMap.put(vertex, vEdge);
 				}
 			} else {
@@ -183,17 +190,17 @@ public class GenConstrainSplitter<V extends IVertex, E extends IHalfEdge, F exte
 			IPoint p2 = mesh.createPoint(constrain.x2, constrain.y2);
 
 			E edge1 = triangulation.insert(p1);
-			V v1 = triangulation.getMesh().getVertex(edge1);
+			V v1 = triangulation.getMesh().vertices().getEndOf(edge1);
 			// could not insertVertex p1
-			if(!getMesh().getPoint(v1).equals(p1)) {
+			if(!getMesh().vertices().toMutablePoint(v1).equals(p1)) {
 				logger.warn("could not insertVertex " + p1);
 				insertPair = false;
 			}
 
 			E edge2 = triangulation.insert(p2);
-			V v2 = triangulation.getMesh().getVertex(edge2);
+			V v2 = triangulation.getMesh().vertices().getEndOf(edge2);
 			// could not insertVertex p2
-			if(!getMesh().getPoint(v2).equals(p2)) {
+			if(!getMesh().vertices().toMutablePoint(v2).equals(p2)) {
 				logger.warn("could not insertVertex " + p2);
 				insertPair = false;
 			}
@@ -204,18 +211,12 @@ public class GenConstrainSplitter<V extends IVertex, E extends IHalfEdge, F exte
 		}
 	}
 
-	@Override
-	public IMesh<V, E, F> getMesh() {
-		return triangulation.getMesh();
+	public ITriangleMeshBuilder<V, E, F>  getMeshBuilder() {
+		return triangulation.getMeshBuilder();
 	}
 
 	@Override
 	public IMeshDataStorage<V, E, F> getMeshDataStorage() {
-		return triangulation.getMeshDataStorage();
-	}
-
-	@Override
-	public IMeshWithDataStorage<V, E, F> getMeshWithDataStorage() {
-		return triangulation.getMeshWithDataStorage();
+		return triangulation.getMeshBuilder().getDataStorage();
 	}
 }

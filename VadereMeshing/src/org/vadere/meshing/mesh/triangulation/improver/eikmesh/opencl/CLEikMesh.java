@@ -1,11 +1,14 @@
 package org.vadere.meshing.mesh.triangulation.improver.eikmesh.opencl;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.vadere.meshing.mesh.gen.mesh.arrayBased.*;
-import org.vadere.meshing.mesh.gen.mesh.pointerBased.PFace;
-import org.vadere.meshing.mesh.inter.IEmptyMeshSupplier;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AFace;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AHalfEdge;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AVertex;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.triangles.ATriangleMesh;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.triangles.ATriangleMeshWithDataStorage;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PFace;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
-import org.vadere.meshing.mesh.inter.mesh.IMeshWithDataStorage;
+import org.vadere.meshing.mesh.inter.mesh.builder.ITriangleMeshBuilder;
 import org.vadere.meshing.mesh.inter.mesh.data.IMeshDataStorage;
 import org.vadere.meshing.mesh.triangulation.triangulator.inter.ITriangulator;
 import org.vadere.meshing.mesh.triangulation.triangulator.gen.GenUniformRefinementTriangulatorSFC;
@@ -19,6 +22,7 @@ import org.vadere.util.geometry.shapes.*;
 import org.vadere.meshing.mesh.triangulation.improver.IMeshImprover;
 
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -30,7 +34,7 @@ public class CLEikMesh implements IMeshImprover<AVertex, AHalfEdge, AFace>, ITri
     private boolean illegalMovement = false;
     private IDistanceFunction distanceFunc;
     private IEdgeLengthFunction edgeLengthFunc;
-    private final IEmptyMeshSupplier<AVertex, AHalfEdge, AFace> meshSupplier;
+    private final Supplier<ITriangleMeshBuilder<AVertex, AHalfEdge, AFace>> meshSupplier;
     private IIncrementalTriangulation<AVertex, AHalfEdge, AFace> triangulation;
     private Collection<? extends VShape> obstacleShapes;
     private ArrayList<Pair<EikMeshPoint, EikMeshPoint>> edges;
@@ -65,12 +69,11 @@ public class CLEikMesh implements IMeshImprover<AVertex, AHalfEdge, AFace>, ITri
             final IEdgeLengthFunction edgeLengthFunc,
             final VRectangle bound,
             final Collection<? extends VShape> obstacleShapes,
-            final IEmptyMeshSupplier<AVertex, AHalfEdge, AFace> meshSupplier) {
+            final Supplier<ITriangleMeshBuilder<AVertex, AHalfEdge, AFace>> meshSupplier) {
 
         this.bound = bound;
         this.distanceFunc = distanceFunc;
         this.edgeLengthFunc = edgeLengthFunc;
-        this.initialEdgeLen = initialEdgeLen;
         this.obstacleShapes = obstacleShapes;
         this.meshSupplier = meshSupplier;
         this.edges = new ArrayList<>();
@@ -90,7 +93,7 @@ public class CLEikMesh implements IMeshImprover<AVertex, AHalfEdge, AFace>, ITri
         log.info("##### (end) compute a uniform refined triangulation #####");
 
         log.info("##### (start) generate a triangulation #####");
-        GenUniformRefinementTriangulatorSFC<AVertex, AHalfEdge, AFace> uniformRefinementTriangulation = new GenUniformRefinementTriangulatorSFC(
+        GenUniformRefinementTriangulatorSFC<AVertex, AHalfEdge, AFace> uniformRefinementTriangulation = new GenUniformRefinementTriangulatorSFC<>(
                 meshSupplier,
                 bound,
                 obstacleShapes,
@@ -99,7 +102,7 @@ public class CLEikMesh implements IMeshImprover<AVertex, AHalfEdge, AFace>, ITri
         triangulation = uniformRefinementTriangulation.generate();
 
         // TODO: dirty cast.
-        clDistMesh = new CLDistMesh((AMeshWithDataStorage) triangulation.getMeshWithDataStorage());
+        clDistMesh = new CLDistMesh((ATriangleMeshWithDataStorage) triangulation.getMeshBuilder().getMeshWithDataStorage());
 	    clDistMesh.init();
 
 	    //clDistMesh.refresh();
@@ -223,53 +226,41 @@ public class CLEikMesh implements IMeshImprover<AVertex, AHalfEdge, AFace>, ITri
     }
 
     private void removeLowQualityTriangles() {
-        List<AFace> faces = getMesh().getFaces();
+        List<AFace> faces = getMesh().faces().getAll();
         for(AFace face : faces) {
             if(faceToQuality(face) < MIN_TRIANGLE_QUALITY) {
-                Optional<AHalfEdge> optEdge = getMesh().getLinkToBoundary(face);
-                if(optEdge.isPresent() && !getMesh().isBoundary(getMesh().getTwin(getMesh().getNext(optEdge.get())))) {
-                    AHalfEdge edge = getMesh().getNext(optEdge.get());
-                    projectToBoundary(getMesh().getVertex(edge));
-                    triangulation.removeFaceAtBorder(face, true);
+                Optional<AHalfEdge> optEdge = getMesh().edges().getLinkToBoundary(face);
+                if(optEdge.isPresent() && !getMesh().edges().isBoundary(getMesh().edges().getTwin(getMesh().edges().getNext(optEdge.get())))) {
+                    AHalfEdge edge = getMesh().edges().getNext(optEdge.get());
+                    projectToBoundary(getMesh().vertices().getEndOf(edge));
+                    triangulation.getMeshBuilder().changeConnectivity().removeFaceAtBorder(face, true);
                 }
             }
         }
     }
 
     public boolean isMovementIllegal() {
-        for(AFace face : getMesh().getFaces()) {
-            if(!getMesh().isBoundary(face) && !getMesh().isDestroyed(face) && !triangulation.isCCW(face)) {
+        for(AFace face : getMesh().faces().getAll()) {
+            if(!getMesh().faces().isBoundary(face) && !getMesh().faces().isDestroyed(face) && !triangulation.getMesh().readConnectivity().isCCW(face)) {
                 return true;
             }
         }
         return false;
     }
 
-    @Override
-    public synchronized AMesh getMesh() {
+    public synchronized ATriangleMesh getMesh() {
         refresh();
-        // TODO: dirty casting
-        return (AMesh) triangulation.getMeshWithDataStorage();
+        return (ATriangleMesh) triangulation.getMesh();
     }
 
     @Override
-    public IMeshDataStorage<AVertex, AHalfEdge, AFace> getDataStorage() {
-        return triangulation.getMeshDataStorage();
-    }
-
-    @Override
-    public IMeshWithDataStorage<AVertex, AHalfEdge, AFace> getMeshWithDataStorage() {
-        return triangulation.getMeshWithDataStorage();
-    }
-
-    @Override
-    public synchronized IMeshDataStorage<AVertex, AHalfEdge, AFace> getMeshDataStorage() {
-        return triangulation.getMeshDataStorage();
+    public ITriangleMeshBuilder<AVertex, AHalfEdge, AFace> getMeshBuilder() {
+        return triangulation.getMeshBuilder();
     }
 
     public double faceToQuality(final AFace face) {
 
-        VLine[] lines = getMesh().toTriangle(face).getLines();
+        VLine[] lines = getMesh().faces().toTriangle(face).getLines();
         double a = lines[0].length();
         double b = lines[1].length();
         double c = lines[2].length();
@@ -285,7 +276,7 @@ public class CLEikMesh implements IMeshImprover<AVertex, AHalfEdge, AFace>, ITri
 
     private void projectToBoundary(final AVertex vertex) {
     	// TODO: get rid of VPoint
-	    VPoint position = getMesh().toPoint(vertex);
+	    VPoint position = getMesh().vertices().toPoint(vertex);
         double distance = distanceFunc.apply(position);
         if(distance < 0) {
             double dGradPX = (distanceFunc.apply(position.add(new VPoint(deps,0))) - distance) / deps;
@@ -296,10 +287,10 @@ public class CLEikMesh implements IMeshImprover<AVertex, AHalfEdge, AFace>, ITri
     }
 
     private void removeTrianglesInsideObstacles() {
-        List<AFace> faces = triangulation.getMesh().getFaces();
+        List<AFace> faces = getMesh().faces().getAll();
         for(AFace face : faces) {
-            if(!triangulation.getMesh().isDestroyed(face) && distanceFunc.apply(triangulation.getMesh().toTriangle(face).midPoint()) > 0) {
-                triangulation.removeFaceAtBorder(face, true);
+            if(!getMesh().faces().isDestroyed(face) && distanceFunc.apply(getMesh().faces().toTriangle(face).midPoint()) > 0) {
+                triangulation.getMeshBuilder().changeConnectivity().removeFaceAtBorder(face, true);
             }
         }
     }
@@ -314,5 +305,10 @@ public class CLEikMesh implements IMeshImprover<AVertex, AHalfEdge, AFace>, ITri
     public void improve() {
         step();
         nSteps++;
+    }
+
+    @Override
+    public IMeshDataStorage<AVertex, AHalfEdge, AFace> getMeshDataStorage() {
+        return IMeshImprover.super.getMeshDataStorage();
     }
 }
