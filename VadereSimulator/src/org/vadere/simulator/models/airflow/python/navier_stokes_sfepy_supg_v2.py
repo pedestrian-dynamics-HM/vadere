@@ -17,7 +17,7 @@ from sfepy.discrete.fem import Mesh, FEDomain, Field
 from sfepy.terms import Term
 from sfepy.discrete.conditions import Conditions, EssentialBC
 from sfepy.solvers.ls import ScipyDirect
-from sfepy.solvers.nls import Newton
+from sfepy.solvers.oseen import Oseen, StabilizationFunction
 
 from build_mesh_sfepy import build_mesh
 from vadere_helpers import extract_attributes
@@ -28,7 +28,7 @@ from skfem import MeshTri
 faulthandler.enable(file=sys.stderr, all_threads=True)
 
 # --- CONFIGURATION ---
-target_nu = 5e-3
+target_nu = 1e-2
 
 def main():
     start_time = time.time()
@@ -48,7 +48,10 @@ def main():
         data = json.load(file)
         topography = data['scenario']['topography']
         attributes_model = data['scenario']['attributesModel']['org.vadere.state.attributes.models.airflow.AttributesAirFlowModel']
-        area_threshold = 0.4
+
+        # You can adjust this threshold back to 0.4 if 0.2 is too unstable
+        area_threshold = 0.025
+
         grid_size, _, x_min, x_max, y_min, y_max, inlet_velocity, inlets, outlets, obstacles, parameter_string = extract_attributes(topography, attributes_model, parameter_string)
         mesh, _, _, _ = build_mesh(inlets, outlets, obstacles, area_threshold, x_min, x_max, y_min, y_max)
 
@@ -104,16 +107,20 @@ def main():
     def get_wall_indices(coors, domain=None): return wall_node_indices
     wall_reg = domain.create_region('Walls', 'vertices by get_wall_indices', 'facet', functions={'get_wall_indices': get_wall_indices})
 
-    print(f"Regions: Inlet={len(inlet_reg.vertices)}, Outlet={len(outlet_reg.vertices)}, Walls={len(wall_reg.vertices)}")
-
     # 3. FIELDS & VARIABLES
     omega = domain.create_region('Omega', 'all')
-    field_u = Field.from_args('fu', np.float64, 'vector', omega, approx_order=2)
+
+    # Using Linear elements (order=1) to simplify the Oseen solver setup
+    field_u = Field.from_args('fu', np.float64, 'vector', omega, approx_order=1)
     field_p = Field.from_args('fp', np.float64, 'scalar', omega, approx_order=1)
+
     u = FieldVariable('u', 'unknown', field_u)
     v = FieldVariable('v', 'test', field_u, primary_var_name='u')
     p = FieldVariable('p', 'unknown', field_p)
     q = FieldVariable('q', 'test', field_p, primary_var_name='p')
+
+    # CRITICAL: 'b' must be linked to 'u' via primary_var_name so Oseen solver knows what to update
+    b = FieldVariable('b', 'parameter', field_u, primary_var_name='u')
 
     # 4. BOUNDARY CONDITIONS
     profile_eps = 1e-2
@@ -133,101 +140,112 @@ def main():
 
     bcs = Conditions([bc_inlet, bc_wall, bc_outlet_p])
 
-    # 5. MATERIALS
-    m_fluid = Material('fluid', values={'val': [[target_nu]]})
-    m_penalty = Material('m_penalty', values={'val': [[1.0]]})
-    integral = Integral('i', order=4)
+    # 5. MATERIALS & STABILIZATION
+    m_fluid = Material('fluid', values={'viscosity': target_nu})
 
-    # ==========================================
-    # PHASE 1: STOKES INITIALIZATION
-    # ==========================================
-    print("\n>>> PHASE 1: Stokes Initialization...")
+    # CRITICAL: The correct Name Map required for the built-in StabilizationFunction
+    name_map = {
+        'u': 'u',
+        'p': 'p',
+        'b': 'b',
+        'v': 'v',
+        'velocity': 'fu',  # Map abstract 'velocity' to your field name 'fu'
+        'pressure': 'fp',  # Map abstract 'pressure' to your field name 'fp'
+        'viscosity': 'viscosity',
+        'fluid': 'fluid',
+        'delta': 'delta',
+        'tau': 'tau',
+        'gamma': 'gamma'
+    }
 
-    # Define Terms specifically for Stokes
-    t_div_s = Term.new('dw_div_grad(fluid.val, v, u)', integral, omega, fluid=m_fluid, v=v, u=u)
-    t_press_s = Term.new('dw_stokes(v, p)', integral, omega, v=v, p=p)
-    t_cont_s = Term.new('dw_stokes(u, q)', integral, omega, u=u, q=q)
-    t_pen_s = Term.new('dw_volume_dot(m_penalty.val, q, p)', integral, omega, m_penalty=m_penalty, q=q, p=p)
+    stabil_func = Function('stabil_func', StabilizationFunction(name_map))
+    m_stabil = Material('stabil', function=stabil_func)
 
-    eq_mom_s = Equation('balance', t_div_s - t_press_s)
-    eq_cont_s = Equation('continuity', t_cont_s + 1e-9 * t_pen_s)
-    stokes_eqs = Equations([eq_mom_s, eq_cont_s])
+    integral = Integral('i', order=3)
 
-    pb_stokes = Problem('stokes', equations=stokes_eqs)
-    pb_stokes.set_bcs(ebcs=bcs)
+    # 6. EQUATIONS
+    # Momentum
+    t_diff = Term.new('dw_div_grad(fluid.viscosity, v, u)', integral, omega,
+                      fluid=m_fluid, v=v, u=u)
+    t_conv = Term.new('dw_lin_convect(v, b, u)', integral, omega,
+                      v=v, b=b, u=u)
+    t_press = Term.new('dw_stokes(v, p)', integral, omega,
+                       v=v, p=p)
+
+    # Stabilization (Momentum)
+    t_supg_c = Term.new('dw_st_supg_c(stabil.delta, v, b, u)', integral, omega,
+                        stabil=m_stabil, v=v, b=b, u=u)
+    t_supg_p = Term.new('dw_st_supg_p(stabil.delta, v, b, p)', integral, omega,
+                        stabil=m_stabil, v=v, b=b, p=p)
+    t_graddiv = Term.new('dw_st_grad_div(stabil.gamma, v, u)', integral, omega,
+                         stabil=m_stabil, v=v, u=u)
+
+    # Continuity
+    t_div = Term.new('dw_stokes(u, q)', integral, omega,
+                     u=u, q=q)
+
+    # Stabilization (Continuity)
+    t_pspg_c = Term.new('dw_st_pspg_c(stabil.tau, q, b, u)', integral, omega,
+                        stabil=m_stabil, q=q, b=b, u=u)
+    t_pspg_p = Term.new('dw_st_pspg_p(stabil.tau, q, p)', integral, omega,
+                        stabil=m_stabil, q=q, p=p)
+
+    eq_momentum = Equation('balance', t_diff + t_conv - t_press + t_graddiv + t_supg_c + t_supg_p)
+    eq_continuity = Equation('incompressibility', t_div + t_pspg_c + t_pspg_p)
+
+    equations = Equations([eq_momentum, eq_continuity])
+
+    # 7. PROBLEM & SOLVER
+    pb = Problem('stabilized_navier_stokes', equations=equations)
+    pb.set_bcs(ebcs=bcs)
 
     ls = ScipyDirect({})
-    nls_stokes = Newton({'i_max': 1, 'eps_a': 1e-10}, lin_solver=ls)
-    pb_stokes.set_solver(nls_stokes)
 
-    # Solve Stokes
-    pb_stokes.time_update()
-    state_stokes = pb_stokes.solve()
-    print(">>> Stokes solution found.")
+    # Oseen Solver Configuration
+    conf_oseen = Struct(
+        name = 'oseen',
+        kind = 'nls.oseen',
+        stabil_mat = 'stabil',
+        i_max = 100,
+        eps_a = 1e-8,
+        eps_r = 1.0,
+        macheps = 1e-16,
+        lin_red = 1e-2,
+        check_navier_stokes_residual = False,
+        problem = pb # Pass the problem object here
+    )
 
-    # ==========================================
-    # PHASE 2: NAVIER-STOKES RAMPING
-    # ==========================================
-    print(f"\n>>> PHASE 2: Navier-Stokes Ramping...")
+    nls = Oseen(conf_oseen, lin_solver=ls, status={})
 
-    # Define NEW Terms for Navier-Stokes (Creates fresh internal state)
-    t_div_ns = Term.new('dw_div_grad(fluid.val, v, u)', integral, omega, fluid=m_fluid, v=v, u=u)
-    t_conv_ns = Term.new('dw_convect(v, u)', integral, omega, v=v, u=u)
-    t_press_ns = Term.new('dw_stokes(v, p)', integral, omega, v=v, p=p)
-    t_cont_ns = Term.new('dw_stokes(u, q)', integral, omega, u=u, q=q)
-    t_pen_ns = Term.new('dw_volume_dot(m_penalty.val, q, p)', integral, omega, m_penalty=m_penalty, q=q, p=p)
+    # CRITICAL FIX: Explicitly force the problem link after creation
+    # This solves the "ValueError: problem parameter needs to be set!" error
+    nls.conf.problem = pb
 
-    eq_mom_ns = Equation('balance', t_div_ns + t_conv_ns - t_press_ns)
-    eq_cont_ns = Equation('continuity', t_cont_ns + 1e-9 * t_pen_ns)
-    ns_eqs = Equations([eq_mom_ns, eq_cont_ns])
+    pb.set_solver(nls)
 
-    # Create NEW Problem
-    pb_ns = Problem('navier_stokes', equations=ns_eqs)
-    pb_ns.set_bcs(ebcs=bcs)
+    # 8. INITIALIZATION
+    variables = pb.get_variables()
+    b_data = np.zeros((mesh.n_nod, 2))
 
-    nls_status = {}
-    nls_ns = Newton({'i_max': 50, 'eps_a': 1e-3, 'eps_r': 1e-3}, lin_solver=ls, status=nls_status)
-    pb_ns.set_solver(nls_ns)
+    for i in range(mesh.n_nod):
+        x, y = coords[i, 0], coords[i, 1]
+        if abs(x - x_max) < profile_eps:   b_data[i, 0] = -inlet_velocity
+        elif abs(y - y_min) < profile_eps: b_data[i, 1] = inlet_velocity
+        elif abs(x - x_min) < profile_eps: b_data[i, 0] = inlet_velocity
+        elif abs(y - y_max) < profile_eps: b_data[i, 1] = -inlet_velocity
 
-    # 1. Initialize Structure
-    pb_ns.time_update()
+    variables['b'].set_data(b_data.ravel())
 
-    # 2. FIX: Force memory allocation for variables
-    # This ensures variables_ns.vec is not None
-    _ = pb_ns.create_state()
+    # 9. SOLVE
+    print("\n>>> Solving with Oseen Solver...")
+    state = pb.solve()
+    print(">>> Converged.")
 
-    # 3. Transfer Stokes solution
-    variables_ns = pb_ns.get_variables()
-    variables_ns.set_state(state_stokes.vec)
+    # 10. POST PROCESSING
+    print("\n>>> Post-processing results...")
 
-    # Access material for manual updating from the NEW equations
-    mat_fluid = ns_eqs[0].terms['dw_div_grad'].get_materials(join=True)[0]
-
-    steps = 10
-    nus = np.logspace(np.log10(0.1), np.log10(target_nu), steps)
-
-    state_final = state_stokes
-
-    for i, nu_val in enumerate(nus):
-        print(f"\n--- Step {i+1}/{steps}: Solving for nu = {nu_val:.2e} ---")
-
-        # Update Viscosity
-        mat_fluid.datas['special']['val'] = np.array([[[[nu_val]]]])
-        mat_fluid.reset()
-
-        # Use previous solution as guess
-        variables_ns.set_state(state_final.vec)
-
-        try:
-            state_final = pb_ns.solve()
-            print(f"  > Success. Residual: {nls_status.get('err', 'N/A')}")
-        except Exception as e:
-            print(f"  > Failed at {nu_val}. Using previous result.")
-            break
-
-    # 8. POST PROCESSING
-    out = state_final.create_output()
-    try: u_vals = out['u'].data
+    out = state.create_output()
+    try:    u_vals = out['u'].data
     except: u_vals = out.u.data
 
     Vx_raw = u_vals[:, 0]
@@ -247,8 +265,10 @@ def main():
     Vy_grid = interpolator_Vy(grid_x, grid_y).filled(0.0)
     vel_mag = np.sqrt(Vx_grid**2 + Vy_grid**2)
 
-    np.savetxt(scenario_file_path + '_' + scenario_hash + '_Vx.txt', Vx_raw, header=f'{Vx_raw.shape[0]}_1_{parameter_string}')
-    np.savetxt(scenario_file_path + '_' + scenario_hash + '_Vy.txt', Vy_raw, header=f'{Vy_raw.shape[0]}_1_{parameter_string}')
+    np.savetxt(scenario_file_path + '_' + scenario_hash + '_Vx.txt', Vx_raw,
+               header=f'{Vx_raw.shape[0]}_1_{parameter_string}')
+    np.savetxt(scenario_file_path + '_' + scenario_hash + '_Vy.txt', Vy_raw,
+               header=f'{Vy_raw.shape[0]}_1_{parameter_string}')
 
     sk_p = mesh.coors[:, :2].T
     sk_t = mesh.get_conn(mesh.descs[0]).T
