@@ -24,12 +24,16 @@ import json
 
 # Navier Stokes parameters
 nu = 1.5e-5  # kinematic viscosity of air at 20°C [m²/s]
-num_iterations = 2000
+num_iterations = 200
 tolerance = 1e-5
-relaxation = 0.05
-use_supg = True
-supg_parameter = 1.0
+relaxation = 0.2
+use_supg = False
+supg_parameter = 0.1
 use_pspg = False
+dt = 0.01             # Time step size (needs to be small enough! start small)
+final_time = 5.0      # Total simulation time
+current_time = 0.0
+max_steps = int(final_time / dt)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -75,6 +79,11 @@ if __name__ == '__main__':
             return 0.5 * (dot(dot(w['w'], grad(u)), v) - dot(dot(w['w'], grad(v)), u))
 
         @BilinearForm
+        def mass(u, v, w):
+            """Vector mass matrix: (u, v) = dot(u, v)"""
+            return dot(u, v)
+
+        @BilinearForm
         def supg_stabilization(u, v, w):
             """
             SUPG (Streamline-Upwind Petrov-Galerkin) stabilization term
@@ -118,87 +127,91 @@ if __name__ == '__main__':
         K_stokes = bmat([[A_stokes, B.T], [B, None]], 'csr')
 
         inlet_basis = define_inlet_basis(basis, mesh, inlets, inlet_velocity)
-        outlet_basis = basis['p'].zeros()
+        uvp_initial = np.hstack((inlet_basis, basis['p'].zeros()))
+        uvp = solve(*condense(K_stokes, x=uvp_initial, D=D))
 
-        uvp = np.hstack((
-            inlet_basis,
-            outlet_basis,
-        ))
-        uvp_stokes = solve(*condense(K_stokes, x=uvp, D=D))
-        u0, p0 = np.split(uvp_stokes, K_stokes.blocks)
-        uvp_fixed_bc = uvp
+        u_n = uvp[:basis['u'].N] # Previous time step velocity
+        p_n = uvp[basis['u'].N:] # Previous time step pressure
 
         print(f"Starting Picard iteration with nu={nu:.2e} m²/s")
         print(f"SUPG stabilization: {'ENABLED' if use_supg else 'DISABLED'}")
 
-        u_sum = np.zeros_like(u0)
+        u_sum = np.zeros_like(u_n)
         start_averaging_at = 1950  # Let the flow develop first
         count_avg = 0
 
-        target_nu = 1.5e-5
-        nu = 1.0e-2
-        nu_decay = 0.98
+        M = asm(mass, basis['u'])
+        A_visc = asm(stokes_visc, basis['u'])
 
-        for iteration in range(num_iterations):
-            nu = max(target_nu, nu * nu_decay)
+        #target_nu = 1.5e-5
+        #nu = 1.0e-2
+        #nu_decay = 0.98
 
-            # Interpolate velocity field for current iteration
-            w_field = basis['u'].interpolate(u0.squeeze())
+        for step in range(1, max_steps + 1):
+            current_time += dt
 
-            # Assemble convection term
+            # 3. Linearization
+            # We use the velocity from the previous step (u_n) to linearize convection
+            # This is a standard "Semi-Implicit" approach.
+            w_field = basis['u'].interpolate(u_n)
+
+            # 4. Assemble Time-Dependent System
+            # Convection A(u_n)
             A_conv = asm(convection, basis['u'], w=w_field)
 
-            # Add SUPG stabilization if enabled
+            # SUPG Stabilization (Recommended for Transient too)
             if use_supg:
                 A_supg = asm(supg_stabilization, basis['u'], w=w_field)
-                A = A_stokes + A_conv + A_supg
+                A_total = A_visc + A_conv + A_supg
             else:
-                A = A_stokes + A_conv
+                A_total = A_visc + A_conv
 
-            # Assemble saddle point system
-            #K = bmat([[A, B.T], [B, None]], 'csr')
+            # LHS Matrix: (1/dt * M + A)
+            # We scale M by 1/dt.
+            lhs_u = (1.0 / dt) * M + A_total
 
+            # System Matrix
             if use_pspg:
-                # PSPG modifies the pressure block (lower-right block of saddle point system)
-                C_pspg = asm(pspg_stabilization, basis['p'], w=w_field)
-                # Assemble saddle point system with PSPG
-                K = bmat([[A, B.T], [B, -C_pspg]], 'csr')  # Note the negative sign
+                 C_pspg = asm(pspg_stabilization, basis['p'], w=w_field)
+                 K = bmat([[lhs_u, B.T], [B, -C_pspg]], 'csr')
             else:
-                K = bmat([[A, B.T], [B, None]], 'csr')
+                 K = bmat([[lhs_u, B.T], [B, None]], 'csr')
 
-            # solve linear system
-            uvp = solve(*condense(K, x=uvp_fixed_bc, D=D))
-            u_new = uvp[:basis['u'].N]
-            p_new = uvp[basis['u'].N:]
+            # RHS Vector: (1/dt * M * u_n)
+            rhs_u = (1.0 / dt) * M @ u_n
+            rhs_p = np.zeros(basis['p'].N)
+            rhs = np.concatenate([rhs_u, rhs_p])
 
-            # apply relaxation
-            u_relaxed = relaxation * u_new + (1.0 - relaxation) * u0
+            # 5. Solve
+            # We use the previous uvp as the boundary condition "template"
+            # (assuming constant inlet velocity)
+            u_old = u_n
+            uvp_next = solve(*condense(K, rhs, x=uvp, D=D))
 
-            # convergence metric
-            diff_u = np.linalg.norm(u_relaxed.ravel() - u0.ravel()) / (np.linalg.norm(u_relaxed.ravel()) + 1e-12)
+            u_n = uvp_next[:basis['u'].N]
+            p_n = uvp_next[basis['u'].N:]
+            uvp = uvp_next # Update for next BC template
 
-            # update solution
-            u0 = u_relaxed
-            p0 = p_new
+            # 6. Calculate Instantaneous Residual (Optional, to check stability)
+            velocity_mag = np.linalg.norm(u_n)
+            if step % 10 == 0:
+                print(f"Time {current_time:.3f}s (Step {step}): Max Vel ~ {np.max(np.abs(u_n)):.2f}")
 
-            #if (iteration + 1) % 10 == 0:
-            print(f"Iteration {iteration+1:3d}: ||Δu||/||u|| = {diff_u:.2e}")
+            diff_u = np.linalg.norm(u_n.ravel() - u_old.ravel()) / (np.linalg.norm(u_n.ravel()) + 1e-12)
+            print(f"Iteration {step+1:3d}: ||Δu||/||u|| = {diff_u:.2e}")
 
-            if iteration >= start_averaging_at:
-                u_sum += u0
+            # 7. Accumulate Average
+            if current_time > start_averaging_at:
+                u_sum += u_n
                 count_avg += 1
 
-            if diff_u < tolerance:
-                print(f"\n✓ Converged after {iteration+1} iterations (||Δu||/||u|| = {diff_u:.2e})")
-                break
-        else:
-            print(f"\n⚠ Maximum iterations ({num_iterations}) reached. Final residual: {diff_u:.2e}")
-
+        # --- Post Loop ---
         if count_avg > 0:
-            print(f"Averaging solution over last {count_avg} steps...")
+            print(f"Averaging over {count_avg} time steps.")
             u_final = u_sum / count_avg
         else:
-            u_final = u0
+            print("Warning: Simulation ended before averaging started.")
+            u_final = u_n
 
         # Post-process solution
         uv = u_final.ravel()
