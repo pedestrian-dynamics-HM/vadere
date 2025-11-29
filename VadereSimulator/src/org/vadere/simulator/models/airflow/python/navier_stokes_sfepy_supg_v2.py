@@ -28,7 +28,7 @@ from skfem import MeshTri
 faulthandler.enable(file=sys.stderr, all_threads=True)
 
 # --- CONFIGURATION ---
-target_nu = 1e-2
+target_nu = 5e-3
 
 def main():
     start_time = time.time()
@@ -49,8 +49,7 @@ def main():
         topography = data['scenario']['topography']
         attributes_model = data['scenario']['attributesModel']['org.vadere.state.attributes.models.airflow.AttributesAirFlowModel']
 
-        # You can adjust this threshold back to 0.4 if 0.2 is too unstable
-        area_threshold = 0.025
+        area_threshold = 0.1
 
         grid_size, _, x_min, x_max, y_min, y_max, inlet_velocity, inlets, outlets, obstacles, parameter_string = extract_attributes(topography, attributes_model, parameter_string)
         mesh, _, _, _ = build_mesh(inlets, outlets, obstacles, area_threshold, x_min, x_max, y_min, y_max)
@@ -110,8 +109,10 @@ def main():
     # 3. FIELDS & VARIABLES
     omega = domain.create_region('Omega', 'all')
 
-    # Using Linear elements (order=1) to simplify the Oseen solver setup
-    field_u = Field.from_args('fu', np.float64, 'vector', omega, approx_order=1)
+    # --- TAYLOR-HOOD (P2/P1) SETUP ---
+    # Velocity is Quadratic (approx_order=2)
+    # Pressure is Linear (approx_order=1)
+    field_u = Field.from_args('fu', np.float64, 'vector', omega, approx_order=2)
     field_p = Field.from_args('fp', np.float64, 'scalar', omega, approx_order=1)
 
     u = FieldVariable('u', 'unknown', field_u)
@@ -119,7 +120,7 @@ def main():
     p = FieldVariable('p', 'unknown', field_p)
     q = FieldVariable('q', 'test', field_p, primary_var_name='p')
 
-    # CRITICAL: 'b' must be linked to 'u' via primary_var_name so Oseen solver knows what to update
+    # Parameter 'b' must match 'u' (Order 2)
     b = FieldVariable('b', 'parameter', field_u, primary_var_name='u')
 
     # 4. BOUNDARY CONDITIONS
@@ -143,14 +144,13 @@ def main():
     # 5. MATERIALS & STABILIZATION
     m_fluid = Material('fluid', values={'viscosity': target_nu})
 
-    # CRITICAL: The correct Name Map required for the built-in StabilizationFunction
     name_map = {
         'u': 'u',
         'p': 'p',
         'b': 'b',
         'v': 'v',
-        'velocity': 'fu',  # Map abstract 'velocity' to your field name 'fu'
-        'pressure': 'fp',  # Map abstract 'pressure' to your field name 'fp'
+        'velocity': 'fu',
+        'pressure': 'fp',
         'viscosity': 'viscosity',
         'fluid': 'fluid',
         'delta': 'delta',
@@ -172,7 +172,7 @@ def main():
     t_press = Term.new('dw_stokes(v, p)', integral, omega,
                        v=v, p=p)
 
-    # Stabilization (Momentum)
+    # Stabilization terms
     t_supg_c = Term.new('dw_st_supg_c(stabil.delta, v, b, u)', integral, omega,
                         stabil=m_stabil, v=v, b=b, u=u)
     t_supg_p = Term.new('dw_st_supg_p(stabil.delta, v, b, p)', integral, omega,
@@ -201,34 +201,36 @@ def main():
 
     ls = ScipyDirect({})
 
-    # Oseen Solver Configuration
     conf_oseen = Struct(
         name = 'oseen',
         kind = 'nls.oseen',
         stabil_mat = 'stabil',
-        i_max = 100,
+        i_max = 50,
         eps_a = 1e-8,
         eps_r = 1.0,
         macheps = 1e-16,
         lin_red = 1e-2,
         check_navier_stokes_residual = False,
-        problem = pb # Pass the problem object here
+        problem = pb
     )
 
     nls = Oseen(conf_oseen, lin_solver=ls, status={})
-
-    # CRITICAL FIX: Explicitly force the problem link after creation
-    # This solves the "ValueError: problem parameter needs to be set!" error
     nls.conf.problem = pb
-
     pb.set_solver(nls)
 
-    # 8. INITIALIZATION
+    # 8. INITIALIZATION (UPDATED FOR P2 ELEMENTS)
     variables = pb.get_variables()
-    b_data = np.zeros((mesh.n_nod, 2))
 
-    for i in range(mesh.n_nod):
-        x, y = coords[i, 0], coords[i, 1]
+    # CRITICAL: We must get coordinates from the FIELD (Order 2), not the Mesh (Order 1)
+    u_dof_coords = field_u.get_coor()
+    n_dofs = u_dof_coords.shape[0]
+
+    b_data = np.zeros((n_dofs, 2))
+
+    for i in range(n_dofs):
+        # Use u_dof_coords instead of coords
+        x, y = u_dof_coords[i, 0], u_dof_coords[i, 1]
+
         if abs(x - x_max) < profile_eps:   b_data[i, 0] = -inlet_velocity
         elif abs(y - y_min) < profile_eps: b_data[i, 1] = inlet_velocity
         elif abs(x - x_min) < profile_eps: b_data[i, 0] = inlet_velocity
@@ -237,13 +239,14 @@ def main():
     variables['b'].set_data(b_data.ravel())
 
     # 9. SOLVE
-    print("\n>>> Solving with Oseen Solver...")
+    print("\n>>> Solving with Oseen Solver (Taylor-Hood P2/P1)...")
     state = pb.solve()
     print(">>> Converged.")
 
     # 10. POST PROCESSING
     print("\n>>> Post-processing results...")
 
+    # create_output() handles the interpolation from P2 back to P1 vertices for plotting
     out = state.create_output()
     try:    u_vals = out['u'].data
     except: u_vals = out.u.data
