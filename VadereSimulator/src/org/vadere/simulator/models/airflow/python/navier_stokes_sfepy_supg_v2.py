@@ -28,8 +28,8 @@ from matplotlib.tri import Triangulation, LinearTriInterpolator
 faulthandler.enable(file=sys.stderr, all_threads=True)
 
 # --- CONFIGURATION ---
-target_nu = 5e-3
-max_iters = 20
+target_nu = 2e-3
+max_iters = 50
 
 def main():
     start_time = time.time()
@@ -44,7 +44,7 @@ def main():
     print("Extracting attributes...")
     geom_data = extract_attributes(args.scenario)
 
-    geom_data["area_threshold"] = 0.05
+    geom_data["area_threshold"] = 0.02
 
     print("Building mesh...")
     mesh, bdry_indices = build_mesh_and_indices(geom_data)
@@ -201,12 +201,11 @@ def main():
         stabil_mat = 'stabil',
         i_max = max_iters,
         eps_a = 1e-8,
-        eps_r = 1.0,
+        eps_r = 1e-4,
         macheps = 1e-16,
         lin_red = 1e-2,
         check_navier_stokes_residual = False,
         problem = pb,
-        log = {'plot' : '/home/sophia/Documents/vadere/vadere/VadereSimulator/src/org/vadere/simulator/models/airflow/python/oseen_log.png'}
     )
 
     nls = Oseen(conf_oseen, lin_solver=ls, status={})
