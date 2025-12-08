@@ -56,13 +56,9 @@ def main():
         print("Error: Number of hashes must match number of area thresholds.")
         sys.exit(1)
 
-    print(f"--- Convergence Analysis ---")
-    print(f"Scenario: {args.scenario}")
-
     # 1. Load the Reference Solution (The finest mesh)
     ref_hash = args.hashes[-1]
     ref_area = args.areas[-1]
-    print(f"\nLoading REFERENCE (Finest) solution: Hash {ref_hash} (Area {ref_area})")
     Vx_ref, Vy_ref = load_velocity_field(args.scenario, ref_hash)
     rows, cols = Vx_ref.shape
     print(f"Grid dimensions: {rows}x{cols}")
@@ -74,8 +70,6 @@ def main():
     for i in range(len(args.hashes) - 1):
         curr_hash = args.hashes[i]
         curr_area = args.areas[i]
-
-        print(f"Loading test solution: Hash {curr_hash} (Area {curr_area})")
         Vx_test, Vy_test = load_velocity_field(args.scenario, curr_hash)
 
         # Sanity Check: Grids MUST be identical
@@ -98,9 +92,8 @@ def main():
         })
 
     # 3. Analyze Convergence Rates
-    print("\n--- Results ---")
     print(f"{'Area':<10} | {'h (approx)':<12} | {'Rel L2 Error':<15} | {'Rate (Order)':<12}")
-    print("-" * 60)
+    print("-" * 50)
 
     # Add the reference point for plotting purposes (Error = 0)
     # But for the table, we calculate rates between steps
@@ -132,12 +125,12 @@ def main():
 
     diff_mag = np.sqrt((Vx_c - Vx_ref)**2 + (Vy_c - Vy_ref)**2)
 
-    plt.figure(figsize=(10, 5))
-    plt.imshow(diff_mag, origin='lower', cmap='hot', interpolation='nearest')
-    plt.colorbar(label='Velocity Difference magnitude (m/s)')
-    plt.title(f"Error Distribution: Coarsest ({args.areas[0]}) vs Finest ({ref_area})")
-    plt.tight_layout()
-    plt.show()
+    #plt.figure(figsize=(10, 5))
+    #plt.imshow(diff_mag, origin='lower', cmap='hot', interpolation='nearest')
+    #plt.colorbar(label='Velocity Difference magnitude (m/s)')
+    #plt.title(f"Error Distribution: Coarsest ({args.areas[0]}) vs Finest ({ref_area})")
+    #plt.tight_layout()
+    #plt.show()
 
 if __name__ == "__main__":
     main()

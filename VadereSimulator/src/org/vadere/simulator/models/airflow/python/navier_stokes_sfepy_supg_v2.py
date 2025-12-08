@@ -28,8 +28,8 @@ from matplotlib.tri import Triangulation, LinearTriInterpolator
 faulthandler.enable(file=sys.stderr, all_threads=True)
 
 # --- CONFIGURATION ---
-target_nu = 2e-3
-max_iters = 50
+target_nu = 1.5e-5
+max_iters = 5
 
 def main():
     start_time = time.time()
@@ -44,7 +44,7 @@ def main():
     print("Extracting attributes...")
     geom_data = extract_attributes(args.scenario)
 
-    geom_data["area_threshold"] = 0.02
+    geom_data["area_threshold"] = 0.001 #0.0000025
 
     print("Building mesh...")
     mesh, bdry_indices = build_mesh_and_indices(geom_data)
@@ -130,10 +130,10 @@ def main():
     inlet_fun = Function('inlet_vel', inlet_profile_func)
 
     bc_inlet = EssentialBC('InletBC', inlet_reg, {'u.all' : inlet_fun})
-    bc_wall = EssentialBC('WallBC', wall_reg, {'u.all' : 0.0}) # No-slip on walls & obstacles
-    bc_outlet_p = EssentialBC('OutletPressure', outlet_reg, {'p.0' : 0.0})
+    bc_wall = EssentialBC('WallBC', wall_reg, {'u.all' : 0.0})
+    #bc_outlet_p = EssentialBC('OutletPressure', outlet_reg, {'p.0' : 0.0})
 
-    bcs = Conditions([bc_inlet, bc_wall, bc_outlet_p])
+    bcs = Conditions([bc_inlet, bc_wall])
 
     # 5. MATERIALS & STABILIZATION
     m_fluid = Material('fluid', values={'viscosity': target_nu})
@@ -201,7 +201,7 @@ def main():
         stabil_mat = 'stabil',
         i_max = max_iters,
         eps_a = 1e-8,
-        eps_r = 1e-4,
+        eps_r = 1.0,
         macheps = 1e-16,
         lin_red = 1e-2,
         check_navier_stokes_residual = False,

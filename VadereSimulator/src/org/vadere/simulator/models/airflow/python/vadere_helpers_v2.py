@@ -18,8 +18,8 @@ def extract_attributes(scenario_file_path):
     # 1. Bounds Calculation
     topo_xmin = topography['attributes']['bounds']['x'] + topography['attributes']['boundingBoxWidth']
     topo_ymin = topography['attributes']['bounds']['y'] + topography['attributes']['boundingBoxWidth']
-    topo_xmax = topography['attributes']['bounds']['x'] + topography['attributes']['bounds']['width']
-    topo_ymax = topography['attributes']['bounds']['y'] + topography['attributes']['bounds']['height']
+    topo_xmax = topography['attributes']['bounds']['x'] + topography['attributes']['bounds']['width'] - topography['attributes']['boundingBoxWidth']
+    topo_ymax = topography['attributes']['bounds']['y'] + topography['attributes']['bounds']['height'] - topography['attributes']['boundingBoxWidth']
 
     airflow_xmin = attributes_model['bounds']['xmin']
     airflow_xmax = attributes_model['bounds']['xmax']
@@ -31,7 +31,6 @@ def extract_attributes(scenario_file_path):
     y_min = max(topo_ymin, airflow_ymin)
     y_max = min(topo_ymax, airflow_ymax)
 
-    # 2. Parameters
     grid_size = float(attributes_model['gridSize'])
     area_threshold = float(attributes_model['areaThreshold'])
     inlet_velocity = float(attributes_model['inletVelocity'])

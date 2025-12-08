@@ -1,8 +1,8 @@
 def extract_attributes(topography, attributes_model, parameter_string):
     topo_xmin = topography['attributes']['bounds']['x'] + topography['attributes']['boundingBoxWidth']
     topo_ymin = topography['attributes']['bounds']['y'] + topography['attributes']['boundingBoxWidth']
-    topo_xmax = topography['attributes']['bounds']['x'] + topography['attributes']['bounds']['width']
-    topo_ymax = topography['attributes']['bounds']['y'] + topography['attributes']['bounds']['height']
+    topo_xmax = topography['attributes']['bounds']['x'] + topography['attributes']['bounds']['width'] - topography['attributes']['boundingBoxWidth']
+    topo_ymax = topography['attributes']['bounds']['y'] + topography['attributes']['bounds']['height'] - topography['attributes']['boundingBoxWidth']
 
     airflow_xmin = attributes_model['bounds']['xmin']
     airflow_xmax = attributes_model['bounds']['xmax']
