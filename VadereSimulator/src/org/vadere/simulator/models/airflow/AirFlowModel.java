@@ -5,14 +5,12 @@ import org.vadere.simulator.models.Model;
 import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.models.airflow.AttributesAirFlowModel;
-import org.vadere.state.attributes.models.airflow.AttributesInOutLet;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.AirFlow;
 import org.vadere.state.util.StateJsonConverter;
 import org.vadere.util.logging.Logger;
 
 import java.io.*;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -58,7 +56,7 @@ public class AirFlowModel extends AbstractAirFlowModel {
         try {
             airFlow.setX_velocity(readArrayFromFile(f_x_velocity.getAbsolutePath()));
             airFlow.setY_velocity(readArrayFromFile(f_y_velocity.getAbsolutePath()));
-            airFlow.setGridSize(attributesAirFlowModel.getGridSize());
+            airFlow.setRectangularGridCellSize(attributesAirFlowModel.getRectangularGridCellSize());
             airFlow.setPeriod(attributesAirFlowModel.getOnPeriod(), attributesAirFlowModel.getOffPeriod());
             airFlow.setBlockingObstaclesIDs(attributesAirFlowModel.getBlockingObstacles());
 
@@ -68,7 +66,7 @@ public class AirFlowModel extends AbstractAirFlowModel {
             try {
                 airFlow.setX_velocity(readArrayFromFile(f_x_velocity.getAbsolutePath()));
                 airFlow.setY_velocity(readArrayFromFile(f_y_velocity.getAbsolutePath()));
-                airFlow.setGridSize(attributesAirFlowModel.getGridSize());
+                airFlow.setRectangularGridCellSize(attributesAirFlowModel.getRectangularGridCellSize());
                 airFlow.setPeriod(attributesAirFlowModel.getOnPeriod(), attributesAirFlowModel.getOffPeriod());
                 airFlow.setBlockingObstaclesIDs(attributesAirFlowModel.getBlockingObstacles());
 

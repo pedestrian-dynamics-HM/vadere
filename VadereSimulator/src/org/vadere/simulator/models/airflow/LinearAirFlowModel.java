@@ -52,6 +52,6 @@ public class LinearAirFlowModel extends AbstractAirFlowModel {
         
         airFlow.setX_velocity(xVelocities);
         airFlow.setY_velocity(yVelocities);
-        airFlow.setGridSize(Double.POSITIVE_INFINITY);
+        airFlow.setRectangularGridCellSize(Double.POSITIVE_INFINITY);
     }
 }

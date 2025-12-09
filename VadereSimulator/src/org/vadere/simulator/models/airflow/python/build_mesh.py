@@ -102,7 +102,7 @@ def build_mesh(geom_data):
         holes.append(find_hole_point(obs_points))
 
     info = builder.get_mesh_info(holes)
-    mesh_data = triangle.build(info, refinement_func=lambda v, area: area > geom_data['area_threshold'])
+    mesh_data = triangle.build(info, refinement_func=lambda v, area: area > geom_data['max_triangle_area'])
 
     # convert to sfepy
     sfepy_coords = np.array(mesh_data.points)

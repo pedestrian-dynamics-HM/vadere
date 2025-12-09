@@ -39,7 +39,7 @@ def main():
                         help='List of hashes ordered from COARSE to FINE. '
                              'The last hash is assumed to be the Ground Truth.')
     parser.add_argument('--areas', required=True, nargs='+', type=float,
-                        help='List of area_thresholds corresponding to the hashes.')
+                        help='List of max_triangle_areas corresponding to the hashes.')
     args = parser.parse_args()
     if len(args.hashes) != len(args.areas):
         print("Error: Number of hashes must match number of area thresholds.")
@@ -63,7 +63,7 @@ def main():
         if Vx_test.shape != Vx_ref.shape:
             print(f"CRITICAL ERROR: Grid mismatch!")
             print(f"Ref: {Vx_ref.shape}, Test: {Vx_test.shape}")
-            print("Ensure 'grid_size' was identical for all runs.")
+            print("Ensure 'rect_grid_cell_size' was identical for all runs.")
             sys.exit(1)
 
         error_l2 = compute_l2_error(Vx_test, Vy_test, Vx_ref, Vy_ref)

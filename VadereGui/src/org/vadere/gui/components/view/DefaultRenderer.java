@@ -366,7 +366,7 @@ public abstract class DefaultRenderer {
 			double[][] xVelocities = airFlow.getXVelocities();
 			double[][] yVelocities = airFlow.getYVelocities();
 
-			double cellSize = airFlow.getGridSize();
+			double cellSize = airFlow.getRectangularGridCellSize();
 
 			double maxArrowLength = 0;
 

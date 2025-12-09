@@ -18,7 +18,7 @@ public class AirFlowTest {
     @BeforeEach
     public void setUp() {
         airFlow = new AirFlow("testScenario", "testHash", BORDER, BORDER, 1000, 1000);
-        airFlow.setGridSize(GRID_SIZE);
+        airFlow.setRectangularGridCellSize(GRID_SIZE);
     }
 
     @Test

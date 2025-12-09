@@ -67,9 +67,9 @@ public class AirFlowData {
         airFlow.setX_velocity(xVelocity);
         airFlow.setY_velocity(yVelocity);
         try {
-            airFlow.setGridSize(lastRow.getDouble(xPosEndCol) - lastRow.getDouble(xPosStartCol));
+            airFlow.setRectangularGridCellSize(lastRow.getDouble(xPosEndCol) - lastRow.getDouble(xPosStartCol));
         } catch (Exception e) {
-            airFlow.setGridSize(lastRow.getInt(xPosEndCol) - lastRow.getInt(xPosStartCol));
+            airFlow.setRectangularGridCellSize(lastRow.getInt(xPosEndCol) - lastRow.getInt(xPosStartCol));
         }
     }
 

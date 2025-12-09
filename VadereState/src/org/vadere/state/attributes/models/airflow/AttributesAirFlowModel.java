@@ -5,7 +5,6 @@ import org.vadere.annotation.factories.attributes.ModelAttributeClass;
 import org.vadere.state.attributes.Attributes;
 
 import java.util.ArrayList;
-import java.util.List;
 
 @ModelAttributeClass
 public class AttributesAirFlowModel extends Attributes {
@@ -16,9 +15,9 @@ public class AttributesAirFlowModel extends Attributes {
 
     private String pythonPath;
 
-    private double gridSize;
+    private double rectangularGridCellSize;
 
-    private double areaThreshold;
+    private double maxTriangleArea;
 
     private double inletVelocity;
 
@@ -35,30 +34,30 @@ public class AttributesAirFlowModel extends Attributes {
     private AttributesBounds bounds;
 
     public AttributesAirFlowModel() {
-        condaPath = "CONDA_EXE";
+        condaPath = "CONDA_PATH";
         condaEnv = "CONDA_ENV";
         pythonPath = "VadereSimulator/src/org/vadere/simulator/models/airflow/python/navier_stokes.py";
-        gridSize = 0.2;
-        areaThreshold = 0.1;
+        maxTriangleArea = 0.01;
+        rectangularGridCellSize = 0.1;
         inletVelocity = 0.3;
         inlets = new ArrayList<>();
-        inlets.add(new AttributesInOutLet("left", 1, 2));
+        inlets.add(new AttributesInOutLet("left", 1, 1));
         outlets = new ArrayList<>();
-        outlets.add(new AttributesInOutLet("right", 1, 2));
+        outlets.add(new AttributesInOutLet("right", 1, 1));
         blockingObstacles = new ArrayList<>();
         onPeriod = 1.0;
         offPeriod = 0;
         bounds = new AttributesBounds();
     }
 
-    public AttributesAirFlowModel(double gridSize, double areaThreshold, double inletVelocity,
+    public AttributesAirFlowModel(double rectangularGridCellSize, double maxTriangleArea, double inletVelocity,
                                   ArrayList<AttributesInOutLet> inlets, ArrayList<AttributesInOutLet> outlets,
                                   ArrayList<Integer> notBlockingObstacles, AttributesBounds bounds) {
-        condaPath = "CONDA_EXE";
+        condaPath = "CONDA_PATH";
         condaEnv = "CONDA_ENV";
         pythonPath = "VadereSimulator/src/org/vadere/simulator/models/airflow/python/navier_stokes.py";
-        this.gridSize = gridSize;
-        this.areaThreshold = areaThreshold;
+        this.maxTriangleArea = maxTriangleArea;
+        this.rectangularGridCellSize = rectangularGridCellSize;
         this.inletVelocity = inletVelocity;
         this.inlets = inlets;
         this.outlets = outlets;
@@ -68,8 +67,8 @@ public class AttributesAirFlowModel extends Attributes {
         this.bounds = bounds;
     }
 
-    public AttributesAirFlowModel(double gridSize) {
-        this.gridSize = gridSize;
+    public AttributesAirFlowModel(double rectangularGridCellSize) {
+        this.rectangularGridCellSize = rectangularGridCellSize;
     }
 
     public String getCondaPath() {
@@ -82,12 +81,12 @@ public class AttributesAirFlowModel extends Attributes {
 
     public String getPythonPath() { return pythonPath; }
 
-    public double getGridSize() {
-        return gridSize;
+    public double getRectangularGridCellSize() {
+        return rectangularGridCellSize;
     }
 
-    public double getAreaThreshold() {
-        return areaThreshold;
+    public double getMaxTriangleArea() {
+        return maxTriangleArea;
     }
 
     public double getInletVelocity() {

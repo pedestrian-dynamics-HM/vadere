@@ -37,7 +37,7 @@ def main():
     # 1. SETUP & MESH GENERATION
     geom_data = extract_attributes(args.scenario)
 
-    geom_data["area_threshold"] = 0.01 #0.0000025
+    geom_data["max_triangle_area"] = 0.01 #0.0000025
 
     mesh, bdry_indices = build_mesh(geom_data)
 
@@ -197,7 +197,7 @@ def main():
     X, Y, Vx_grid, Vy_grid, vel_mag = postprocess_solution(
         u_vals,
         mesh,
-        geom_data['grid_size'],
+        geom_data['rect_grid_cell_size'],
         x_min, x_max, y_min, y_max
     )
 

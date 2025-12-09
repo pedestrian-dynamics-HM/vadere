@@ -32,22 +32,22 @@ public class AirFlowProcessor extends DataProcessor<TopographyGridKey, String> {
 
         double[][] xVelocity = airFlow.getXVelocities();
         double[][] yVelocity = airFlow.getYVelocities();
-        double gridSize = airFlow.getGridSize();
+        double rectangularGridCellSize = airFlow.getRectangularGridCellSize();
 
         if (xVelocity != null && yVelocity != null) {
             double[][] x_velocity = airFlow.getXVelocities();
             double[][] y_velocity = airFlow.getYVelocities();
             //state.getTopography().getBounds().width = x_velocity.length;
 
-            int xSteps = (int) Math.ceil(state.getTopography().getBounds().width / gridSize);
-            int ySteps = (int) Math.ceil(state.getTopography().getBounds().height / gridSize);
+            int xSteps = (int) Math.ceil(state.getTopography().getBounds().width / rectangularGridCellSize);
+            int ySteps = (int) Math.ceil(state.getTopography().getBounds().height / rectangularGridCellSize);
 
             for (int i = 0; i < x_velocity.length; i++) {
                 for (int j = 0; j < y_velocity[0].length; j++) {
-                    double xStart = j * gridSize + airFlow.getXmin();
-                    double xEnd = (j + 1) * gridSize + airFlow.getXmin();
-                    double yStart = i * gridSize + airFlow.getYmin();
-                    double yEnd = (i + 1) * gridSize + airFlow.getYmin();
+                    double xStart = j * rectangularGridCellSize + airFlow.getXmin();
+                    double xEnd = (j + 1) * rectangularGridCellSize + airFlow.getXmin();
+                    double yStart = i * rectangularGridCellSize + airFlow.getYmin();
+                    double yEnd = (i + 1) * rectangularGridCellSize + airFlow.getYmin();
                     double xCenter = (xStart + xEnd) / 2.0;
                     double yCenter = (yStart + yEnd) / 2.0;
                     double xVal = xVelocity[i][j];

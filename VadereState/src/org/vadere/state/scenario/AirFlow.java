@@ -10,7 +10,7 @@ public class AirFlow {
     private final String scenarioPath;
     private String airflowHash;
 
-    private double gridSize;
+    private double rectangularGridCellSize;
     private final double xmin;
     private final double ymin;
     private final double xmax;
@@ -41,8 +41,8 @@ public class AirFlow {
         this.y_velocity = y_velocity;
     }
 
-    public void setGridSize(double gridSize) {
-        this.gridSize = gridSize;
+    public void setRectangularGridCellSize(double rectangularGridCellSize) {
+        this.rectangularGridCellSize = rectangularGridCellSize;
     }
 
     public String getScenarioPath() {
@@ -72,8 +72,8 @@ public class AirFlow {
             return new double[]{0, 0};
         }
 
-        int x_idx = (int) Math.round((x - xmin) / gridSize);
-        int y_idx = (int) Math.round((y - ymin) / gridSize);
+        int x_idx = (int) Math.round((x - xmin) / rectangularGridCellSize);
+        int y_idx = (int) Math.round((y - ymin) / rectangularGridCellSize);
 
         // Clamp indices to valid grid range, keeping one cell buffer from edges, because edges are always zero
         x_idx = Math.max(1, Math.min(x_idx, x_velocity[0].length - 2));
@@ -104,8 +104,8 @@ public class AirFlow {
         return y_velocity;
     }
 
-    public double getGridSize() {
-        return gridSize;
+    public double getRectangularGridCellSize() {
+        return rectangularGridCellSize;
     }
 
     public void setPeriod(double onPeriod, double offPeriod) {

@@ -58,7 +58,7 @@ public class AirTransmissionModelTest {
 
         // Initialize AirFlow
         AirFlow airFlow = new AirFlow("test", "test_hash", 0.0, 0.0, 10, 10);
-        airFlow.setGridSize(Double.POSITIVE_INFINITY);
+        airFlow.setRectangularGridCellSize(Double.POSITIVE_INFINITY);
         topography.setAirFlow(airFlow);
 
         initializeTransmissionModel();
@@ -645,7 +645,7 @@ public class AirTransmissionModelTest {
         AirFlow airFlow = new AirFlow("test", "test_hash", 0.0, 0.0, 10, 10);
         airFlow.setX_velocity(xVelocity);
         airFlow.setY_velocity(yVelocity);
-        airFlow.setGridSize(Double.POSITIVE_INFINITY);
+        airFlow.setRectangularGridCellSize(Double.POSITIVE_INFINITY);
 
         topography.setAirFlow(airFlow);
     }

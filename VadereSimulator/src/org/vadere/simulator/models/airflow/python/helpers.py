@@ -29,8 +29,8 @@ def extract_attributes(scenario_file_path):
     y_min = max(topo_ymin, airflow_ymin)
     y_max = min(topo_ymax, airflow_ymax)
 
-    grid_size = float(attributes_model['gridSize'])
-    area_threshold = float(attributes_model['areaThreshold'])
+    rect_grid_cell_size = float(attributes_model['rectangularGridCellSize'])
+    max_triangle_area = float(attributes_model['maxTriangleArea'])
     inlet_velocity = float(attributes_model['inletVelocity'])
     blocking_obstacles = attributes_model['blockingObstacles']
 
@@ -69,8 +69,8 @@ def extract_attributes(scenario_file_path):
                 obstacles.append([(point['x'], point['y']) for point in obstacle['shape']['points']])
 
     return {
-        'grid_size': grid_size,
-        'area_threshold': area_threshold,
+        'rect_grid_cell_size': rect_grid_cell_size,
+        'max_triangle_area': max_triangle_area,
         'x_min': x_min, 'x_max': x_max,
         'y_min': y_min, 'y_max': y_max,
         'inlet_velocity': inlet_velocity,
@@ -89,7 +89,7 @@ def get_initial_velocity_at_point(x, y, x_min, x_max, y_min, y_max, velocity, ep
 
 
 def get_parameter_string(geom_data):
-    parameter_string = f"{geom_data['grid_size']}-{geom_data['area_threshold']}-{geom_data['inlet_velocity']}-"
+    parameter_string = f"{geom_data['rect_grid_cell_size']}-{geom_data['max_triangle_area']}-{geom_data['inlet_velocity']}-"
 
     for item in geom_data['inlets']:
         parameter_string += f"{item['side']}[{item['coords'][0]},{item['coords'][1]}]"
@@ -103,7 +103,7 @@ def get_parameter_string(geom_data):
     return parameter_string
 
 
-def postprocess_solution(u_vals, mesh, grid_size, x_min, x_max, y_min, y_max):
+def postprocess_solution(u_vals, mesh, rect_grid_cell_size, x_min, x_max, y_min, y_max):
     """
     Converts FEM results on triangular grid to a rectangular grid for Vadere.
     """
@@ -116,8 +116,8 @@ def postprocess_solution(u_vals, mesh, grid_size, x_min, x_max, y_min, y_max):
     interp_v_comp = LinearTriInterpolator(triang, Vy_raw)
 
     eps = 1e-9
-    x_rng = np.arange(x_min, x_max + grid_size/100.0, grid_size)
-    y_rng = np.arange(y_min, y_max + grid_size/100.0, grid_size)
+    x_rng = np.arange(x_min, x_max + rect_grid_cell_size/100.0, rect_grid_cell_size)
+    y_rng = np.arange(y_min, y_max + rect_grid_cell_size/100.0, rect_grid_cell_size)
     X, Y = np.meshgrid(x_rng, y_rng)
     Vx = interp_u_comp(X, Y).filled(0.0)
     Vy = interp_v_comp(X, Y).filled(0.0)
