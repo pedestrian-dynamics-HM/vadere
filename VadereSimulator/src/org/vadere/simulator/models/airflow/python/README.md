@@ -8,14 +8,14 @@ Conda is also included in the [Anaconda Distribution](https://repo.anaconda.com)
 
 ## Create conda environment
 
-Create new conda environment with python and activate it.
+Create a new conda environment with python and activate it: 
 
 ```bash
 conda create -n CONDA_ENV python=3.11
 conda activate CONDA_ENV
 ```
 
-Install required packages.
+Install required packages: 
 
 ```bash
 pip install -r requirements.txt
