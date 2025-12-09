@@ -16,7 +16,7 @@ class GeometryBuilder:
         self.precision = precision
 
     def add_node(self, x, y):
-        # Round coordinates to handle floating point noise
+        # round coordinates to handle floating point noise
         key = (round(x, self.precision), round(y, self.precision))
 
         if key in self.node_map:
@@ -31,7 +31,7 @@ class GeometryBuilder:
         idx1 = self.add_node(x1, y1)
         idx2 = self.add_node(x2, y2)
         if idx1 == idx2:
-            return # Ignore zero-length segments
+            return # ignore zero-length segments
         edge = tuple(sorted((idx1, idx2)))
         self.edges.add(edge)
 
