@@ -2,7 +2,6 @@ import json
 import numpy as np
 from matplotlib.tri import Triangulation, LinearTriInterpolator
 from matplotlib import pyplot as plt
-import numpy as np
 
 
 def extract_attributes(scenario_file_path):
@@ -15,7 +14,6 @@ def extract_attributes(scenario_file_path):
     topography = data['scenario']['topography']
     attributes_model = data['scenario']['attributesModel']['org.vadere.state.attributes.models.airflow.AttributesAirFlowModel']
 
-    # 1. Bounds Calculation
     topo_xmin = topography['attributes']['bounds']['x'] + topography['attributes']['boundingBoxWidth']
     topo_ymin = topography['attributes']['bounds']['y'] + topography['attributes']['boundingBoxWidth']
     topo_xmax = topography['attributes']['bounds']['x'] + topography['attributes']['bounds']['width'] - topography['attributes']['boundingBoxWidth']
@@ -36,7 +34,6 @@ def extract_attributes(scenario_file_path):
     inlet_velocity = float(attributes_model['inletVelocity'])
     blocking_obstacles = attributes_model['blockingObstacles']
 
-    # 3. Inlets / Outlets
     inlets = []
     for i, ins in enumerate(attributes_model['inlets']):
         inlets.append({
@@ -44,6 +41,8 @@ def extract_attributes(scenario_file_path):
             "side": ins['side'],
             "coords": [float(ins['start']), float(ins['start'] + ins['width'])]
         })
+    if not inlets:
+        raise ValueError(f"No inlets defined. The airflow model requires at least one inlet.")
 
     outlets = []
     for i, outs in enumerate(attributes_model['outlets']):
@@ -52,8 +51,9 @@ def extract_attributes(scenario_file_path):
             "side": outs['side'],
             "coords": [float(outs['start']), float(outs['start'] + outs['width'])]
         })
+    if not outlets:
+        raise ValueError(f"No outlets defined. The airflow model requires at least one outlet.")
 
-    # 4. Obstacles
     obstacles = []
     for obstacle in topography['obstacles']:
         if obstacle['id'] in blocking_obstacles:
@@ -62,7 +62,6 @@ def extract_attributes(scenario_file_path):
                 ob_y_min = obstacle['shape']['y']
                 ob_x_max = ob_x_min + obstacle['shape']['width']
                 ob_y_max = ob_y_min + obstacle['shape']['height']
-                # Store as list of points
                 obstacles.append([(ob_x_min, ob_y_min), (ob_x_min, ob_y_max),
                                   (ob_x_max, ob_y_max), (ob_x_max, ob_y_min)])
 
@@ -79,6 +78,14 @@ def extract_attributes(scenario_file_path):
         'outlets': outlets,
         'obstacles': obstacles
     }
+
+
+def get_initial_velocity_at_point(x, y, x_min, x_max, y_min, y_max, velocity, eps=1e-3):
+    if abs(x - x_min) < eps:   return [velocity, 0.0]
+    elif abs(x - x_max) < eps: return [-velocity, 0.0]
+    elif abs(y - y_min) < eps: return [0.0, velocity]
+    elif abs(y - y_max) < eps: return [0.0, -velocity]
+    return [0.0, 0.0]
 
 
 def get_parameter_string(geom_data):

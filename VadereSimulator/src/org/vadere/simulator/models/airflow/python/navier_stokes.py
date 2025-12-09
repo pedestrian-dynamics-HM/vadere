@@ -3,269 +3,214 @@ os.environ['OPENBLAS_NUM_THREADS'] = '1'
 os.environ['MKL_NUM_THREADS'] = '1'
 os.environ['NUMEXPR_NUM_THREADS'] = '1'
 
-import faulthandler, sys
-faulthandler.enable(file=sys.stderr, all_threads=True)
-
+import sys
 import time
-start_time = time.time()
-from skfem import *
-from skfem.models.poisson import vector_laplace
-from skfem.models.general import divergence
-from matplotlib import pyplot as plt
-from matplotlib.tri import LinearTriInterpolator, Triangulation
-from skfem.helpers import dot, grad, sym_grad, inner
-from build_mesh import build_mesh
-from plot_results import plot_results
-from skfem_helpers import *
-from vadere_helpers import extract_attributes
 import numpy as np
 import argparse
-import json
+import faulthandler
 
-# Navier Stokes parameters
-nu = 1.5e-3  # kinematic viscosity of air at 20°C [m²/s]
-num_iterations = 50
-tolerance = 1e-8
-relaxation = 0.3  # Slightly higher for lower viscosity
-use_supg = True  # Enable SUPG stabilization
-supg_parameter = 0.5  # SUPG parameter (0.5-1.0 typical)
-use_pspg = False
-dt = 0.1
+from sfepy.base.base import Struct
+from sfepy.discrete import (FieldVariable, Material, Integral, Function,
+                            Equation, Equations, Problem)
+from sfepy.discrete.fem import FEDomain, Field
+from sfepy.terms import Term
+from sfepy.discrete.conditions import Conditions, EssentialBC
+from sfepy.solvers.ls import ScipyDirect
+from sfepy.solvers.oseen import Oseen, StabilizationFunction
 
-if __name__ == '__main__':
+from build_mesh import build_mesh
+from helpers import *
+
+faulthandler.enable(file=sys.stderr, all_threads=True)
+
+target_nu = 1.5e-2
+max_iters = 20
+
+def main():
+    start_time = time.time()
+
     parser = argparse.ArgumentParser()
     parser.add_argument('scenario')
     parser.add_argument('hash')
     args = parser.parse_args()
-    config = vars(args)
 
-    scenario_file_path = config['scenario']
-    scenario_hash = config['hash']
+    # 1. SETUP & MESH GENERATION
+    geom_data = extract_attributes(args.scenario)
 
-    parameter_string = ""
+    geom_data["area_threshold"] = 0.01 #0.0000025
 
-    with open(scenario_file_path) as file:
-        data = json.load(file)
-        topography = data['scenario']['topography']
-        attributes_model = data['scenario']['attributesModel']['org.vadere.state.attributes.models.airflow.AttributesAirFlowModel']
-        grid_size, area_threshold, x_min, x_max, y_min, y_max, inlet_velocity, inlets, outlets, obstacles, parameter_string = extract_attributes(topography, attributes_model, parameter_string)
+    mesh, bdry_indices = build_mesh(geom_data)
 
-        area_threshold = 0.02
+    print(f"Mesh: {mesh.n_nod} nodes, {mesh.n_el} elements.")
+    domain = FEDomain('domain', mesh)
 
-        mesh, inlet_dict, outlet_dict, boundary_dict = build_mesh(inlets, outlets, obstacles, area_threshold, x_min, x_max, y_min, y_max)
+    # 2. REGIONS
+    omega = domain.create_region('Omega', 'all')
+    all_bdry_reg = domain.create_region('AllBoundary', 'vertices of surface', 'facet')
+    all_bdry_indices = all_bdry_reg.vertices
 
-        element = {'u': ElementVector(ElementTriP2()), 'p': ElementTriP1()}
-        basis = {variable: Basis(mesh, e, intorder=4)
-                 for variable, e in element.items()}
+    def get_inlet_idxs(coors, domain=None):
+        return bdry_indices['inlet']
 
-        print("Velocity DOFs:", basis['u'].N)
-        print("Pressure DOFs:", basis['p'].N)
-        print("Total system size:", basis['u'].N * 2 + basis['p'].N)
+    def get_outlet_idxs(coors, domain=None):
+        return bdry_indices['outlet']
 
+    inlet_reg = domain.create_region('Inlet',
+                                     'vertices by get_inlet_idxs',
+                                     'facet',
+                                     functions={'get_inlet_idxs': get_inlet_idxs})
+    outlet_reg = domain.create_region('Outlet',
+                                      'vertices by get_outlet_idxs',
+                                      'facet',
+                                      functions={'get_outlet_idxs': get_outlet_idxs})
+    open_bdry_indices = np.union1d(bdry_indices['inlet'], bdry_indices['outlet'])
+    wall_indices = np.setdiff1d(all_bdry_indices, open_bdry_indices)
 
-        # --- Define Bilinear Forms for Navier-Stokes ---
-        @BilinearForm
-        def stokes_visc(u, v, w):
-            """Viscous term with symmetric gradient"""
-            return nu * inner(sym_grad(u), sym_grad(v))
+    def get_wall_idxs(coors, domain=None):
+        return wall_indices
 
-        @BilinearForm
-        def convection(u, v, w):
-            """Convection term, skew-symmetric form"""
-            #return dot(dot(w['w'], grad(u)), v)
-            #return 0.5*(dot(dot(w['w'], grad(u)), v) - dot(dot(w['w'], grad(v)), u))
-            return (dot(dot(w['w'], grad(u)), v) - dot(dot(w['w'], grad(v)), u)) / 2.0
+    wall_reg = domain.create_region('Walls',
+                                    'vertices by get_wall_idxs',
+                                    'facet',
+                                    functions={'get_wall_idxs': get_wall_idxs})
 
-        @BilinearForm
-        def mass_matrix(u, v, w):
-            return dot(u, v) / dt
+    # 3. FIELDS & VARIABLES
+    field_u = Field.from_args('fu', np.float64, 'vector', omega, approx_order=2)
+    field_p = Field.from_args('fp', np.float64, 'scalar', omega, approx_order=1)
 
+    u = FieldVariable('u', 'unknown', field_u)
+    v = FieldVariable('v', 'test', field_u, primary_var_name='u')
+    p = FieldVariable('p', 'unknown', field_p)
+    q = FieldVariable('q', 'test', field_p, primary_var_name='p')
+    b = FieldVariable('b', 'parameter', field_u, primary_var_name='u')
 
-        @BilinearForm
-        def stokes_turbulent(u, v, w):
-            # Calculate Strain Rate Tensor magnitude |S|
-            # S = 0.5 * (grad(u) + grad(u).T)
-            # simplified for 2D: approx proportional to grad(u) magnitude
+    # 4. BOUNDARY CONDITIONS
+    inlet_velocity = geom_data['inlet_velocity']
+    x_min, x_max = geom_data['x_min'], geom_data['x_max']
+    y_min, y_max = geom_data['y_min'], geom_data['y_max']
+    profile_eps = 1e-3
 
-            # Get gradient of previous solution
-            du = grad(w['w'])
-            shear_rate = (inner(du, du) + 1e-12)**0.5
+    def inlet_profile_func(ts, coors, **kwargs):
+        val = np.zeros((coors.shape[0], 2))
+        for i, (x, y) in enumerate(coors[:, :2]):
+            val[i] = get_initial_velocity_at_point(x, y, x_min, x_max, y_min, y_max, inlet_velocity)
+        return val
 
-            # Smagorinsky-style Turbulent Viscosity
-            # Cs is a constant (usually 0.1 to 0.2)
-            # h is element size
-            Cs = 0.15
-            h = w.h
-            nu_turbulent = (Cs * h)**2 * shear_rate
+    inlet_fun = Function('inlet_vel', inlet_profile_func)
+    bc_inlet = EssentialBC('InletBC', inlet_reg, {'u.all' : inlet_fun})
+    bc_wall = EssentialBC('WallBC', wall_reg, {'u.all' : 0.0})
+    bcs = Conditions([bc_inlet, bc_wall])
 
-            # Total effective viscosity
-            nu_eff = nu + nu_turbulent
+    # 5. MATERIALS & STABILIZATION
+    m_fluid = Material('fluid', values={'viscosity': target_nu})
 
-            # Standard Stokes term with variable viscosity
-            return nu_eff * inner(sym_grad(u), sym_grad(v))
+    name_map = {
+        'u': 'u',
+        'p': 'p',
+        'b': 'b',
+        'v': 'v',
+        'velocity': 'fu',
+        'pressure': 'fp',
+        'viscosity': 'viscosity',
+        'fluid': 'fluid',
+        'delta': 'delta',
+        'tau': 'tau',
+        'gamma': 'gamma'
+    }
 
-        @BilinearForm
-        def supg_stabilization(u, v, w):
-            """
-            SUPG (Streamline-Upwind Petrov-Galerkin) stabilization term
-            Adds artificial diffusion only in streamline direction
-            """
-            # Get velocity field and compute its magnitude
-            vel = w['w']
-            vel_mag = (dot(vel, vel) + 1e-12)**0.5
+    stabil_func = Function('stabil_func', StabilizationFunction(name_map))
+    m_stabil = Material('stabil', function=stabil_func)
 
-            # Element size (approximate using mesh statistics)
-            h = w.h  # Element diameter from basis
+    integral = Integral('i', order=3)
 
-            # Compute intrinsic time scale (tau)
-            # tau = h / (2 * |u|) for advection-dominated flow
-            # Limited by viscous time scale: h²/(4*nu)
-            tau_adv = h / (2.0 * vel_mag + 1e-12)
-            tau_diff = h * h / (4.0 * nu + 1e-12)
-            tau = 1.0 / (1.0/tau_adv + 1.0/tau_diff)
-            tau = supg_parameter * tau
+    # 6. EQUATIONS
+    # momentum
+    t_diff = Term.new('dw_div_grad(fluid.viscosity, v, u)', integral, omega,
+                      fluid=m_fluid, v=v, u=u)
+    t_conv = Term.new('dw_lin_convect(v, b, u)', integral, omega,
+                      v=v, b=b, u=u)
+    t_press = Term.new('dw_stokes(v, p)', integral, omega,
+                       v=v, p=p)
 
-            # SUPG term: tau * (u·∇u) · (w·∇v)
-            residual = dot(vel, grad(u))
-            test_streamline = dot(vel, grad(v))
+    # stabilization
+    t_supg_c = Term.new('dw_st_supg_c(stabil.delta, v, b, u)', integral, omega,
+                        stabil=m_stabil, v=v, b=b, u=u)
+    t_supg_p = Term.new('dw_st_supg_p(stabil.delta, v, b, p)', integral, omega,
+                        stabil=m_stabil, v=v, b=b, p=p)
+    t_graddiv = Term.new('dw_st_grad_div(stabil.gamma, v, u)', integral, omega,
+                         stabil=m_stabil, v=v, u=u)
 
-            return tau * dot(residual, test_streamline)
+    # continuity
+    t_div = Term.new('dw_stokes(u, q)', integral, omega,
+                     u=u, q=q)
 
-        @BilinearForm
-        def pspg_stabilization(p, q, w):
-            """
-            PSPG (Pressure-Stabilizing Petrov-Galerkin) stabilization
-            Stabilizes pressure, especially for equal-order elements
-            (Less critical for P2-P1, but helps at low viscosity)
-            """
-            vel = w['w']
-            vel_mag = (dot(vel, vel) + 1e-12)**0.5
-            h = w.h
+    # stabilization
+    t_pspg_c = Term.new('dw_st_pspg_c(stabil.tau, q, b, u)', integral, omega,
+                        stabil=m_stabil, q=q, b=b, u=u)
+    t_pspg_p = Term.new('dw_st_pspg_p(stabil.tau, q, p)', integral, omega,
+                        stabil=m_stabil, q=q, p=p)
 
-            # Same tau as SUPG
-            tau_adv = h / (2.0 * vel_mag + 1e-12)
-            tau_diff = h * h / (4.0 * nu + 1e-12)
-            tau = 1.0 / (1.0/tau_adv + 1.0/tau_diff)
-            tau = supg_parameter * tau
+    eq_momentum = Equation('balance', t_diff + t_conv - t_press + t_graddiv + t_supg_c + t_supg_p)
+    eq_continuity = Equation('incompressibility', t_div + t_pspg_c + t_pspg_p)
+    equations = Equations([eq_momentum, eq_continuity])
 
-            # PSPG term: tau * ∇p · ∇q
-            return tau * dot(grad(p), grad(q))
+    # 7. PROBLEM & SOLVER
+    pb = Problem('stabilized_navier_stokes', equations=equations)
+    pb.set_bcs(ebcs=bcs)
 
-        # Solve Stokes flow first for initial guess
-        print("Solving initial Stokes flow...")
-        D = define_dofs(basis, mesh, inlet_dict, outlet_dict)
-        A_stokes = asm(stokes_visc, basis['u'])
-        B = -asm(divergence, basis['u'], basis['p'])
-        K_stokes = bmat([[A_stokes, B.T], [B, None]], 'csr')
+    ls = ScipyDirect({})
 
-        current_time = 0.0
+    conf_oseen = Struct(
+        name = 'oseen',
+        kind = 'nls.oseen',
+        stabil_mat = 'stabil',
+        i_max = max_iters,
+        eps_a = 1e-8,
+        eps_r = 1.0,
+        macheps = 1e-16,
+        lin_red = 1e-2,
+        check_navier_stokes_residual = False,
+        problem = pb,
+    )
 
-        inlet_basis = define_inlet_basis(basis, mesh, inlets, inlet_velocity)
-        outlet_basis = basis['p'].zeros()
+    nls = Oseen(conf_oseen, lin_solver=ls, status={})
+    nls.conf.problem = pb
+    pb.set_solver(nls)
 
-        uvp = np.hstack((
-            inlet_basis,
-            outlet_basis,
-        ))
-        uvp_stokes = solve(*condense(K_stokes, x=uvp, D=D))
-        uvp_stokes = np.zeros(len(uvp_stokes), dtype=float)
-        u0, p0 = np.split(uvp_stokes, K_stokes.blocks)
-        uvp_fixed_bc = uvp
+    # 8. INITIALIZATION
+    variables = pb.get_variables()
+    u_dof_coords = field_u.get_coor()
+    n_dofs = u_dof_coords.shape[0]
+    b_data = np.zeros((n_dofs, 2))
+    for i in range(n_dofs):
+        x, y = u_dof_coords[i, 0], u_dof_coords[i, 1]
+        b_data[i] = get_initial_velocity_at_point(x, y, x_min, x_max, y_min, y_max, inlet_velocity)
+    variables['b'].set_data(b_data.ravel())
 
-        u_prev = u0
+    # 9. SOLVE
+    state = pb.solve()
 
-        # --- CONFIGURATION FOR CHAOS ---
-        dt = 0.02             # Needs to be smaller for Crank-Nicolson stability
-        theta = 0.5           # 0.5 = Crank-Nicolson (Energy Conserving), 1.0 = Backward Euler (Dissipative)
-        nu = 0.001            # Low viscosity (Re ~ 5,000)
-        max_inlet_vel = inlet_velocity
+    # 10. POST PROCESSING
+    out = state.create_output()
+    u_vals = out['u'].data
 
-        # Define Mass Matrix once
-        M = asm(mass_matrix, basis['u'])
+    X, Y, Vx_grid, Vy_grid, vel_mag = postprocess_solution(
+        u_vals,
+        mesh,
+        geom_data['grid_size'],
+        x_min, x_max, y_min, y_max
+    )
 
-        print("Starting Crank-Nicolson Solver with Inlet Jitter...")
+    ny, nx = X.shape
+    parameter_string = get_parameter_string(geom_data)
 
-        for iteration in range(num_iterations):
-            current_t = iteration * dt
+    np.savetxt(args.scenario + '_' + args.hash + '_Vx.txt', Vx_grid,
+               header=f'{ny}_{nx}_{parameter_string}')
+    np.savetxt(args.scenario + '_' + args.hash + '_Vy.txt', Vy_grid,
+               header=f'{ny}_{nx}_{parameter_string}')
 
-            # --- 1. CREATE INLET JITTER ---
-            # We modulate the inlet velocity slightly over time.
-            # This prevents the flow from ever becoming perfectly symmetric.
-            jitter = 0.15 * np.sin(10 * current_t) + 0.1 * np.random.normal()
-            current_inlet_mag = max_inlet_vel * (1.0 + jitter)
+    plot_results(mesh, X, Y, Vx_grid, Vy_grid, vel_mag, geom_data["obstacles"])
+    print(f"\nTotal time: {time.time() - start_time:.2f} s")
 
-            # Re-define Dirichlet BCs for this specific time step
-            # (You need to update your inlet_basis or D vector here depending on your helper functions)
-            # This acts as a continuous "kick" to the system.
-            # For simplicity, we assume you can scale your existing boundary vector:
-            uvp_current_bc = uvp_fixed_bc.copy()
-            # Note: You need to know which indices correspond to the inlet to scale them.
-            # If that's too hard, skip the jitter for now and focus on Crank-Nicolson below.
-
-            # --- 2. PREPARE SYSTEM ---
-            w_field = basis['u'].interpolate(u0.squeeze())
-
-            # Assemble current physics matrices
-            A_conv = asm(convection, basis['u'], w=w_field)
-
-            # Use minimal SUPG or none. For Crank-Nicolson, try turning it OFF first.
-            A_stokes_curr = asm(stokes_visc, basis['u']) # uses the global 'nu'
-
-            A_step = A_stokes_curr + A_conv
-
-            # --- 3. CRANK-NICOLSON ASSEMBLY ---
-            # Equation: [M/dt + theta*A] * u_new = [M/dt - (1-theta)*A] * u_old
-
-            # LHS Matrix
-            LHS_A = (1/dt) * M + theta * A_step
-
-            # RHS Vector (The History Term)
-            # This is the crucial part: We take the previous flow state and apply the physics
-            # "halfway" backwards.
-            RHS_vector_u = ((1/dt) * M - (1-theta) * A_step) @ u0
-
-            # Pad for pressure (0s)
-            RHS_total = np.concatenate([RHS_vector_u, np.zeros(basis['p'].N)])
-
-            # --- 4. SOLVE SADDLE POINT SYSTEM ---
-            # [ LHS_A   B.T ] [ u ] = [ RHS ]
-            # [ B       0   ] [ p ]   [  0  ]
-
-            K = bmat([[LHS_A, B.T], [B, None]], 'csr')
-
-            # Solve
-            uvp = solve(*condense(K, b=RHS_total, x=uvp_fixed_bc, D=D))
-            u_new = uvp[:basis['u'].N]
-
-            # --- 5. MONITOR ---
-            diff = np.linalg.norm(u_new - u0)/np.linalg.norm(u_new)
-            print(f"Step {iteration}: Time {current_t:.3f}, Change: {diff:.4e}")
-
-            u0 = u_new
-
-        #else:
-        #    print(f"\n⚠ Maximum iterations ({num_iterations}) reached. Final residual: {diff_u:.2e}")
-
-        # Post-process solution
-        uv = u0.ravel()
-        X, Y, Vx, Vy, velocity_magnitude = postprocess_solution(basis, mesh, uv, grid_size, x_min, x_max, y_min, y_max)
-
-        # Compute Reynolds number for reporting
-        if inlet_velocity > 0:
-            char_length = max(x_max - x_min, y_max - y_min)
-            Re = inlet_velocity * char_length / nu
-            print(f"\nFlow characteristics:")
-            print(f"  Reynolds number: Re = {Re:.2e}")
-            print(f"  Kinematic viscosity: ν = {nu:.2e} m²/s")
-            print(f"  Characteristic velocity: U = {inlet_velocity:.2f} m/s")
-            print(f"  Characteristic length: L = {char_length:.2f} m")
-
-        # Save results
-        np.savetxt(scenario_file_path + '_' + scenario_hash + '_Vx.txt', Vx,
-                   header=f'{Vx.shape[0]}_{Vx.shape[1]}_{parameter_string}')
-        np.savetxt(scenario_file_path + '_' + scenario_hash + '_Vy.txt', Vy,
-                   header=f'{Vy.shape[0]}_{Vy.shape[1]}_{parameter_string}')
-
-        plot_results(mesh, X, Y, Vx, Vy, velocity_magnitude, obstacles)
-        elapsed_time = time.time() - start_time
-        print(f"\nTotal computation time: {elapsed_time:.2f} seconds")
+if __name__ == '__main__':
+    main()
