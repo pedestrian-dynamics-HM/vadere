@@ -32,6 +32,7 @@ def extract_attributes(scenario_file_path):
     rect_grid_cell_size = float(attributes_model['rectangularGridCellSize'])
     max_triangle_area = float(attributes_model['maxTriangleArea'])
     inlet_velocity = float(attributes_model['inletVelocity'])
+    viscosity = float(attributes_model['viscosity'])
     blocking_obstacles = attributes_model['blockingObstacles']
 
     inlets = []
@@ -74,6 +75,7 @@ def extract_attributes(scenario_file_path):
         'x_min': x_min, 'x_max': x_max,
         'y_min': y_min, 'y_max': y_max,
         'inlet_velocity': inlet_velocity,
+        'viscosity': viscosity,
         'inlets': inlets,
         'outlets': outlets,
         'obstacles': obstacles

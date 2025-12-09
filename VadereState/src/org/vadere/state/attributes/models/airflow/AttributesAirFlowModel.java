@@ -21,6 +21,8 @@ public class AttributesAirFlowModel extends Attributes {
 
     private double inletVelocity;
 
+    private double viscosity;
+
     private ArrayList<AttributesInOutLet> inlets;
 
     private ArrayList<AttributesInOutLet> outlets;
@@ -40,6 +42,7 @@ public class AttributesAirFlowModel extends Attributes {
         maxTriangleArea = 0.01;
         rectangularGridCellSize = 0.1;
         inletVelocity = 0.3;
+        viscosity = 1e-3;
         inlets = new ArrayList<>();
         inlets.add(new AttributesInOutLet("left", 1, 1));
         outlets = new ArrayList<>();
@@ -51,6 +54,7 @@ public class AttributesAirFlowModel extends Attributes {
     }
 
     public AttributesAirFlowModel(double rectangularGridCellSize, double maxTriangleArea, double inletVelocity,
+                                  double viscosity,
                                   ArrayList<AttributesInOutLet> inlets, ArrayList<AttributesInOutLet> outlets,
                                   ArrayList<Integer> notBlockingObstacles, AttributesBounds bounds) {
         condaPath = "CONDA_PATH";
@@ -59,6 +63,7 @@ public class AttributesAirFlowModel extends Attributes {
         this.maxTriangleArea = maxTriangleArea;
         this.rectangularGridCellSize = rectangularGridCellSize;
         this.inletVelocity = inletVelocity;
+        this.viscosity = viscosity;
         this.inlets = inlets;
         this.outlets = outlets;
         this.blockingObstacles = notBlockingObstacles;
@@ -83,14 +88,6 @@ public class AttributesAirFlowModel extends Attributes {
 
     public double getRectangularGridCellSize() {
         return rectangularGridCellSize;
-    }
-
-    public double getMaxTriangleArea() {
-        return maxTriangleArea;
-    }
-
-    public double getInletVelocity() {
-        return inletVelocity;
     }
 
     public ArrayList<AttributesInOutLet> getInlets() {

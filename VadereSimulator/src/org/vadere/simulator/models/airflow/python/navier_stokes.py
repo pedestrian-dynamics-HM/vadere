@@ -23,7 +23,6 @@ from helpers import *
 
 faulthandler.enable(file=sys.stderr, all_threads=True)
 
-target_nu = 1.5e-2
 max_iters = 20
 
 def main():
@@ -102,7 +101,7 @@ def main():
     bcs = Conditions([bc_inlet, bc_wall])
 
     # 5. MATERIALS & STABILIZATION
-    m_fluid = Material('fluid', values={'viscosity': target_nu})
+    m_fluid = Material('fluid', values={'viscosity': geom_data['viscosity']})
 
     name_map = {
         'u': 'u',
