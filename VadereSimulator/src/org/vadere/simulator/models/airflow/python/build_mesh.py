@@ -1,136 +1,146 @@
 import numpy as np
-import meshpy.triangle as triangle
+import gmsh
 from sfepy.discrete.fem import Mesh
 
-
-class GeometryBuilder:
-    """
-    A helper class to manage nodes and edges strictly.
-    It prevents duplicate nodes by snapping coordinates to a grid
-    and prevents zero-length edges.
-    """
-    def __init__(self, precision=6):
-        self.nodes = []
-        self.node_map = {}
-        self.edges = set()
-        self.precision = precision
-
-    def add_node(self, x, y):
-        # round coordinates to handle floating point noise
-        key = (round(x, self.precision), round(y, self.precision))
-
-        if key in self.node_map:
-            return self.node_map[key]
-
-        idx = len(self.nodes)
-        self.nodes.append((x, y))
-        self.node_map[key] = idx
-        return idx
-
-    def add_segment(self, x1, y1, x2, y2):
-        idx1 = self.add_node(x1, y1)
-        idx2 = self.add_node(x2, y2)
-        if idx1 == idx2:
-            return # ignore zero-length segments
-        edge = tuple(sorted((idx1, idx2)))
-        self.edges.add(edge)
-
-    def add_loop(self, points, is_closed=True):
-        """Adds a sequence of points as segments."""
-        if len(points) < 2: return
-
-        prev_idx = self.add_node(points[0][0], points[0][1])
-        first_idx = prev_idx
-
-        for i in range(1, len(points)):
-            curr_idx = self.add_node(points[i][0], points[i][1])
-            if curr_idx != prev_idx:
-                self.edges.add(tuple(sorted((prev_idx, curr_idx))))
-                prev_idx = curr_idx
-
-        if is_closed and prev_idx != first_idx:
-            self.edges.add(tuple(sorted((prev_idx, first_idx))))
-
-    def get_mesh_info(self, holes):
-        info = triangle.MeshInfo()
-        info.set_points(self.nodes)
-        info.set_facets(list(self.edges))
-        info.set_holes(holes)
-        return info
-
-
-def find_hole_point(poly_points):
-    """Finds a robust point inside a polygon."""
-    arr = np.array(poly_points)
-    return np.mean(arr[:, 0]), np.mean(arr[:, 1])
-
-
 def build_mesh(geom_data):
+    # Initialize Gmsh
+    gmsh.initialize()
+    gmsh.model.add("airflow_model")
+
+    # 1. SETUP GEOMETRY (Using OpenCASCADE Kernel)
+    # --------------------------------------------
     x_min, x_max = geom_data['x_min'], geom_data['x_max']
     y_min, y_max = geom_data['y_min'], geom_data['y_max']
 
-    builder = GeometryBuilder(precision=5)
+    # Create the main domain rectangle
+    # addRectangle(x, y, z, dx, dy)
+    domain_tag = gmsh.model.occ.addRectangle(x_min, y_min, 0, x_max - x_min, y_max - y_min)
 
-    def make_side_points(p_start, p_end, fixed_val, axis, side_name):
-        pts = [p_start, p_end]
+    obstacle_tags = []
 
-        features = geom_data['inlets'] + geom_data['outlets']
-        for feat in features:
-            if feat['side'] == side_name:
-                c1, c2 = feat['coords']
-                if axis == 0: pts.extend([(c1, fixed_val), (c2, fixed_val)])
-                else:         pts.extend([(fixed_val, c1), (fixed_val, c2)])
+    # Create obstacles
+    for obs_pts in geom_data['obstacles']:
+        # Check if obstacle is a rectangle (optimization)
+        # (Assuming axis-aligned for simplicity, but Polygon works too)
+        # Let's use generic Polygon for robustness
 
-        pts.sort(key=lambda p: p[axis])
-        if p_start[axis] > p_end[axis]:
-            pts.reverse()
-        return pts
+        # Gmsh requires points -> lines -> wire -> surface
+        # But addPolygon is simpler if available, otherwise we use addLineLoop
 
-    b_pts = make_side_points((x_min, y_min), (x_max, y_min), y_min, 0, 'bottom')
-    r_pts = make_side_points((x_max, y_min), (x_max, y_max), x_max, 1, 'right')
-    t_pts = make_side_points((x_max, y_max), (x_min, y_max), y_max, 0, 'top')
-    l_pts = make_side_points((x_min, y_max), (x_min, y_min), x_min, 1, 'left')
+        # 1. Add Points
+        p_tags = []
+        for (px, py) in obs_pts:
+            # addPoint(x, y, z, mesh_size)
+            p_tags.append(gmsh.model.occ.addPoint(px, py, 0))
 
-    for i in range(len(b_pts)-1): builder.add_segment(*b_pts[i], *b_pts[i+1])
-    for i in range(len(r_pts)-1): builder.add_segment(*r_pts[i], *r_pts[i+1])
-    for i in range(len(t_pts)-1): builder.add_segment(*t_pts[i], *t_pts[i+1])
-    for i in range(len(l_pts)-1): builder.add_segment(*l_pts[i], *l_pts[i+1])
+        # 2. Add Lines
+        l_tags = []
+        for i in range(len(p_tags)):
+            p1 = p_tags[i]
+            p2 = p_tags[(i + 1) % len(p_tags)]
+            l_tags.append(gmsh.model.occ.addLine(p1, p2))
 
-    holes = []
-    for obs_points in geom_data['obstacles']:
-        builder.add_loop(obs_points, is_closed=True)
-        holes.append(find_hole_point(obs_points))
+        # 3. Add Wire (Loop) and Surface
+        wire_tag = gmsh.model.occ.addCurveLoop(l_tags)
+        surf_tag = gmsh.model.occ.addPlaneSurface([wire_tag])
+        obstacle_tags.append((2, surf_tag)) # (Dimension, Tag)
 
-    info = builder.get_mesh_info(holes)
-    mesh_data = triangle.build(info, refinement_func=lambda v, area: area > geom_data['max_triangle_area'])
+    # 2. BOOLEAN DIFFERENCE (The Magic Step)
+    # --------------------------------------
+    # Domain - Obstacles
+    # This automatically handles "touching walls" and "overlapping" perfectly.
+    if obstacle_tags:
+        # cut(object, tool)
+        gmsh.model.occ.cut([(2, domain_tag)], obstacle_tags)
 
-    # convert to sfepy
-    sfepy_coords = np.array(mesh_data.points)
-    sfepy_conns = [np.array(mesh_data.elements)]
-    sfepy_mat_ids = [np.zeros(len(mesh_data.elements), dtype=np.int32)]
+    # Sync CAD to Mesh model
+    gmsh.model.occ.synchronize()
 
+    # 3. MESH SETTINGS
+    # ----------------
+    # Set global element size based on your 'max_triangle_area'
+    # Approx side length h ~ sqrt(2 * area) for equilateral triangle
+    target_h = np.sqrt(2 * geom_data['max_triangle_area'])
+
+    # Or rely on Gmsh's adaptive sizing, but let's clamp it
+    gmsh.option.setNumber("Mesh.CharacteristicLengthMin", target_h * 0.5)
+    gmsh.option.setNumber("Mesh.CharacteristicLengthMax", target_h)
+
+    # Generate 2D Mesh
+    gmsh.model.mesh.generate(2)
+
+    # 4. EXTRACT DATA FOR SFEPY
+    # -------------------------
+    # Get all nodes
+    node_tags, node_coords, _ = gmsh.model.mesh.getNodes()
+
+    # Reshape coords (x, y, z) -> (N, 3)
+    sfepy_coords = np.array(node_coords).reshape(-1, 3)[:, :2] # Keep only X, Y
+
+    # Get all 2D triangle elements
+    # elementTypes: 2 is 3-node triangle
+    elem_types, elem_tags, elem_node_tags = gmsh.model.mesh.getElements(dim=2)
+
+    if not elem_types:
+        raise RuntimeError("Gmsh failed to generate any 2D elements.")
+
+    # Find the index for triangles (type 2)
+    tri_index = -1
+    for i, t in enumerate(elem_types):
+        if t == 2:
+            tri_index = i
+            break
+
+    if tri_index == -1:
+        raise RuntimeError("No triangle elements found.")
+
+    # Extract connectivity
+    # elem_node_tags is a flat list [n1, n2, n3, n1, n2, n3...]
+    tri_nodes = np.array(elem_node_tags[tri_index], dtype=np.int32).reshape(-1, 3)
+
+    # Gmsh node tags are 1-based and might not be contiguous.
+    # We need to map them to 0-based indices matching sfepy_coords row order.
+
+    # Create mapping: Gmsh_Tag -> Array_Index
+    tag_map = {tag: i for i, tag in enumerate(node_tags)}
+
+    # Remap connectivity
+    sfepy_conns = []
+    current_conn = np.zeros_like(tri_nodes)
+    for r in range(tri_nodes.shape[0]):
+        for c in range(3):
+            current_conn[r, c] = tag_map[tri_nodes[r, c]]
+
+    sfepy_conns.append(current_conn)
+    sfepy_mat_ids = [np.zeros(len(current_conn), dtype=np.int32)]
+
+    # Cleanup Gmsh
+    gmsh.finalize()
+
+    # 5. CREATE SFEPY MESH
+    # --------------------
     mesh = Mesh.from_data('ns_mesh', sfepy_coords, None, sfepy_conns, sfepy_mat_ids, ['2_3'])
 
-    # identify boundary indices
+    # 6. IDENTIFY BOUNDARIES (Spatial Search)
+    # ---------------------------------------
+    # (This logic works fine on the generated nodes)
     inlet_indices = set()
     outlet_indices = set()
     eps = 1e-4
-    for i, (x, y) in enumerate(sfepy_coords):
-        for item in geom_data['inlets']:
-            c = item['coords']
-            s = item['side']
-            if s == 'left' and abs(x - x_min) < eps and c[0]-eps <= y <= c[1]+eps: inlet_indices.add(i)
-            elif s == 'right' and abs(x - x_max) < eps and c[0]-eps <= y <= c[1]+eps: inlet_indices.add(i)
-            elif s == 'bottom' and abs(y - y_min) < eps and c[0]-eps <= x <= c[1]+eps: inlet_indices.add(i)
-            elif s == 'top' and abs(y - y_max) < eps and c[0]-eps <= x <= c[1]+eps: inlet_indices.add(i)
 
-        for item in geom_data['outlets']:
-            c = item['coords']
-            s = item['side']
-            if s == 'left' and abs(x - x_min) < eps and c[0]-eps <= y <= c[1]+eps: outlet_indices.add(i)
-            elif s == 'right' and abs(x - x_max) < eps and c[0]-eps <= y <= c[1]+eps: outlet_indices.add(i)
-            elif s == 'bottom' and abs(y - y_min) < eps and c[0]-eps <= x <= c[1]+eps: outlet_indices.add(i)
-            elif s == 'top' and abs(y - y_max) < eps and c[0]-eps <= x <= c[1]+eps: outlet_indices.add(i)
+    for i, (x, y) in enumerate(sfepy_coords):
+        for item in geom_data['inlets'] + geom_data['outlets']:
+            c, s = item['coords'], item['side']
+            is_inlet = (item in geom_data['inlets'])
+            target = inlet_indices if is_inlet else outlet_indices
+
+            hit = False
+            if s == 'left' and abs(x - x_min) < eps and c[0]-eps <= y <= c[1]+eps: hit=True
+            elif s == 'right' and abs(x - x_max) < eps and c[0]-eps <= y <= c[1]+eps: hit=True
+            elif s == 'bottom' and abs(y - y_min) < eps and c[0]-eps <= x <= c[1]+eps: hit=True
+            elif s == 'top' and abs(y - y_max) < eps and c[0]-eps <= x <= c[1]+eps: hit=True
+
+            if hit: target.add(i)
 
     return mesh, {
         'inlet': np.array(list(inlet_indices), dtype=np.int32),
