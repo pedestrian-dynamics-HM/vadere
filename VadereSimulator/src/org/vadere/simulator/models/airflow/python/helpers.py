@@ -136,7 +136,7 @@ def postprocess_solution(u_vals, mesh, rect_grid_cell_size, x_min, x_max, y_min,
     return X, Y, Vx, Vy, velocity_magnitude
 
 
-def plot_results(mesh, X, Y, Vx, Vy, vel_mag, obstacles):
+def plot_results(mesh, X, Y, Vx, Vy, vel_mag, obstacles, path):
     """
     Plots mesh, streamlines, and vectors side-by-side
     """
@@ -194,4 +194,5 @@ def plot_results(mesh, X, Y, Vx, Vy, vel_mag, obstacles):
         ax.set_xlim(x_min, x_max)
         ax.set_ylim(y_min, y_max)
 
-    plt.show()
+    plt.savefig(path)
+    plt.close()

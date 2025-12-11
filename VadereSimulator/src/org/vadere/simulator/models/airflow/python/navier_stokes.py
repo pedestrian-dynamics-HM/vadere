@@ -2,6 +2,7 @@ import os
 os.environ['OPENBLAS_NUM_THREADS'] = '1'
 os.environ['MKL_NUM_THREADS'] = '1'
 os.environ['NUMEXPR_NUM_THREADS'] = '1'
+os.environ['OMP_NUM_THREADS'] = '1'
 
 import sys
 import time
@@ -33,17 +34,21 @@ def main():
     parser.add_argument('hash')
     args = parser.parse_args()
 
-    # 1. SETUP & MESH GENERATION
+    # SETUP & MESH GENERATION
     geom_data = extract_attributes(args.scenario)
 
-    geom_data["max_triangle_area"] = 0.01 #0.0000025
+    geom_data["max_triangle_area"] = 0.002 #0.000002
+    # restaurant: 0.01: 107s
+    # small: 0.0001: 43s
+    # 0.000002: 12733.68s, 212min, 3.5h
+    geom_data["viscosity"] = 1e-3
 
     mesh, bdry_indices = build_mesh(geom_data)
 
     print(f"Mesh: {mesh.n_nod} nodes, {mesh.n_el} elements.")
     domain = FEDomain('domain', mesh)
 
-    # 2. REGIONS
+    # REGIONS
     omega = domain.create_region('Omega', 'all')
     all_bdry_reg = domain.create_region('AllBoundary', 'vertices of surface', 'facet')
     all_bdry_indices = all_bdry_reg.vertices
@@ -73,7 +78,7 @@ def main():
                                     'facet',
                                     functions={'get_wall_idxs': get_wall_idxs})
 
-    # 3. FIELDS & VARIABLES
+    # FIELDS & VARIABLES
     field_u = Field.from_args('fu', np.float64, 'vector', omega, approx_order=2)
     field_p = Field.from_args('fp', np.float64, 'scalar', omega, approx_order=1)
 
@@ -83,7 +88,7 @@ def main():
     q = FieldVariable('q', 'test', field_p, primary_var_name='p')
     b = FieldVariable('b', 'parameter', field_u, primary_var_name='u')
 
-    # 4. BOUNDARY CONDITIONS
+    # BOUNDARY CONDITIONS
     inlet_velocity = geom_data['inlet_velocity']
     x_min, x_max = geom_data['x_min'], geom_data['x_max']
     y_min, y_max = geom_data['y_min'], geom_data['y_max']
@@ -100,7 +105,7 @@ def main():
     bc_wall = EssentialBC('WallBC', wall_reg, {'u.all' : 0.0})
     bcs = Conditions([bc_inlet, bc_wall])
 
-    # 5. MATERIALS & STABILIZATION
+    # MATERIALS & STABILIZATION
     m_fluid = Material('fluid', values={'viscosity': geom_data['viscosity']})
 
     name_map = {
@@ -122,7 +127,7 @@ def main():
 
     integral = Integral('i', order=3)
 
-    # 6. EQUATIONS
+    # EQUATIONS
     # momentum
     t_diff = Term.new('dw_div_grad(fluid.viscosity, v, u)', integral, omega,
                       fluid=m_fluid, v=v, u=u)
@@ -153,7 +158,7 @@ def main():
     eq_continuity = Equation('incompressibility', t_div + t_pspg_c + t_pspg_p)
     equations = Equations([eq_momentum, eq_continuity])
 
-    # 7. PROBLEM & SOLVER
+    # PROBLEM & SOLVER
     pb = Problem('stabilized_navier_stokes', equations=equations)
     pb.set_bcs(ebcs=bcs)
 
@@ -176,7 +181,7 @@ def main():
     nls.conf.problem = pb
     pb.set_solver(nls)
 
-    # 8. INITIALIZATION
+    # INITIALIZATION
     variables = pb.get_variables()
     u_dof_coords = field_u.get_coor()
     n_dofs = u_dof_coords.shape[0]
@@ -186,10 +191,10 @@ def main():
         b_data[i] = get_initial_velocity_at_point(x, y, x_min, x_max, y_min, y_max, inlet_velocity)
     variables['b'].set_data(b_data.ravel())
 
-    # 9. SOLVE
+    # SOLVE
     state = pb.solve()
 
-    # 10. POST PROCESSING
+    # 00POST PROCESSING
     out = state.create_output()
     u_vals = out['u'].data
 
@@ -208,8 +213,12 @@ def main():
     np.savetxt(args.scenario + '_' + args.hash + '_Vy.txt', Vy_grid,
                header=f'{ny}_{nx}_{parameter_string}')
 
-    plot_results(mesh, X, Y, Vx_grid, Vy_grid, vel_mag, geom_data["obstacles"])
     print(f"\nTotal time: {time.time() - start_time:.2f} s")
+    plot_results(mesh, X, Y, Vx_grid, Vy_grid, vel_mag, geom_data["obstacles"],
+                 args.scenario + '_' + args.hash + '_results.png')
+
+    if os.path.exists("domain.vtk"):
+            os.remove("domain.vtk")
 
 if __name__ == '__main__':
     main()

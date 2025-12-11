@@ -18,6 +18,7 @@ conda activate CONDA_ENV
 Install required packages: 
 
 ```bash
+pip install --upgrade pip setuptools wheel
 pip install -r requirements.txt
 ```
 
