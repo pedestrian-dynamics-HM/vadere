@@ -11,6 +11,12 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * Faces of an array based {@link AMesh}
+ *
+ * Original author: Benedikt Zoennchen
+ * Refactored by: Hayato Hess
+ */
 public class AMeshFaces implements IMeshFaces<AVertex, AHalfEdge, AFace>, Iterable<AFace>{
     protected IMesh<AVertex, AHalfEdge, AFace>  parent;
 

@@ -8,6 +8,12 @@ import org.vadere.meshing.mesh.inter.mesh.IMeshWithDataStorage;
 import org.vadere.meshing.mesh.inter.mesh.builder.*;
 import org.vadere.meshing.mesh.inter.meshConnectivity.IPolyConnectivity;
 
+/**
+ * Builder to create an array-based mesh
+ *
+ * Original author: Benedikt Zoennchen
+ * Refactored by: Hayato Hess
+ */
 public class AMeshBuilder extends MeshBuilderBase<AVertex, AHalfEdge, AFace, AMeshDataStorage, AMesh> {
     private final AMeshBuilderOptimizer<AMeshVertices, AMeshEdges, AMeshFaces, AMesh> optimizer = new AMeshBuilderOptimizer<>(this);
     private final AMeshBuilderEdges<AMeshVertices, AMeshEdges, AMeshFaces, AMesh> edgesBuilder = new AMeshBuilderEdges<>(this);

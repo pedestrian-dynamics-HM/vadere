@@ -7,7 +7,12 @@ import org.vadere.meshing.mesh.inter.mesh.builder.MeshBuilderVerticesBase;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 
-
+/**
+ * Vertices builder used in {@link AMeshBuilder}
+ *
+ * Original author: Benedikt Zoennchen
+ * Refactored by: Hayato Hess
+ */
 public class AMeshBuilderVertices<Vertices extends AMeshVertices, Edges extends AMeshEdges, Faces extends AMeshFaces,
         Mesh extends ArrayBasedMesh<Vertices,Edges,Faces>> extends MeshBuilderVerticesBase<AVertex, AHalfEdge, AFace, Mesh> {
     private final MeshBuilderBase<AVertex, AHalfEdge, AFace, AMeshDataStorage, Mesh> parent;

@@ -5,6 +5,12 @@ import org.vadere.meshing.mesh.gen.mesh.MeshBuilderBase;
 import org.vadere.meshing.mesh.gen.mesh.arrayBased.AMeshDataStorage;
 import org.vadere.meshing.mesh.inter.mesh.builder.MeshBuilderFacesBase;
 
+/**
+ * Faces builder used in {@link AMeshBuilder}
+ *
+ * Original author: Benedikt Zoennchen
+ * Refactored by: Hayato Hess
+ */
 public class AMeshBuilderFaces<Vertices extends AMeshVertices, Edges extends AMeshEdges, Faces extends AMeshFaces,
         Mesh extends ArrayBasedMesh<Vertices,Edges,Faces>> extends MeshBuilderFacesBase<AVertex, AHalfEdge, AFace, Mesh> {
     private final MeshBuilderBase<AVertex, AHalfEdge, AFace, AMeshDataStorage, Mesh> parent;

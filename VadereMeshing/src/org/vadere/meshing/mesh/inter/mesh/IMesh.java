@@ -22,21 +22,15 @@ import java.util.List;
  * correctness of the mesh definition e.g. no overlapping edges. There are some classes for automatic mesh generation like
  * {@link ITriangulator} or other factory methods like {@link MeshUtils#createSimpleTriMesh}
  * </p>
- It uses the half-edge data structure to store all information and is a generic interface to provide different implementations such as:
+ * It uses the half-edge data structure to store all information and is a generic interface to provide different implementations such as:
  * <ul>
  *     <li>A pointer based version which implements a doubled-linked-list data structure {@link PMesh}</li>
  *     <li>An index based version which implements an array data structure {@link AMesh}</li>
  * </ul>
  * <p>
- * It should be impossible to create faces, edges, and vertices of the mesh without using the mesh i.e. IMesh is a factory for faces, edges and vertices.
+ * {@link org.vadere.meshing.mesh.inter.mesh.builder.IMeshBuilder} is used to create faces, edges, and vertices of the mesh.
  * A boundary can be a hole or the border. A hole is surrounded by faces and the border is the infinite large face representing the space which is not
  * part of any finite face.
- * </p>
- * <p>
- * For all iterators and stream usage it should be clear that if one manipulates the mesh during iteration the result is not clear. Therefore, use those
- * iterators and streams only if no manipulation is done while iterating. If you want to manipulate the data structure, construct a list {@link List} beforehand and
- * iterate over the list {@link List} while changing elements in the mesh. The mesh offers a large set of different iterators and streams to iterate over all neighbouring
- * faces of a face, vertices of a vertex, edges of a vertex or over all edges / vertices / points of a face.
  * </p>
  *     We define as base elements: vertices {@link V}, half-edges {@link E} and faces {@link F}.
  *     <ul>
@@ -66,7 +60,12 @@ import java.util.List;
  * at the boundary / hole / border. Sometimes we say edge instead of half-edge but we try to use full-edge if we explicitly talk about the edge defined by the half-edge and
  * its twin.
  * </p>
- *
+ * <p>
+ * Note: For all iterators and stream usage it should be clear that if one manipulates the mesh during iteration the result is not clear. Therefore, use those
+ * iterators and streams only if no manipulation is done while iterating. If you want to manipulate the data structure, construct a list {@link List} beforehand and
+ * iterate over the list {@link List} while changing elements in the mesh. The mesh offers a large set of different iterators and streams to iterate over all neighbouring
+ * faces of a face, vertices of a vertex, edges of a vertex or over all edges / vertices / points of a face.
+ * </p>
  * @author Benedikt Zoennchen
  *
  * @param <V> the type of the vertices

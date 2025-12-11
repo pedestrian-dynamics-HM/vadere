@@ -20,6 +20,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+/**
+ * Used to access edges of an {@link faces}
+ */
 public interface IMeshFaces<V extends IVertex, E extends IHalfEdge, F extends IFace> extends Iterable<F> {
     IMesh<V, E, F> base();
 

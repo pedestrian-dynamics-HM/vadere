@@ -12,6 +12,12 @@ import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * Vertices of an array based {@link AMesh}
+ *
+ * Original author: Benedikt Zoennchen
+ * Refactored by: Hayato Hess
+ */
 public class AMeshVertices implements IMeshVertices<AVertex, AHalfEdge, AFace> {
     protected IMesh<AVertex, AHalfEdge, AFace> parent;
 

@@ -5,6 +5,10 @@ import org.vadere.meshing.mesh.gen.mesh.MeshBase;
 import org.vadere.meshing.mesh.gen.mesh.arrayBased.AMeshDataStorage;
 import org.vadere.meshing.mesh.inter.mesh.data.IMeshDataStorage;
 
+/**
+ * Original author: Benedikt Zoennchen
+ * Refactored by: Hayato Hess
+ */
 public abstract class ArrayBasedMesh<
         Vertices extends AMeshVertices,
         Edges extends AMeshEdges,

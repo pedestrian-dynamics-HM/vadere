@@ -7,7 +7,8 @@ import org.vadere.util.logging.Logger;
 /**
  * An array-based implementation of {@link IMesh}.
  *
- * @author Benedikt Zoennchen
+ * Original author: Benedikt Zoennchen
+ * Refactored by: Hayato Hess
  */
 public class AMesh extends ArrayBasedMesh<AMeshVertices, AMeshEdges, AMeshFaces> implements IMesh<AVertex, AHalfEdge, AFace>{
 	final static Logger log = Logger.getLogger(AMesh.class);

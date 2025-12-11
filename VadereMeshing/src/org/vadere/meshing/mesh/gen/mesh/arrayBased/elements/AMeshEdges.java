@@ -11,6 +11,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * Edges of an array based {@link AMesh}
+ *
+ * Original author: Benedikt Zoennchen
+ * Refactored by: Hayato Hess
+ */
 public class AMeshEdges implements IMeshEdges<AVertex, AHalfEdge, AFace> {
     protected IMesh<AVertex, AHalfEdge, AFace>  parent;
 

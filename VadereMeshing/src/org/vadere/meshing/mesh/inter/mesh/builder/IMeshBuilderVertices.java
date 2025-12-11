@@ -9,6 +9,9 @@ import org.vadere.util.geometry.shapes.IPoint;
 
 import java.util.List;
 
+/**
+ * Part of the {@link IMeshBuilder} used to create {@link IVertex}
+ */
 public interface IMeshBuilderVertices<V extends IVertex, E extends IHalfEdge, F extends IFace> {
     /**
      * A factory method which creates a new vertex. The vertex will not be inserted into the mesh data

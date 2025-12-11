@@ -17,6 +17,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+/**
+ * Used to access vertices of an {@link IMesh}
+ */
 public interface IMeshVertices<V extends IVertex, E extends IHalfEdge, F extends IFace> extends Iterable<V> {
     IMesh<V, E, F> parent();
 

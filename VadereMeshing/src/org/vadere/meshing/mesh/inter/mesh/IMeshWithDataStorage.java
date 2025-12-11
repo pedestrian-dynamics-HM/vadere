@@ -3,6 +3,9 @@ package org.vadere.meshing.mesh.inter.mesh;
 import org.vadere.meshing.mesh.inter.mesh.builder.IMeshBuilder;
 import org.vadere.meshing.mesh.inter.mesh.data.IMeshDataStorage;
 
+/**
+ * Container holding a Mesh with it's DataStorage
+ */
 public interface IMeshWithDataStorage<V extends IVertex, E extends IHalfEdge, F extends IFace> {
     IMesh<V, E, F> getMesh();
     IMeshDataStorage<V, E, F> getDataStorage();

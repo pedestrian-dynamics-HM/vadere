@@ -5,6 +5,9 @@ import org.vadere.meshing.mesh.inter.mesh.IFace;
 import org.vadere.meshing.mesh.inter.mesh.IHalfEdge;
 import org.vadere.meshing.mesh.inter.mesh.IVertex;
 
+/**
+ * Part of the {@link IMeshBuilder} used to create {@link org.vadere.meshing.mesh.inter.mesh.IMeshEdges}
+ */
 public interface IMeshBuilderEdges<V extends IVertex, E extends IHalfEdge, F extends IFace> {
     /**
      * A factory method which creates a new half-edge with a established vertex relationship.

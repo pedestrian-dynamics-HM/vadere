@@ -9,6 +9,12 @@ import org.vadere.meshing.mesh.inter.mesh.IVertex;
 
 import java.util.List;
 
+/**
+ * The IMeshDataStorage interface provides mechanisms for accessing and managing data
+ * associated with vertices, edges, and faces within a mesh structure. It extends the
+ * functionality of both IMeshDataStorageReader and IMeshDataStorageWriter to enable
+ * data reading and writing operations.
+ */
 public interface IMeshDataStorage<V extends IVertex, E extends IHalfEdge, F extends IFace>
         extends IMeshDataStorageReader<V,E,F>, IMeshDataStorageWriter<V, E, F> {
 

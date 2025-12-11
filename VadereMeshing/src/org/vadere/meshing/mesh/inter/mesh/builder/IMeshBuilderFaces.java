@@ -8,6 +8,9 @@ import org.vadere.util.geometry.shapes.IPoint;
 
 import java.util.List;
 
+/**
+ * Part of the {@link IMeshBuilder} used to create {@link IFace}
+ */
 public interface IMeshBuilderFaces<V extends IVertex, E extends IHalfEdge, F extends IFace> {
     /**
      * A factory method which creates a new face which will be added to the mesh data structure.

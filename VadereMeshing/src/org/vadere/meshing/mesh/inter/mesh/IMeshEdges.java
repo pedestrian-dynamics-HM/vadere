@@ -19,6 +19,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+/**
+ * Used to access edges of an {@link IMesh}
+ */
 public interface IMeshEdges<V extends IVertex, E extends IHalfEdge, F extends IFace> extends Iterable<E> {
     IMesh<V, E, F> base();
 

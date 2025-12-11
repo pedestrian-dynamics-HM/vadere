@@ -7,9 +7,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * A Face is a region of a planar separation of the 2-D space, e.g. the region of a Polygon/Triangle and so on.
+ * An pointer-based implementation of {@link IFace}.
  *
- * @author Benedikt Zoennchen
+ * Original author: Benedikt Zoennchen
+ * Refactored by: Hayato Hess
  */
 public class PFace implements IFace, Cloneable {
 

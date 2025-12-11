@@ -5,6 +5,9 @@ import org.vadere.meshing.mesh.inter.ITriEventListener;
 import org.vadere.meshing.mesh.inter.mesh.*;
 import org.vadere.meshing.mesh.inter.meshConnectivity.IReadOnlyTriConnectivity;
 
+/**
+ * An {@link IMesh} formed out of triangular faces (having three {@link IMeshVertices} each).
+ */
 public interface ITriangleMesh<V extends IVertex, E extends IHalfEdge, F extends IFace> extends IMesh<V, E, F> {
     ITriangleMeshEdges<V, E, F> edges();
     ITriangleMeshFaces<V, E, F> faces();

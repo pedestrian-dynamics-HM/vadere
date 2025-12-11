@@ -3,9 +3,10 @@ package org.vadere.meshing.mesh.inter.mesh;
 import org.vadere.util.geometry.shapes.IPoint;
 
 /**
- *
- * A vertex {@link IVertex} can be the end of multiple half-edges {@link IHalfEdge}.
- * It is itself is a {@link IPoint}.
+ * A vertex represents a point in space.
+ * It may be connected to other vertices by half-edges {@link IHalfEdge},
+ * which together can form a face {@link IFace}.
+ * A single vertex can serve as the endpoint of multiple half-edges.
  *
  * @author Benedikt Zoennchen
  *

@@ -5,7 +5,8 @@ import org.vadere.meshing.mesh.inter.mesh.IHalfEdge;
 /**
  * An array-based implementation of {@link IHalfEdge}.
  *
- * @author Benedikt Zoennchen
+ * Original author: Benedikt Zoennchen
+ * Refactored by: Hayato Hess
  */
 public class AHalfEdge implements IHalfEdge, Cloneable {
 

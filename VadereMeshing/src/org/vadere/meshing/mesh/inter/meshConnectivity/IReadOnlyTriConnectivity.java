@@ -33,7 +33,7 @@ import java.util.function.Predicate;
  * @param <E> the type of the half-edges
  * @param <F> the type of the faces
  *
- * @author Benedikt Zoennchen (main)
+ * @author Benedikt Zoennchen
  * @author Hayato Hess refactored from ITriConnectivity
  */
 public interface IReadOnlyTriConnectivity<V extends IVertex, E extends IHalfEdge, F extends IFace> extends IReadOnlyPolyConnectivity<V, E, F>{

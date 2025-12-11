@@ -8,6 +8,12 @@ import org.vadere.util.geometry.shapes.VPoint;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * An pointer-based implementation of {@link IHalfEdge}.
+ *
+ * Original author: Benedikt Zoennchen
+ * Refactored by: Hayato Hess
+ */
 public class PHalfEdge implements IHalfEdge, Cloneable {
 
 	private Map<String, Object> propertyElements;

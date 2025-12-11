@@ -5,7 +5,8 @@ import org.vadere.meshing.mesh.inter.mesh.IFace;
 /**
  * An array-based implementation of {@link IFace}.
  *
- * @author Benedikt Zoennchen
+ * Original author: Benedikt Zoennchen
+ * Refactored by: Hayato Hess
  */
 public class AFace implements IFace, Cloneable {
 

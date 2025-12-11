@@ -14,6 +14,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Optimizers used in {@link AMeshBuilder}
+ *
+ * Original author: Benedikt Zoennchen
+ * Refactored by: Hayato Hess
+ */
 public class AMeshBuilderOptimizer<Vertices extends AMeshVertices, Edges extends AMeshEdges, Faces extends AMeshFaces,
         Mesh extends ArrayBasedMesh<Vertices,Edges,Faces>> implements IMeshOptimizer<AVertex, AHalfEdge, AFace> {
     private final MeshBuilderBase<AVertex, AHalfEdge, AFace, AMeshDataStorage, Mesh> parent;
