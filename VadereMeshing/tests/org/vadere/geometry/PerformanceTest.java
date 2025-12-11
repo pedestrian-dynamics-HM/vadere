@@ -52,13 +52,6 @@ public class PerformanceTest {
 		}
 	}
 
-	private static void testPointerWalk() {
-		long ms = System.currentTimeMillis();
-		IIncrementalTriangulation<PVertex, PHalfEdge, PFace> delaunay = IIncrementalTriangulation.createPTriangulation(ITriangleMeshPointLocator.Type.BASE, points);
-		delaunay.finish();
-		log.info("runtime of the Walk method, #vertices = " + delaunay.getVertices().size() + " is " + (System.currentTimeMillis() - ms) + " [ms]");
-	}
-
 	private static void testArrayJumpAndWalk() {
 		long ms = System.currentTimeMillis();
 		IIncrementalTriangulation<AVertex, AHalfEdge, AFace> delaunay = IIncrementalTriangulation.createATriangulation(ITriangleMeshPointLocator.Type.JUMP_AND_WALK, points);
@@ -71,20 +64,6 @@ public class PerformanceTest {
 		IIncrementalTriangulation<PVertex, PHalfEdge, PFace> delaunay = IIncrementalTriangulation.createPTriangulation(ITriangleMeshPointLocator.Type.JUMP_AND_WALK, points);
 		delaunay.finish();
 		log.info("runtime of the Jump & Walk method (Pointer), #vertices = " + delaunay.getVertices().size() + " is " + (System.currentTimeMillis() - ms) + " [ms]");
-	}
-
-	private static void testPointerDelaunayHierarchy() {
-		long ms = System.currentTimeMillis();
-		IIncrementalTriangulation<PVertex, PHalfEdge, PFace> delaunay = IIncrementalTriangulation.createPTriangulation(ITriangleMeshPointLocator.Type.DELAUNAY_HIERARCHY, points);
-		delaunay.finish();
-		log.info("runtime of the Delaunay-Hierarchy (Pointer), #vertices = " + delaunay.getVertices().size() + " is " + (System.currentTimeMillis() - ms) + " [ms]");
-	}
-
-	private static void testArrayDelaunayHierarchy() {
-		long ms = System.currentTimeMillis();
-		IIncrementalTriangulation<AVertex, AHalfEdge, AFace> delaunay = IIncrementalTriangulation.createATriangulation(ITriangleMeshPointLocator.Type.DELAUNAY_HIERARCHY, points);
-		delaunay.finish();
-		log.info("runtime of the Delaunay-Hierarchy (Array), #vertices = " + delaunay.getVertices().size() + " is " + (System.currentTimeMillis() - ms) + " [ms]");
 	}
 
 	private static void testSweepline() {

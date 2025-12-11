@@ -59,9 +59,7 @@ public class TestBoyerWatson {
 
 		List<IIncrementalTriangulation<PVertex, PHalfEdge, PFace>> triangulationList = new ArrayList<>();
 
-		triangulationList.add(IIncrementalTriangulation.createPTriangulation(ITriangleMeshPointLocator.Type.BASE, points));
-		triangulationList.add(IIncrementalTriangulation.createPTriangulation(ITriangleMeshPointLocator.Type.DELAUNAY_TREE, points));
-		triangulationList.add(IIncrementalTriangulation.createPTriangulation(ITriangleMeshPointLocator.Type.DELAUNAY_HIERARCHY, points));
+		triangulationList.add(IIncrementalTriangulation.createPTriangulation(ITriangleMeshPointLocator.Type.JUMP_AND_WALK, points));
 
 		for(IIncrementalTriangulation<PVertex, PHalfEdge, PFace> delaunayTriangulation : triangulationList) {
 			delaunayTriangulation.finish();
@@ -114,7 +112,7 @@ public class TestBoyerWatson {
 		points.add(p2);
 		points.add(p3);
 
-		IIncrementalTriangulation<PVertex, PHalfEdge, PFace> delaunayTriangulation = IIncrementalTriangulation.createPTriangulation(ITriangleMeshPointLocator.Type.BASE, points);
+		IIncrementalTriangulation<PVertex, PHalfEdge, PFace> delaunayTriangulation = IIncrementalTriangulation.createPTriangulation(ITriangleMeshPointLocator.Type.JUMP_AND_WALK, points);
 		PFace face = delaunayTriangulation.locateFace(centerPoint).get();
 		IMesh<PVertex, PHalfEdge, PFace> mesh = delaunayTriangulation.getMesh();
 		PHalfEdge edge = mesh.edges().getAnyOf(face);

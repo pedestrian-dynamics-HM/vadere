@@ -12,7 +12,6 @@ import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.simulator.models.potential.solver.calculators.cartesian.EikonalSolverFMM;
-import org.vadere.simulator.models.potential.solver.calculators.cartesian.EikonalSolverSFMM;
 import org.vadere.simulator.models.potential.solver.timecost.UnitTimeCostFunction;
 import org.vadere.util.math.IDistanceFunction;
 import org.vadere.util.data.cellgrid.CellGrid;
@@ -78,14 +77,6 @@ public class PerformanceSFMM {
 	@BenchmarkMode(Mode.SingleShotTime) @OutputTimeUnit(TimeUnit.MILLISECONDS)
 	public double testFMM(PerformanceSFMM.StateCellGrid stateCellGrid) {
 		EikonalSolverFMM ffm = new EikonalSolverFMM(stateCellGrid.cellGrid, stateCellGrid.distanceFunction, true, new UnitTimeCostFunction(), 0.1, 1.0);
-		ffm.solve();
-		return stateCellGrid.cellGrid.getValue(0, 0).potential;
-	}
-
-	@Benchmark
-	@BenchmarkMode(Mode.SingleShotTime) @OutputTimeUnit(TimeUnit.MILLISECONDS)
-	public double testSFMM(PerformanceSFMM.StateCellGrid stateCellGrid) {
-		EikonalSolverSFMM ffm = new EikonalSolverSFMM(stateCellGrid.cellGrid, stateCellGrid.distanceFunction, true, new UnitTimeCostFunction(), 0.1, 1.0);
 		ffm.solve();
 		return stateCellGrid.cellGrid.getValue(0, 0).potential;
 	}

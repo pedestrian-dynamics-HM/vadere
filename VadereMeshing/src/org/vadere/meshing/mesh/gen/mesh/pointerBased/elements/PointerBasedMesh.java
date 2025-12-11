@@ -61,14 +61,4 @@ public abstract class PointerBasedMesh<
         vertices().finalizeCopy(edgeMap);
         edges().finalizeCopy(faceMap, edgeMap);
     }
-
-    @Override
-    public void setDown(@NotNull final PVertex up, @NotNull final PVertex down) {
-        up.setDown(down);
-    }
-
-    @Override
-    public PVertex getDown(@NotNull final PVertex vertex) {
-        return vertex.getDown();
-    }
 }

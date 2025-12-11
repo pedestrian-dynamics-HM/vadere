@@ -14,7 +14,7 @@ import org.vadere.meshing.mesh.triangulation.improver.eikmesh.impl.PEikMesh;
 import org.vadere.meshing.utils.io.poly.PSLGGenerator;
 import org.vadere.meshing.utils.io.tex.TexGraphGenerator;
 import org.vadere.simulator.models.potential.solver.calculators.mesh.MeshEikonalSolverFMM;
-import org.vadere.simulator.models.potential.solver.calculators.mesh.PotentialPoint;
+import org.vadere.simulator.models.potential.solver.calculators.mesh.base.PotentialPoint;
 import org.vadere.simulator.models.potential.solver.timecost.UnitTimeCostFunction;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.VPoint;

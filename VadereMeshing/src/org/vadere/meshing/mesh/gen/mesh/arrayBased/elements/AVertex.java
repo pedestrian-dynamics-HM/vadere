@@ -1,7 +1,6 @@
 package org.vadere.meshing.mesh.gen.mesh.arrayBased.elements;
 
 import org.jetbrains.annotations.NotNull;
-import org.vadere.meshing.mesh.gen.pointLocator.DelaunayHierarchyPointLocator;
 import org.vadere.meshing.mesh.inter.mesh.IVertex;
 import org.vadere.util.geometry.shapes.IPoint;
 
@@ -27,12 +26,6 @@ public class AVertex implements IVertex, Cloneable {
 	 * The point of the vertex
 	 */
     private IPoint point;
-
-	/**
-	 * The array-index of the down vertex. This is only required by if one uses the {@link DelaunayHierarchyPointLocator} as the
-	 * point location algorithm of the mesh / the triangulation.
-	 */
-	private int down;
 
 	/**
 	 * The array-index of the half-edge which ends in this vertex.
@@ -72,7 +65,6 @@ public class AVertex implements IVertex, Cloneable {
 		this.lock = new ReentrantLock();
 		this.destroyed = toCopy.destroyed;
 		this.halfEdge = toCopy.halfEdge;
-		this.down = toCopy.down;
 	}
 
 	protected void setPoint(@NotNull final IPoint point) {
@@ -90,14 +82,6 @@ public class AVertex implements IVertex, Cloneable {
 
 	public void setEdge(final int halfEdge) {
 		this.halfEdge = halfEdge;
-	}
-
-	public int getDown() {
-		return down;
-	}
-
-	public void setDown(final int down) {
-		this.down = down;
 	}
 
 	public int getId() {

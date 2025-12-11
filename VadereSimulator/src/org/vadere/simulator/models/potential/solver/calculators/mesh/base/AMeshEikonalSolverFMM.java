@@ -1,4 +1,4 @@
-package org.vadere.simulator.models.potential.solver.calculators.mesh;
+package org.vadere.simulator.models.potential.solver.calculators.mesh.base;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.inter.ITriangleMeshPointLocator;

@@ -1,4 +1,4 @@
-package org.vadere.simulator.models.potential.solver.calculators.mesh;
+package org.vadere.simulator.models.potential.solver.calculators.mesh.multiCoreOptimized;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
@@ -8,6 +8,7 @@ import org.vadere.meshing.mesh.inter.mesh.IFace;
 import org.vadere.meshing.mesh.inter.mesh.IHalfEdge;
 import org.vadere.meshing.mesh.inter.mesh.ITriangleMeshWithDataStorage;
 import org.vadere.meshing.mesh.inter.mesh.IVertex;
+import org.vadere.simulator.models.potential.solver.calculators.mesh.base.AMeshEikonalSolver;
 import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.logging.Logger;
@@ -25,6 +26,9 @@ import java.util.Set;
 
 
 /**
+ *  Use this if you have many CPU cores and/or want to solve te equation multiple times during simulation
+ *  Right now this is not required and therefore not used.
+ *
  * This class computes the traveling time T using the Informed Fast Iterative Method (IFIM) for arbitrary triangulated meshes.
  * Compare PhD thesis B. Zoennchen Section 9.5.
  * The quality of the result depends on the quality of the triangulation. For a high accuracy the triangulation

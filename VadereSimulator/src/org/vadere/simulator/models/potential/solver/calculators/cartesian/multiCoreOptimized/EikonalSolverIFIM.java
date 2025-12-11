@@ -1,7 +1,7 @@
-package org.vadere.simulator.models.potential.solver.calculators.cartesian;
+package org.vadere.simulator.models.potential.solver.calculators.cartesian.multiCoreOptimized;
 
 import org.apache.commons.lang3.tuple.Triple;
-import org.vadere.meshing.mesh.inter.IVertexContainerDouble;
+import org.vadere.simulator.models.potential.solver.calculators.cartesian.AGridEikonalSolver;
 import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
 import org.vadere.util.data.cellgrid.CellGrid;
 import org.vadere.util.data.cellgrid.CellState;
@@ -10,13 +10,15 @@ import org.vadere.util.logging.Logger;
 import org.vadere.util.math.IDistanceFunction;
 
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.stream.Collectors;
 
 /**
+ * Use this if you have many CPU cores and/or want to solve te equation multiple times during simulation
+ * Right now this is not required and therefore not used.
+ *
  * The Informed Fast Iterative Method on a Cartesian Grid, compare PhD thesis B. Zoennchen Section 9.5
  *
  * @author Benedikt Zoennchen

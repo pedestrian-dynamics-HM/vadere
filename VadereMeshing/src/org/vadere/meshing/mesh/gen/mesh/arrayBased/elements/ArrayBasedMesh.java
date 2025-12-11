@@ -56,16 +56,4 @@ public abstract class ArrayBasedMesh<
         vertices().clear();
         setElementRemoved(false);
     }
-
-    // the vertex should not be contained in vertices, only the up/down
-    @Override
-    public AVertex getDown(@NotNull final AVertex vertex) {
-        return vertices().getAllInternal().get(vertex.getDown());
-    }
-
-    // the vertex should not be contained in vertices, only the up/down
-    @Override
-    public void setDown(@NotNull final AVertex up, @NotNull AVertex down) {
-        up.setDown(down.getId());
-    }
 }

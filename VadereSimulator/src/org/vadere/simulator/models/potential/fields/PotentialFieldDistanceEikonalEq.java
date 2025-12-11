@@ -4,10 +4,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
 import org.vadere.simulator.models.potential.solver.calculators.PotentialFieldCalculatorNone;
-import org.vadere.simulator.models.potential.solver.calculators.cartesian.EikonalSolverFIM;
+import org.vadere.simulator.models.potential.solver.calculators.cartesian.multiCoreOptimized.EikonalSolverFIM;
 import org.vadere.simulator.models.potential.solver.calculators.cartesian.EikonalSolverFMM;
-import org.vadere.simulator.models.potential.solver.calculators.cartesian.EikonalSolverFSM;
-import org.vadere.simulator.models.potential.solver.calculators.cartesian.EikonalSolverIFIM;
 import org.vadere.simulator.models.potential.solver.timecost.UnitTimeCostFunction;
 import org.vadere.simulator.utils.cache.CacheException;
 import org.vadere.simulator.utils.cache.ICellGridCacheObject;
@@ -108,14 +106,8 @@ public class PotentialFieldDistanceEikonalEq implements IPotentialField {
 			case NONE:
 				eikonalSolver = new PotentialFieldCalculatorNone();
 				break;
-			case INFORMED_FAST_ITERATIVE_METHOD:
-				eikonalSolver = new EikonalSolverIFIM(cellGrid, distFunc, new UnitTimeCostFunction(), attributesFloorField.getObstacleGridPenalty(), attributesFloorField.getTargetAttractionStrength());
-				break;
 			case FAST_ITERATIVE_METHOD:
 				eikonalSolver = new EikonalSolverFIM(cellGrid, distFunc, isHighAccuracyFM, new UnitTimeCostFunction(), attributesFloorField.getObstacleGridPenalty(), attributesFloorField.getTargetAttractionStrength());
-				break;
-			case FAST_SWEEPING_METHOD:
-				eikonalSolver = new EikonalSolverFSM(cellGrid, distFunc, isHighAccuracyFM, new UnitTimeCostFunction(), attributesFloorField.getObstacleGridPenalty(), attributesFloorField.getTargetAttractionStrength());
 				break;
 			default:
 				eikonalSolver = new EikonalSolverFMM(cellGrid, distFunc, isHighAccuracyFM, new UnitTimeCostFunction(), attributesFloorField.getObstacleGridPenalty(), attributesFloorField.getTargetAttractionStrength());

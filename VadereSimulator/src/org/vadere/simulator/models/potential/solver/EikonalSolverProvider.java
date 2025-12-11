@@ -6,15 +6,10 @@ import org.vadere.meshing.mesh.gen.pointLocator.JumpAndWalkPointLocator;
 import org.vadere.simulator.models.potential.fields.IPotentialField;
 import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
 import org.vadere.simulator.models.potential.solver.calculators.PotentialFieldCalculatorNone;
-import org.vadere.simulator.models.potential.solver.calculators.cartesian.EikonalSolverFIM;
+import org.vadere.simulator.models.potential.solver.calculators.cartesian.multiCoreOptimized.EikonalSolverFIM;
 import org.vadere.simulator.models.potential.solver.calculators.cartesian.EikonalSolverFMM;
-import org.vadere.simulator.models.potential.solver.calculators.cartesian.EikonalSolverFSM;
-import org.vadere.simulator.models.potential.solver.calculators.cartesian.EikonalSolverIFIM;
-import org.vadere.simulator.models.potential.solver.calculators.mesh.MeshEikonalSolverFIM;
-import org.vadere.simulator.models.potential.solver.calculators.mesh.MeshEikonalSolverFIMLockFree;
 import org.vadere.simulator.models.potential.solver.calculators.mesh.MeshEikonalSolverFMM;
-import org.vadere.simulator.models.potential.solver.calculators.mesh.MeshEikonalSolverIFIM;
-import org.vadere.simulator.models.potential.solver.calculators.mesh.MeshEikonalSolverIFIMLockFree;
+import org.vadere.simulator.models.potential.solver.calculators.mesh.multiCoreOptimized.MeshEikonalSolverFIM;
 import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
 import org.vadere.simulator.models.potential.solver.timecost.UnitTimeCostFunction;
 import org.vadere.simulator.models.potential.timeCostFunction.TimeCostFunctionFactory;
@@ -135,15 +130,11 @@ public abstract class EikonalSolverProvider  {
 			case NONE:
 				eikonalSolver = new PotentialFieldCalculatorNone();
 				break;
-			case INFORMED_FAST_ITERATIVE_METHOD:
-				eikonalSolver = new EikonalSolverIFIM(cellGrid, distFunc, timeCost, attributesPotential.getObstacleGridPenalty(), attributesPotential.getTargetAttractionStrength());
-				break;
 			case FAST_ITERATIVE_METHOD:
 				eikonalSolver = new EikonalSolverFIM(cellGrid, distFunc, isHighAccuracyFM, timeCost, attributesPotential.getObstacleGridPenalty(), attributesPotential.getTargetAttractionStrength());
 				break;
-			case FAST_SWEEPING_METHOD:
-				eikonalSolver = new EikonalSolverFSM(cellGrid, distFunc, isHighAccuracyFM, timeCost, attributesPotential.getObstacleGridPenalty(), attributesPotential.getTargetAttractionStrength());
-				break;
+			case HIGH_ACCURACY_FAST_MARCHING:
+			case FAST_MARCHING:
 			default:
 				eikonalSolver = new EikonalSolverFMM(cellGrid, distFunc, isHighAccuracyFM, timeCost, attributesPotential.getObstacleGridPenalty(), attributesPotential.getTargetAttractionStrength());
 		}
@@ -163,20 +154,11 @@ public abstract class EikonalSolverProvider  {
 
 		var pointLocator = new JumpAndWalkPointLocator<>(triangulation.getMesh());
 		switch (createMethod) {
-			case INFORMED_FAST_ITERATIVE_METHOD_TRI:
-				eikonalSolver = new MeshEikonalSolverIFIM<>(targetId +"", targetShapes, timeCost, triangulation, pointLocator);
-				break;
 			case FAST_ITERATIVE_METHOD_TRI:
 				eikonalSolver = new MeshEikonalSolverFIM<>(targetId +"", targetShapes, timeCost, triangulation, pointLocator);
 				break;
-			case FAST_ITERATIVE_METHOD_TRI_LOCK_FREE:
-				eikonalSolver = new MeshEikonalSolverFIMLockFree<>(targetId +"", targetShapes, timeCost, triangulation, pointLocator);
-				break;
-			case INFORMED_FAST_ITERATIVE_METHOD_TRI_LOCK_FREE:
-				eikonalSolver = new MeshEikonalSolverIFIMLockFree<>(targetId +"", targetShapes, timeCost, triangulation, pointLocator);
-				break;
+			case FAST_MARCHING_TRI:
 			default:
-				// todo hh: only use FMM, remove rest
 				eikonalSolver = new MeshEikonalSolverFMM<>(targetId +"", targetShapes, timeCost, triangulation, pointLocator);
 				break;
 		}

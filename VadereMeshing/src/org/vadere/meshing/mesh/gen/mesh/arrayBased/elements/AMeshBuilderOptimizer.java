@@ -145,7 +145,6 @@ public class AMeshBuilderOptimizer<Vertices extends AMeshVertices, Edges extends
         }
 
         for(AVertex vertex : vertices) {
-            vertex.setDown(vertexMap[vertex.getDown()]);
             vertex.setEdge(edgeMap[vertex.getEdge()]);
         }
 

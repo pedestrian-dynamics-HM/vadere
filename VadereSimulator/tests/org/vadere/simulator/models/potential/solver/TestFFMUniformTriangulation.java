@@ -14,7 +14,7 @@ import org.vadere.meshing.mesh.inter.ITriangleMeshPointLocator;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
 import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
 import org.vadere.simulator.models.potential.solver.calculators.mesh.MeshEikonalSolverFMM;
-import org.vadere.simulator.models.potential.solver.calculators.mesh.PotentialPoint;
+import org.vadere.simulator.models.potential.solver.calculators.mesh.base.PotentialPoint;
 import org.vadere.simulator.models.potential.solver.timecost.UnitTimeCostFunction;
 import org.vadere.util.data.cellgrid.IPotentialPoint;
 import org.vadere.util.geometry.shapes.IPoint;
@@ -42,7 +42,7 @@ public class TestFFMUniformTriangulation {
     public void setUp() throws Exception {
         IPointConstructor<IPotentialPoint> pointConstructor = (x, y) -> new PotentialPoint(x, y);
         uniformTriangulation = IIncrementalTriangulation.createUniformTriangulation(
-                ITriangleMeshPointLocator.Type.BASE,
+                ITriangleMeshPointLocator.Type.JUMP_AND_WALK,
                 new VRectangle(0, 0, width, height),
                 minTriangleSideLength
         );

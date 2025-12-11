@@ -3,6 +3,7 @@ package org.vadere.simulator.models.potential.solver.calculators.mesh;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.inter.ITriangleMeshPointLocator;
 import org.vadere.meshing.mesh.inter.mesh.*;
+import org.vadere.simulator.models.potential.solver.calculators.mesh.base.AMeshEikonalSolverFMM;
 import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VShape;

@@ -201,7 +201,7 @@ public interface IIncrementalTriangulation<V extends IVertex, E extends IHalfEdg
 			points.add(new VPoint(x, y));
 		}
 
-		var triangulation = IncrementalTriangulation.fromBuilderFactory(PTriangleMeshBuilder::new, ITriangleMeshPointLocator.Type.DELAUNAY_HIERARCHY, points);
+		var triangulation = IncrementalTriangulation.fromBuilderFactory(PTriangleMeshBuilder::new, ITriangleMeshPointLocator.Type.JUMP_AND_WALK, points);
 		triangulation.compute();
 		return triangulation;
 	}

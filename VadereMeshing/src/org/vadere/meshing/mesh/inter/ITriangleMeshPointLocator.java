@@ -81,10 +81,7 @@ public interface ITriangleMeshPointLocator<V extends IVertex, E extends IHalfEdg
 	 * Types of implemented point location algorithms {@link ITriangleMeshPointLocator}.
 	 */
 	enum Type {
-		DELAUNAY_TREE,
-		DELAUNAY_HIERARCHY,
 		JUMP_AND_WALK,      // preferable!
-		BASE
 	}
 
 

@@ -3,7 +3,6 @@ package org.vadere.meshing.mesh.inter.mesh;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AMesh;
-import org.vadere.meshing.mesh.gen.pointLocator.DelaunayHierarchyPointLocator;
 import org.vadere.meshing.mesh.inter.mesh.data.IMeshDataStorage;
 import org.vadere.meshing.mesh.inter.meshConnectivity.IReadOnlyPolyConnectivity;
 import org.vadere.meshing.mesh.triangulation.triangulator.inter.ITriangulator;
@@ -81,27 +80,6 @@ public interface IMesh<V extends IVertex, E extends IHalfEdge, F extends IFace> 
 	IMeshEdges<V, E, F> edges();
 	IMeshFaces<V, E, F> faces();
 	IMeshVertices<V, E, F> vertices();
-
-	// TODO: this is for the delaunay-hierarchy only!
-	/**
-	 * This is specifically used by {@link DelaunayHierarchyPointLocator}
-	 * to establish the link of the different hierarchies in O(1).
-	 *
-	 * @param v a vertex of hierarchy k
-	 * @return the vertex connected to v which is at the hierarchy k-1.
-	 */
-	V getDown(@NotNull V v);
-
-	// TODO: this is for the delaunay-hierarchy only!
-	/**
-	 * This is specifically used by {@link DelaunayHierarchyPointLocator}
-	 * to establish the link of the different hierarchies. Connects two vertices up and down such that
-	 * up is at the hierarchy k and down is at hierarchy k+1 in O(1).
-	 *
-	 * @param up    vertex at hierarchy k
-	 * @param down  vertex at hierarchy k+1
-	 */
-	void setDown(@NotNull V up, @NotNull V down);
 
 	default String getMeshInformations() {
 		// here we divide the number of half-edges by 2 because each edge is represented by 2 half-edges

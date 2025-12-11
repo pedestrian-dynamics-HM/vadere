@@ -1,4 +1,4 @@
-package org.vadere.simulator.models.potential.solver.calculators.mesh;
+package org.vadere.simulator.models.potential.solver.calculators.mesh.multiCoreOptimized;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.inter.ITriangleMeshPointLocator;
@@ -6,6 +6,7 @@ import org.vadere.meshing.mesh.inter.mesh.IFace;
 import org.vadere.meshing.mesh.inter.mesh.IHalfEdge;
 import org.vadere.meshing.mesh.inter.mesh.ITriangleMeshWithDataStorage;
 import org.vadere.meshing.mesh.inter.mesh.IVertex;
+import org.vadere.simulator.models.potential.solver.calculators.mesh.base.AMeshEikonalSolver;
 import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.util.logging.Logger;
@@ -19,6 +20,8 @@ import java.util.ListIterator;
 
 
 /**
+ * Use this if you have many CPU cores
+ *
  * This class computes the traveling time T using the (single threaded) Fast Iterative Method for arbitrary triangulated meshes.
  * The quality of the result depends on the quality of the triangulation. For a high accuracy the triangulation
  * should not contain too many non-acute triangles.

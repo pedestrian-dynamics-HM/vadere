@@ -1,5 +1,6 @@
-package org.vadere.simulator.models.potential.solver.calculators.cartesian;
+package org.vadere.simulator.models.potential.solver.calculators.cartesian.multiCoreOptimized;
 
+import org.vadere.simulator.models.potential.solver.calculators.cartesian.AGridEikonalSolver;
 import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
 import org.vadere.util.data.cellgrid.CellGrid;
 import org.vadere.util.data.cellgrid.CellState;
@@ -15,6 +16,8 @@ import java.util.stream.Collectors;
 
 
 /**
+ * Use this if you have many CPU cores
+ *
  * Implementation of the sequential fast iterative method (FIM) presented in
  * 'A Fast Iterative Method for Eikonal Equations' jeong-2008.
  *

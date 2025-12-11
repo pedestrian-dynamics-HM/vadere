@@ -176,7 +176,7 @@ public class LaplacianSmother implements IPMeshImprover {
 
     // TODO: parallize the whole triangulation
     public void retriangulate() {
-        triangulation = IIncrementalTriangulation.createPTriangulation(ITriangleMeshPointLocator.Type.DELAUNAY_HIERARCHY, getMesh().vertices().toPoints());
+        triangulation = IIncrementalTriangulation.createPTriangulation(ITriangleMeshPointLocator.Type.JUMP_AND_WALK, getMesh().vertices().toPoints());
         removeTrianglesInsideObstacles();
         triangulation.finish();
     }

@@ -433,33 +433,11 @@ public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F 
 
 	@Override
 	public void setPointLocator(@NotNull final ITriangleMeshPointLocator.Type type) {
-
-		/**
-		 * This method is somehow recursive. The Delaunay-Hierarchy is a hierarchy of triangulations using the base point
-		 * location algorithm. Therefore if the type is equal to the Delaunay-Hierarchy a supplier is required which
-		 * construct triangulations based on this triangulation i.e. with the same "starting" mesh or bound!
-		 */
 		switch (type) {
-			case DELAUNAY_TREE:
-				if(!points.isEmpty()) {
-					throw new IllegalArgumentException(ITriangleMeshPointLocator.Type.DELAUNAY_TREE + " is only supported for empty triangulations.");
-				}
-				pointLocator = new DelaunayTreePointLocator<>(this.mesh);
-				break;
-			case DELAUNAY_HIERARCHY:
-				Supplier<IIncrementalTriangulation<V, E, F>> supplier;
-				if(useMeshForBound) {
-					supplier = () -> IncrementalTriangulation.fromMeshBuilder(meshBuilder.copy(), ITriangleMeshPointLocator.Type.BASE, illegalPredicate);
-				}
-				else {
-					supplier = () -> IncrementalTriangulation.fromBuilderFactory(meshBuilder::newInstance, ITriangleMeshPointLocator.Type.BASE, bound, illegalPredicate);
-				}
-				pointLocator = new DelaunayHierarchyPointLocator<>(this, supplier);
-				break;
+			default:
 			case JUMP_AND_WALK:
 				pointLocator = new JumpAndWalkPointLocator<>(this.mesh);
 				break;
-			default: pointLocator = new SimpleTriangleMeshPointLocator<>(this.mesh);
 		}
 	}
 
@@ -1046,7 +1024,7 @@ public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F 
 
 		PMesh mesh = new PMesh();
 		IIncrementalTriangulation<PVertex, PHalfEdge, PFace> bw = IIncrementalTriangulation.createPTriangulation(
-				ITriangleMeshPointLocator.Type.DELAUNAY_HIERARCHY,
+				ITriangleMeshPointLocator.Type.JUMP_AND_WALK,
 				points
 		);
 		bw.finish();
@@ -1062,7 +1040,7 @@ public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F 
 
         ms = System.currentTimeMillis();
         IIncrementalTriangulation<AVertex, AHalfEdge, AFace> bw2 = IIncrementalTriangulation.createATriangulation(
-                ITriangleMeshPointLocator.Type.DELAUNAY_HIERARCHY,
+                ITriangleMeshPointLocator.Type.JUMP_AND_WALK,
                 points
         );
         bw2.finish();

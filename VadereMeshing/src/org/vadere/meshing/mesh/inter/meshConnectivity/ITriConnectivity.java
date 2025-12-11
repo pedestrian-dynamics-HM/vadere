@@ -4,32 +4,15 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.vadere.meshing.mesh.gen.pointLocator.DelaunayHierarchyPointLocator;
-import org.vadere.meshing.mesh.gen.GenEar;
 import org.vadere.meshing.mesh.inter.mesh.*;
-import org.vadere.meshing.mesh.inter.mesh.builder.IMeshBuilder;
-import org.vadere.meshing.mesh.inter.mesh.builder.IMeshBuilderEdges;
-import org.vadere.meshing.mesh.inter.mesh.builder.IMeshBuilderFaces;
-import org.vadere.meshing.mesh.inter.mesh.builder.IMeshBuilderVertices;
-import org.vadere.meshing.mesh.inter.mesh.triangle.ITriangleMesh;
-import org.vadere.util.data.Node;
-import org.vadere.util.data.NodeLinkedList;
-import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.IPoint;
-import org.vadere.util.geometry.shapes.VLine;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VTriangle;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.math.IDistanceFunction;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.PriorityQueue;
 import java.util.Random;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 /**
  * <p>A tri-connectivity {@link ITriConnectivity} is the connectivity of a mesh of non-intersecting connected triangles including holes.
@@ -71,9 +54,7 @@ public interface ITriConnectivity<V extends IVertex, E extends IHalfEdge, F exte
 	 * <p>This will replace the point of a vertex. If the point has other coordinates than
 	 * the old point of the vertex this will reposition the vertex without any checks, i.e.
 	 * the user has to know what he does and has to make sure that the mesh is valid and feasible
-	 * afterwards and all listeners e.g. the point locators such as the Delaunay-Hierarchy
-	 * {@link DelaunayHierarchyPointLocator} can handle this
-	 * repositioning!</p>
+	 * afterwards</p>
 	 *
 	 * <p>Does not change the connectivity but may change the position of a vertex and therefore requires
 	 * connectivity changes which has to be made manually!</p>
