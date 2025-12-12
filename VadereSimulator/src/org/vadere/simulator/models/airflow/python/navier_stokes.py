@@ -37,15 +37,19 @@ def main():
     # SETUP & MESH GENERATION
     geom_data = extract_attributes(args.scenario)
 
-    geom_data["max_triangle_area"] = 0.002 #0.000002
+    geom_data["max_triangle_area"] = 1e-5 #0.000002
     # restaurant: 0.01: 107s
+    # 0.002: 730s, 12min
+    # 0.001: 45min
     # small: 0.0001: 43s
     # 0.000002: 12733.68s, 212min, 3.5h
-    geom_data["viscosity"] = 1e-3
+    geom_data["viscosity"] = 1.5e-5
 
     mesh, bdry_indices = build_mesh(geom_data)
 
     print(f"Mesh: {mesh.n_nod} nodes, {mesh.n_el} elements.")
+    mesh_time = time.time()
+    print(f"\nMesh creation time: {mesh_time - start_time:.2f} s")
     domain = FEDomain('domain', mesh)
 
     # REGIONS
@@ -169,8 +173,8 @@ def main():
         kind = 'nls.oseen',
         stabil_mat = 'stabil',
         i_max = max_iters,
-        eps_a = 1e-8,
-        eps_r = 1.0,
+        eps_a = 1e-6,
+        eps_r = 1e-4,
         macheps = 1e-16,
         lin_red = 1e-2,
         check_navier_stokes_residual = False,
@@ -199,11 +203,9 @@ def main():
     u_vals = out['u'].data
 
     X, Y, Vx_grid, Vy_grid, vel_mag = postprocess_solution(
-        u_vals,
-        mesh,
-        geom_data['rect_grid_cell_size'],
-        x_min, x_max, y_min, y_max
+        u_vals, mesh, geom_data
     )
+
 
     ny, nx = X.shape
     parameter_string = get_parameter_string(geom_data)
@@ -213,6 +215,7 @@ def main():
     np.savetxt(args.scenario + '_' + args.hash + '_Vy.txt', Vy_grid,
                header=f'{ny}_{nx}_{parameter_string}')
 
+    print(f"\nOseen solver time: {time.time() - mesh_time:.2f} s")
     print(f"\nTotal time: {time.time() - start_time:.2f} s")
     plot_results(mesh, X, Y, Vx_grid, Vy_grid, vel_mag, geom_data["obstacles"],
                  args.scenario + '_' + args.hash + '_results.png')

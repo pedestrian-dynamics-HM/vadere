@@ -105,33 +105,33 @@ def get_parameter_string(geom_data):
     return parameter_string
 
 
-def postprocess_solution(u_vals, mesh, rect_grid_cell_size, x_min, x_max, y_min, y_max):
+def postprocess_solution(u_vals, mesh, geom_data):
     """
     Converts FEM results on triangular grid to a rectangular grid for Vadere.
     """
-    Vx_raw = u_vals[:, 0]
-    Vy_raw = u_vals[:, 1]
+    res = geom_data.get('rect_grid_cell_size', 0.1)
+    xmin, xmax = geom_data['x_min'], geom_data['x_max']
+    ymin, ymax = geom_data['y_min'], geom_data['y_max']
 
-    elems = mesh.get_conn(mesh.descs[0])
-    triang = Triangulation(mesh.coors[:, 0], mesh.coors[:, 1], elems)
-    interp_u_comp = LinearTriInterpolator(triang, Vx_raw)
-    interp_v_comp = LinearTriInterpolator(triang, Vy_raw)
+    nx = int(np.round((xmax - xmin) / res)) + 1
+    ny = int(np.round((ymax - ymin) / res)) + 1
 
-    eps = 1e-9
-    x_rng = np.arange(x_min, x_max + rect_grid_cell_size/100.0, rect_grid_cell_size)
-    y_rng = np.arange(y_min, y_max + rect_grid_cell_size/100.0, rect_grid_cell_size)
+    x_rng = np.linspace(xmin, xmax, nx)
+    y_rng = np.linspace(ymin, ymax, ny)
     X, Y = np.meshgrid(x_rng, y_rng)
-    Vx = interp_u_comp(X, Y).filled(0.0)
-    Vy = interp_v_comp(X, Y).filled(0.0)
-    mask = (Vx == 0.0) & (Vy == 0.0)
-    velocity_magnitude = np.sqrt(Vx ** 2 + Vy ** 2)
-    masked_mag = np.ma.masked_array(velocity_magnitude, mask=mask)
 
-    print(f"Max U component on grid: {np.max(Vx):.4f}")
-    print(f"Max V component on grid: {np.max(Vy):.4f}")
-    print(f"Max velocity magnitude on grid: {np.max(velocity_magnitude):.4f}")
-    if masked_mag.count() > 0:
-        print(f"Average velocity magnitude (fluid only): {np.mean(masked_mag):.4f}")
+    conn = mesh.get_conn('2_3')
+    triang = Triangulation(mesh.coors[:, 0], mesh.coors[:, 1], conn)
+
+    interp_u = LinearTriInterpolator(triang, u_vals[:, 0])
+    interp_v = LinearTriInterpolator(triang, u_vals[:, 1])
+    Vx = interp_u(X, Y).filled(0.0)
+    Vy = interp_v(X, Y).filled(0.0)
+
+    velocity_magnitude = np.hypot(Vx, Vy)
+    print(f"Grid: {nx}x{ny} points (res={res}m)")
+    print(f"Max velocity magnitude [m/s]: {np.max(velocity_magnitude):.4f} m/s")
+    print(f"Average velocity magnitude [m/s]: {np.mean(masked_mag):.4f}")
 
     return X, Y, Vx, Vy, velocity_magnitude
 
@@ -195,4 +195,5 @@ def plot_results(mesh, X, Y, Vx, Vy, vel_mag, obstacles, path):
         ax.set_ylim(y_min, y_max)
 
     plt.savefig(path)
+    plt.show()
     plt.close()

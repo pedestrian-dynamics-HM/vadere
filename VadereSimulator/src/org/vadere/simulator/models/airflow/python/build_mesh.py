@@ -3,17 +3,30 @@ import gmsh
 from sfepy.discrete.fem import Mesh
 
 def build_mesh(geom_data):
-    # 1. GMSH SETUP
+    """
+    Generates a 2D triangular mesh with refinement on walls, inlets and outlets.
+    """
+    # INITIALIZATION
     gmsh.initialize()
+    gmsh.model.remove()
     gmsh.model.add("airflow_model")
 
     x_min, x_max = geom_data['x_min'], geom_data['x_max']
     y_min, y_max = geom_data['y_min'], geom_data['y_max']
 
-    # Create Domain
-    domain_tag = gmsh.model.occ.addRectangle(x_min, y_min, 0, x_max - x_min, y_max - y_min)
+    # SIZING LOGIC
+    # Convert area to characteristic edge length (h)
+    # h ~ sqrt(2 * Area) is a good approximation for equilateral triangles
+    base_h = np.sqrt(2 * geom_data['max_triangle_area'])
 
-    # 2. FORCE NODES AT INLETS/OUTLETS (Critical for robustness)
+    # Define refinement relative to base_h to maintain gradient at any scale
+    h_wall = base_h           # size at the wall
+    h_bulk = base_h * 2.0     # size in the center
+    dist_min = base_h * 2.0   # distance up to which h_wall is strictly enforced
+    dist_max = base_h * 15.0  # distance at which mesh reaches full h_bulk
+
+    # GEOMETRY
+    domain_tag = gmsh.model.occ.addRectangle(x_min, y_min, 0, x_max - x_min, y_max - y_min)
     feature_points = []
     all_features = geom_data['inlets'] + geom_data['outlets']
 
@@ -31,9 +44,11 @@ def build_mesh(geom_data):
 
     if feature_points:
         occ_res, _ = gmsh.model.occ.fragment([(2, domain_tag)], feature_points)
-        domain_tag = occ_res[0][1]
+        for dim, tag in occ_res:
+            if dim == 2:
+                domain_tag = tag
+                break
 
-    # 3. CREATE OBSTACLES
     obstacle_tags = []
     for obs_pts in geom_data['obstacles']:
         p_tags = [gmsh.model.occ.addPoint(px, py, 0) for px, py in obs_pts]
@@ -47,69 +62,114 @@ def build_mesh(geom_data):
 
     if obstacle_tags:
         occ_res, _ = gmsh.model.occ.cut([(2, domain_tag)], obstacle_tags)
-        if occ_res: domain_tag = occ_res[0][1]
+        # Update domain tag again
+        if occ_res:
+            for dim, tag in occ_res:
+                if dim == 2:
+                    domain_tag = tag
+                    break
 
     gmsh.model.occ.synchronize()
 
-    # 4. MESH SETTINGS (Natural Look)
-    # Calculate target edge length from user area
-    target_h = np.sqrt(2 * geom_data['max_triangle_area'])
+    # MESH FIELDS (REFINEMENT)
+    boundary_curves = [tag for dim, tag in gmsh.model.getEntities(dim=1)]
 
-    gmsh.option.setNumber("Mesh.Algorithm", 5) # Delaunay (Natural look)
-    gmsh.option.setNumber("Mesh.Smoothing", 0) # Disable smoothing for organic feel
-    gmsh.option.setNumber("Mesh.CharacteristicLengthMin", target_h * 0.1)
-    gmsh.option.setNumber("Mesh.CharacteristicLengthMax", target_h)
+    # distance to boundaries
+    dist_field = gmsh.model.mesh.field.add("Distance")
+    gmsh.model.mesh.field.setNumbers(dist_field, "CurvesList", boundary_curves)
+    gmsh.model.mesh.field.setNumber(dist_field, "Sampling", 100)
+
+    # applies h_wall close to curves, interpolates to h_bulk far away
+    thresh_field = gmsh.model.mesh.field.add("Threshold")
+    gmsh.model.mesh.field.setNumber(thresh_field, "InField", dist_field)
+    gmsh.model.mesh.field.setNumber(thresh_field, "SizeMin", h_wall)
+    gmsh.model.mesh.field.setNumber(thresh_field, "SizeMax", h_bulk)
+    gmsh.model.mesh.field.setNumber(thresh_field, "DistMin", dist_min)
+    gmsh.model.mesh.field.setNumber(thresh_field, "DistMax", dist_max)
+
+    gmsh.model.mesh.field.setAsBackgroundMesh(thresh_field)
+
+    # MESH GENERATION SETTINGS
+    gmsh.option.setNumber("Mesh.Algorithm", 6) # Frontal-Delaunay
+    gmsh.option.setNumber("Mesh.CharacteristicLengthExtendFromBoundary", 0)
+    gmsh.option.setNumber("Mesh.CharacteristicLengthFromPoints", 0)
+    gmsh.option.setNumber("Mesh.CharacteristicLengthFromCurvature", 0)
 
     gmsh.model.mesh.generate(2)
 
-    # 5. EXTRACT DATA
+    # EXTRACT DATA FOR SFEPY
     node_tags, node_coords, _ = gmsh.model.mesh.getNodes()
     sfepy_coords = np.array(node_coords).reshape(-1, 3)[:, :2]
 
     elem_types, elem_tags, elem_node_tags = gmsh.model.mesh.getElements(dim=2)
-    tri_index = next((i for i, t in enumerate(elem_types) if t == 2), -1)
 
-    if tri_index == -1:
-        raise RuntimeError("Gmsh failed to generate 2D elements.")
+    try:
+        elem_types, elem_tags, elem_node_tags = gmsh.model.mesh.getElements(dim=2)
+        tri_type_indices = np.where(elem_types == 2)[0]
+
+        if len(tri_type_indices) == 0:
+            gmsh.finalize()
+            raise RuntimeError("Gmsh failed to generate 2D triangular elements.")
+
+        tri_index = tri_type_indices[0]
+        tri_nodes = np.array(elem_node_tags[tri_index], dtype=np.int32).reshape(-1, 3)
+    except ValueError:
+        gmsh.finalize()
+        raise RuntimeError("Gmsh failed to generate 2D triangular elements.")
 
     tri_nodes = np.array(elem_node_tags[tri_index], dtype=np.int32).reshape(-1, 3)
+    max_tag = np.max(node_tags)
 
-    tag_map = {tag: i for i, tag in enumerate(node_tags)}
-    current_conn = np.zeros_like(tri_nodes)
-    for r in range(tri_nodes.shape[0]):
-        for c in range(3):
-            current_conn[r, c] = tag_map[tri_nodes[r, c]]
+    if max_tag < 2 * len(node_tags):
+        tag_map_array = np.zeros(max_tag + 1, dtype=np.int32)
+        tag_map_array[node_tags] = np.arange(len(node_tags))
+        sfepy_conns_array = tag_map_array[tri_nodes]
+    else:
+        tag_map = {tag: i for i, tag in enumerate(node_tags)}
+        sfepy_conns_array = np.zeros_like(tri_nodes)
+        for r in range(tri_nodes.shape[0]):
+            for c in range(3):
+                sfepy_conns_array[r, c] = tag_map[tri_nodes[r, c]]
 
-    sfepy_conns = [current_conn]
-    sfepy_mat_ids = [np.zeros(len(current_conn), dtype=np.int32)]
+    sfepy_conns = [sfepy_conns_array]
+    sfepy_mat_ids = [np.zeros(len(sfepy_conns_array), dtype=np.int32)]
 
     gmsh.finalize()
 
-    # 6. CREATE MESH & BOUNDARIES
+    # CREATE MESH OBJECT
     mesh = Mesh.from_data('ns_mesh', sfepy_coords, None, sfepy_conns, sfepy_mat_ids, ['2_3'])
 
+    # IDENTIFY BOUNDARY NODES
     inlet_indices = set()
     outlet_indices = set()
-    eps = 1e-4
+    eps = 1e-5
 
-    for i, (x, y) in enumerate(sfepy_coords):
-        for item in all_features:
-            c = sorted(item['coords'])
-            s = item['side']
-            is_inlet = (item in geom_data['inlets'])
-            target = inlet_indices if is_inlet else outlet_indices
+    feats_by_side = {'left': [], 'right': [], 'top': [], 'bottom': []}
+    for item in all_features:
+        c = sorted(item['coords'])
+        is_inlet = (item in geom_data['inlets'])
+        feats_by_side[item['side']].append((c[0], c[1], is_inlet))
 
-            hit = False
-            if s == 'left' and abs(x - x_min) < eps:
-                if c[0] - eps <= y <= c[1] + eps: hit = True
-            elif s == 'right' and abs(x - x_max) < eps:
-                if c[0] - eps <= y <= c[1] + eps: hit = True
-            elif s == 'bottom' and abs(y - y_min) < eps:
-                if c[0] - eps <= x <= c[1] + eps: hit = True
-            elif s == 'top' and abs(y - y_max) < eps:
-                if c[0] - eps <= x <= c[1] + eps: hit = True
+    coords = sfepy_coords
 
-            if hit: target.add(i)
+    # helper for vectorized boundary checking
+    def check_side(mask, coord_idx, side_key):
+        if not np.any(mask): return
+        potential_idxs = np.where(mask)[0]
+        vals = coords[potential_idxs, coord_idx]
+
+        for (c0, c1, is_inlet) in feats_by_side[side_key]:
+            hits = (vals >= c0 - eps) & (vals <= c1 + eps)
+            hit_indices = potential_idxs[hits]
+            if is_inlet:
+                inlet_indices.update(hit_indices)
+            else:
+                outlet_indices.update(hit_indices)
+
+    check_side(np.abs(coords[:, 0] - x_min) < eps, 1, 'left')
+    check_side(np.abs(coords[:, 0] - x_max) < eps, 1, 'right')
+    check_side(np.abs(coords[:, 1] - y_min) < eps, 0, 'bottom')
+    check_side(np.abs(coords[:, 1] - y_max) < eps, 0, 'top')
 
     return mesh, {
         'inlet': np.array(list(inlet_indices), dtype=np.int32),
