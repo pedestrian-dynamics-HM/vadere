@@ -10,8 +10,6 @@ import java.util.TreeMap;
 
 import org.apache.commons.configuration2.Configuration;
 import org.vadere.gui.components.utils.Resources;
-import org.vadere.gui.components.utils.Messages;
-import org.vadere.gui.components.utils.Resources;
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.psychology.information.InformationState;
 import org.vadere.util.config.VadereConfig;
