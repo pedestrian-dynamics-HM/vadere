@@ -131,7 +131,7 @@ def postprocess_solution(u_vals, mesh, geom_data):
     velocity_magnitude = np.hypot(Vx, Vy)
     print(f"Grid: {nx}x{ny} points (res={res}m)")
     print(f"Max velocity magnitude [m/s]: {np.max(velocity_magnitude):.4f} m/s")
-    print(f"Average velocity magnitude [m/s]: {np.mean(masked_mag):.4f}")
+    print(f"Average velocity magnitude [m/s]: {np.mean(velocity_magnitude):.4f}")
 
     return X, Y, Vx, Vy, velocity_magnitude
 

@@ -37,13 +37,13 @@ def main():
     # SETUP & MESH GENERATION
     geom_data = extract_attributes(args.scenario)
 
-    geom_data["max_triangle_area"] = 1e-5 #0.000002
+    #geom_data["max_triangle_area"] = 5e-5 #0.000002
     # restaurant: 0.01: 107s
     # 0.002: 730s, 12min
     # 0.001: 45min
     # small: 0.0001: 43s
     # 0.000002: 12733.68s, 212min, 3.5h
-    geom_data["viscosity"] = 1.5e-5
+    #geom_data["viscosity"] = 1e-4
 
     mesh, bdry_indices = build_mesh(geom_data)
 
