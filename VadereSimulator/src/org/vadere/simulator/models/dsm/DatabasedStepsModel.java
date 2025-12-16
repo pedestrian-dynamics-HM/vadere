@@ -163,6 +163,7 @@ public class DatabasedStepsModel implements MainModel {
             LinkedList<Integer> nextTarget = new LinkedList<>();
             nextTarget.add(nextStep.getTargetId());
             pedestrian.setTargets(nextTarget);
+            pedestrian.setNextTargetListIndex(0);
 
             FootStep currentFootstep = new FootStep(startPosition, endPosition, nextStep.getStartTime(), nextStep.getEndTime());
             pedestrian.getTrajectory().add(currentFootstep);
