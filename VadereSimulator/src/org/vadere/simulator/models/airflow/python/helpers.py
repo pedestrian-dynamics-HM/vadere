@@ -2,6 +2,7 @@ import json
 import numpy as np
 from matplotlib.tri import Triangulation, LinearTriInterpolator
 from matplotlib import pyplot as plt
+from pathlib import Path
 
 
 def extract_attributes(scenario_file_path):
@@ -134,6 +135,15 @@ def postprocess_solution(u_vals, mesh, geom_data):
     print(f"Average velocity magnitude [m/s]: {np.mean(velocity_magnitude):.4f}")
 
     return X, Y, Vx, Vy, velocity_magnitude
+
+
+def get_cache_dir(scenario_path):
+    scenario_path = Path(scenario_path)
+    parent_dir = scenario_path.parent
+    scenario_name = scenario_path.stem
+    cache_dir = parent_dir / "cache"
+    cache_dir.mkdir(parents=True, exist_ok=True)
+    return cache_dir, scenario_name
 
 
 def plot_results(mesh, X, Y, Vx, Vy, vel_mag, obstacles, path):

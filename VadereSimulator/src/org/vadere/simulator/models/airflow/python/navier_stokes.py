@@ -214,16 +214,16 @@ def main():
     ny, nx = X.shape
     parameter_string = get_parameter_string(geom_data)
 
-    scenario_name = args.scenario.removesuffix(".scenario")
-    np.savetxt(scenario_name + '_' + args.hash + '_Vx.txt', Vx_grid,
+    cache_dir, scenario_name = get_cache_dir(args.scenario)
+    np.savetxt(f"{cache_dir / scenario_name}_{args.hash}_Vx.txt", Vx_grid,
                header=f'{ny}_{nx}_{parameter_string}')
-    np.savetxt(scenario_name + '_' + args.hash + '_Vy.txt', Vy_grid,
+    np.savetxt(f"{cache_dir / scenario_name}_{args.hash}_Vy.txt", Vy_grid,
                header=f'{ny}_{nx}_{parameter_string}')
 
     print(f"\nOseen solver time: {time.time() - mesh_time:.2f} s")
     print(f"\nTotal time: {time.time() - start_time:.2f} s")
     plot_results(mesh, X, Y, Vx_grid, Vy_grid, vel_mag, geom_data["obstacles"],
-                 scenario_name + '_' + args.hash + '_results.png')
+                 f"{cache_dir / scenario_name}_{args.hash}_results.png")
 
     if os.path.exists("domain.vtk"):
             os.remove("domain.vtk")

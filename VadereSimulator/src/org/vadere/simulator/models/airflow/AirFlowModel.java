@@ -37,9 +37,13 @@ public class AirFlowModel extends AbstractAirFlowModel {
     @Override
     public void setupAirFlow() {
         String hash = airFlow.getAirflowHash();
-        
-        File f_x_velocity = new File(airFlow.getScenarioPath().replaceFirst("\\.scenario$", "") + "_" + hash + X_VELOCITY_FILE_ENDING);
-        File f_y_velocity = new File(airFlow.getScenarioPath().replaceFirst("\\.scenario$", "") + "_" + hash + Y_VELOCITY_FILE_ENDING);
+
+        File originalScenario = new File(airFlow.getScenarioPath());
+        File cacheDir = new File(originalScenario.getParent(), "cache");
+        String scenarioName = originalScenario.getName().replaceFirst("\\.scenario$", "");
+
+        File f_x_velocity = new File(cacheDir, scenarioName + "_" + hash + X_VELOCITY_FILE_ENDING);
+        File f_y_velocity = new File(cacheDir, scenarioName + "_" + hash + Y_VELOCITY_FILE_ENDING);
 
         // To make sure suq controller doesn't compute airflow multiple times for same scenario: 
         // If files don't exist with exact name, try finding files with alternative pattern
@@ -89,7 +93,7 @@ public class AirFlowModel extends AbstractAirFlowModel {
         String basePath = parentDir.getAbsolutePath();
         
         File[] files = parentDir.listFiles((dir, name) -> 
-            name.matches("\\d+_\\d+\\.scenario_" + hash + X_VELOCITY_FILE_ENDING));
+            name.matches("\\d+_\\d+_" + hash + X_VELOCITY_FILE_ENDING));
         
         if (files == null || files.length == 0) {
             return null;
