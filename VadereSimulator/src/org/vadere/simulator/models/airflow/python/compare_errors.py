@@ -39,7 +39,7 @@ def main():
                         help='List of hashes ordered from COARSE to FINE. '
                              'The last hash is assumed to be the Ground Truth.')
     parser.add_argument('--areas', required=True, nargs='+', type=float,
-                        help='List of max_triangle_areas corresponding to the hashes.')
+                        help='List of max_triangle_edge_lens corresponding to the hashes.')
     args = parser.parse_args()
     if len(args.hashes) != len(args.areas):
         print("Error: Number of hashes must match number of area thresholds.")

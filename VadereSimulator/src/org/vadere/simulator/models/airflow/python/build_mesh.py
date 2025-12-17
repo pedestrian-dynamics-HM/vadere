@@ -15,15 +15,11 @@ def build_mesh(geom_data):
     y_min, y_max = geom_data['y_min'], geom_data['y_max']
 
     # SIZING LOGIC
-    # Convert area to characteristic edge length (h)
-    # h ~ sqrt(2 * Area) is a good approximation for equilateral triangles
-    base_h = np.sqrt(2 * geom_data['max_triangle_area'])
-
-    # Define refinement relative to base_h to maintain gradient at any scale
-    h_wall = base_h           # size at the wall
-    h_bulk = base_h * 2.0     # size in the center
-    dist_min = base_h * 2.0   # distance up to which h_wall is strictly enforced
-    dist_max = base_h * 15.0  # distance at which mesh reaches full h_bulk
+    h_max = geom_data['max_triangle_edge_len']
+    refinement_factor = 3.0
+    h_wall = h_max / refinement_factor
+    dist_min = h_wall * 2.0   # distance up to which h_wall is strictly enforced
+    dist_max = h_wall * 15.0  # distance at which mesh reaches full h_max
 
     # GEOMETRY
     domain_tag = gmsh.model.occ.addRectangle(x_min, y_min, 0, x_max - x_min, y_max - y_min)
@@ -71,7 +67,7 @@ def build_mesh(geom_data):
 
     gmsh.model.occ.synchronize()
 
-    # MESH FIELDS (REFINEMENT)
+    # MESH FIELDS
     boundary_curves = [tag for dim, tag in gmsh.model.getEntities(dim=1)]
 
     # distance to boundaries
@@ -83,7 +79,7 @@ def build_mesh(geom_data):
     thresh_field = gmsh.model.mesh.field.add("Threshold")
     gmsh.model.mesh.field.setNumber(thresh_field, "InField", dist_field)
     gmsh.model.mesh.field.setNumber(thresh_field, "SizeMin", h_wall)
-    gmsh.model.mesh.field.setNumber(thresh_field, "SizeMax", h_bulk)
+    gmsh.model.mesh.field.setNumber(thresh_field, "SizeMax", h_max)
     gmsh.model.mesh.field.setNumber(thresh_field, "DistMin", dist_min)
     gmsh.model.mesh.field.setNumber(thresh_field, "DistMax", dist_max)
 

@@ -17,7 +17,7 @@ public class AttributesAirFlowModel extends Attributes {
 
     private double rectangularGridCellSize;
 
-    private double maxTriangleArea;
+    private double maxTriangleEdgeLen;
 
     private double inletVelocity;
 
@@ -39,7 +39,7 @@ public class AttributesAirFlowModel extends Attributes {
         condaPath = "CONDA_PATH";
         condaEnv = "CONDA_ENV";
         pythonPath = "VadereSimulator/src/org/vadere/simulator/models/airflow/python/navier_stokes.py";
-        maxTriangleArea = 0.01;
+        maxTriangleEdgeLen = 0.2;
         rectangularGridCellSize = 0.1;
         inletVelocity = 0.3;
         viscosity = 1e-3;
@@ -53,14 +53,14 @@ public class AttributesAirFlowModel extends Attributes {
         bounds = new AttributesBounds();
     }
 
-    public AttributesAirFlowModel(double rectangularGridCellSize, double maxTriangleArea, double inletVelocity,
+    public AttributesAirFlowModel(double rectangularGridCellSize, double maxTriangleEdgeLen, double inletVelocity,
                                   double viscosity,
                                   ArrayList<AttributesInOutLet> inlets, ArrayList<AttributesInOutLet> outlets,
                                   ArrayList<Integer> notBlockingObstacles, AttributesBounds bounds) {
         condaPath = "CONDA_PATH";
         condaEnv = "CONDA_ENV";
         pythonPath = "VadereSimulator/src/org/vadere/simulator/models/airflow/python/navier_stokes.py";
-        this.maxTriangleArea = maxTriangleArea;
+        this.maxTriangleEdgeLen = maxTriangleEdgeLen;
         this.rectangularGridCellSize = rectangularGridCellSize;
         this.inletVelocity = inletVelocity;
         this.viscosity = viscosity;

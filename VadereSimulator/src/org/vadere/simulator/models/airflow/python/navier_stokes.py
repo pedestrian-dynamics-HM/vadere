@@ -37,7 +37,7 @@ def main():
     # SETUP & MESH GENERATION
     geom_data = extract_attributes(args.scenario)
 
-    #geom_data["max_triangle_area"] = 1e-2 #0.000002
+    #geom_data["max_triangle_edge_len"] = 0.2 #0.000002
     # restaurant: 0.01: 107s
     # 0.002: 730s, 12min
     # 0.001: 45min
@@ -211,8 +211,6 @@ def main():
     X, Y, Vx_grid, Vy_grid, vel_mag = postprocess_solution(
         u_vals, mesh, geom_data
     )
-
-
     ny, nx = X.shape
     parameter_string = get_parameter_string(geom_data)
 

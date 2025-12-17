@@ -30,7 +30,7 @@ def extract_attributes(scenario_file_path):
     y_max = min(topo_ymax, airflow_ymax)
 
     rect_grid_cell_size = float(attributes_model['rectangularGridCellSize'])
-    max_triangle_area = float(attributes_model['maxTriangleArea'])
+    max_triangle_edge_len = float(attributes_model['maxTriangleEdgeLen'])
     inlet_velocity = float(attributes_model['inletVelocity'])
     viscosity = float(attributes_model['viscosity'])
     blocking_obstacles = attributes_model['blockingObstacles']
@@ -71,7 +71,7 @@ def extract_attributes(scenario_file_path):
 
     return {
         'rect_grid_cell_size': rect_grid_cell_size,
-        'max_triangle_area': max_triangle_area,
+        'max_triangle_edge_len': max_triangle_edge_len,
         'x_min': x_min, 'x_max': x_max,
         'y_min': y_min, 'y_max': y_max,
         'inlet_velocity': inlet_velocity,
@@ -91,7 +91,7 @@ def get_initial_velocity_at_point(x, y, x_min, x_max, y_min, y_max, velocity, ep
 
 
 def get_parameter_string(geom_data):
-    parameter_string = f"{geom_data['rect_grid_cell_size']}-{geom_data['max_triangle_area']}-{geom_data['inlet_velocity']}-"
+    parameter_string = f"{geom_data['rect_grid_cell_size']}-{geom_data['max_triangle_edge_len']}-{geom_data['inlet_velocity']}-"
 
     for item in geom_data['inlets']:
         parameter_string += f"{item['side']}[{item['coords'][0]},{item['coords'][1]}]"
