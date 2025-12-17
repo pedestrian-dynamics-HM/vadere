@@ -255,7 +255,7 @@ public class DatabasedStepsModel implements MainModel {
                 return;
             }
 
-            String targetFileName = "postvis_" + locomotionHash + ".traj";
+            String targetFileName = this.domain.getTopography().getContextId() + "_" + locomotionHash + ".traj";
             File targetDir = new File(attributesDSM.getTrajectoryFileOrFolder());
             if (!targetDir.exists()) {
                 targetDir.mkdirs();

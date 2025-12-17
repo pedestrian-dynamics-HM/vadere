@@ -16,7 +16,7 @@ from sfepy.discrete import (FieldVariable, Material, Integral, Function,
 from sfepy.discrete.fem import FEDomain, Field
 from sfepy.terms import Term
 from sfepy.discrete.conditions import Conditions, EssentialBC
-from sfepy.solvers.ls import ScipyDirect
+from sfepy.solvers.ls import ScipyDirect, ScipyIterative
 from sfepy.solvers.oseen import Oseen, StabilizationFunction
 
 from build_mesh import build_mesh
@@ -37,13 +37,13 @@ def main():
     # SETUP & MESH GENERATION
     geom_data = extract_attributes(args.scenario)
 
-    #geom_data["max_triangle_area"] = 5e-5 #0.000002
+    #geom_data["max_triangle_area"] = 1e-2 #0.000002
     # restaurant: 0.01: 107s
     # 0.002: 730s, 12min
     # 0.001: 45min
     # small: 0.0001: 43s
     # 0.000002: 12733.68s, 212min, 3.5h
-    #geom_data["viscosity"] = 1e-4
+    #geom_data["viscosity"] = 1e-3
 
     mesh, bdry_indices = build_mesh(geom_data)
 
@@ -166,6 +166,12 @@ def main():
     pb = Problem('stabilized_navier_stokes', equations=equations)
     pb.set_bcs(ebcs=bcs)
 
+    #ls = ScipyIterative({
+    #    'method': 'gmres',
+    #    'i_max': 15000,
+    #    'eps_a': 1e-9,
+    #    'eps_r': 1e-9,
+    #})
     ls = ScipyDirect({})
 
     conf_oseen = Struct(
@@ -198,7 +204,7 @@ def main():
     # SOLVE
     state = pb.solve()
 
-    # 00POST PROCESSING
+    # POST PROCESSING
     out = state.create_output()
     u_vals = out['u'].data
 
@@ -210,15 +216,16 @@ def main():
     ny, nx = X.shape
     parameter_string = get_parameter_string(geom_data)
 
-    np.savetxt(args.scenario + '_' + args.hash + '_Vx.txt', Vx_grid,
+    scenario_name = args.scenario.removesuffix(".scenario")
+    np.savetxt(scenario_name + '_' + args.hash + '_Vx.txt', Vx_grid,
                header=f'{ny}_{nx}_{parameter_string}')
-    np.savetxt(args.scenario + '_' + args.hash + '_Vy.txt', Vy_grid,
+    np.savetxt(scenario_name + '_' + args.hash + '_Vy.txt', Vy_grid,
                header=f'{ny}_{nx}_{parameter_string}')
 
     print(f"\nOseen solver time: {time.time() - mesh_time:.2f} s")
     print(f"\nTotal time: {time.time() - start_time:.2f} s")
     plot_results(mesh, X, Y, Vx_grid, Vy_grid, vel_mag, geom_data["obstacles"],
-                 args.scenario + '_' + args.hash + '_results.png')
+                 scenario_name + '_' + args.hash + '_results.png')
 
     if os.path.exists("domain.vtk"):
             os.remove("domain.vtk")

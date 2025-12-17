@@ -38,8 +38,8 @@ public class AirFlowModel extends AbstractAirFlowModel {
     public void setupAirFlow() {
         String hash = airFlow.getAirflowHash();
         
-        File f_x_velocity = new File(airFlow.getScenarioPath() + "_" + hash + X_VELOCITY_FILE_ENDING);
-        File f_y_velocity = new File(airFlow.getScenarioPath() + "_" + hash + Y_VELOCITY_FILE_ENDING);
+        File f_x_velocity = new File(airFlow.getScenarioPath().replaceFirst("\\.scenario$", "") + "_" + hash + X_VELOCITY_FILE_ENDING);
+        File f_y_velocity = new File(airFlow.getScenarioPath().replaceFirst("\\.scenario$", "") + "_" + hash + Y_VELOCITY_FILE_ENDING);
 
         // To make sure suq controller doesn't compute airflow multiple times for same scenario: 
         // If files don't exist with exact name, try finding files with alternative pattern
