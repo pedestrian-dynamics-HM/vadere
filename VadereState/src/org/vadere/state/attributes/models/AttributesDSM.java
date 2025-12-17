@@ -21,7 +21,7 @@ public class AttributesDSM extends Attributes {
      * or a folder, in which either a .traj file with the corresponding hash is stored or if not,
      * will be created using the fallbackMainModel and stored in the folder
      */
-    private String trajectoryFileOrFolder = "./temp/postvis.traj";
+    private String trajectoryFileOrFolder = null;
     private int bufferedLines = 1000;
     /**
      * This list should only be used if fallbackMainModel is null.

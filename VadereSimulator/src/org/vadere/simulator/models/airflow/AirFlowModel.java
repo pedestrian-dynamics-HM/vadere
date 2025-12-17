@@ -38,9 +38,9 @@ public class AirFlowModel extends AbstractAirFlowModel {
     public void setupAirFlow() {
         String hash = airFlow.getAirflowHash();
 
-        File originalScenario = new File(airFlow.getScenarioPath());
-        File cacheDir = new File(originalScenario.getParent(), "cache");
-        String scenarioName = originalScenario.getName().replaceFirst("\\.scenario$", "");
+        File scenarioPath = new File(airFlow.getScenarioPath());
+        File cacheDir = new File(scenarioPath.getParent(), "cache");
+        String scenarioName = scenarioPath.getName().replaceFirst("\\.scenario$", "");
 
         File f_x_velocity = new File(cacheDir, scenarioName + "_" + hash + X_VELOCITY_FILE_ENDING);
         File f_y_velocity = new File(cacheDir, scenarioName + "_" + hash + Y_VELOCITY_FILE_ENDING);

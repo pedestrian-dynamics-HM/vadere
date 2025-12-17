@@ -53,6 +53,7 @@ public class DatabasedStepsModel implements MainModel {
     private boolean canExtractStepsFromFile;
     private MainModel fallbackMainModel;
     public static String outputPath = "outputPath";
+    public static String scenarioPath;
     public static String outputWrittenCallback = "outputWrittenCallback";
     public static String simulationSeedName = "simulationSeed";
     protected long simulationSeed;
@@ -65,6 +66,7 @@ public class DatabasedStepsModel implements MainModel {
         this.random = random;
         this.attributesPedestrian = attributesPedestrian;
         this.outputPath = VadereContext.getCtx(domain.getTopography()).getString(outputPath);
+        this.scenarioPath = VadereContext.getCtx(domain.getTopography()).getString("scenarioPath");
         this.simulationSeed = VadereContext.getCtx(domain.getTopography()).getLong(simulationSeedName);
         attributesDSM = Model.findAttributes(attributesList, AttributesDSM.class);
         this.locomotionHash = getLocomotionHash(this.domain.getTopography(), this.simulationSeed, this.attributesDSM.getAttributesFallbackModel());
@@ -84,8 +86,7 @@ public class DatabasedStepsModel implements MainModel {
 
     protected boolean checkIfCanExtractStepsFromFile() {
         if (attributesDSM.getTrajectoryFileOrFolder() == null) {
-            logger.error("Variable trajectoryFileOrFolder must be a .traj file or directory");
-            throw new IllegalArgumentException("Invalid argument for trajectoryFile");
+            setDefaultTrajectoryPath();
         }
         if (attributesDSM.getTrajectoryFileOrFolder().endsWith(".traj")) {
             return true;
@@ -103,6 +104,19 @@ public class DatabasedStepsModel implements MainModel {
         } else {
             return false;
         }
+    }
+
+    private void setDefaultTrajectoryPath() {
+        logger.info("Variable trajectoryFileOrFolder is null. Using default cache folder.");
+        File scenarioFile = new File(this.scenarioPath);
+        File cacheDir = new File(scenarioFile.getParent(), "cache");
+        if (!cacheDir.exists()) {
+            boolean success = cacheDir.mkdirs();
+            if (!success) {
+                logger.warn("Could not create default cache directory: " + cacheDir.getAbsolutePath());
+            }
+        }
+        attributesDSM.setTrajectoryFileOrFolder(cacheDir.getAbsolutePath());
     }
 
     private void initializeFallbackMainModel(List<Attributes> attributesList) {
