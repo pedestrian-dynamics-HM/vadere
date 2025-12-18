@@ -1,8 +1,9 @@
 import os
-os.environ['OPENBLAS_NUM_THREADS'] = '1'
-os.environ['MKL_NUM_THREADS'] = '1'
-os.environ['NUMEXPR_NUM_THREADS'] = '1'
-os.environ['OMP_NUM_THREADS'] = '1'
+#os.environ['OPENBLAS_NUM_THREADS'] = '1'
+#os.environ['MKL_NUM_THREADS'] = '1'
+#os.environ['NUMEXPR_NUM_THREADS'] = '1'
+#os.environ['OMP_NUM_THREADS'] = '1'
+
 
 import sys
 import time
@@ -16,7 +17,7 @@ from sfepy.discrete import (FieldVariable, Material, Integral, Function,
 from sfepy.discrete.fem import FEDomain, Field
 from sfepy.terms import Term
 from sfepy.discrete.conditions import Conditions, EssentialBC
-from sfepy.solvers.ls import ScipyDirect, ScipyIterative
+from sfepy.solvers.ls import ScipyDirect, ScipyIterative, PETScKrylovSolver
 from sfepy.solvers.oseen import Oseen, StabilizationFunction
 
 from build_mesh import build_mesh
@@ -172,7 +173,15 @@ def main():
     #    'eps_a': 1e-9,
     #    'eps_r': 1e-9,
     #})
-    ls = ScipyDirect({})
+    #ls = ScipyDirect({})
+    ls = PETScKrylovSolver({
+        'method': 'gmres',
+        'precond': 'lu',
+        'i_max': 10,
+        'eps_a': 1e-40,
+        'eps_r': 1e-40,
+        'options': '-pc_factor_mat_solver_type mumps'
+    })
 
     conf_oseen = Struct(
         name = 'oseen',
