@@ -4,3 +4,8 @@ scipy==1.15.1
 gmsh==4.15.0
 sfepy==2025.3
 jax==0.6.2
+
+# pip install lbmpy matplotlib
+# pip install ipython
+# pip install ipywidgets
+# pip install lbmpy pystencils sympy

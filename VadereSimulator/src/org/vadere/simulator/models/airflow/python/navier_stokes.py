@@ -1,8 +1,8 @@
 import os
-#os.environ['OPENBLAS_NUM_THREADS'] = '1'
-#os.environ['MKL_NUM_THREADS'] = '1'
-#os.environ['NUMEXPR_NUM_THREADS'] = '1'
-#os.environ['OMP_NUM_THREADS'] = '1'
+os.environ['OPENBLAS_NUM_THREADS'] = '1'
+os.environ['MKL_NUM_THREADS'] = '1'
+os.environ['NUMEXPR_NUM_THREADS'] = '1'
+os.environ['OMP_NUM_THREADS'] = '1'
 
 
 import sys
@@ -173,15 +173,15 @@ def main():
     #    'eps_a': 1e-9,
     #    'eps_r': 1e-9,
     #})
-    #ls = ScipyDirect({})
-    ls = PETScKrylovSolver({
-        'method': 'gmres',
-        'precond': 'lu',
-        'i_max': 10,
-        'eps_a': 1e-40,
-        'eps_r': 1e-40,
-        'options': '-pc_factor_mat_solver_type mumps'
-    })
+    ls = ScipyDirect({})
+    #ls = PETScKrylovSolver({
+    #    'method': 'gmres',
+    #    'precond': 'lu',
+    #    'i_max': 10,
+    #    'eps_a': 1e-40,
+    #    'eps_r': 1e-40,
+    #    'options': '-pc_factor_mat_solver_type mumps'
+    #})
 
     conf_oseen = Struct(
         name = 'oseen',
