@@ -120,8 +120,40 @@ def main():
     equations = Equations([eq_momentum, eq_continuity])
 
     # 5. SOLVERS
+    # OPTION A: Iterative Solver (Faster for larger meshes)
+    # Uses GMRES with ILU preconditioning.
+    #ls_conf = {
+    #    'name': 'ls',
+    #    'kind': 'ls.scipy_iterative',
+    #    'method': 'gmres',
+    #    'i_max': 500,
+    #    'eps_a': 1e-6,
+    #    'eps_r': 1e-6,
+    #}
+
+    # OPTION B: Direct Solver (Keep this if your mesh is very small < 2000 nodes)
     ls_conf = {'name': 'ls', 'kind': 'ls.scipy_direct'}
-    nls_conf = {'name': 'newton', 'kind': 'nls.newton', 'i_max': 10, 'eps_a': 1e-8, 'eps_r': 1.0}
+
+    # NONLINEAR SOLVER (NEWTON)
+    nls_conf = {
+        'name': 'newton',
+        'kind': 'nls.newton',
+
+        # SPEED OPTIMIZATION 1: Relax tolerances
+        # We don't need 1e-8 precision for every time step.
+        # 1e-3 is usually enough to capture the flow physics.
+        'eps_a': 1e-4,
+        'eps_r': 1e-3,
+
+        # SPEED OPTIMIZATION 2: Jacobian Reuse (lin_red)
+        # If the residual reduces by factor 0.1 (lin_red), REUSE the matrix
+        # instead of rebuilding it. This saves massive amounts of CPU time.
+        'lin_red': 0.1,
+
+        'i_max': 15,    # Safety limit
+    }
+
+    # TIME STEPPING SOLVER
     ts_conf = {
         'name': 'ts',
         'kind': 'ts.simple',
@@ -132,10 +164,11 @@ def main():
     pb = Problem('unsteady_ns', equations=equations)
     pb.set_bcs(ebcs=bcs)
 
+    # Init Solvers
     ls = Solver.any_from_conf(Struct(**ls_conf))
     nls = Solver.any_from_conf(Struct(**nls_conf), lin_solver=ls)
 
-    # Bind Evaluator
+    # Bind Evaluator (Critical for manual solving)
     evaluator = pb.get_evaluator()
     nls.fun = evaluator.eval_residual
     nls.fun_grad = evaluator.eval_tangent_matrix
@@ -145,15 +178,7 @@ def main():
 
     # 6. INITIALIZATION
     variables = pb.get_variables()
-    n_dof_u = variables['u'].n_dof
-
-    # Create a small random perturbation field (noise amplitude ~10% of inlet velocity)
-    # Assuming inlet velocity is around 1.0 m/s, we use 0.1 as noise scale
-    np.random.seed(42) # Fixed seed for reproducibility
-    noise_u = np.random.normal(scale=0.1, size=n_dof_u)
-
-    # Set this as the initial condition
-    variables['u'].set_data(noise_u)
+    variables['u'].set_data(np.zeros(variables['u'].n_dof))
     variables['p'].set_data(np.zeros(variables['p'].n_dof))
 
     # 7. SOLVE WITH AVERAGING
