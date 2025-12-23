@@ -72,18 +72,15 @@ def main():
     V = VectorFunctionSpace(mesh, "P", 2)
     Q = FunctionSpace(mesh, "P", 1)
 
-    # 3. Time Stepping Setup
-    T = 3.0           # Total seconds
-    dt = 0.05        # 5ms timestep
+    # 3. Time Stepping Setup (Optimized for Speed)
+    # Since we removed the wobble and stabilized the solver, we can use large dt.
+    T = 100.0
+    dt = 0.5        # Increased from 0.01 to 0.2 (20x faster)
     k = Constant(dt)
     num_steps = int(T / dt)
 
-    # 4. Boundary Conditions (With Wobble)
+    # 4. Boundary Conditions (STEADY - No Wobble)
     inlet_vel = geom_data['inlet_velocity']
-    wobble_scale = 0.4
-    freq = 6.0
-
-    inlet_exprs = []
     bcu = []
 
     # Wall (No Slip)
@@ -93,30 +90,28 @@ def main():
         c, s = inlet['coords'], inlet['side']
         center, width = (c[0] + c[1]) / 2.0, c[1] - c[0]
 
+        # Clean parabolic profile without sin() or time dependency
         if s=='left':
             u_x = f"{inlet_vel}*(1.0 - pow((x[1]-{center})/({width}/2.0), 2))"
-            u_y = f"{wobble_scale} * {inlet_vel} * sin({freq}*t)"
-            val = Expression((u_x, u_y), degree=2, t=0.0)
+            u_y = "0.0"
         elif s=='right':
             u_x = f"-{inlet_vel}*(1.0 - pow((x[1]-{center})/({width}/2.0), 2))"
-            u_y = f"{wobble_scale} * {inlet_vel} * sin({freq}*t)"
-            val = Expression((u_x, u_y), degree=2, t=0.0)
+            u_y = "0.0"
         elif s=='bottom':
             u_y = f"{inlet_vel}*(1.0 - pow((x[0]-{center})/({width}/2.0), 2))"
-            u_x = f"{wobble_scale} * {inlet_vel} * sin({freq}*t)"
-            val = Expression((u_x, u_y), degree=2, t=0.0)
+            u_x = "0.0"
         elif s=='top':
             u_y = f"-{inlet_vel}*(1.0 - pow((x[0]-{center})/({width}/2.0), 2))"
-            u_x = f"{wobble_scale} * {inlet_vel} * sin({freq}*t)"
-            val = Expression((u_x, u_y), degree=2, t=0.0)
+            u_x = "0.0"
 
-        inlet_exprs.append(val)
+        # Degree 2 matches the function space V
+        val = Expression((u_x, u_y), degree=2)
         bcu.append(DirichletBC(V, val, boundaries, 1))
 
     # Pressure BC: Outlet P=0
     bcp = [DirichletBC(Q, Constant(0.0), boundaries, 2)]
 
-    # 5. Variational Forms (Chorin / IPCS Splitting)
+    # 5. Variational Forms (Stabilized IPCS)
     u = TrialFunction(V)
     v = TestFunction(V)
     p = TrialFunction(Q)
@@ -129,8 +124,6 @@ def main():
 
     mu = Constant(geom_data['viscosity'])
     rho = Constant(1.0)
-
-    # --- FIX: Define Normal Vector ---
     n = FacetNormal(mesh)
 
     # --- Step 1: Tentative Velocity ---
@@ -138,9 +131,13 @@ def main():
     def epsilon(u): return sym(nabla_grad(u))
     def sigma(u, p): return 2*mu*epsilon(u) - p*Identity(len(u))
 
-    # Explicit advection, Implicit diffusion
+    # CRITICAL CHANGE: Semi-Implicit Advection
+    # Old (Explicit, Unstable): dot(u_n, nabla_grad(u_n))
+    # New (Implicit, Stable):   dot(u_n, nabla_grad(u))
+    # This treats 'u' as the unknown in the convection term, stabilizing large dt.
+
     F1 = rho*dot((u - u_n) / k, v)*dx + \
-         rho*dot(dot(u_n, nabla_grad(u_n)), v)*dx + \
+         rho*dot(dot(u_n, nabla_grad(u)), v)*dx + \
          inner(sigma(U, p_n), epsilon(v))*dx + \
          dot(p_n*n, v)*ds - dot(mu*nabla_grad(U)*n, v)*ds
 
@@ -156,7 +153,7 @@ def main():
     L3 = dot(u_, v)*dx - k/rho * dot(nabla_grad(p_ - p_n), v)*dx
 
     # 6. Solvers
-    A1 = assemble(a1)
+    # Note: A1 is now time-dependent (contains u_n), so we assemble it inside the loop
     A2 = assemble(a2)
     A3 = assemble(a3)
 
@@ -170,15 +167,14 @@ def main():
     count = 0
     t = 0.0
 
-    print(f"\n--- Starting Robust IPCS Simulation ({num_steps} steps) ---")
+    print(f"\n--- Starting Optimized Simulation ({num_steps} steps, dt={dt}) ---")
 
     for step in range(num_steps):
         t += dt
 
-        # Update BCs
-        for expr in inlet_exprs: expr.t = t
-
         # 1. Tentative Velocity
+        # Since advection is implicit, Matrix A1 depends on u_n and must be re-assembled
+        A1 = assemble(a1)
         b1 = assemble(L1)
         [bc.apply(A1, b1) for bc in bcu]
         solver1.solve(A1, u_.vector(), b1)
@@ -196,13 +192,14 @@ def main():
         # 4. Update Pressure
         p_n.assign(p_)
 
-        # 5. Accumulate Average (Skip first 0.5s)
-        if t > 2.95:
+        # 5. Accumulate Average (Last 20% of simulation)
+        # Since flow is likely steady/periodic, we average the end to smooth out any small vortex shedding
+        if t > (T * 0.8):
             u_avg.vector().axpy(1.0, u_n.vector())
             count += 1
 
-        if step % 20 == 0:
-            print(f"  Step {step}/{num_steps} (t={t:.3f}s)")
+        if step % 10 == 0:
+            print(f"  Step {step}/{num_steps} (t={t:.2f}s)")
 
     # Normalize
     if count > 0:
