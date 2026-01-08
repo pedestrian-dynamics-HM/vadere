@@ -3,393 +3,319 @@ import argparse
 import sys
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.path import Path
-
-# --- 1. IMPORTS & COMPATIBILITY ---
 import pystencils as ps
 import lbmpy
+
+# --- 1. SETUP ---
 from lbmpy.enums import Method, Stencil
+from lbmpy.stencils import LBStencil
 
-# Stencil API-Switch
-try:
-    from lbmpy.stencils import LBStencil
-    def get_d2q9_stencil(): return LBStencil(Stencil.D2Q9)
-except ImportError:
-    from lbmpy.stencils import get_stencil
-    def get_d2q9_stencil(): return get_stencil("D2Q9")
+def get_d2q9_stencil():
+    return LBStencil(Stencil.D2Q9)
 
-# Method API-Switch
-try:
-    from lbmpy.creationfunctions import create_lb_update_rule, create_lb_method
-except ImportError:
-    from lbmpy.creationfunctions import create_lb_collision_rule as create_lb_update_rule
-    try:
-        from lbmpy.creationfunctions import create_lb_method
-    except ImportError:
-        from lbmpy.methods import create_lb_method
-
+from lbmpy.creationfunctions import create_lb_update_rule, create_lb_method
 from helpers import extract_attributes, get_cache_dir, get_parameter_string
 
-# --- 2. CONSTANTS ---
-INV_D2Q9 = [0, 2, 1, 4, 3, 8, 7, 6, 5]
-WEIGHTS = np.array([4/9, 1/9, 1/9, 1/9, 1/9, 1/36, 1/36, 1/36, 1/36])
-DIRS = np.array([
-    [0, 0], [0, 1], [0, -1], [-1, 0], [1, 0],
-    [-1, 1], [1, 1], [-1, -1], [1, -1]
-])
+# --- 2. PHYSICS HELPERS ---
+def extract_stencil_info(lb_method):
+    """
+    Extracts directions and creates the Bounce-Back Index Map.
+    """
+    stencil = lb_method.stencil
+    dirs = np.array(stencil, dtype=np.int32)
+    weights = np.array(lb_method.weights, dtype=np.float64)
 
-# --- 3. NUMERICS ---
+    # Create Inverse Map: inv_indices[i] is the index of the direction opposite to i
+    inv_indices = np.zeros(len(dirs), dtype=np.int32)
+    for i, d in enumerate(dirs):
+        inv_d = tuple(-1 * x for x in d)
+        try:
+            inv_indices[i] = stencil.index(inv_d)
+        except ValueError:
+            raise ValueError(f"Stencil Error: Direction {d} has no inverse in {stencil}")
 
-def calc_macroscopic(pdfs):
-    """ Manual calculation of Density (rho) and Velocity (u). """
+    return dirs, weights, inv_indices
+
+def get_equilibrium(rho, u, dirs, weights):
+    """
+    Robust Equilibrium (Handles Scalar Inlet & Field Simulation).
+    """
+    # u_sq: (nx, ny) or scalar
+    u_sq = np.sum(u**2, axis=-1)
+
+    # c_u: (nx, ny, 9) or (9,)
+    c_u = np.dot(u, dirs.T)
+
+    t1 = 3.0 * c_u
+    t2 = 4.5 * c_u**2
+
+    # Broadcast correction
+    if u_sq.ndim > 0:
+        t3 = 1.5 * u_sq[..., np.newaxis]
+    else:
+        t3 = 1.5 * u_sq
+
+    if not np.isscalar(rho) and rho.ndim > 0:
+        rho_term = rho[..., np.newaxis]
+    else:
+        rho_term = rho
+
+    return weights * rho_term * (1.0 + t1 + t2 - t3)
+
+def calc_macroscopic(pdfs, dirs):
     rho = np.sum(pdfs, axis=2)
-    momentum = np.dot(pdfs, DIRS)
+    momentum = np.tensordot(pdfs, dirs, axes=(2, 0))
     rho_safe = np.maximum(rho, 1e-5)
     u = momentum / rho_safe[..., np.newaxis]
     return rho, u
 
-def get_equilibrium(rho, u_x, u_y):
-    """ Calculate BGK Equilibrium Distribution. """
-    u_sq = u_x**2 + u_y**2
-    c_u = (DIRS[:, 0] * u_x + DIRS[:, 1] * u_y)
-    t1 = 3.0 * c_u
-    t2 = 4.5 * c_u**2
-    t3 = 1.5 * u_sq
-    return WEIGHTS * rho * (1.0 + t1 + t2 - t3)
-
-# --- 4. ROBUST GEOMETRY ENGINE ---
-
-def rasterize_obstacle_thick(wall_mask, obstacle_points, dx, x_min, y_min):
+# --- 3. ROBUST GEOMETRY ---
+def rasterize_thick_line(mask, p1, p2, bounds, thickness=3.0):
     """
-    Rasterizes obstacles with a 'THICK BRUSH' to prevent diagonal leakage.
-    Instead of marking 1 cell, we mark a 3x3 block around every point.
+    Draws watertight walls [x, y].
     """
-    nx, ny = wall_mask.shape
-    pts = np.array(obstacle_points)
-    num_pts = len(pts)
+    nx, ny = mask.shape
+    x_min, y_min, dx = bounds
 
-    # Iterate over perimeter edges
-    for i in range(num_pts):
-        p1 = pts[i]
-        p2 = pts[(i + 1) % num_pts]
+    # Physical -> Grid
+    gx1 = (p1[0] - x_min) / dx
+    gy1 = (p1[1] - y_min) / dx
+    gx2 = (p2[0] - x_min) / dx
+    gy2 = (p2[1] - y_min) / dx
 
-        dist = np.linalg.norm(p2 - p1)
-        if dist < 1e-9: continue
+    # Bounding Box
+    ix_min = max(0, int(min(gx1, gx2) - thickness))
+    ix_max = min(nx, int(max(gx1, gx2) + thickness + 1))
+    iy_min = max(0, int(min(gy1, gy2) - thickness))
+    iy_max = min(ny, int(max(gy1, gy2) + thickness + 1))
 
-        # High-density sampling (Step size = 1/3 of a cell)
-        steps = max(5, int(np.ceil(dist / (dx * 0.33))))
+    for x in range(ix_min, ix_max):
+        for y in range(iy_min, iy_max):
+            l2 = (gx2-gx1)**2 + (gy2-gy1)**2
+            if l2 == 0:
+                dist = np.hypot(x-gx1, y-gy1)
+            else:
+                t = ((x-gx1)*(gx2-gx1) + (y-gy1)*(gy2-gy1)) / l2
+                t = max(0, min(1, t))
+                proj_x = gx1 + t * (gx2-gx1)
+                proj_y = gy1 + t * (gy2-gy1)
+                dist = np.hypot(x-proj_x, y-proj_y)
 
-        xs = np.linspace(p1[0], p2[0], steps)
-        ys = np.linspace(p1[1], p2[1], steps)
+            if dist <= thickness:
+                mask[x, y] = True
 
-        # Convert to grid indices
-        ixs = np.round((xs - x_min) / dx).astype(int)
-        iys = np.round((ys - y_min) / dx).astype(int)
-
-        # Clip to domain
-        ixs = np.clip(ixs, 0, nx - 1)
-        iys = np.clip(iys, 0, ny - 1)
-
-        # --- THE THICKENING FIX ---
-        # Mark the center cell AND neighbors (3x3 block)
-        # This guarantees that the wall is 'watertight' for D2Q9
-        for dx_i in [-1, 0, 1]:
-            for dy_i in [-1, 0, 1]:
-                # Shifted indices
-                xi = np.clip(ixs + dx_i, 0, nx - 1)
-                yi = np.clip(iys + dy_i, 0, ny - 1)
-                wall_mask[xi, yi] = True
-
-# --- 5. BOUNDARIES ---
-
-def apply_wall_bounce_back(pdfs, mask):
-    """ Reflects particles at walls (No-Slip). """
-    if not np.any(mask): return
-    wall_cells = pdfs[mask]
-    pdfs[mask] = wall_cells[:, INV_D2Q9]
-
-def apply_inlet(pdfs, slice_obj, u_target_x, u_target_y, current_step, ramp_steps):
-    """ Soft start (Ramp-Up). """
-    factor = 1.0
-    if current_step < ramp_steps:
-        factor = current_step / float(ramp_steps)
-
-    feq = get_equilibrium(1.0, u_target_x * factor, u_target_y * factor)
-    pdfs[slice_obj] = feq
-
-def apply_outlet(pdfs, slice_obj, neighbor_slice):
-    """ Zero-gradient outlet. """
-    pdfs[slice_obj] = pdfs[neighbor_slice]
-
-# --- 6. PLOTTING ---
-
-def plot_lbm_results(X, Y, Vx, Vy, vel_mag, obstacles, wall_mask, path):
-    """ Plots Grid/Geometry, Streamlines, and Vectors side-by-side. """
-    x_min, x_max = np.min(X), np.max(X)
-    y_min, y_max = np.min(Y), np.max(Y)
-
-    # 2-Panel Plot
-    domain_width = x_max - x_min
-    domain_height = y_max - y_min
-    aspect = domain_width / (domain_height + 1e-5)
-    plot_height = 8
-    plot_width = plot_height * aspect
-    fig_width = plot_width * 2
-
-    fig, axes = plt.subplots(1, 2,
-                             figsize=(fig_width, plot_height),
-                             sharex=True, sharey=True,
-                             constrained_layout=True)
-    ax_stream, ax_quiver = axes
-
-    def draw_obstacles(ax):
-        for obs in obstacles:
-            obs_arr = np.array(obs)
-            ax.fill(obs_arr[:, 0], obs_arr[:, 1], color='grey', alpha=1.0, zorder=10)
-
-    # --- Plot 1: Streamlines ---
-    levels = np.linspace(0, np.max(vel_mag), 50)
-    cf1 = ax_stream.contourf(X, Y, vel_mag, levels=levels, cmap='viridis')
-
-    # Fix for 'rows of x must be equal' -> Use standard meshgrid
-    ax_stream.streamplot(X, Y, Vx, Vy, color='white', linewidth=0.5,
-                         density=1.5, arrowsize=1, arrowstyle='->')
-
-    draw_obstacles(ax_stream)
-    # Overlay the actual LBM wall mask to debug leakage visually
-    # We plot the mask as a faint red overlay
-    ax_stream.imshow(wall_mask.T, origin='lower', extent=[x_min, x_max, y_min, y_max],
-                     cmap='Reds', alpha=0.3, zorder=5)
-
-    ax_stream.set_title("Streamlines (Red=LBM Wall)")
-    cb1 = fig.colorbar(cf1, ax=ax_stream, location='bottom', fraction=0.05, pad=0.05)
-    cb1.set_label('Velocity (m/s)')
-
-    # --- Plot 2: Vectors ---
-    cf2 = ax_quiver.contourf(X, Y, vel_mag, levels=levels, cmap='viridis')
-    skip = max(1, int(len(X[0])/40))
-    ax_quiver.quiver(X[::skip, ::skip], Y[::skip, ::skip],
-                     Vx[::skip, ::skip], Vy[::skip, ::skip],
-                     color='white', scale=None, width=0.003, alpha=0.8)
-    draw_obstacles(ax_quiver)
-    ax_quiver.set_title("Velocity Vectors")
-    cb2 = fig.colorbar(cf2, ax=ax_quiver, location='bottom', fraction=0.05, pad=0.05)
-    cb2.set_label('Velocity (m/s)')
-
-    for ax in axes:
-        ax.set_xlabel("x (m)")
-        ax.set_ylabel("y (m)")
-        ax.set_aspect('equal', adjustable='box')
-        ax.set_xlim(x_min, x_max)
-        ax.set_ylim(y_min, y_max)
-
-    print(f"Saving plot to {path}")
-    plt.savefig(path)
-    plt.close()
-
-# --- 7. SETUP ---
-
-def physical_to_lattice(geom_data, target_u_lb=0.05):
-    dx = geom_data['rect_grid_cell_size']
-    u_phys = geom_data['inlet_velocity']
-    nu_phys = geom_data['viscosity']
-
-    L_x = geom_data['x_max'] - geom_data['x_min']
-    nx = int(np.round(L_x / dx))
-    ny = int(np.round((geom_data['y_max'] - geom_data['y_min']) / dx))
-
-    dt = (target_u_lb * dx) / u_phys
-    nu_lb = nu_phys * dt / (dx**2)
-    omega = 1.0 / (3.0 * nu_lb + 0.5)
-
-    print(f"\n--- Parameter Check ---")
-    print(f"  Theoretical Omega: {omega:.4f}")
-
-    MAX_OMEGA = 1.9
-    if omega > MAX_OMEGA:
-        print(f"WARNING: Omega {omega:.4f} is too high. Clamping to {MAX_OMEGA}.")
-        omega = MAX_OMEGA
-
-    print(f"  Final Parameters: nx={nx}, ny={ny}, omega={omega:.4f}")
-    return nx, ny, omega, target_u_lb, dt
-
+# --- 4. MAIN ---
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('scenario')
     parser.add_argument('hash')
     args = parser.parse_args()
 
+    # --- GEOMETRY ---
     geom_data = extract_attributes(args.scenario)
-    nx, ny, omega, u_lb, dt = physical_to_lattice(geom_data, target_u_lb=0.05)
+    dx = geom_data['rect_grid_cell_size']
+    x_min, x_max = geom_data['x_min'], geom_data['x_max']
+    y_min, y_max = geom_data['y_min'], geom_data['y_max']
+
+    # Layout: (nx, ny) -> (Width, Height)
+    nx = int(np.round((x_max - x_min) / dx))
+    ny = int(np.round((y_max - y_min) / dx))
+
+    print(f"--- Initialization ---")
+    print(f"Grid: {nx} x {ny} (Compatible Layout)")
+
+    # Parameters
+    u_phys = geom_data['inlet_velocity']
+    nu_phys = geom_data['viscosity']
+
+    u_lb = 0.04
+    dt = (u_lb * dx) / u_phys
+    nu_lb = nu_phys * dt / (dx**2)
+    omega = 1.0 / (3.0 * nu_lb + 0.5)
+    omega = min(omega, 1.95)
+
+    print(f"Omega: {omega:.4f}")
 
     # --- KERNEL ---
     stencil = get_d2q9_stencil()
-    print("Configuring Solver...")
+    # TRT is stable for walls
     try:
-        lb_method = create_lb_method(method=Method.TRT, stencil=stencil,
-                                     relaxation_rate=omega, compressible=True)
-        print(" -> Method: TRT")
-    except Exception:
-        lb_method = create_lb_method(method=Method.SRT, stencil=stencil,
-                                     relaxation_rate=omega, compressible=True)
-        print(" -> Method: SRT")
+        lb_method = create_lb_method(method=Method.TRT, stencil=stencil, relaxation_rate=omega)
+    except:
+        lb_method = create_lb_method(method=Method.SRT, stencil=stencil, relaxation_rate=omega)
 
+    # Compile
     update_rule = create_lb_update_rule(lb_method=lb_method, optimization={'cse_global': True})
     kernel = ps.create_kernel(update_rule, target=ps.Target.CPU).compile()
+
+    # Get Stencil Info
+    DIRS, WEIGHTS, INV_INDICES = extract_stencil_info(lb_method)
 
     # --- ARRAYS ---
     pdfs = np.zeros((nx, ny, 9), dtype=np.float64)
     pdfs_tmp = np.zeros_like(pdfs)
-    pdfs[:] = WEIGHTS
 
-    # --- GEOMETRY (THICKENED) ---
-    print("Rasterizing Obstacles (Thick Brush)...")
+    for i, w in enumerate(WEIGHTS):
+        pdfs[:, :, i] = w
+
+    # --- WALL MASK ---
     wall_mask = np.zeros((nx, ny), dtype=bool)
+    bounds = (x_min, y_min, dx)
 
-    # 1. Domain
-    wall_mask[0, :] = True; wall_mask[-1, :] = True
-    wall_mask[:, 0] = True; wall_mask[:, -1] = True
-
-    inlets, outlets = [], []
-
-    def get_slice(side, start, end):
-        dx = geom_data['rect_grid_cell_size']
-        def idx(v): return max(0, min(nx, int(round((v - geom_data['x_min'])/dx))))
-        def idy(v): return max(0, min(ny, int(round((v - geom_data['y_min'])/dx))))
-        ix_s, ix_e = idx(start), idx(end)
-        iy_s, iy_e = idy(start), idy(end)
-
-        if side == 'left':   return (slice(0, 1), slice(iy_s, iy_e))
-        if side == 'right':  return (slice(nx-1, nx), slice(iy_s, iy_e))
-        if side == 'bottom': return (slice(ix_s, ix_e), slice(0, 1))
-        if side == 'top':    return (slice(ix_s, ix_e), slice(ny-1, ny))
-        return None
-
-    # Inlets/Outlets
-    for inlet in geom_data['inlets']:
-        sl = get_slice(inlet['side'], inlet['coords'][0], inlet['coords'][1])
-        if sl:
-            wall_mask[sl] = False # Clear wall at inlet
-            vx, vy = 0, 0
-            if inlet['side'] == 'left': vx = u_lb
-            elif inlet['side'] == 'right': vx = -u_lb
-            elif inlet['side'] == 'bottom': vy = u_lb
-            elif inlet['side'] == 'top': vy = -u_lb
-            inlets.append({'slice': sl, 'u': (vx, vy)})
-
-    for outlet in geom_data['outlets']:
-        sl = get_slice(outlet['side'], outlet['coords'][0], outlet['coords'][1])
-        if sl:
-            wall_mask[sl] = False # Clear wall at outlet
-            sx, sy = sl
-            if outlet['side'] == 'left': nx_s, ny_s = slice(1, 2), sy
-            elif outlet['side'] == 'right': nx_s, ny_s = slice(nx-2, nx-1), sy
-            elif outlet['side'] == 'bottom': nx_s, ny_s = sx, slice(1, 2)
-            elif outlet['side'] == 'top': nx_s, ny_s = sx, slice(ny-2, ny-1)
-            outlets.append({'slice': sl, 'neighbor': (nx_s, ny_s)})
-
-    # 2. OBSTACLES WITH THICK RASTERIZATION
+    # 1. Obstacles (Thick)
     if geom_data['obstacles']:
-        dx = geom_data['rect_grid_cell_size']
-        x_min, y_min = geom_data['x_min'], geom_data['y_min']
-
-        # A. Fill Interiors
-        x_v = np.linspace(x_min, geom_data['x_max'], nx)
-        y_v = np.linspace(y_min, geom_data['y_max'], ny)
-        xv, yv = np.meshgrid(x_v, y_v, indexing='ij')
-        points = np.vstack((xv.ravel(), yv.ravel())).T
-
         for obs in geom_data['obstacles']:
-            # Fill Volume
-            inside = Path(obs).contains_points(points).reshape((nx, ny))
-            wall_mask = wall_mask | inside
+            pts = obs
+            for i in range(len(pts)):
+                p1 = pts[i]
+                p2 = pts[(i+1)%len(pts)]
+                rasterize_thick_line(wall_mask, p1, p2, bounds, thickness=2.5)
 
-            # Thick Perimeter Brush
-            rasterize_obstacle_thick(wall_mask, obs, dx, x_min, y_min)
+    # 2. Border (Watertight - 3 Cells Thick)
+    # This prevents tunneling and periodic wrapping
+    wall_mask[0:3, :] = True   # Left
+    wall_mask[-3:, :] = True   # Right
+    wall_mask[:, 0:3] = True   # Bottom
+    wall_mask[:, -3:] = True   # Top
 
-    # --- MAIN LOOP ---
-    print("Starting Simulation...")
+    # 3. Inlets/Outlets (Punch holes)
+    inlets = []
+    outlets = []
+
+    def get_idx(val, start, limit):
+        idx = int(round((val - start)/dx))
+        return max(0, min(limit, idx))
+
+    for feat in geom_data['inlets'] + geom_data['outlets']:
+        is_inlet = (feat in geom_data['inlets'])
+        side = feat['side']
+        c_start, c_end = feat['coords']
+
+        sl = None
+        u_target = np.array([0.0, 0.0])
+
+        # Slicing [x, y]
+        if side == 'left': # x=0
+            y_s, y_e = get_idx(c_start, y_min, ny), get_idx(c_end, y_min, ny)
+            sl = (slice(0, 3), slice(y_s, y_e)) # Cut through thick wall
+            u_target = np.array([u_lb, 0])
+            neighbor = (slice(3, 4), slice(y_s, y_e))
+
+        elif side == 'right': # x=max
+            y_s, y_e = get_idx(c_start, y_min, ny), get_idx(c_end, y_min, ny)
+            sl = (slice(nx-3, nx), slice(y_s, y_e))
+            u_target = np.array([-u_lb, 0])
+            neighbor = (slice(nx-4, nx-3), slice(y_s, y_e))
+
+        elif side == 'bottom': # y=0
+            x_s, x_e = get_idx(c_start, x_min, nx), get_idx(c_end, x_min, nx)
+            sl = (slice(x_s, x_e), slice(0, 3))
+            u_target = np.array([0, u_lb])
+            neighbor = (slice(x_s, x_e), slice(3, 4))
+
+        elif side == 'top': # y=max
+            x_s, x_e = get_idx(c_start, x_min, nx), get_idx(c_end, x_min, nx)
+            sl = (slice(x_s, x_e), slice(ny-3, ny))
+            u_target = np.array([0, -u_lb])
+            neighbor = (slice(x_s, x_e), slice(ny-4, ny-3))
+
+        if sl:
+            wall_mask[sl] = False
+            if is_inlet:
+                inlets.append({'slice': sl, 'u': u_target})
+            else:
+                outlets.append({'slice': sl, 'neighbor': neighbor})
+
+    # --- SIMULATION ---
+    print("Running Simulation...")
     max_steps = 60000
-    check_interval = 2000
-    tol = 1e-5
-    last_energy = 0.0
-    use_src_dst = False
     ramp_steps = 2000
 
-    start_time = time.time()
+    for i in range(1, max_steps+1):
+        # 1. Stream & Collide (Src -> Dst)
+        kernel(src=pdfs, dst=pdfs_tmp)
 
-    for i in range(1, max_steps + 1):
-        try:
-            if not use_src_dst: kernel(pdfs=pdfs, pdfs_tmp=pdfs_tmp)
-            else: kernel(src=pdfs, dst=pdfs_tmp)
-        except TypeError:
-            use_src_dst = True
-            kernel(src=pdfs, dst=pdfs_tmp)
+        # 2. BOUNDARY CONDITIONS (On Dst)
 
-        apply_wall_bounce_back(pdfs_tmp, wall_mask)
+        # A. BOUNCE BACK (The Physics Fix)
+        # Any fluid that streamed into a wall node is reflected back.
+        if np.any(wall_mask):
+            # Optimized numpy slice flip
+            # Takes particles at wall, flips them to inverse directions
+            pdfs_tmp[wall_mask] = pdfs_tmp[wall_mask][:, INV_INDICES]
 
+        # B. INLETS
         for inl in inlets:
-            apply_inlet(pdfs_tmp, inl['slice'], inl['u'][0], inl['u'][1],
-                       current_step=i, ramp_steps=ramp_steps)
-        for out in outlets:
-            apply_outlet(pdfs_tmp, out['slice'], out['neighbor'])
+            ramp = min(1.0, i/ramp_steps)
+            u_cur = inl['u'] * ramp
+            feq = get_equilibrium(1.0, u_cur, DIRS, WEIGHTS)
+            pdfs_tmp[inl['slice']] = feq
 
+        # C. OUTLETS
+        for out in outlets:
+            pdfs_tmp[out['slice']] = pdfs_tmp[out['neighbor']]
+
+        # 3. Swap
         np.copyto(pdfs, pdfs_tmp)
 
-        if i % check_interval == 0:
-            rho, u = calc_macroscopic(pdfs)
-            eng = np.sum(u**2)
-            if np.isnan(eng) or eng > 1e15:
-                print(f"CRITICAL: Instability at step {i}!")
-                break
-            diff = abs(eng - last_energy)
-            rel_err = diff / (eng + 1e-10)
-            print(f"Step {i}: Energy={eng:.4e}, Rel.Err={rel_err:.6e}")
-            if rel_err < tol and i > ramp_steps:
-                print(f"--> Converged (Step {i})")
-                break
-            last_energy = eng
+        if i % 5000 == 0:
+            print(f"Step {i}/{max_steps}...")
 
-    # --- EXPORT ---
-    print("Exporting results...")
-    rho, u = calc_macroscopic(pdfs)
-    scale = geom_data['inlet_velocity'] / u_lb
-    vx_phys = u[..., 0] * scale
-    vy_phys = u[..., 1] * scale
+    # --- OUTPUT ---
+    rho, u = calc_macroscopic(pdfs, DIRS)
+    scale = u_phys / u_lb
+    vx = u[..., 0] * scale
+    vy = u[..., 1] * scale
 
-    vx_export = vx_phys.T
-    vy_export = vy_phys.T
+    # Mask walls for clean plot (visual only)
+    vx[wall_mask] = 0
+    vy[wall_mask] = 0
+
+    # Transpose for Plotting (nx, ny) -> (ny, nx)
+    vx_plot = vx.T
+    vy_plot = vy.T
+    mask_plot = wall_mask.T
 
     cache_dir, scenario_name = get_cache_dir(args.scenario)
     hdr = f'{ny}_{nx}_{get_parameter_string(geom_data)}'
 
-    np.savetxt(f"{cache_dir}/{scenario_name}_{args.hash}_Vx.txt", vx_export, header=hdr)
-    np.savetxt(f"{cache_dir}/{scenario_name}_{args.hash}_Vy.txt", vy_export, header=hdr)
+    np.savetxt(f"{cache_dir}/{scenario_name}_{args.hash}_Vx.txt", vx_plot, header=hdr)
+    np.savetxt(f"{cache_dir}/{scenario_name}_{args.hash}_Vy.txt", vy_plot, header=hdr)
 
-    # --- PLOT ---
-    print("Generating Plots...")
-    # Use standard 'xy' indexing for Matplotlib
-    x_rng = np.linspace(geom_data['x_min'], geom_data['x_max'], nx)
-    y_rng = np.linspace(geom_data['y_min'], geom_data['y_max'], ny)
-    X, Y = np.meshgrid(x_rng, y_rng)
+    # Plot
+    x_range = np.linspace(x_min, x_max, nx)
+    y_range = np.linspace(y_min, y_max, ny)
+    X, Y = np.meshgrid(x_range, y_range)
 
-    # Calculate Velocity Magnitude
-    vel_mag_plot = np.sqrt(vx_export**2 + vy_export**2)
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 6))
 
-    # Mask Velocity inside obstacles for cleaner plot
-    # We transpose wall_mask to match plot coords (ny, nx)
-    wall_mask_plot = wall_mask.T
-    # Set velocity to 0 where wall is present
-    vel_mag_plot[wall_mask_plot] = 0.0
-    vx_export[wall_mask_plot] = 0.0
-    vy_export[wall_mask_plot] = 0.0
+    vel_mag = np.sqrt(vx_plot**2 + vy_plot**2)
+    vel_masked = np.ma.masked_where(mask_plot, vel_mag)
+
+    # Streamlines     ax1.set_title("Streamlines")
+    ax1.contourf(X, Y, vel_masked, levels=50, cmap='viridis', origin='lower')
+    # Overlay Wall Mask to prove alignment
+    ax1.imshow(mask_plot, extent=[x_min, x_max, y_min, y_max], origin='lower', cmap='binary', alpha=0.2)
+    ax1.streamplot(X, Y, vx_plot, vy_plot, color='white', density=1.5, linewidth=0.6)
+
+    # Vectors
+    ax2.set_title("Vectors")
+    ax2.contourf(X, Y, vel_masked, levels=50, cmap='viridis', origin='lower')
+    skip = max(1, int(nx/35))
+    ax2.quiver(X[::skip, ::skip], Y[::skip, ::skip],
+               vx_plot[::skip, ::skip], vy_plot[::skip, ::skip],
+               color='white', scale=None, alpha=0.7)
+
+    for ax in [ax1, ax2]:
+        for obs in geom_data['obstacles']:
+            ax.fill(np.array(obs)[:,0], np.array(obs)[:,1], color='gray', alpha=0.5)
+        ax.set_aspect('equal')
+        ax.set_xlim(x_min, x_max)
+        ax.set_ylim(y_min, y_max)
 
     out_img = f"{cache_dir}/{scenario_name}_{args.hash}_results.png"
-
-    plot_lbm_results(X, Y, vx_export, vy_export, vel_mag_plot,
-                     geom_data['obstacles'], wall_mask, out_img)
-
-    print(f"Finished in {time.time()-start_time:.2f}s")
+    plt.savefig(out_img, dpi=150, bbox_inches='tight')
+    print("Done.")
 
 if __name__ == '__main__':
     main()
