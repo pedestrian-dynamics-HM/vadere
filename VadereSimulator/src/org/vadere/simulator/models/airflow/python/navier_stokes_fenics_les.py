@@ -68,153 +68,155 @@ def main():
     with XDMFFile(mesh_file) as infile: infile.read(mesh)
     boundaries = mark_boundaries(mesh, geom_data)
 
-    # 2. Function Spaces
+    # 2. Spaces
     V = VectorFunctionSpace(mesh, "P", 2)
     Q = FunctionSpace(mesh, "P", 1)
+    DG = FunctionSpace(mesh, "DG", 0) # For turbulence calculation
 
-    # 3. Time Stepping Setup (Wobble Restored)
-    # Reduced dt to resolve the sine wave oscillation
-    T = 30.0
-    dt = 0.5       # Small enough to capture wobble
+    # 3. Time Setup
+    # T=5.0s is long enough to let the average stabilize
+    T = 5.0
+    dt = 0.02         # 20ms steps (LES is robust enough for this)
     k = Constant(dt)
     num_steps = int(T / dt)
 
-    # 4. Boundary Conditions (Dynamic Wobble)
+    # 4. Boundary Conditions (Wobbly Inlet to trigger Turbulence)
     inlet_vel = geom_data['inlet_velocity']
+    wobble_scale = 0.25 # 25% side-to-side oscillation
+    freq = 3.0          # Slow, heavy oscillation
+
+    inlet_exprs = []
     bcu = []
-
-    # Store inlet expressions to update 't' later
-    inlet_expressions = []
-
-    # Wall (No Slip)
-    bcu.append(DirichletBC(V, Constant((0, 0)), boundaries, 3))
+    bcu.append(DirichletBC(V, Constant((0, 0)), boundaries, 3)) # Wall
 
     for inlet in geom_data['inlets']:
         c, s = inlet['coords'], inlet['side']
         center, width = (c[0] + c[1]) / 2.0, c[1] - c[0]
 
-        # Base parabolic profile string
-        # Wobble added: The transverse component oscillates with sin(3*t)
-        # Amplitude of wobble is 0.5 * inlet_vel
-
-        # Parabolic term common to both
-        para_y = f"(1.0 - pow((x[1]-{center})/({width}/2.0), 2))"
-        para_x = f"(1.0 - pow((x[0]-{center})/({width}/2.0), 2))"
-
+        # Parabolic Profile + Transverse Sine Wave
         if s=='left':
-            u_x = f"{inlet_vel} * {para_y}"
-            u_y = f"{inlet_vel} * 0.5 * sin(10.0*t) * {para_y}"
+            u_x = f"{inlet_vel}*(1.0 - pow((x[1]-{center})/({width}/2.0), 2))"
+            u_y = f"{wobble_scale} * {inlet_vel} * sin({freq}*t)"
+            val = Expression((u_x, u_y), degree=2, t=0.0)
         elif s=='right':
-            u_x = f"-{inlet_vel} * {para_y}"
-            u_y = f"{inlet_vel} * 0.5 * sin(10.0*t) * {para_y}"
+            u_x = f"-{inlet_vel}*(1.0 - pow((x[1]-{center})/({width}/2.0), 2))"
+            u_y = f"{wobble_scale} * {inlet_vel} * sin({freq}*t)"
+            val = Expression((u_x, u_y), degree=2, t=0.0)
         elif s=='bottom':
-            u_y = f"{inlet_vel} * {para_x}"
-            u_x = f"{inlet_vel} * 0.5 * sin(10.0*t) * {para_x}"
+            u_y = f"{inlet_vel}*(1.0 - pow((x[0]-{center})/({width}/2.0), 2))"
+            u_x = f"{wobble_scale} * {inlet_vel} * sin({freq}*t)"
+            val = Expression((u_x, u_y), degree=2, t=0.0)
         elif s=='top':
-            u_y = f"-{inlet_vel} * {para_x}"
-            u_x = f"{inlet_vel} * 0.5 * sin(10.0*t) * {para_x}"
+            u_y = f"-{inlet_vel}*(1.0 - pow((x[0]-{center})/({width}/2.0), 2))"
+            u_x = f"{wobble_scale} * {inlet_vel} * sin({freq}*t)"
+            val = Expression((u_x, u_y), degree=2, t=0.0)
 
-        # Create Expression with 't' parameter
-        val = Expression((u_x, u_y), degree=2, t=0.0)
-        inlet_expressions.append(val)
+        inlet_exprs.append(val)
         bcu.append(DirichletBC(V, val, boundaries, 1))
 
-    # Pressure BC: Outlet P=0
     bcp = [DirichletBC(Q, Constant(0.0), boundaries, 2)]
 
-    # 5. Variational Forms (Stabilized IPCS)
-    u = TrialFunction(V)
-    v = TestFunction(V)
-    p = TrialFunction(Q)
-    q = TestFunction(Q)
+    # 5. Physics Setup
+    u, v = TrialFunction(V), TestFunction(V)
+    p, q = TrialFunction(Q), TestFunction(Q)
 
-    u_n = Function(V)   # Velocity at step n
-    u_  = Function(V)   # Tentative Velocity (u*)
-    p_n = Function(Q)   # Pressure at step n
-    p_  = Function(Q)   # New Pressure (p_n+1)
+    u_n = Function(V)   # Previous Velocity
+    u_  = Function(V)   # Tentative Velocity
+    p_n = Function(Q)   # Previous Pressure
+    p_  = Function(Q)   # New Pressure
 
     mu = Constant(geom_data['viscosity'])
     rho = Constant(1.0)
-    n = FacetNormal(mesh)
+    n_vec = FacetNormal(mesh)
 
-    # --- Step 1: Tentative Velocity ---
+    # --- Smagorinsky LES Model ---
+    # We define mu_eff (Effective Viscosity) as a Coefficient we update every step
+    # This avoids recompiling the form
+    mu_eff_fn = Function(DG)
+
+    # Pre-calculate geometric constants for LES
+    C_s = Constant(0.15)  # Smagorinsky constant
+    h = CellDiameter(mesh)
+
+    def S(u): return sym(nabla_grad(u))
+    def sigma(u, p, visc): return 2*visc*S(u) - p*Identity(len(u))
+
+    # Form 1: Tentative Velocity (Uses mu_eff_fn)
     U = 0.5*(u_n + u)
-    def epsilon(u): return sym(nabla_grad(u))
-    def sigma(u, p): return 2*mu*epsilon(u) - p*Identity(len(u))
-
-    # Implicit Advection (Stable for dynamic flows too)
     F1 = rho*dot((u - u_n) / k, v)*dx + \
-         rho*dot(dot(u_n, nabla_grad(u)), v)*dx + \
-         inner(sigma(U, p_n), epsilon(v))*dx + \
-         dot(p_n*n, v)*ds - dot(mu*nabla_grad(U)*n, v)*ds
+         rho*dot(dot(u_n, nabla_grad(u_n)), v)*dx + \
+         inner(sigma(U, p_n, mu_eff_fn), S(v))*dx + \
+         dot(p_n*n_vec, v)*ds - dot(mu_eff_fn*nabla_grad(U)*n_vec, v)*ds
 
-    a1 = lhs(F1)
-    L1 = rhs(F1)
+    a1, L1 = lhs(F1), rhs(F1)
 
-    # --- Step 2: Pressure Projection ---
+    # Form 2: Pressure (Constant LHS, Variable RHS)
     a2 = dot(nabla_grad(p), nabla_grad(q))*dx
     L2 = dot(nabla_grad(p_n), nabla_grad(q))*dx - (rho/k)*div(u_)*q*dx
 
-    # --- Step 3: Velocity Correction ---
+    # Form 3: Correction
     a3 = dot(u, v)*dx
     L3 = dot(u_, v)*dx - k/rho * dot(nabla_grad(p_ - p_n), v)*dx
 
     # 6. Solvers
+    # A2 and A3 are constant geometry, assemble ONCE
     A2 = assemble(a2)
     A3 = assemble(a3)
 
-    solver1 = KrylovSolver("gmres", "ilu")
-    solver2 = KrylovSolver("gmres", "amg")
-    solver3 = KrylovSolver("cg", "sor")
+    solver1 = KrylovSolver("gmres", "ilu") # Step 1 changes (viscosity), re-assemble
+    solver2 = KrylovSolver("gmres", "amg") # Step 2 constant matrix
+    solver3 = KrylovSolver("cg", "sor")    # Step 3 constant matrix
 
-    # Averaging Accumulator
-    u_avg = Function(V)
-    u_avg.vector().zero()
-    count = 0
-    t = 0.0
+    u_avg = Function(V); u_avg.vector().zero()
+    count = 0; t = 0.0
 
-    print(f"\n--- Starting Dynamic Simulation with Wobble ({num_steps} steps, dt={dt}) ---")
+    print(f"\n--- Starting LES Simulation ({num_steps} steps) ---")
 
     for step in range(num_steps):
         t += dt
+        for expr in inlet_exprs: expr.t = t
 
-        # Update boundary condition time
-        for expr in inlet_expressions:
-            expr.t = t
+        # 0. UPDATE TURBULENCE (Smagorinsky)
+        # Calculate new viscosity based on current flow strain
+        # nu_t = (Cs * h)^2 * |S(u_n)|
+        strain_mag = sqrt(2 * inner(S(u_n), S(u_n)))
+        viscosity_expr = mu + rho * (C_s * h)**2 * strain_mag
 
-        # 1. Tentative Velocity
+        # Project this onto the DG space for the solver to use
+        # (Using local_project or just interpolate/project)
+        # Simple projection is fast enough here
+        mu_eff_fn.assign(project(viscosity_expr, DG, solver_type="cg", preconditioner_type="sor"))
+
+        # 1. Tentative Velocity (Matrix A1 changes because mu_eff changed!)
         A1 = assemble(a1)
         b1 = assemble(L1)
         [bc.apply(A1, b1) for bc in bcu]
         solver1.solve(A1, u_.vector(), b1)
 
-        # 2. Pressure Update
+        # 2. Pressure (Reuse A2)
         b2 = assemble(L2)
         [bc.apply(A2, b2) for bc in bcp]
         solver2.solve(A2, p_.vector(), b2)
 
-        # 3. Velocity Correction
+        # 3. Correction (Reuse A3)
         b3 = assemble(L3)
         [bc.apply(A3, b3) for bc in bcu]
         solver3.solve(A3, u_n.vector(), b3)
 
-        # 4. Update Pressure
         p_n.assign(p_)
 
-        # 5. Accumulate Average
-        if t > 10: #(T - dt):
+        # Average (Start after 1.5s to let turbulence develop)
+        if t > 1.5:
             u_avg.vector().axpy(1.0, u_n.vector())
             count += 1
 
-        if step % 50 == 0:
-            print(f"  Step {step}/{num_steps} (t={t:.2f}s)")
+        if step % 20 == 0:
+            # Print max velocity to ensure it's not blowing up
+            max_v = u_n.vector().norm("linf")
+            print(f"  Step {step}/{num_steps} (t={t:.2f}s) | Max V: {max_v:.2f}")
 
-    # Normalize
-    if count > 0:
-        u_avg.vector()[:] /= float(count)
-        print(f"Averaged over {count} snapshots.")
-    else:
-        u_avg.assign(u_n)
+    if count > 0: u_avg.vector()[:] /= float(count)
+    else: u_avg.assign(u_n)
 
     # 7. Export
     print("Interpolating...")
@@ -226,7 +228,7 @@ def main():
     x_rng, y_rng = np.linspace(xmin, xmax, nx), np.linspace(ymin, ymax, ny)
     X, Y = np.meshgrid(x_rng, y_rng)
 
-    Vx_grid, Vy_grid = np.zeros_like(X), np.zeros_like(Y)
+    Vx, Vy = np.zeros_like(X), np.zeros_like(Y)
     u_eval = u_avg
     u_eval.set_allow_extrapolation(True)
 
@@ -234,10 +236,10 @@ def main():
         for j in range(nx):
             try:
                 val = u_eval(Point(X[i, j], Y[i, j]))
-                Vx_grid[i, j], Vy_grid[i, j] = val[0], val[1]
+                Vx[i, j], Vy[i, j] = val[0], val[1]
             except: pass
 
-    vel_mag = np.hypot(Vx_grid, Vy_grid)
+    vel_mag = np.hypot(Vx, Vy)
     print(f"Max Average Vel: {np.max(vel_mag):.4f}")
 
     param_str = get_parameter_string(geom_data)
@@ -245,12 +247,12 @@ def main():
     vx_path = cache_dir / f"{scenario_name}_{args.hash}_Vx.txt"
     vy_path = cache_dir / f"{scenario_name}_{args.hash}_Vy.txt"
     img_path = cache_dir / f"{scenario_name}_{args.hash}_results.png"
-    np.savetxt(vx_path, Vx_grid, header=header)
-    np.savetxt(vy_path, Vy_grid, header=header)
+    np.savetxt(vx_path, Vx, header=header)
+    np.savetxt(vy_path, Vy, header=header)
 
     if np.max(vel_mag) > 1e-6:
         adapter = SfePyMeshAdapter(mesh)
-        plot_results(adapter, X, Y, Vx_grid, Vy_grid, vel_mag, geom_data["obstacles"], str(img_path))
+        plot_results(adapter, X, Y, Vx, Vy, vel_mag, geom_data["obstacles"], str(img_path))
     else:
         from matplotlib import pyplot as plt
         plt.figure(); plt.text(0.5,0.5,"Zero Flow"); plt.savefig(str(img_path)); plt.close()

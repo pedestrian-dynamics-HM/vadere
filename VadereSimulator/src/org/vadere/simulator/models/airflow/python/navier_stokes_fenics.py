@@ -154,7 +154,7 @@ def main():
     print("\n--- Phase 2: Final Solve (Newton) ---")
     # Now that 'w' contains a valid flow field, Newton will converge easily
     try:
-        solve(F == 0, w, bcs, solver_parameters={
+        solve(F_newton == 0, w, bcs, solver_parameters={
             "newton_solver": {
                 "linear_solver": "gmres",      # mumps, gmres, amg, hypre_euclid
                 "preconditioner": "ilu",       # Incomplete LU factorization
