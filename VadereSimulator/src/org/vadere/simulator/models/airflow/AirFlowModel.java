@@ -48,7 +48,7 @@ public class AirFlowModel extends AbstractAirFlowModel {
         // To make sure suq controller doesn't compute airflow multiple times for same scenario: 
         // If files don't exist with exact name, try finding files with alternative pattern but same hash
         if(!(f_x_velocity.exists() && !f_x_velocity.isDirectory()) && !(f_y_velocity.exists() && !f_y_velocity.isDirectory())) {
-            File[] alternativeFiles = findAlternativeVelocityFiles(hash);
+            File[] alternativeFiles = findAlternativeVelocityFiles(hash, cacheDir);
             if (alternativeFiles != null) {
                 f_x_velocity = alternativeFiles[0];
                 f_y_velocity = alternativeFiles[1];
@@ -83,18 +83,13 @@ public class AirFlowModel extends AbstractAirFlowModel {
     }
 
 
-    private File[] findAlternativeVelocityFiles(String hash) {
-        File scenarioFile = new File(airFlow.getScenarioPath());
-        File parentDir = scenarioFile.getParentFile();
-        if (parentDir == null || !parentDir.exists()) {
+    private File[] findAlternativeVelocityFiles(String hash, File cacheDir) {
+        if (cacheDir == null || !cacheDir.exists()) {
             return null;
         }
-
-        // TODO add cache
-
-        String basePath = parentDir.getAbsolutePath();
+        String basePath = cacheDir.getAbsolutePath();
         
-        File[] files = parentDir.listFiles((dir, name) -> 
+        File[] files = cacheDir.listFiles((dir, name) ->
             name.matches("\\d+_\\d+_" + hash + X_VELOCITY_FILE_ENDING));
         
         if (files == null || files.length == 0) {
