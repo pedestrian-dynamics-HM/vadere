@@ -38,14 +38,6 @@ def main():
     # SETUP & MESH GENERATION
     geom_data = extract_attributes(args.scenario)
 
-    #geom_data["max_triangle_edge_len"] = 0.2 #0.000002
-    # restaurant: 0.01: 107s
-    # 0.002: 730s, 12min
-    # 0.001: 45min
-    # small: 0.0001: 43s
-    # 0.000002: 12733.68s, 212min, 3.5h
-    #geom_data["viscosity"] = 1e-3
-
     mesh, bdry_indices = build_mesh(geom_data)
 
     print(f"Mesh: {mesh.n_nod} nodes, {mesh.n_el} elements.")
@@ -166,22 +158,7 @@ def main():
     # PROBLEM & SOLVER
     pb = Problem('stabilized_navier_stokes', equations=equations)
     pb.set_bcs(ebcs=bcs)
-
-    #ls = ScipyIterative({
-    #    'method': 'gmres',
-    #    'i_max': 15000,
-    #    'eps_a': 1e-9,
-    #    'eps_r': 1e-9,
-    #})
     ls = ScipyDirect({})
-    #ls = PETScKrylovSolver({
-    #    'method': 'gmres',
-    #    'precond': 'lu',
-    #    'i_max': 10,
-    #    'eps_a': 1e-40,
-    #    'eps_r': 1e-40,
-    #    'options': '-pc_factor_mat_solver_type mumps'
-    #})
 
     conf_oseen = Struct(
         name = 'oseen',
