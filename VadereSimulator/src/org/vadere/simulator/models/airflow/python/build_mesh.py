@@ -29,10 +29,10 @@ def build_mesh(geom_data):
     for feat in all_features:
         s, c = feat['side'], feat['coords']
         pts_to_add = []
-        if s == 'bottom':   pts_to_add = [(c[0], y_min), (c[1], y_min)]
-        elif s == 'top':    pts_to_add = [(c[0], y_max), (c[1], y_max)]
-        elif s == 'left':   pts_to_add = [(x_min, c[0]), (x_min, c[1])]
-        elif s == 'right':  pts_to_add = [(x_max, c[0]), (x_max, c[1])]
+        if s == "south":   pts_to_add = [(c[0], y_min), (c[1], y_min)]
+        elif s == "north":    pts_to_add = [(c[0], y_max), (c[1], y_max)]
+        elif s == "west":   pts_to_add = [(x_min, c[0]), (x_min, c[1])]
+        elif s == "east":  pts_to_add = [(x_max, c[0]), (x_max, c[1])]
 
         for (px, py) in pts_to_add:
             pt_tag = gmsh.model.occ.addPoint(px, py, 0)
@@ -140,7 +140,7 @@ def build_mesh(geom_data):
     outlet_indices = set()
     eps = 1e-5
 
-    feats_by_side = {'left': [], 'right': [], 'top': [], 'bottom': []}
+    feats_by_side = {"west": [], "east": [], "north": [], "south": []}
     for item in all_features:
         c = sorted(item['coords'])
         is_inlet = (item in geom_data['inlets'])
@@ -162,10 +162,10 @@ def build_mesh(geom_data):
             else:
                 outlet_indices.update(hit_indices)
 
-    check_side(np.abs(coords[:, 0] - x_min) < eps, 1, 'left')
-    check_side(np.abs(coords[:, 0] - x_max) < eps, 1, 'right')
-    check_side(np.abs(coords[:, 1] - y_min) < eps, 0, 'bottom')
-    check_side(np.abs(coords[:, 1] - y_max) < eps, 0, 'top')
+    check_side(np.abs(coords[:, 0] - x_min) < eps, 1, "west")
+    check_side(np.abs(coords[:, 0] - x_max) < eps, 1, "east")
+    check_side(np.abs(coords[:, 1] - y_min) < eps, 0, "south")
+    check_side(np.abs(coords[:, 1] - y_max) < eps, 0, "north")
 
     return mesh, {
         'inlet': np.array(list(inlet_indices), dtype=np.int32),

@@ -44,9 +44,9 @@ public class AttributesAirFlowModel extends Attributes {
         inletVelocity = 0.3;
         viscosity = 1e-3;
         inlets = new ArrayList<>();
-        inlets.add(new AttributesInOutLet("left", 1, 1));
+        inlets.add(new AttributesInOutLet("west", 1, 1));
         outlets = new ArrayList<>();
-        outlets.add(new AttributesInOutLet("right", 1, 1));
+        outlets.add(new AttributesInOutLet("east", 1, 1));
         blockingObstacles = new ArrayList<>();
         onPeriod = 1.0;
         offPeriod = 0;

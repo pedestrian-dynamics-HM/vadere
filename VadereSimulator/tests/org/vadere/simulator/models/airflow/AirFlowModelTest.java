@@ -56,9 +56,9 @@ class AirFlowModelTest {
     @Test
     public void testInitialize() {
         ArrayList<AttributesInOutLet> inlets = new ArrayList<>();
-        inlets.add(new AttributesInOutLet("left", 1., 2.));
+        inlets.add(new AttributesInOutLet("west", 1., 2.));
         ArrayList<AttributesInOutLet> outlets = new ArrayList<>();
-        outlets.add(new AttributesInOutLet("right", 4., 5.));
+        outlets.add(new AttributesInOutLet("east", 4., 5.));
         AttributesAirFlowModel attributesAirFlowModel = new AttributesAirFlowModel(2., 0.1, 1., inlets, outlets, new ArrayList<>(), new AttributesBounds());
         attributesList.add(attributesAirFlowModel);
 
@@ -119,9 +119,9 @@ class AirFlowModelTest {
 
     private void initializeModel(boolean rightParameters, boolean periodic) {
         ArrayList<AttributesInOutLet> inlets = new ArrayList<>();
-        inlets.add(new AttributesInOutLet("left", 1., 2.));
+        inlets.add(new AttributesInOutLet("west", 1., 2.));
         ArrayList<AttributesInOutLet> outlets = new ArrayList<>();
-        outlets.add(new AttributesInOutLet("right", 4., 5.));
+        outlets.add(new AttributesInOutLet("east", 4., 5.));
         AttributesAirFlowModel attributesAirFlowModel;
         if (rightParameters) {
             attributesAirFlowModel = new AttributesAirFlowModel(2., 0.1, 1., inlets, outlets, new ArrayList<>(), new AttributesBounds());

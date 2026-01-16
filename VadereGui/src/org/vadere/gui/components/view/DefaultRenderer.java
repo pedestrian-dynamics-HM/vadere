@@ -321,16 +321,16 @@ public abstract class DefaultRenderer {
 
 			for (AttributesInOutLet inlet : attributesAirFlowModel.getInlets()) {
 				switch (inlet.getSide()) {
-					case "bottom":
+					case "south":
 						g.fill(new VRectangle.Double(inlet.getStart(), yMin - 0.1, inlet.getWidth(), 0.1));
 						break;
-					case "top":
+					case "north":
 						g.fill(new VRectangle.Double(inlet.getStart(), yMax, inlet.getWidth(), 0.1));
 						break;
-					case "left":
+					case "west":
 						g.fill(new VRectangle.Double(xMin - 0.1, inlet.getStart(), 0.1, inlet.getWidth()));
 						break;
-					case "right":
+					case "east":
 						g.fill(new VRectangle.Double(xMax, inlet.getStart(), 0.1, inlet.getWidth()));
 						break;
 				}
@@ -341,16 +341,16 @@ public abstract class DefaultRenderer {
 
 			for (AttributesInOutLet outlet : attributesAirFlowModel.getOutlets()) {
 				switch (outlet.getSide()) {
-					case "bottom":
+					case "south":
 						g.fill(new VRectangle.Double(outlet.getStart(), yMin - 0.1, outlet.getWidth(), 0.1));
 						break;
-					case "top":
+					case "north":
 						g.fill(new VRectangle.Double(outlet.getStart(), yMax, outlet.getWidth(), 0.1));
 						break;
-					case "left":
+					case "west":
 						g.fill(new VRectangle.Double(xMin - 0.1, outlet.getStart(), 0.1, outlet.getWidth()));
 						break;
-					case "right":
+					case "east":
 						g.fill(new VRectangle.Double(xMax, outlet.getStart(), 0.1, outlet.getWidth()));
 						break;
 				}

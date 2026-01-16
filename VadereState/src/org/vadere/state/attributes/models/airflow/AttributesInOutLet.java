@@ -9,7 +9,7 @@ public class AttributesInOutLet {
     private double width;
 
     public AttributesInOutLet() {
-        side = "bottom";
+        side = "south";
         start = 0;
         width = 1;
     }
