@@ -303,8 +303,8 @@ public abstract class DefaultRenderer {
 
 			double topoXmin = topography.getBounds().getX() + topography.getBoundingBoxWidth();
 			double topoYmin = topography.getBounds().getY() + topography.getBoundingBoxWidth();
-			double topoXmax = topography.getBounds().getX() + topography.getBounds().getWidth();
-			double topoYmax = topography.getBounds().getY() + topography.getBounds().getHeight();
+			double topoXmax = topography.getBounds().getX() + topography.getBounds().getWidth() - topography.getBoundingBoxWidth();
+			double topoYmax = topography.getBounds().getY() + topography.getBounds().getHeight() - topography.getBoundingBoxWidth();
 
 			AttributesAirFlowModel attributesAirFlowModel = Model.findAttributes(modelAttributes, AttributesAirFlowModel.class);
 			double airflowXmin = attributesAirFlowModel.getBounds().getXmin();
@@ -317,41 +317,41 @@ public abstract class DefaultRenderer {
 			double xMax = Math.min(topoXmax, airflowXmax);
 			double yMax = Math.min(topoYmax, airflowYmax);
 
-			g.setColor(new Color(0, 130, 70)); // green
+			g.setColor(new Color(100, 190, 100)); // green
 
 			for (AttributesInOutLet inlet : attributesAirFlowModel.getInlets()) {
 				switch (inlet.getSide()) {
 					case "south":
-						g.fill(new VRectangle.Double(inlet.getStart(), yMin - 0.1, inlet.getWidth(), 0.1));
+						g.fill(new VRectangle.Double(inlet.getStart(), yMin, inlet.getWidth(), 0.1));
 						break;
 					case "north":
-						g.fill(new VRectangle.Double(inlet.getStart(), yMax, inlet.getWidth(), 0.1));
+						g.fill(new VRectangle.Double(inlet.getStart(), yMax - 0.1, inlet.getWidth(), 0.1));
 						break;
 					case "west":
-						g.fill(new VRectangle.Double(xMin - 0.1, inlet.getStart(), 0.1, inlet.getWidth()));
+						g.fill(new VRectangle.Double(xMin, inlet.getStart(), 0.1, inlet.getWidth()));
 						break;
 					case "east":
-						g.fill(new VRectangle.Double(xMax, inlet.getStart(), 0.1, inlet.getWidth()));
+						g.fill(new VRectangle.Double(xMax - 0.1, inlet.getStart(), 0.1, inlet.getWidth()));
 						break;
 				}
 
 			}
 
-			g.setColor(new Color(180, 0, 0)); // red
+			g.setColor(new Color(220, 30, 30)); // red
 
 			for (AttributesInOutLet outlet : attributesAirFlowModel.getOutlets()) {
 				switch (outlet.getSide()) {
 					case "south":
-						g.fill(new VRectangle.Double(outlet.getStart(), yMin - 0.1, outlet.getWidth(), 0.1));
+						g.fill(new VRectangle.Double(outlet.getStart(), yMin, outlet.getWidth(), 0.1));
 						break;
 					case "north":
-						g.fill(new VRectangle.Double(outlet.getStart(), yMax, outlet.getWidth(), 0.1));
+						g.fill(new VRectangle.Double(outlet.getStart(), yMax - 0.1, outlet.getWidth(), 0.1));
 						break;
 					case "west":
-						g.fill(new VRectangle.Double(xMin - 0.1, outlet.getStart(), 0.1, outlet.getWidth()));
+						g.fill(new VRectangle.Double(xMin, outlet.getStart(), 0.1, outlet.getWidth()));
 						break;
 					case "east":
-						g.fill(new VRectangle.Double(xMax, outlet.getStart(), 0.1, outlet.getWidth()));
+						g.fill(new VRectangle.Double(xMax - 0.1, outlet.getStart(), 0.1, outlet.getWidth()));
 						break;
 				}
 
