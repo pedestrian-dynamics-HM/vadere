@@ -1,8 +1,6 @@
 package org.vadere.state.simulation;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.vadere.util.geometry.shapes.VRectangle;
 
 import java.util.Iterator;
@@ -128,27 +126,65 @@ public class VTrajectory implements Iterable<FootStep> {
 		return footSteps.removeLast();
 	}
 
+	/**
+	 * Cuts the trajectory to the given rectangle. Footsteps that are completely outside of the rectangle are removed, footsteps that are completely inside the rectangle are kept and footsteps that intersect with the rectangle are cut at the intersection points.
+	 * If the trajectory enters multiple times only the last intersection is kept, so that the resulting trajectory is a single connected trajectory.
+	 *
+	 * @param rectangle the rectangle to cut the trajectory to
+	 * @return a new trajectory that is cut to the given rectangle
+	 */
 	public VTrajectory cut(@NotNull final VRectangle rectangle) {
 		LinkedList<FootStep> newFootSteps = new LinkedList<>();
-		boolean inside = !footSteps.isEmpty() ? rectangle.contains(footSteps.peekFirst().getStart()) : false;
 
+		boolean outside = true; // whether the trajectory is currently outside of the rectangle, initially true because we assume that the trajectory starts outside of the rectangle
 		for(FootStep footStep : footSteps) {
-			if(footStep.intersects(rectangle)) {
-				Pair<FootStep, FootStep> splitStep = footStep.cut(footStep.computeIntersectionTime(rectangle));
-
-				if(!inside) {
-					newFootSteps.clear();
-					newFootSteps.add(splitStep.getRight());
-				}
-				else {
-					newFootSteps.add(splitStep.getLeft());
-				}
-
-				inside = !inside;
-
+			Optional<FootStep.LineRectClippingResult> optionalClipping = footStep.computeClipping(rectangle);
+			boolean stepIsOutside = optionalClipping.isEmpty();
+			if(stepIsOutside){
+				outside = true;
+				continue;
 			}
-			else if(inside) {
+
+			FootStep.LineRectClippingResult clipping = optionalClipping.get();
+
+			if(clipping.isCompletelyInside()){
+				ensureSingleConnectedTrajectory(newFootSteps, outside);
+				outside = false;
 				newFootSteps.add(footStep);
+				continue;
+			}
+
+			if(clipping.entersBoundary()){
+				double clippingStartTime = clipping.clippingStart().time();
+
+				boolean footstepEndsOnBoundary = clippingStartTime >= footStep.getEndTime();
+				if(footstepEndsOnBoundary){
+					continue;
+				}
+
+				ensureSingleConnectedTrajectory(newFootSteps, outside);
+				outside = clipping.exitsBoundary();
+
+				FootStep fromBoundaryIntersectionToStepEnd = footStep.cut(clippingStartTime).getRight();
+				if (!clipping.exitsBoundary()) {
+					newFootSteps.add(fromBoundaryIntersectionToStepEnd);
+					continue;
+                }
+
+				double clippingEndTime = clipping.clippingEnd().time();
+				FootStep betweenTwoBoundaryIntersections = fromBoundaryIntersectionToStepEnd.cut(clippingEndTime).getLeft();
+				newFootSteps.add(betweenTwoBoundaryIntersections);
+            }else{
+				assert clipping.exitsBoundary();
+				outside = true;
+
+				double clippingEndTime = clipping.clippingEnd().time();
+				boolean footstepStartsOnBoundary = clippingEndTime <= footStep.getStartTime();
+				if(footstepStartsOnBoundary){
+					continue;
+				}
+				FootStep fromInsideStartToBoundary = footStep.cut(clippingEndTime).getLeft();
+				newFootSteps.add(fromInsideStartToBoundary);
 			}
 		}
 
@@ -157,8 +193,10 @@ public class VTrajectory implements Iterable<FootStep> {
 		return copy;
 	}
 
-	private boolean isEntering(@NotNull final VRectangle rectangle, @NotNull FootStep intersectionStep) {
-		return rectangle.contains(intersectionStep.getEnd());
+	private void ensureSingleConnectedTrajectory(LinkedList<FootStep> newFootSteps, boolean outside) {
+		if(outside){
+			newFootSteps.clear();
+		}
 	}
 
 	public void cutTail(final double simStartTime) {
