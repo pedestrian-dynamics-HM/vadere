@@ -4,11 +4,12 @@ import argparse
 import sys
 import os
 
-def load_velocity_field(scenario_path, scenario_hash):
-    vx_file = f"{scenario_path}_{scenario_hash}_Vx.txt"
-    vy_file = f"{scenario_path}_{scenario_hash}_Vy.txt"
+def load_velocity_field(cache_path, scenario_name, scenario_hash):
+    vx_file = f"{cache_path}/{scenario_name}_{scenario_hash}_Vx.txt"
+    vy_file = f"{cache_path}/{scenario_name}_{scenario_hash}_Vy.txt"
 
     if not os.path.exists(vx_file) or not os.path.exists(vy_file):
+        print(vx_file)
         print(f"Error: Could not find files for hash {scenario_hash}")
         print(f"Looking for: {vx_file}")
         sys.exit(1)
@@ -34,21 +35,22 @@ def compute_l2_error(Vx_test, Vy_test, Vx_ref, Vy_ref):
 
 def main():
     parser = argparse.ArgumentParser(description='Compare convergence of multiple FEM runs.')
-    parser.add_argument('--scenario', required=True, help='Path to scenario (without extension)')
+    parser.add_argument('--cache_path', required=True, help='Path to cache folder')
+    parser.add_argument('--scenario_name', required=True, help='Scenario name (without extension)')
     parser.add_argument('--hashes', required=True, nargs='+',
                         help='List of hashes ordered from COARSE to FINE. '
                              'The last hash is assumed to be the Ground Truth.')
-    parser.add_argument('--areas', required=True, nargs='+', type=float,
+    parser.add_argument('--edgelens', required=True, nargs='+', type=float,
                         help='List of max_triangle_edge_lens corresponding to the hashes.')
     args = parser.parse_args()
-    if len(args.hashes) != len(args.areas):
+    if len(args.hashes) != len(args.edgelens):
         print("Error: Number of hashes must match number of area thresholds.")
         sys.exit(1)
 
     # load the reference solution (the finest mesh)
     ref_hash = args.hashes[-1]
-    ref_area = args.areas[-1]
-    Vx_ref, Vy_ref = load_velocity_field(args.scenario, ref_hash)
+    ref_edgelen = args.edgelens[-1]
+    Vx_ref, Vy_ref = load_velocity_field(args.cache_path, args.scenario_name, ref_hash)
     rows, cols = Vx_ref.shape
     print(f"Grid dimensions: {rows}x{cols}")
 
@@ -56,8 +58,8 @@ def main():
     results = []
     for i in range(len(args.hashes) - 1):
         curr_hash = args.hashes[i]
-        curr_area = args.areas[i]
-        Vx_test, Vy_test = load_velocity_field(args.scenario, curr_hash)
+        curr_edgelen = args.edgelens[i]
+        Vx_test, Vy_test = load_velocity_field(args.cache_path, args.scenario_name, curr_hash)
 
         # check: grids must be identical
         if Vx_test.shape != Vx_ref.shape:
@@ -67,14 +69,14 @@ def main():
             sys.exit(1)
 
         error_l2 = compute_l2_error(Vx_test, Vy_test, Vx_ref, Vy_ref)
-        h = np.sqrt(curr_area) # approximate element size h
+        #h = np.sqrt(curr_area) # approximate element size h
         results.append({
-            'area': curr_area,
-            'h': h,
+            #'area': curr_area,
+            'h': curr_edgelen,
             'error': error_l2
         })
 
-    print(f"{'area':<10} | {'h (approx)':<12} | {'rel L2 error':<15} | {'convergence rate':<12}")
+    print(f"{'triangle edge length':<12} | {'rel L2 error':<15} | {'convergence rate':<12}")
     print("-" * 50)
 
     # analyze convergence rates
@@ -90,7 +92,7 @@ def main():
             if err > 1e-12:
                 rate = np.log(previous_err / err) / np.log(previous_h / h)
                 rate_str = f"{rate:.4f}"
-        print(f"{res['area']:<10.4f} | {h:<12.4f} | {err:<15.6e} | {rate_str:<12}")
+        print(f"{h:<12.4f} | {err:<15.6e} | {rate_str:<12}")
 
         previous_h = h
         previous_err = err
