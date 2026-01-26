@@ -96,7 +96,7 @@ public class DatabasedStepsModel implements MainModel {
             logger.error("Variable trajectoryFileOrFolder must be a .traj file or directory");
             throw new IllegalArgumentException("Invalid argument for trajectoryFile");
         }
-        String trajFileName = "postvis_" + locomotionHash + ".traj";
+        String trajFileName = this.domain.getTopography().getContextId() + "_" + locomotionHash + ".traj";
         File trajFile = new File(dir, trajFileName);
         if (trajFile.exists()) {
             attributesDSM.setTrajectoryFileOrFolder(trajFile.getAbsolutePath());
