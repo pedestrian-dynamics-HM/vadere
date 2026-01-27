@@ -77,8 +77,9 @@ public class DatabasedStepsModel implements MainModel {
             subModelBuilder.buildSubModels(attributesDSM.getSubmodels());
             subModelBuilder.addBuildedSubModelsToList(models);
             models.add(this);
-
             this.trajectoryBuffer = new TrajectoryBuffer(attributesDSM.getTrajectoryFileOrFolder(), attributesDSM.getBufferedLines());
+
+            VadereContext.getCtx(domain.getTopography()).put(outputWrittenCallback, (Runnable) this::deleteTrajectoryFile);
         } else {
             initializeFallbackMainModel(attributesList);
         }
@@ -282,6 +283,18 @@ public class DatabasedStepsModel implements MainModel {
         } catch (IOException e) {
             logger.error("Failed to copy trajectory file: " + e.getMessage());
             e.printStackTrace();
+        }
+    }
+
+    private void deleteTrajectoryFile() {
+        try {
+            Path sourcePath = Paths.get(outputPath, "postvis.traj");
+            if (Files.exists(sourcePath)) {
+                Files.delete(sourcePath);
+                logger.info("Deleted source trajectory file: " + sourcePath);
+            }
+        } catch (IOException e) {
+            logger.warn("Failed to delete source trajectory file: " + e.getMessage());
         }
     }
 
