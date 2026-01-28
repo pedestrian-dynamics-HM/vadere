@@ -33,7 +33,7 @@ def extract_attributes(scenario_file_path):
     rect_grid_cell_size = float(attributes_model['rectangularGridCellSize'])
     max_triangle_edge_len = float(attributes_model['maxTriangleEdgeLen'])
     inlet_velocity = float(attributes_model['inletVelocity'])
-    viscosity = float(attributes_model['viscosity'])
+    viscosity = convert_reynolds_to_viscosity(inlet_velocity, x_min, x_max, y_min, y_max) #float(attributes_model['viscosity'])
     blocking_obstacles = attributes_model['blockingObstacles']
 
     inlets = []
@@ -82,6 +82,11 @@ def extract_attributes(scenario_file_path):
         'obstacles': obstacles
     }
 
+def convert_reynolds_to_viscosity(inlet_velocity, x_min, x_max, y_min, y_max):
+    reynolds_nr = 3000
+    char_length = ((x_max - x_min) + (y_max - y_min)) / 2
+    viscosity = (inlet_velocity * char_length) / reynolds_nr
+    return viscosity
 
 def get_initial_velocity_at_point(x, y, x_min, x_max, y_min, y_max, velocity, eps=1e-3):
     if abs(x - x_min) < eps:   return [velocity, 0.0]
