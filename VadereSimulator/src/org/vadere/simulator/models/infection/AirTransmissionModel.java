@@ -86,8 +86,8 @@ public class AirTransmissionModel extends AbstractExposureModel {
 	/**
 	 * Define the simulation steps after which an aerosol cloud gets removed when moving through an obstacle
 	 */
-	protected static final int STUCK_MAX = 10;
-	protected static final int MOVE_EVERY_N_STEPS = 3;  // Move clouds every 3rd step
+	protected static final int STUCK_MAX = 3;
+	protected static final int MOVE_AEROSOLS_EVERY_N_STEPS = 3;
 	protected int airFlowStepCounter = 0;
 
 	@Override
@@ -498,14 +498,14 @@ public class AirTransmissionModel extends AbstractExposureModel {
 			return;
 		}
 		airFlowStepCounter++;
-		if (airFlowStepCounter >= MOVE_EVERY_N_STEPS) {
+		if (airFlowStepCounter >= MOVE_AEROSOLS_EVERY_N_STEPS) {
 			Collection<AerosolCloud> allAerosolClouds = topography.getAerosolClouds();
 			Collection<AerosolCloud> toRemove = new ArrayList<>();
 			for (AerosolCloud aerosolCloud : allAerosolClouds) {
 				VPoint center = aerosolCloud.getCenter();
 				double[] airflowXY = topography.getAirFlow().getFlowDirection(simTimeInSec, center.getX(), center.getY());
-				double xShift = airflowXY[0] * simTimeStepLength * MOVE_EVERY_N_STEPS;
-				double yShift = airflowXY[1] * simTimeStepLength * MOVE_EVERY_N_STEPS;
+				double xShift = airflowXY[0] * simTimeStepLength * MOVE_AEROSOLS_EVERY_N_STEPS;
+				double yShift = airflowXY[1] * simTimeStepLength * MOVE_AEROSOLS_EVERY_N_STEPS;
 				// remove aerosol clouds that are shifted outside the airflow bounds
 				if (topography.getAirFlow().shouldRemoveAerosolCloud(center.getX(), center.getY(), xShift, yShift)) {
 					toRemove.add(aerosolCloud);
@@ -521,14 +521,19 @@ public class AirTransmissionModel extends AbstractExposureModel {
 		if (topography.getAirFlow() == null) {
 			return;
 		}
+		// only remove stuck AerosolClouds after they should have been moved
+		if (airFlowStepCounter != 0) {
+			return;
+		}
 		Collection<AerosolCloud> aerosolClouds = topography.getAerosolClouds();
-		Collection<Obstacle> obstacles = topography.getObstacles();
+		Collection<Integer> blockingIDs = topography.getAirFlow().getBlockingObstaclesIDs();
+		List<Obstacle> blockingObstacles = topography.getObstacles().stream()
+				.filter(obstacle -> blockingIDs.contains(obstacle.getId()))
+				.collect(Collectors.toList());
 		Collection<AerosolCloud> toRemove = new ArrayList<>();
 		for (AerosolCloud aerosolCloud : aerosolClouds) {
-			boolean isStuck = obstacles.stream()
-					.filter(obstacle -> obstacle.getShape().contains(aerosolCloud.getCenter()))
-					.anyMatch(obstacle -> topography.getAirFlow().getBlockingObstaclesIDs().contains(obstacle.getId()));
-
+			boolean isStuck = blockingObstacles.stream()
+					.anyMatch(obstacle -> obstacle.getShape().contains(aerosolCloud.getCenter()));
 			if (isStuck) {
 				if (aerosolCounter.containsKey(aerosolCloud)) {
 					aerosolCounter.put(aerosolCloud, aerosolCounter.get(aerosolCloud) + 1);

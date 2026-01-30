@@ -83,7 +83,7 @@ def extract_attributes(scenario_file_path):
     }
 
 def convert_reynolds_to_viscosity(inlet_velocity, x_min, x_max, y_min, y_max):
-    reynolds_nr = 3000
+    reynolds_nr = 4000
     char_length = ((x_max - x_min) + (y_max - y_min)) / 2
     viscosity = (inlet_velocity * char_length) / reynolds_nr
     return viscosity

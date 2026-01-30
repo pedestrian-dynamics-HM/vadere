@@ -16,10 +16,10 @@ def build_mesh(geom_data):
 
     # SIZING LOGIC
     h_max = geom_data['max_triangle_edge_len']
-    refinement_factor = 3.0
+    refinement_factor = 2.0
     h_wall = h_max / refinement_factor
     dist_min = h_wall * 2.0   # distance up to which h_wall is strictly enforced
-    dist_max = h_wall * 15.0  # distance at which mesh reaches full h_max
+    dist_max = h_wall * 5.0  # distance at which mesh reaches full h_max
 
     # GEOMETRY
     domain_tag = gmsh.model.occ.addRectangle(x_min, y_min, 0, x_max - x_min, y_max - y_min)
