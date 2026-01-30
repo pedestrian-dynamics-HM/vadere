@@ -281,11 +281,12 @@ public class AirTransmissionModel extends AbstractExposureModel {
 	public void updateAerosolCloudsPathogenLoad(double simTimeInSec) {
 		AttributesAirTransmissionModel attrModel = (AttributesAirTransmissionModel) getAttributes();
 		double lambda = exponentialDecayFactor / attrModel.getAerosolCloudHalfLife();
+		double decayFactor = Math.exp(-lambda * simTimeStepLength);
 
 		Collection<AerosolCloud> allAerosolClouds = topography.getAerosolClouds();
 		for (AerosolCloud aerosolCloud : allAerosolClouds) {
 			if (simTimeInSec > aerosolCloud.getCreationTime()) {
-				aerosolCloud.setCurrentPathogenLoad(aerosolCloud.getCurrentPathogenLoad() * Math.exp(-lambda * simTimeStepLength));
+				aerosolCloud.setCurrentPathogenLoad(aerosolCloud.getCurrentPathogenLoad() * decayFactor);
 			}
 		}
 	}
@@ -329,13 +330,7 @@ public class AirTransmissionModel extends AbstractExposureModel {
 		double initialPathogenConcentration = attrModel.getAerosolCloudInitialPathogenLoad() / initialCloudVolume;
 		double minimumConcentration = minimumPercentage * initialPathogenConcentration;
 
-		Collection<AerosolCloud> aerosolCloudsToBeDeleted = topography.getAerosolClouds()
-				.stream()
-				.filter(a -> a.getPathogenConcentration() < minimumConcentration)
-				.collect(Collectors.toSet());
-		for (AerosolCloud aerosolCloud : aerosolCloudsToBeDeleted) {
-			topography.getAerosolClouds().remove(aerosolCloud);
-		}
+		topography.getAerosolClouds().removeIf(a -> a.getPathogenConcentration() < minimumConcentration);
 	}
 
 	public void deleteExpiredDroplets(double simTimeInSec) {
@@ -360,11 +355,6 @@ public class AirTransmissionModel extends AbstractExposureModel {
 
 	protected void updatePedestriansExposureToAerosolClouds() {
 		AttributesAirTransmissionModel attrModel = (AttributesAirTransmissionModel) getAttributes();
-		Collection<Pedestrian> breathingInPeds = topography.getPedestrianDynamicElements()
-				.getElements()
-				.stream()
-				.filter(p -> p.<AirTransmissionModelHealthStatus>getHealthStatus().isBreathingIn())
-				.collect(Collectors.toSet());
 
 		// Agents absorb pathogen continuously but simulation is discrete. Therefore, the absorption during inhalation
 		// must be divided into absorption for each sim step:
@@ -373,25 +363,19 @@ public class AirTransmissionModel extends AbstractExposureModel {
 
 		Collection<AerosolCloud> allAerosolClouds = topography.getAerosolClouds();
 		for (AerosolCloud aerosolCloud : allAerosolClouds) {
-			Collection<Pedestrian> breathingInPedsInAerosolCloud = breathingInPeds
-					.stream()
-					.filter(p -> aerosolCloud.getShape().contains(p.getPosition()))
-					.collect(Collectors.toSet());
+			Collection<Pedestrian> pedsInCloud = getPedestriansInsideAerosolCloud(topography, aerosolCloud);
 
-			for (Pedestrian ped : breathingInPedsInAerosolCloud) {
-				double deltaDegreeOfExposure = aerosolCloud.getPathogenConcentration() * aerosolAbsorptionRatePerSimStep;
-				updatePedestrianDegreeOfExposure(ped, deltaDegreeOfExposure);
+			for (Pedestrian ped : pedsInCloud) {
+				if (ped.<AirTransmissionModelHealthStatus>getHealthStatus().isBreathingIn()) {
+					double deltaDegreeOfExposure = aerosolCloud.getPathogenConcentration() * aerosolAbsorptionRatePerSimStep;
+					updatePedestrianDegreeOfExposure(ped, deltaDegreeOfExposure);
+				}
 			}
 		}
 	}
 
 	protected void updatePedestriansExposureToDroplets() {
 		AttributesAirTransmissionModel attrModel = (AttributesAirTransmissionModel) getAttributes();
-		Collection<Pedestrian> breathingInPeds = topography.getPedestrianDynamicElements()
-				.getElements()
-				.stream()
-				.filter(p -> p.<AirTransmissionModelHealthStatus>getHealthStatus().isBreathingIn())
-				.collect(Collectors.toSet());
 
 		/*
 		 * Agents absorb pathogen continuously but simulation is discrete. Therefore, the absorption during inhalation
@@ -407,14 +391,19 @@ public class AirTransmissionModel extends AbstractExposureModel {
 		 */
 		Collection<Droplets> allDroplets = topography.getDroplets();
 		for (Droplets droplets : allDroplets) {
-			Collection<Pedestrian> breathingInPedsInDroplets = breathingInPeds
-					.stream()
-					.filter(p -> droplets.getShape().contains(p.getPosition()))
-					.collect(Collectors.toSet());
+			Rectangle2D bounds = droplets.getShape().getBounds2D();
+			VPoint center = new VPoint(bounds.getCenterX(), bounds.getCenterY());
+			double proximity = Math.max(bounds.getHeight(), bounds.getWidth());
 
-			for (Pedestrian ped : breathingInPedsInDroplets) {
-				double deltaDegreeOfExposure = attrModel.getDropletsPathogenLoad() * dropletsAbsorptionRatePerSimStep;
-				updatePedestrianDegreeOfExposure(ped, deltaDegreeOfExposure);
+			Collection<Pedestrian> nearbyPeds = topography.getSpatialMap(Pedestrian.class).getObjects(center, proximity);
+
+			for (Pedestrian ped : nearbyPeds) {
+				if (droplets.getShape().contains(ped.getPosition()) &&
+						ped.<AirTransmissionModelHealthStatus>getHealthStatus().isBreathingIn()) {
+
+					double deltaDegreeOfExposure = attrModel.getDropletsPathogenLoad() * dropletsAbsorptionRatePerSimStep;
+					updatePedestrianDegreeOfExposure(ped, deltaDegreeOfExposure);
+				}
 			}
 		}
 	}
