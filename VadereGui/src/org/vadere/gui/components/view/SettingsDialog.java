@@ -276,8 +276,13 @@ public class SettingsDialog extends JDialog {
 		JRadioButton rbImageOverlay = createRadioButtonWithListener(AgentColoring.IMAGE_OVERLAY, Localization.getString("SettingsDialog.tfUseImageOverlay.text"));
 
 
-		rbTargetColoring.setSelected(true);
-		model.setAgentColoring(AgentColoring.TARGET);
+		if(model.config.isAerosolCloudsRecorded()) {
+			rbHealthStatusColoring.setSelected(true);
+			model.setAgentColoring(AgentColoring.HEALTH_STATUS);
+		} else {
+			rbTargetColoring.setSelected(true);
+			model.setAgentColoring(AgentColoring.TARGET);
+		}
 
 		group = new ButtonGroup();
 		group.add(rbTargetColoring);
