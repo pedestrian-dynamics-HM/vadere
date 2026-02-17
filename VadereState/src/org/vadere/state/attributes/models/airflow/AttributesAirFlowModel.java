@@ -21,7 +21,7 @@ public class AttributesAirFlowModel extends Attributes {
 
     private double inletVelocity;
 
-    private double viscosity;
+    private double reynoldsNumber;
 
     private ArrayList<AttributesInOutLet> inlets;
 
@@ -42,7 +42,7 @@ public class AttributesAirFlowModel extends Attributes {
         maxTriangleEdgeLen = 0.2;
         rectangularGridCellSize = 0.1;
         inletVelocity = 0.3;
-        viscosity = 1e-3;
+        reynoldsNumber = 4000;
         inlets = new ArrayList<>();
         inlets.add(new AttributesInOutLet("west", 1, 1));
         outlets = new ArrayList<>();
@@ -54,7 +54,7 @@ public class AttributesAirFlowModel extends Attributes {
     }
 
     public AttributesAirFlowModel(double rectangularGridCellSize, double maxTriangleEdgeLen, double inletVelocity,
-                                  double viscosity,
+                                  double reynoldsNumber,
                                   ArrayList<AttributesInOutLet> inlets, ArrayList<AttributesInOutLet> outlets,
                                   ArrayList<Integer> notBlockingObstacles, AttributesBounds bounds) {
         condaPath = "CONDA_PATH";
@@ -63,7 +63,7 @@ public class AttributesAirFlowModel extends Attributes {
         this.maxTriangleEdgeLen = maxTriangleEdgeLen;
         this.rectangularGridCellSize = rectangularGridCellSize;
         this.inletVelocity = inletVelocity;
-        this.viscosity = viscosity;
+        this.reynoldsNumber = reynoldsNumber;
         this.inlets = inlets;
         this.outlets = outlets;
         this.blockingObstacles = notBlockingObstacles;

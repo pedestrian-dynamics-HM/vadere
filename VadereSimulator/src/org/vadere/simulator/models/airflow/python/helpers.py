@@ -33,7 +33,8 @@ def extract_attributes(scenario_file_path):
     rect_grid_cell_size = float(attributes_model['rectangularGridCellSize'])
     max_triangle_edge_len = float(attributes_model['maxTriangleEdgeLen'])
     inlet_velocity = float(attributes_model['inletVelocity'])
-    viscosity = convert_reynolds_to_viscosity(inlet_velocity, x_min, x_max, y_min, y_max) #float(attributes_model['viscosity'])
+    reynolds_nr = float(attributes_model['reynoldsNumber'])
+    viscosity = convert_reynolds_to_viscosity(reynolds_nr, inlet_velocity, x_min, x_max, y_min, y_max)
     blocking_obstacles = attributes_model['blockingObstacles']
 
     inlets = []
@@ -82,8 +83,7 @@ def extract_attributes(scenario_file_path):
         'obstacles': obstacles
     }
 
-def convert_reynolds_to_viscosity(inlet_velocity, x_min, x_max, y_min, y_max):
-    reynolds_nr = 4000
+def convert_reynolds_to_viscosity(reynolds_nr, inlet_velocity, x_min, x_max, y_min, y_max):
     char_length = ((x_max - x_min) + (y_max - y_min)) / 2
     viscosity = (inlet_velocity * char_length) / reynolds_nr
     return viscosity
