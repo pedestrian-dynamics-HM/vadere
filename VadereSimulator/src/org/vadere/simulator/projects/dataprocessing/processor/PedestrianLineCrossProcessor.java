@@ -9,6 +9,8 @@ import org.vadere.state.attributes.processor.AttributesProcessor;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.simulation.FootStep;
 import org.vadere.util.geometry.shapes.VLine;
+import org.vadere.util.geometry.shapes.VPoint;
+import org.vadere.util.geometry.shapes.Vector2D;
 
 import java.util.Collection;
 
@@ -19,12 +21,29 @@ import java.util.Collection;
  * @author Benedikt Zoennchen
  */
 @DataProcessorClass()
-public class PedestrianLineCrossProcessor extends DataProcessor<PedestrianIdKey, Double> {
+public class PedestrianLineCrossProcessor extends DataProcessor<PedestrianIdKey, PedestrianLineCrossProcessor.CrossInformation> {
+
+	public class CrossInformation {
+		public double crossingTime;
+		public VPoint stepStart;
+		public VPoint stepEnd;
+
+		public CrossInformation(double crossingTime, FootStep step) {
+			this.crossingTime = crossingTime;
+			this.stepStart = step.getStart();
+			this.stepEnd = step.getEnd();
+		}
+
+		public Vector2D GetExitDirection(){
+			VPoint norm = stepEnd.subtract(stepStart).normZeroSafe();
+			return new Vector2D(norm.getX(), norm.getY());
+		}
+	}
 
 	private VLine line;
 
 	public PedestrianLineCrossProcessor() {
-		super("crossTime");
+		super("crossTime", "crossDirection");
 		setAttributes(new AttributesPedestrianLineCrossProcessor());
 	}
 
@@ -37,8 +56,8 @@ public class PedestrianLineCrossProcessor extends DataProcessor<PedestrianIdKey,
 
 			for(FootStep footStep : ped.getTrajectory()) {
 				if(footStep.intersects(line)) {
-					double intersectionTime = footStep.computeIntersectionTime(line);
-					this.putValue(key, intersectionTime);
+					double crossingTime = footStep.computeIntersectionTime(line);
+					this.putValue(key, new CrossInformation(crossingTime, footStep));
 				}
 			}
 		}
@@ -53,6 +72,16 @@ public class PedestrianLineCrossProcessor extends DataProcessor<PedestrianIdKey,
 		super.init(manager);
 		AttributesPedestrianLineCrossProcessor att = (AttributesPedestrianLineCrossProcessor) this.getAttributes();
 		this.line = new VLine(att.getP1(), att.getP2());
+	}
+
+	@Override
+	public String[] toStrings(PedestrianIdKey key) {
+		if(!hasValue(key)){
+			return new String[]{"-", "-"};
+		}
+
+		CrossInformation crossInfo = getValue(key);
+		return new String[]{Double.toString(crossInfo.crossingTime), crossInfo.GetExitDirection().toString()};
 	}
 
 	@Override
