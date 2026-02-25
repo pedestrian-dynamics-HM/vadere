@@ -27,15 +27,30 @@ public class PedestrianCrossingTimeProcessor extends DataProcessor<PedestrianIdK
 		public double startTime;
 		@Nullable
 		public Double exitingTime;
+		public VPoint enteringPoint;
+		public VPoint exitingPoint;
 
-		public PedestrianCrossingTimeProcessorCrossInformation(double startTime) {
+		public PedestrianCrossingTimeProcessorCrossInformation(double startTime, VPoint enteringPoint) {
 			this.startTime = startTime;
+			this.enteringPoint = enteringPoint;
 			this.exitingTime = null;
+			this.exitingPoint = null;
 		}
 
-		public PedestrianCrossingTimeProcessorCrossInformation setEnd(double endTime) {
+		public PedestrianCrossingTimeProcessorCrossInformation setEnd(double endTime, VPoint leavingPoint) {
 			this.exitingTime = endTime;
+			this.exitingPoint = leavingPoint;
 			return this;
+		}
+
+		@Nullable
+		public Vector2D GetExitDirection(){
+			if(exitingPoint == null) {
+				return null;
+			}
+
+			VPoint norm = exitingPoint.subtract(enteringPoint).normZeroSafe();
+			return new Vector2D(norm.getX(), norm.getY());
 		}
 	}
 
@@ -45,7 +60,7 @@ public class PedestrianCrossingTimeProcessor extends DataProcessor<PedestrianIdK
 	private static Logger logger = Logger.getLogger(PedestrianCrossingTimeProcessor.class);
 
 	public PedestrianCrossingTimeProcessor() {
-		super("crossStartTime", "crossEndTime");
+		super("crossStartTime", "crossEndTime", "crossDirection");
 		setAttributes(new AttributesCrossingTimeProcessor());
 	}
 
@@ -69,7 +84,7 @@ public class PedestrianCrossingTimeProcessor extends DataProcessor<PedestrianIdK
 				boolean footStepClipsMeasurementArea = optionalFootStepClippingResult.isPresent();
 				if(!footStepClipsMeasurementArea){
 					if(hasCrossStartTime(key)){
-						setExit(key, footStep.getStartTime());
+						setExit(key, footStep.getStartTime(), footStep.getStart());
 					}
 					continue;
 				}
@@ -83,18 +98,18 @@ public class PedestrianCrossingTimeProcessor extends DataProcessor<PedestrianIdK
 				boolean footStepExitsMeasurementArea = footStepClippingResult.exitsBoundary();
 				if(footStepExitsMeasurementArea){
 					FootStep.IntersectionPointAndTime clippingEnd = footStepClippingResult.clippingEnd();
-					setExit(key, clippingEnd.time());
+					setExit(key, clippingEnd.time(), clippingEnd.point());
 				}
-            }
+			}
 		}
 	}
 
 	private void setEnter(@NotNull final PedestrianIdKey key, double time, VPoint enteringPoint) {
-		putValue(key, new PedestrianCrossingTimeProcessorCrossInformation(time));
+		putValue(key, new PedestrianCrossingTimeProcessorCrossInformation(time, enteringPoint));
 	}
 
-	private void setExit(@NotNull final PedestrianIdKey key, double time) {
-		putValue(key, getValue(key).setEnd(time));
+	private void setExit(@NotNull final PedestrianIdKey key, double time, VPoint exitingPoint) {
+		putValue(key, getValue(key).setEnd(time, exitingPoint));
 	}
 
 	private boolean hasCrossStartTime(@NotNull final PedestrianIdKey key) {
@@ -127,12 +142,14 @@ public class PedestrianCrossingTimeProcessor extends DataProcessor<PedestrianIdK
 	public String[] toStrings(@NotNull final  PedestrianIdKey key) {
 		PedestrianCrossingTimeProcessorCrossInformation times = getValue(key);
 		if(times == null) {
-			return new String[]{"-", "-"};
+			return new String[]{"-", "-", "-"};
 		}
 
+		Vector2D exitDirection = times.GetExitDirection();
 		return new String[]{
 				Double.toString(times.startTime),
-				times.exitingTime == null ? "" : Double.toString(times.exitingTime)
+				times.exitingTime == null ? "" : Double.toString(times.exitingTime),
+				exitDirection == null ? "" : exitDirection.toString()
 		};
 	}
 
