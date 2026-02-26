@@ -47,7 +47,7 @@ public class VTrajectory implements Iterable<FootStep> {
 
 	public Optional<Double> speed(@NotNull final VRectangle rectangle) {
 		VTrajectory cutting = clone();
-		cutting.cut(rectangle);
+		cutting.cutToLastClipping(rectangle);
 		return cutting.speed();
 	}
 
@@ -89,7 +89,7 @@ public class VTrajectory implements Iterable<FootStep> {
 	}
 
 	public double length(final double startSimTime, final double endSimTime) {
-		return clone().cut(startSimTime, endSimTime).length();
+		return clone().cutToLastClipping(startSimTime, endSimTime).length();
 	}
 
 	public Optional<Double> duration() {
@@ -133,7 +133,7 @@ public class VTrajectory implements Iterable<FootStep> {
 	 * @param rectangle the rectangle to cut the trajectory to
 	 * @return a new trajectory that is cut to the given rectangle
 	 */
-	public VTrajectory cut(@NotNull final VRectangle rectangle) {
+	public VTrajectory cutToLastClipping(@NotNull final VRectangle rectangle) {
 		LinkedList<FootStep> newFootSteps = new LinkedList<>();
 
 		boolean outside = true; // whether the trajectory is currently outside of the rectangle, initially true because we assume that the trajectory starts outside of the rectangle
@@ -243,7 +243,7 @@ public class VTrajectory implements Iterable<FootStep> {
 		return newTrajectory;
 	}
 
-	public VTrajectory cut(final double startTime, final double endTime) {
+	public VTrajectory cutToLastClipping(final double startTime, final double endTime) {
 		LinkedList<FootStep> copy = new LinkedList<>(footSteps);
 		VTrajectory subTrajectory = new VTrajectory();
 		subTrajectory.footSteps = copy;

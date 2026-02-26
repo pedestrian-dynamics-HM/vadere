@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class VTrajectoryTest {
 
     @Test
-    void cut_betweenThreeSteps_returnsMiddleStep() {
+    void cutToLastClipping_betweenThreeSteps_returnsMiddleStep() {
         // arrange
         VRectangle rectangle = new VRectangle(1, 0, 1, 2);
 
@@ -38,7 +38,7 @@ public class VTrajectoryTest {
         trajectory.add(firstStep).add(secondStep).add(thirdStep);
 
         // act
-        VTrajectory cut = trajectory.cut(rectangle);
+        VTrajectory cut = trajectory.cutToLastClipping(rectangle);
 
         // assert
         assertEquals(1, cut.size());
@@ -52,7 +52,7 @@ public class VTrajectoryTest {
     }
 
     @Test
-    void cut_halfFirstAndLastStep_returnsFirstHalfThenMiddleThenLastHalf() {
+    void cutToLastClipping_halfFirstAndLastStep_returnsFirstHalfThenMiddleThenLastHalf() {
         // arrange
         VRectangle rectangle = new VRectangle(0.5, 0, 2, 2);
 
@@ -79,7 +79,7 @@ public class VTrajectoryTest {
         trajectory.add(firstStep).add(secondStep).add(thirdStep);
 
         // act
-        VTrajectory cut = trajectory.cut(rectangle);
+        VTrajectory cut = trajectory.cutToLastClipping(rectangle);
 
         // assert
         assertEquals(3, cut.size());
@@ -106,7 +106,7 @@ public class VTrajectoryTest {
     }
 
     @Test
-    void cut_singleStepDiagonal_returnsMiddlePiece() {
+    void cutToLastClipping_singleStepDiagonal_returnsMiddlePiece() {
         // arrange
         VRectangle rectangle = new VRectangle(1, 1, 1, 1);
 
@@ -121,7 +121,7 @@ public class VTrajectoryTest {
         trajectory.add(step);
 
         // act
-        VTrajectory cut = trajectory.cut(rectangle);
+        VTrajectory cut = trajectory.cutToLastClipping(rectangle);
 
         // assert
         assertEquals(1, cut.size());
@@ -137,7 +137,7 @@ public class VTrajectoryTest {
     }
 
     @Test
-    void cut_insideAndOutside_returnsInsidePiece() {
+    void cutToLastClipping_insideAndOutside_returnsInsidePiece() {
         // arrange
         VRectangle rectangle = new VRectangle(1, 1, 1, 1);
 
@@ -168,7 +168,7 @@ public class VTrajectoryTest {
         trajectory.add(outside2);
 
         // act
-        VTrajectory cut = trajectory.cut(rectangle);
+        VTrajectory cut = trajectory.cutToLastClipping(rectangle);
 
         // assert
         assertEquals(1, cut.size());
@@ -179,7 +179,7 @@ public class VTrajectoryTest {
     }
 
     @Test
-    void cut_startsInsideGoesOutside_returnsInsidePiece() {
+    void cutToLastClipping_startsInsideGoesOutside_returnsInsidePiece() {
         // arrange
         VRectangle rectangle = new VRectangle(1, 1, 1, 1);
 
@@ -194,7 +194,7 @@ public class VTrajectoryTest {
         trajectory.add(startsInside);
 
         // act
-        VTrajectory cut = trajectory.cut(rectangle);
+        VTrajectory cut = trajectory.cutToLastClipping(rectangle);
 
         // assert
         assertEquals(1, cut.size());
@@ -210,7 +210,7 @@ public class VTrajectoryTest {
     }
 
     @Test
-    void cut_touchesRectangle_returnsTouchingPart() {
+    void cutToLastClipping_touchesRectangleBounds_returnsTouchingPart() {
         // arrange
         VRectangle rectangle = new VRectangle(1, 1, 1, 1);
 
@@ -225,7 +225,7 @@ public class VTrajectoryTest {
         trajectory.add(startsInside);
 
         // act
-        VTrajectory cut = trajectory.cut(rectangle);
+        VTrajectory cut = trajectory.cutToLastClipping(rectangle);
 
         // assert
         assertEquals(1, cut.size());
@@ -240,7 +240,7 @@ public class VTrajectoryTest {
     }
 
     @Test
-    void cut_isExactlyOnBounds_returnsTouchingPart() {
+    void cutToLastClipping_isExactlyOnBounds_returnsTouchingPart() {
         // arrange
         VRectangle rectangle = new VRectangle(1, 1, 1, 1);
 
@@ -255,7 +255,7 @@ public class VTrajectoryTest {
         trajectory.add(startsInside);
 
         // act
-        VTrajectory cut = trajectory.cut(rectangle);
+        VTrajectory cut = trajectory.cutToLastClipping(rectangle);
 
         // assert
         assertEquals(1, cut.size());
@@ -270,7 +270,7 @@ public class VTrajectoryTest {
     }
 
     @Test
-    void cut_multipleTimes_returnsLastTrajectory() {
+    void cutToLastClipping_multipleClippings_returnsLastTrajectory() {
         // arrange
         VRectangle rectangle = new VRectangle(1, 1, 2, 4);
 
@@ -313,7 +313,7 @@ public class VTrajectoryTest {
                 .add(secondIntersectionExit);
 
         // act
-        VTrajectory cut = trajectory.cut(rectangle);
+        VTrajectory cut = trajectory.cutToLastClipping(rectangle);
 
         // assert
         assertEquals(2, cut.size());

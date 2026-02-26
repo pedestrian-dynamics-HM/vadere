@@ -87,7 +87,7 @@ public class FundamentalDiagramBProcessor extends DataProcessor<PedestrianIdKey,
 		for(Map.Entry<PedestrianIdKey, VTrajectory> trajectoryEntry : trajectoryMap.entrySet()) {
 			PedestrianIdKey key = trajectoryEntry.getKey();
 			VTrajectory trajectory = trajectoryEntry.getValue();
-			VTrajectory clone = trajectory.cut(measurementAreaVRec);
+			VTrajectory clone = trajectory.cutToLastClipping(measurementAreaVRec);
 			cutTrajectoryMap.put(key, clone);
 		}
 
@@ -111,7 +111,7 @@ public class FundamentalDiagramBProcessor extends DataProcessor<PedestrianIdKey,
 
 		double densityIntegral = cutTrajectoryMap.values()
 				.stream()
-				.map(trajectory -> trajectory.cut(pedTrajectory.getStartTime().get(), pedTrajectory.getEndTime().get()))
+				.map(trajectory -> trajectory.cutToLastClipping(pedTrajectory.getStartTime().get(), pedTrajectory.getEndTime().get()))
 				.filter(trajectory -> !trajectory.isEmpty())
 				//.filter(trajectory -> trajectory.isInBetween(pedTrajectory))
 				//.sorted(Comparator.comparingDouble(t -> t.getStartTime().get()))
