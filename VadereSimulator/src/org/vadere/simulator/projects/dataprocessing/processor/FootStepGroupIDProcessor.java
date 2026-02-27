@@ -22,7 +22,7 @@ public class FootStepGroupIDProcessor extends DataProcessor<EventtimePedestrianI
 			CentroidGroupModel model = (CentroidGroupModel)m;
 			model.getGroupsById().forEach((gId, group) -> {	// for each group
 				group.getMembers().forEach(ped -> {			// for each member in group
-					ped.getTrajectory().getFootSteps().forEach(fs -> {
+					ped.getTrajectoryOfSimulationStep().getFootSteps().forEach(fs -> {
 						this.putValue(new EventtimePedestrianIdKey(fs.getStartTime(), ped.getId()), gId);
 					});
 				});

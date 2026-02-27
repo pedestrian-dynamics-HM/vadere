@@ -76,7 +76,7 @@ public class PedestrianCrossingTimeProcessor extends DataProcessor<PedestrianIdK
 				continue;
 			}
 
-			for(FootStep footStep : ped.getTrajectory()) {
+			for(FootStep footStep : ped.getTrajectoryOfSimulationStep()) {
 
 				Optional<FootStep.LineRectClippingResult> optionalFootStepClippingResult
 						= footStep.computeClipping(measurementAreaVRec);

@@ -32,7 +32,7 @@ public class PedestrianTrajectoryProcessor extends DataProcessor<PedestrianIdKey
 
 		for(Pedestrian ped : peds) {
 			PedestrianIdKey key = new PedestrianIdKey(ped.getId());
-			getValue(key).concat(ped.getTrajectory());
+			getValue(key).concat(ped.getTrajectoryOfSimulationStep());
 		}
 	}
 

@@ -55,10 +55,10 @@ public class PedestrianListBuilder {
 		Pedestrian p = new Pedestrian(new AttributesAgent(id), new Random());
 
 		for(FootStep fs : trajectory){
-			p.getTrajectory().add(fs);
+			p.getTrajectoryOfSimulationStep().add(fs);
 		}
 		// Set the pedestrian position to the last known position where he started a step.
-		p.setPosition(p.getTrajectory().getFootSteps().getLast().getStart());
+		p.setPosition(p.getTrajectoryOfSimulationStep().getFootSteps().getLast().getStart());
 		out.add(p);
 
 		return this;

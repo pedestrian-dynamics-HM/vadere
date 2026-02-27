@@ -5,7 +5,6 @@ import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
 import org.vadere.simulator.control.simulation.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.EventtimePedestrianIdKey;
-import org.vadere.simulator.projects.dataprocessing.datakey.PedestrianIdKey;
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.simulation.FootStep;
@@ -31,7 +30,7 @@ public class FootStepSelfCategoryProcessor extends DataProcessor<EventtimePedest
 		Collection<Pedestrian> pedestrians = state.getTopography().getElements(Pedestrian.class);
 
 		for(Pedestrian p : pedestrians){
-			VTrajectory traj = p.getTrajectory();
+			VTrajectory traj = p.getTrajectoryOfSimulationStep();
 			SelfCategory selfCat = p.getSelfCategory();
 			String selfCategoryString = selfCat.toString();
 
