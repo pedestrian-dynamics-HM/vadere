@@ -78,7 +78,7 @@ public class PedestrianCrossingTimeProcessor extends DataProcessor<PedestrianIdK
 
 			for(FootStep footStep : ped.getTrajectoryOfSimulationStep()) {
 
-				Optional<FootStep.LineRectClippingResult> optionalFootStepClippingResult
+				Optional<FootStep.StepRectClippingResult> optionalFootStepClippingResult
 						= footStep.computeClipping(measurementAreaVRec);
 
 				boolean footStepClipsMeasurementArea = optionalFootStepClippingResult.isPresent();
@@ -89,7 +89,7 @@ public class PedestrianCrossingTimeProcessor extends DataProcessor<PedestrianIdK
 					continue;
 				}
 
-				FootStep.LineRectClippingResult footStepClippingResult = optionalFootStepClippingResult.get();
+				FootStep.StepRectClippingResult footStepClippingResult = optionalFootStepClippingResult.get();
 				if(!hasCrossStartTime(key)){
 					FootStep.IntersectionPointAndTime clippingStart = footStepClippingResult.clippingStart();
 					setEnter(key, clippingStart.time(), clippingStart.point());

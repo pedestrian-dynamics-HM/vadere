@@ -171,10 +171,10 @@ public class FootStepTest {
         );
 
         // act
-        Optional<FootStep.LineRectClippingResult> intersection = footStep.computeClipping(rectangle);
+        Optional<FootStep.StepRectClippingResult> intersection = footStep.computeClipping(rectangle);
 
         // assert
-        FootStep.LineRectClippingResult clippingResult = assertPresent(intersection);
+        FootStep.StepRectClippingResult clippingResult = assertPresent(intersection);
         FootStep.IntersectionPointAndTime enter = assertPresent(clippingResult.entryPoint());
         assertEquals(expectedEnterX, enter.point().x, 1e-6f);
         assertEquals(expectedEnterY, enter.point().y, 1e-6f);
@@ -246,11 +246,11 @@ public class FootStepTest {
         );
 
         // act
-        Optional<FootStep.LineRectClippingResult> optionalClippingResult =
+        Optional<FootStep.StepRectClippingResult> optionalClippingResult =
                 footStep.computeClipping(rectangle);
 
         // assert
-        FootStep.LineRectClippingResult clippingResult = assertPresent(optionalClippingResult);
+        FootStep.StepRectClippingResult clippingResult = assertPresent(optionalClippingResult);
         assertMissing(clippingResult.exitPoint());
         FootStep.IntersectionPointAndTime enter = assertPresent(clippingResult.entryPoint());
         assertEquals(expectedX, enter.point().x, 1e-6f);
@@ -318,11 +318,11 @@ public class FootStepTest {
         );
 
         // act
-        Optional<FootStep.LineRectClippingResult> optionalClippingResult =
+        Optional<FootStep.StepRectClippingResult> optionalClippingResult =
                 footStep.computeClipping(rectangle);
 
         // assert
-        FootStep.LineRectClippingResult clippingResult = assertPresent(optionalClippingResult);
+        FootStep.StepRectClippingResult clippingResult = assertPresent(optionalClippingResult);
         assertMissing(clippingResult.entryPoint());
         FootStep.IntersectionPointAndTime exit = assertPresent(clippingResult.exitPoint());
         assertEquals(expectedX, exit.point().x, 1e-6f);
@@ -386,11 +386,11 @@ public class FootStepTest {
         );
 
         // act
-        Optional<FootStep.LineRectClippingResult> optionalClippingResult =
+        Optional<FootStep.StepRectClippingResult> optionalClippingResult =
                 footStep.computeClipping(rectangle);
 
         // assert
-        FootStep.LineRectClippingResult clippingResult = assertPresent(optionalClippingResult);
+        FootStep.StepRectClippingResult clippingResult = assertPresent(optionalClippingResult);
         assertMissing(clippingResult.entryPoint());
         assertMissing(clippingResult.exitPoint());
         assertTrue(clippingResult.isCompletelyInside());
@@ -433,10 +433,10 @@ public class FootStepTest {
         );
 
         // act
-        Optional<FootStep.LineRectClippingResult> optionalClippingResult = footStep.computeClipping(rectangle);
+        Optional<FootStep.StepRectClippingResult> optionalClippingResult = footStep.computeClipping(rectangle);
 
         // assert
-        FootStep.LineRectClippingResult clippingResult = assertPresent(optionalClippingResult);
+        FootStep.StepRectClippingResult clippingResult = assertPresent(optionalClippingResult);
         assertMissing(clippingResult.exitPoint());
         FootStep.IntersectionPointAndTime enterPointAndTime = assertPresent(clippingResult.entryPoint());
         assertEquals(expectedTime, enterPointAndTime.time(), 1e-6);
@@ -474,10 +474,10 @@ public class FootStepTest {
         );
 
         // act
-        Optional<FootStep.LineRectClippingResult> optionalClippingResult = footStep.computeClipping(rectangle);
+        Optional<FootStep.StepRectClippingResult> optionalClippingResult = footStep.computeClipping(rectangle);
 
         // assert
-        FootStep.LineRectClippingResult clippingResult = assertPresent(optionalClippingResult);
+        FootStep.StepRectClippingResult clippingResult = assertPresent(optionalClippingResult);
         assertMissing(clippingResult.entryPoint());
         FootStep.IntersectionPointAndTime exitPointAndTime = assertPresent(clippingResult.exitPoint());
         assertEquals(expectedTime, exitPointAndTime.time(), 1e-6);
@@ -528,7 +528,7 @@ public class FootStepTest {
         );
 
         // act
-        Optional<FootStep.LineRectClippingResult> intersection = footStep.computeClipping(rectangle);
+        Optional<FootStep.StepRectClippingResult> intersection = footStep.computeClipping(rectangle);
 
         // assert
         assertMissing(intersection);

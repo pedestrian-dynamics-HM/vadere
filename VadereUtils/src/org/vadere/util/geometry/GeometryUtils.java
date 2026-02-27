@@ -85,13 +85,21 @@ public class GeometryUtils {
 	/**
 	 * Computes the intersection between a line segment startPoint → endPoint
 	 * and an (axis-aligned) rectangle using the Liang–Barsky line clipping algorithm.
+	 * The result describes the portion of the step that lies inside the rectangle.
 	 *
+	 * <p><strong>Rectangle boundary behavior:</strong>
+	 * <ul>
+	 *   <li>If a line touches the rectangle from inside: considered fully inside, not intersecting.</li>
+	 *   <li>If a line touches the rectangle from outside: considered intersecting, with the touching point as the entry point.</li>
+	 * </ul>
+	 *
+	 * <p><strong>Result consists of:</strong>
 	 * <table border="1">
 	 *   <tr><td>Result</td><td> entryPoint </td> <td> exitPoint </td> <td> Reason </td></tr>
 	 *   <tr><td> ✔ </td> <td> ✔ </td> <td> ✔ </td> <td> line crosses rectangle</td></tr>
-	 *   <tr><td> ✔ </td> <td> ✔ </td> <td> x </td> <td> line's end is on boundary or enters rectangle without exiting</td></tr>
-	 *   <tr><td> ✔ </td> <td> x </td> <td> ✔ </td> <td> line starts inside and exits or starts on boundary going outwards</td></tr>
-	 *   <tr><td> ✔ </td> <td> x </td> <td> x </td> <td> line lies/touches inside the rectangle boundary</td></tr>
+	 *   <tr><td> ✔ </td> <td> ✔ </td> <td> x </td> <td> line starts outside, and it's end is on rectangle or enters rectangle without exiting</td></tr>
+	 *   <tr><td> ✔ </td> <td> x </td> <td> ✔ </td> <td> line starts inside and exits or starts on the rectangle going outwards</td></tr>
+	 *   <tr><td> ✔ </td> <td> x </td> <td> x </td> <td> line starts inside and ends inside or touches rectangle (start and/or end point)</td></tr>
 	 *   <tr><td> x </td> <td> - </td> <td> - </td> <td> line does not intersect the rectangle</td></tr>
 	 * </table>
 	 */
@@ -168,87 +176,6 @@ public class GeometryUtils {
 	 */
 	public record LineRectClippingResult(Optional<IntersectionPointAndPercentage> entryPoint, Optional<IntersectionPointAndPercentage> exitPoint) {}
 	public record IntersectionPointAndPercentage(VPoint point, double linePercentage) {}
-
-	/**
-	 * Finds the first intersection point between a line segment (x1,y1)->(x2,y2)
-	 * and a rectangle.
-	 *
-	 * Returns the point and the percentage on the line of the intersection
-	 */
-	public static Optional<Pair<VPoint, Double>> firstIntersectionPoint(
-			@NotNull final VRectangle rectangle,
-			double x1, double y1,
-			double x2, double y2) {
-
-		/*
-			Modified Liang-Barsky line clipping algorithm
-			Liang-Barsky calculates how much a line clips. We are interested in where it intersects.
-		 */
-
-		double dx = x2 - x1;
-		double dy = y2 - y1;
-
-		Optional<Double> tEnter = Optional.empty();
-		Optional<Double> tExit  = Optional.empty();
-
-		double xmin = rectangle.x;
-		double ymin = rectangle.y;
-		double xmax = rectangle.x + rectangle.width;
-		double ymax = rectangle.y + rectangle.height;
-
-		double[] p = {-dx, dx, -dy, dy};
-		double[] q = {
-				x1 - xmin, // left
-				xmax - x1, // right
-				y1 - ymin, // bottom
-				ymax - y1  // top
-		};
-
-		for (int i = 0; i < 4; i++) {
-			boolean isParallel = p[i] == 0;
-			if (isParallel) {
-				if (q[i] < 0) {
-					return Optional.empty(); // Completely outside and parallel
-				}
-				continue;
-			}
-
-			double t = q[i] / p[i];
-			if(t > 1 || t < 0) {
-				continue;
-			}
-
-			if (p[i] < 0) {
-				if(tEnter.isEmpty() || tEnter.get() < t){
-					tEnter = Optional.of(t);
-				}
-			} else {
-				if(tExit.isEmpty() || tExit.get() > t){
-					tExit = Optional.of(t);
-				}
-			}
-		}
-
-		if (tEnter.isEmpty() && tExit.isEmpty()) {
-			return Optional.empty(); // Intersection not within line segment
-		}
-
-		double t;
-		if(tEnter.isEmpty()) {
-			t = tExit.get();
-		}else{
-			if(tExit.isEmpty()){
-				t = tEnter.get();
-			}else{
-				t = Math.min(tEnter.get(), tExit.get());
-			}
-		}
-
-		return Optional.of(Pair.of(new VPoint(
-				x1 + t * dx,
-				y1 + t * dy
-		), t));
-	}
 
 	public static VPoint intersectionPoint(@NotNull final VLine line1, @NotNull final VLine line2) {
 		return intersectionPoint(line1.x1, line1.y1, line1.x2, line1.y2, line2.x1, line2.y1, line2.x2, line2.y2);

@@ -138,14 +138,14 @@ public class VTrajectory implements Iterable<FootStep> {
 
 		boolean outside = true; // whether the trajectory is currently outside of the rectangle, initially true because we assume that the trajectory starts outside of the rectangle
 		for(FootStep footStep : footSteps) {
-			Optional<FootStep.LineRectClippingResult> optionalClipping = footStep.computeClipping(rectangle);
+			Optional<FootStep.StepRectClippingResult> optionalClipping = footStep.computeClipping(rectangle);
 			boolean stepIsOutside = optionalClipping.isEmpty();
 			if(stepIsOutside){
 				outside = true;
 				continue;
 			}
 
-			FootStep.LineRectClippingResult clipping = optionalClipping.get();
+			FootStep.StepRectClippingResult clipping = optionalClipping.get();
 
 			if(clipping.isCompletelyInside()){
 				ensureSingleConnectedTrajectory(newFootSteps, outside);

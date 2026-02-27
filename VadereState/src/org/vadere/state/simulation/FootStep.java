@@ -127,19 +127,26 @@ public final class FootStep {
 	 *
 	 * <p>The result describes the portion of the step that lies inside the rectangle.</p>
 	 *
+	 * <p><strong>Rectangle boundary behavior:</strong>
+	 * <ul>
+	 *   <li>If a step touches the rectangle from inside: considered fully inside, not intersecting.</li>
+	 *   <li>If a step touches the rectangle from outside: considered intersecting, with the touching point as the entry point.</li>
+	 * </ul>
+	 *
+	 * <p><strong>Result consists of:</strong>
 	 * <table border="1">
 	 *   <tr><td>Result</td><td> entryPoint </td> <td> exitPoint </td> <td> Reason </td></tr>
-	 * 	<tr><td> ✔ </td> <td> ✔ </td> <td> ✔ </td> <td> step crosses rectangle</td></tr>
-	 * 	<tr><td> ✔ </td> <td> ✔ </td> <td> x </td> <td> step's end is on boundary or enters rectangle without exiting</td></tr>
-	 * 	<tr><td> ✔ </td> <td> x </td> <td> ✔ </td> <td> step starts inside and exits or starts on boundary going outwards</td></tr>
-	 * 	<tr><td> ✔ </td> <td> x </td> <td> x </td> <td> step lies/touches inside the rectangle boundary</td></tr>
-	 * 	<tr><td> x </td> <td> - </td> <td> - </td> <td> step does not intersect the rectangle</td></tr>
+	 *   <tr><td> ✔ </td> <td> ✔ </td> <td> ✔ </td> <td> step crosses rectangle</td></tr>
+	 *   <tr><td> ✔ </td> <td> ✔ </td> <td> x </td> <td> step starts outside, and it's end is on rectangle or enters rectangle without exiting</td></tr>
+	 *   <tr><td> ✔ </td> <td> x </td> <td> ✔ </td> <td> step starts inside and exits or starts on the rectangle going outwards</td></tr>
+	 *   <tr><td> ✔ </td> <td> x </td> <td> x </td> <td> step starts inside and ends inside or touches rectangle (start and/or end point)</td></tr>
+	 *   <tr><td> x </td> <td> - </td> <td> - </td> <td> step does not intersect the rectangle</td></tr>
 	 * </table>
 	 *
 	 * @return an {@code Optional} containing a {@code LineRectClippingResult} that describes
 	 *         the clipped segment, or {@code Optional.empty()} if there is no intersection
 	 */
-	public Optional<LineRectClippingResult> computeClipping(@NotNull VRectangle rectangle) {
+	public Optional<StepRectClippingResult> computeClipping(@NotNull VRectangle rectangle) {
 		VPoint start = getStart();
 		VPoint end = getEnd();
 		Optional<GeometryUtils.LineRectClippingResult> optionalClippingResult = GeometryUtils.computeClipping(rectangle, start, end);
@@ -178,7 +185,7 @@ public final class FootStep {
 			clippingEnd = new IntersectionPointAndTime(end, getEndTime());
 		}
 
-		return Optional.of(new LineRectClippingResult(enter, exit, clippingStart, clippingEnd));
+		return Optional.of(new StepRectClippingResult(enter, exit, clippingStart, clippingEnd));
 	}
 
 	public static VPoint interpolateFootStep(final double startX, final double startY, final double endX, final double endY, final double startTime, final double endTime, final double time) {
@@ -250,12 +257,12 @@ public final class FootStep {
 	}
 
 	/**
-	 * @param entryPoint    the point where the line intersects the boundary entering the rectangle. Empty when the line is inside or when the line exits but does not enter.
-	 * @param exitPoint     the point where the line intersects the boundary exiting the rectangle. Empty when the line is inside or when line enters but does not exit.
-	 * @param clippingStart the point of the line that first enters the rectangle. When the line is completely inside, this is set to the start of the line.
-	 * @param clippingEnd   the point of the line that exits the rectangle. When the line is completely inside or enters and never exists, this is set to the end of the line.
+	 * @param entryPoint    the point where the step intersects the boundary entering the rectangle. Empty when the step is inside or when the step exits but does not enter.
+	 * @param exitPoint     the point where the step intersects the boundary exiting the rectangle. Empty when the step is inside or when the step enters but does not exit.
+	 * @param clippingStart the point of the step that first enters the rectangle. When the step is completely inside, this is set to the start of the step.
+	 * @param clippingEnd   the point of the step that exits the rectangle. When the step is completely inside or enters and never exists, this is set to the end of the step.
 	 */
-	public record LineRectClippingResult(Optional<IntersectionPointAndTime> entryPoint, Optional<IntersectionPointAndTime> exitPoint,
+	public record StepRectClippingResult(Optional<IntersectionPointAndTime> entryPoint, Optional<IntersectionPointAndTime> exitPoint,
 										 IntersectionPointAndTime clippingStart, IntersectionPointAndTime clippingEnd) {
 		boolean isCompletelyInside(){
 			return entryPoint.isEmpty() && exitPoint.isEmpty();
