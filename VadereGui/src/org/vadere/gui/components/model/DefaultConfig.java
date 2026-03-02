@@ -25,7 +25,7 @@ public class DefaultConfig {
 	private Color measurementAreaColor = Color.RED;
 	private int measurementAreaAlpha = 140;
 	private Color aerosolCloudColor = new Color(202, 156, 76); // Color(0.60f, 0.52f, 0.00f);
-	private int aerosolCloudAlphaMax = 10;
+	private int aerosolCloudAlphaMax = 20;
 	private double aerosolCloudMaxPathogenConcentration; // pathogen concentration that corresponds to aerosolCloudAlphaMax
 	private Color dropletsColor = new Color(190, 210, 20);
 	private Color exposedColor = new Color(202, 76, 187);

@@ -34,7 +34,7 @@ public class AttributesExposureModelSourceParameters extends Attributes {
     }
 
     public AttributesExposureModelSourceParameters() {
-        this(Attributes.ID_NOT_SET, false, List.of());
+        this(Attributes.ID_NOT_SET, false, List.of(0));
     }
 
     public boolean isInfectious() {

@@ -57,11 +57,11 @@ public class AttributesAirTransmissionModelAerosolCloud extends Attributes {
 
 
     public AttributesAirTransmissionModelAerosolCloud() {
-        this.halfLife = 600;
-        this.initialRadius = 1.5;
-        this.initialPathogenLoad = 10000;
-        this.airDispersionFactor = 0;
-        this.pedestrianDispersionWeight = 0.0125;
+        this.halfLife = 5300;
+        this.initialRadius = 1.0;
+        this.initialPathogenLoad = 1000;
+        this.airDispersionFactor = 0.003;
+        this.pedestrianDispersionWeight = 0.0;
         this.absorptionRate = 0.0005;
     }
 
