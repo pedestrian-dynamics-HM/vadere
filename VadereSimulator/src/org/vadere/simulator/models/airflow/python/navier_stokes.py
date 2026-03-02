@@ -209,7 +209,7 @@ def main():
     print(f"\nOseen solver time: {time.time() - mesh_time:.2f} s")
     print(f"\nTotal time: {time.time() - start_time:.2f} s")
     plot_results(mesh, X, Y, Vx_grid, Vy_grid, vel_mag, geom_data["obstacles"],
-                 f"{cache_dir / scenario_name}_{args.hash}_results.png")
+                 f"{cache_dir / scenario_name}_{args.hash}")
 
     if os.path.exists("domain.vtk"):
             os.remove("domain.vtk")

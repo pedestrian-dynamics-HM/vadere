@@ -155,85 +155,15 @@ def get_cache_dir(scenario_path):
 
 def plot_results(mesh, X, Y, Vx, Vy, vel_mag, obstacles, path):
     """
-    Plots mesh, streamlines, and vectors side-by-side
+    Plots mesh, streamlines, and vectors as three separate figures
     """
+    # Assuming necessary imports (plt, np, mcolors, PowerNorm, ticker) are above
+
     base = plt.cm.Blues
     trunc_blues = mcolors.LinearSegmentedColormap.from_list(
         'trunc_blues',
         base(np.linspace(0.3, 0.9, 256))
     )
-    plt.rcParams.update({
-        "font.size": 16,
-        "axes.titlesize": 18,
-        "axes.labelsize": 16,
-        "xtick.labelsize": 16,
-        "ytick.labelsize": 16,
-    })
-
-    x_min, x_max = np.min(X), np.max(X)
-    y_min, y_max = np.min(Y), np.max(Y)
-    domain_width = x_max - x_min
-    domain_height = y_max - y_min
-    aspect = domain_width / domain_height
-    plot_height = 15
-    plot_width = plot_height * aspect
-
-    fig_width = plot_width * 3
-    fig, axes = plt.subplots(1, 3,
-                             figsize=(fig_width, plot_height),
-                             sharex=True,
-                             #sharey=True,
-                             constrained_layout=True)
-    ax_mesh, ax_stream, ax_quiver = axes
-
-    def draw_obstacles(ax):
-        for obs in obstacles:
-            obs_arr = np.array(obs)
-            ax.fill(obs_arr[:, 0], obs_arr[:, 1], color='white', alpha=1.0, zorder=10)
-
-    # plot 1: mesh
-    coords = mesh.coors
-    conn = mesh.get_conn(mesh.descs[0])
-    ax_mesh.triplot(coords[:, 0], coords[:, 1], conn,
-                    color='k', linewidth=0.5, alpha=0.6)
-    draw_obstacles(ax_mesh)
-    ax_mesh.set_title("Mesh (Triangulation)")
-    ax_mesh.set_ylabel("y (m)")
-
-    # plot 2: streamlines
-    levels = np.linspace(0, np.max(vel_mag), 100)
-    cf1 = ax_stream.contourf(X, Y, vel_mag, levels=levels, cmap='trunc_blues', norm=PowerNorm(gamma=0.6))
-    ax_stream.streamplot(X, Y, Vx, Vy, color='white', linewidth=1.0,
-                         density=1.5, arrowsize=1, arrowstyle='->')
-    draw_obstacles(ax_stream)
-    ax_stream.set_title("Streamlines")
-    cb1 = fig.colorbar(cf1, ax=ax_stream, location='bottom', fraction=0.05, pad=0.02)
-    cb1.set_label('Velocity (m/s)')
-    cb1.locator = ticker.MaxNLocator(nbins=4)
-    cb1.update_ticks()
-    ax_stream.set_ylabel("y (m)")
-
-
-    # plot 3: rectangular grid airflow
-    cf2 = ax_quiver.contourf(X, Y, vel_mag, levels=levels, cmap='trunc_blues', norm=PowerNorm(gamma=0.6))
-    ax_quiver.quiver(X, Y, Vx, Vy, color='white', scale=10, width=0.003, alpha=0.8)
-    draw_obstacles(ax_quiver)
-    ax_quiver.set_title("Velocity Vectors")
-    cb2 = fig.colorbar(cf2, ax=ax_quiver, location='bottom', fraction=0.05, pad=0.02)
-    cb2.set_label('Velocity (m/s)')
-    cb2.locator = ticker.MaxNLocator(nbins=5)
-    cb2.update_ticks()
-
-    for ax in axes:
-        ax.set_xlabel("x (m)")
-        ax.set_aspect('equal', adjustable='box')
-        ax.set_xlim(x_min, x_max)
-        ax.set_ylim(y_min, y_max)
-
-    plt.savefig(path+"_results.svg")
-    plt.show()
-    plt.close()
-
 
     plt.rcParams.update({
         "font.size": 16,
@@ -248,36 +178,75 @@ def plot_results(mesh, X, Y, Vx, Vy, vel_mag, obstacles, path):
     domain_width = x_max - x_min
     domain_height = y_max - y_min
     aspect = domain_width / domain_height
+
+    # Set dimensions for a single plot
     plot_height = 15
     plot_width = plot_height * aspect
-
-    # Create a single streamlines plot
-    fig, ax = plt.subplots(figsize=(plot_width, plot_height), constrained_layout=True)
 
     def draw_obstacles(ax):
         for obs in obstacles:
             obs_arr = np.array(obs)
             ax.fill(obs_arr[:, 0], obs_arr[:, 1], color='grey', alpha=1.0, zorder=10)
 
-    levels = np.linspace(0, 0.15, 100)
-    cf = ax.contourf(X, Y, vel_mag, levels=levels, cmap=trunc_blues, norm=PowerNorm(gamma=0.6))
-    ax.streamplot(X, Y, Vx, Vy, color='white', linewidth=2,
-                  density=1.5, arrowsize=2, arrowstyle='->')
-    draw_obstacles(ax)
+    def format_axes(ax):
+        """Applies common formatting to individual axes."""
+        ax.set_xlabel("x (m)")
+        ax.set_aspect('equal', adjustable='box')
+        ax.set_xlim(x_min, x_max)
+        ax.set_ylim(y_min, y_max)
 
-    #ax.set_title("Streamlines")
-    ax.set_xlabel("x (m)")
-    ax.set_ylabel("y (m)")
+    # Figure 1: Mesh
+    fig_mesh, ax_mesh = plt.subplots(figsize=(plot_width, plot_height), constrained_layout=True)
 
-    cb = fig.colorbar(cf, ax=ax, location='bottom', fraction=0.05, pad=0.02)
-    cb.set_label('Velocity (m/s)')
-    cb.locator = ticker.MaxNLocator(nbins=3)
-    cb.update_ticks()
+    coords = mesh.coors
+    conn = mesh.get_conn(mesh.descs[0])
+    ax_mesh.triplot(coords[:, 0], coords[:, 1], conn,
+                    color='k', linewidth=0.5, alpha=0.6)
+    draw_obstacles(ax_mesh)
+    #ax_mesh.set_title("Mesh (Triangulation)")
+    ax_mesh.set_ylabel("y (m)")
+    format_axes(ax_mesh)
 
-    ax.set_aspect('equal', adjustable='box')
-    ax.set_xlim(x_min, x_max)
-    ax.set_ylim(y_min, y_max)
-
-    plt.savefig(path + "_streamlines.svg")
+    fig_mesh.savefig(path + "_mesh.svg")
     plt.show()
-    plt.close()
+    plt.close(fig_mesh)
+
+    # Figure 2: Streamlines
+    fig_stream, ax_stream = plt.subplots(figsize=(plot_width, plot_height), constrained_layout=True)
+
+    levels = np.linspace(0, 0.15, 100)
+    cf1 = ax_stream.contourf(X, Y, vel_mag, levels=levels, cmap=trunc_blues, norm=PowerNorm(gamma=0.6))
+    ax_stream.streamplot(X, Y, Vx, Vy, color='white', linewidth=1.0,
+                         density=1.5, arrowsize=1, arrowstyle='->')
+    draw_obstacles(ax_stream)
+
+    cb1 = fig_stream.colorbar(cf1, ax=ax_stream, location='bottom', fraction=0.05, pad=0.02)
+    cb1.set_label('Velocity (m/s)')
+    cb1.locator = ticker.MaxNLocator(nbins=4)
+    cb1.update_ticks()
+
+    ax_stream.set_ylabel("y (m)")
+    format_axes(ax_stream)
+
+    fig_stream.savefig(path + "_streamlines.svg")
+    plt.show()
+    plt.close(fig_stream)
+
+    # Figure 3: Rectangular grid airflow
+    fig_quiver, ax_quiver = plt.subplots(figsize=(plot_width, plot_height), constrained_layout=True)
+
+    cf2 = ax_quiver.contourf(X, Y, vel_mag, levels=levels, cmap=trunc_blues, norm=PowerNorm(gamma=0.6))
+    ax_quiver.quiver(X, Y, Vx, Vy, color='white', scale=10, width=0.003, alpha=0.8)
+    draw_obstacles(ax_quiver)
+
+    cb2 = fig_quiver.colorbar(cf2, ax=ax_quiver, location='bottom', fraction=0.05, pad=0.02)
+    cb2.set_label('Velocity (m/s)')
+    cb2.locator = ticker.MaxNLocator(nbins=4)
+    cb2.update_ticks()
+
+    ax_quiver.set_ylabel("y (m)")
+    format_axes(ax_quiver)
+
+    fig_quiver.savefig(path + "_vectors.svg")
+    plt.show()
+    plt.close(fig_quiver)

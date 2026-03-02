@@ -317,21 +317,23 @@ public abstract class DefaultRenderer {
 			double xMax = Math.min(topoXmax, airflowXmax);
 			double yMax = Math.min(topoYmax, airflowYmax);
 
+			double inletOutletDepth = 0.1;
+
 			g.setColor(new Color(100, 190, 100)); // green
 
 			for (AttributesInOutLet inlet : attributesAirFlowModel.getInlets()) {
 				switch (inlet.getSide()) {
 					case "south":
-						g.fill(new VRectangle.Double(inlet.getStart(), yMin, inlet.getWidth(), 0.1));
+						g.fill(new VRectangle.Double(inlet.getStart(), yMin, inlet.getWidth(), inletOutletDepth));
 						break;
 					case "north":
-						g.fill(new VRectangle.Double(inlet.getStart(), yMax - 0.1, inlet.getWidth(), 0.1));
+						g.fill(new VRectangle.Double(inlet.getStart(), yMax - inletOutletDepth, inlet.getWidth(), inletOutletDepth));
 						break;
 					case "west":
-						g.fill(new VRectangle.Double(xMin, inlet.getStart(), 0.1, inlet.getWidth()));
+						g.fill(new VRectangle.Double(xMin, inlet.getStart(), inletOutletDepth, inlet.getWidth()));
 						break;
 					case "east":
-						g.fill(new VRectangle.Double(xMax - 0.1, inlet.getStart(), 0.1, inlet.getWidth()));
+						g.fill(new VRectangle.Double(xMax - inletOutletDepth, inlet.getStart(), inletOutletDepth, inlet.getWidth()));
 						break;
 				}
 
@@ -342,16 +344,16 @@ public abstract class DefaultRenderer {
 			for (AttributesInOutLet outlet : attributesAirFlowModel.getOutlets()) {
 				switch (outlet.getSide()) {
 					case "south":
-						g.fill(new VRectangle.Double(outlet.getStart(), yMin, outlet.getWidth(), 0.1));
+						g.fill(new VRectangle.Double(outlet.getStart(), yMin, outlet.getWidth(), inletOutletDepth));
 						break;
 					case "north":
-						g.fill(new VRectangle.Double(outlet.getStart(), yMax - 0.1, outlet.getWidth(), 0.1));
+						g.fill(new VRectangle.Double(outlet.getStart(), yMax - inletOutletDepth, outlet.getWidth(), inletOutletDepth));
 						break;
 					case "west":
-						g.fill(new VRectangle.Double(xMin, outlet.getStart(), 0.1, outlet.getWidth()));
+						g.fill(new VRectangle.Double(xMin, outlet.getStart(), inletOutletDepth, outlet.getWidth()));
 						break;
 					case "east":
-						g.fill(new VRectangle.Double(xMax - 0.1, outlet.getStart(), 0.1, outlet.getWidth()));
+						g.fill(new VRectangle.Double(xMax - inletOutletDepth, outlet.getStart(), inletOutletDepth, outlet.getWidth()));
 						break;
 				}
 
@@ -362,7 +364,7 @@ public abstract class DefaultRenderer {
 
 			double visTolerance = 10e-8;
 
-
+			/*
 			double[][] xVelocities = airFlow.getXVelocities();
 			double[][] yVelocities = airFlow.getYVelocities();
 
@@ -402,7 +404,9 @@ public abstract class DefaultRenderer {
 						drawLineArrow(g, mX, mY, angle, arrowLength);
 					}
 				}
-			}
+
+
+			}*/
 		}
 	}
 
