@@ -38,42 +38,45 @@ public class AirFlowModelTester extends AirFlowModel {
 
     @Override
     public void initialize(List<Attributes> attributesList, Domain domain, AttributesAgent attributesPedestrian, Random random) {
-        // First initialize the airflow with a null hash to prevent NPE
         super.initialize(attributesList, domain, attributesPedestrian, random);
-        
-        // Then find and set attributes
         this.attributesAirFlowModel = Model.findAttributes(attributesList, AttributesAirFlowModel.class);
-        
-        // Finally set the test hash after everything else is initialized
-        if (this.airFlow != null) {
-            this.airFlow.setAirflowHash("test_hash");
-        }
-        // Set bounds explicitly for test
-        this.airFlow = new AirFlow("", "test_hash", 0, 0, 2, 2); // Example bounds
+        String scenarioPath = this.airFlow.getScenarioPath();
+        this.airFlow = new AirFlow(scenarioPath, "test_hash", 0, 0, 2, 2);
     }
 
     @Override
     protected void calculateAirFlow(String hash) {
-        File file1 = new File(airFlow.getScenarioPath() + "_" + hash + X_VELOCITY_FILE_ENDING);
-        File file2 = new File(airFlow.getScenarioPath() + "_" + hash + Y_VELOCITY_FILE_ENDING);
+        // Write files to the same location that setupAirFlow() will look for them.
+        // setupAirFlow() constructs: cacheDir / scenarioName + "_" + hash + ending
+        File scenarioFile = new File(airFlow.getScenarioPath());
+        File cacheDir = new File(scenarioFile.getParent(), "cache");
+        cacheDir.mkdirs();
+        String scenarioName = scenarioFile.getName().replaceFirst("\\.scenario$", "");
+
+        File file1 = new File(cacheDir, scenarioName + "_" + hash + X_VELOCITY_FILE_ENDING);
+        File file2 = new File(cacheDir, scenarioName + "_" + hash + Y_VELOCITY_FILE_ENDING);
         try {
             file1.createNewFile();
             file2.createNewFile();
             PrintWriter w1 = new PrintWriter(new FileWriter(file1));
             PrintWriter w2 = new PrintWriter(new FileWriter(file2));
-            w1.println(airflowVxText);
-            w2.println(airflowVyText);
+            w1.print(airflowVxText);
+            w2.print(airflowVyText);
             w1.close();
             w2.close();
-
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
     protected void calculateWrongAirFlow() {
-        File file1 = new File(airFlow.getScenarioPath() + "_" + airFlow.getAirflowHash() + X_VELOCITY_FILE_ENDING);
-        File file2 = new File(airFlow.getScenarioPath() + "_" + airFlow.getAirflowHash() + Y_VELOCITY_FILE_ENDING);
+        File scenarioFile = new File(airFlow.getScenarioPath());
+        File cacheDir = new File(scenarioFile.getParent(), "cache");
+        cacheDir.mkdirs();
+        String scenarioName = scenarioFile.getName().replaceFirst("\\.scenario$", "");
+
+        File file1 = new File(cacheDir, scenarioName + "_" + airFlow.getAirflowHash() + X_VELOCITY_FILE_ENDING);
+        File file2 = new File(cacheDir, scenarioName + "_" + airFlow.getAirflowHash() + Y_VELOCITY_FILE_ENDING);
         try {
             file1.createNewFile();
             file2.createNewFile();

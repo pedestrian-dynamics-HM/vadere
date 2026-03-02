@@ -628,13 +628,13 @@ public class AirTransmissionModelTest {
         AerosolCloud cloud = topography.getAerosolClouds().stream().findFirst().get();
         VPoint initialPosition = cloud.getCenter();
 
-        for (int i = 0; i < airTransmissionModel.MOVE_EVERY_N_STEPS - 1; i++)
+        for (int i = 0; i < airTransmissionModel.MOVE_AEROSOLS_EVERY_N_STEPS - 1; i++)
             airTransmissionModel.updateAerosolCloudsLocation(0);
             assertEquals(initialPosition, cloud.getCenter());
 
         airTransmissionModel.updateAerosolCloudsLocation(0);
-        assertEquals(initialPosition.x + dx * airTransmissionModel.simTimeStepLength * airTransmissionModel.MOVE_EVERY_N_STEPS, cloud.getCenter().x, "Aerosol cloud should be shifted correctly");
-        assertEquals(initialPosition.y + dy * airTransmissionModel.simTimeStepLength * airTransmissionModel.MOVE_EVERY_N_STEPS, cloud.getCenter().y, "Aerosol cloud should be shifted correctly");
+        assertEquals(initialPosition.x + dx * airTransmissionModel.simTimeStepLength * airTransmissionModel.MOVE_AEROSOLS_EVERY_N_STEPS, cloud.getCenter().x, "Aerosol cloud should be shifted correctly");
+        assertEquals(initialPosition.y + dy * airTransmissionModel.simTimeStepLength * airTransmissionModel.MOVE_AEROSOLS_EVERY_N_STEPS, cloud.getCenter().y, "Aerosol cloud should be shifted correctly");
     }
 
     private void createAirflow(AirTransmissionModel airTransmissionModel, double[][] xVelocity, double[][] yVelocity) {
@@ -665,7 +665,7 @@ public class AirTransmissionModelTest {
         double[][] yVelocity = new double[][]{{0.0}};
         airFlow.setX_velocity(xVelocity);
         airFlow.setY_velocity(yVelocity);
-        airFlow.setGridSize(Double.POSITIVE_INFINITY);
+        airFlow.setRectangularGridCellSize(Double.POSITIVE_INFINITY);
         topography.setAirFlow(airFlow);
 
         // Initialize model with time step 0.4

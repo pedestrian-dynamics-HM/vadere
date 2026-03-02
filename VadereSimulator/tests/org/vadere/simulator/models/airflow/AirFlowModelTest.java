@@ -12,6 +12,7 @@ import org.vadere.state.attributes.models.airflow.AttributesBounds;
 import org.vadere.state.attributes.models.airflow.AttributesInOutLet;
 import org.vadere.state.scenario.Topography;
 
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -47,10 +48,19 @@ class AirFlowModelTest {
         VadereContext.add("AirFlowModelTest", ctx);
     }
 
+
     @AfterEach
     public void deleteAirflowFiles() {
-        deleteFile(airFlowModel.airFlow.getScenarioPath() + "_test_hash" + "_Vx.txt");
-        deleteFile(airFlowModel.airFlow.getScenarioPath() + "_test_hash" + "_Vy.txt");
+        File cacheDir = new File(new File(airFlowModel.airFlow.getScenarioPath()).getParent(), "cache");
+        if (cacheDir.exists()) {
+            File[] files = cacheDir.listFiles();
+            if (files != null) {
+                for (File f : files) {
+                    f.delete();
+                }
+            }
+            cacheDir.delete();
+        }
     }
 
     @Test
@@ -59,7 +69,7 @@ class AirFlowModelTest {
         inlets.add(new AttributesInOutLet("west", 1., 2.));
         ArrayList<AttributesInOutLet> outlets = new ArrayList<>();
         outlets.add(new AttributesInOutLet("east", 4., 5.));
-        AttributesAirFlowModel attributesAirFlowModel = new AttributesAirFlowModel(2., 0.1, 1., inlets, outlets, new ArrayList<>(), new AttributesBounds());
+        AttributesAirFlowModel attributesAirFlowModel = new AttributesAirFlowModel(2., 0.1, 1., 4000, inlets, outlets, new ArrayList<>(), new AttributesBounds());
         attributesList.add(attributesAirFlowModel);
 
         initializeModel(true, false);
@@ -85,8 +95,6 @@ class AirFlowModelTest {
         assertNull(airFlowModel.airFlow.getYVelocities(), "Y velocities should be null before preLoop");
         airFlowModel.preLoop(0);
         assertNotNull(airFlowModel.airFlow.getFlowDirection(0, 0, 0));
-        deleteFile(airFlowModel.airFlow.getScenarioPath() + "_" + hash + "_Vx.txt");
-        deleteFile(airFlowModel.airFlow.getScenarioPath() + "_" + hash + "_Vy.txt");
     }
 
     @Test
@@ -124,9 +132,9 @@ class AirFlowModelTest {
         outlets.add(new AttributesInOutLet("east", 4., 5.));
         AttributesAirFlowModel attributesAirFlowModel;
         if (rightParameters) {
-            attributesAirFlowModel = new AttributesAirFlowModel(2., 0.1, 1., inlets, outlets, new ArrayList<>(), new AttributesBounds());
+            attributesAirFlowModel = new AttributesAirFlowModel(2., 0.1, 1., 4000, inlets, outlets, new ArrayList<>(), new AttributesBounds());
         } else {
-            attributesAirFlowModel = new AttributesAirFlowModel(1., 0.1, 1., inlets, outlets, new ArrayList<>(), new AttributesBounds());
+            attributesAirFlowModel = new AttributesAirFlowModel(1., 0.1, 1., 4000, inlets, outlets, new ArrayList<>(), new AttributesBounds());
         }
         if (periodic) {
             attributesAirFlowModel.setOffPeriod(1.0);
