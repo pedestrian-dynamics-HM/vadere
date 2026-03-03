@@ -317,9 +317,9 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 		IMeshDataStorage<V, E, F> dataStorage = refiner.getMeshDataStorage();
 		this.fixpointC = dataStorage.getBooleanVertexContainer(propFixPoint);
 		this.constraintC = dataStorage.getBooleanEdgeContainer(propConstrained);
-		this.velocityXC = dataStorage.getDoubleVertexContainer(propVelocityX, triangulation.getMesh());
-		this.velocityYC = dataStorage.getDoubleVertexContainer(propVelocityY, triangulation.getMesh());
-		this.absVelocityC = dataStorage.getDoubleVertexContainer(propAbsVelocity, triangulation.getMesh());
+		this.velocityXC = dataStorage.getDoubleVertexContainer(propVelocityX, refiner.getMesh());
+		this.velocityYC = dataStorage.getDoubleVertexContainer(propVelocityY, refiner.getMesh());
+		this.absVelocityC = dataStorage.getDoubleVertexContainer(propAbsVelocity, refiner.getMesh());
 	}
 
 	public GenEikMesh(

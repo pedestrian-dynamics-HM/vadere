@@ -226,7 +226,7 @@ public class GenUniformRefinementTriangulatorSFC<V extends IVertex, E extends IH
 	    V p3 = vertexBuilder.createAndInsert(xMin+max, yMin+max);
 
 	    // counter clockwise!
-	    F square = meshBuilder.faces().createAndInsert(p0, p1, p3, p2);
+	    F square = meshBuilder.faces().createFromVertexesInTheMesh(p0, p1, p3, p2);
 	    F tri = meshBuilder.faces().createAndInsert();
 
 	    // start divide the square into 2 triangles
@@ -482,7 +482,7 @@ public class GenUniformRefinementTriangulatorSFC<V extends IVertex, E extends IH
 
 	@Override
 	public ITriangleMeshBuilder<V, E, F> getMeshBuilder() {
-		return triangulation.getMeshBuilder();
+		return meshBuilder;
 	}
 
 	/**
