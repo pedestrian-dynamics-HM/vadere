@@ -125,6 +125,78 @@ class AirFlowModelTest {
         assertFalse(Math.pow(airFlow[0], 2) + Math.pow(airFlow[1], 2) > 0);
     }
 
+    @Test
+    public void testFlowDirectionOutsideBoundsReturnsZero() {
+        initializeModel(true, false);
+        airFlowModel.preLoop(0);
+
+        double[] flow = airFlowModel.airFlow.getFlowDirection(0, -1, -1);
+        assertEquals(0, flow[0], "X velocity outside bounds should be 0");
+        assertEquals(0, flow[1], "Y velocity outside bounds should be 0");
+
+        flow = airFlowModel.airFlow.getFlowDirection(0, 3, 3);
+        assertEquals(0, flow[0], "X velocity outside bounds should be 0");
+        assertEquals(0, flow[1], "Y velocity outside bounds should be 0");
+    }
+
+    @Test
+    public void testFlowDirectionInsideBoundsReturnsNonZero() {
+        initializeModel(true, false);
+        airFlowModel.preLoop(0);
+        double[] flow = airFlowModel.airFlow.getFlowDirection(0, 1, 1);
+        assertTrue(flow[0] != 0 || flow[1] != 0,
+                "Airflow at interior point should have non-zero velocity");
+    }
+
+    @Test
+    public void testFlowDirectionBeforePreLoopReturnsZero() {
+        initializeModel(true, false);
+        double[] flow = airFlowModel.airFlow.getFlowDirection(0, 1, 1);
+        assertEquals(0, flow[0], "X velocity before preLoop should be 0");
+        assertEquals(0, flow[1], "Y velocity before preLoop should be 0");
+    }
+
+    @Test
+    public void testShouldRemoveAerosolCloudMovingOutside() {
+        initializeModel(true, false);
+        airFlowModel.preLoop(0);
+
+        // Start inside (1,1), shift takes it outside (1+2=3, 1+2=3)
+        assertTrue(airFlowModel.airFlow.shouldRemoveAerosolCloud(1, 1, 2, 2),
+                "Cloud moving from inside to outside bounds should be removed");
+    }
+
+    @Test
+    public void testShouldNotRemoveAerosolCloudStayingInside() {
+        initializeModel(true, false);
+        airFlowModel.preLoop(0);
+
+        // Start inside (1,1), small shift keeps it inside
+        assertFalse(airFlowModel.airFlow.shouldRemoveAerosolCloud(1, 1, 0.1, 0.1),
+                "Cloud staying inside bounds should not be removed");
+    }
+
+    @Test
+    public void testShouldNotRemoveAerosolCloudAlreadyOutside() {
+        initializeModel(true, false);
+        airFlowModel.preLoop(0);
+
+        // Start outside (5,5), still outside after shift
+        assertFalse(airFlowModel.airFlow.shouldRemoveAerosolCloud(5, 5, 1, 1),
+                "Cloud already outside bounds should not be flagged for removal");
+    }
+
+    @Test
+    public void testBlockingObstaclesIDs() {
+        initializeModel(true, false);
+        airFlowModel.preLoop(0);
+
+        List<Integer> ids = airFlowModel.airFlow.getBlockingObstaclesIDs();
+        assertNotNull(ids, "Blocking obstacles list should not be null");
+        assertTrue(ids.isEmpty(), "Default blocking obstacles list should be empty");
+    }
+
+
     private void initializeModel(boolean rightParameters, boolean periodic) {
         ArrayList<AttributesInOutLet> inlets = new ArrayList<>();
         inlets.add(new AttributesInOutLet("west", 1., 2.));
