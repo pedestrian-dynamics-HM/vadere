@@ -79,25 +79,6 @@ public class AirTransmissionModelTest {
         assertEquals(ctx.get(AirTransmissionModel.simStepLength), airTransmissionModel.simTimeStepLength);
     }
 
-    // TODO test not completed yet
-//    @Test
-//    public void testSourceControllerEvent() {
-//        int pedestrianId = 1;
-//        int sourceId = 1;
-//        Source source = new Source(new AttributesSource(sourceId, new VRectangle(1, 1, 1, 1)));
-//        topography.addSource(source);
-//
-//        MainModel mainModel = new OptimalStepsModel();
-//        SourceControllerFactory sourceControllerFactory = mainModel.getSourceControllerFactory();
-//        SourceController sourceController = sourceControllerFactory
-//                .create(topography, source, mainModel, new AttributesAgent(pedestrianId), rdm);
-//
-//        double simTimeInSec = simStartTime;
-//        Agent agent = new Pedestrian(new AttributesAgent(), rdm);
-//
-//        airTransmissionModel.sourceControllerEvent(sourceController, simTimeInSec, agent);
-//    }
-
     @Test
     public void testTopographyControllerEventDefinesInfectiousPedestrian() {
         int pedestrianId = 1;
@@ -127,23 +108,6 @@ public class AirTransmissionModelTest {
     private TopographyController getTopographyController(MainModel mainModel) {
         return new TopographyController(new Domain(topography), mainModel, rdm);
     }
-
-//    TODO test not completed yet
-//    @Test
-//    public void testRegisterToScenarioElementControllerEvents() {
-//
-//        int sourceId = 1;
-//        Source source = new Source(new AttributesSource(sourceId, new VRectangle(1,1,1,1)));
-//        topography.addSource(source);
-//
-//        attrModel.getExposureModelSourceParameters().add(new AttributesExposureModelSourceParameters(sourceId, true));
-//
-//        double simEndTime = 100;
-//
-//        for (double simTimeInSec = simStartTime; simTimeInSec < simEndTime; simTimeInSec += airTransmissionModel.simTimeStepLength) {
-//            airTransmissionModel.update(simTimeInSec);
-//        }
-//    }
 
     @Test
     public void testUpdateCreatesAerosolCloudsAlthoughNotActive() {
@@ -389,7 +353,8 @@ public class AirTransmissionModelTest {
     @Test
     public void testUpdateAerosolCloudsExtentAgentMovement() {
         AttributesAirTransmissionModel attrModel = (AttributesAirTransmissionModel) airTransmissionModel.getAttributes();
-        
+        attrModel.setAirDispersionFactor(0);
+
         createAerosolCloud(airTransmissionModel);
 
         double simTimeStepLength = airTransmissionModel.simTimeStepLength;
@@ -562,11 +527,6 @@ public class AirTransmissionModelTest {
         }
 
         return pedestrian;
-    }
-
-    @Test
-    public void testUpdatePedestriansHealthStatus() {
-
     }
 
     private void initializeTransmissionModel() {
@@ -779,5 +739,215 @@ public class AirTransmissionModelTest {
         Obstacle obstacle = new Obstacle(new AttributesObstacle(1, shape));
         topography.getAirFlow().setBlockingObstaclesIDs(List.of(1));
         return obstacle;
+    }
+
+    @Test
+    public void testUpdateAerosolCloudsLocationNoAirFlow() {
+        setAerosolCloudsActive(true);
+        createAerosolCloud(airTransmissionModel);
+        topography.setAirFlow(null);
+
+        AerosolCloud cloud = topography.getAerosolClouds().stream().findFirst().get();
+        VPoint initialPosition = cloud.getCenter();
+
+        airTransmissionModel.updateAerosolCloudsLocation(0);
+
+        assertEquals(initialPosition, cloud.getCenter(),
+                "Cloud should not move when airFlow is null");
+    }
+
+    @Test
+    public void testUpdateAerosolCloudsLocationZeroVelocity() {
+        setAerosolCloudsActive(true);
+        createAerosolCloud(airTransmissionModel);
+        double[][] xVelocity = new double[][]{{0, 0, 0}, {0, 0, 0}, {0, 0, 0}};
+        double[][] yVelocity = new double[][]{{0, 0, 0}, {0, 0, 0}, {0, 0, 0}};
+        createAirflow(airTransmissionModel, xVelocity, yVelocity);
+
+        AerosolCloud cloud = topography.getAerosolClouds().stream().findFirst().get();
+        VPoint initialPosition = cloud.getCenter();
+
+        for (int i = 0; i < airTransmissionModel.MOVE_AEROSOLS_EVERY_N_STEPS; i++) {
+            airTransmissionModel.updateAerosolCloudsLocation(0);
+        }
+
+        assertEquals(initialPosition.x, cloud.getCenter().x, ALLOWED_DOUBLE_TOLERANCE,
+                "Cloud x should not change with zero velocity");
+        assertEquals(initialPosition.y, cloud.getCenter().y, ALLOWED_DOUBLE_TOLERANCE,
+                "Cloud y should not change with zero velocity");
+    }
+
+    @Test
+    public void testUpdateAerosolCloudsLocationRemovesCloudLeavingBounds() {
+        setAerosolCloudsActive(true);
+
+        AttributesAirTransmissionModel attrModel = (AttributesAirTransmissionModel) airTransmissionModel.getAttributes();
+        AerosolCloud edgeCloud = new AerosolCloud(new AttributesAerosolCloud(99,
+                attrModel.getAerosolCloudInitialRadius(),
+                new VPoint(9.9, 5),
+                simStartTime,
+                attrModel.getAerosolCloudInitialPathogenLoad()));
+        topography.addAerosolCloud(edgeCloud);
+
+        double[][] xVelocity = new double[][]{{100, 100, 100}, {100, 100, 100}, {100, 100, 100}};
+        double[][] yVelocity = new double[][]{{0, 0, 0}, {0, 0, 0}, {0, 0, 0}};
+        createAirflow(airTransmissionModel, xVelocity, yVelocity);
+
+        for (int i = 0; i < airTransmissionModel.MOVE_AEROSOLS_EVERY_N_STEPS; i++) {
+            airTransmissionModel.updateAerosolCloudsLocation(0);
+        }
+
+        boolean cloudRemoved = topography.getAerosolClouds().stream().noneMatch(c -> c.getId() == 99);
+        assertTrue(cloudRemoved, "Cloud pushed outside airflow bounds should be removed");
+    }
+
+    @Test
+    public void testUpdateAerosolCloudsLocationMultipleClouds() {
+        setAerosolCloudsActive(true);
+        AttributesAirTransmissionModel attrModel = (AttributesAirTransmissionModel) airTransmissionModel.getAttributes();
+
+        AerosolCloud cloud1 = new AerosolCloud(new AttributesAerosolCloud(1,
+                attrModel.getAerosolCloudInitialRadius(), new VPoint(3, 3), simStartTime,
+                attrModel.getAerosolCloudInitialPathogenLoad()));
+        AerosolCloud cloud2 = new AerosolCloud(new AttributesAerosolCloud(2,
+                attrModel.getAerosolCloudInitialRadius(), new VPoint(7, 7), simStartTime,
+                attrModel.getAerosolCloudInitialPathogenLoad()));
+        topography.addAerosolCloud(cloud1);
+        topography.addAerosolCloud(cloud2);
+
+        double[][] xVelocity = new double[][]{{1, 1, 1}, {1, 1, 1}, {1, 1, 1}};
+        double[][] yVelocity = new double[][]{{0, 0, 0}, {0, 0, 0}, {0, 0, 0}};
+        createAirflow(airTransmissionModel, xVelocity, yVelocity);
+
+        VPoint initial1 = cloud1.getCenter();
+        VPoint initial2 = cloud2.getCenter();
+
+        for (int i = 0; i < airTransmissionModel.MOVE_AEROSOLS_EVERY_N_STEPS; i++) {
+            airTransmissionModel.updateAerosolCloudsLocation(0);
+        }
+
+        double expectedShift = 1 * airTransmissionModel.simTimeStepLength * airTransmissionModel.MOVE_AEROSOLS_EVERY_N_STEPS;
+        assertEquals(initial1.x + expectedShift, cloud1.getCenter().x, ALLOWED_DOUBLE_TOLERANCE,
+                "Cloud 1 should be shifted correctly");
+        assertEquals(initial2.x + expectedShift, cloud2.getCenter().x, ALLOWED_DOUBLE_TOLERANCE,
+                "Cloud 2 should be shifted correctly");
+    }
+
+    @Test
+    public void testRemoveStuckAerosolCloudsSkipsWhenStepCounterNonZero() {
+        // removeStuckAerosolClouds should only run when airFlowStepCounter == 0
+        setAerosolCloudsActive(true);
+        createAerosolCloud(airTransmissionModel);
+        AerosolCloud cloud = topography.getAerosolClouds().stream().findFirst().get();
+        double[][] xVelocity = new double[][]{{0}};
+        double[][] yVelocity = new double[][]{{0}};
+        createAirflow(airTransmissionModel, xVelocity, yVelocity);
+
+        Obstacle blockingObstacle = createBlockingObstacleAtPosition(cloud.getCenter());
+        topography.addObstacle(blockingObstacle);
+
+        airTransmissionModel.updateAerosolCloudsLocation(0);
+        airTransmissionModel.removeStuckAerosolClouds();
+        assertFalse(airTransmissionModel.aerosolCounter.containsKey(cloud),
+                "removeStuckAerosolClouds should skip when airFlowStepCounter != 0");
+    }
+
+    @Test
+    public void testRemoveStuckAerosolCloudsNonBlockingObstacleIgnored() {
+        setAerosolCloudsActive(true);
+        createAerosolCloud(airTransmissionModel);
+        AerosolCloud cloud = topography.getAerosolClouds().stream().findFirst().get();
+        double[][] xVelocity = new double[][]{{0}};
+        double[][] yVelocity = new double[][]{{0}};
+        createAirflow(airTransmissionModel, xVelocity, yVelocity);
+
+        VShape shape = new VRectangle(cloud.getCenter().x - 0.5, cloud.getCenter().y - 0.5, 1, 1);
+        Obstacle nonBlockingObstacle = new Obstacle(new AttributesObstacle(99, shape));
+        topography.addObstacle(nonBlockingObstacle);
+        topography.getAirFlow().setBlockingObstaclesIDs(List.of(1));
+
+        for (int i = 0; i <= airTransmissionModel.STUCK_MAX + 1; i++) {
+            airTransmissionModel.removeStuckAerosolClouds();
+        }
+
+        assertEquals(1, topography.getAerosolClouds().size(),
+                "Cloud should not be removed by non-blocking obstacle");
+    }
+
+    @Test
+    public void testUpdateAerosolCloudsLocationResetCounterAfterMove() {
+        setAerosolCloudsActive(true);
+        createAerosolCloud(airTransmissionModel);
+        double[][] xVelocity = new double[][]{{0, 0, 0}, {0, 1, 0}, {0, 0, 0}};
+        double[][] yVelocity = new double[][]{{0, 0, 0}, {0, 0, 0}, {0, 0, 0}};
+        createAirflow(airTransmissionModel, xVelocity, yVelocity);
+
+        AerosolCloud cloud = topography.getAerosolClouds().stream().findFirst().get();
+        for (int i = 0; i < airTransmissionModel.MOVE_AEROSOLS_EVERY_N_STEPS; i++) {
+            airTransmissionModel.updateAerosolCloudsLocation(0);
+        }
+        VPoint positionAfterFirstMove = cloud.getCenter();
+
+        // Next MOVE_AEROSOLS_EVERY_N_STEPS-1 calls should NOT move the cloud
+        for (int i = 0; i < airTransmissionModel.MOVE_AEROSOLS_EVERY_N_STEPS - 1; i++) {
+            airTransmissionModel.updateAerosolCloudsLocation(0);
+        }
+        assertEquals(positionAfterFirstMove, cloud.getCenter(),
+                "Cloud should not have moved before the counter resets again");
+
+        airTransmissionModel.updateAerosolCloudsLocation(0);
+        assertNotEquals(positionAfterFirstMove.x, cloud.getCenter().x,
+                "Cloud should have moved after the counter resets and triggers again");
+    }
+
+    @Test
+    public void testPeriodicAirflowDisablesCloudMovement() {
+        setAerosolCloudsActive(true);
+        createAerosolCloud(airTransmissionModel);
+
+        AirFlow airFlow = new AirFlow("test", "test_hash", 0.0, 0.0, 10, 10);
+        double[][] xVelocity = new double[][]{{5, 5, 5}, {5, 5, 5}, {5, 5, 5}};
+        double[][] yVelocity = new double[][]{{0, 0, 0}, {0, 0, 0}, {0, 0, 0}};
+        airFlow.setX_velocity(xVelocity);
+        airFlow.setY_velocity(yVelocity);
+        airFlow.setRectangularGridCellSize(Double.POSITIVE_INFINITY);
+        airFlow.setPeriod(1.0, 1.0);
+        topography.setAirFlow(airFlow);
+
+        AerosolCloud cloud = topography.getAerosolClouds().stream().findFirst().get();
+        VPoint initialPosition = cloud.getCenter();
+
+        for (int i = 0; i < airTransmissionModel.MOVE_AEROSOLS_EVERY_N_STEPS; i++) {
+            airTransmissionModel.updateAerosolCloudsLocation(0.5);
+        }
+
+        assertEquals(initialPosition.x, cloud.getCenter().x, ALLOWED_DOUBLE_TOLERANCE,
+                "Cloud should not move during off period of periodic airflow");
+    }
+
+    @Test
+    public void testPeriodicAirflowEnablesCloudMovementDuringOnPeriod() {
+        setAerosolCloudsActive(true);
+        createAerosolCloud(airTransmissionModel);
+
+        AirFlow airFlow = new AirFlow("test", "test_hash", 0.0, 0.0, 10, 10);
+        double[][] xVelocity = new double[][]{{5, 5, 5}, {5, 5, 5}, {5, 5, 5}};
+        double[][] yVelocity = new double[][]{{0, 0, 0}, {0, 0, 0}, {0, 0, 0}};
+        airFlow.setX_velocity(xVelocity);
+        airFlow.setY_velocity(yVelocity);
+        airFlow.setRectangularGridCellSize(Double.POSITIVE_INFINITY);
+        airFlow.setPeriod(1.0, 1.0);
+        topography.setAirFlow(airFlow);
+
+        AerosolCloud cloud = topography.getAerosolClouds().stream().findFirst().get();
+        VPoint initialPosition = cloud.getCenter();
+
+        for (int i = 0; i < airTransmissionModel.MOVE_AEROSOLS_EVERY_N_STEPS; i++) {
+            airTransmissionModel.updateAerosolCloudsLocation(1.5);
+        }
+
+        double expectedShift = 5 * airTransmissionModel.simTimeStepLength * airTransmissionModel.MOVE_AEROSOLS_EVERY_N_STEPS;
+        assertEquals(initialPosition.x + expectedShift, cloud.getCenter().x, ALLOWED_DOUBLE_TOLERANCE,
+                "Cloud should move during on period of periodic airflow");
     }
 }
