@@ -31,7 +31,8 @@ public class DatabasedStepsModelTest {
               "org.vadere.state.attributes.models.AttributesDSM" : {
                 "trajectoryFileOrFolder" : "%s",
                 "submodels" : [ ],
-                "bufferedLines" : 1000
+                "bufferedLines" : 1000, 
+                "deletePostvisFile" : false
               }
             },""";
 
@@ -41,6 +42,7 @@ public class DatabasedStepsModelTest {
               "org.vadere.state.attributes.models.AttributesDSM" : {
                   "trajectoryFileOrFolder" : "%s",
                   "bufferedLines" : 1000,
+                  "deletePostvisFile" : false,
                   "submodels" : [ ],
                   "fallbackMainModel" : "org.vadere.simulator.models.osm.OptimalStepsModel",
                   "attributesFallbackModel" : {
@@ -141,13 +143,12 @@ public class DatabasedStepsModelTest {
     void testModel(Path scenarioPath) throws IOException {
         String[] split1 = Files.readString(scenarioPath).split("\"processWriters\"");
         String[] split2 = split1[1].split("\"scenario\"");
-        String scenarioString =  split1[0] + processors + "\"scenario\"" + split2[1];
+        String scenarioString = split1[0] + processors + "\"scenario\"" + split2[1];
 
         final Path scenarioFile = Files.createFile(testDir.resolve("scenario.model"));
         Files.writeString(scenarioFile, scenarioString);
 
         Path outputTrajectoryPathLocomotionModel = runLocomotionModel(scenarioFile, scenarioString);
-
         Path outputTrajectoryPathDSM = runDSM(scenarioString, outputTrajectoryPathLocomotionModel);
 
         String expected = Files.readString(outputTrajectoryPathLocomotionModel);
@@ -218,8 +219,9 @@ public class DatabasedStepsModelTest {
     public void testCheckIfCanExtractStepsFromFile() throws IOException {
         // Setup - Create temporary directory and files
         Path tempDir = Files.createTempDirectory("test_traj");
+        String contextId = "testScenario";
         String testHash = "abc123";
-        String trajFileName = "postvis_" + testHash + ".traj";
+        String trajFileName = contextId + "_" + testHash + ".traj";
         File trajFileInDir = new File(tempDir.toFile(), trajFileName);
         trajFileInDir.createNewFile();
 
@@ -238,6 +240,7 @@ public class DatabasedStepsModelTest {
             // Case 2: Directory contains .traj file with matching hash
             attributesDSM.setTrajectoryFileOrFolder(tempDir.toString());
             dsm.setLocomotionHash(testHash);
+            dsm.setContextId(contextId);
             assertTrue(dsm.checkIfCanExtractStepsFromFile(),
                     "Should return true when directory contains matching .traj file");
             assertEquals(trajFileInDir.getAbsolutePath(),
@@ -256,12 +259,6 @@ public class DatabasedStepsModelTest {
                     () -> dsm.checkIfCanExtractStepsFromFile(),
                     "Should throw exception when path is neither .traj file nor directory");
 
-            // Case 5: Null path
-            attributesDSM.setTrajectoryFileOrFolder(null);
-            assertThrows(IllegalArgumentException.class,
-                    () -> dsm.checkIfCanExtractStepsFromFile(),
-                    "Should throw exception when path is null");
-
         } finally {
             trajFileInDir.delete();
             directTrajFile.delete();
@@ -270,11 +267,45 @@ public class DatabasedStepsModelTest {
     }
 
     @Test
+    public void testCheckIfCanExtractStepsFromFileNullUsesDefaultCache() throws IOException {
+        // When trajectoryFileOrFolder is null, setDefaultTrajectoryPath creates a cache/
+        // subdirectory under the scenario file's parent.
+        Path tempScenarioDir = Files.createTempDirectory("test_scenario");
+        Path fakeScenarioFile = Files.createFile(tempScenarioDir.resolve("test.scenario"));
+
+        DatabasedStepsModel dsm = new DatabasedStepsModel();
+        AttributesDSM attributesDSM = new AttributesDSM();
+        attributesDSM.setTrajectoryFileOrFolder(null);
+        dsm.setAttributesDSM(attributesDSM);
+        DatabasedStepsModel.scenarioPath = fakeScenarioFile.toAbsolutePath().toString();
+        dsm.setLocomotionHash("someHash");
+        dsm.setContextId("testCtx");
+
+        // No matching .traj in the newly created cache dir, so should return false
+        assertFalse(dsm.checkIfCanExtractStepsFromFile(),
+                "Should return false when cache dir is empty");
+
+        // Verify the cache directory was created
+        Path expectedCacheDir = tempScenarioDir.resolve("cache");
+        assertTrue(Files.isDirectory(expectedCacheDir),
+                "Default cache directory should have been created");
+
+        // Verify attributesDSM was updated to point to the cache directory
+        assertEquals(expectedCacheDir.toAbsolutePath().toString(),
+                attributesDSM.getTrajectoryFileOrFolder(),
+                "Should update trajectoryFileOrFolder to cache directory path");
+
+        // Cleanup
+        Files.deleteIfExists(expectedCacheDir);
+        Files.deleteIfExists(fakeScenarioFile);
+        Files.deleteIfExists(tempScenarioDir);
+    }
+
+    @Test
     public void testDSMFolderInput() throws IOException {
         Path scenarioFile = Files.createFile(testDir.resolve("scenario.model"));
         Path scenarioFolder = scenarioFile.toAbsolutePath().getParent();
 
-        // Create scenario JSON
         Path scenarioPath = Path.of("../Scenarios/ModelTests/TestOSM/scenarios/narrow_passage_pso_ok.scenario");
         String baseScenario = Files.readString(scenarioPath);
         String modifiedScenario = insertModelDSM(baseScenario, scenarioFolder);
@@ -283,45 +314,62 @@ public class DatabasedStepsModelTest {
         Scenario scenario = ScenarioFactory.createScenarioWithScenarioJson(modifiedScenario);
         ScenarioCache cache = ScenarioCache.load(scenario, scenarioFolder);
 
-        // Ensure no postvis_*.traj exists yet
-        assertNoTrajFiles(scenarioFolder);
+        // Verify no cached .traj files exist yet
+        assertNoCachedTrajFiles(scenarioFolder);
 
-        // Run 1: Since no postvis_*.traj exists yet in the given folder, the DSM will create one by running an OSM
+        // Run 1: No cached .traj exists, so DSM runs the fallback model
+        // and copies the trajectory file to the cache location
         ScenarioRun run1 = new ScenarioRun(scenario, outputDir.toString(), null, outputDir, cache);
         run1.run();
         Path outputTraj1 = run1.getOutputPath().resolve(TRAJECTORY_FILE_NAME).toAbsolutePath();
 
-        // Check if .traj file was created
-        assertSingleTrajFile(scenarioFolder);
+        assertSingleCachedTrajFile(scenarioFolder);
 
         // Run 2: Since a postvis_*.traj exists now, the DSM will just read the existing .traj file
         ScenarioRun run2 = new ScenarioRun(scenario, outputDir.toString(), null, outputDir, cache);
         run2.run();
         Path outputTraj2 = run2.getOutputPath().resolve(TRAJECTORY_FILE_NAME).toAbsolutePath();
 
-        // Check if there is only one .traj file
-        assertSingleTrajFile(scenarioFolder);
+        assertSingleCachedTrajFile(scenarioFolder);
 
-        // Compare outputs
         compareTrajectoryFiles(Files.readString(outputTraj1), Files.readString(outputTraj2));
     }
 
-    private void assertNoTrajFiles(Path folder) throws IOException {
-        List<Path> matches = findTrajFiles(folder);
-        assertTrue(matches.isEmpty(), "Expected no postvis_*.traj files, found: " + matches);
+    /**
+     * Searches for cached trajectory files in both the given folder and its cache/ subdirectory.
+     * The DSM names cached files as: contextId_locomotionHash.traj
+     */
+    private List<Path> findCachedTrajFiles(Path folder) throws IOException {
+        List<Path> results = new ArrayList<>();
+        results.addAll(findTrajFilesInDir(folder));
+
+        Path cacheDir = folder.resolve("cache");
+        if (Files.isDirectory(cacheDir)) {
+            results.addAll(findTrajFilesInDir(cacheDir));
+        }
+        return results;
     }
 
-    private void assertSingleTrajFile(Path folder) throws IOException {
-        List<Path> matches = findTrajFiles(folder);
-        assertEquals(1, matches.size(), "Expected exactly one postvis_*.traj file, found: " + matches);
-    }
-
-    private List<Path> findTrajFiles(Path folder) throws IOException {
-        try (var stream = Files.list(folder)) {
+    private List<Path> findTrajFilesInDir(Path dir) throws IOException {
+        if (!Files.isDirectory(dir)) {
+            return Collections.emptyList();
+        }
+        try (var stream = Files.list(dir)) {
             return stream
-                    .filter(p -> p.getFileName().toString().matches("postvis_[A-Za-z0-9]+\\.traj"))
+                    // Match contextId_hash.traj format used by copyTrajectoryFile
+                    .filter(p -> p.getFileName().toString().matches(".+_[A-Za-z0-9]+\\.traj"))
                     .collect(Collectors.toList());
         }
+    }
+
+    private void assertNoCachedTrajFiles(Path folder) throws IOException {
+        List<Path> matches = findCachedTrajFiles(folder);
+        assertTrue(matches.isEmpty(), "Expected no cached .traj files, found: " + matches);
+    }
+
+    private void assertSingleCachedTrajFile(Path folder) throws IOException {
+        List<Path> matches = findCachedTrajFiles(folder);
+        assertEquals(1, matches.size(), "Expected exactly one cached .traj file, found: " + matches);
     }
 
     private String insertModelDSM(String scenarioJson, Path scenarioFolder) {

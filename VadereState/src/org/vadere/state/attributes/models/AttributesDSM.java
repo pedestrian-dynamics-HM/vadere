@@ -24,10 +24,16 @@ public class AttributesDSM extends Attributes {
     private String trajectoryFileOrFolder = null;
     private int bufferedLines = 1000;
     /**
+     * Option to delete the postvis.traj file from the scenario output folder. This is useful
+     * for parameter studies, since the postvis.traj file take up a lot of space.
+     */
+    private boolean deletePostvisFile = true;
+    /**
      * This list should only be used if fallbackMainModel is null.
      * Otherwise, the submodels list of fallbackMainModel will be used.
      */
     private List<String> submodels = new LinkedList<>();
+
     /**
      * the main model if the trajectory file is not found
      */
@@ -43,6 +49,8 @@ public class AttributesDSM extends Attributes {
     public String getTrajectoryFileOrFolder() {
         return trajectoryFileOrFolder;
     }
+
+    public boolean isDeletePostvisFile() { return deletePostvisFile; }
 
     public List<String> getSubmodels() {
         return new ArrayList<>(submodels);

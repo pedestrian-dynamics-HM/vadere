@@ -58,6 +58,7 @@ public class DatabasedStepsModel implements MainModel {
     public static String simulationSeedName = "simulationSeed";
     protected long simulationSeed;
     private String locomotionHash = "";
+    private String contextId;
 
 
     @Override
@@ -97,7 +98,7 @@ public class DatabasedStepsModel implements MainModel {
             logger.error("Variable trajectoryFileOrFolder must be a .traj file or directory");
             throw new IllegalArgumentException("Invalid argument for trajectoryFile");
         }
-        String trajFileName = this.domain.getTopography().getContextId() + "_" + locomotionHash + ".traj";
+        String trajFileName = getContextId() + "_" + locomotionHash + ".traj";
         File trajFile = new File(dir, trajFileName);
         if (trajFile.exists()) {
             attributesDSM.setTrajectoryFileOrFolder(trajFile.getAbsolutePath());
@@ -270,7 +271,7 @@ public class DatabasedStepsModel implements MainModel {
                 return;
             }
 
-            String targetFileName = this.domain.getTopography().getContextId() + "_" + locomotionHash + ".traj";
+            String targetFileName = getContextId() + "_" + locomotionHash + ".traj";
             File targetDir = new File(attributesDSM.getTrajectoryFileOrFolder());
             if (!targetDir.exists()) {
                 targetDir.mkdirs();
@@ -287,6 +288,9 @@ public class DatabasedStepsModel implements MainModel {
     }
 
     private void deleteTrajectoryFile() {
+        if (!attributesDSM.isDeletePostvisFile()) {
+            return;
+        }
         try {
             Path sourcePath = Paths.get(outputPath, "postvis.traj");
             if (Files.exists(sourcePath)) {
@@ -308,5 +312,16 @@ public class DatabasedStepsModel implements MainModel {
 
     protected boolean canExtractStepsFromFile() {
         return this.canExtractStepsFromFile;
+    }
+
+    protected String getContextId() {
+        if (contextId != null) {
+            return contextId;
+        }
+        return domain.getTopography().getContextId();
+    }
+
+    protected void setContextId(String contextId) {
+        this.contextId = contextId;
     }
 }
