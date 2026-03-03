@@ -1,5 +1,6 @@
 package org.vadere.state.scenario;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.health.DoseResponseModelInfectionStatus;
 import org.vadere.state.health.ExposureModelHealthStatus;
@@ -49,6 +50,7 @@ public class Pedestrian extends Agent {
      * will be cleared after each completion of a time step. The output processor <tt>PedestrianStrideProcessor</tt>
      * can write out those foot steps.
      */
+    @JsonAlias("trajectory") // backwards compatibility
     private VTrajectory trajectoryOfSimulationStep;
     /**
      * This list stores the last n footsteps. I.e., this list is NOT cleared after each simulation loop like "trajectory" variable.
