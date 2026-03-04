@@ -130,24 +130,24 @@ public class AirFlowModel extends AbstractAirFlowModel {
     }
 
     private double[][] readArrayFromFile(String filename) throws IOException {
-        BufferedReader reader = new BufferedReader(new FileReader(filename));
+        try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
+            String header = reader.readLine();
+            String[] split = header.substring(2).split("_");
+            int x_dim = Integer.parseInt(split[0]);
+            int y_dim = Integer.parseInt(split[1]);
 
-        String header = reader.readLine();
-        String[] split = header.substring(2).split("_");
-        int x_dim = Integer.parseInt(split[0]);
-        int y_dim = Integer.parseInt(split[1]);
+            double[][] result = new double[x_dim][y_dim];
 
-        double[][] result = new double[x_dim][y_dim];
-
-        for (int i = 0; i < x_dim; i++) {
-            String line = reader.readLine();
-            String[] lineSplit = line.split(" ");
-            for (int j = 0; j < y_dim; j++) {
-                try {
-                    result[i][j] = Double.parseDouble(lineSplit[j]);
-                } catch (NumberFormatException ignored) {}
+            for (int i = 0; i < x_dim; i++) {
+                String line = reader.readLine();
+                String[] lineSplit = line.split(" ");
+                for (int j = 0; j < y_dim; j++) {
+                    try {
+                        result[i][j] = Double.parseDouble(lineSplit[j]);
+                    } catch (NumberFormatException ignored) {}
+                }
             }
+            return result;
         }
-        return result;
     }
 }
