@@ -44,7 +44,7 @@ class AirFlowModelTest {
 
         rdm = new Random(0);
         ctx = new VadereContext();
-        ctx.put("scenarioPath", tempDir.toAbsolutePath().toString());
+        ctx.put("scenarioPath", tempDir.resolve("test.scenario").toAbsolutePath().toString());
         VadereContext.add("AirFlowModelTest", ctx);
     }
 
