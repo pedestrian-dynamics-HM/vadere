@@ -9,8 +9,7 @@ import org.vadere.util.geometry.shapes.VShape;
 
 import java.awt.geom.Path2D;
 
-import static  org.junit.jupiter.api.Assertions.assertEquals;
-import static  org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class GeometryUtilsTest {
@@ -98,6 +97,90 @@ public class GeometryUtilsTest {
 		assertTrue(GeometryUtils.intersectHalfLineSegment(new VPoint(1, 0), new VPoint(0.5, 0.5), p1, p2));
 		assertTrue(GeometryUtils.intersectHalfLineSegment(new VPoint(1, 0), new VPoint(1, 1), p1, p2));
 		assertTrue(GeometryUtils.intersectHalfLineSegment(new VPoint(2, 1), new VPoint(-1, 31), p1, p2));
+	}
+
+	@Test
+	public void intersectsRectangleBoundary_containedLine_returnsFalse() {
+		// Arrange
+		VPoint lineStart = new VPoint(0, 1);
+		VPoint lineEnd = new VPoint(3, 1);
+		VRectangle area = new VRectangle(0, 0, 3, 3);
+
+		// Act
+		boolean intersects = GeometryUtils.intersectsRectangleBoundary(area, lineStart.x, lineStart.y, lineEnd.x, lineEnd.y);
+
+		// Assert
+		assertFalse(intersects);
+	}
+
+	@Test
+	public void intersectsRectangleBoundary_enteringLine_returnsTrue() {
+		// Arrange
+		VPoint lineStart = new VPoint(0, 1);
+		VPoint lineEnd = new VPoint(3, 1);
+		VRectangle area = new VRectangle(2, 0, 3, 3);
+
+		// Act
+		boolean intersects = GeometryUtils.intersectsRectangleBoundary(area, lineStart.x, lineStart.y, lineEnd.x, lineEnd.y);
+
+		// Assert
+		assertTrue(intersects);
+	}
+
+	@Test
+	public void intersectsRectangleBoundary_exitingLine_returnsTrue() {
+		// Arrange
+		VPoint lineStart = new VPoint(3, 1);
+		VPoint lineEnd = new VPoint(0, 1);
+		VRectangle area = new VRectangle(2, 0, 3, 3);
+
+		// Act
+		boolean intersects = GeometryUtils.intersectsRectangleBoundary(area, lineStart.x, lineStart.y, lineEnd.x, lineEnd.y);
+
+		// Assert
+		assertTrue(intersects);
+	}
+
+	@Test
+	public void intersectsRectangleBoundary_crossingLine_returnsTrue() {
+		// Arrange
+		VPoint lineStart = new VPoint(0, 1);
+		VPoint lineEnd = new VPoint(10, 1);
+		VRectangle area = new VRectangle(2, 0, 3, 3);
+
+		// Act
+		boolean intersects = GeometryUtils.intersectsRectangleBoundary(area, lineStart.x, lineStart.y, lineEnd.x, lineEnd.y);
+
+		// Assert
+		assertTrue(intersects);
+	}
+
+	@Test
+	public void intersectsRectangleBoundary_touchingLineFromOutside_returnsFalse() {
+		// Arrange
+		VPoint lineStart = new VPoint(0, 1);
+		VPoint lineEnd = new VPoint(2, 1);
+		VRectangle area = new VRectangle(2, 0, 3, 3);
+
+		// Act
+		boolean intersects = GeometryUtils.intersectsRectangleBoundary(area, lineStart.x, lineStart.y, lineEnd.x, lineEnd.y);
+
+		// Assert
+		assertFalse(intersects);
+	}
+
+	@Test
+	public void intersectsRectangleBoundary_touchingLineFromInside_returnsFalse() {
+		// Arrange
+		VPoint lineStart = new VPoint(0, 1);
+		VPoint lineEnd = new VPoint(2, 1);
+		VRectangle area = new VRectangle(0, 0, 2, 3);
+
+		// Act
+		boolean intersects = GeometryUtils.intersectsRectangleBoundary(area, lineStart.x, lineStart.y, lineEnd.x, lineEnd.y);
+
+		// Assert
+		assertFalse(intersects);
 	}
 
 	@Test

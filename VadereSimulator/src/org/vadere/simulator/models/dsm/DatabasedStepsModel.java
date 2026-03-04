@@ -165,7 +165,7 @@ public class DatabasedStepsModel implements MainModel {
             pedestrian.setTargets(nextTarget);
 
             FootStep currentFootstep = new FootStep(startPosition, endPosition, nextStep.getStartTime(), nextStep.getEndTime());
-            pedestrian.getTrajectory().add(currentFootstep);
+            pedestrian.getTrajectoryOfSimulationStep().add(currentFootstep);
 
             if (!startPosition.equals(nextStep.getStartPosition())) {
                 logger.warn("Agent spawn positions did not match with the input trajectories");

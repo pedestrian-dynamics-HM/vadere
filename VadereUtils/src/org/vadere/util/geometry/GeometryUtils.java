@@ -12,6 +12,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.Random;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.locationtech.jts.geom.Coordinate;
@@ -82,37 +83,99 @@ public class GeometryUtils {
 	}
 
 	/**
-	 * Computes the (optional) intersection point of a {@link VRectangle} boundary and the line-segment defined by ((x1, y1), (x2, y2)).
+	 * Computes the intersection between a line segment startPoint → endPoint
+	 * and an (axis-aligned) rectangle using the Liang–Barsky line clipping algorithm.
+	 * The result describes the portion of the step that lies inside the rectangle.
 	 *
-	 * @param rectangle the rectangle
-	 * @param x1        the x-coordinate of the first point of the line-segment
-	 * @param y1        the y-coordinate of the first point of the line-segment
-	 * @param x2        the x-coordinate of the second point of the line-segment
-	 * @param y2        the y-coordinate of the second point of the line-segment
+	 * <p><strong>Rectangle boundary behavior:</strong>
+	 * <ul>
+	 *   <li>If a line touches the rectangle from inside: considered fully inside, not intersecting.</li>
+	 *   <li>If a line touches the rectangle from outside: considered intersecting, with the touching point as the entry point.</li>
+	 * </ul>
 	 *
-	 * @return the intersection point or {@link Optional#empty()}
+	 * <p><strong>Result consists of:</strong>
+	 * <table border="1">
+	 *   <tr><td>Result</td><td> entryPoint </td> <td> exitPoint </td> <td> Reason </td></tr>
+	 *   <tr><td> ✔ </td> <td> ✔ </td> <td> ✔ </td> <td> line crosses rectangle</td></tr>
+	 *   <tr><td> ✔ </td> <td> ✔ </td> <td> x </td> <td> line starts outside, and it's end is on rectangle or enters rectangle without exiting</td></tr>
+	 *   <tr><td> ✔ </td> <td> x </td> <td> ✔ </td> <td> line starts inside and exits or starts on the rectangle going outwards</td></tr>
+	 *   <tr><td> ✔ </td> <td> x </td> <td> x </td> <td> line starts inside and ends inside or touches rectangle (start and/or end point)</td></tr>
+	 *   <tr><td> x </td> <td> - </td> <td> - </td> <td> line does not intersect the rectangle</td></tr>
+	 * </table>
 	 */
-	public static Optional<VPoint> intersectionPoint(
+	public static Optional<LineRectClippingResult> computeClipping(
 			@NotNull final VRectangle rectangle,
-			final double x1,
-			final double y1,
-			final double x2,
-			final double y2) {
-		if(intersectLineSegment(rectangle.x, rectangle.y, rectangle.x + rectangle.width, rectangle.y, x1, y1, x2, y2)) {
-			return Optional.of(intersectionPoint(rectangle.x, rectangle.y, rectangle.x + rectangle.width, rectangle.y, x1, y1, x2, y2));
-		}
-		else if(intersectLineSegment(rectangle.x, rectangle.y, rectangle.x, rectangle.y + rectangle.height, x1, y1, x2, y2)) {
-			return Optional.of(intersectionPoint(rectangle.x, rectangle.y, rectangle.x, rectangle.y + rectangle.height, x1, y1, x2, y2));
-		}
-		else if(intersectLineSegment(rectangle.x + rectangle.width, rectangle.y, rectangle.x + rectangle.width, rectangle.y + rectangle.height, x1, y1, x2, y2)) {
-			return Optional.of(intersectionPoint(rectangle.x + rectangle.width, rectangle.y, rectangle.x + rectangle.width, rectangle.y + rectangle.height, x1, y1, x2, y2));
-		}
-		if(intersectLineSegment(rectangle.x, rectangle.y + rectangle.height, rectangle.x + rectangle.width, rectangle.y + rectangle.height, x1, y1, x2, y2)) {
-			return Optional.of(intersectionPoint(rectangle.x, rectangle.y + rectangle.height, rectangle.x + rectangle.width, rectangle.y + rectangle.height, x1, y1, x2, y2));
+			VPoint startPoint,
+			VPoint endPoint) {
+
+		double dx = endPoint.x - startPoint.x;
+		double dy = endPoint.y - startPoint.y;
+		double[] axisDelta = {-dx, dx, -dy, dy};
+
+		double xmin = rectangle.x;
+		double ymin = rectangle.y;
+		double xmax = rectangle.x + rectangle.width;
+		double ymax = rectangle.y + rectangle.height;
+
+		double[] distanceToBoundary = {
+				startPoint.x - xmin, // left rect boundary
+				xmax - startPoint.x, // right rect boundary
+				startPoint.y - ymin, // bottom rect boundary
+				ymax - startPoint.y  // top rect boundary
+		};
+
+		double tEnter = 0.0;
+		boolean foundEnterIntersection = false;
+		double tExit = 1.0;
+		boolean foundExitIntersection = false;
+
+		for (int i = 0; i < 4; i++) {
+			boolean isParallel = axisDelta[i] == 0;
+			if (isParallel) {
+				if (distanceToBoundary[i] < 0) {
+					return Optional.empty(); // Completely outside and parallel
+				}
+				continue;
+			}
+
+			double t = distanceToBoundary[i] / axisDelta[i];
+
+			if (axisDelta[i] < 0) {
+				if(t >= tEnter){
+					tEnter = t;
+					foundEnterIntersection = t>0 && t<=1;
+				}
+			} else {
+				if(t <= tExit){
+					tExit = t;
+					foundExitIntersection = t>=0&& t<1;
+				}
+			}
+
+			if (tEnter > tExit){
+				return Optional.empty(); // Line is completely outside
+			}
 		}
 
-		return Optional.empty();
+		Optional<IntersectionPointAndPercentage> entryPoint = foundEnterIntersection ? Optional.of(new IntersectionPointAndPercentage(new VPoint(
+                startPoint.x + tEnter * dx,
+                startPoint.y + tEnter * dy
+        ), tEnter)) : Optional.empty();
+
+        Optional<IntersectionPointAndPercentage> exitPoint = foundExitIntersection ? Optional.of(new IntersectionPointAndPercentage(new VPoint(
+                startPoint.x + tExit * dx,
+                startPoint.y + tExit * dy
+        ), tExit)) : Optional.empty();
+
+        return Optional.of(new LineRectClippingResult(entryPoint, exitPoint));
 	}
+
+	/**
+	 * @param entryPoint the entry intersection point. Only {@code Optional.empty()} when the line starts from the or from the bounds of the rectangle
+	 * @param exitPoint the exit intersection point. Empty when the line is fully inside, touches the bounds from the inside or only enters the rectangle.
+	 */
+	public record LineRectClippingResult(Optional<IntersectionPointAndPercentage> entryPoint, Optional<IntersectionPointAndPercentage> exitPoint) {}
+	public record IntersectionPointAndPercentage(VPoint point, double linePercentage) {}
 
 	public static VPoint intersectionPoint(@NotNull final VLine line1, @NotNull final VLine line2) {
 		return intersectionPoint(line1.x1, line1.y1, line1.x2, line1.y2, line2.x1, line2.y1, line2.x2, line2.y2);
@@ -127,7 +190,10 @@ public class GeometryUtils {
 	 * @param x2        the x-coordinate of the second point of the line-segment
 	 * @param y2        the y-coordinate of the second point of the line-segment
 	 *
-	 * @return true if there is an intersection, false otherwise.
+	 * @return true if the line segment intersects the rectangle’s boundary,
+	 *         including cases where the segment starts inside the rectangle
+	 *         and exits it. Returns false if the segment only touches the
+	 *         boundary without crossing it.
 	 */
 	public static boolean intersectsRectangleBoundary(@NotNull final VRectangle rectangle, double x1, double y1, double x2, double y2) {
 		return  intersectLineSegment(rectangle.x, rectangle.y, rectangle.x + rectangle.width, rectangle.y, x1, y1, x2, y2) ||

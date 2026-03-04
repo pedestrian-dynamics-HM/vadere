@@ -82,14 +82,14 @@ public class FundamentalDiagramAProcessor extends DataProcessor<TimestepKey, Lis
 			final double localStartTime = simTime - deltaTime;
 			final double localEndTime = simTime;
 
-			Map<PedestrianIdKey, Double> crossingTimes = pedestrianLineCrossProcessor.getData();
+			Map<PedestrianIdKey, PedestrianLineCrossProcessor.CrossInformation> crossingTimes = pedestrianLineCrossProcessor.getData();
 			int N = 0;
 			double velocity = 0.0;
 			double minTime = Double.MAX_VALUE;
 			double maxTime = Double.MIN_VALUE;
 
-			for(Map.Entry<PedestrianIdKey, Double> entry : crossingTimes.entrySet()) {
-				double crossingTime = entry.getValue();
+			for(Map.Entry<PedestrianIdKey, PedestrianLineCrossProcessor.CrossInformation> entry : crossingTimes.entrySet()) {
+				double crossingTime = entry.getValue().crossingTime;
 
 				int crossingStep = 1;
 				if(deltaSimTime > 0) {

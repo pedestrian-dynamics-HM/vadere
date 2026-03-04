@@ -130,7 +130,7 @@ public class PedestrianSpeedInAreaProcessorUsingAgentTrajectory extends DataProc
 
 			if (measurementArea.getShape().contains(pedestrian.getPosition())) {
 				VTrajectory wholeTrajectory = pedestrianTrajectoryProcessor.getValue(new PedestrianIdKey(pedestrian.getId()));
-				VTrajectory cuttedTrajectory = wholeTrajectory.cut(measurementArea.asVRectangle());
+				VTrajectory cuttedTrajectory = wholeTrajectory.cutToLastClipping(measurementArea.asVRectangle());
 
 				speed = speedCalculationStrategy.apply(cuttedTrajectory, measurementArea.asVRectangle());
 			}
