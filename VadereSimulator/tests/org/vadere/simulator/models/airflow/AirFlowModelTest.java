@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class AirFlowModelTest {
 
     @TempDir
-    static Path tempDir;
+    Path tempDir;
 
     List<Attributes> attributesList;
     AirFlowModelTester airFlowModel;
