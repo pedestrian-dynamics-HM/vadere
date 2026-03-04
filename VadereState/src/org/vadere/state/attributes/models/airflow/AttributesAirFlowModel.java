@@ -56,7 +56,7 @@ public class AttributesAirFlowModel extends Attributes {
     public AttributesAirFlowModel(double rectangularGridCellSize, double maxTriangleEdgeLen, double inletVelocity,
                                   double reynoldsNumber,
                                   ArrayList<AttributesInOutLet> inlets, ArrayList<AttributesInOutLet> outlets,
-                                  ArrayList<Integer> notBlockingObstacles, AttributesBounds bounds) {
+                                  ArrayList<Integer> blockingObstacles, AttributesBounds bounds) {
         condaPath = "CONDA_PATH";
         condaEnv = "CONDA_ENV";
         pythonPath = "VadereSimulator/src/org/vadere/simulator/models/airflow/python/navier_stokes.py";
@@ -66,7 +66,7 @@ public class AttributesAirFlowModel extends Attributes {
         this.reynoldsNumber = reynoldsNumber;
         this.inlets = inlets;
         this.outlets = outlets;
-        this.blockingObstacles = notBlockingObstacles;
+        this.blockingObstacles = blockingObstacles;
         onPeriod = 1.0;
         offPeriod = 0; 
         this.bounds = bounds;
