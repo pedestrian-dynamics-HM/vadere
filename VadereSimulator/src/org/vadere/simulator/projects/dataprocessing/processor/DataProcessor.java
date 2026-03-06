@@ -1,5 +1,6 @@
 package org.vadere.simulator.projects.dataprocessing.processor;
 
+import org.jetbrains.annotations.Nullable;
 import org.vadere.simulator.control.simulation.SimulationState;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.Model;
@@ -101,6 +102,7 @@ public abstract class DataProcessor<K extends DataKey<K>, V> {
 		return this.data.containsKey(key);
 	}
 
+	@Nullable
 	public V getValue(final K key) {
 		return data.get(key);
 	}

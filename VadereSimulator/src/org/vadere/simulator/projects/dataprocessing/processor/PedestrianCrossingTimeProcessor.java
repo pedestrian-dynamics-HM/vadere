@@ -24,23 +24,66 @@ import java.util.Optional;
 public class PedestrianCrossingTimeProcessor extends DataProcessor<PedestrianIdKey, PedestrianCrossingTimeProcessor.PedestrianCrossingTimeProcessorCrossInformation> implements UsesMeasurementArea {
 
 	public static class PedestrianCrossingTimeProcessorCrossInformation{
-		public double startTime;
+		public double enteringTime;
 		@Nullable
 		public Double exitingTime;
 		public VPoint enteringPoint;
 		public VPoint exitingPoint;
 
-		public PedestrianCrossingTimeProcessorCrossInformation(double startTime, VPoint enteringPoint) {
-			this.startTime = startTime;
+		// Used to track multiple crossings of the measurement area.
+		// If a pedestrian enters the measurement area, then exits and then enters again, we want to track both crossings and use the longer one for the final output.
+		@Nullable
+		public Double enterAgainTime;
+		@Nullable
+		public VPoint enteringAgainPoint;
+
+		public PedestrianCrossingTimeProcessorCrossInformation(double enteringTime, VPoint enteringPoint) {
+			this.enteringTime = enteringTime;
 			this.enteringPoint = enteringPoint;
 			this.exitingTime = null;
 			this.exitingPoint = null;
+			this.enterAgainTime = null;
+			this.enteringAgainPoint = null;
+		}
+
+		public PedestrianCrossingTimeProcessorCrossInformation setEnterAgain(double enteringTime, VPoint enteringPoint) {
+			assert exitingTime != null && exitingPoint != null;
+
+			this.enterAgainTime = enteringTime;
+			this.enteringAgainPoint = enteringPoint;
+			return this;
 		}
 
 		public PedestrianCrossingTimeProcessorCrossInformation setEnd(double endTime, VPoint leavingPoint) {
+			if(enterAgainTime != null && enteringAgainPoint != null){
+				double currentDistanceSq = exitingPoint.distanceSq(enteringPoint);
+				double newDistanceSq = leavingPoint.distanceSq(enteringAgainPoint);
+
+				boolean replaceWithLongerCrossing = newDistanceSq > currentDistanceSq;
+				if(replaceWithLongerCrossing) {
+					this.enteringTime = enterAgainTime;
+					this.enteringPoint = enteringAgainPoint;
+					this.exitingTime = endTime;
+					this.exitingPoint = leavingPoint;
+				}
+
+				this.enterAgainTime = null;
+				this.enteringAgainPoint = null;
+
+				return this;
+			}
+
 			this.exitingTime = endTime;
 			this.exitingPoint = leavingPoint;
 			return this;
+		}
+
+		public boolean isInside() {
+			return exitingTime == null || enterAgainTime != null;
+		}
+
+		public boolean isOutside() {
+			return exitingTime != null && enterAgainTime == null;
 		}
 
 		@Nullable
@@ -71,11 +114,6 @@ public class PedestrianCrossingTimeProcessor extends DataProcessor<PedestrianIdK
 		for(Pedestrian ped : peds) {
 			PedestrianIdKey key = new PedestrianIdKey(ped.getId());
 
-			boolean alreadyMeasured = hasCrossEndTime(key);
-			if(alreadyMeasured){
-				continue;
-			}
-
 			for(FootStep footStep : ped.getTrajectoryOfSimulationStep()) {
 
 				Optional<FootStep.StepRectClippingResult> optionalFootStepClippingResult
@@ -83,14 +121,14 @@ public class PedestrianCrossingTimeProcessor extends DataProcessor<PedestrianIdK
 
 				boolean footStepClipsMeasurementArea = optionalFootStepClippingResult.isPresent();
 				if(!footStepClipsMeasurementArea){
-					if(hasCrossStartTime(key)){
+					if(isConsideredInside(key)){
 						setExit(key, footStep.getStartTime(), footStep.getStart());
 					}
 					continue;
 				}
 
 				FootStep.StepRectClippingResult footStepClippingResult = optionalFootStepClippingResult.get();
-				if(!hasCrossStartTime(key)){
+				if(isConsideredOutside(key)){
 					FootStep.IntersectionPointAndTime clippingStart = footStepClippingResult.clippingStart();
 					setEnter(key, clippingStart.time(), clippingStart.point());
 				}
@@ -105,21 +143,29 @@ public class PedestrianCrossingTimeProcessor extends DataProcessor<PedestrianIdK
 	}
 
 	private void setEnter(@NotNull final PedestrianIdKey key, double time, VPoint enteringPoint) {
-		putValue(key, new PedestrianCrossingTimeProcessorCrossInformation(time, enteringPoint));
+		PedestrianCrossingTimeProcessorCrossInformation current = getValue(key);
+		if(current == null){
+			putValue(key, new PedestrianCrossingTimeProcessorCrossInformation(time, enteringPoint));
+		}else{
+			current.setEnterAgain(time, enteringPoint);
+			putValue(key, current);
+		}
 	}
 
 	private void setExit(@NotNull final PedestrianIdKey key, double time, VPoint exitingPoint) {
-		putValue(key, getValue(key).setEnd(time, exitingPoint));
+		PedestrianCrossingTimeProcessorCrossInformation current = getValue(key);
+		assert current != null;
+		putValue(key, current.setEnd(time, exitingPoint));
 	}
 
-	private boolean hasCrossStartTime(@NotNull final PedestrianIdKey key) {
+	private boolean isConsideredOutside(@NotNull final PedestrianIdKey key) {
 		PedestrianCrossingTimeProcessorCrossInformation times = getValue(key);
-		return times != null;
+		return times == null || times.isOutside();
 	}
 
-	private boolean hasCrossEndTime(@NotNull final PedestrianIdKey key) {
+	private boolean isConsideredInside(@NotNull final PedestrianIdKey key) {
 		PedestrianCrossingTimeProcessorCrossInformation times = getValue(key);
-		return times!=null && times.exitingTime != null;
+		return times!=null && times.isInside();
 	}
 
 	@Override
@@ -147,7 +193,7 @@ public class PedestrianCrossingTimeProcessor extends DataProcessor<PedestrianIdK
 
 		Vector2D exitDirection = times.GetExitDirection();
 		return new String[]{
-				Double.toString(times.startTime),
+				Double.toString(times.enteringTime),
 				times.exitingTime == null ? "" : Double.toString(times.exitingTime),
 				exitDirection == null ? "" : exitDirection.toString()
 		};
