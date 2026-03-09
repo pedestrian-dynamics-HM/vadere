@@ -201,7 +201,7 @@ def plot_results(mesh, X, Y, Vx, Vy, vel_mag, obstacles, path):
     coords = mesh.coors
     conn = mesh.get_conn(mesh.descs[0])
     ax_mesh.triplot(coords[:, 0], coords[:, 1], conn,
-                    color='k', linewidth=0.5, alpha=0.6)
+                    color='k', linewidth=0.8, alpha=0.9)
     draw_obstacles(ax_mesh)
     #ax_mesh.set_title("Mesh (Triangulation)")
     ax_mesh.set_ylabel("y (m)")
@@ -216,8 +216,8 @@ def plot_results(mesh, X, Y, Vx, Vy, vel_mag, obstacles, path):
 
     levels = np.linspace(0, 0.15, 100)
     cf1 = ax_stream.contourf(X, Y, vel_mag, levels=levels, cmap=trunc_blues, norm=PowerNorm(gamma=0.6))
-    ax_stream.streamplot(X, Y, Vx, Vy, color='white', linewidth=1.0,
-                         density=1.5, arrowsize=1, arrowstyle='->')
+    ax_stream.streamplot(X, Y, Vx, Vy, color='white', linewidth=2.5,
+                         density=1.5, arrowsize=2, arrowstyle='->')
     draw_obstacles(ax_stream)
 
     cb1 = fig_stream.colorbar(cf1, ax=ax_stream, location='bottom', fraction=0.05, pad=0.02)
@@ -236,7 +236,7 @@ def plot_results(mesh, X, Y, Vx, Vy, vel_mag, obstacles, path):
     fig_quiver, ax_quiver = plt.subplots(figsize=(plot_width, plot_height), constrained_layout=True)
 
     cf2 = ax_quiver.contourf(X, Y, vel_mag, levels=levels, cmap=trunc_blues, norm=PowerNorm(gamma=0.6))
-    ax_quiver.quiver(X, Y, Vx, Vy, color='white', scale=10, width=0.003, alpha=0.8)
+    ax_quiver.quiver(X, Y, Vx, Vy, color='white', scale=2, width=0.005, alpha=1.0)
     draw_obstacles(ax_quiver)
 
     cb2 = fig_quiver.colorbar(cf2, ax=ax_quiver, location='bottom', fraction=0.05, pad=0.02)
