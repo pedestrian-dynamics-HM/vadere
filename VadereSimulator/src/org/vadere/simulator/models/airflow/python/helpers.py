@@ -162,7 +162,7 @@ def plot_results(mesh, X, Y, Vx, Vy, vel_mag, obstacles, path):
     base = plt.cm.Blues
     trunc_blues = mcolors.LinearSegmentedColormap.from_list(
         'trunc_blues',
-        base(np.linspace(0.3, 0.9, 256))
+        base(np.linspace(0.3, 1.0, 256))
     )
 
     plt.rcParams.update({
@@ -180,7 +180,7 @@ def plot_results(mesh, X, Y, Vx, Vy, vel_mag, obstacles, path):
     aspect = domain_width / domain_height
 
     # Set dimensions for a single plot
-    plot_height = 15
+    plot_height = 7
     plot_width = plot_height * aspect
 
     def draw_obstacles(ax):
@@ -214,21 +214,22 @@ def plot_results(mesh, X, Y, Vx, Vy, vel_mag, obstacles, path):
     # Figure 2: Streamlines
     fig_stream, ax_stream = plt.subplots(figsize=(plot_width, plot_height), constrained_layout=True)
 
-    levels = np.linspace(0, 0.15, 100)
+    levels = np.linspace(0, 0.55, 100)
     cf1 = ax_stream.contourf(X, Y, vel_mag, levels=levels, cmap=trunc_blues, norm=PowerNorm(gamma=0.6))
-    ax_stream.streamplot(X, Y, Vx, Vy, color='white', linewidth=2.5,
-                         density=1.5, arrowsize=2, arrowstyle='->')
+    ax_stream.streamplot(X, Y, Vx, Vy, color='white', linewidth=2.0,
+                         density=1.0, arrowsize=2.0, arrowstyle='->')
     draw_obstacles(ax_stream)
 
     cb1 = fig_stream.colorbar(cf1, ax=ax_stream, location='bottom', fraction=0.05, pad=0.02)
     cb1.set_label('Velocity (m/s)')
-    cb1.locator = ticker.MaxNLocator(nbins=4)
+    cb1.locator = ticker.MaxNLocator(nbins=6)
     cb1.update_ticks()
 
     ax_stream.set_ylabel("y (m)")
     format_axes(ax_stream)
 
     fig_stream.savefig(path + "_streamlines.svg")
+    fig_stream.savefig(path + "_streamlines.png")
     plt.show()
     plt.close(fig_stream)
 

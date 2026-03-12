@@ -29,7 +29,7 @@ public class DefaultConfig {
 	private double aerosolCloudMaxPathogenConcentration; // pathogen concentration that corresponds to aerosolCloudAlphaMax
 	private Color dropletsColor = new Color(190, 210, 20);
 	private Color exposedColor = new Color(202, 76, 187);
-	private Color infectiousColor = new Color(202, 76, 76);
+	private Color infectiousColor = new Color(240, 50, 50);
 	private HashMap<GroupMembership, Color> groupMembershipColors = new HashMap<>();
 	private boolean changed = false;
 	private LinkedList<BufferedImage> linkedListImages = new LinkedList<>();
