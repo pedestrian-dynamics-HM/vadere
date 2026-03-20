@@ -214,7 +214,7 @@ def plot_results(mesh, X, Y, Vx, Vy, vel_mag, obstacles, path):
     # Figure 2: Streamlines
     fig_stream, ax_stream = plt.subplots(figsize=(plot_width, plot_height), constrained_layout=True)
 
-    levels = np.linspace(0, 0.55, 100)
+    levels = np.linspace(0, np.max(vel_mag), 100)
     cf1 = ax_stream.contourf(X, Y, vel_mag, levels=levels, cmap=trunc_blues, norm=PowerNorm(gamma=0.6))
     ax_stream.streamplot(X, Y, Vx, Vy, color='white', linewidth=2.0,
                          density=1.0, arrowsize=2.0, arrowstyle='->')
