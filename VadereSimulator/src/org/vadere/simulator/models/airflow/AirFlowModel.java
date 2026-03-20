@@ -13,6 +13,7 @@ import org.vadere.util.logging.Logger;
 import java.io.*;
 import java.util.List;
 import java.util.Random;
+import java.util.Map;
 
 @ModelClass
 public class AirFlowModel extends AbstractAirFlowModel {
@@ -111,13 +112,25 @@ public class AirFlowModel extends AbstractAirFlowModel {
         logger.info("Running python script for calculating airflow");
         try {
             ProcessBuilder processBuilder = new ProcessBuilder();
-            processBuilder.command(attributesAirFlowModel.getCondaPath(),  "run", "-n", attributesAirFlowModel.getCondaEnv(),
+            processBuilder.command(attributesAirFlowModel.getCondaPath(), "run", "-n", attributesAirFlowModel.getCondaEnv(),
                     "python", attributesAirFlowModel.getPythonPath(), airFlow.getScenarioPath(), hash
             );
+
+            // Clean environment to prevent conda nesting conflicts
+            // (e.g., when Vadere is launched from within another conda env or IDE)
+            Map<String, String> env = processBuilder.environment();
+            env.keySet().removeIf(key -> key.startsWith("CONDA_") || key.equals("PYTHONPATH"));
+
+            // Ensure the directory containing the conda binary is on PATH
+            String condaPath = attributesAirFlowModel.getCondaPath();
+            String condaBinDir = new File(condaPath).getParent();
+            if (condaBinDir != null) {
+                env.put("PATH", condaBinDir + File.pathSeparator + env.getOrDefault("PATH", ""));
+            }
             Process process = processBuilder.start();
 
-            System.out.println(attributesAirFlowModel.getCondaPath() + " " +  "run" + " " + "-n" + " " + attributesAirFlowModel.getCondaEnv() + " " +
-                    "python" + " " + attributesAirFlowModel.getPythonPath() + " " + airFlow.getScenarioPath() + " " + hash);
+            System.out.println(attributesAirFlowModel.getCondaPath() + " run -n " + attributesAirFlowModel.getCondaEnv() + " " +
+                    "python " + attributesAirFlowModel.getPythonPath() + " " + airFlow.getScenarioPath() + " " + hash);
 
             int exitCode = process.waitFor();
             logger.info("Finished python script with exitCode: {}", exitCode);
