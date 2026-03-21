@@ -358,55 +358,6 @@ public abstract class DefaultRenderer {
 				}
 
 			}
-
-			g.setColor(new Color(100, 100, 100)); // gray
-			g.setStroke(new BasicStroke(2*getLineWidth()));
-
-			double visTolerance = 10e-8;
-
-			/*
-			double[][] xVelocities = airFlow.getXVelocities();
-			double[][] yVelocities = airFlow.getYVelocities();
-
-			double cellSize = airFlow.getRectangularGridCellSize();
-
-			double maxArrowLength = 0;
-
-			for (int i = 0; i < xVelocities.length; i++){
-				for (int j = 0; j < xVelocities[i].length; j++){
-					double arrowLength = Math.abs(Math.pow(xVelocities[i][j], 2) + Math.pow(yVelocities[i][j], 2));
-					if (arrowLength > maxArrowLength){
-						maxArrowLength = arrowLength;
-					}
-				}
-			}
-
-			for (int i = 0; i < xVelocities.length; i++){
-				for (int j = 0; j < xVelocities[i].length; j++){
-
-					double arrowLength = Math.abs(Math.pow(xVelocities[i][j], 2) + Math.pow(yVelocities[i][j], 2));
-					arrowLength = arrowLength / maxArrowLength;
-
-					if (airFlowScale.equals(Localization.getString("SettingsDialog.chbAirflowScaleSqrt.text"))) {
-						arrowLength = Math.sqrt(arrowLength);
-					} else if (airFlowScale.equals(Localization.getString("SettingsDialog.chbAirflowScaleLog.text"))) {
-						arrowLength = (Math.log(arrowLength) - Math.log(visTolerance)) / (Math.log(1) - Math.log(visTolerance));
-					}
-					arrowLength = arrowLength * cellSize;
-
-					if (arrowLength > visTolerance) {
-
-						double mX = i * cellSize + xMin;
-						double mY = j * cellSize + yMin;
-
-						double angle = Math.atan2(yVelocities[i][j], xVelocities[i][j]);
-
-						drawLineArrow(g, mX, mY, angle, arrowLength);
-					}
-				}
-
-
-			}*/
 		}
 	}
 
