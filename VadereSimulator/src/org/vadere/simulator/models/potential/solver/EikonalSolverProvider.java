@@ -8,6 +8,7 @@ import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
 import org.vadere.simulator.models.potential.solver.calculators.PotentialFieldCalculatorNone;
 import org.vadere.simulator.models.potential.solver.calculators.cartesian.multiCoreOptimized.EikonalSolverFIM;
 import org.vadere.simulator.models.potential.solver.calculators.cartesian.EikonalSolverFMM;
+import org.vadere.simulator.models.potential.solver.calculators.cartesian.multiCoreOptimized.EikonalSolverIFIM;
 import org.vadere.simulator.models.potential.solver.calculators.mesh.MeshEikonalSolverFMM;
 import org.vadere.simulator.models.potential.solver.calculators.mesh.multiCoreOptimized.MeshEikonalSolverFIM;
 import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
@@ -132,6 +133,9 @@ public abstract class EikonalSolverProvider  {
 				break;
 			case FAST_ITERATIVE_METHOD:
 				eikonalSolver = new EikonalSolverFIM(cellGrid, distFunc, isHighAccuracyFM, timeCost, attributesPotential.getObstacleGridPenalty(), attributesPotential.getTargetAttractionStrength());
+				break;
+			case INFORMED_FAST_ITERATIVE_METHOD:
+				eikonalSolver = new EikonalSolverIFIM(cellGrid, distFunc, timeCost, attributesPotential.getObstacleGridPenalty(), attributesPotential.getTargetAttractionStrength());
 				break;
 			case HIGH_ACCURACY_FAST_MARCHING:
 			case FAST_MARCHING:
