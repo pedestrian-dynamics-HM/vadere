@@ -25,7 +25,7 @@ public class FootStepHealthStatusProcessor extends DataProcessor<EventtimePedest
     @Override
     protected void doUpdate(final SimulationState state) {
         for (Pedestrian pedestrian : state.getTopography().getElements(Pedestrian.class)) {
-            LinkedList<FootStep> footSteps = pedestrian.getTrajectory().clone().getFootSteps();
+            LinkedList<FootStep> footSteps = pedestrian.getTrajectoryOfSimulationStep().clone().getFootSteps();
 
 
             String healthStatusAsString = healthStatusToString(pedestrian);

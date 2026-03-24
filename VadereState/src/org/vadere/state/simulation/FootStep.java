@@ -3,10 +3,12 @@ package org.vadere.state.simulation;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.util.geometry.GeometryUtils;
+import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -76,16 +78,32 @@ public final class FootStep {
 		return endTime - startTime;
 	}
 
-	public boolean intersects(@NotNull final VRectangle rectangle) {
+	/**
+	 * @see GeometryUtils#intersectsRectangleBoundary(VRectangle, double, double, double, double)
+	 */
+	public boolean intersectsBoundary(@NotNull final VRectangle rectangle) {
 		return GeometryUtils.intersectsRectangleBoundary(rectangle, getStart().x, getStart().y, getEnd().x, getEnd().y);
 	}
 
+	/**
+	 * @see GeometryUtils#intersectLineSegment(IPoint, IPoint, IPoint, IPoint)
+	 */
 	public boolean intersects(@NotNull final VLine line) {
 		VPoint start = getStart();
 		VPoint end = getEnd();
 		return GeometryUtils.intersectLineSegment(new VPoint(line.getP1()), new VPoint(line.getP2()), start, end);
 	}
 
+	public double computeIntersectionTime(@NotNull final VLine line) {
+		VPoint start = getStart();
+		VPoint end = getEnd();
+		VPoint intersectionPoint = GeometryUtils.intersectionPoint(line.getX1(), line.getY1(), line.getX2(), line.getY2(), start.getX(), start.getY(), end.getX(), end.getY());
+		double dStart = intersectionPoint.distance(start);
+		double stepLength = start.distance(end);
+		double duration = getEndTime() - getStartTime();
+		double intersectionTime = getStartTime() + duration * (dStart / stepLength);
+		return intersectionTime;
+	}
 
 	public Pair<FootStep, FootStep> cut(final double simTimeInSec) {
 		if(simTimeInSec >= endTime || simTimeInSec <= startTime) {
@@ -104,32 +122,70 @@ public final class FootStep {
 		return Pair.of(first, second);
 	}
 
-	public double computeIntersectionTime(@NotNull final VRectangle rectangle) {
+	/**
+	 * Computes the intersection of the footstep with a rectangle.
+	 *
+	 * <p>The result describes the portion of the step that lies inside the rectangle.</p>
+	 *
+	 * <p><strong>Rectangle boundary behavior:</strong>
+	 * <ul>
+	 *   <li>If a step touches the rectangle from inside: considered fully inside, not intersecting.</li>
+	 *   <li>If a step touches the rectangle from outside: considered intersecting, with the touching point as the entry point.</li>
+	 * </ul>
+	 *
+	 * <p><strong>Result consists of:</strong>
+	 * <table border="1">
+	 *   <tr><td>Result</td><td> entryPoint </td> <td> exitPoint </td> <td> Reason </td></tr>
+	 *   <tr><td> ✔ </td> <td> ✔ </td> <td> ✔ </td> <td> step crosses rectangle</td></tr>
+	 *   <tr><td> ✔ </td> <td> ✔ </td> <td> x </td> <td> step starts outside, and it's end is on rectangle or enters rectangle without exiting</td></tr>
+	 *   <tr><td> ✔ </td> <td> x </td> <td> ✔ </td> <td> step starts inside and exits or starts on the rectangle going outwards</td></tr>
+	 *   <tr><td> ✔ </td> <td> x </td> <td> x </td> <td> step starts inside and ends inside or touches rectangle (start and/or end point)</td></tr>
+	 *   <tr><td> x </td> <td> - </td> <td> - </td> <td> step does not intersect the rectangle</td></tr>
+	 * </table>
+	 *
+	 * @return an {@code Optional} containing a {@code LineRectClippingResult} that describes
+	 *         the clipped segment, or {@code Optional.empty()} if there is no intersection
+	 */
+	public Optional<StepRectClippingResult> computeClipping(@NotNull VRectangle rectangle) {
 		VPoint start = getStart();
 		VPoint end = getEnd();
-		Optional<VPoint> intersectionPointOpt = GeometryUtils.intersectionPoint(rectangle, start.getX(), start.getY(), end.getX(), end.getY());
-		VPoint intersectionPoint;
-		if (intersectionPointOpt.isEmpty()) {
-			intersectionPoint = getStart();
-		} else {
-			intersectionPoint = intersectionPointOpt.get();
+		Optional<GeometryUtils.LineRectClippingResult> optionalClippingResult = GeometryUtils.computeClipping(rectangle, start, end);
+		if(optionalClippingResult.isEmpty()) {
+			return Optional.empty();
 		}
-		double dStart = intersectionPoint.distance(start);
-		double stepLength = start.distance(end);
-		double duration = getEndTime() - getStartTime();
-		double intersectionTime = getStartTime() + duration * (dStart / stepLength);
-		return intersectionTime;
-	}
 
-	public double computeIntersectionTime(@NotNull final VLine line) {
-		VPoint start = getStart();
-		VPoint end = getEnd();
-		VPoint intersectionPoint = GeometryUtils.intersectionPoint(line.getX1(), line.getY1(), line.getX2(), line.getY2(), start.getX(), start.getY(), end.getX(), end.getY());
-		double dStart = intersectionPoint.distance(start);
-		double stepLength = start.distance(end);
+		GeometryUtils.LineRectClippingResult clippingResult = optionalClippingResult.get();
 		double duration = getEndTime() - getStartTime();
-		double intersectionTime = getStartTime() + duration * (dStart / stepLength);
-		return intersectionTime;
+
+		Optional<IntersectionPointAndTime> enter = Optional.empty();
+		IntersectionPointAndTime clippingStart;
+		if(clippingResult.entryPoint().isPresent()){
+			GeometryUtils.IntersectionPointAndPercentage entryPoint = clippingResult.entryPoint().get();
+
+			double intersectionTime = getStartTime() + duration * entryPoint.linePercentage();
+			IntersectionPointAndTime pointAndTime = new IntersectionPointAndTime(entryPoint.point(), intersectionTime);
+
+			enter = Optional.of(pointAndTime);
+			clippingStart = pointAndTime;
+		}else{
+			clippingStart = new IntersectionPointAndTime(start, getStartTime());
+		}
+
+		Optional<IntersectionPointAndTime> exit = Optional.empty();
+		IntersectionPointAndTime clippingEnd;
+		if(clippingResult.exitPoint().isPresent()){
+			GeometryUtils.IntersectionPointAndPercentage exitPoint = clippingResult.exitPoint().get();
+
+			double intersectionTime = getStartTime() + duration * exitPoint.linePercentage();
+			IntersectionPointAndTime pointAndTime = new IntersectionPointAndTime(exitPoint.point(), intersectionTime);
+
+			exit = Optional.of(pointAndTime);
+			clippingEnd = pointAndTime;
+		}else{
+			clippingEnd = new IntersectionPointAndTime(end, getEndTime());
+		}
+
+		return Optional.of(new StepRectClippingResult(enter, exit, clippingStart, clippingEnd));
 	}
 
 	public static VPoint interpolateFootStep(final double startX, final double startY, final double endX, final double endY, final double startTime, final double endTime, final double time) {
@@ -187,4 +243,38 @@ public final class FootStep {
 		return valueLine;
 	}
 
+	@Override
+	public boolean equals(Object o) {
+		if (o == null || getClass() != o.getClass()) return false;
+		FootStep footStep = (FootStep) o;
+		return Double.compare(startTime, footStep.startTime) == 0 && Double.compare(endTime, footStep.endTime) == 0
+				&& Objects.equals(start, footStep.start) && Objects.equals(end, footStep.end);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(startTime, endTime, start, end);
+	}
+
+	/**
+	 * @param entryPoint    the point where the step intersects the boundary entering the rectangle. Empty when the step is inside or when the step exits but does not enter.
+	 * @param exitPoint     the point where the step intersects the boundary exiting the rectangle. Empty when the step is inside or when the step enters but does not exit.
+	 * @param clippingStart the point of the step that first enters the rectangle. When the step is completely inside, this is set to the start of the step.
+	 * @param clippingEnd   the point of the step that exits the rectangle. When the step is completely inside or enters and never exists, this is set to the end of the step.
+	 */
+	public record StepRectClippingResult(Optional<IntersectionPointAndTime> entryPoint, Optional<IntersectionPointAndTime> exitPoint,
+										 IntersectionPointAndTime clippingStart, IntersectionPointAndTime clippingEnd) {
+		boolean isCompletelyInside(){
+			return entryPoint.isEmpty() && exitPoint.isEmpty();
+		}
+
+		public boolean entersBoundary(){
+			return entryPoint.isPresent();
+		}
+
+		public boolean exitsBoundary(){
+			return exitPoint.isPresent();
+		}
+	}
+	public record IntersectionPointAndTime(VPoint point, double time) {}
 }

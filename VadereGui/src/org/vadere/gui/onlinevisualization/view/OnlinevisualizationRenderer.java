@@ -118,7 +118,7 @@ public class OnlinevisualizationRenderer extends SimulationRenderer {
 	 */
 	private Stream<VPoint> getFootStepsPosition(@NotNull final Agent agent) {
 		if(agent instanceof Pedestrian) {
-			return ((Pedestrian) agent).getTrajectory().stream().map(footStep -> footStep.getStart());
+			return ((Pedestrian) agent).getTrajectoryOfSimulationStep().stream().map(footStep -> footStep.getStart());
 		}
 		else {
 			return Stream.of(agent.getPosition());

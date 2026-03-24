@@ -32,9 +32,9 @@ public class FlowProcessor extends NoDataKeyProcessor<Double> {
     @Override
     public void postLoop(final SimulationState state) {
         pedLineCross.postLoop(state);
-        Collection<Double> lineCrossValues = pedLineCross.getValues();
-        OptionalDouble lineCrossMax = lineCrossValues.stream().mapToDouble(Double::doubleValue).max();
-        OptionalDouble lineCrossMin = lineCrossValues.stream().mapToDouble(Double::doubleValue).min();
+        Collection<PedestrianLineCrossProcessor.CrossInformation> lineCrossValues = pedLineCross.getValues();
+        OptionalDouble lineCrossMax = lineCrossValues.stream().map(crossInformation -> crossInformation.crossingTime).mapToDouble(Double::doubleValue).max();
+        OptionalDouble lineCrossMin = lineCrossValues.stream().map(crossInformation -> crossInformation.crossingTime).mapToDouble(Double::doubleValue).min();
         double flow;
         if(lineCrossMax.isPresent() && lineCrossMin.isPresent()){
             double deltaT = lineCrossMax.getAsDouble() - lineCrossMin.getAsDouble();

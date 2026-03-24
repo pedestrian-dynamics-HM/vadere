@@ -4,7 +4,6 @@ import org.vadere.annotation.factories.dataprocessors.DataProcessorClass;
 import org.vadere.simulator.control.simulation.SimulationState;
 import org.vadere.simulator.projects.dataprocessing.ProcessorManager;
 import org.vadere.simulator.projects.dataprocessing.datakey.EventtimePedestrianIdKey;
-import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.simulation.FootStep;
 import org.vadere.state.simulation.VTrajectory;
@@ -13,7 +12,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 
 /**
- * <p>During one time step a pedestrian my move multiple times which is saved by {@link Pedestrian#getTrajectory()}, i.e.
+ * <p>During one time step a pedestrian my move multiple times which is saved by {@link Pedestrian#getTrajectoryOfSimulationStep()}, i.e.
  * the {@link VTrajectory} will be adjusted after each update(simTimeInSec) call such that it contains the foot steps
  * which started at the lastSimTimeInSec!</p>
  *
@@ -37,7 +36,7 @@ public class FootStepProcessor extends DataProcessor<EventtimePedestrianIdKey, F
     @Override
     protected void doUpdate(final SimulationState state) {
         for (Pedestrian pedestrian : state.getTopography().getElements(Pedestrian.class)) {
-            LinkedList<FootStep> footSteps = pedestrian.getTrajectory().clone().getFootSteps();
+            LinkedList<FootStep> footSteps = pedestrian.getTrajectoryOfSimulationStep().clone().getFootSteps();
 
             for (FootStep fs : footSteps) {
                 putValue(new EventtimePedestrianIdKey(fs.getStartTime(), pedestrian.getId()), fs);
