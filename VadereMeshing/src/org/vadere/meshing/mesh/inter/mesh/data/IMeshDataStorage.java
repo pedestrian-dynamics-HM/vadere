@@ -7,8 +7,6 @@ import org.vadere.meshing.mesh.inter.mesh.IHalfEdge;
 import org.vadere.meshing.mesh.inter.mesh.IMesh;
 import org.vadere.meshing.mesh.inter.mesh.IVertex;
 
-import java.util.List;
-
 /**
  * The IMeshDataStorage interface provides mechanisms for accessing and managing data
  * associated with vertices, edges, and faces within a mesh structure. It extends the

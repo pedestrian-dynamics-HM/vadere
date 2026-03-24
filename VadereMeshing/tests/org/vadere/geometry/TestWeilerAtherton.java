@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import org.vadere.meshing.WeilerAtherton;
 import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PFace;
 import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PMesh;
-import org.vadere.meshing.mesh.gen.mesh.pointerBased.PMeshWithDataStorage;
 import org.vadere.meshing.mesh.gen.mesh.pointerBased.triangles.PTriangleMeshBuilder;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.VPoint;

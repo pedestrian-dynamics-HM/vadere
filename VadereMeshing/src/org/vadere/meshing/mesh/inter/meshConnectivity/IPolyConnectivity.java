@@ -5,19 +5,11 @@ import org.vadere.meshing.mesh.IllegalMeshException;
 import org.vadere.meshing.mesh.inter.ITriangleMeshPointLocator;
 import org.vadere.meshing.mesh.inter.mesh.*;
 import org.vadere.meshing.mesh.inter.mesh.builder.*;
-import org.vadere.meshing.mesh.inter.mesh.triangle.ITriangleMeshEdges;
-import org.vadere.meshing.mesh.iterators.EdgeIterator;
 import org.vadere.meshing.mesh.gen.IncrementalTriangulation;
 import org.vadere.util.geometry.shapes.IPoint;
-import org.vadere.util.logging.Logger;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 /**
  * <p>

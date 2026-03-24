@@ -6,10 +6,7 @@ import org.jetbrains.annotations.Nullable;
 import org.vadere.meshing.mesh.inter.IVertexContainerDouble;
 import org.vadere.meshing.mesh.inter.mesh.*;
 import org.vadere.meshing.mesh.inter.mesh.data.IMeshDataStorage;
-import org.vadere.meshing.mesh.inter.mesh.triangle.ITriangleMesh;
-import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.IPoint;
-import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.logging.Logger;
 

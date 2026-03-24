@@ -2,10 +2,6 @@ package org.vadere.meshing.mesh.gen.mesh.pointerBased.elements;
 
 import org.vadere.meshing.mesh.gen.PolyConnectivity;
 import org.vadere.meshing.mesh.gen.mesh.MeshBuilderBase;
-import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AMesh;
-import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AMeshEdges;
-import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AMeshFaces;
-import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AMeshVertices;
 import org.vadere.meshing.mesh.gen.mesh.pointerBased.PMeshWithDataStorage;
 import org.vadere.meshing.mesh.inter.mesh.IMeshWithDataStorage;
 import org.vadere.meshing.mesh.inter.mesh.builder.*;

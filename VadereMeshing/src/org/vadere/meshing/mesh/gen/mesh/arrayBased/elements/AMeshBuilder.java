@@ -4,7 +4,6 @@ import org.vadere.meshing.mesh.gen.PolyConnectivity;
 import org.vadere.meshing.mesh.gen.mesh.MeshBuilderBase;
 import org.vadere.meshing.mesh.gen.mesh.arrayBased.AMeshDataStorage;
 import org.vadere.meshing.mesh.gen.mesh.arrayBased.AMeshWithDataStorage;
-import org.vadere.meshing.mesh.inter.mesh.IMeshWithDataStorage;
 import org.vadere.meshing.mesh.inter.mesh.builder.*;
 import org.vadere.meshing.mesh.inter.meshConnectivity.IPolyConnectivity;
 

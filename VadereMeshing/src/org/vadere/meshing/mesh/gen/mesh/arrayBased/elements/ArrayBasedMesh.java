@@ -1,6 +1,5 @@
 package org.vadere.meshing.mesh.gen.mesh.arrayBased.elements;
 
-import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.gen.mesh.MeshBase;
 import org.vadere.meshing.mesh.gen.mesh.arrayBased.AMeshDataStorage;
 import org.vadere.meshing.mesh.inter.mesh.data.IMeshDataStorage;

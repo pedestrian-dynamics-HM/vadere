@@ -60,11 +60,11 @@ public interface ITriangleMesh<V extends IVertex, E extends IHalfEdge, F extends
     void flipEdgeEvent(@NotNull final F f1, @NotNull final F f2);
 
     /**
-     * <p>Informs the mesh when a new point is inserted into the mesh.</p>
+     * <p>Informs the mesh when a new halfEdge is inserted into the mesh.</p>
      *
      * <p>Does not change the connectivity.</p>
      *
-     * @param vertex the vertex which was inserted
+     * @param halfEdge the halfEdge which was inserted
      */
-    void insertEvent(@NotNull final E vertex);
+    void insertEvent(@NotNull final E halfEdge);
 }

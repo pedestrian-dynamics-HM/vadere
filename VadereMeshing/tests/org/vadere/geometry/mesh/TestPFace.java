@@ -2,10 +2,6 @@ package org.vadere.geometry.mesh;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AFace;
-import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AHalfEdge;
-import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AVertex;
-import org.vadere.meshing.mesh.gen.mesh.arrayBased.triangles.ATriangleMeshBuilder;
 import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PFace;
 import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PHalfEdge;
 import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PMesh;

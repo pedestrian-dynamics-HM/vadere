@@ -2,7 +2,6 @@ package org.vadere.meshing.mesh.impl;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.gen.IncrementalTriangulation;
-import org.vadere.meshing.mesh.gen.mesh.pointerBased.*;
 import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PFace;
 import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PHalfEdge;
 import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PVertex;

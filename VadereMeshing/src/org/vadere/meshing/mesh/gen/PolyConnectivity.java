@@ -8,8 +8,6 @@ import org.vadere.meshing.mesh.inter.meshConnectivity.IPolyConnectivity;
 import org.vadere.meshing.mesh.inter.meshConnectivity.IReadOnlyPolyConnectivity;
 import org.vadere.meshing.mesh.iterators.EdgeIterator;
 import org.vadere.util.geometry.shapes.IPoint;
-import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.logging.Logger;
 
 import java.util.*;

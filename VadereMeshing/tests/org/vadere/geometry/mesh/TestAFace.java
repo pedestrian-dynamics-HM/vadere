@@ -2,13 +2,11 @@ package org.vadere.geometry.mesh;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.vadere.meshing.mesh.gen.mesh.arrayBased.*;
 import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AFace;
 import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AHalfEdge;
 import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AVertex;
 import org.vadere.meshing.mesh.gen.mesh.arrayBased.triangles.ATriangleMeshBuilder;
 import org.vadere.meshing.mesh.inter.mesh.IMesh;
-import org.vadere.meshing.mesh.inter.mesh.IMeshWithDataStorage;
 import org.vadere.meshing.mesh.inter.mesh.builder.ITriangleMeshBuilder;
 
 import java.util.ArrayList;
