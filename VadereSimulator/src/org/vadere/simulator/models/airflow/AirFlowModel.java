@@ -111,6 +111,12 @@ public class AirFlowModel extends AbstractAirFlowModel {
     protected void calculateAirFlow(String hash) {
         logger.info("Running python script for calculating airflow");
         try {
+            File condaFile = new File(attributesAirFlowModel.getCondaPath());
+            if (!condaFile.exists() || !condaFile.canExecute()) {
+                throw new RuntimeException("Conda executable not found or not executable: " + attributesAirFlowModel.getCondaPath() +
+                        ". Follow instructions on VadereSimulator/src/org/vadere/simulator/models/airflow/python/README.md for setting up a conda environment.");
+            }
+
             ProcessBuilder processBuilder = new ProcessBuilder();
             processBuilder.command(attributesAirFlowModel.getCondaPath(), "run", "-n", attributesAirFlowModel.getCondaEnv(),
                     "python", attributesAirFlowModel.getPythonPath(), airFlow.getScenarioPath(), hash
@@ -122,8 +128,7 @@ public class AirFlowModel extends AbstractAirFlowModel {
             env.keySet().removeIf(key -> key.startsWith("CONDA_") || key.equals("PYTHONPATH"));
 
             // Ensure the directory containing the conda binary is on PATH
-            String condaPath = attributesAirFlowModel.getCondaPath();
-            String condaBinDir = new File(condaPath).getParent();
+            String condaBinDir = condaFile.getParent();
             if (condaBinDir != null) {
                 env.put("PATH", condaBinDir + File.pathSeparator + env.getOrDefault("PATH", ""));
             }
