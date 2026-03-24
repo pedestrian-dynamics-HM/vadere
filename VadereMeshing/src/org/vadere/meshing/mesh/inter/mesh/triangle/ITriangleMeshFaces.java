@@ -2,10 +2,7 @@ package org.vadere.meshing.mesh.inter.mesh.triangle;
 
 import org.apache.commons.lang3.tuple.Triple;
 import org.jetbrains.annotations.NotNull;
-import org.vadere.meshing.mesh.inter.mesh.IFace;
-import org.vadere.meshing.mesh.inter.mesh.IHalfEdge;
-import org.vadere.meshing.mesh.inter.mesh.IMeshFaces;
-import org.vadere.meshing.mesh.inter.mesh.IVertex;
+import org.vadere.meshing.mesh.inter.mesh.*;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -29,27 +26,6 @@ public interface ITriangleMeshFaces<V extends IVertex, E extends IHalfEdge, F ex
         return new VTriangle(new VPoint(vertices.get(0)), new VPoint(vertices.get(1)), new VPoint(vertices.get(2)));
     }
 
-    default VPoint toMidpoint(@NotNull final F face) {
-        var vertices = base().vertices();
-        assert vertices.getAllOf(face).size() == 3 : "number of vertices of " + face + " is " + vertices.getAllOf(face).size();
-
-        E edge = base().edges().getAnyOf(face);
-        V v1 = vertices.getEndOf(edge);
-        V v2 = vertices.getEndOf(base().edges().getNext(edge));
-        V v3 = vertices.getEndOf(base().edges().getPrev(edge));
-        return GeometryUtils.getTriangleMidpoint(v1.getX(), v1.getY(), v2.getX(), v2.getY(), v3.getX(), v3.getY());
-    }
-
-    default VPoint toCircumcenter(@NotNull final F face) {
-        var vertices = base().vertices();
-        assert vertices.getAllOf(face).size() == 3 : "number of vertices of " + face + " is " + vertices.getAllOf(face).size();
-        E edge = base().edges().getAnyOf(face);
-        V v1 = vertices.getEndOf(edge);
-        V v2 = vertices.getEndOf(base().edges().getNext(edge));
-        V v3 = vertices.getEndOf(base().edges().getPrev(edge));
-        return GeometryUtils.getCircumcenter(v1.getX(), v1.getY(), v2.getX(), v2.getY(), v3.getX(), v3.getY());
-    }
-
     /**
      * Returns the midpoint {@link VPoint} of a triangle defined by the face.
      * Assumption: The face represents a triangle, i.e. it has exactly 3 distinct points. This
@@ -58,17 +34,27 @@ public interface ITriangleMeshFaces<V extends IVertex, E extends IHalfEdge, F ex
      * @param face the face.
      * @return the midpoint {@link VPoint} of a triangle defined by the face.
      */
-    default VPoint getTriangleMidPoint(@NotNull final F face) {
+    default VPoint toTriangleMidpoint(@NotNull final F face) {
         var vertices = base().vertices();
         var edges = base().edges();
         assert vertices.getAllOf(face).size() == 3 : "number of vertices of " + face + " is " + vertices.getAllOf(face).size();
         E e1 = edges.getAnyOf(face);
         E e2 = edges.getNext(e1);
-        E e3 = edges.getNext(e2);
+        E e3 = edges.getPrev(e1);
         V v1 = vertices.getEndOf(e1);
         V v2 = vertices.getEndOf(e2);
         V v3 = vertices.getEndOf(e3);
         return GeometryUtils.getTriangleMidpoint(v1.getX(), v1.getY(), v2.getX(), v2.getY(), v3.getX(), v3.getY());
+    }
+
+    default VPoint toTriangleCircumcenter(@NotNull final F face) {
+        var vertices = base().vertices();
+        assert vertices.getAllOf(face).size() == 3 : "number of vertices of " + face + " is " + vertices.getAllOf(face).size();
+        E edge = base().edges().getAnyOf(face);
+        V v1 = vertices.getEndOf(edge);
+        V v2 = vertices.getEndOf(base().edges().getNext(edge));
+        V v3 = vertices.getEndOf(base().edges().getPrev(edge));
+        return GeometryUtils.getCircumcenter(v1.getX(), v1.getY(), v2.getX(), v2.getY(), v3.getX(), v3.getY());
     }
 
     /**

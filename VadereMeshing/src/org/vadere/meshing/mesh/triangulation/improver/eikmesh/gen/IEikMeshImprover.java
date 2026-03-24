@@ -34,7 +34,7 @@ public interface IEikMeshImprover<V extends IVertex, E extends IHalfEdge, F exte
 	}
 
 	default Predicate<F> outsidePredicate(@NotNull final IDistanceFunction distanceFunc) {
-		return f -> distanceFunc.apply(this.getMesh().faces().toMidpoint(f)) > 0;
+		return f -> distanceFunc.apply(this.getMesh().faces().toTriangleMidpoint(f)) > 0;
 	}
 
 	default Predicate<F> lowQualityPredicate() {

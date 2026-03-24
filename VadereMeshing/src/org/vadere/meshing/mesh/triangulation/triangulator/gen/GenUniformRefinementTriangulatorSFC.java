@@ -624,7 +624,7 @@ public class GenUniformRefinementTriangulatorSFC<V extends IVertex, E extends IH
 	 * Note the border is part of the whole boundary which is defined by the border and the holes.</p>
 	 */
 	private void shrinkBorder() {
-		Predicate<F> removePredicate = face -> distFunc.apply(faces.toMidpoint(face)) > 0;
+		Predicate<F> removePredicate = face -> distFunc.apply(faces.toTriangleMidpoint(face)) > 0;
 		triangulation.getMeshBuilder().changeConnectivity().shrinkBorder(removePredicate, true, false);
 	}
 
@@ -669,7 +669,7 @@ public class GenUniformRefinementTriangulatorSFC<V extends IVertex, E extends IH
 		List<F> all = faces.getAll();
 		for(F face : all) {
 			if(!faces.isDestroyed(face) && !faces.isHole(face)) {
-				getMeshBuilder().changeConnectivity().createHole(face, f -> distFunc.apply(faces.toMidpoint(f)) > 0, true, false);
+				getMeshBuilder().changeConnectivity().createHole(face, f -> distFunc.apply(faces.toTriangleMidpoint(f)) > 0, true, false);
 			}
 		}
 	}

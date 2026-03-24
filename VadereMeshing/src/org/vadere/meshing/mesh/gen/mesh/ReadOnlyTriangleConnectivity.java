@@ -122,7 +122,7 @@ public class ReadOnlyTriangleConnectivity <V extends IVertex, E extends IHalfEdg
 
     @Override
     public LinkedList<E> straightWalk2DGatherDirectional(@NotNull final F face, @NotNull final VPoint direction, @NotNull final Predicate<E> additionalStopCondition) {
-        VPoint q = faces.toMidpoint(face);
+        VPoint q = faces.toTriangleMidpoint(face);
         assert faces.toTriangle(face).contains(q);
 
         Predicate<E> publicStopCondion = e -> isRightOf(q.x, q.y, e);
@@ -143,7 +143,7 @@ public class ReadOnlyTriangleConnectivity <V extends IVertex, E extends IHalfEdg
         // initialize
         F face = startFace;
         // for convex polygons we could also use: VPoint q = getMesh().toPolygon(startFace).getPolygonCentroid();
-        VPoint q = faces.getTriangleMidPoint(startFace); // walk from q to p
+        VPoint q = faces.toTriangleMidpoint(startFace); // walk from q to p
         VPoint p = new VPoint(x1, y1);
 
         return straightGatherWalk2D(q, p, face, stopCondition);

@@ -867,7 +867,7 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 	 */
 	private void updateFace(@NotNull F face) {
 		if(canBreak(face) && isBreaking(face)) {
-			VPoint circumcenter = getMesh().faces().toCircumcenter(face);
+			VPoint circumcenter = getMesh().faces().toTriangleCircumcenter(face);
 			getMeshBuilder().changeConnectivity()
 					.splitTriangle(face, getMeshBuilder().getMesh().createPoint(circumcenter.getX(), circumcenter.getY()), false);
 		}
@@ -1011,7 +1011,7 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 		if(faceToQuality(face) > 0.95) {
 			E edge = getMesh().edges().getAnyOf(face);
 			if(edgeLengthFunc.apply(getMesh().edges().toLine(edge).midPoint()) * 2.1 <= getMesh().edges().toLine(edge).length()) {
-				VPoint circumcenter = getMesh().faces().toCircumcenter(face);
+				VPoint circumcenter = getMesh().faces().toTriangleCircumcenter(face);
 				return getMesh().readConnectivity().faceContains(circumcenter.getX(), circumcenter.getY(), face);
 						//getMesh().toTriangle(face).contains(circumcenter);
 			}
@@ -1355,7 +1355,7 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 	 * This takes O(n) time where n is the number of removed faces which will be consumed.
 	 */
 	private void removeFacesAtBoundary() {
-		Predicate<F> isOutside = f -> distanceFunc.apply(getMesh().faces().toMidpoint(f)) > 0;
+		Predicate<F> isOutside = f -> distanceFunc.apply(getMesh().faces().toTriangleMidpoint(f)) > 0;
 		Predicate<F> isSeparated = f -> getMesh().faces().isSeparated(f);
 		//Predicate<F> isInvalid = f -> !getTriangulation().isValid(f);
 		Predicate<F> isOfLowQuality = f -> faceToQuality(f) < Parameters.MIN_TRIANGLE_QUALITY && !isShortBoundaryEdge(f);
@@ -1420,7 +1420,7 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 	 * <p>Shrinks the boundary such that there are no more triangles outside the boundary i.e. where the distance is positive.</p>
 	 */
 	private void shrinkBoundary() {
-		Predicate<F> removePredicate = face -> distanceFunc.apply(getMesh().faces().toMidpoint(face)) > 0;
+		Predicate<F> removePredicate = face -> distanceFunc.apply(getMesh().faces().toTriangleMidpoint(face)) > 0;
 		getMeshBuilder().changeConnectivity().shrinkBoundary(removePredicate, true);
 	}
 
@@ -1429,7 +1429,7 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 	 * Note the border is part of the whole boundary which is defined by the border and the holes.</p>
 	 */
 	private void shrinkBorder() {
-		Predicate<F> removePredicate = face -> distanceFunc.apply(getMesh().faces().toMidpoint(face)) > 0;
+		Predicate<F> removePredicate = face -> distanceFunc.apply(getMesh().faces().toTriangleMidpoint(face)) > 0;
 		getMeshBuilder().changeConnectivity().shrinkBorder(removePredicate, true);
 	}
 
@@ -1440,7 +1440,7 @@ public class GenEikMesh<V extends IVertex, E extends IHalfEdge, F extends IFace>
 		List<F> faces = getMesh().faces().getAll();
 		for(F face : faces) {
 			if(!getMesh().faces().isDestroyed(face) && !getMesh().faces().isHole(face)) {
-				getMeshBuilder().changeConnectivity().createHole(face, f -> distanceFunc.apply(getMesh().faces().toMidpoint(f)) > 0, true);
+				getMeshBuilder().changeConnectivity().createHole(face, f -> distanceFunc.apply(getMesh().faces().toTriangleMidpoint(f)) > 0, true);
 			}
 		}
 	}
