@@ -121,7 +121,7 @@ public class BiomechanicsModel implements MainModel {
 			agent.clearFootSteps();
 
 			FootStep currentFootstep = new FootStep(positions.get(i), agent.getPosition(), lastSimTimeInSec, simTimeInSec);
-			agent.getTrajectory().add(currentFootstep);
+			agent.getTrajectoryOfSimulationStep().add(currentFootstep);
 			agent.getFootstepHistory().add(currentFootstep);
 		}
 

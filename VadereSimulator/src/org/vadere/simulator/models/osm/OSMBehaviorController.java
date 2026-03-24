@@ -4,7 +4,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.vadere.simulator.models.potential.combinedPotentials.CombinedPotentialStrategy;
-import org.vadere.simulator.models.potential.combinedPotentials.TargetRepulsionStrategy;
 import org.vadere.simulator.utils.topography.TopographyHelper;
 import org.vadere.state.psychology.cognition.SelfCategory;
 import org.vadere.state.psychology.perception.types.ChangeTarget;
@@ -94,7 +93,7 @@ public class OSMBehaviorController {
         pedestrian.getStrides().add(Pair.of(currentPosition.distance(nextPosition), stepStartTime));
 
         FootStep currentFootstep = new FootStep(currentPosition, nextPosition, stepStartTime, stepEndTime);
-        pedestrian.getTrajectory().add(currentFootstep);
+        pedestrian.getTrajectoryOfSimulationStep().add(currentFootstep);
         pedestrian.getFootstepHistory().add(currentFootstep);
     }
 
@@ -105,7 +104,7 @@ public class OSMBehaviorController {
 	 * @param topography the topography
 	 */
 	public void undoStep(@NotNull final PedestrianOSM pedestrian, @NotNull final Topography topography) {
-	    FootStep footStep = pedestrian.getTrajectory().removeLast();
+	    FootStep footStep = pedestrian.getTrajectoryOfSimulationStep().removeLast();
 	    pedestrian.getFootstepHistory().removeLast();
 
 	    pedestrian.setPosition(footStep.getStart());
@@ -260,8 +259,8 @@ public class OSMBehaviorController {
         // since pedestrian 2 might have done some steps in this time step and
         // is ahead (with respect to the time) of pedestrian 1.
         // We remove those steps which is not a good solution!
-        if(!pedestrian2.getTrajectory().isEmpty()) {
-            pedestrian2.getTrajectory().adjustEndTime(startTimeStep);
+        if(!pedestrian2.getTrajectoryOfSimulationStep().isEmpty()) {
+            pedestrian2.getTrajectoryOfSimulationStep().adjustEndTime(startTimeStep);
         }
 
         pedestrian1.setTimeOfNextStep(startTimeStep);

@@ -74,7 +74,7 @@ public class PedestrianVelocityByTrajectoryProcessor extends APedestrianVelocity
 			double startTime = lastSimTimes.getFirst();
 			double endTime = currentSimTime;
 			double duration = (endTime - startTime);
-			velocity = pedestrianTrajectoryProcessor.getValue(new PedestrianIdKey(pedId)).cut(startTime, endTime).speed().orElse(0.0);
+			velocity = pedestrianTrajectoryProcessor.getValue(new PedestrianIdKey(pedId)).cutToLastClipping(startTime, endTime).speed().orElse(0.0);
 		}
 
 		return velocity;

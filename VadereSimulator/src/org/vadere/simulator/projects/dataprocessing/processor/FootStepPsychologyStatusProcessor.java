@@ -27,7 +27,7 @@ public class FootStepPsychologyStatusProcessor extends DataProcessor<EventtimePe
 	@Override
 	protected void doUpdate(final SimulationState state) {
 		for (Pedestrian pedestrian : state.getTopography().getElements(Pedestrian.class)) {
-			LinkedList<FootStep> footSteps = pedestrian.getTrajectory().clone().getFootSteps();
+			LinkedList<FootStep> footSteps = pedestrian.getTrajectoryOfSimulationStep().clone().getFootSteps();
 
 			String psychologyStatus = psychologyStatusToString(pedestrian);
 

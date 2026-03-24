@@ -186,7 +186,7 @@ public class PedestrianBHM extends Pedestrian {
 		}
 
 		FootStep currentFootstep = new FootStep(position, getPosition(), startTimeStep, endTimeStep);
-		getTrajectory().add(currentFootstep);
+		getTrajectoryOfSimulationStep().add(currentFootstep);
 		getFootstepHistory().add(currentFootstep);
 	}
 

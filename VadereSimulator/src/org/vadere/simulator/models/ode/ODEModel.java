@@ -130,7 +130,7 @@ public abstract class ODEModel<T extends DynamicElement, TAttributes extends Att
 					pedestrian.clearFootSteps();
 
 					FootStep currentFootstep = new FootStep(positions.get(i), pedestrian.getPosition(), lastSimTimeInSec, simTimeInSec);
-					pedestrian.getTrajectory().add(currentFootstep);
+					pedestrian.getTrajectoryOfSimulationStep().add(currentFootstep);
 					pedestrian.getFootstepHistory().add(currentFootstep);
 				}
 			}
