@@ -6,10 +6,17 @@
 ### Added
 - Added new `DatabasedStepsModel` as implementation of `MainModel`. This model allows to reconstruct the movement behaviour of agents from a trajectory file.
 - Add `crossDirection` to `PedestrianCrossingTimeProcessor` and `PedestrianLineCrossProcessor`
-- Rework Line with Rectangle clipping logic used in cutting trajectories at measurement areas. 
+- Rework Line with Rectangle clipping logic used in cutting trajectories at measurement areas.
+
 ### Removed
+- Removed unused Eikonal Solvers `HIGH_ACCURACY_FAST_MARCHING_DYNAMIC`, `HIGH_ACCURACY_FAST_MARCHING_DENSITY`, `INFORMED_FAST_ITERATIVE_METHOD`, `FAST_SWEEPING_METHOD`, `FAST_ITERATIVE_METHOD_TRI_LOCK_FREE`, `FAST_ITERATIVE_METHOD_TRI`, `INFORMED_FAST_ITERATIVE_METHOD_TRI`, and `INFORMED_FAST_ITERATIVE_METHOD_TRI_LOCK_FREE`
+- Removed unused PointLocators `DelaunayHierarchyPointLocator`, `DelaunayTreePointLocator`, `SimpleTriangleMeshPointLocator`
 
 ### Changed
+- Split IMesh into several subclasses (IVertices,IHalfEdges,IFaces)
+- Introduce mesh builders and move all creation logic to the builders
+- Split Connectivity into read and write methods accessible either through the mesh or, when changing by the mesh builder
+- Introduce TriangleMesh to clearly distinguish cases where a regular mesh is insufficient
 
 ### Fixed
 
