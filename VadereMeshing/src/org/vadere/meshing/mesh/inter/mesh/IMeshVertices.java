@@ -373,8 +373,10 @@ public interface IMeshVertices<V extends IVertex, E extends IHalfEdge, F extends
         V result = null;
         double distance = Double.MAX_VALUE;
         for (V vertex : iterableFor(face)) {
-            if(toMutablePoint(vertex).distance(x, y) < distance) {
+            double vertexPointDistance = toMutablePoint(vertex).distance(x, y);
+            if(vertexPointDistance < distance) {
                 result = vertex;
+                distance = vertexPointDistance;
             }
         }
 
