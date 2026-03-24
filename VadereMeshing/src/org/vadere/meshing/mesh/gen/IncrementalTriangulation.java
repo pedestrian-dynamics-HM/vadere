@@ -352,7 +352,7 @@ public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F 
 				}
 			}
 		}
-		assert cVirtualVertices.size() == virtualVertices.size();
+		assert cVirtualVertices.size() == toCopy.virtualVertices.size();
 		this.virtualVertices = cVirtualVertices;
 
 		/**
@@ -456,7 +456,7 @@ public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F 
 
 			// remove all faces outside the hole
 			VPolygon polygon = faces.toPolygon(hole);
-			Predicate<F> removePredicate = face -> !polygon.contains(faces.toMidpoint(face));
+			Predicate<F> removePredicate = face -> !polygon.contains(faces.toTriangleMidpoint(face));
 			cdt.getMeshBuilder().changeConnectivity().shrinkBorder(removePredicate, true);
 
 			IMesh<V, E, F> holeMesh = incrementalTriangulation.mesh;
