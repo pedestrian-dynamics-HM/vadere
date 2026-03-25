@@ -1,9 +1,9 @@
 package org.vadere.meshing.mesh.triangulation.triangulator.gen;
 
 import org.jetbrains.annotations.NotNull;
-import org.vadere.meshing.mesh.inter.IFace;
-import org.vadere.meshing.mesh.inter.IHalfEdge;
-import org.vadere.meshing.mesh.inter.IVertex;
+import org.vadere.meshing.mesh.inter.mesh.IFace;
+import org.vadere.meshing.mesh.inter.mesh.IHalfEdge;
+import org.vadere.meshing.mesh.inter.mesh.IVertex;
 
 /**
  * <p>A {@link SFCNode} is part of the {@link GenSpaceFillingCurve} containing a

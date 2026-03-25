@@ -4,9 +4,8 @@ package org.vadere.simulator.models.potential.solver;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
-import org.vadere.simulator.models.potential.solver.calculators.cartesian.EikonalSolverFIM;
+import org.vadere.simulator.models.potential.solver.calculators.cartesian.multiCoreOptimized.EikonalSolverFIM;
 import org.vadere.simulator.models.potential.solver.calculators.cartesian.EikonalSolverFMM;
-import org.vadere.simulator.models.potential.solver.calculators.cartesian.EikonalSolverFSM;
 import org.vadere.simulator.models.potential.solver.timecost.UnitTimeCostFunction;
 import org.vadere.util.data.cellgrid.CellGrid;
 import org.vadere.util.data.cellgrid.CellState;
@@ -83,17 +82,6 @@ public class TestEikonalSolver {
 		testMaxError(eikonalSolverFIM);
 		double runtimeInMs = System.currentTimeMillis() - ms;
 		logger.info("FIM (not high accuracy) required " + runtimeInMs + "[ms]");
-	}
-
-	@Test
-	public void TestFSM() {
-		double ms = System.currentTimeMillis();
-		EikonalSolver eikonalSolverFSM = new EikonalSolverFSM(cellGrid,
-				distFunc, false, new UnitTimeCostFunction(), unknownPenalty, weight);
-		eikonalSolverFSM.solve();
-		testMaxError(eikonalSolverFSM);
-		double runtimeInMs = System.currentTimeMillis() - ms;
-		logger.info("FSM (not high accuracy) required " + runtimeInMs + "[ms]");
 	}
 
 	private void testMaxError(EikonalSolver eikonalSolver) {

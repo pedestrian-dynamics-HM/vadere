@@ -34,7 +34,7 @@ public class RuppertExamples {
 				false
 		);
 		//(mesh, f -> false, width, height, colorFunction
-		PMeshPanel panel = new PMeshPanel(ruppert.getMesh(), f -> ruppert.getMesh().getBooleanData(f, "boundary"),1000, 1000);
+		PMeshPanel panel = new PMeshPanel(ruppert.getMesh(), f -> ruppert.getMeshBuilder().getDataStorage().getBooleanData(f, "boundary"),1000, 1000);
 		panel.display("Ruppert's Algorithm");
 		while (!ruppert.isFinished()) {
 			try {
@@ -43,7 +43,7 @@ public class RuppertExamples {
 				e.printStackTrace();
 			}
 
-			synchronized (ruppert.getMesh()) {
+			synchronized (ruppert.getMeshBuilder()) {
 				ruppert.step();
 			}
 			panel.repaint();

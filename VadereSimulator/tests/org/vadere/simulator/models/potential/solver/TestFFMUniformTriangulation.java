@@ -4,16 +4,17 @@ package org.vadere.simulator.models.potential.solver;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.vadere.meshing.mesh.gen.PFace;
-import org.vadere.meshing.mesh.gen.PHalfEdge;
-import org.vadere.meshing.mesh.gen.PVertex;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PFace;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PHalfEdge;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PVertex;
+import org.vadere.meshing.mesh.gen.pointLocator.JumpAndWalkPointLocator;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
-import org.vadere.meshing.mesh.inter.IPointLocator;
+import org.vadere.meshing.mesh.inter.ITriangleMeshPointLocator;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
 import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
 import org.vadere.simulator.models.potential.solver.calculators.mesh.MeshEikonalSolverFMM;
-import org.vadere.simulator.models.potential.solver.calculators.mesh.PotentialPoint;
+import org.vadere.simulator.models.potential.solver.calculators.mesh.base.PotentialPoint;
 import org.vadere.simulator.models.potential.solver.timecost.UnitTimeCostFunction;
 import org.vadere.util.data.cellgrid.IPotentialPoint;
 import org.vadere.util.geometry.shapes.IPoint;
@@ -41,7 +42,7 @@ public class TestFFMUniformTriangulation {
     public void setUp() throws Exception {
         IPointConstructor<IPotentialPoint> pointConstructor = (x, y) -> new PotentialPoint(x, y);
         uniformTriangulation = IIncrementalTriangulation.createUniformTriangulation(
-                IPointLocator.Type.BASE,
+                ITriangleMeshPointLocator.Type.JUMP_AND_WALK,
                 new VRectangle(0, 0, width, height),
                 minTriangleSideLength
         );
@@ -62,7 +63,11 @@ public class TestFFMUniformTriangulation {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}*/
-        EikonalSolver solver = new MeshEikonalSolverFMM(new UnitTimeCostFunction(), targetPoints, uniformTriangulation);
+        EikonalSolver solver = new MeshEikonalSolverFMM(
+                new UnitTimeCostFunction(),
+                targetPoints,
+                uniformTriangulation.getMeshBuilder().getMeshWithDataStorage(),
+                new JumpAndWalkPointLocator(uniformTriangulation.getMesh()));
         log.info("start FFM");
         solver.solve();
         log.info("FFM finished");

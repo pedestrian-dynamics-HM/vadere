@@ -1,18 +1,18 @@
 package org.vadere.meshing.examples;
 
 import org.jetbrains.annotations.NotNull;
-import org.vadere.meshing.mesh.gen.AFace;
-import org.vadere.meshing.mesh.gen.AHalfEdge;
-import org.vadere.meshing.mesh.gen.AVertex;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AFace;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AHalfEdge;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AVertex;
 import org.vadere.meshing.mesh.gen.MeshPanel;
 import org.vadere.meshing.mesh.gen.MeshRenderer;
-import org.vadere.meshing.mesh.gen.PFace;
-import org.vadere.meshing.mesh.gen.PHalfEdge;
-import org.vadere.meshing.mesh.gen.PMesh;
-import org.vadere.meshing.mesh.gen.PVertex;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PFace;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PHalfEdge;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PVertex;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.triangles.PTriangleMeshBuilder;
 import org.vadere.meshing.mesh.impl.PMeshPanel;
 import org.vadere.meshing.mesh.impl.PSLG;
-import org.vadere.meshing.mesh.inter.IMesh;
+import org.vadere.meshing.mesh.inter.mesh.IMesh;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
 import org.vadere.meshing.mesh.triangulation.DistanceFunctionApproxBF;
 import org.vadere.meshing.mesh.triangulation.edgeLengthFunctions.EdgeLengthFunctionApprox;
@@ -82,7 +82,7 @@ public class MeshQuantityPrinting {
 		PDelaunayTriangulator dt = new PDelaunayTriangulator(points);
 		dt.generate();
 
-		VPolygon bound = dt.getMesh().toPolygon(dt.getMesh().getBorder());
+		VPolygon bound = dt.getMesh().faces().toPolygon(dt.getMesh().faces().getOuterBorder());
 		var meshImprover = new PEikMesh(
 				p -> 1.0,
 				dt.getTriangulation()
@@ -113,7 +113,7 @@ public class MeshQuantityPrinting {
 
 
 		points.clear();
-		points.addAll(meshImprover.getMesh().getBoundaryPoints());
+		points.addAll(meshImprover.getMesh().vertices().getBoundaryVertices());
 		for (int i = 0; i < 100-points.size(); i++) {
 			points.add(new VPoint(random.nextDouble() * 8, random.nextDouble() * 8));
 		}
@@ -121,7 +121,7 @@ public class MeshQuantityPrinting {
 		dt = new PDelaunayTriangulator(points);
 		dt.generate();
 
-		bound = dt.getMesh().toPolygon(dt.getMesh().getBorder());
+		bound = dt.getMesh().faces().toPolygon(dt.getMesh().faces().getOuterBorder());
 		var meshImprover2 = new PEikMesh(
 				p -> 1.0,
 				dt.getTriangulation()
@@ -167,10 +167,10 @@ public class MeshQuantityPrinting {
 		BufferedWriter bufferedWriterAngles = IOUtils.getWriter("angles_eik.csv", dir);
 		bufferedWriterAngles.write("iteration angle\n");
 
-		bufferedWriterQualities1.write(printQualities(200, meshImprover2.getMesh(), f -> meshImprover.getTriangulation().faceToQuality(f)));
+		bufferedWriterQualities1.write(printQualities(200, meshImprover2.getMesh(), f -> meshImprover.getTriangulation().getMesh().readConnectivity().faceToQuality(f)));
 		bufferedWriterQualities1.close();
 
-		bufferedWriterQualities2.write(printQualities(200, meshImprover2.getMesh(), f -> meshImprover.getTriangulation().faceToLongestEdgeQuality(f)));
+		bufferedWriterQualities2.write(printQualities(200, meshImprover2.getMesh(), f -> meshImprover.getTriangulation().getMesh().readConnectivity().faceToLongestEdgeQuality(f)));
 		bufferedWriterQualities2.close();
 
 		bufferedWriterAngles.write(printAngles(200, meshImprover2.getMesh()));
@@ -225,10 +225,10 @@ public class MeshQuantityPrinting {
 		BufferedWriter bufferedWriterAngles = IOUtils.getWriter("angles_eik.csv", dir);
 		bufferedWriterAngles.write("iteration angle\n");
 
-		bufferedWriterQualities1.write(printQualities(200, meshImprover.getMesh(), f -> meshImprover.getTriangulation().faceToQuality(f)));
+		bufferedWriterQualities1.write(printQualities(200, meshImprover.getMesh(), f -> meshImprover.getTriangulation().getMesh().readConnectivity().faceToQuality(f)));
 		bufferedWriterQualities1.close();
 
-		bufferedWriterQualities2.write(printQualities(200, meshImprover.getMesh(), f -> meshImprover.getTriangulation().faceToLongestEdgeQuality(f)));
+		bufferedWriterQualities2.write(printQualities(200, meshImprover.getMesh(), f -> meshImprover.getTriangulation().getMesh().readConnectivity().faceToLongestEdgeQuality(f)));
 		bufferedWriterQualities2.close();
 
 		bufferedWriterAngles.write(printAngles(200, meshImprover.getMesh()));
@@ -249,14 +249,14 @@ public class MeshQuantityPrinting {
 		edgeLengthFunctionApprox.smooth(0.2);
 		IDistanceFunction distanceFunction = IDistanceFunction.create(pslg.getSegmentBound(), pslg.getHoles());
 
-		GenEikMesh<PVertex, PHalfEdge, PFace> meshImprover = new GenEikMesh<>(distanceFunction, edgeLengthFunctionApprox, h0, pslg.getBoundingBox(), pslg.getAllPolygons(), () -> new PMesh());
+		GenEikMesh<PVertex, PHalfEdge, PFace> meshImprover = new GenEikMesh<>(distanceFunction, edgeLengthFunctionApprox, h0, pslg.getBoundingBox(), pslg.getAllPolygons(), PTriangleMeshBuilder::new);
 		var meshPanel = new PMeshPanel(meshImprover.getMesh(), 1000, 1000);
 		meshPanel.display("Airfoil");
 		int it = 1;
 		while (it < 500) {
 			meshImprover.improve();
 			it++;
-			synchronized (meshImprover.getMesh()) {
+			synchronized (meshImprover.getMeshBuilder()) {
 				meshPanel.repaint();
 			}
 			Thread.sleep(10);
@@ -284,10 +284,10 @@ public class MeshQuantityPrinting {
 			BufferedWriter bufferedWriterAngles = IOUtils.getWriter("angles_eik.csv", dir);
 			bufferedWriterAngles.write("iteration angle\n");
 
-			bufferedWriterQualities1.write(printQualities(500, meshImprover.getMesh(), f -> meshImprover.getTriangulation().faceToQuality(f)));
+			bufferedWriterQualities1.write(printQualities(500, meshImprover.getMesh(), f -> meshImprover.getTriangulation().getMesh().readConnectivity().faceToQuality(f)));
 			bufferedWriterQualities1.close();
 
-			bufferedWriterQualities2.write(printQualities(500, meshImprover.getMesh(), f -> meshImprover.getTriangulation().faceToLongestEdgeQuality(f)));
+			bufferedWriterQualities2.write(printQualities(500, meshImprover.getMesh(), f -> meshImprover.getTriangulation().getMesh().readConnectivity().faceToLongestEdgeQuality(f)));
 			bufferedWriterQualities2.close();
 
 			bufferedWriterAngles.write(printAngles(500, meshImprover.getMesh()));
@@ -315,7 +315,7 @@ public class MeshQuantityPrinting {
 		Collection<VPolygon> holes = pslg.getHoles();
 		VPolygon segmentBound = pslg.getSegmentBound();
 		IDistanceFunction distanceFunction = IDistanceFunction.create(segmentBound, holes);
-		IDistanceFunction distanceFunctionApproximation = new DistanceFunctionApproxBF(pslg, distanceFunction, () -> new PMesh());
+		IDistanceFunction distanceFunctionApproximation = new DistanceFunctionApproxBF(pslg, distanceFunction, PTriangleMeshBuilder::new);
 
 		IEdgeLengthFunction edgeLengthFunction = p -> h0 + smoothness * Math.abs((distanceFunctionApproximation).apply(p));
 		EdgeLengthFunctionApprox edgeLengthFunctionApprox = new EdgeLengthFunctionApprox(pslg, edgeLengthFunction);
@@ -337,7 +337,7 @@ public class MeshQuantityPrinting {
 		while (it < 500) {
 			meshImprover.improve();
 			it++;
-			synchronized (meshImprover.getMesh()) {
+			synchronized (meshImprover.getMeshBuilder()) {
 				meshPanel.repaint();
 			}
 			Thread.sleep(10);
@@ -365,10 +365,10 @@ public class MeshQuantityPrinting {
 			BufferedWriter bufferedWriterAngles = IOUtils.getWriter("angles_eik.csv", dir);
 			bufferedWriterAngles.write("iteration angle\n");
 
-			bufferedWriterQualities1.write(printQualities(500, meshImprover.getMesh(), f -> meshImprover.getTriangulation().faceToQuality(f)));
+			bufferedWriterQualities1.write(printQualities(500, meshImprover.getMesh(), f -> meshImprover.getTriangulation().getMesh().readConnectivity().faceToQuality(f)));
 			bufferedWriterQualities1.close();
 
-			bufferedWriterQualities2.write(printQualities(500, meshImprover.getMesh(), f -> meshImprover.getTriangulation().faceToLongestEdgeQuality(f)));
+			bufferedWriterQualities2.write(printQualities(500, meshImprover.getMesh(), f -> meshImprover.getTriangulation().getMesh().readConnectivity().faceToLongestEdgeQuality(f)));
 			bufferedWriterQualities2.close();
 
 			bufferedWriterAngles.write(printAngles(500, meshImprover.getMesh()));
@@ -396,7 +396,7 @@ public class MeshQuantityPrinting {
 		Collection<VPolygon> holes = pslg.getHoles();
 		VPolygon segmentBound = pslg.getSegmentBound();
 		IDistanceFunction distanceFunction = IDistanceFunction.create(segmentBound, holes);
-		IDistanceFunction distanceFunctionApproximation = new DistanceFunctionApproxBF(pslg, distanceFunction, () -> new PMesh());
+		IDistanceFunction distanceFunctionApproximation = new DistanceFunctionApproxBF(pslg, distanceFunction, PTriangleMeshBuilder::new);
 
 		IEdgeLengthFunction edgeLengthFunction = p -> h0 + smoothness * Math.abs((distanceFunctionApproximation).apply(p));
 		EdgeLengthFunctionApprox edgeLengthFunctionApprox = new EdgeLengthFunctionApprox(pslg, edgeLengthFunction);
@@ -418,7 +418,7 @@ public class MeshQuantityPrinting {
 		while (it < 500) {
 			meshImprover.improve();
 			it++;
-			synchronized (meshImprover.getMesh()) {
+			synchronized (meshImprover.getMeshBuilder()) {
 				meshPanel.repaint();
 			}
 			Thread.sleep(10);
@@ -446,10 +446,10 @@ public class MeshQuantityPrinting {
 			BufferedWriter bufferedWriterAngles = IOUtils.getWriter("angles_eik.csv", dir);
 			bufferedWriterAngles.write("iteration angle\n");
 
-			bufferedWriterQualities1.write(printQualities(500, meshImprover.getMesh(), f -> meshImprover.getTriangulation().faceToQuality(f)));
+			bufferedWriterQualities1.write(printQualities(500, meshImprover.getMesh(), f -> meshImprover.getTriangulation().getMesh().readConnectivity().faceToQuality(f)));
 			bufferedWriterQualities1.close();
 
-			bufferedWriterQualities2.write(printQualities(500, meshImprover.getMesh(), f -> meshImprover.getTriangulation().faceToLongestEdgeQuality(f)));
+			bufferedWriterQualities2.write(printQualities(500, meshImprover.getMesh(), f -> meshImprover.getTriangulation().getMesh().readConnectivity().faceToLongestEdgeQuality(f)));
 			bufferedWriterQualities2.close();
 
 			bufferedWriterAngles.write(printAngles(500, meshImprover.getMesh()));
@@ -518,7 +518,7 @@ public class MeshQuantityPrinting {
 			Thread.sleep(10);
 			meshImprover.improve();
 			meshPanel.repaint();
-			System.out.println(meshImprover.getMesh().getFaces().stream().mapToInt(f -> f.getId()).max().getAsInt());
+			System.out.println(meshImprover.getMesh().faces().getAll().stream().mapToInt(f -> f.getId()).max().getAsInt());
 		}
 
 		BufferedWriter meshWriter = IOUtils.getWriter("spaceFillingCurve_partition_mesh.tex", new File("/Users/bzoennchen/Development/workspaces/hmRepo/PersZoennchen/PhD/trash/generated/eikmesh/"));
@@ -578,7 +578,7 @@ public class MeshQuantityPrinting {
 			meshImprover.improve();
 			meshPanel.repaint();
 			System.out.println(meshImprover.getQuality());
-			System.out.println(meshImprover.getMesh().getNumberOfFaces());
+			System.out.println(meshImprover.getMesh().faces().getAll().size());
 		}
 
 		BufferedWriter meshWriter = IOUtils.getWriter("spaceFillingCurve_partition_mesh.tex", new File("/Users/bzoennchen/Development/workspaces/hmRepo/PersZoennchen/PhD/trash/generated/eikmesh/"));
@@ -587,7 +587,7 @@ public class MeshQuantityPrinting {
 
 		BufferedWriter writer = IOUtils.getWriter("bridge.poly", new File("/Users/bzoennchen/Development/workspaces/hmRepo/PersZoennchen/PhD/trash/generated/eikmesh/"));
 		MeshPolyWriter<AVertex, AHalfEdge, AFace> meshPolyWriter = new MeshPolyWriter<>();
-		writer.write(meshPolyWriter.to2DPoly(meshImprover.getMesh()));
+		writer.write(meshPolyWriter.to2DPoly(meshImprover.getMeshBuilder().getMeshWithDataStorage()));
 		writer.close();
 	}
 
@@ -615,7 +615,7 @@ public class MeshQuantityPrinting {
 			init++;
 		}
 
-		var mesh = meshImprover.getMesh();
+		var meshBuilder = meshImprover.getMeshBuilder();
 		var tri = meshImprover.getTriangulation();
 		var panel = new PMeshPanel(meshImprover.getMesh(), 500, 500);
 		panel.display();
@@ -624,8 +624,8 @@ public class MeshQuantityPrinting {
 		while (iteration < maxIteration+1) {
 			meshImprover.improve();
 			panel.repaint();
-			bufferedWriterQualities1.write(printQualities(iteration, mesh, f -> tri.faceToQuality(f)));
-			bufferedWriterQualities2.write(printQualities(iteration, mesh, f -> tri.faceToLongestEdgeQuality(f)));
+			bufferedWriterQualities1.write(printQualities(iteration, meshBuilder.getMesh(), f -> tri.getMesh().readConnectivity().faceToQuality(f)));
+			bufferedWriterQualities2.write(printQualities(iteration, meshBuilder.getMesh(), f -> tri.getMesh().readConnectivity().faceToLongestEdgeQuality(f)));
 			bufferedWriterAngles.write(printAngles(iteration, meshImprover.getMesh()));
 
 			if(!meshPrints.isEmpty() && meshPrints.peek() == iteration) {
@@ -787,7 +787,7 @@ public class MeshQuantityPrinting {
 		PContrainedDelaunayTriangulator dt = new PContrainedDelaunayTriangulator(pslg, true);
 		dt.generate(true);
 		System.out.println(TexGraphGenerator.toTikz(dt.getMesh(), f -> {
-			VTriangle tri = dt.getMesh().toTriangle(f);
+			VTriangle tri = dt.getMesh().faces().toTriangle(f);
 			if(pslg.getSegmentBound().contains(tri.midPoint()))
 				return Colors.YELLOW;
 			else
@@ -799,7 +799,7 @@ public class MeshQuantityPrinting {
 
 	private static String printQualities(int iteration, IMesh<PVertex, PHalfEdge, PFace> mesh, Function<PFace, Double> rho){
 		StringBuilder builder = new StringBuilder();
-		for(PFace face : mesh.getFaces()) {
+		for(PFace face : mesh.faces()) {
 			double quality = rho.apply(face);
 			builder.append(iteration);
 			builder.append(" ");
@@ -823,12 +823,12 @@ public class MeshQuantityPrinting {
 
 	private static String printAngles(int iteration, IMesh<PVertex, PHalfEdge, PFace> mesh){
 		StringBuilder builder = new StringBuilder();
-		for(PFace face : mesh.getFaces()) {
+		for(PFace face : mesh.faces()) {
 
-			for(PHalfEdge edge : mesh.getEdges(face)) {
-				VPoint p1 = mesh.toPoint(edge);
-				VPoint p2 = mesh.toPoint(mesh.getNext(edge));
-				VPoint p3 = mesh.toPoint(mesh.getPrev(edge));
+			for(PHalfEdge edge : mesh.edges().getAllOf(face)) {
+				VPoint p1 = mesh.edges().endToPoint(edge);
+				VPoint p2 = mesh.edges().endToPoint(mesh.edges().getNext(edge));
+				VPoint p3 = mesh.edges().endToPoint(mesh.edges().getPrev(edge));
 				builder.append(iteration);
 				builder.append(" ");
 				builder.append(GeometryUtils.angle(p1, p2, p3));

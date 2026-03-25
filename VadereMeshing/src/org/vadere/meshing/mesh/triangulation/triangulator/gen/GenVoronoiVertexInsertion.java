@@ -2,12 +2,10 @@ package org.vadere.meshing.mesh.triangulation.triangulator.gen;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.impl.PSLG;
-import org.vadere.meshing.mesh.inter.IFace;
-import org.vadere.meshing.mesh.inter.IHalfEdge;
+import org.vadere.meshing.mesh.inter.mesh.*;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
-import org.vadere.meshing.mesh.inter.IMesh;
-import org.vadere.meshing.mesh.inter.IMeshSupplier;
-import org.vadere.meshing.mesh.inter.IVertex;
+import org.vadere.meshing.mesh.inter.mesh.builder.ITriangleMeshBuilder;
+import org.vadere.meshing.mesh.inter.mesh.data.IMeshDataStorage;
 import org.vadere.meshing.mesh.triangulation.triangulator.inter.IRefiner;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VLine;
@@ -27,6 +25,7 @@ import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 /**
  * Implementation of the Voronoi-vertex point insertion method from [1] (rebay-1993).
@@ -64,9 +63,9 @@ public class GenVoronoiVertexInsertion<V extends IVertex, E extends IHalfEdge, F
 	private DelaunayPlacement<V, E, F> placementStrategy;
 
 	public GenVoronoiVertexInsertion(@NotNull final PSLG pslg,
-	                                 @NotNull final IMeshSupplier<V, E, F> meshSupplier,
-	                                 final boolean createHoles,
-	                                 @NotNull Function<IPoint, Double> circumRadiusFunc) {
+									 @NotNull final Supplier<ITriangleMeshBuilder<V, E, F>> meshSupplier,
+									 final boolean createHoles,
+									 @NotNull Function<IPoint, Double> circumRadiusFunc) {
 
 		this.segments = new HashSet<>();
 		this.initialized = false;
@@ -87,12 +86,12 @@ public class GenVoronoiVertexInsertion<V extends IVertex, E extends IHalfEdge, F
 		if(!initialized) {
 			cdt.generate(true);
 			segments = new HashSet<>(cdt.getConstrains());
-			getTriangulation().getMesh()
-					.streamFaces()
-					.filter(f -> pslg.getSegmentBound().contains(getMesh().toTriangle(f).midPoint()))
+			getMesh().faces()
+					.stream()
+					.filter(f -> pslg.getSegmentBound().contains(getMesh().faces().toTriangle(f).midPoint()))
 					.forEach(f -> add(f));
 
-			getTriangulation().setCanIllegalPredicate(e -> !segments.contains(e) && !segments.contains(getMesh().getTwin(e)));
+			getTriangulation().setCanIllegalPredicate(e -> !segments.contains(e) && !segments.contains(getMesh().edges().getTwin(e)));
 			initialized = true;
 		}
 		else if(!refinementFinished()) {
@@ -102,17 +101,18 @@ public class GenVoronoiVertexInsertion<V extends IVertex, E extends IHalfEdge, F
 			//logger.info("" + getMesh().isDestroyed(face));
 			//VTriangle triangle = getMesh().toTriangle(face);
 			VTriangle triangle = triangles.get(face);
-			VPoint circumcenter = this.placementStrategy.computePlacement(getMesh().getEdge(face), triangle);
+			VPoint circumcenter = this.placementStrategy.computePlacement(getMesh().edges().getAnyOf(face), triangle);
 			Optional<F> locatedFace = locateFace(circumcenter.getX(), circumcenter.getY(), face);
 
 			if(locatedFace.isPresent()) {
 				//logger.info("insertVertex" + circumcenter);
-				E edge = getTriangulation().splitTriangle(locatedFace.get(), getMesh().createPoint(circumcenter.getX(), circumcenter.getY()));
-				V v = getMesh().getVertex(edge);
+				IPoint splitPoint = getMeshBuilder().getMesh().createPoint(circumcenter.getX(), circumcenter.getY());
+				E edge = getMeshBuilder().changeConnectivity().splitTriangle(locatedFace.get(), splitPoint);
+				V v = getMesh().vertices().getEndOf(edge);
 
 				// update triangles
-				for(F f : getMesh().getFaceIt(v)) {
-					VTriangle tri = getTriangulation().getMesh().toTriangle(f);
+				for(F f : getMesh().faces().adjacentIterableFor(v)) {
+					VTriangle tri = getMesh().faces().toTriangle(f);
 					if(pslg.getSegmentBound().contains(tri.midPoint())) {
 						heap.remove(f);
 						add(f);
@@ -134,8 +134,8 @@ public class GenVoronoiVertexInsertion<V extends IVertex, E extends IHalfEdge, F
 			}
 		}
 		return Optional.empty();*/
-		Optional<F> optFace = getTriangulation().locateMarch(x, y, face);
-		if(optFace.isPresent() && !getMesh().isBoundary(optFace.get())) {
+		Optional<F> optFace = getMesh().readConnectivity().locateMarch(x, y, face);
+		if(optFace.isPresent() && !getMesh().faces().isBoundary(optFace.get())) {
 			return optFace;
 		}
 		else {
@@ -149,7 +149,7 @@ public class GenVoronoiVertexInsertion<V extends IVertex, E extends IHalfEdge, F
 	}
 
 	private boolean refinementFinished() {
-		return initialized == true && (heap.isEmpty() || getMesh().getNumberOfVertices() >= MAX_POINTS);
+		return initialized == true && (heap.isEmpty() || getMesh().vertices().getAll().size() >= MAX_POINTS);
 	}
 
 	@Override
@@ -178,15 +178,17 @@ public class GenVoronoiVertexInsertion<V extends IVertex, E extends IHalfEdge, F
 
 	public void removeTriangles() {
 		if(createHoles) {
+			var connectivity = getMeshBuilder().changeConnectivity();
+
 			for(VPolygon hole : pslg.getHoles()) {
-				Predicate<F> mergeCondition = f -> !getMesh().isBoundary(f) && hole.contains(getMesh().toTriangle(f).midPoint());
-				Optional<F> optFace = getMesh().streamFaces().filter(mergeCondition).findAny();
+				Predicate<F> mergeCondition = f -> !getMesh().faces().isBoundary(f) && hole.contains(getMesh().faces().toTriangle(f).midPoint());
+				Optional<F> optFace = getMesh().faces().stream().filter(mergeCondition).findAny();
 				if(optFace.isPresent()) {
-					getTriangulation().createHole(optFace.get(), mergeCondition, true);
+					connectivity.createHole(optFace.get(), mergeCondition, true);
 				}
 			}
-			Predicate<F> mergeCondition = f -> !pslg.getSegmentBound().contains(getMesh().toTriangle(f).midPoint());
-			getTriangulation().shrinkBorder(mergeCondition, true);
+			Predicate<F> mergeCondition = f -> !pslg.getSegmentBound().contains(getMesh().faces().toTriangle(f).midPoint());
+			connectivity.shrinkBorder(mergeCondition, true);
 		}
 	}
 
@@ -194,13 +196,17 @@ public class GenVoronoiVertexInsertion<V extends IVertex, E extends IHalfEdge, F
 		return cdt.getTriangulation();
 	}
 
+	public ITriangleMeshBuilder<V, E, F> getMeshBuilder() {
+		return cdt.getMeshBuilder();
+	}
+
 	@Override
-	public IMesh<V, E, F> getMesh() {
-		return cdt.getMesh();
+	public IMeshDataStorage<V, E, F> getMeshDataStorage() {
+		return cdt.getMeshDataStorage();
 	}
 
 	private void add(@NotNull final F face) {
-		VTriangle triangle = getMesh().toTriangle(face);
+		VTriangle triangle = getMesh().faces().toTriangle(face);
 		double radius = triangle.getCircumscribedRadius();
 		VPoint circumcenter = triangle.getCircumcenter();
 		if(radius > minRadius && triangle.getCircumscribedRadius() > circumRadiusFunc.apply(circumcenter)) {

@@ -1,12 +1,14 @@
 package org.vadere.simulator.examples.Meshing;
 
 import org.vadere.meshing.mesh.gen.MeshPanel;
-import org.vadere.meshing.mesh.gen.PFace;
-import org.vadere.meshing.mesh.gen.PHalfEdge;
-import org.vadere.meshing.mesh.gen.PMesh;
-import org.vadere.meshing.mesh.gen.PVertex;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PFace;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PHalfEdge;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PVertex;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.triangles.PTriangleMeshBuilder;
+import org.vadere.meshing.mesh.gen.pointLocator.JumpAndWalkPointLocator;
+import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
+import org.vadere.meshing.mesh.inter.mesh.MeshPythonUtils;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.GenEikMesh;
-import org.vadere.meshing.mesh.triangulation.improver.eikmesh.impl.PEikMesh;
 import org.vadere.meshing.utils.io.IOUtils;
 import org.vadere.simulator.models.potential.solver.calculators.mesh.MeshEikonalSolverFMM;
 import org.vadere.simulator.models.potential.solver.timecost.UnitTimeCostFunction;
@@ -52,7 +54,7 @@ public class CirclesFMM {
 				h0,
 				GeometryUtils.boundRelative(domain.toPolygon().getPoints()),
 				Arrays.asList(domain),
-				() -> new PMesh());
+				PTriangleMeshBuilder::new);
 
 		improver.initialize();
 		MeshPanel<PVertex, PHalfEdge, PFace> panel = new MeshPanel<PVertex, PHalfEdge, PFace>(improver.getMesh(), 1000, 1000);
@@ -64,16 +66,18 @@ public class CirclesFMM {
 		}
 
 
+		IIncrementalTriangulation<PVertex, PHalfEdge, PFace> triangulation = improver.getTriangulation();
 		var solver = new MeshEikonalSolverFMM<>(
 				"",
 				new UnitTimeCostFunction(),
 				points,
-				improver.getTriangulation());
+				triangulation.getMeshBuilder().getMeshWithDataStorage(),
+				new JumpAndWalkPointLocator<>(improver.getMesh()));
 		solver.solve();
-		meshWriter.write(improver.getTriangulation().getMesh().toPythonTriangulation(v -> solver.getPotential(v)));
+		meshWriter.write(MeshPythonUtils.toPythonTriangulation(improver.getTriangulation().getMeshBuilder().getMeshWithDataStorage(), v -> solver.getPotential(v)));
 		meshWriter.close();
 		System.out.println("finished");
-		System.out.println(improver.getTriangulation().getMesh().toPythonTriangulation(v -> solver.getPotential(v)));
+		System.out.println(MeshPythonUtils.toPythonTriangulation(improver.getTriangulation().getMeshBuilder().getMeshWithDataStorage(), v -> solver.getPotential(v)));
 
 	}
 }

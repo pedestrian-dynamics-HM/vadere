@@ -2,17 +2,17 @@ package org.vadere.meshing.mesh.triangulation.triangulator.gen;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.gen.IncrementalTriangulation;
-import org.vadere.meshing.mesh.inter.IFace;
-import org.vadere.meshing.mesh.inter.IHalfEdge;
+import org.vadere.meshing.mesh.inter.mesh.*;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
-import org.vadere.meshing.mesh.inter.IMesh;
-import org.vadere.meshing.mesh.inter.IVertex;
+import org.vadere.meshing.mesh.inter.mesh.builder.ITriangleMeshBuilder;
+import org.vadere.meshing.mesh.inter.mesh.data.IMeshDataStorage;
 import org.vadere.meshing.mesh.triangulation.triangulator.inter.ITriangulator;
 import org.vadere.util.math.IDistanceFunction;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
 
 import java.util.Random;
+import java.util.function.Supplier;
 
 /**
  * <p>A triangulator which randomly inserts points.</p>
@@ -35,20 +35,20 @@ public class GenRandomPointsSetTriangulator<V extends IVertex, E extends IHalfEd
 	/**
 	 * The default constructor.
 	 *
-	 * @param mesh              an empty mesh which will contain the all elements of the triangulation
+	 * @param supplier      creates the empty mesh which will contain the all elements of the triangulation
 	 * @param numberOfPoints    the number of random points which will be inserted
 	 * @param bound             the bound containing all points
 	 * @param distFunc          a distance function which has to be positive at positions where
 	 *                          no point should be inserted and negative elsewhere.
 	 * @param random            a pseudo random number generator
 	 */
-	public GenRandomPointsSetTriangulator(@NotNull final IMesh<V, E, F> mesh,
-	                                      @NotNull final int numberOfPoints,
-	                                      @NotNull final VRectangle bound,
-	                                      @NotNull final IDistanceFunction distFunc,
-	                                      @NotNull final Random random
+	public GenRandomPointsSetTriangulator(@NotNull final Supplier<ITriangleMeshBuilder<V, E, F>> supplier,
+										  @NotNull final int numberOfPoints,
+										  @NotNull final VRectangle bound,
+										  @NotNull final IDistanceFunction distFunc,
+										  @NotNull final Random random
 	) {
-		this.triangulation = new IncrementalTriangulation<>(mesh, bound);
+		this.triangulation = IncrementalTriangulation.fromBuilderFactory(supplier, bound);
 		this.numberOfPoints = numberOfPoints;
 		this.random = random;
 		this.bound = bound;
@@ -57,33 +57,33 @@ public class GenRandomPointsSetTriangulator<V extends IVertex, E extends IHalfEd
 
 	/**
 	 *
-	 * @param mesh              an empty mesh which will contain the all elements of the triangulation
+	 * @param supplier      creates the empty mesh which will contain the all elements of the triangulation
 	 * @param numberOfPoints    the number of random points which will be inserted
 	 * @param bound             the bound containing all points
 	 * @param distFunc          a distance function which has to be positive at positions where
 	 *                          no point should be inserted and negative elsewhere.
 	 */
-    public GenRandomPointsSetTriangulator(@NotNull final IMesh<V, E, F> mesh,
+    public GenRandomPointsSetTriangulator(Supplier<ITriangleMeshBuilder<V, E, F>> supplier,
                                           @NotNull final int numberOfPoints,
                                           @NotNull final VRectangle bound,
                                           @NotNull final IDistanceFunction distFunc
                                 ) {
-        this(mesh, numberOfPoints, bound, distFunc, new Random());
+        this(supplier, numberOfPoints, bound, distFunc, new Random());
     }
 
 	/**
 	 *
-	 * @param mesh              an empty mesh which will contain the all elements of the triangulation
+	 * @param supplier      creates the empty mesh which will contain the all elements of the triangulation
 	 * @param numberOfPoints    the number of random points which will be inserted
 	 * @param bound             the bound containing all points
 	 * @param random            a pseudo random number generator
 	 */
-	public GenRandomPointsSetTriangulator(@NotNull final IMesh<V, E, F> mesh,
+	public GenRandomPointsSetTriangulator(Supplier<ITriangleMeshBuilder<V, E, F>> supplier,
 	                                      @NotNull final int numberOfPoints,
 	                                      @NotNull final VRectangle bound,
 	                                      @NotNull final Random random
 	) {
-		this.triangulation = new IncrementalTriangulation<>(mesh, bound);
+		this.triangulation = IncrementalTriangulation.fromBuilderFactory(supplier, bound);
 		this.numberOfPoints = numberOfPoints;
 		this.random = random;
 		this.bound = bound;
@@ -91,16 +91,15 @@ public class GenRandomPointsSetTriangulator<V extends IVertex, E extends IHalfEd
 	}
 
 	/**
-	 *
-	 * @param mesh              an empty mesh which will contain the all elements of the triangulation
+	 * @param supplier      creates the empty mesh which will contain the all elements of the triangulation
 	 * @param numberOfPoints    the number of random points which will be inserted
 	 * @param bound             the bound containing all points
 	 */
-	public GenRandomPointsSetTriangulator(@NotNull final IMesh<V, E, F> mesh,
+	public GenRandomPointsSetTriangulator(Supplier<ITriangleMeshBuilder<V, E, F>> supplier,
 	                                      @NotNull final int numberOfPoints,
 	                                      @NotNull final VRectangle bound
 	) {
-		this(mesh, numberOfPoints, bound, new Random());
+		this(supplier, numberOfPoints, bound, new Random());
 	}
 
     @Override
@@ -134,9 +133,13 @@ public class GenRandomPointsSetTriangulator<V extends IVertex, E extends IHalfEd
 		return triangulation;
 	}
 
+	public ITriangleMeshBuilder<V, E, F> getMeshBuilder() {
+		return triangulation.getMeshBuilder();
+	}
+
 	@Override
-	public IMesh<V, E, F> getMesh() {
-		return triangulation.getMesh();
+	public IMeshDataStorage<V, E, F> getMeshDataStorage() {
+		return triangulation.getMeshDataStorage();
 	}
 
 	private IPoint randomPoint() {

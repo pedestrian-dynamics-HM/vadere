@@ -6,11 +6,9 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.gen.IncrementalTriangulation;
 import org.vadere.meshing.mesh.impl.PSLG;
-import org.vadere.meshing.mesh.inter.IFace;
-import org.vadere.meshing.mesh.inter.IHalfEdge;
+import org.vadere.meshing.mesh.inter.mesh.*;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
-import org.vadere.meshing.mesh.inter.IMesh;
-import org.vadere.meshing.mesh.inter.IVertex;
+import org.vadere.meshing.mesh.inter.mesh.builder.ITriangleMeshBuilder;
 import org.vadere.meshing.mesh.triangulation.triangulator.inter.ITriangulator;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.IPoint;
@@ -60,10 +58,10 @@ public class GenConstrainedDelaunayTriangulator<V extends IVertex, E extends IHa
 	private boolean allowSegmentFaces;
 
 	public GenConstrainedDelaunayTriangulator(
-			@NotNull final Supplier<IMesh<V, E, F>> meshSupply,
+			@NotNull final Supplier<ITriangleMeshBuilder<V, E, F>> meshSupply,
 			@NotNull final PSLG pslg,
 			final boolean confirming) {
-		this(new IncrementalTriangulation<>(meshSupply.get(), pslg.getBoundingBox()), pslg, confirming);
+		this(IncrementalTriangulation.fromBuilderFactory(meshSupply, pslg.getBoundingBox()), pslg, confirming);
 	}
 
 	public GenConstrainedDelaunayTriangulator(
@@ -97,7 +95,7 @@ public class GenConstrainedDelaunayTriangulator<V extends IVertex, E extends IHa
 		/**
 		 * This prevent the flipping of constrained edges
 		 */
-		Predicate<E> canIllegal = e -> !eConstrains.contains(e) && !eConstrains.contains(getMesh().getTwin(e));
+		Predicate<E> canIllegal = e -> !eConstrains.contains(e) && !eConstrains.contains(getMesh().edges().getTwin(e));
 		this.triangulation = triangulation;
 		this.triangulation.setCanIllegalPredicate(canIllegal);
 	}
@@ -118,10 +116,10 @@ public class GenConstrainedDelaunayTriangulator<V extends IVertex, E extends IHa
 		for(Pair<V, V> constrain : vConstrains) {
 			V v1 = constrain.getLeft();
 			V v2 = constrain.getRight();
-			for(E e : getMesh().getEdgeIt(v1)) {
-				if(getMesh().getTwinVertex(e).equals(v2)) {
+			for(E e : getMesh().edges().iterableFor(v1)) {
+				if(getMesh().vertices().getTwin(e).equals(v2)) {
 					eConstrains.add(e);
-					eConstrains.add(getMesh().getTwin(e));
+					eConstrains.add(getMesh().edges().getTwin(e));
 					break;
 				}
 			}
@@ -143,20 +141,20 @@ public class GenConstrainedDelaunayTriangulator<V extends IVertex, E extends IHa
 	}
 
 	private void split() {
-		List<E> edges = getMesh().getEdges();
+		List<E> edges = getMesh().edges().getAll();
 		for(E edge : edges) {
 			if(!eConstrains.contains(edge)) {
-				V v1 = getMesh().getVertex(edge);
-				V v2 = getMesh().getTwinVertex(edge);
+				V v1 = getMesh().vertices().getEndOf(edge);
+				V v2 = getMesh().vertices().getTwin(edge);
 				if(isSegmentVertex(v1) && isSegmentVertex(v2)) {
-					getTriangulation().splitEdge(edge, true);
+					getTriangulation().getMeshBuilder().changeConnectivity().splitEdge(edge, true);
 				}
 			}
 		}
 	}
 
 	private boolean isSegmentVertex(@NotNull final V v) {
-		return getMesh().streamEdges(v).anyMatch(e -> eConstrains.contains(e));
+		return getMesh().edges().streamEdgesOf(v).anyMatch(e -> eConstrains.contains(e));
 	}
 
 	// TODO: this is slow!
@@ -167,8 +165,12 @@ public class GenConstrainedDelaunayTriangulator<V extends IVertex, E extends IHa
 		 * corner vertices have 2 possible split lines!
 		 */
 		Map<E, VLine> projectionLines = new HashMap<>();
+		var vertices = getMesh().vertices();
 		for(E constrain : eConstrains) {
-			VLine projectionLine = new VLine(getMesh().toPoint(getMesh().getVertex(constrain)), getMesh().toPoint(getMesh().getTwinVertex(constrain)));
+			VLine projectionLine = new VLine(
+					vertices.toPoint(vertices.getEndOf(constrain)),
+					vertices.toPoint(vertices.getTwin(constrain))
+			);
 			projectionLines.put(constrain, projectionLine);
 		}
 
@@ -177,15 +179,15 @@ public class GenConstrainedDelaunayTriangulator<V extends IVertex, E extends IHa
 		do {
 			// TODO this seems expensive!
 			nonConformingEdge = eConstrains.stream()
-					.filter(edge -> !getMesh().isAtBoundary(edge))
-					.filter(edge -> getTriangulation().isDelaunayIllegal(edge))
+					.filter(edge -> !getMesh().edges().isAtBoundary(edge))
+					.filter(edge -> getTriangulation().getMeshBuilder().changeConnectivity().isDelaunayIllegal(edge))
 					.findAny();
 
 			if(nonConformingEdge.isPresent()) {
 				// this call will remove 2 element from eConstrains and will add 4 new ones
 				VLine line = projectionLines.get(nonConformingEdge.get());
 				if(line == null) {
-					line = projectionMap.get(getMesh().getVertex(nonConformingEdge.get()));
+					line = projectionMap.get(getMesh().vertices().getEndOf(nonConformingEdge.get()));
 				}
 				V splitVertex = split(nonConformingEdge.get(), eConstrains);
 				projectionMap.put(splitVertex, line);
@@ -221,8 +223,8 @@ public class GenConstrainedDelaunayTriangulator<V extends IVertex, E extends IHa
 	}*/
 
 	@Override
-	public IMesh<V, E, F> getMesh() {
-		return triangulation.getMesh();
+	public ITriangleMeshBuilder<V, E, F> getMeshBuilder() {
+		return triangulation.getMeshBuilder();
 	}
 
 	public Collection<E> getConstrains() {
@@ -244,12 +246,12 @@ public class GenConstrainedDelaunayTriangulator<V extends IVertex, E extends IHa
 
 		while (!newEdges.isEmpty()) {
 			E edge = newEdges.removeFirst();
-			VLine vEdge = triangulation.getMesh().toLine(edge);
+			VLine vEdge = getMesh().edges().toLine(edge);
 
 			// the edge is not actually equal to the constrain
 			if(GeometryUtils.intersectLine(v1.getX(), v1.getY(), v2.getX(), v2.getY(), vEdge.x1, vEdge.y1, vEdge.x2, vEdge.y2, GeometryUtils.DOUBLE_EPS)) {
-				if(triangulation.isIllegal(edge)) {
-					triangulation.flip(edge);
+				if(triangulation.getMeshBuilder().changeConnectivity().isIllegal(edge)) {
+					triangulation.getMeshBuilder().changeConnectivity().flip(edge);
 					newEdges.addLast(edge);
 				}
 			}
@@ -261,25 +263,26 @@ public class GenConstrainedDelaunayTriangulator<V extends IVertex, E extends IHa
 		LinkedList<E> newEdges = new LinkedList<>();
 		V v1 = contrain.getLeft();
 		V v2 = contrain.getRight();
-		LinkedList<E> intersectingEdges = triangulation.getIntersectingEdges(v1, v2);
+		LinkedList<E> intersectingEdges = getMesh().readConnectivity().getIntersectingEdges(v1, v2);
 
+		var edges = getMesh().edges();
 		while (!intersectingEdges.isEmpty()) {
 			E edge = intersectingEdges.removeFirst();
 
-			VLine vEdge = triangulation.getMesh().toLine(edge);
+			VLine vEdge = edges.toLine(edge);
 
 			// to be save, TODO inconsistent geometry check which may lead to a deadlock (isLeftOfRobust is "robust" while intersectLineSegment is not")
 			if(GeometryUtils.intersectLineSegment(vEdge.x1, vEdge.y1, vEdge.x2, vEdge.y2, v1.getX(), v1.getY(), v2.getX(), v2.getY())) {
-				E next = triangulation.getMesh().getNext(edge);
-				E prev = triangulation.getMesh().getPrev(edge);
-				E twin = triangulation.getMesh().getTwin(edge);
-				IPoint q = triangulation.getMesh().getPoint(triangulation.getMesh().getNext(twin));
+				E next = edges.getNext(edge);
+				E prev = edges.getPrev(edge);
+				E twin = edges.getTwin(edge);
+				IPoint q = edges.getMutableEndPoint(edges.getNext(twin));
 
 				// convex quadrilateral
-				if(triangulation.isLeftOf(q.getX(), q.getY(), prev) && triangulation.isLeftOf(q.getX(), q.getY(), next)) {
-					triangulation.flip(edge);
+				if(getMesh().readConnectivity().isLeftOf(q.getX(), q.getY(), prev) && getMesh().readConnectivity().isLeftOf(q.getX(), q.getY(), next)) {
+					getMeshBuilder().changeConnectivity().flip(edge);
 
-					vEdge = triangulation.getMesh().toLine(edge);
+					vEdge = getMesh().edges().toLine(edge);
 					if(GeometryUtils.intersectLineSegment(vEdge.x1, vEdge.y1, vEdge.x2, vEdge.y2, v1.getX(), v1.getY(), v2.getX(), v2.getY())) {
 						intersectingEdges.addLast(edge);
 					} else {
@@ -297,27 +300,25 @@ public class GenConstrainedDelaunayTriangulator<V extends IVertex, E extends IHa
 
 	private void computeDelaunayTriangulation(final boolean finalize) {
 		triangulation.init();
-		IMesh<V, E, F> mesh = triangulation.getMesh();
-
 		triangulation.insert(points);
 
 		for(VLine constrain : constrains) {
 			boolean insertPair = true;
-			IPoint p1 = mesh.createPoint(constrain.x1, constrain.y1);
-			IPoint p2 = mesh.createPoint(constrain.x2, constrain.y2);
+			IPoint p1 = getMesh().createPoint(constrain.x1, constrain.y1);
+			IPoint p2 = getMesh().createPoint(constrain.x2, constrain.y2);
 
 			E edge1 = triangulation.insert(p1);
-			V v1 = triangulation.getMesh().getVertex(edge1);
+			V v1 = getMesh().vertices().getEndOf(edge1);
 			// could not insertVertex p1
-			if(!getMesh().getPoint(v1).equals(p1)) {
+			if(!getMesh().vertices().toMutablePoint(v1).equals(p1)) {
 				logger.warn("could not insertVertex " + p1);
 				insertPair = false;
 			}
 
 			E edge2 = triangulation.insert(p2);
-			V v2 = triangulation.getMesh().getVertex(edge2);
+			V v2 = getMesh().vertices().getEndOf(edge2);
 			// could not insertVertex p2
-			if(!getMesh().getPoint(v2).equals(p2)) {
+			if(!getMesh().vertices().toMutablePoint(v2).equals(p2)) {
 				logger.warn("could not insertVertex " + p2);
 				insertPair = false;
 			}

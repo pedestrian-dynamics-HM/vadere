@@ -3,18 +3,13 @@ package org.vadere.meshing.mesh.triangulation.triangulator.gen;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.gen.MeshPanel;
-import org.vadere.meshing.mesh.gen.MeshRenderer;
-import org.vadere.meshing.mesh.inter.IFace;
-import org.vadere.meshing.mesh.inter.IHalfEdge;
+import org.vadere.meshing.mesh.inter.mesh.*;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
-import org.vadere.meshing.mesh.inter.IMesh;
-import org.vadere.meshing.mesh.inter.IVertex;
+import org.vadere.meshing.mesh.inter.mesh.builder.ITriangleMeshBuilder;
+import org.vadere.meshing.mesh.inter.mesh.data.IMeshDataStorage;
 import org.vadere.meshing.mesh.triangulation.triangulator.inter.IRefiner;
-import org.vadere.meshing.utils.color.Colors;
-import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.logging.Logger;
 
-import java.awt.*;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -177,7 +172,7 @@ public class GenRegularRefinement<V extends IVertex, E extends IHalfEdge, F exte
 	@Override
 	public void refine() {
 		if(!finished) {
-			toRefine = getMesh().streamEdges().filter(e -> edgeRefinementPredicate.test(e)).collect(Collectors.toCollection(LinkedList::new));
+			toRefine = getMesh().edges().stream().filter(e -> edgeRefinementPredicate.test(e)).collect(Collectors.toCollection(LinkedList::new));
 			refined = false;
 			if(toRefine.isEmpty()) {
 				return;
@@ -270,15 +265,20 @@ public class GenRegularRefinement<V extends IVertex, E extends IHalfEdge, F exte
 	}
 
 	@Override
-	public IMesh<V, E, F> getMesh() {
-		return triangulation.getMesh();
+	public ITriangleMeshBuilder<V, E, F> getMeshBuilder() {
+		return triangulation.getMeshBuilder();
+	}
+
+	@Override
+	public IMeshDataStorage<V, E, F> getMeshDataStorage() {
+		return triangulation.getMeshDataStorage();
 	}
 
 	private boolean isGBGBMerge(@NotNull final V v) {
-		for(E e : getMesh().getEdgeIt(v)) {
-			F f1 = getMesh().getFace(e);
-			F f2 = getMesh().getTwinFace(e);
-			if(!getMesh().isAtBoundary(e) && !(isBlue(f1) && isGreen(f2) || isGreen(f1) && isBlue(f2))) {
+		for(E e : getMesh().edges().iterableFor(v)) {
+			F f1 = getMesh().faces().getOf(e);
+			F f2 = getMesh().faces().getTwin(e);
+			if(!getMesh().edges().isAtBoundary(e) && !(isBlue(f1) && isGreen(f2) || isGreen(f1) && isBlue(f2))) {
 				return false;
 			}
 		}
@@ -286,21 +286,21 @@ public class GenRegularRefinement<V extends IVertex, E extends IHalfEdge, F exte
 	}
 
 	private boolean isGB(@NotNull final E e) {
-		F f1 = getMesh().getFace(e);
-		F f2 = getMesh().getTwinFace(e);
-		return !getMesh().isAtBoundary(e) && (isBlue(f1) && isGreen(f2) || isGreen(f1) && isBlue(f2));
+		F f1 = getMesh().faces().getOf(e);
+		F f2 = getMesh().faces().getTwin(e);
+		return !getMesh().edges().isAtBoundary(e) && (isBlue(f1) && isGreen(f2) || isGreen(f1) && isBlue(f2));
 	}
 
 	private boolean isRB(@NotNull final E e) {
-		F f1 = getMesh().getFace(e);
-		F f2 = getMesh().getTwinFace(e);
-		return !getMesh().isAtBoundary(e) && (isRed(f1) && isBlue(f2) || isBlue(f1) && isRed(f2));
+		F f1 = getMesh().faces().getOf(e);
+		F f2 = getMesh().faces().getTwin(e);
+		return !getMesh().edges().isAtBoundary(e) && (isRed(f1) && isBlue(f2) || isBlue(f1) && isRed(f2));
 	}
 
 	private boolean isRR(@NotNull final E e) {
-		F f1 = getMesh().getFace(e);
-		F f2 = getMesh().getTwinFace(e);
-		return !getMesh().isAtBoundary(e) && (isRed(f1) && isRed(f2) && isGreen(e));
+		F f1 = getMesh().faces().getOf(e);
+		F f2 = getMesh().faces().getTwin(e);
+		return !getMesh().edges().isAtBoundary(e) && (isRed(f1) && isRed(f2) && isGreen(e));
 	}
 
 	/*private boolean canFlipToCoarse(@NotNull final E edge) {
@@ -319,22 +319,25 @@ public class GenRegularRefinement<V extends IVertex, E extends IHalfEdge, F exte
 	}*/
 
 	private boolean canGGSwap(@NotNull final E edge) {
-		if(getMesh().isAtBoundary(edge)) {
+		if(getMesh().edges().isAtBoundary(edge)) {
 			return false;
 		}
 
-		F f1 = getMesh().getFace(edge);
-		F f2 = getMesh().getTwinFace(edge);
+		var faces = getMesh().faces();
+		var vertices = getMesh().vertices();
 
-		int level = getLevel(getMesh().getVertex(edge));
+		F f1 = faces.getOf(edge);
+		F f2 = faces.getTwin(edge);
+
+		int level = getLevel(vertices.getEndOf(edge));
 
 		return isGreen(f1) && isGreen(f2)
-				&& (getMesh().streamVertices(f1).allMatch(v -> getLevel(v) == level)) || (getMesh().streamVertices(f2).allMatch(v -> getLevel(v) == level));
+				&& (vertices.streamVerticesOf(f1).allMatch(v -> getLevel(v) == level)) || (vertices.streamVerticesOf(f2).allMatch(v -> getLevel(v) == level));
 
 	}
 
 	private int flipAllToCoarse(@NotNull final V vertex, boolean boundary) {
-		List<E> edges = getMesh().getEdges(vertex);
+		List<E> edges = getMesh().edges().getAllOf(vertex);
 		int degree = edges.size();
 		int requiredDegree = boundary ? 3 : 4;
 		for(E e : edges) {
@@ -350,7 +353,7 @@ public class GenRegularRefinement<V extends IVertex, E extends IHalfEdge, F exte
 
 	private void coarse(@NotNull final V vertex) {
 		if(isRemoveable(vertex)) {
-			boolean boundary = getMesh().isAtBoundary(vertex);
+			boolean boundary = getMesh().vertices().isAtBoundary(vertex);
 			int requiredDegree = boundary ? 3 : 4;
 
 			// flip as much as possible
@@ -375,56 +378,58 @@ public class GenRegularRefinement<V extends IVertex, E extends IHalfEdge, F exte
 			E prev2 = null;
 			int level;
 
+			var edges = getMesh().edges();
 
 			if(isGBGBMerge(vertex)) {
 				int vertexLevel = getLevel(vertex);
-				for(E e : getMesh().getEdgeIt(vertex)) {
-					if(!getMesh().isAtBoundary(e) && getLevel(getMesh().getTwinVertex(e)) == vertexLevel) {
+
+				for(E e : edges.iterableFor(vertex)) {
+					if(!edges.isAtBoundary(e) && getLevel(getMesh().vertices().getTwin(e)) == vertexLevel) {
 						e1 = e;
-						next1 = getMesh().getNext(e1);
-						prev1 = getMesh().getPrev(e1);
-						e2 = getMesh().getTwin(getMesh().getNext(getMesh().getTwin(next1)));
-						prev2 = getMesh().getPrev(e2);
+						next1 = edges.getNext(e1);
+						prev1 = edges.getPrev(e1);
+						e2 = edges.getTwin(edges.getNext(edges.getTwin(next1)));
+						prev2 = edges.getPrev(e2);
 						break;
 					}
 				}
 
 				level = getLevel(next1);
-				triangulation.removeSimpleLink(e1);
+				triangulation.getMeshBuilder().changeConnectivity().removeSimpleLink(e1);
 				if(!boundary) {
-					triangulation.removeSimpleLink(e2);
+					triangulation.getMeshBuilder().changeConnectivity().removeSimpleLink(e2);
 				}
-				E survivor = triangulation.remove2DVertex(vertex, true);
+				E survivor = triangulation.getMeshBuilder().changeConnectivity().remove2DVertex(vertex, true);
 				setLevel(survivor, level - 1);
-				setColor(getMesh().getFace(prev1), Coloring.RED);
+				setColor(getMesh().faces().getOf(prev1), Coloring.RED);
 				if(!boundary) {
-					setColor(getMesh().getFace(prev2), Coloring.RED);
+					setColor(getMesh().faces().getOf(prev2), Coloring.RED);
 				}
 			} else {
-				for(E e : getMesh().getEdgeIt(vertex)) {
+				for(E e : edges.iterableFor(vertex)) {
 
-					if(!getMesh().isAtBoundary(e) &&
+					if(!edges.isAtBoundary(e) &&
 							(isRed(e) ||
 							//(isRed(getMesh().getFace(e)) && isRed(getMesh().getTwinFace(e))) ||
-							(isGreen(getMesh().getFace(e)) && isBlue(getMesh().getTwinFace(e))) ||
-							(isBlue(getMesh().getFace(e)) && isGreen(getMesh().getTwinFace(e))))) {
+							(isGreen(getMesh().faces().getOf(e)) && isBlue(getMesh().faces().getTwin(e))) ||
+							(isBlue(getMesh().faces().getOf(e)) && isGreen(getMesh().faces().getTwin(e))))) {
 						e1 = e;
 						//et1 = getMesh().getTwin(e1);
-						next1 = getMesh().getNext(e1);
-						prev1 = getMesh().getPrev(e1);
-						e2 = getMesh().getTwin(getMesh().getNext(getMesh().getTwin(next1)));
-						prev2 = getMesh().getPrev(e2);
+						next1 = edges.getNext(e1);
+						prev1 = edges.getPrev(e1);
+						e2 = edges.getTwin(edges.getNext(edges.getTwin(next1)));
+						prev2 = edges.getPrev(e2);
 						break;
 					}
 				}
 
 				level = getLevel(next1);
-				triangulation.removeSimpleLink(e1);
+				triangulation.getMeshBuilder().changeConnectivity().removeSimpleLink(e1);
 				if(!boundary) {
-					triangulation.removeSimpleLink(e2);
+					triangulation.getMeshBuilder().changeConnectivity().removeSimpleLink(e2);
 				}
 
-				E survivor = triangulation.remove2DVertex(vertex, true);
+				E survivor = triangulation.getMeshBuilder().changeConnectivity().remove2DVertex(vertex, true);
 				setLevel(survivor, level - 1);
 			}
 		} else {
@@ -455,14 +460,14 @@ public class GenRegularRefinement<V extends IVertex, E extends IHalfEdge, F exte
 				toRefine.addLast(edge);
 			}
 
-			E twin = getMesh().getTwin(edge);
-			F f1 = getMesh().getFace(edge);
-			F f2 = getMesh().getTwinFace(edge);
+			E twin = getMesh().edges().getTwin(edge);
+			F f1 = getMesh().faces().getOf(edge);
+			F f2 = getMesh().faces().getTwin(edge);
 
 			if(!isRefinable(edge, f1)) {
 				if(isBlue(f1)) {
 					E redEdge = findRed(f1);
-					E greenEdge = findGreen(getMesh().getTwinFace(redEdge));
+					E greenEdge = findGreen(getMesh().faces().getTwin(redEdge));
 					if(!greenEdge.equals(edge)) {
 						refine(greenEdge, dept+1);
 					}
@@ -477,7 +482,7 @@ public class GenRegularRefinement<V extends IVertex, E extends IHalfEdge, F exte
 			if(!isRefinable(twin, f2)) {
 				if(isBlue(f2)) {
 					E redEdge = findRed(f2);
-					E greenEdge = findGreen(getMesh().getTwinFace(redEdge));
+					E greenEdge = findGreen(getMesh().faces().getTwin(redEdge));
 					if(!greenEdge.equals(edge)) {
 						refine(greenEdge, dept+1);
 					}
@@ -494,16 +499,16 @@ public class GenRegularRefinement<V extends IVertex, E extends IHalfEdge, F exte
 	// RGB-Subdivision
 
 	private boolean invalid(@NotNull final E edge) {
-		E twin = getMesh().getTwin(edge);
-		if(!getMesh().isAtBoundary(edge) && isRed(edge) &&
-				(isRed(getMesh().getNext(edge)) || isRed(getMesh().getPrev(edge)) || isRed(getMesh().getNext(twin)) || isRed(getMesh().getPrev(twin)))) {
+		E twin = getMesh().edges().getTwin(edge);
+		if(!getMesh().edges().isAtBoundary(edge) && isRed(edge) &&
+				(isRed(getMesh().edges().getNext(edge)) || isRed(getMesh().edges().getPrev(edge)) || isRed(getMesh().edges().getNext(twin)) || isRed(getMesh().edges().getPrev(twin)))) {
 			return true;
 		}
 		return false;
 	}
 
 	private List<E> valid() {
-		return getMesh().streamEdges().filter(e -> invalid(e)).collect(Collectors.toList());
+		return getMesh().edges().stream().filter(e -> invalid(e)).collect(Collectors.toList());
 	}
 
 	/**
@@ -511,19 +516,19 @@ public class GenRegularRefinement<V extends IVertex, E extends IHalfEdge, F exte
 	 * @param edge
 	 */
 	private void splitGreen(@NotNull final E edge) {
-		boolean isBoundary1 = getMesh().isBoundary(edge);
-		boolean isBoundary2 = getMesh().isBoundary(getMesh().getTwin(edge));
+		boolean isBoundary1 = getMesh().edges().isBoundary(edge);
+		boolean isBoundary2 = getMesh().edges().isBoundary(getMesh().edges().getTwin(edge));
 
-		boolean isGreen1 = !isBoundary1 && isGreen(getMesh().getFace(edge));
-		boolean isGreen2 = !isBoundary2 && isGreen(getMesh().getTwinFace(edge));
+		boolean isGreen1 = !isBoundary1 && isGreen(getMesh().faces().getOf(edge));
+		boolean isGreen2 = !isBoundary2 && isGreen(getMesh().faces().getTwin(edge));
 
 //		boolean isRed1 = isRed(getMesh().getFace(edge));
 //		boolean isRed2 = isRed(getMesh().getTwinFace(edge));
 
 		int level = getLevel(edge);
 
-		V v1 = !isBoundary1 ? getMesh().getOpposite(edge) : null;
-		V v2 = !isBoundary2 ? getMesh().getOpposite(getMesh().getTwin(edge)) : null;
+		V v1 = !isBoundary1 ? getMesh().vertices().getOpposite(edge) : null;
+		V v2 = !isBoundary2 ? getMesh().vertices().getOpposite(getMesh().edges().getTwin(edge)) : null;
 
 		// split operation
 		V v = split(edge);
@@ -532,22 +537,22 @@ public class GenRegularRefinement<V extends IVertex, E extends IHalfEdge, F exte
 
 		// adjust the possible two edges that split the old faces
 		if(!isBoundary1) {
-			adjustMiddleEdge(getMesh().getEdge(v1, v).get(), level, isGreen1);
+			adjustMiddleEdge(getMesh().edges().getOf(v1, v).get(), level, isGreen1);
 		}
 
 		if(!isBoundary2) {
-			adjustMiddleEdge(getMesh().getEdge(v2, v).get(), level, isGreen2);
+			adjustMiddleEdge(getMesh().edges().getOf(v2, v).get(), level, isGreen2);
 		}
 
-		for(E e : getMesh().getEdgeIt(v)) {
+		for(E e : getMesh().edges().iterableFor(v)) {
 			if(edgeRefinementPredicate.test(e)) {
 				toRefine.addLast(e);
 			}
 
 			//TODO: required?
-			E pe = getMesh().getPrev(e);
+			E pe = getMesh().edges().getPrev(e);
 			if(edgeRefinementPredicate.test(pe)) {
-				toRefine.addLast(getMesh().getPrev(pe));
+				toRefine.addLast(getMesh().edges().getPrev(pe));
 			}
 		}
 
@@ -574,50 +579,50 @@ public class GenRegularRefinement<V extends IVertex, E extends IHalfEdge, F exte
 			setGreen(edge);
 			setLevel(edge, level + 1);
 
-			if(canFlipToRefine(getMesh().getNext(edge))) {
-				flipToRefine(getMesh().getNext(edge));
+			if(canFlipToRefine(getMesh().edges().getNext(edge))) {
+				flipToRefine(getMesh().edges().getNext(edge));
 			}
 
-			E e1Twin = getMesh().getTwin(edge);
-			if(canFlipToRefine(getMesh().getPrev(e1Twin))) {
-				flipToRefine(getMesh().getPrev(e1Twin));
+			E e1Twin = getMesh().edges().getTwin(edge);
+			if(canFlipToRefine(getMesh().edges().getPrev(e1Twin))) {
+				flipToRefine(getMesh().edges().getPrev(e1Twin));
 			}
 		}
 	}
 
 	private V split(@NotNull final E edge) {
-		boolean isBoundary1 = getMesh().isBoundary(edge);
-		boolean isBoundary2 = getMesh().isBoundary(getMesh().getTwin(edge));
+		boolean isBoundary1 = getMesh().edges().isBoundary(edge);
+		boolean isBoundary2 = getMesh().edges().isBoundary(getMesh().edges().getTwin(edge));
 
-		E prev = getMesh().getPrev(edge);
-		E next = getMesh().getNext(edge);
-		E twin = getMesh().getTwin(edge);
-		E twinNext = getMesh().getNext(twin);
+		E prev = getMesh().edges().getPrev(edge);
+		E next = getMesh().edges().getNext(edge);
+		E twin = getMesh().edges().getTwin(edge);
+		E twinNext = getMesh().edges().getNext(twin);
 		boolean flipable = isFlipable(edge);
 
-		V v1 = getMesh().getVertex(next);
-		V v2 = getMesh().getVertex(twinNext);
+		V v1 = getMesh().vertices().getEndOf(next);
+		V v2 = getMesh().vertices().getEndOf(twinNext);
 		int level = getLevel(edge);
 
-		Pair<E, E> split = triangulation.splitEdge(edge, false);
-		V v = getMesh().getVertex(split.getLeft());
+		Pair<E, E> split = triangulation.getMeshBuilder().changeConnectivity().splitEdge(edge, false);
+		V v = getMesh().vertices().getEndOf(split.getLeft());
 
 		setLevel(v, level + 1);
 
-		setLevel(getMesh().getNext(prev), level + 1);
-		setLevel(getMesh().getPrev(next), level + 1);
-		setColor(getMesh().getNext(prev), Coloring.GREEN);
-		setColor(getMesh().getPrev(next), Coloring.GREEN);
-		setFlipable(getMesh().getNext(prev), flipable);
-		setFlipable(getMesh().getPrev(next), flipable);
+		setLevel(getMesh().edges().getNext(prev), level + 1);
+		setLevel(getMesh().edges().getPrev(next), level + 1);
+		setColor(getMesh().edges().getNext(prev), Coloring.GREEN);
+		setColor(getMesh().edges().getPrev(next), Coloring.GREEN);
+		setFlipable(getMesh().edges().getNext(prev), flipable);
+		setFlipable(getMesh().edges().getPrev(next), flipable);
 
 		if(!isBoundary1) {
-			E e1 = getMesh().getEdge(v1, v).get();
+			E e1 = getMesh().edges().getOf(v1, v).get();
 			setFlipable(e1, true);
 		}
 
 		if(!isBoundary2) {
-			E e2 = getMesh().getEdge(v2, v).get();
+			E e2 = getMesh().edges().getOf(v2, v).get();
 			setFlipable(e2, true);
 		}
 		return v;
@@ -626,13 +631,13 @@ public class GenRegularRefinement<V extends IVertex, E extends IHalfEdge, F exte
 	private void flipToRefine(@NotNull final E edge) {
 		if(canFlipToRefine(edge) && isFlipable(edge)) {
 
-			F f1 = getMesh().getFace(edge);
-			F f2 = getMesh().getTwinFace(edge);
-			E twin = getMesh().getTwin(edge);
+			F f1 = getMesh().faces().getOf(edge);
+			F f2 = getMesh().faces().getTwin(edge);
+			E twin = getMesh().edges().getTwin(edge);
 
 
 			int level = getLevel(edge);
-			triangulation.flip(edge);
+			triangulation.getMeshBuilder().changeConnectivity().flip(edge);
 
 			setLevel(edge, level + 1);
 			//setLevel(f1, level + 1);
@@ -656,24 +661,24 @@ public class GenRegularRefinement<V extends IVertex, E extends IHalfEdge, F exte
 
 	private boolean flipToCoarse(@NotNull final E edge) {
 		if(isFlipable(edge)) {
-			F f1 = getMesh().getFace(edge);
-			F f2 = getMesh().getTwinFace(edge);
-			E twin = getMesh().getTwin(edge);
+			F f1 = getMesh().faces().getOf(edge);
+			F f2 = getMesh().faces().getTwin(edge);
+			E twin = getMesh().edges().getTwin(edge);
 
 			int level = getLevel(edge);
 
 			if(canGGSwap(edge)) {
-				triangulation.flip(edge);
+				triangulation.getMeshBuilder().changeConnectivity().flip(edge);
 				setLevel(edge, level - 1);
 				setColor(edge, Coloring.RED);
 				return true;
 			} else if(isBlue(f1) && isBlue(f2) && isRed(edge)) {
-				triangulation.flip(edge);
+				triangulation.getMeshBuilder().changeConnectivity().flip(edge);
 				setLevel(edge, level + 1);
 				setColor(edge, Coloring.GREEN);
 				return true;
 			} else if(isRed(edge) && ((isBlue(f2) && isRed(f1)) || (isBlue(f1) && isRed(f2)))) {
-				triangulation.flip(edge);
+				triangulation.getMeshBuilder().changeConnectivity().flip(edge);
 				return true;
 			}
 
@@ -697,7 +702,7 @@ public class GenRegularRefinement<V extends IVertex, E extends IHalfEdge, F exte
 	private E findGreen(@NotNull final F face) {
 		int level = Integer.MAX_VALUE;
 		E result = null;
-		for(E e : getMesh().getEdgeIt(face)) {
+		for(E e : getMesh().edges().iterableFor(face)) {
 			if(isGreen(e) && getLevel(e) < level) {
 				level = getLevel(e);
 				result = e;
@@ -709,7 +714,7 @@ public class GenRegularRefinement<V extends IVertex, E extends IHalfEdge, F exte
 	private E findRed(@NotNull final F face) {
 		int level = Integer.MAX_VALUE;
 		E result = null;
-		for(E e : getMesh().getEdgeIt(face)) {
+		for(E e : getMesh().edges().iterableFor(face)) {
 			if(isRed(e) && getLevel(e) < level) {
 				level = getLevel(e);
 				result = e;
@@ -719,14 +724,14 @@ public class GenRegularRefinement<V extends IVertex, E extends IHalfEdge, F exte
 	}
 
 	private boolean canFlipToRefine(@NotNull final E edge) {
-		F f1 = getMesh().getFace(edge);
-		F f2 = getMesh().getTwinFace(edge);
-		return !getMesh().isAtBoundary(edge) && isRed(edge) && isBlue(f1) && isBlue(f2) && getLevel(edge) == getLevel(f1) && getLevel(edge) == getLevel(f2);
+		F f1 = getMesh().faces().getOf(edge);
+		F f2 = getMesh().faces().getTwin(edge);
+		return !getMesh().edges().isAtBoundary(edge) && isRed(edge) && isBlue(f1) && isBlue(f2) && getLevel(edge) == getLevel(f1) && getLevel(edge) == getLevel(f2);
 	}
 
 	private boolean isRemoveable(@NotNull V vertex) {
 		int level = getLevel(vertex);
-		return level > 0 && level >= getMesh().streamVertices(vertex).mapToInt(v -> getLevel(v)).max().orElse(0);
+		return level > 0 && level >= getMesh().vertices().streamVerticesOf(vertex).mapToInt(v -> getLevel(v)).max().orElse(0);
 	}
 
 	/**
@@ -737,14 +742,14 @@ public class GenRegularRefinement<V extends IVertex, E extends IHalfEdge, F exte
 	 * @return true if the edge is refinable, false otherwise
 	 */
 	private boolean isRefinable(@NotNull E edge) {
-		boolean refinable1 = isRefinable(edge, getMesh().getFace(edge));
-		boolean refinable2 = isRefinable(getMesh().getTwin(edge), getMesh().getTwinFace(edge));
+		boolean refinable1 = isRefinable(edge, getMesh().faces().getOf(edge));
+		boolean refinable2 = isRefinable(getMesh().edges().getTwin(edge), getMesh().faces().getTwin(edge));
 		return  refinable1 && refinable2;
 	}
 
 	private boolean isRefinable(@NotNull E edge, @NotNull F face) {
 		int level = getLevel(edge);
-		return isGreen(edge) && (getMesh().isBoundary(edge) || getLevel(face) == level);
+		return isGreen(edge) && (getMesh().edges().isBoundary(edge) || getLevel(face) == level);
 	}
 
 	public boolean isGreen(@NotNull E edge) {
@@ -762,10 +767,10 @@ public class GenRegularRefinement<V extends IVertex, E extends IHalfEdge, F exte
 	 * @return true if if the triangle is blue, false otherwise
 	 */
 	public boolean isBlue(@NotNull final F face) {
-		assert getMesh().getVertices(face).size() == 3;
-		E e1 = getMesh().getEdge(face);
-		E e2 = getMesh().getNext(e1);
-		E e3 = getMesh().getNext(e2);
+		assert getMesh().vertices().getAllOf(face).size() == 3;
+		E e1 = getMesh().edges().getAnyOf(face);
+		E e2 = getMesh().edges().getNext(e1);
+		E e3 = getMesh().edges().getNext(e2);
 		int level1 = getLevel(e1);
 		int level2 = getLevel(e2);
 		int level3 = getLevel(e3);
@@ -780,9 +785,9 @@ public class GenRegularRefinement<V extends IVertex, E extends IHalfEdge, F exte
 	 */
 	public boolean isRed(@NotNull final F face) {
 		//assert getMesh().getVertices(face).size() == 3;
-		E e1 = getMesh().getEdge(face);
-		E e2 = getMesh().getNext(e1);
-		E e3 = getMesh().getNext(e2);
+		E e1 = getMesh().edges().getAnyOf(face);
+		E e2 = getMesh().edges().getNext(e1);
+		E e3 = getMesh().edges().getNext(e2);
 		int level1 = getLevel(e1);
 		int level2 = getLevel(e2);
 		int level3 = getLevel(e3);
@@ -796,19 +801,19 @@ public class GenRegularRefinement<V extends IVertex, E extends IHalfEdge, F exte
 	 * @return true if the triangle is green, false otherwise
 	 */
 	public boolean isGreen(@NotNull final F face) {
-		assert getMesh().getVertices(face).size() == 3;
-		E e1 = getMesh().getEdge(face);
-		E e2 = getMesh().getNext(e1);
-		E e3 = getMesh().getNext(e2);
+		assert getMesh().vertices().getAllOf(face).size() == 3;
+		E e1 = getMesh().edges().getAnyOf(face);
+		E e2 = getMesh().edges().getNext(e1);
+		E e3 = getMesh().edges().getNext(e2);
 		return getLevel(e1) == getLevel(e2) && getLevel(e1) == getLevel(e3);
 	}
 
 	private int getLevel(@NotNull final V vertex) {
-		return getMesh().getIntegerData(vertex, propertyLevel);
+		return getMeshDataStorage().getIntegerData(vertex, propertyLevel);
 	}
 
 	public int getLevel(@NotNull final E edge) {
-		int level = getMesh().getIntegerData(edge, propertyLevel);;
+		int level = getMeshDataStorage().getIntegerData(edge, propertyLevel);;
 		return level;
 	}
 
@@ -819,25 +824,25 @@ public class GenRegularRefinement<V extends IVertex, E extends IHalfEdge, F exte
 	 * @return the level of the triangle
 	 */
 	private int getLevel(@NotNull final F face) {
-		assert getMesh().getVertices(face).size() == 3;
-		E e1 = getMesh().getEdge(face);
-		E e2 = getMesh().getNext(e1);
-		E e3 = getMesh().getNext(e2);
+		assert getMesh().vertices().getAllOf(face).size() == 3;
+		E e1 = getMesh().edges().getAnyOf(face);
+		E e2 = getMesh().edges().getNext(e1);
+		E e3 = getMesh().edges().getNext(e2);
 		return Math.min(getLevel(e1), Math.min(getLevel(e2), getLevel(e3)));
 	}
 
 	public void setLevel(@NotNull final V vertex, final int level) {
-		getMesh().setIntegerData(vertex, propertyLevel, level);
+		getMeshDataStorage().setIntegerData(vertex, propertyLevel, level);
 	}
 
 	public void setLevel(@NotNull final E edge, final int level) {
-		getMesh().setIntegerData(edge, propertyLevel, level);
-		getMesh().setIntegerData(getMesh().getTwin(edge), propertyLevel, level);
+		getMeshDataStorage().setIntegerData(edge, propertyLevel, level);
+		getMeshDataStorage().setIntegerData(getMesh().edges().getTwin(edge), propertyLevel, level);
 	}
 
 	public void setFlipable(@NotNull final E edge, final boolean flipable) {
-		getMesh().setBooleanData(edge, propertyFlipable, flipable);
-		getMesh().setBooleanData(getMesh().getTwin(edge), propertyFlipable, flipable);
+		getMeshDataStorage().setBooleanData(edge, propertyFlipable, flipable);
+		getMeshDataStorage().setBooleanData(getMesh().edges().getTwin(edge), propertyFlipable, flipable);
 	}
 
 	/**
@@ -848,33 +853,33 @@ public class GenRegularRefinement<V extends IVertex, E extends IHalfEdge, F exte
 	 * @return true if the edge is not part of any edge of the base triangulation, false otherwise
 	 */
 	private boolean isFlipable(@NotNull final E edge){
-		return getMesh().getBooleanData(edge, propertyFlipable);
+		return getMeshDataStorage().getBooleanData(edge, propertyFlipable);
 	}
 
 	private Coloring getColor(@NotNull final V vertex) {
-		return getMesh().getData(vertex, propertyColor, Coloring.class).orElse(Coloring.GREEN);
+		return getMeshDataStorage().getData(vertex, propertyColor, Coloring.class).orElse(Coloring.GREEN);
 	}
 
 	private Coloring getColor(@NotNull final E edge) {
-		Optional<Coloring> color = getMesh().getData(edge, propertyColor, Coloring.class);
+		Optional<Coloring> color = getMeshDataStorage().getData(edge, propertyColor, Coloring.class);
 		return color.orElse(Coloring.GREEN);
 	}
 
 	private Coloring getColor(@NotNull final F face) {
-		return getMesh().getData(face, propertyColor, Coloring.class).orElse(Coloring.GREEN);
+		return getMeshDataStorage().getData(face, propertyColor, Coloring.class).orElse(Coloring.GREEN);
 	}
 
 	private void setColor(@NotNull final V vertex, final Coloring coloring) {
-		getMesh().setData(vertex, propertyColor, coloring);
+		getMeshDataStorage().setData(vertex, propertyColor, coloring);
 	}
 
 	private void setColor(@NotNull final E edge, final Coloring coloring) {
-		getMesh().setData(edge, propertyColor, coloring);
-		getMesh().setData(getMesh().getTwin(edge), propertyColor, coloring);
+		getMeshDataStorage().setData(edge, propertyColor, coloring);
+		getMeshDataStorage().setData(getMesh().edges().getTwin(edge), propertyColor, coloring);
 	}
 
 	private void setColor(@NotNull final F face, final Coloring coloring) {
-		getMesh().setData(face, propertyColor, coloring);
+		getMeshDataStorage().setData(face, propertyColor, coloring);
 	}
 
 	public void setMaxLevel(int maxLevel) {

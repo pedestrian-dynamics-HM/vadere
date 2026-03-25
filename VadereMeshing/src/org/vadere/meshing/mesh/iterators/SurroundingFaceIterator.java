@@ -1,11 +1,10 @@
 package org.vadere.meshing.mesh.iterators;
 
 import org.jetbrains.annotations.NotNull;
-import org.vadere.meshing.mesh.inter.IFace;
-import org.vadere.meshing.mesh.inter.IHalfEdge;
-import org.vadere.meshing.mesh.inter.IMesh;
-import org.vadere.meshing.mesh.inter.IVertex;
-import org.vadere.util.geometry.shapes.IPoint;
+import org.vadere.meshing.mesh.inter.mesh.IFace;
+import org.vadere.meshing.mesh.inter.mesh.IHalfEdge;
+import org.vadere.meshing.mesh.inter.mesh.IMesh;
+import org.vadere.meshing.mesh.inter.mesh.IVertex;
 
 import java.util.Iterator;
 
@@ -24,7 +23,7 @@ public class SurroundingFaceIterator<V extends IVertex, E extends IHalfEdge, F e
 	private IMesh<V, E, F> mesh;
 
 	public SurroundingFaceIterator(@NotNull final IMesh<V, E, F> mesh, @NotNull final F face) {
-		assert mesh.isAlive(face);
+		assert mesh.faces().isAlive(face);
 		this.mesh = mesh;
 		this.edgeIterator = new EdgeIterator<>(mesh, face);
 	}
@@ -36,6 +35,6 @@ public class SurroundingFaceIterator<V extends IVertex, E extends IHalfEdge, F e
 
 	@Override
 	public F next() {
-		return mesh.getTwinFace(edgeIterator.next());
+		return mesh.faces().getTwin(edgeIterator.next());
 	}
 }

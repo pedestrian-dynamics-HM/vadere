@@ -1,13 +1,14 @@
 package org.vadere.meshing.mesh.triangulation.plots;
 
 import org.apache.commons.lang3.time.StopWatch;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.*;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AFace;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AHalfEdge;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AVertex;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.triangles.ATriangleMesh;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.triangles.ATriangleMeshBuilder;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.math.IDistanceFunction;
-import org.vadere.meshing.mesh.gen.AFace;
-import org.vadere.meshing.mesh.gen.AHalfEdge;
-import org.vadere.meshing.mesh.gen.AMesh;
-import org.vadere.meshing.mesh.gen.AVertex;
-import org.vadere.meshing.mesh.inter.IMeshSupplier;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
@@ -33,7 +34,6 @@ public class  TriangleQuality{
 	private static final double initialEdgeLength = 1.5;
 
 	private static void stepUniformRing(double startLen) {
-		IMeshSupplier<AVertex, AHalfEdge, AFace> supplier = () -> new AMesh();
 		IDistanceFunction distanceFunc = p -> Math.abs(7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 3;
 		List<VShape> obstacles = new ArrayList<>();
 
@@ -47,7 +47,7 @@ public class  TriangleQuality{
 				uniformEdgeLength,
 				initialEdgeLength,
 				bbox, obstacles,
-				supplier);
+				ATriangleMeshBuilder::new);
 
 		//79 480
 		StopWatch overAllTime = new StopWatch();
@@ -64,9 +64,9 @@ public class  TriangleQuality{
 			step++;
 		} while (!meshGenerator.isFinished());
 
-		log.info("#vertices: " + meshGenerator.getMesh().getVertices().size());
-		log.info("#edges: " + meshGenerator.getMesh().getEdges().size());
-		log.info("#faces: " + meshGenerator.getMesh().getFaces().size());
+		log.info("#vertices: " + meshGenerator.getMeshBuilder().getMesh().vertices().count());
+		log.info("#edges: " + meshGenerator.getMeshBuilder().getMesh().edges().count());
+		log.info("#faces: " + meshGenerator.getMeshBuilder().getMesh().faces().count());
 		log.info("quality: " + meshGenerator.getQuality());
 		log.info("#step: " + steps);
 		log.info("overall time: " + overAllTime.getTime() + "[ms]");
@@ -85,7 +85,6 @@ public class  TriangleQuality{
 	}
 
 	private static void resultUniformRing(double startLen) {
-		IMeshSupplier<AVertex, AHalfEdge, AFace> supplier = () -> new AMesh();
 		IDistanceFunction distanceFunc = p -> Math.abs(7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 3;
 		List<VShape> obstacles = new ArrayList<>();
 
@@ -97,7 +96,7 @@ public class  TriangleQuality{
 				uniformEdgeLength,
 				initialEdgeLength,
 				bbox, obstacles,
-				supplier);
+				ATriangleMeshBuilder::new);
 
 		//79 480
 		StopWatch overAllTime = new StopWatch();
@@ -112,9 +111,9 @@ public class  TriangleQuality{
 			step++;
 		} while (!meshGenerator.isFinished());
 
-		log.info("#vertices: " + meshGenerator.getMesh().getVertices().size());
-		log.info("#edges: " + meshGenerator.getMesh().getEdges().size());
-		log.info("#faces: " + meshGenerator.getMesh().getFaces().size());
+		log.info("#vertices: " + meshGenerator.getMeshBuilder().getMesh().vertices().count());
+		log.info("#edges: " + meshGenerator.getMeshBuilder().getMesh().edges().count());
+		log.info("#faces: " + meshGenerator.getMeshBuilder().getMesh().faces().count());
 		log.info("quality: " + meshGenerator.getQuality());
 		log.info("#step: " + step);
 		log.info("overall time: " + overAllTime.getTime() + "[ms]");
@@ -128,12 +127,11 @@ public class  TriangleQuality{
 
 
 		System.out.println("print qualities for unified tri " + initialEdgeLength);
-		System.out.println("quality: [" + meshGenerator.getMesh().getFaces().stream().map(f -> meshGenerator.faceToQuality(f)).map(n -> n+"").reduce("", (s1,s2) -> s1 + "," + s2).substring(1) + "]");
-		System.out.println("#none acute triangles: " + meshGenerator.getMesh().getFaces().stream().map(f -> meshGenerator.getMesh().toTriangle(f)).filter(t -> t.isNonAcute()).count());
+		System.out.println("quality: [" + meshGenerator.getMesh().faces().stream().map(f -> meshGenerator.faceToQuality(f)).map(n -> n+"").reduce("", (s1, s2) -> s1 + "," + s2).substring(1) + "]");
+		System.out.println("#none acute triangles: " + meshGenerator.getMesh().faces().stream().map(f -> meshGenerator.getMeshBuilder().getMesh().faces().toTriangle(f)).filter(t -> t.isNonAcute()).count());
 	}
 
 	private static void resultAdaptiveRing(double startLen) {
-		IMeshSupplier<AVertex, AHalfEdge, AFace> supplier = () -> new AMesh();
 		IDistanceFunction distanceFunc = p -> Math.abs(7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 3;
 		List<VShape> obstacles = new ArrayList<>();
 		IEdgeLengthFunction edgeLengthFunc = p -> initialEdgeLength + Math.abs(distanceFunc.apply(p)) * 0.5;
@@ -146,7 +144,7 @@ public class  TriangleQuality{
 				edgeLengthFunc,
 				initialEdgeLength,
 				bbox, obstacles,
-				supplier);
+				ATriangleMeshBuilder::new);
 
 		//79 480
 		StopWatch overAllTime = new StopWatch();
@@ -161,14 +159,14 @@ public class  TriangleQuality{
 			step++;
 		} while (!meshGenerator.isFinished());
 
-		log.info("#vertices: " + meshGenerator.getMesh().getVertices().size());
-		log.info("#edges: " + meshGenerator.getMesh().getEdges().size());
-		log.info("#faces: " + meshGenerator.getMesh().getFaces().size());
+		log.info("#vertices: " + meshGenerator.getMeshBuilder().getMesh().vertices().count());
+		log.info("#edges: " + meshGenerator.getMeshBuilder().getMesh().edges().count());
+		log.info("#faces: " + meshGenerator.getMeshBuilder().getMesh().faces().count());
 		log.info("quality: " + meshGenerator.getQuality());
 		log.info("#step: " + step);
 		log.info("overall time: " + overAllTime.getTime() + "[ms]");
 
-		MeshPanel<AVertex, AHalfEdge, AFace> distmeshPanel = new MeshPanel(meshGenerator.getMesh(), f -> false, 1000, 800);
+		MeshPanel<AVertex, AHalfEdge, AFace> distmeshPanel = new MeshPanel<>(meshGenerator.getMesh(), f -> false, 1000, 800);
 		JFrame frame = distmeshPanel.display();
 		frame.setVisible(true);
 		frame.setTitle("uniformRing()");
@@ -177,12 +175,11 @@ public class  TriangleQuality{
 
 
 		System.out.println("print qualities for unified tri " + initialEdgeLength);
-		System.out.println("quality: [" + meshGenerator.getMesh().getFaces().stream().map(f -> meshGenerator.faceToQuality(f)).map(n -> n+"").reduce("", (s1,s2) -> s1 + "," + s2).substring(1) + "]");
-		System.out.println("#none acute triangles: " + meshGenerator.getMesh().getFaces().stream().map(f -> meshGenerator.getMesh().toTriangle(f)).filter(t -> t.isNonAcute()).count());
+		System.out.println("quality: [" + meshGenerator.getMeshBuilder().getMesh().faces().stream().map(f -> meshGenerator.faceToQuality(f)).map(n -> n+"").reduce("", (s1, s2) -> s1 + "," + s2).substring(1) + "]");
+		System.out.println("#none acute triangles: " + meshGenerator.getMeshBuilder().getMesh().faces().stream().map(f -> meshGenerator.getMeshBuilder().getMesh().faces().toTriangle(f)).filter(t -> t.isNonAcute()).count());
 	}
 
 	private static void stepAdativeRing(double startLen) {
-		IMeshSupplier<AVertex, AHalfEdge, AFace> supplier = () -> new AMesh();
 		IDistanceFunction distanceFunc = p -> Math.abs(7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 3;
 		List<VShape> obstacles = new ArrayList<>();
 
@@ -197,7 +194,7 @@ public class  TriangleQuality{
 				edgeLengthFunc,
 				initialEdgeLength,
 				bbox, obstacles,
-				supplier);
+				ATriangleMeshBuilder::new);
 
 		//79 480
 		StopWatch overAllTime = new StopWatch();
@@ -214,9 +211,9 @@ public class  TriangleQuality{
 			step++;
 		} while (!meshGenerator.isFinished());
 
-		log.info("#vertices: " + meshGenerator.getMesh().getVertices().size());
-		log.info("#edges: " + meshGenerator.getMesh().getEdges().size());
-		log.info("#faces: " + meshGenerator.getMesh().getFaces().size());
+		log.info("#vertices: " + meshGenerator.getMeshBuilder().getMesh().vertices().count());
+		log.info("#edges: " + meshGenerator.getMeshBuilder().getMesh().edges().count());
+		log.info("#faces: " + meshGenerator.getMeshBuilder().getMesh().faces().count());
 		log.info("quality: " + meshGenerator.getQuality());
 		log.info("#step: " + steps);
 		log.info("overall time: " + overAllTime.getTime() + "[ms]");

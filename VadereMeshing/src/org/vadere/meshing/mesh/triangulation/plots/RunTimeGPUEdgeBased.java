@@ -1,13 +1,14 @@
 package org.vadere.meshing.mesh.triangulation.plots;
 
 import org.apache.commons.lang3.time.StopWatch;
-import org.vadere.meshing.mesh.gen.AFace;
-import org.vadere.meshing.mesh.gen.AHalfEdge;
-import org.vadere.meshing.mesh.gen.AMesh;
-import org.vadere.meshing.mesh.gen.AVertex;
 import org.vadere.meshing.mesh.gen.MeshPanel;
-import org.vadere.meshing.mesh.inter.IMeshSupplier;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AFace;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AHalfEdge;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AVertex;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.triangles.ATriangleMesh;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.triangles.ATriangleMeshBuilder;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
+import org.vadere.meshing.mesh.inter.mesh.builder.ITriangleMeshBuilder;
 import org.vadere.meshing.mesh.triangulation.edgeLengthFunctions.IEdgeLengthFunction;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.opencl.CLEikMesh;
@@ -19,6 +20,7 @@ import org.vadere.util.opencl.OpenCLException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 import javax.swing.*;
 
@@ -36,7 +38,7 @@ public class RunTimeGPUEdgeBased extends JFrame {
 
     private static void overallUniformRing() {
 
-		IMeshSupplier<AVertex, AHalfEdge, AFace> supplier = () -> new AMesh();
+		Supplier<ITriangleMeshBuilder<AVertex, AHalfEdge, AFace>> supplier = ATriangleMeshBuilder::new;
 		IDistanceFunction distanceFunc = p -> Math.abs(7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 3;
 		List<VShape> obstacles = new ArrayList<>();
 
@@ -54,14 +56,16 @@ public class RunTimeGPUEdgeBased extends JFrame {
 			meshGenerator.generate();
 			overAllTime.stop();
 
-			log.info("#vertices: " + meshGenerator.getMesh().getVertices().size());
-			log.info("#edges: " + meshGenerator.getMesh().getEdges().size());
-			log.info("#faces: " + meshGenerator.getMesh().getFaces().size());
+			ATriangleMesh mesh = meshGenerator.getMesh();
+
+			log.info("#vertices: " + mesh.vertices().count());
+			log.info("#edges: " + mesh.edges().count());
+			log.info("#faces: " + mesh.faces().count());
 			log.info("quality" + meshGenerator.getQuality());
 			log.info("overall time: " + overAllTime.getTime() + "[ms]");
 
-			nVertices.add(meshGenerator.getMesh().getVertices().size());
-			runTimes.add( overAllTime.getTime());
+			nVertices.add(mesh.vertices().count());
+			runTimes.add(overAllTime.getTime());
 
 			MeshPanel<AVertex, AHalfEdge, AFace> distmeshPanel = new MeshPanel(meshGenerator.getMesh(), f -> false, 1000, 800);
 			JFrame frame = distmeshPanel.display();
@@ -78,7 +82,7 @@ public class RunTimeGPUEdgeBased extends JFrame {
 	}
 
 	private static void stepUniformRing(double startLen, double endLen, double stepLen) throws OpenCLException {
-		IMeshSupplier<AVertex, AHalfEdge, AFace> supplier = () -> new AMesh();
+		Supplier<ITriangleMeshBuilder<AVertex, AHalfEdge, AFace>> supplier = ATriangleMeshBuilder::new;
 		IDistanceFunction distanceFunc = p -> Math.abs(7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 3;
 		List<VShape> obstacles = new ArrayList<>();
 
@@ -111,17 +115,17 @@ public class RunTimeGPUEdgeBased extends JFrame {
 			meshGenerator.finish();
 
 			log.info("initial edge length: " + initialEdgeLength);
-			log.info("#vertices: " + meshGenerator.getMesh().getVertices().size());
-			log.info("#edges: " + meshGenerator.getMesh().getEdges().size());
-			log.info("#faces: " + meshGenerator.getMesh().getFaces().size());
+			log.info("#vertices: " + meshGenerator.getMesh().vertices().count());
+			log.info("#edges: " + meshGenerator.getMesh().edges().count());
+			log.info("#faces: " + meshGenerator.getMesh().faces().count());
 			log.info("quality: " + meshGenerator.getQuality());
 			log.info("#step: " + steps);
 			log.info("overall time: " + overAllTime.getTime() + "[ms]");
 			log.info("step avg time: " + (double)overAllTime.getNanoTime() / steps + "[ns]");
 			log.info("step avg time: " + (double)overAllTime.getTime() / steps + "[ms]");
 
-			nVertices.add(meshGenerator.getMesh().getVertices().size());
-			runTimes.add( overAllTime.getTime());
+			nVertices.add(meshGenerator.getMesh().vertices().count());
+			runTimes.add(overAllTime.getTime());
 
 			MeshPanel<AVertex, AHalfEdge, AFace> distmeshPanel = new MeshPanel(meshGenerator.getMesh(), f -> false, 1000, 800);
 			JFrame frame = distmeshPanel.display();

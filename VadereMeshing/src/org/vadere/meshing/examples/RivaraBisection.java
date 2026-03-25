@@ -1,8 +1,8 @@
 package org.vadere.meshing.examples;
 
-import org.vadere.meshing.mesh.gen.AFace;
-import org.vadere.meshing.mesh.gen.AHalfEdge;
-import org.vadere.meshing.mesh.gen.AVertex;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AFace;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AHalfEdge;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AVertex;
 import org.vadere.meshing.mesh.gen.MeshPanel;
 import org.vadere.meshing.mesh.triangulation.triangulator.gen.GenRivaraRefinement;
 import org.vadere.meshing.mesh.triangulation.triangulator.impl.ADelaunayTriangulator;
@@ -30,12 +30,12 @@ public class RivaraBisection {
 		var delaunayTriangulator = new ADelaunayTriangulator(points);
 		var triangulation = delaunayTriangulator.generate();
 
-		GenRivaraRefinement<AVertex, AHalfEdge, AFace> refinement = new GenRivaraRefinement<>(triangulation, e -> triangulation.getMesh().toLine(e).length() > 0.3);
+		GenRivaraRefinement<AVertex, AHalfEdge, AFace> refinement = new GenRivaraRefinement<>(triangulation, e -> triangulation.getMesh().edges().toLine(e).length() > 0.3);
 		MeshPanel<AVertex, AHalfEdge, AFace> panel = new MeshPanel<>(triangulation.getMesh(), 500, 500);
 		panel.display();
 
 		while (!refinement.isFinished()) {
-			synchronized (triangulation.getMesh()) {
+			synchronized (triangulation.getMeshBuilder()) {
 				refinement.refine();
 			}
 			panel.repaint();

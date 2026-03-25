@@ -5,13 +5,20 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.vadere.meshing.examples.MeshExamples;
 import org.vadere.meshing.mesh.gen.IncrementalTriangulation;
-import org.vadere.meshing.mesh.gen.PFace;
-import org.vadere.meshing.mesh.gen.PHalfEdge;
-import org.vadere.meshing.mesh.gen.PMesh;
-import org.vadere.meshing.mesh.gen.PVertex;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.*;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PFace;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PHalfEdge;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PMeshBuilder;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PVertex;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.triangles.PTriangleMeshBuilder;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.triangles.PTriangleMeshWithDataStorage;
+import org.vadere.meshing.mesh.gen.pointLocator.JumpAndWalkPointLocator;
 import org.vadere.meshing.mesh.impl.PMeshPanel;
 import org.vadere.meshing.mesh.impl.PSLG;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
+import org.vadere.meshing.mesh.inter.mesh.ITriangleMeshWithDataStorage;
+import org.vadere.meshing.mesh.inter.mesh.MeshPythonUtils;
+import org.vadere.meshing.mesh.inter.mesh.triangle.ITriangleMesh;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.GenEikMesh;
 import org.vadere.meshing.utils.io.poly.MeshPolyReader;
 import org.vadere.meshing.utils.io.poly.MeshPolyWriter;
@@ -21,7 +28,6 @@ import org.vadere.simulator.models.potential.solver.calculators.mesh.MeshEikonal
 import org.vadere.simulator.models.potential.solver.timecost.UnitTimeCostFunction;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.VPoint;
-import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.math.IDistanceFunction;
 
@@ -38,56 +44,52 @@ public class TestFMMEikMesh {
 	@Test
 	public void testTriangulationFMMMuenchnerFreiheit() throws IOException {
 		final InputStream inputStream = MeshExamples.class.getResourceAsStream("/poly/muenchner_freiheit.poly");
-		MeshPolyReader<PVertex, PHalfEdge, PFace> meshReader = new MeshPolyReader<>(() -> new PMesh());
-		var mesh = meshReader.readMesh(inputStream);
+		MeshPolyReader<PVertex, PHalfEdge, PFace> meshReader = new MeshPolyReader<>(PTriangleMeshBuilder::new);
+		var mesh = (PTriangleMeshWithDataStorage) meshReader.readMesh(inputStream);
 
-		IIncrementalTriangulation<PVertex, PHalfEdge, PFace> triangulation = new IncrementalTriangulation<>(mesh);
+		IIncrementalTriangulation<PVertex, PHalfEdge, PFace> triangulation = IncrementalTriangulation.fromMeshBuilder(mesh.modify());
 
 		double xmin = 150;
 		double ymin = 80;
 		double h = 10;
 		double w = 10;
 
-		VRectangle targetRectangle = new VRectangle(xmin, ymin, h, w);
 		VPoint targetPoint = new VPoint(xmin, ymin);
 
 		EikonalSolver solver = new MeshEikonalSolverFMM(
 				new UnitTimeCostFunction(),
 				Collections.singleton(targetPoint),
-				triangulation);
+				triangulation.getMeshBuilder().getMeshWithDataStorage(),
+				new JumpAndWalkPointLocator(triangulation.getMesh()));
 		long ms = System.currentTimeMillis();
 		log.info("start FFM");
 		solver.solve();
 		log.info("FFM finished");
 		log.info("time: " + (System.currentTimeMillis() - ms));
 
-		MeshPolyWriter<PVertex, PHalfEdge, PFace> meshPolyWriter = new MeshPolyWriter<>();
-
-		//System.out.println(meshPolyWriter.to2DPoly(triangulation.getMesh(), 1, i -> "potential", v -> false));
-
-		System.out.println(mesh.toPythonTriangulation(v -> triangulation.getMesh().getDoubleData(v, "potential")));
+		System.out.println(MeshPythonUtils.toPythonTriangulation(triangulation.getMeshBuilder().getMeshWithDataStorage(), "potential"));
 	}
 
 	@Test
 	public void testTriangulationFMMKaiserslautern() throws IOException {
 		final InputStream inputStream = MeshExamples.class.getResourceAsStream("/poly/kaiserslautern_tri.poly");
-		MeshPolyReader<PVertex, PHalfEdge, PFace> meshReader = new MeshPolyReader<>(() -> new PMesh());
-		var mesh = meshReader.readMesh(inputStream);
+		MeshPolyReader<PVertex, PHalfEdge, PFace> meshReader = new MeshPolyReader<>(PTriangleMeshBuilder::new);
+		var mesh = (ITriangleMeshWithDataStorage<PVertex, PHalfEdge, PFace>) meshReader.readMesh(inputStream);
 
-		IIncrementalTriangulation<PVertex, PHalfEdge, PFace> triangulation = new IncrementalTriangulation<>(mesh);
+		IIncrementalTriangulation<PVertex, PHalfEdge, PFace> triangulation = IncrementalTriangulation.fromMeshBuilder(mesh.modify());
 
 		double xmin = 150;
 		double ymin = 80;
 		double h = 10;
 		double w = 10;
 
-		VRectangle targetRectangle = new VRectangle(xmin, ymin, h, w);
 		VPoint targetPoint = new VPoint(40, 40);
 
 		EikonalSolver solver = new MeshEikonalSolverFMM(
 				new UnitTimeCostFunction(),
 				Collections.singleton(targetPoint),
-				triangulation);
+				triangulation.getMeshBuilder().getMeshWithDataStorage(),
+				new JumpAndWalkPointLocator(triangulation.getMesh()));
 		long ms = System.currentTimeMillis();
 		log.info("start FFM");
 		solver.solve();
@@ -108,11 +110,7 @@ public class TestFMMEikMesh {
 		log.info("walk finished");
 		log.info("time: " + (System.currentTimeMillis() - ms));
 
-		MeshPolyWriter<PVertex, PHalfEdge, PFace> meshPolyWriter = new MeshPolyWriter<>();
-
-		//System.out.println(meshPolyWriter.to2DPoly(triangulation.getMesh(), 1, i -> "potential", v -> false));
-
-		System.out.println(mesh.toPythonTriangulation(v -> triangulation.getMesh().getDoubleData(v, "potential")));
+		System.out.println(MeshPythonUtils.toPythonTriangulation(triangulation.getMeshBuilder().getMeshWithDataStorage(), "potential"));
 	}
 
 	@Disabled
@@ -143,7 +141,7 @@ public class TestFMMEikMesh {
 				h0,
 				pslg.getBoundingBox(),
 				pslg.getAllPolygons(),
-				() -> new PMesh());
+				PTriangleMeshBuilder::new);
 
 		PMeshPanel panel = new PMeshPanel(eikMesh.getMesh(), 600, 800);
 		panel.display();
@@ -158,7 +156,8 @@ public class TestFMMEikMesh {
 		// 3. solve the eikonal equation on the given mehsh
 		EikonalSolver solver = new MeshEikonalSolverFMM(
 				new UnitTimeCostFunction(),
-				eikMesh.getTriangulation(),
+				eikMesh.getTriangulation().getMeshBuilder().getMeshWithDataStorage(),
+				new JumpAndWalkPointLocator<>(eikMesh.getTriangulation().getMesh()),
 				eikMesh.getFixVertices().stream().filter(v -> v.distance(targetPoint) < GeometryUtils.DOUBLE_EPS).collect(Collectors.toList()));
 		long ms = System.currentTimeMillis();
 		log.info("start FFM");
@@ -168,8 +167,6 @@ public class TestFMMEikMesh {
 
 		// 4. print the result to the console i.e. standard out
 		MeshPolyWriter<PVertex, PHalfEdge, PFace> meshPolyWriter = new MeshPolyWriter<>();
-		System.out.println(meshPolyWriter.to2DPoly(eikMesh.getMesh(), 1, i -> "potential", v -> false));
-
-		//System.out.println(eikMesh.getMesh().toPythonTriangulation(v -> eikMesh.getMesh().getDoubleData(v, "potential")));
+		System.out.println(meshPolyWriter.to2DPoly(eikMesh.getMeshBuilder().getMeshWithDataStorage(), 1, i -> "potential", v -> false));
 	}
 }

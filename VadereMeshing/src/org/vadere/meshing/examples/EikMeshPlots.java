@@ -1,13 +1,13 @@
 package org.vadere.meshing.examples;
 
 import org.vadere.meshing.mesh.gen.MeshPanel;
-import org.vadere.meshing.mesh.gen.PFace;
-import org.vadere.meshing.mesh.gen.PHalfEdge;
-import org.vadere.meshing.mesh.gen.PMesh;
-import org.vadere.meshing.mesh.gen.PVertex;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PFace;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PHalfEdge;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PMesh;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PVertex;
 import org.vadere.meshing.mesh.impl.PMeshPanel;
 import org.vadere.meshing.mesh.impl.PSLG;
-import org.vadere.meshing.mesh.inter.IMesh;
+import org.vadere.meshing.mesh.inter.mesh.IMesh;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
 import org.vadere.meshing.mesh.triangulation.edgeLengthFunctions.EdgeLengthFunctionApprox;
 import org.vadere.meshing.mesh.triangulation.edgeLengthFunctions.IEdgeLengthFunction;
@@ -87,7 +87,7 @@ public class EikMeshPlots {
 		dt.generate();
 		//write(toTexDocument(TexGraphGenerator.toTikz(dt.getMesh(), f -> lightBlue, 1.0f)), "eikmesh_random_before");
 
-		VPolygon bound = dt.getMesh().toPolygon(dt.getMesh().getBorder());
+		VPolygon bound = dt.getMesh().faces().toPolygon(dt.getMesh().faces().getOuterBorder());
 		var meshImprover = new PEikMesh(
 				p -> 2.0,
 				dt.getTriangulation()
@@ -520,7 +520,7 @@ public class EikMeshPlots {
 				e.printStackTrace();
 			}
 
-			synchronized (ruppert.getMesh()) {
+			synchronized (ruppert.getMeshBuilder()) {
 				ruppert.step();
 			}
 			panel.repaint();
@@ -535,7 +535,7 @@ public class EikMeshPlots {
 				e.printStackTrace();
 			}
 
-			synchronized (eikMesh.getMesh()) {
+			synchronized (eikMesh.getMeshBuilder()) {
 				eikMesh.improve();
 			}
 			panel.repaint();
@@ -575,7 +575,7 @@ public class EikMeshPlots {
 
 	private static String printQualities(int iteration, IMesh<PVertex, PHalfEdge, PFace> mesh, Function<PFace, Double> rho){
 		StringBuilder builder = new StringBuilder();
-		for(PFace face : mesh.getFaces()) {
+		for(PFace face : mesh.faces()) {
 			double quality = rho.apply(face);
 			builder.append(iteration);
 			builder.append(" ");
@@ -599,12 +599,13 @@ public class EikMeshPlots {
 
 	private static String printAngles(int iteration, IMesh<PVertex, PHalfEdge, PFace> mesh){
 		StringBuilder builder = new StringBuilder();
-		for(PFace face : mesh.getFaces()) {
+		var edges = mesh.edges();
 
-			for(PHalfEdge edge : mesh.getEdges(face)) {
-				VPoint p1 = mesh.toPoint(edge);
-				VPoint p2 = mesh.toPoint(mesh.getNext(edge));
-				VPoint p3 = mesh.toPoint(mesh.getPrev(edge));
+		for(PFace face : mesh.faces()) {
+			for(PHalfEdge edge : edges.getAllOf(face)) {
+				VPoint p1 = edges.endToPoint(edge);
+				VPoint p2 = edges.endToPoint(edges.getNext(edge));
+				VPoint p3 = edges.endToPoint(edges.getPrev(edge));
 				builder.append(iteration);
 				builder.append(" ");
 				builder.append(GeometryUtils.angle(p1, p2, p3));

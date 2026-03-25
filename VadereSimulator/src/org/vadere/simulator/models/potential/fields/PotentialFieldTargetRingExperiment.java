@@ -2,7 +2,7 @@ package org.vadere.simulator.models.potential.fields;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.annotation.factories.models.ModelClass;
-import org.vadere.meshing.mesh.inter.IMesh;
+import org.vadere.meshing.mesh.inter.mesh.IMesh;
 import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.Attributes;

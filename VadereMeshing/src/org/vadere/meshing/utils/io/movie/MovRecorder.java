@@ -3,12 +3,10 @@ package org.vadere.meshing.utils.io.movie;
 import org.jcodec.api.awt.SequenceEncoder;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.gen.MeshRenderer;
-import org.vadere.meshing.mesh.inter.IFace;
-import org.vadere.meshing.mesh.inter.IHalfEdge;
-import org.vadere.meshing.mesh.inter.IVertex;
-import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
+import org.vadere.meshing.mesh.inter.mesh.IFace;
+import org.vadere.meshing.mesh.inter.mesh.IHalfEdge;
+import org.vadere.meshing.mesh.inter.mesh.IVertex;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.GenEikMesh;
-import org.vadere.util.geometry.shapes.VRectangle;
 
 import java.awt.image.BufferedImage;
 import java.io.File;

@@ -8,8 +8,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 import org.jetbrains.annotations.NotNull;
-import org.vadere.meshing.mesh.gen.PMesh;
-import org.vadere.meshing.mesh.inter.IMesh;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PMesh;
+import org.vadere.meshing.mesh.inter.mesh.IMesh;
 import org.vadere.state.scenario.Agent;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.util.geometry.shapes.IPoint;

@@ -4,6 +4,7 @@ import org.vadere.gui.components.utils.Localization;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.components.model.IDefaultModel;
 import org.vadere.meshing.mesh.gen.MeshRenderer;
+import org.vadere.meshing.mesh.inter.mesh.IMesh;
 import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.simulator.models.Model;
 import org.vadere.state.attributes.Attributes;

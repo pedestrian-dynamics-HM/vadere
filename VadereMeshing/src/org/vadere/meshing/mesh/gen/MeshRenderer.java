@@ -1,31 +1,24 @@
 package org.vadere.meshing.mesh.gen;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.vadere.meshing.mesh.inter.IFace;
-import org.vadere.meshing.mesh.inter.IHalfEdge;
-import org.vadere.meshing.mesh.inter.IMesh;
-import org.vadere.meshing.mesh.inter.IVertex;
+import org.vadere.meshing.mesh.inter.mesh.IFace;
+import org.vadere.meshing.mesh.inter.mesh.IHalfEdge;
+import org.vadere.meshing.mesh.inter.mesh.IMesh;
+import org.vadere.meshing.mesh.inter.mesh.IVertex;
 import org.vadere.util.geometry.GeometryUtils;
-import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;
-import org.vadere.util.geometry.shapes.VTriangle;
 import org.vadere.util.logging.Logger;
-import org.vadere.util.visualization.ColorHelper;
 
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
-import java.util.Random;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 /**
  * This helper class renders a {@link IMesh} into a {@link BufferedImage} or a {@link Graphics2D}.
@@ -169,10 +162,10 @@ public class MeshRenderer<V extends IVertex, E extends IHalfEdge, F extends IFac
 		Stroke stroke = graphics.getStroke();
 		float minEdgeLen;
 		synchronized (mesh) {
-			faces = mesh./*clone().*/getFaces();
-			edges = mesh.getEdges();
-			vertices = mesh.getVertices();
-			minEdgeLen = (float)edges.stream().mapToDouble(e -> mesh.toLine(e).length()).min().orElse(0.0);
+			faces = mesh./*clone().*/faces().getAll();
+			edges = mesh.edges().getAll();
+			vertices = mesh.vertices().getAll();
+			minEdgeLen = (float)edges.stream().mapToDouble(e -> mesh.edges().toLine(e).length()).min().orElse(0.0);
 		}
 		//graphics.translate(-bound.getMinX()+(0.5*Math.max(0, bound.getWidth()-bound.getHeight())), -bound.getMinY() + (bound.getHeight()-height / scale));
 		graphics.setStroke(new BasicStroke(minEdgeLen * 1.0f/15f));
@@ -185,7 +178,7 @@ public class MeshRenderer<V extends IVertex, E extends IHalfEdge, F extends IFac
 
 		if(renderFaces) {
 			for(F face : faces) {
-				VPolygon polygon = mesh.toPolygon(face);
+				VPolygon polygon = mesh.faces().toPolygon(face);
 
 				if(alertPred.test(face)) {
 					graphics.setColor(new Color(200, 0, 0));
@@ -227,7 +220,7 @@ public class MeshRenderer<V extends IVertex, E extends IHalfEdge, F extends IFac
 				ec = edgeColorFunction.apply(edge);
 			}
 			graphics.setColor(ec);
-			graphics.draw(mesh.toLine(edge));
+			graphics.draw(mesh.edges().toLine(edge));
 		}
 
 		for(V vertex : vertices) {
@@ -270,9 +263,9 @@ public class MeshRenderer<V extends IVertex, E extends IHalfEdge, F extends IFac
 	}
 
 	private boolean isNonAcute(@NotNull final E edge, @NotNull final IMesh<V, E, F> mesh) {
-		VPoint p1 = mesh.toPoint(mesh.getPrev(edge));
-		VPoint p2 = mesh.toPoint(edge);
-		VPoint p3 = mesh.toPoint(mesh.getNext(edge));
+		VPoint p1 = mesh.edges().endToPoint(mesh.edges().getPrev(edge));
+		VPoint p2 = mesh.edges().endToPoint(edge);
+		VPoint p3 = mesh.edges().endToPoint(mesh.edges().getNext(edge));
 
 		double angle1 = GeometryUtils.angle(p1, p2, p3);
 

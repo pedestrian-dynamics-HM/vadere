@@ -3,11 +3,10 @@ package org.vadere.meshing.mesh.impl;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.gen.MeshPanel;
 import org.vadere.meshing.mesh.gen.MeshRenderer;
-import org.vadere.meshing.mesh.gen.PFace;
-import org.vadere.meshing.mesh.gen.PHalfEdge;
-import org.vadere.meshing.mesh.gen.PVertex;
-import org.vadere.meshing.mesh.inter.IMesh;
-import org.vadere.util.geometry.shapes.IPoint;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PFace;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PHalfEdge;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PVertex;
+import org.vadere.meshing.mesh.inter.mesh.IMesh;
 
 import java.awt.*;
 import java.util.function.Function;

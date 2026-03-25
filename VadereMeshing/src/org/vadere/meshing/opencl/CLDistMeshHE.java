@@ -1,6 +1,12 @@
 package org.vadere.meshing.opencl;
 
 
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.*;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.*;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.triangles.ATriangleMeshBuilder;
+import org.vadere.meshing.mesh.inter.mesh.IMesh;
+import org.vadere.meshing.mesh.inter.mesh.IMeshWithDataStorage;
+import org.vadere.meshing.mesh.inter.mesh.MeshUtils;
 import org.vadere.util.logging.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.PointerBuffer;
@@ -8,9 +14,6 @@ import org.lwjgl.opencl.CLContextCallback;
 import org.lwjgl.opencl.CLProgramCallback;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
-import org.vadere.meshing.mesh.gen.AMesh;
-import org.vadere.meshing.mesh.gen.AVertex;
-import org.vadere.meshing.mesh.gen.CLGatherer;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.opencl.CLInfo;
 import org.vadere.util.opencl.CLOperation;
@@ -120,15 +123,18 @@ public class CLDistMeshHE extends CLOperation {
     private PointerBuffer retSize;
     private ByteBuffer source;
 
-    private AMesh mesh;
+    private AMeshBuilder meshBuilder;
 
     private boolean doublePrecision = true;
     private boolean hasToRead = false;
 
-    public CLDistMeshHE(@NotNull AMesh mesh) {
+    public CLDistMeshHE(@NotNull AMeshWithDataStorage toCopy) {
         super(CL_DEVICE_TYPE_GPU);
-        this.mesh = mesh;
-        this.mesh.garbageCollection();
+        AMeshBuilder meshBuilder = new AMeshBuilder(toCopy);
+        meshBuilder.getOptimizer().garbageCollection();
+
+        this.meshBuilder = meshBuilder;
+        AMesh mesh = this.meshBuilder.getMesh();
         if(doublePrecision) {
             this.vD = CLGatherer.getVerticesD(mesh);
         }
@@ -140,9 +146,9 @@ public class CLDistMeshHE extends CLOperation {
         this.vToE = CLGatherer.getEdgeOfVertex(mesh);
         this.borderV = CLGatherer.getBorderVertices(mesh);
 
-        this.numberOfVertices = mesh.getNumberOfVertices();
-        this.numberOfEdges = mesh.getNumberOfEdges();
-        this.numberOfFaces = mesh.getNumberOfFaces();
+        this.numberOfVertices = this.meshBuilder.getMesh().vertices().count();
+        this.numberOfEdges = this.meshBuilder.getMesh().edges().count();
+        this.numberOfFaces = this.meshBuilder.getMesh().faces().count();
         this.edgeLabels = MemoryUtil.memAllocInt(numberOfEdges);
 
         for(int i = 0; i < numberOfEdges; i++) {
@@ -487,20 +493,20 @@ public class CLDistMeshHE extends CLOperation {
         List<IPoint> pointSet = new ArrayList<>(numberOfVertices);
         if(doublePrecision) {
             for(int i = 0; i < numberOfVertices*2; i+=2) {
-                pointSet.add(mesh.createPoint(vD.get(i), vD.get(i+1)));
+                pointSet.add(meshBuilder.getMesh().createPoint(vD.get(i), vD.get(i+1)));
             }
         }
         else {
             for(int i = 0; i < numberOfVertices*2; i+=2) {
-                pointSet.add(mesh.createPoint(vF.get(i), vF.get(i+1)));
+                pointSet.add(meshBuilder.getMesh().createPoint(vF.get(i), vF.get(i+1)));
             }
         }
 
         // scatter data
-        mesh.setPositions(pointSet);
-        CLGatherer.scatterFaces(mesh, t);
-        CLGatherer.scatterHalfEdges(mesh, e);
-        CLGatherer.scatterEdgeOfVertex(mesh, vToE);
+        meshBuilder.vertices().setAllVertexPositions(pointSet);
+        CLGatherer.scatterFaces(meshBuilder.getMesh(), t);
+        CLGatherer.scatterHalfEdges(meshBuilder.getMesh(), e);
+        CLGatherer.scatterEdgeOfVertex(meshBuilder.getMesh(), vToE);
     }
 
     private int ceilPowerOf2(int value) {
@@ -613,12 +619,16 @@ public class CLDistMeshHE extends CLOperation {
      * Assumption: There is only one Platform with a GPU.
      */
     public static void main(String... args) throws OpenCLException {
-        AMesh mesh = AMesh.createSimpleTriMesh().createSimpleTriMesh();
+        ATriangleMeshBuilder triangleMeshBuilder = new ATriangleMeshBuilder();
+        IMeshWithDataStorage<AVertex, AHalfEdge, AFace> meshWithDataStorage = triangleMeshBuilder.getMeshWithDataStorage();
+        IMesh<AVertex, AHalfEdge, AFace> mesh = meshWithDataStorage.getMesh();
+        MeshUtils.createSimpleTriMesh(triangleMeshBuilder);
+
         log.info("before");
-        Collection<AVertex> vertices = mesh.getVertices();
+        Collection<AVertex> vertices = mesh.vertices().getAll();
         log.info(vertices);
 
-        CLDistMeshHE clDistMesh = new CLDistMeshHE(mesh);
+        CLDistMeshHE clDistMesh = new CLDistMeshHE((AMeshWithDataStorage) meshWithDataStorage);
         clDistMesh.init();
 
         clDistMesh.printTri();

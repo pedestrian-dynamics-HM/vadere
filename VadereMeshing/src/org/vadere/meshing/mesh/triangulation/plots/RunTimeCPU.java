@@ -1,13 +1,13 @@
 package org.vadere.meshing.mesh.triangulation.plots;
 
 import org.apache.commons.lang3.time.StopWatch;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.*;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AFace;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AHalfEdge;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AVertex;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.triangles.ATriangleMeshBuilder;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.math.IDistanceFunction;
-import org.vadere.meshing.mesh.gen.AFace;
-import org.vadere.meshing.mesh.gen.AHalfEdge;
-import org.vadere.meshing.mesh.gen.AMesh;
-import org.vadere.meshing.mesh.gen.AVertex;
-import org.vadere.meshing.mesh.inter.IMeshSupplier;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
@@ -38,7 +38,6 @@ public class RunTimeCPU extends JFrame {
 
 
     private static void overallUniformRing() {
-	    IMeshSupplier<AVertex, AHalfEdge, AFace> supplier = () -> new AMesh();
 	    IDistanceFunction distanceFunc = p -> Math.abs(7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 3;
 	    List<VShape> obstacles = new ArrayList<>();
 
@@ -51,16 +50,16 @@ public class RunTimeCPU extends JFrame {
 				    uniformEdgeLength,
 				    initialEdgeLength,
 				    bbox, obstacles,
-				    supplier);
+				    ATriangleMeshBuilder::new);
 
 		    StopWatch overAllTime = new StopWatch();
 		    overAllTime.start();
 		    meshGenerator.generate();
 		    overAllTime.stop();
 
-		    log.info("#vertices: " + meshGenerator.getMesh().getVertices().size());
-		    log.info("#edges: " + meshGenerator.getMesh().getEdges().size());
-		    log.info("#faces: " + meshGenerator.getMesh().getFaces().size());
+		    log.info("#vertices: " + meshGenerator.getMesh().vertices().count());
+		    log.info("#edges: " + meshGenerator.getMesh().edges().count());
+		    log.info("#faces: " + meshGenerator.getMesh().faces().count());
 		    log.info("quality" + meshGenerator.getQuality());
 		    log.info("overall time: " + overAllTime.getTime() + "[ms]");
 
@@ -76,7 +75,6 @@ public class RunTimeCPU extends JFrame {
 	}
 
 	private static void stepUniformRing(double startLen, double endLen, double stepLen) {
-		IMeshSupplier<AVertex, AHalfEdge, AFace> supplier = () -> new AMesh();
 		IDistanceFunction distanceFunc = p -> Math.abs(7 - Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY())) - 3;
 		List<VShape> obstacles = new ArrayList<>();
 
@@ -94,7 +92,7 @@ public class RunTimeCPU extends JFrame {
 					uniformEdgeLength,
 					initialEdgeLength,
 					bbox, obstacles,
-					supplier);
+					ATriangleMeshBuilder::new);
 
 			StopWatch overAllTime = new StopWatch();
 
@@ -108,15 +106,15 @@ public class RunTimeCPU extends JFrame {
 				steps++;
 			} while (!meshGenerator.isFinished());
 
-			log.info("#vertices: " + meshGenerator.getMesh().getVertices().size());
-			log.info("#edges: " + meshGenerator.getMesh().getEdges().size());
-			log.info("#faces: " + meshGenerator.getMesh().getFaces().size());
+			log.info("#vertices: " + meshGenerator.getMesh().vertices().count());
+			log.info("#edges: " + meshGenerator.getMesh().edges().count());
+			log.info("#faces: " + meshGenerator.getMesh().faces().count());
 			log.info("quality: " + meshGenerator.getQuality());
 			log.info("#step: " + steps);
 			log.info("overall time: " + overAllTime.getTime() + "[ms]");
 			log.info("step avg time: " + overAllTime.getTime() / steps + "[ms]");
 
-			nVertices.add(meshGenerator.getMesh().getVertices().size());
+			nVertices.add(meshGenerator.getMesh().vertices().count());
 			runTimes.add( overAllTime.getTime());
 
 			MeshPanel<AVertex, AHalfEdge, AFace> distmeshPanel = new MeshPanel(meshGenerator.getMesh(), f -> false, 1000, 800);
