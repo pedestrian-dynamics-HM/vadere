@@ -1,10 +1,11 @@
 package org.vadere.meshing.mesh.triangulation.improver.eikmesh.impl;
 
 import org.jetbrains.annotations.NotNull;
-import org.vadere.meshing.mesh.gen.PFace;
-import org.vadere.meshing.mesh.gen.PHalfEdge;
-import org.vadere.meshing.mesh.gen.PMesh;
-import org.vadere.meshing.mesh.gen.PVertex;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.*;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PFace;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PHalfEdge;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PVertex;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.triangles.PTriangleMeshBuilder;
 import org.vadere.meshing.mesh.impl.PTriangulation;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
 import org.vadere.meshing.mesh.triangulation.edgeLengthFunctions.IEdgeLengthFunction;
@@ -56,7 +57,7 @@ public class PEikMesh extends GenEikMesh<PVertex, PHalfEdge, PFace> {
 			@NotNull VRectangle bound,
 			@NotNull Collection<? extends VShape> obstacleShapes) {
 
-		super(distanceFunc, edgeLengthFunc, initialEdgeLen, bound, obstacleShapes, () -> new PMesh());
+		super(distanceFunc, edgeLengthFunc, initialEdgeLen, bound, obstacleShapes, PTriangleMeshBuilder::new);
 	}
 
 	public PEikMesh(
@@ -66,7 +67,7 @@ public class PEikMesh extends GenEikMesh<PVertex, PHalfEdge, PFace> {
 			double initialEdgeLen,
 			@NotNull VRectangle bound
 	) {
-		super(distanceFunc, edgeLengthFunc, fixPoints, initialEdgeLen, bound, Collections.EMPTY_LIST,() -> new PMesh());
+		super(distanceFunc, edgeLengthFunc, fixPoints, initialEdgeLen, bound, Collections.EMPTY_LIST, PTriangleMeshBuilder::new);
 	}
 
 
@@ -76,8 +77,7 @@ public class PEikMesh extends GenEikMesh<PVertex, PHalfEdge, PFace> {
 			double initialEdgeLen,
 			@NotNull VRectangle bound) {
 
-		super(distanceFunc, edgeLengthFunc, initialEdgeLen, bound,
-				() -> new PMesh());
+		super(distanceFunc, edgeLengthFunc, initialEdgeLen, bound, PTriangleMeshBuilder::new);
 	}
 
 	public PEikMesh(
@@ -85,20 +85,20 @@ public class PEikMesh extends GenEikMesh<PVertex, PHalfEdge, PFace> {
 			double initialEdgeLen,
 			@NotNull VRectangle bound) {
 
-		super(distanceFunc, e -> 1.0, initialEdgeLen, bound, () -> new PMesh());
+		super(distanceFunc, e -> 1.0, initialEdgeLen, bound, PTriangleMeshBuilder::new);
 	}
 
 	public PEikMesh(
 			double initialEdgeLen,
 			@NotNull VRectangle bound) {
 
-		super(p -> 1.0, e -> 1.0, initialEdgeLen, bound, () -> new PMesh());
+		super(p -> 1.0, e -> 1.0, initialEdgeLen, bound, PTriangleMeshBuilder::new);
 	}
 
 	public PEikMesh(
 			@NotNull VPolygon polygon,
 			double initialEdgeLen,
 			@NotNull Collection<? extends VShape> obstacleShapes) {
-		super(polygon, initialEdgeLen, obstacleShapes, () -> new PMesh());
+		super(polygon, initialEdgeLen, obstacleShapes, PTriangleMeshBuilder::new);
 	}
 }

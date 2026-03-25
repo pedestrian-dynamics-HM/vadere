@@ -1,6 +1,6 @@
 package org.vadere.meshing.examples;
 
-import org.vadere.meshing.mesh.gen.PMeshSuppliert;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PMeshBuilder;
 import org.vadere.meshing.mesh.impl.PMeshPanel;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
 import org.vadere.meshing.mesh.triangulation.edgeLengthFunctions.IEdgeLengthFunction;
@@ -13,9 +13,9 @@ import org.vadere.meshing.utils.io.poly.MeshPolyReader;
 import org.vadere.meshing.utils.io.poly.MeshPolyWriter;
 import org.vadere.meshing.utils.io.tex.TexGraphGenerator;
 import org.vadere.util.geometry.GeometryUtils;
-import org.vadere.meshing.mesh.gen.PFace;
-import org.vadere.meshing.mesh.gen.PHalfEdge;
-import org.vadere.meshing.mesh.gen.PVertex;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PFace;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PHalfEdge;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PVertex;
 import org.vadere.meshing.mesh.gen.MeshPanel;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -284,7 +284,7 @@ public class EikMeshExamples {
 		//recorder.finish();
 
 		Function<PVertex, Color> vertexColorFunction = v -> {
-			if(meshImprover.getMesh().isAtBoundary(v)){
+			if(meshImprover.getMesh().vertices().isAtBoundary(v)){
 				return Colors.BLUE;
 			} else if(meshImprover.isFixPoint(v)) {
 				return Colors.RED;
@@ -335,13 +335,10 @@ public class EikMeshExamples {
 		// (optional) define the gui to display the mesh
 		//meshImprover.generate();
 
-
-		var meshSuppliert = PMeshSuppliert.defaultMeshSupplier;
-
 		var writer = new MeshPolyWriter<PVertex, PHalfEdge, PFace>();
-		var reader = new MeshPolyReader<>(meshSuppliert);
+		var reader = new MeshPolyReader<>(PMeshBuilder::new);
 
-		String polyString = writer.to2DPoly(meshImprover.getMesh());
+		String polyString = writer.to2DPoly(meshImprover.getMeshBuilder().getMeshWithDataStorage());
 		InputStream inputStream = new ByteArrayInputStream(polyString.getBytes(Charset.forName("UTF-8")));
 
 		System.out.println(polyString);

@@ -1,7 +1,8 @@
 package org.vadere.meshing.examples;
 
 import org.jetbrains.annotations.NotNull;
-import org.vadere.meshing.mesh.gen.PMesh;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.PMeshWithDataStorage;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.triangles.PTriangleMeshBuilder;
 import org.vadere.meshing.mesh.impl.PSLG;
 import org.vadere.meshing.mesh.triangulation.DistanceFunctionApproxBF;
 import org.vadere.meshing.mesh.triangulation.edgeLengthFunctions.EdgeLengthFunctionApprox;
@@ -43,7 +44,7 @@ public class BackgroundMeshExamples {
 	public static void distance(@NotNull final String fileName) throws IOException {
 		final InputStream inputStream = MeshExamples.class.getResourceAsStream(fileName);
 		PSLG pslg = PSLGGenerator.toPSLG(inputStream);
-		DistanceFunctionApproxBF distFunctionApprox = new DistanceFunctionApproxBF(pslg, IDistanceFunction.create(pslg.getSegmentBound(), pslg.getHoles()),() -> new PMesh());
+		DistanceFunctionApproxBF distFunctionApprox = new DistanceFunctionApproxBF(pslg, IDistanceFunction.create(pslg.getSegmentBound(), pslg.getHoles()), PTriangleMeshBuilder::new);
 		distFunctionApprox.printPython();
 	}
 }

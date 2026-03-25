@@ -2,10 +2,10 @@ package org.vadere.meshing.utils.io.poly;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.impl.PSLG;
-import org.vadere.meshing.mesh.inter.IFace;
-import org.vadere.meshing.mesh.inter.IHalfEdge;
-import org.vadere.meshing.mesh.inter.IMesh;
-import org.vadere.meshing.mesh.inter.IVertex;
+import org.vadere.meshing.mesh.inter.mesh.IFace;
+import org.vadere.meshing.mesh.inter.mesh.IHalfEdge;
+import org.vadere.meshing.mesh.inter.mesh.IMesh;
+import org.vadere.meshing.mesh.inter.mesh.IVertex;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -47,22 +47,22 @@ public class PSLGGenerator {
 		int dimension = 3;
 		StringBuilder builder = new StringBuilder();
 		builder.append("#node\n");
-		builder.append(mesh.getNumberOfVertices() + SEPARATOR + dimension + "\n");
+		builder.append(mesh.vertices().count() + SEPARATOR + dimension + "\n");
 		Map<V, Integer> map = new HashMap<>();
 		int id = 1;
-		for(V v : mesh.getVertices()) {
+		for(V v : mesh.vertices()) {
 			map.put(v, id);
 			builder.append(id + SEPARATOR + v.getX() + SEPARATOR + v.getY() + SEPARATOR + 0.0 + "\n");
 			id++;
 		}
 
 		builder.append("#FACET 2D\n");
-		builder.append(mesh.getNumberOfFaces()+"\n");
+		builder.append(mesh.faces().count()+"\n");
 
-		for(F face : mesh.getFaces()) {
+		for(F face : mesh.faces()) {
 			builder.append("1 0\n");
-			builder.append(mesh.getPoints(face).size() + SEPARATOR);
-			for(V v : mesh.getVertices(face)) {
+			builder.append(mesh.faces().getPoints(face).size() + SEPARATOR);
+			for(V v : mesh.vertices().getAllOf(face)) {
 				builder.append(map.get(v) + SEPARATOR);
 			}
 			builder.delete(builder.length()-SEPARATOR.length(), builder.length());

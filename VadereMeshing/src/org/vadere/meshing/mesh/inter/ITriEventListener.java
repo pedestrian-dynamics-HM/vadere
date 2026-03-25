@@ -1,5 +1,9 @@
 package org.vadere.meshing.mesh.inter;
 
+import org.vadere.meshing.mesh.inter.mesh.IFace;
+import org.vadere.meshing.mesh.inter.mesh.IHalfEdge;
+import org.vadere.meshing.mesh.inter.mesh.IVertex;
+
 /**
  * A {@link ITriEventListener} listens to events that change the topography of the triangulation.
  *

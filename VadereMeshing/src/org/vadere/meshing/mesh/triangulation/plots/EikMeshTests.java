@@ -1,9 +1,11 @@
 package org.vadere.meshing.mesh.triangulation.plots;
 
 import org.apache.commons.lang3.time.StopWatch;
-import org.vadere.meshing.mesh.gen.AFace;
-import org.vadere.meshing.mesh.gen.AMesh;
-import org.vadere.meshing.mesh.inter.IMeshSupplier;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.*;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AFace;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AHalfEdge;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AVertex;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.triangles.ATriangleMeshBuilder;
 import org.vadere.meshing.mesh.inter.IPointConstructor;
 import org.vadere.meshing.mesh.triangulation.edgeLengthFunctions.IEdgeLengthFunction;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.GenEikMesh;
@@ -11,8 +13,6 @@ import org.vadere.meshing.mesh.gen.MeshPanel;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.EikMeshPoint;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.math.IDistanceFunction;
-import org.vadere.meshing.mesh.gen.AHalfEdge;
-import org.vadere.meshing.mesh.gen.AVertex;
 import org.vadere.util.geometry.shapes.VPolygon;
 import org.vadere.util.geometry.shapes.VRectangle;
 import org.vadere.util.geometry.shapes.VShape;
@@ -41,7 +41,6 @@ public class EikMeshTests {
 
 	private static void testVisual(){
 		VPolygon hex = VShape.generateHexagon(0.4);
-		IMeshSupplier<AVertex, AHalfEdge, AFace> supplier = () -> new AMesh();
 
 		IDistanceFunction quader = p -> Math.max(Math.abs(p.getX()), Math.abs(p.getY())) - 1.0;
 		IDistanceFunction circ = p -> Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY()) - 1.0;
@@ -58,7 +57,7 @@ public class EikMeshTests {
 				edgeLengthFunction,
 				initialEdgeLength,
 				bbox, obstacles,
-				supplier);
+				ATriangleMeshBuilder::new);
 
 		Predicate<AFace> predicate = f ->  meshGenerator.faceToQuality(f) < 0.8;
 		MeshPanel<AVertex, AHalfEdge, AFace> distmeshPanel = new MeshPanel(meshGenerator.getMesh(),
@@ -70,7 +69,7 @@ public class EikMeshTests {
 
 		StopWatch overAllTime = new StopWatch();
 		overAllTime.start();
-		log.debug("#vertices: " + meshGenerator.getMesh().getPoints().size());
+		log.debug("#vertices: " + meshGenerator.getMesh().vertices().count());
 		int step = 0;
 		while (step < 300) {
 
@@ -97,8 +96,8 @@ public class EikMeshTests {
 		}
 		overAllTime.stop();
 
-		log.info("#vertices:" + meshGenerator.getMesh().getVertices().size());
-		log.info("#edges:" + meshGenerator.getMesh().getEdges().size());
+		log.info("#vertices:" + meshGenerator.getMesh().vertices().count());
+		log.info("#edges:" + meshGenerator.getMesh().edges().count());
 		log.info("overall time: " + overAllTime.getTime() + "[ms]");
 		log.info("quality:" + meshGenerator.getQuality());
 		log.info("min-quality: " + meshGenerator.getMinQuality());

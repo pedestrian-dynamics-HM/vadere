@@ -2,7 +2,7 @@ package org.vadere.simulator.models.queuing;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.annotation.factories.models.ModelClass;
-import org.vadere.meshing.mesh.inter.IMesh;
+import org.vadere.meshing.mesh.inter.mesh.IMesh;
 import org.vadere.simulator.models.potential.fields.IPotentialField;
 import org.vadere.simulator.models.potential.fields.IPotentialFieldTargetGrid;
 import org.vadere.simulator.models.potential.fields.PotentialFieldTargetGrid;

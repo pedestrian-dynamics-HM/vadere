@@ -2,23 +2,15 @@
 package org.vadere.simulator.models.potential.solver;
 
 import org.jetbrains.annotations.NotNull;
-import org.vadere.meshing.mesh.gen.AFace;
-import org.vadere.meshing.mesh.gen.AHalfEdge;
-import org.vadere.meshing.mesh.gen.AVertex;
-import org.vadere.meshing.mesh.gen.IncrementalTriangulation;
-import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
+import org.vadere.meshing.mesh.gen.pointLocator.JumpAndWalkPointLocator;
 import org.vadere.simulator.models.potential.fields.IPotentialField;
 import org.vadere.simulator.models.potential.solver.calculators.EikonalSolver;
 import org.vadere.simulator.models.potential.solver.calculators.PotentialFieldCalculatorNone;
-import org.vadere.simulator.models.potential.solver.calculators.cartesian.EikonalSolverFIM;
+import org.vadere.simulator.models.potential.solver.calculators.cartesian.multiCoreOptimized.EikonalSolverFIM;
 import org.vadere.simulator.models.potential.solver.calculators.cartesian.EikonalSolverFMM;
-import org.vadere.simulator.models.potential.solver.calculators.cartesian.EikonalSolverFSM;
-import org.vadere.simulator.models.potential.solver.calculators.cartesian.EikonalSolverIFIM;
-import org.vadere.simulator.models.potential.solver.calculators.mesh.MeshEikonalSolverFIM;
-import org.vadere.simulator.models.potential.solver.calculators.mesh.MeshEikonalSolverFIMLockFree;
+import org.vadere.simulator.models.potential.solver.calculators.cartesian.multiCoreOptimized.EikonalSolverIFIM;
 import org.vadere.simulator.models.potential.solver.calculators.mesh.MeshEikonalSolverFMM;
-import org.vadere.simulator.models.potential.solver.calculators.mesh.MeshEikonalSolverIFIM;
-import org.vadere.simulator.models.potential.solver.calculators.mesh.MeshEikonalSolverIFIMLockFree;
+import org.vadere.simulator.models.potential.solver.calculators.mesh.multiCoreOptimized.MeshEikonalSolverFIM;
 import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
 import org.vadere.simulator.models.potential.solver.timecost.UnitTimeCostFunction;
 import org.vadere.simulator.models.potential.timeCostFunction.TimeCostFunctionFactory;
@@ -52,13 +44,12 @@ public abstract class EikonalSolverProvider  {
 			final AttributesFloorField attributesPotential);
 
 	protected EikonalSolver buildBase(final Domain domain, @NotNull final List<VShape> targetShapes) {
-		var triangulation = new IncrementalTriangulation<>(domain.getFloorFieldMesh());
-
 		ITimeCostFunction timeCost = new UnitTimeCostFunction();
 		EikonalSolver eikonalSolver = new MeshEikonalSolverFMM(
 				targetShapes,
 				timeCost,
-				triangulation);
+				domain.getFloorFieldMesh(),
+				new JumpAndWalkPointLocator(domain.getFloorFieldMesh().getMesh()));
 
 		return eikonalSolver;
 	}
@@ -85,95 +76,95 @@ public abstract class EikonalSolverProvider  {
 		EikonalSolverType createMethod = attributesPotential.getCreateMethod();
 
 		Rectangle2D.Double bounds = topography.getBounds();
-		EikonalSolver eikonalSolver;
 
 		if(createMethod == EikonalSolverType.NONE) {
 			return new PotentialFieldCalculatorNone();
 		}
 
-		/**
-		 * Use a regular grid based method.
-		 */
 		if(createMethod.isUsingCellGrid()) {
-			CellGrid cellGrid = new CellGrid(bounds.getWidth(), bounds.getHeight(),
-					attributesPotential.getPotentialFieldResolution(), new CellState(), bounds.getMinX(), bounds.getMinY());
+			return createGridBasedSolver(targetId, targetShapes, attributesPedestrian, attributesPotential, bounds, createMethod, topography);
+		}
 
-			if (createMethod != EikonalSolverType.NONE) {
-				for (VShape shape : targetShapes) {
-					FloorDiscretizer.setGridValuesForShape(cellGrid, shape,
-							new CellState(0.0, PathFindingTag.Target));
-				}
+		if(domain.getFloorFieldMesh() != null) {
+			return createTriangleMeshBasedSolver(domain, targetId, targetShapes, attributesPedestrian, attributesPotential, topography, createMethod);
+		}else{
+			throw new UnsupportedOperationException("Can not use mesh based floor field computation without a mesh!");
+		}
+	}
 
-				for (Obstacle obstacle : topography.getObstacles()) {
-					FloorDiscretizer.setGridValuesForShape(cellGrid, obstacle.getShape(),
-							new CellState(Double.MAX_VALUE, PathFindingTag.Obstacle));
-				}
+	/**
+	 * Use a regular grid based method.
+	 */
+	@NotNull
+	private static EikonalSolver createGridBasedSolver(int targetId, List<VShape> targetShapes, AttributesAgent attributesPedestrian, AttributesFloorField attributesPotential, Rectangle2D.Double bounds, EikonalSolverType createMethod, Topography topography) {
+		EikonalSolver eikonalSolver;
+		CellGrid cellGrid = new CellGrid(bounds.getWidth(), bounds.getHeight(),
+				attributesPotential.getPotentialFieldResolution(), new CellState(), bounds.getMinX(), bounds.getMinY());
+
+		if (createMethod != EikonalSolverType.NONE) {
+			for (VShape shape : targetShapes) {
+				FloorDiscretizer.setGridValuesForShape(cellGrid, shape,
+						new CellState(0.0, PathFindingTag.Target));
 			}
 
-			boolean isHighAccuracyFM = createMethod.isHighAccuracy();
-
-			ITimeCostFunction timeCost = TimeCostFunctionFactory.create(
-					attributesPotential.getTimeCostAttributes(),
-					attributesPedestrian,
-					topography,
-					targetId, 1.0 / cellGrid.getResolution());
-
-			/**
-			 * The distance function returns values < 0 if the point is inside the domain,
-			 * i.e. outside of any obstacle and values > 0 if the point lies inside an obstacle.
-			 */
-			IDistanceFunction distFunc = new DistanceFunctionTarget(cellGrid, targetShapes);
-
-			switch (createMethod) {
-				case NONE:
-					eikonalSolver = new PotentialFieldCalculatorNone();
-					break;
-				case INFORMED_FAST_ITERATIVE_METHOD:
-					eikonalSolver = new EikonalSolverIFIM(cellGrid, distFunc, timeCost, attributesPotential.getObstacleGridPenalty(), attributesPotential.getTargetAttractionStrength());
-					break;
-				case FAST_ITERATIVE_METHOD:
-					eikonalSolver = new EikonalSolverFIM(cellGrid, distFunc, isHighAccuracyFM, timeCost, attributesPotential.getObstacleGridPenalty(), attributesPotential.getTargetAttractionStrength());
-					break;
-				case FAST_SWEEPING_METHOD:
-					eikonalSolver = new EikonalSolverFSM(cellGrid, distFunc, isHighAccuracyFM, timeCost, attributesPotential.getObstacleGridPenalty(), attributesPotential.getTargetAttractionStrength());
-					break;
-				default:
-					eikonalSolver = new EikonalSolverFMM(cellGrid, distFunc, isHighAccuracyFM, timeCost, attributesPotential.getObstacleGridPenalty(), attributesPotential.getTargetAttractionStrength());
+			for (Obstacle obstacle : topography.getObstacles()) {
+				FloorDiscretizer.setGridValuesForShape(cellGrid, obstacle.getShape(),
+						new CellState(Double.MAX_VALUE, PathFindingTag.Obstacle));
 			}
-		} else {
-			if(domain.getFloorFieldMesh() != null) {
-				IIncrementalTriangulation<AVertex, AHalfEdge, AFace> triangulation = new IncrementalTriangulation<>(domain.getFloorFieldMesh());
+		}
 
-				ITimeCostFunction timeCost = TimeCostFunctionFactory.create(
-						attributesPotential.getTimeCostAttributes(),
-						attributesPedestrian,
-						topography,
-						targetId, triangulation);
+		boolean isHighAccuracyFM = createMethod.isHighAccuracy();
 
-				switch (createMethod) {
-					case INFORMED_FAST_ITERATIVE_METHOD_TRI:
-						eikonalSolver = new MeshEikonalSolverIFIM<>(targetId+"", targetShapes, timeCost, triangulation);
-						break;
-					case FAST_ITERATIVE_METHOD_TRI:
-						eikonalSolver = new MeshEikonalSolverFIM<>(targetId+"", targetShapes, timeCost, triangulation);
-						break;
-					case FAST_ITERATIVE_METHOD_TRI_LOCK_FREE:
-						eikonalSolver = new MeshEikonalSolverFIMLockFree<>(targetId+"", targetShapes, timeCost, triangulation);
-						break;
-					case INFORMED_FAST_ITERATIVE_METHOD_TRI_LOCK_FREE:
-						eikonalSolver = new MeshEikonalSolverIFIMLockFree<>(targetId+"", targetShapes, timeCost, triangulation);
-						break;
-					default:
-						eikonalSolver = new MeshEikonalSolverFMM<>(targetId+"", targetShapes, timeCost, triangulation);
-						break;
-				}
+		ITimeCostFunction timeCost = TimeCostFunctionFactory.create(
+				attributesPotential.getTimeCostAttributes(),
+				attributesPedestrian,
+				topography,
+				targetId, 1.0 / cellGrid.getResolution());
 
-				//eikonalSolver = new MeshEikonalSolverFMM<>(targetId+"", targetShapes, timeCost, triangulation
-				//	/*,topography.getSources().stream().map(s -> s.getShape()).collect(Collectors.toList())*/);
-				//eikonalSolver.solve();
-			} else {
-				throw new UnsupportedOperationException("Can not use mesh based floor field computation without a mesh!");
-			}
+		/**
+		 * The distance function returns values < 0 if the point is inside the domain,
+		 * i.e. outside of any obstacle and values > 0 if the point lies inside an obstacle.
+		 */
+		IDistanceFunction distFunc = new DistanceFunctionTarget(cellGrid, targetShapes);
+
+		switch (createMethod) {
+			case NONE:
+				eikonalSolver = new PotentialFieldCalculatorNone();
+				break;
+			case FAST_ITERATIVE_METHOD:
+				eikonalSolver = new EikonalSolverFIM(cellGrid, distFunc, isHighAccuracyFM, timeCost, attributesPotential.getObstacleGridPenalty(), attributesPotential.getTargetAttractionStrength());
+				break;
+			case INFORMED_FAST_ITERATIVE_METHOD:
+				eikonalSolver = new EikonalSolverIFIM(cellGrid, distFunc, timeCost, attributesPotential.getObstacleGridPenalty(), attributesPotential.getTargetAttractionStrength());
+				break;
+			case HIGH_ACCURACY_FAST_MARCHING:
+			case FAST_MARCHING:
+			default:
+				eikonalSolver = new EikonalSolverFMM(cellGrid, distFunc, isHighAccuracyFM, timeCost, attributesPotential.getObstacleGridPenalty(), attributesPotential.getTargetAttractionStrength());
+		}
+		return eikonalSolver;
+	}
+
+	@NotNull
+	private static EikonalSolver createTriangleMeshBasedSolver(Domain domain, int targetId, List<VShape> targetShapes, AttributesAgent attributesPedestrian, AttributesFloorField attributesPotential, Topography topography, EikonalSolverType createMethod) {
+		EikonalSolver eikonalSolver;
+		var triangulation = domain.getFloorFieldMesh();
+
+		ITimeCostFunction timeCost = TimeCostFunctionFactory.create(
+				attributesPotential.getTimeCostAttributes(),
+				attributesPedestrian,
+				topography,
+				targetId, triangulation);
+
+		var pointLocator = new JumpAndWalkPointLocator<>(triangulation.getMesh());
+		switch (createMethod) {
+			case FAST_ITERATIVE_METHOD_TRI:
+				eikonalSolver = new MeshEikonalSolverFIM<>(targetId +"", targetShapes, timeCost, triangulation, pointLocator);
+				break;
+			case FAST_MARCHING_TRI:
+			default:
+				eikonalSolver = new MeshEikonalSolverFMM<>(targetId +"", targetShapes, timeCost, triangulation, pointLocator);
+				break;
 		}
 		return eikonalSolver;
 	}

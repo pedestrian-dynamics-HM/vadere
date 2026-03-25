@@ -3,10 +3,10 @@ package org.vadere.simulator.models.potential.timeCostFunction;
 import org.apache.commons.math3.special.Erf;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.vadere.meshing.mesh.inter.IFace;
-import org.vadere.meshing.mesh.inter.IHalfEdge;
-import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
-import org.vadere.meshing.mesh.inter.IVertex;
+import org.vadere.meshing.mesh.inter.mesh.IFace;
+import org.vadere.meshing.mesh.inter.mesh.IHalfEdge;
+import org.vadere.meshing.mesh.inter.mesh.ITriangleMeshWithDataStorage;
+import org.vadere.meshing.mesh.inter.mesh.IVertex;
 import org.vadere.meshing.mesh.inter.IVertexContainerDouble;
 import org.vadere.meshing.utils.math.GeometryUtilsMesh;
 import org.vadere.simulator.models.potential.solver.timecost.ITimeCostFunction;
@@ -30,7 +30,7 @@ public class TimeCostObstacleDensityMesh<V extends IVertex, E extends IHalfEdge,
 	private final ITimeCostFunction timeCostFunction;
 	private final IDistanceFunction distanceFunction;
 	private final AttributesTimeCost attributesTimeCost;
-	private final IIncrementalTriangulation<V, E, F> triangulation;
+	private final ITriangleMeshWithDataStorage<V, E, F> triangulation;
 	private final IVertexContainerDouble<V, E, F> densities;
 	private boolean updated;
 
@@ -42,7 +42,7 @@ public class TimeCostObstacleDensityMesh<V extends IVertex, E extends IHalfEdge,
 
 	public TimeCostObstacleDensityMesh(
 			@NotNull final ITimeCostFunction timeCostFunction,
-			@NotNull final IIncrementalTriangulation<V, E, F> triangulation,
+			@NotNull final ITriangleMeshWithDataStorage<V, E, F> triangulation,
 			final AttributesTimeCost attributesTimeCost,
 			final AttributesAgent attributesAgent,
 			final IDistanceFunction distanceFunction){
@@ -50,7 +50,7 @@ public class TimeCostObstacleDensityMesh<V extends IVertex, E extends IHalfEdge,
 		this.attributesTimeCost = attributesTimeCost;
 		this.triangulation = triangulation;
 		this.distanceFunction = distanceFunction;
-		this.densities = triangulation.getMesh().getDoubleVertexContainer(nameObstacleDensity);
+		this.densities = triangulation.getDataStorage().getDoubleVertexContainer(nameObstacleDensity, triangulation.getMesh());
 		this.updated = false;
 
 		//TODO duplicated code
@@ -77,9 +77,9 @@ public class TimeCostObstacleDensityMesh<V extends IVertex, E extends IHalfEdge,
 
 	@Override
 	public double costAt(@NotNull final IPoint p) {
-		F face = triangulation.locate(p).get();
+		F face = triangulation.getMesh().readConnectivity().locateNonBoundaryByFullScan(p).get();
 		double cost = 0;
-		if (!triangulation.getMesh().isBoundary(face)) {
+		if (!triangulation.getMesh().faces().isBoundary(face)) {
 			cost = GeometryUtilsMesh.barycentricInterpolation(face, triangulation.getMesh(),
 					v -> densities.getValue(v), p.getX(), p.getY());
 		}
@@ -90,10 +90,10 @@ public class TimeCostObstacleDensityMesh<V extends IVertex, E extends IHalfEdge,
 	public void update() {
 		timeCostFunction.update();
 		if(!updated) {
-			triangulation.getMesh().streamVerticesParallel()
-					.filter(v -> -distanceFunction.apply(triangulation.getMesh().toPoint(v)) < influenceRadius)
+			triangulation.getMesh().vertices().streamParallel()
+					.filter(v -> -distanceFunction.apply(triangulation.getMesh().vertices().toPoint(v)) < influenceRadius)
 					.forEach(v -> {
-						double dist = Math.max(0, -distanceFunction.apply(triangulation.getMesh().toPoint(v)));
+						double dist = Math.max(0, -distanceFunction.apply(triangulation.getMesh().vertices().toPoint(v)));
 						double density = density(dist);
 						densities.setValue(v, density);
 					});

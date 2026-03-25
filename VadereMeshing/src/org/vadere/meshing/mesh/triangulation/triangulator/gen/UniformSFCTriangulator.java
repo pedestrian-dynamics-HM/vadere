@@ -1,11 +1,10 @@
 package org.vadere.meshing.mesh.triangulation.triangulator.gen;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.vadere.meshing.mesh.inter.IFace;
-import org.vadere.meshing.mesh.inter.IHalfEdge;
-import org.vadere.meshing.mesh.inter.IMesh;
+import org.vadere.meshing.mesh.inter.mesh.*;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
-import org.vadere.meshing.mesh.inter.IVertex;
+import org.vadere.meshing.mesh.inter.mesh.builder.ITriangleMeshBuilder;
+import org.vadere.meshing.mesh.inter.mesh.data.IMeshDataStorage;
 import org.vadere.meshing.mesh.triangulation.triangulator.inter.ITriangulator;
 import org.vadere.util.logging.Logger;
 import org.vadere.util.math.IDistanceFunction;
@@ -70,22 +69,22 @@ public class UniformSFCTriangulator<V extends IVertex, E extends IHalfEdge, F ex
 		LinkedList<F> toRefineFaces = new LinkedList<>();
 		LinkedList<F> sortedFaces = new LinkedList<>();
 
-		toRefineFaces.addAll(mesh.getFaces());
+		toRefineFaces.addAll(mesh.faces().getAll());
 
 		while (!toRefineFaces.isEmpty()) {
 			F face = toRefineFaces.removeFirst();
 
-			E longestEdge = mesh.streamEdges(face)
-					.reduce((e1, e2) -> mesh.toLine(e1).length() > mesh.toLine(e2).length() ? e1 : e2)
+			E longestEdge = mesh.edges().streamEdgesOf(face)
+					.reduce((e1, e2) -> mesh.edges().toLine(e1).length() > mesh.edges().toLine(e2).length() ? e1 : e2)
 					.get();
 
 			if(!isCompleted(longestEdge)) {
-				IPoint midPoint = mesh.toLine(longestEdge).midPoint();
+				IPoint midPoint = mesh.edges().toLine(longestEdge).midPoint();
 				IPoint p = mesh.createPoint(midPoint.getX(), midPoint.getY());
-				Pair<E, E> edges = triangulation.splitEdge(p, longestEdge, false);
+				Pair<E, E> edges = triangulation.getMeshBuilder().changeConnectivity().splitEdge(p, longestEdge, false);
 
-				F f1 = mesh.getFace(edges.getLeft());
-				F f2 = mesh.getTwinFace(edges.getLeft());
+				F f1 = mesh.faces().getOf(edges.getLeft());
+				F f2 = mesh.faces().getTwin(edges.getLeft());
 
 				if(edges.getRight() != null) {
 
@@ -107,16 +106,16 @@ public class UniformSFCTriangulator<V extends IVertex, E extends IHalfEdge, F ex
 	}
 
 	private void generate(E edge) {
-        F face = mesh.getFace(edge);
+        F face = mesh.faces().getOf(edge);
 
-        E longestEdge = mesh.streamEdges(face)
-                .reduce((e1, e2) -> mesh.toLine(e1).length() > mesh.toLine(e2).length() ? e1 : e2)
+        E longestEdge = mesh.edges().streamEdgesOf(face)
+                .reduce((e1, e2) -> mesh.edges().toLine(e1).length() > mesh.edges().toLine(e2).length() ? e1 : e2)
                 .get();
 
         if(!isCompleted(longestEdge)) {
-            IPoint midPoint = mesh.toLine(longestEdge).midPoint();
+            IPoint midPoint = mesh.edges().toLine(longestEdge).midPoint();
 	        IPoint p = mesh.createPoint(midPoint.getX(), midPoint.getY());
-            Pair<E, E> edges = triangulation.splitEdge(p, longestEdge, false);
+            Pair<E, E> edges = triangulation.getMeshBuilder().changeConnectivity().splitEdge(p, longestEdge, false);
 
             if(edge.equals(longestEdge)) {
                 throw new IllegalArgumentException("invalid start triangle.");
@@ -126,10 +125,10 @@ public class UniformSFCTriangulator<V extends IVertex, E extends IHalfEdge, F ex
             if(edges.getRight() == null) {
                 E e1 = edges.getLeft();
                 E e2 = edges.getRight();
-                F f1 = mesh.getFace(edges.getLeft());
-                F f2 = mesh.getTwinFace(edges.getLeft());
+                F f1 = mesh.faces().getOf(edges.getLeft());
+                F f2 = mesh.faces().getTwin(edges.getLeft());
 
-                if(mesh.streamEdges(f1).anyMatch(e -> e.equals(edge))) {
+                if(mesh.edges().streamEdgesOf(f1).anyMatch(e -> e.equals(edge))) {
                     F tmp = f1;
                     f1 = f2;
                     f2 = f1;
@@ -158,21 +157,26 @@ public class UniformSFCTriangulator<V extends IVertex, E extends IHalfEdge, F ex
 		return triangulation;
 	}
 
-	@Override
-	public IMesh<V, E, F> getMesh() {
-		return mesh;
-	}
+    @Override
+    public IMeshDataStorage<V, E, F> getMeshDataStorage() {
+        return triangulation.getMeshDataStorage();
+    }
 
-	private void removeTrianglesOutsideBBox() {
+    @Override
+    public ITriangleMeshBuilder<V, E, F> getMeshBuilder() {
+        return triangulation.getMeshBuilder();
+    }
+
+    private void removeTrianglesOutsideBBox() {
         boolean removedSome = true;
 
         while (removedSome) {
             removedSome = false;
 
-            List<F> candidates = mesh.getFaces(mesh.getBorder());
+            List<F> candidates = mesh.faces().getSurroundingOf(mesh.faces().getOuterBorder());
             for(F face : candidates) {
-                if(!mesh.isDestroyed(face) && mesh.streamVertices(face).anyMatch(v -> !bbox.contains(v))) {
-                    triangulation.removeFaceAtBorder(face, true);
+                if(!mesh.faces().isDestroyed(face) && mesh.vertices().streamVerticesOf(face).anyMatch(v -> !bbox.contains(v))) {
+                    triangulation.getMeshBuilder().changeConnectivity().removeFaceAtBorder(face, true);
                     removedSome = true;
                 }
             }
@@ -180,10 +184,10 @@ public class UniformSFCTriangulator<V extends IVertex, E extends IHalfEdge, F ex
     }
 
     private void removeTrianglesInsideObstacles() {
-        List<F> faces = triangulation.getMesh().getFaces();
+        List<F> faces = triangulation.getMesh().faces().getAll();
         for(F face : faces) {
-            if(!triangulation.getMesh().isDestroyed(face) && distFunc.apply(triangulation.getMesh().toTriangle(face).midPoint()) > 0) {
-                triangulation.removeFaceAtBorder(face, true);
+            if(!triangulation.getMesh().faces().isDestroyed(face) && distFunc.apply(triangulation.getMesh().faces().toTriangle(face).midPoint()) > 0) {
+                triangulation.getMeshBuilder().changeConnectivity().removeFaceAtBorder(face, true);
             }
         }
     }
@@ -223,23 +227,23 @@ public class UniformSFCTriangulator<V extends IVertex, E extends IHalfEdge, F ex
     }
 
     private boolean isCompleted(E edge) {
-        if(mesh.isBoundary(edge)){
-            edge = mesh.getTwin(edge);
+        if(mesh.edges().isBoundary(edge)){
+            edge = mesh.edges().getTwin(edge);
         }
 
-        F face = mesh.getFace(edge);
-        F twin = mesh.getTwinFace(edge);
+        F face = mesh.faces().getOf(edge);
+        F twin = mesh.faces().getTwin(edge);
 
-        VTriangle triangle = mesh.toTriangle(face);
-        VLine line = mesh.toLine(edge);
+        VTriangle triangle = mesh.faces().toTriangle(face);
+        VLine line = mesh.edges().toLine(edge);
 
         return (line.length() <= lenFunc.apply(line.midPoint()) && random.nextDouble() < 0.96)
-                || (!triangle.intersectsRectangleLine(bbox) && (mesh.isBoundary(twin) || !mesh.toTriangle(twin).intersectsRectangleLine(bbox)))
-                || boundary.stream().anyMatch(shape -> shape.contains(triangle.getBounds2D()) || (!mesh.isBoundary(twin) && shape.contains(mesh.toTriangle(twin).getBounds2D())));
+                || (!triangle.intersectsRectangleLine(bbox) && (mesh.faces().isBoundary(twin) || !mesh.faces().toTriangle(twin).intersectsRectangleLine(bbox)))
+                || boundary.stream().anyMatch(shape -> shape.contains(triangle.getBounds2D()) || (!mesh.faces().isBoundary(twin) && shape.contains(mesh.faces().toTriangle(twin).getBounds2D())));
     }
 
     private Collection<E> refine(final E edge) {
-        IPoint midPoint = mesh.toLine(edge).midPoint();
+        IPoint midPoint = mesh.edges().toLine(edge).midPoint();
 	    IPoint p = mesh.createPoint(midPoint.getX(), midPoint.getY());
 
         if(points.contains(p)) {
@@ -247,8 +251,8 @@ public class UniformSFCTriangulator<V extends IVertex, E extends IHalfEdge, F ex
         }
         else {
             points.add(p);
-            E createdEdge = triangulation.splitEdge(p, edge, false).getLeft();
-            return mesh.getIncidentEdges(createdEdge);
+            E createdEdge = triangulation.getMeshBuilder().changeConnectivity().splitEdge(p, edge, false).getLeft();
+            return mesh.edges().getIncidentEdges(createdEdge);
         }
     }
 

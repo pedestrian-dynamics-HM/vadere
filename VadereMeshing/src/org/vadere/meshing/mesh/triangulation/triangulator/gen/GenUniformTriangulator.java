@@ -1,10 +1,10 @@
 package org.vadere.meshing.mesh.triangulation.triangulator.gen;
 
-import org.vadere.meshing.mesh.inter.IFace;
-import org.vadere.meshing.mesh.inter.IHalfEdge;
-import org.vadere.meshing.mesh.inter.IMesh;
+import org.vadere.meshing.mesh.inter.mesh.*;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
-import org.vadere.meshing.mesh.inter.IVertex;
+import org.vadere.meshing.mesh.inter.mesh.builder.ITriangleMeshBuilder;
+import org.vadere.meshing.mesh.inter.mesh.data.IMeshDataStorage;
+import org.vadere.meshing.mesh.inter.mesh.triangle.ITriangleMesh;
 import org.vadere.meshing.mesh.triangulation.triangulator.inter.ITriangulator;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VRectangle;
@@ -85,9 +85,15 @@ public class GenUniformTriangulator<V extends IVertex, E extends IHalfEdge, F ex
 	}
 
 	@Override
-	public IMesh<V, E, F> getMesh() {
-        return triangulation.getMesh();
+	public ITriangleMeshBuilder<V, E, F> getMeshBuilder() {
+        return triangulation.getMeshBuilder();
 	}
+
+	@Override
+	public IMeshDataStorage<V, E, F> getMeshDataStorage() {
+		return triangulation.getMeshDataStorage();
+	}
+
 
 	private Collection<IPoint> generatePointSet() {
 		// height of a triangle with 60 deg everywhere
@@ -96,22 +102,23 @@ public class GenUniformTriangulator<V extends IVertex, E extends IHalfEdge, F ex
 		double h = minTriangleSideLength * Math.sqrt(3) / 2.0;
 		// create stencil with four triangle which can be used to triangulate
 		// the whole rectangle seamlessly
-		IPoint add1 = getMesh().createPoint(-s / 2, h);
-		IPoint add2 = getMesh().createPoint(s / 2, h);
-		IPoint add3 = getMesh().createPoint(s, 0);
-		IPoint add4 = getMesh().createPoint(0, 2 * h);
-		IPoint add5 = getMesh().createPoint(s, 2 * h);
+		var mesh = getMeshBuilder().getMesh();
+		IPoint add1 = mesh.createPoint(-s / 2, h);
+		IPoint add2 = mesh.createPoint(s / 2, h);
+		IPoint add3 = mesh.createPoint(s, 0);
+		IPoint add4 = mesh.createPoint(0, 2 * h);
+		IPoint add5 = mesh.createPoint(s, 2 * h);
 
 		for (int row = 0; row < (int) Math.ceil(height / h) + 1; row += 2) {
 			for (int col = 0; col < (int) Math.ceil(width
 					/ minTriangleSideLength); col++) {
-				IPoint p1 = getMesh().createPoint(left + col * minTriangleSideLength, top + row * h);
+				IPoint p1 = mesh.createPoint(left + col * minTriangleSideLength, top + row * h);
 
-				IPoint p2 = getMesh().createPoint(p1.getX() + add1.getX(), p1.getY() + add1.getY());
-				IPoint p3 = getMesh().createPoint(p1.getX() + add2.getX(), p1.getY() + add2.getY());
-				IPoint p4 = getMesh().createPoint(p1.getX() + add3.getX(), p1.getY() + add3.getY());
-				IPoint p5 = getMesh().createPoint(p1.getX() + add4.getX(), p1.getY() + add4.getY());
-				IPoint p6 = getMesh().createPoint(p1.getX() + add5.getX(), p1.getY() + add5.getY());
+				IPoint p2 = mesh.createPoint(p1.getX() + add1.getX(), p1.getY() + add1.getY());
+				IPoint p3 = mesh.createPoint(p1.getX() + add2.getX(), p1.getY() + add2.getY());
+				IPoint p4 = mesh.createPoint(p1.getX() + add3.getX(), p1.getY() + add3.getY());
+				IPoint p5 = mesh.createPoint(p1.getX() + add4.getX(), p1.getY() + add4.getY());
+				IPoint p6 = mesh.createPoint(p1.getX() + add5.getX(), p1.getY() + add5.getY());
 
 				pointSet.add(p1);
 				pointSet.add(p2);

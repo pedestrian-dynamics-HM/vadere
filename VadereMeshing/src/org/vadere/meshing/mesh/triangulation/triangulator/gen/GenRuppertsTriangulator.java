@@ -3,12 +3,11 @@ package org.vadere.meshing.mesh.triangulation.triangulator.gen;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.impl.PSLG;
-import org.vadere.meshing.mesh.inter.IFace;
-import org.vadere.meshing.mesh.inter.IHalfEdge;
+import org.vadere.meshing.mesh.inter.mesh.*;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
-import org.vadere.meshing.mesh.inter.IMesh;
 import org.vadere.meshing.mesh.inter.ITriEventListener;
-import org.vadere.meshing.mesh.inter.IVertex;
+import org.vadere.meshing.mesh.inter.mesh.builder.ITriangleMeshBuilder;
+import org.vadere.meshing.mesh.inter.mesh.data.IMeshDataStorage;
 import org.vadere.meshing.mesh.triangulation.triangulator.inter.IPlacementStrategy;
 import org.vadere.meshing.mesh.triangulation.triangulator.inter.ITriangulator;
 import org.vadere.util.geometry.GeometryUtils;
@@ -123,7 +122,7 @@ public class GenRuppertsTriangulator<V extends IVertex, E extends IHalfEdge, F e
 
 
 	public GenRuppertsTriangulator(
-			@NotNull final Supplier<IMesh<V, E, F>> meshSupplier,
+			@NotNull final Supplier<ITriangleMeshBuilder<V, E, F>> meshSupplier,
 			@NotNull final PSLG pslg,
 			final double minAngle,
 			@NotNull Function<IPoint, Double> circumRadiusFunc,
@@ -132,7 +131,7 @@ public class GenRuppertsTriangulator<V extends IVertex, E extends IHalfEdge, F e
 	}
 
 	public GenRuppertsTriangulator(
-			@NotNull final Supplier<IMesh<V, E, F>> meshSupplier,
+			@NotNull final Supplier<ITriangleMeshBuilder<V, E, F>> meshSupplier,
 			@NotNull final PSLG pslg,
 			final double minAngle,
 			@NotNull Function<IPoint, Double> circumRadiusFunc,
@@ -142,7 +141,7 @@ public class GenRuppertsTriangulator<V extends IVertex, E extends IHalfEdge, F e
 	}
 
 	public GenRuppertsTriangulator(
-			@NotNull final Supplier<IMesh<V, E, F>> meshSupplier,
+			@NotNull final Supplier<ITriangleMeshBuilder<V, E, F>> meshSupplier,
 			@NotNull final PSLG pslgBound,
 			@NotNull final PSLG pslg,
 			final double minAngle,
@@ -170,7 +169,7 @@ public class GenRuppertsTriangulator<V extends IVertex, E extends IHalfEdge, F e
 	}
 
 	public GenRuppertsTriangulator(
-			@NotNull final Supplier<IMesh<V, E, F>> meshSupplier,
+			@NotNull final Supplier<ITriangleMeshBuilder<V, E, F>> meshSupplier,
 			@NotNull final PSLG pslg) {
 		this(meshSupplier, pslg, MIN_ANGLE_TO_TERMINATE, p -> Double.POSITIVE_INFINITY, true);
 	}
@@ -183,9 +182,13 @@ public class GenRuppertsTriangulator<V extends IVertex, E extends IHalfEdge, F e
 		return generated;
 	}
 
+	public ITriangleMeshBuilder<V, E, F> getMeshBuilder() {
+		return cdt.getMeshBuilder();
+	}
+
 	@Override
-	public IMesh<V, E, F> getMesh() {
-		return cdt.getMesh();
+	public IMeshDataStorage<V, E, F> getMeshDataStorage() {
+		return cdt.getMeshDataStorage();
 	}
 
 	/**
@@ -203,8 +206,8 @@ public class GenRuppertsTriangulator<V extends IVertex, E extends IHalfEdge, F e
 			if((handleBad && isBad(face)) || (!handleBad && isLarge(face))) {
 				// (2) compute the insertion point
 				VTriangle triangle = triangles.get(face);
-				assert getMesh().toTriangle(face).midPoint().distance(triangle.midPoint()) < GeometryUtils.DOUBLE_EPS;
-				VPoint circumCenter = placementStrategy.computePlacement(getMesh().getEdge(face), triangle);
+				assert getMesh().faces().toTriangle(face).midPoint().distance(triangle.midPoint()) < GeometryUtils.DOUBLE_EPS;
+				VPoint circumCenter = placementStrategy.computePlacement(getMesh().edges().getAnyOf(face), triangle);
 
 				// (3) find segements which are encroached by the insertion point
 				findEncrocedSegments(circumCenter);
@@ -222,7 +225,7 @@ public class GenRuppertsTriangulator<V extends IVertex, E extends IHalfEdge, F e
 					E e = triangulation.insert(circumCenter.getX(), circumCenter.getY());
 //					assert segments.stream().noneMatch(edge -> isEncroachedExpensive(edge));
 					logger.debug("inserted: " + circumCenter);
-					for(F f : getMesh().getFaceIt(getMesh().getVertex(e))) {
+					for(F f : getMesh().faces().adjacentIterableFor(getMesh().vertices().getEndOf(e))) {
 						if(isBad(f)) {
 							addBadTriangle(f);
 						}
@@ -241,7 +244,7 @@ public class GenRuppertsTriangulator<V extends IVertex, E extends IHalfEdge, F e
 	}
 
 	public void refineSub() {
-    	while (getMesh().streamFaces().anyMatch(f -> isBad(f))) {
+    	while (getMesh().faces().stream().anyMatch(f -> isBad(f))) {
     		refineSimplex2D();
 	    }
 	}
@@ -250,26 +253,26 @@ public class GenRuppertsTriangulator<V extends IVertex, E extends IHalfEdge, F e
 
 		// (1) remove triangles inside holes
 	    for(VPolygon hole : pslgBound.getHoles()) {
-		    Predicate<F> mergeCondition = f -> hole.contains(getMesh().toTriangle(f).midPoint());
-		    Optional<F> optFace = getMesh().streamFaces(f -> !getMesh().isHole(f)).filter(mergeCondition).findAny();
+		    Predicate<F> mergeCondition = f -> hole.contains(getMesh().faces().toTriangle(f).midPoint());
+		    Optional<F> optFace = getMesh().faces().stream(f -> !getMesh().faces().isHole(f)).filter(mergeCondition).findAny();
 		    if (optFace.isPresent()) {
-			    Optional<F> optionalF = triangulation.createHole(optFace.get(), mergeCondition, true);
+			    Optional<F> optionalF = triangulation.getMeshBuilder().changeConnectivity().createHole(optFace.get(), mergeCondition, true);
 		    }
 	    }
 
 	    // (2) remove triangles outside the boundary
 	    if(pslgBound.getSegmentBound() != null) {
-		    Predicate<F> mergeCondition = f -> !pslgBound.getSegmentBound().contains(getMesh().toTriangle(f).midPoint());
-		    triangulation.shrinkBorder(mergeCondition, true);
+		    Predicate<F> mergeCondition = f -> !pslgBound.getSegmentBound().contains(getMesh().faces().toTriangle(f).midPoint());
+			triangulation.getMeshBuilder().changeConnectivity().shrinkBorder(mergeCondition, true);
 	    }
 	}
 
 	private void markOutsideTriangles() {
 		for(VPolygon hole : pslgBound.getHoles()) {
-			Predicate<F> markCondition = f -> !isMarked(f) && hole.contains(getMesh().toTriangle(f).midPoint());
-			Optional<F> optFace = getMesh().streamFaces(f -> !getMesh().isHole(f)).filter(markCondition).findAny();
+			Predicate<F> markCondition = f -> !isMarked(f) && hole.contains(getMesh().faces().toTriangle(f).midPoint());
+			Optional<F> optFace = getMesh().faces().stream(f -> !getMesh().faces().isHole(f)).filter(markCondition).findAny();
 			if (optFace.isPresent()) {
-				List<F> faces = triangulation.findFaces(optFace.get(), markCondition, 0);
+				List<F> faces = triangulation.getMesh().readConnectivity().findFaces(optFace.get(), markCondition, 0);
 				faces.stream().forEach(f -> mark(f));
 			}
 		}
@@ -279,7 +282,7 @@ public class GenRuppertsTriangulator<V extends IVertex, E extends IHalfEdge, F e
     	if(!initialized) {
 		    // (1) compute the constrained Delaunay triangulation (CDT)
 		    triangulation = cdt.generate();
-		    triangulation.addTriEventListener(this);
+		    triangulation.getMesh().addTriEventListener(this);
 
 		    // (2) remove triangles inside holes and at concavities
 		    //removeTriangles();
@@ -287,7 +290,7 @@ public class GenRuppertsTriangulator<V extends IVertex, E extends IHalfEdge, F e
 		    // (3) get the segments which should not be flipped!
 		    segments.addAll(cdt.getConstrains());
 
-		    triangulation.setCanIllegalPredicate(edge -> !segments.contains(edge) && !segments.contains(getMesh().getTwin(edge)));
+		    triangulation.setCanIllegalPredicate(edge -> !segments.contains(edge) && !segments.contains(getMesh().edges().getTwin(edge)));
 
 		    if(createHoles) {
 			    removeOutsideTriangles();
@@ -301,8 +304,8 @@ public class GenRuppertsTriangulator<V extends IVertex, E extends IHalfEdge, F e
 //		    assert segments.stream().noneMatch(edge -> isEncroachedExpensive(edge));
 
 		    // (5) gather all bad triangles
-		    getMesh().streamFaces().filter(f -> isBad(f)).forEach(f -> addBadTriangle(f));
-		    getMesh().streamFaces().filter(f -> isLarge(f) && !isBad(f)).forEach(f -> addLargeTriangle(f));
+		    getMesh().faces().stream().filter(f -> isBad(f)).forEach(f -> addBadTriangle(f));
+		    getMesh().faces().stream().filter(f -> isLarge(f) && !isBad(f)).forEach(f -> addLargeTriangle(f));
 
 		    initialized = true;
 	    } else if(!badTriangles.isEmpty() || !largeTriangles.isEmpty()) {
@@ -311,17 +314,17 @@ public class GenRuppertsTriangulator<V extends IVertex, E extends IHalfEdge, F e
     		if(!allowSegmentFaces) {
 			    List<E> initialSegments = segments.stream().collect(Collectors.toList());
 			    for (E segment : initialSegments) {
-				    VLine line = getMesh().toLine(segment);
+				    VLine line = getMesh().edges().toLine(segment);
 				    VLine smallest = null;
-				    for (E edge : getMesh().getEdgeIt(getMesh().getVertex(segment))) {
-					    VLine nLine = getMesh().toLine(edge);
+				    for (E edge : getMesh().edges().iterableFor(getMesh().vertices().getEndOf(segment))) {
+					    VLine nLine = getMesh().edges().toLine(edge);
 					    if(smallest == null || smallest.length() > nLine.length()) {
 						    smallest = nLine;
 					    }
 				    }
 
-				    for (E edge : getMesh().getEdgeIt(getMesh().getTwinVertex(segment))) {
-					    VLine nLine = getMesh().toLine(edge);
+				    for (E edge : getMesh().edges().iterableFor(getMesh().vertices().getTwin(segment))) {
+					    VLine nLine = getMesh().edges().toLine(edge);
 					    if(smallest == null || smallest.length() > nLine.length()) {
 						    smallest = nLine;
 					    }
@@ -340,13 +343,13 @@ public class GenRuppertsTriangulator<V extends IVertex, E extends IHalfEdge, F e
 	}
 
 	private void split() {
-		List<E> edges = getMesh().getEdges();
+		List<E> edges = getMesh().edges().getAll();
 		for(E edge : edges) {
 			if(!segments.contains(edge)) {
-				V v1 = getMesh().getVertex(edge);
-				V v2 = getMesh().getTwinVertex(edge);
+				V v1 = getMesh().vertices().getEndOf(edge);
+				V v2 = getMesh().vertices().getTwin(edge);
 				if(isSegmentVertex(v1) && isSegmentVertex(v2)) {
-					getTriangulation().splitEdge(edge, true);
+					triangulation.getMeshBuilder().changeConnectivity().splitEdge(edge, true);
 				}
 			}
 		}
@@ -365,10 +368,10 @@ public class GenRuppertsTriangulator<V extends IVertex, E extends IHalfEdge, F e
 	}
 
 	private void addBadTriangle(@NotNull F face) {
-		VTriangle triangle = getMesh().toTriangle(face);
+		VTriangle triangle = getMesh().faces().toTriangle(face);
 		if(pslgBound.getSegmentBound().contains(triangle.midPoint())) {
-			triangles.put(face, getMesh().toTriangle(face));
-			qualities.put(face, getTriangulation().faceToQuality(face));
+			triangles.put(face, getMesh().faces().toTriangle(face));
+			qualities.put(face, triangulation.getMesh().readConnectivity().faceToQuality(face));
 			if(!badTriangleSet.contains(face)) {
 				badTriangles.add(face);
 				badTriangleSet.add(face);
@@ -398,10 +401,10 @@ public class GenRuppertsTriangulator<V extends IVertex, E extends IHalfEdge, F e
 	}
 
 	private void addLargeTriangle(@NotNull F face) {
-		VTriangle triangle = getMesh().toTriangle(face);
+		VTriangle triangle = getMesh().faces().toTriangle(face);
 		if(pslgBound.getSegmentBound().contains(triangle.midPoint())) {
-			triangles.put(face, getMesh().toTriangle(face));
-			qualities.put(face, getTriangulation().faceToQuality(face));
+			triangles.put(face, getMesh().faces().toTriangle(face));
+			qualities.put(face, triangulation.getMesh().readConnectivity().faceToQuality(face));
 			if(!largeTriangleSet.contains(face)) {
 				largeTriangles.add(face);
 				largeTriangleSet.add(face);
@@ -443,42 +446,42 @@ public class GenRuppertsTriangulator<V extends IVertex, E extends IHalfEdge, F e
 	}
 
 	private Pair<E, E> split(@NotNull final E segment) {
-		E splitSegment = isBoundary(segment) ? getMesh().getTwin(segment) : segment;
+		E splitSegment = isBoundary(segment) ? getMesh().edges().getTwin(segment) : segment;
 		int size = segments.size();
 		segments.remove(splitSegment);
-		segments.remove(getMesh().getTwin(splitSegment));
+		segments.remove(getMesh().edges().getTwin(splitSegment));
 		assert segments.size() == size - 2;
 
 		// add s1, s2
-		VLine line = getMesh().toLine(splitSegment);
+		VLine line = getMesh().edges().toLine(splitSegment);
 		VPoint midPoint = line.midPoint();
-		V vertex = getMesh().createVertex(midPoint.getX(), midPoint.getY());
-		V v1 = getMesh().getVertex(splitSegment);
-		V v2 = getMesh().getTwinVertex(splitSegment);
+		V vertex = getMeshBuilder().vertices().create(midPoint.getX(), midPoint.getY());
+		V v1 = getMesh().vertices().getEndOf(splitSegment);
+		V v2 = getMesh().vertices().getTwin(splitSegment);
 
-		boolean mark = !createHoles && isMarked(getMesh().getTwinFace(splitSegment));
+		boolean mark = !createHoles && isMarked(getMesh().faces().getTwin(splitSegment));
 
 		// split s
-		List<E> toLegalize = triangulation.splitEdgeAndReturn(vertex, splitSegment, false);
+		List<E> toLegalize = triangulation.getMeshBuilder().changeConnectivity().splitEdgeAndReturn(vertex, splitSegment, false);
 
 		// update data structure: add s1, s2
-		E e1 = getMesh().getEdge(vertex, v1).get();
-		E e2 = getMesh().getEdge(vertex, v2).get();
+		E e1 = getMesh().edges().getOf(vertex, v1).get();
+		E e2 = getMesh().edges().getOf(vertex, v2).get();
 
 		segments.add(e1);
-		segments.add(getMesh().getTwin(e1));
+		segments.add(getMesh().edges().getTwin(e1));
 		segments.add(e2);
-		segments.add(getMesh().getTwin(e2));
+		segments.add(getMesh().edges().getTwin(e2));
 
 		if(mark) {
 			// we have to mark the correct face, this depends on the call above i.e. V v1 = getMesh().getVertex(splitSegment);
 			// and the fact that splitSegment is not a boundary edge.
-			mark(getMesh().getFace(e1));
-			mark(getMesh().getTwinFace(e2));
+			mark(getMesh().faces().getOf(e1));
+			mark(getMesh().faces().getTwin(e2));
 		}
 
 		for(E e : toLegalize) {
-			triangulation.legalize(e, vertex);
+			triangulation.getMeshBuilder().changeConnectivity().legalize(e, vertex);
 		}
 
 		if(isEncroached(e1)) {
@@ -491,7 +494,7 @@ public class GenRuppertsTriangulator<V extends IVertex, E extends IHalfEdge, F e
 			assert segments.contains(e2);
 		}
 
-		for(F f : getMesh().getFaceIt(vertex)) {
+		for(F f : getMesh().faces().adjacentIterableFor(vertex)) {
 			if(!isBoundary(f)) {
 				if(isBad(f)) {
 					addBadTriangle(f);
@@ -506,15 +509,15 @@ public class GenRuppertsTriangulator<V extends IVertex, E extends IHalfEdge, F e
 	}
 
 	private boolean isBoundary(@NotNull final F f) {
-		return getMesh().isBoundary(f) || isMarked(f);
+		return getMesh().faces().isBoundary(f) || isMarked(f);
 	}
 
 	private boolean isBoundary(@NotNull final E edge) {
-		return isBoundary(getMesh().getFace(edge));
+		return isBoundary(getMesh().faces().getOf(edge));
 	}
 
 	private boolean isAtBoundary(@NotNull final E edge) {
-		return isBoundary(edge) || isBoundary(getMesh().getTwin(edge));
+		return isBoundary(edge) || isBoundary(getMesh().edges().getTwin(edge));
 	}
 
     @Override
@@ -536,7 +539,7 @@ public class GenRuppertsTriangulator<V extends IVertex, E extends IHalfEdge, F e
 	}
 
 	private boolean isLarge(@NotNull final F face) {
-		VTriangle triangle = getMesh().toTriangle(face);
+		VTriangle triangle = getMesh().faces().toTriangle(face);
 		return isInside(face)
 				&& (circumRadiusFunc.apply(triangle.getCircumcenter()) < triangle.getCircumscribedRadius());
 	}
@@ -546,12 +549,12 @@ public class GenRuppertsTriangulator<V extends IVertex, E extends IHalfEdge, F e
 			return false;
 		}
 		else {
-			return getMesh().streamVertices(face).allMatch(v -> isSegmentVertex(v));
+			return getMesh().vertices().streamVerticesOf(face).allMatch(v -> isSegmentVertex(v));
 		}
 	}
 
 	private boolean isSegmentVertex(@NotNull final V v) {
-		return getMesh().streamEdges(v).anyMatch(e -> segments.contains(e));
+		return getMesh().edges().streamEdgesOf(v).anyMatch(e -> segments.contains(e));
 	}
 
 	private boolean isBad(@NotNull final F face) {
@@ -564,13 +567,13 @@ public class GenRuppertsTriangulator<V extends IVertex, E extends IHalfEdge, F e
 		}
 
 		//TODO: this might be expensive!
-		return pslg.getSegmentBound().contains(getMesh().toTriangle(face).midPoint());
+		return pslg.getSegmentBound().contains(getMesh().faces().toTriangle(face).midPoint());
     }
 
 	private boolean isSkinny(@NotNull final F face, final double angle) {
 		double alpha = angle; // lowest angle3D in degree
 		double radAlpha = Math.toRadians(alpha);
-		VTriangle triangle = getMesh().toTriangle(face);
+		VTriangle triangle = getMesh().faces().toTriangle(face);
 
 		return GeometryUtils.angle(triangle.p1, triangle.p2, triangle.p3) < radAlpha
 				|| GeometryUtils.angle(triangle.p3, triangle.p1, triangle.p2) < radAlpha
@@ -578,31 +581,31 @@ public class GenRuppertsTriangulator<V extends IVertex, E extends IHalfEdge, F e
 	}
 
 	private boolean isEncroached(@NotNull final E segment, @NotNull final VPoint p) {
-		VLine line = getMesh().toLine(segment);
+		VLine line = getMesh().edges().toLine(segment);
 		VPoint midPoint = line.midPoint();
 		VCircle diameterCircle = new VCircle(midPoint, midPoint.distance(line.getX1(), line.getY1()));
 		return p.distance(line.getVPoint1()) > GeometryUtils.DOUBLE_EPS && p.distance(line.getVPoint2()) > GeometryUtils.DOUBLE_EPS && diameterCircle.contains(p);
 	}
 
 	private boolean isEncroached(@NotNull final E segment) {
-		E seg = isBoundary(segment) ? getMesh().getTwin(segment) : segment;
-		VPoint p1 = getMesh().toPoint(getMesh().getNext(seg));
+		E seg = isBoundary(segment) ? getMesh().edges().getTwin(segment) : segment;
+		VPoint p1 = getMesh().edges().endToPoint(getMesh().edges().getNext(seg));
 		if(isEncroached(seg, p1)) {
 			return true;
 		} else if(isAtBoundary(seg)) {
 			return false;
 		} else {
-			VPoint p2 = getMesh().toPoint(getMesh().getNext(getMesh().getTwin(seg)));
+			VPoint p2 = getMesh().edges().endToPoint(getMesh().edges().getNext(getMesh().edges().getTwin(seg)));
 			return isEncroached(seg, p2);
 		}
 	}
 
 	private boolean isMarked(@NotNull final F face) {
-		return getMesh().getBooleanData(face, "boundary");
+		return getMeshDataStorage().getBooleanData(face, "boundary");
 	}
 
 	private void mark(@NotNull final F face) {
-		getMesh().setBooleanData(face, "boundary", true);
+		getMeshDataStorage().setBooleanData(face, "boundary", true);
 	}
 
     /*private boolean isEncroached(@NotNull final E segment) {
@@ -629,10 +632,10 @@ public class GenRuppertsTriangulator<V extends IVertex, E extends IHalfEdge, F e
 
     // TODO replace this!
 	private boolean isEncroachedExpensive(@NotNull final E segment) {
-		VLine line = getMesh().toLine(segment);
+		VLine line = getMesh().edges().toLine(segment);
 		VPoint midPoint = line.midPoint();
 		VCircle diameterCircle = new VCircle(midPoint, midPoint.distance(line.getX1(), line.getY1()));
-		return getMesh().streamPoints().anyMatch(p -> isEncroached(segment, new VPoint(p.getX(), p.getY())));
+		return getMesh().vertices().streamPoints().anyMatch(p -> isEncroached(segment, new VPoint(p.getX(), p.getY())));
 	}
 
 	@Override
@@ -656,8 +659,8 @@ public class GenRuppertsTriangulator<V extends IVertex, E extends IHalfEdge, F e
 	}
 
 	private void handleVertexInsertion(@NotNull final V vertex) {
-		for(E e : getMesh().getEdgeIt(vertex)) {
-			E prev = getMesh().getPrev(e);
+		for(E e : getMesh().edges().iterableFor(vertex)) {
+			E prev = getMesh().edges().getPrev(e);
 			if(segments.contains(prev) && isEncroached(prev)) {
 				encroachedSegements.add(prev);
 				assert segments.contains(prev);

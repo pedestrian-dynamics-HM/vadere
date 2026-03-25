@@ -1,7 +1,8 @@
 package org.vadere.meshing.examples;
 
 import org.vadere.meshing.mesh.gen.MeshPanel;
-import org.vadere.meshing.mesh.gen.PMesh;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.*;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PMeshBuilder;
 import org.vadere.meshing.mesh.triangulation.triangulator.gen.GenRandomPointsSetTriangulator;
 import org.vadere.util.geometry.shapes.VRectangle;
 
@@ -20,7 +21,8 @@ public class DelaunayTriangulationExamples {
 
 		// define a random point set triangulator
 		int numberOfPoint = 5000;
-		GenRandomPointsSetTriangulator randomTriangulator = new GenRandomPointsSetTriangulator(new PMesh(), numberOfPoint, bound);
+
+		GenRandomPointsSetTriangulator randomTriangulator = new GenRandomPointsSetTriangulator(PMeshBuilder::new, numberOfPoint, bound);
 
 		// fill in the points into the empty triangulation
 		randomTriangulator.generate();

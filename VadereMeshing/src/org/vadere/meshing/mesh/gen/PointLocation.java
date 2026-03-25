@@ -1,6 +1,9 @@
 package org.vadere.meshing.mesh.gen;
 
-import org.vadere.meshing.mesh.inter.IMesh;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PFace;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PHalfEdge;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PVertex;
+import org.vadere.meshing.mesh.inter.mesh.IMesh;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VLine;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -51,8 +54,8 @@ public class PointLocation {
 
 		@Override
 		public boolean test(final PHalfEdge halfEdge) {
-			IPoint v1 = mesh.getPoint(halfEdge);
-			IPoint v2 = mesh.getPoint(mesh.getPrev(halfEdge));
+			IPoint v1 = mesh.edges().getMutableEndPoint(halfEdge);
+			IPoint v2 = mesh.edges().getMutableEndPoint(mesh.edges().getPrev(halfEdge));
 			return (v1.getX() <= p1.getX() && v2.getX() >= p2.getX()) || (v2.getX() <= p1.getX() && v1.getX() >= p2.getX());
 		}
 	}
@@ -89,7 +92,7 @@ public class PointLocation {
 
 		//TODO distinct is maybe slow here
 		Set<IPoint> pointSet = faces.stream()
-				.flatMap(face -> mesh.streamEdges(face)).map(edge -> mesh.getPoint(edge))
+				.flatMap(face -> mesh.edges().streamEdgesOf(face)).map(edge -> mesh.edges().getMutableEndPoint(edge))
 				.sorted(pointComparatorX).collect(Collectors.toSet());
 
 		orderedPointList = pointSet.stream().sorted(pointComparatorX).collect(Collectors.toList());
@@ -100,7 +103,7 @@ public class PointLocation {
 			IPoint p1 = orderedPointList.get(i);
 			IPoint p2 = orderedPointList.get(i+1);
 			List<PHalfEdge> halfEdges = faces.stream()
-					.flatMap(face -> mesh.streamEdges(face)).filter(new BetweenTwoPoints(p1, p2))
+					.flatMap(face -> mesh.edges().streamEdgesOf(face)).filter(new BetweenTwoPoints(p1, p2))
 					.sorted(new HalfEdgeComparator(p1.getX(), p2.getX())).collect(Collectors.toList());
 
 			List<IPoint> intersectionPoints = halfEdges.stream()
@@ -125,7 +128,7 @@ public class PointLocation {
 	private IPoint intersectionWithX(double x, VLine line) {
 		Point2D p = line.getX1() < line.getX2() ? line.getP1() : line.getP2();
 
-		return mesh.getPoint(mesh.createVertex(x, (p.getY() + (p.getX()-x) * line.slope())));
+		return mesh.createPoint(x, p.getY() + (p.getX()-x) * line.slope());
 	}
 
 	public Optional<PFace> getFace(final VPoint point) {
@@ -149,14 +152,14 @@ public class PointLocation {
 
 		PHalfEdge edge = halfeEdgesSegments.get(xSegmentIndex).get(ySegmentIndex);
 
-		PFace face = mesh.getFace(edge);
-		VPolygon polygon = mesh.toPolygon(face);
+		PFace face = mesh.faces().getOf(edge);
+		VPolygon polygon = mesh.faces().toPolygon(face);
 		if(polygon.contains(point)) {
 			return Optional.of(face);
 		}
 		else {
-			PFace f = mesh.getTwinFace(edge);
-			if(mesh.isBoundary(f)) {
+			PFace f = mesh.faces().getTwin(edge);
+			if(mesh.faces().isBoundary(f)) {
 				return Optional.empty();
 			}
 			else {

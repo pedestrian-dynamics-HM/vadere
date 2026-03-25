@@ -1,10 +1,10 @@
 package org.vadere.meshing.utils.debug;
 
 import org.jetbrains.annotations.NotNull;
-import org.vadere.meshing.mesh.inter.IFace;
-import org.vadere.meshing.mesh.inter.IHalfEdge;
-import org.vadere.meshing.mesh.inter.IMesh;
-import org.vadere.meshing.mesh.inter.IVertex;
+import org.vadere.meshing.mesh.inter.mesh.IFace;
+import org.vadere.meshing.mesh.inter.mesh.IHalfEdge;
+import org.vadere.meshing.mesh.inter.mesh.IMesh;
+import org.vadere.meshing.mesh.inter.mesh.IVertex;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VCircle;
 import org.vadere.util.geometry.shapes.VPoint;
@@ -46,13 +46,13 @@ public class SimpleTriCanvas
 	private SimpleTriCanvas(final IMesh<V, E, F> mesh, double width, double height, VRectangle bound) {
 		super(mesh, width, height, bound);
 		this.faces = new ArrayList<>();
-		this.faces = mesh.getFacesWithHoles();
+		this.faces = mesh.faces().getFacesWithHoles();
 
 		// set state information
 		setStateLog(sb -> {
 			sb.append("Faces\n");
 			int i = 0;
-			for (IFace f : mesh.getFacesWithHoles()) {
+			for (IFace f : mesh.faces().getFacesWithHoles()) {
 				sb.append(i).append(": ");
 				sb.append(f.toString()).append("\n");
 				i++;
@@ -88,7 +88,7 @@ public class SimpleTriCanvas
 			int i = 0;
 			for (F face : faces) {
 				try {
-					VPolygon polygon = mesh.toPolygon(face);
+					VPolygon polygon = mesh.faces().toPolygon(face);
 
 					graphics.setColor(colorFunctions.faceFillColor(mesh, face));
 					graphics.fill(polygon);

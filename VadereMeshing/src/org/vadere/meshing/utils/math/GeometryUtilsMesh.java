@@ -1,10 +1,7 @@
 package org.vadere.meshing.utils.math;
 
 import org.jetbrains.annotations.NotNull;
-import org.vadere.meshing.mesh.inter.IFace;
-import org.vadere.meshing.mesh.inter.IHalfEdge;
-import org.vadere.meshing.mesh.inter.IMesh;
-import org.vadere.meshing.mesh.inter.IVertex;
+import org.vadere.meshing.mesh.inter.mesh.*;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.math.InterpolationUtil;
 
@@ -22,7 +19,7 @@ public class GeometryUtilsMesh {
 	public static <V extends IVertex, E extends IHalfEdge, F extends IFace> double getArea(
 			@NotNull final F face,
 			@NotNull final IMesh<V, E, F> mesh) {
-		return GeometryUtils.areaOfPolygon(mesh.getVertices(face));
+		return GeometryUtils.areaOfPolygon(mesh.vertices().getAllOf(face));
 	}
 
 	public static <V extends IVertex, E extends IHalfEdge, F extends IFace> double barycentricInterpolation(
@@ -32,10 +29,13 @@ public class GeometryUtilsMesh {
 			final double x,
 			final double y) {
 
-		E edge = mesh.getEdge(face);
-		V v1 = mesh.getVertex(edge);
-		V v2 = mesh.getVertex(mesh.getNext(edge));
-		V v3 = mesh.getVertex(mesh.getPrev(edge));
+		var vertices = mesh.vertices();
+		var edges = mesh.edges();
+
+		E edge = edges.getAnyOf(face);
+		V v1 = vertices.getEndOf(edge);
+		V v2 = vertices.getEndOf(edges.getNext(edge));
+		V v3 = vertices.getEndOf(edges.getPrev(edge));
 
 		return InterpolationUtil.barycentricInterpolation(v1, v2, v3, function, x, y);
 	}
@@ -58,26 +58,26 @@ public class GeometryUtilsMesh {
 			Function<V, Double> f,
 			@NotNull final Predicate<V> valid) {
 
-		double vx = mesh.getX(v);
-		double vy = mesh.getY(v);
+		double vx = mesh.vertices().getX(v);
+		double vy = mesh.vertices().getY(v);
 		double vz = f.apply(v);
 		double alpha = 0;
 		double beta = 0;
 		double area = 0;
 
 
-		for(E edge : mesh.getEdgeIt(v)) {
-			if(!mesh.isAtBoundary(edge)) {
-				V vi = mesh.getTwinVertex(edge);
-				V vj = mesh.getTwinVertex(mesh.getTwin(mesh.getNext(edge)));
-				V vk = mesh.getTwinVertex(mesh.getPrev(mesh.getTwin(edge)));
+		for(E edge : mesh.edges().iterableFor(v)) {
+			if(!mesh.edges().isAtBoundary(edge)) {
+				V vi = mesh.vertices().getTwin(edge);
+				V vj = mesh.vertices().getTwin(mesh.edges().getTwin(mesh.edges().getNext(edge)));
+				V vk = mesh.vertices().getTwin(mesh.edges().getPrev(mesh.edges().getTwin(edge)));
 
-				double vix = mesh.getX(vi);
-				double viy = mesh.getY(vi);
+				double vix = mesh.vertices().getX(vi);
+				double viy = mesh.vertices().getY(vi);
 				double viz = f.apply(vi);
 
-				double vjx = mesh.getX(vj);
-				double vjy = mesh.getY(vj);
+				double vjx = mesh.vertices().getX(vj);
+				double vjy = mesh.vertices().getY(vj);
 				double vjz = f.apply(vj);
 
 				if(valid.test(vi) && valid.test(vj) && valid.test(vk)) {
@@ -89,8 +89,8 @@ public class GeometryUtilsMesh {
 					double ejy = vjy - vy;
 					double ejz = vjz - vz;
 
-					double ekx = mesh.getX(vk) - vx;
-					double eky = mesh.getY(vk) - vy;
+					double ekx = mesh.vertices().getX(vk) - vx;
+					double eky = mesh.vertices().getY(vk) - vy;
 					double ekz = f.apply(vk) - vz;
 
 					double alphai = GeometryUtils.angle3D(eix, eiy, eiz, ejx, ejy, ejz);
@@ -125,23 +125,23 @@ public class GeometryUtilsMesh {
 	                                                                                           @NotNull final E edge) {
 		double alpha = 0;
 		double beta = 0;
-		V v = mesh.getVertex(edge);
+		V v = mesh.vertices().getEndOf(edge);
 		if(valid.test(v)) {
-			double vx = mesh.getX(v);
-			double vy = mesh.getY(v);
+			double vx = mesh.vertices().getX(v);
+			double vy = mesh.vertices().getY(v);
 			double vz = f.apply(v);
 
-			if(!mesh.isAtBoundary(edge)) {
-				V vi = mesh.getTwinVertex(edge);
-				V vj = mesh.getTwinVertex(mesh.getTwin(mesh.getNext(edge)));
-				V vk = mesh.getTwinVertex(mesh.getPrev(mesh.getTwin(edge)));
+			if(!mesh.edges().isAtBoundary(edge)) {
+				V vi = mesh.vertices().getTwin(edge);
+				V vj = mesh.vertices().getTwin(mesh.edges().getTwin(mesh.edges().getNext(edge)));
+				V vk = mesh.vertices().getTwin(mesh.edges().getPrev(mesh.edges().getTwin(edge)));
 
-				double vix = mesh.getX(vi);
-				double viy = mesh.getY(vi);
+				double vix = mesh.vertices().getX(vi);
+				double viy = mesh.vertices().getY(vi);
 				double viz = f.apply(vi);
 
-				double vjx = mesh.getX(vj);
-				double vjy = mesh.getY(vj);
+				double vjx = mesh.vertices().getX(vj);
+				double vjy = mesh.vertices().getY(vj);
 				double vjz = f.apply(vj);
 
 				if(valid.test(vi) && valid.test(vj) && valid.test(vk)) {
@@ -153,8 +153,8 @@ public class GeometryUtilsMesh {
 					double ejy = vjy - vy;
 					double ejz = vjz - vz;
 
-					double ekx = mesh.getX(vk) - vx;
-					double eky = mesh.getY(vk) - vy;
+					double ekx = mesh.vertices().getX(vk) - vx;
+					double eky = mesh.vertices().getY(vk) - vy;
 					double ekz = f.apply(vk) - vz;
 
 					alpha = GeometryUtils.angle3D(eix, eiy, eiz, ejx, ejy, ejz);

@@ -1,7 +1,7 @@
 package org.vadere.meshing.examples;
 
 import org.vadere.meshing.mesh.gen.MeshRenderer;
-import org.vadere.meshing.mesh.gen.PFace;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PFace;
 import org.vadere.meshing.mesh.impl.PMeshPanel;
 import org.vadere.meshing.mesh.impl.PSLG;
 import org.vadere.meshing.mesh.triangulation.edgeLengthFunctions.EdgeLengthFunctionApprox;
@@ -35,7 +35,7 @@ public class ElementSizeFunction {
 		edgeLengthFunctionApprox.printPython();
 
 		Function<PFace, Color> colorFunction = f -> {
-			VTriangle triangle = edgeLengthFunctionApprox.getMesh().toTriangle(f);
+			VTriangle triangle = edgeLengthFunctionApprox.getMesh().faces().toTriangle(f);
 			if(pslg.getHoles().stream().anyMatch(hole -> hole.contains(triangle.midPoint())) || !pslg.getSegmentBound().contains(triangle.midPoint())) {
 				return Color.WHITE;
 			} else {
@@ -44,7 +44,7 @@ public class ElementSizeFunction {
 		};
 
 		System.out.println(TexGraphGenerator.toTikz(edgeLengthFunctionApprox.getMesh(), colorFunction, e -> Color.BLACK, v -> Color.BLACK, 1.0f, true));
-		System.out.println(edgeLengthFunctionApprox.getMesh().getNumberOfVertices());
+		System.out.println(edgeLengthFunctionApprox.getMesh().vertices().count());
 
 		double h0 = 1.0;
 		var meshImprover = new PEikMesh(
@@ -61,7 +61,7 @@ public class ElementSizeFunction {
 		meshImprover.improve();
 		int i = 1;
 		while (!meshImprover.isFinished()) {
-			synchronized (meshImprover.getMesh()) {
+			synchronized (meshImprover.getMeshBuilder()) {
 				meshImprover.improve();
 			}
 			//Thread.sleep(500);

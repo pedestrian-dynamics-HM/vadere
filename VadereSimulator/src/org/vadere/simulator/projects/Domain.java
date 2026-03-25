@@ -2,12 +2,12 @@ package org.vadere.simulator.projects;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.vadere.meshing.mesh.gen.AMesh;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.triangles.ATriangleMeshWithDataStorage;
 import org.vadere.state.scenario.Topography;
 
 public class Domain {
-	private final @Nullable AMesh floorFieldMesh;
-	private final @Nullable AMesh backgroundMesh;
+	private final @Nullable ATriangleMeshWithDataStorage floorFieldMesh;
+    private final @Nullable ATriangleMeshWithDataStorage backgroundMesh;
 	private final @NotNull Topography topography;
 
 	public Domain(@NotNull final Topography topography) {
@@ -16,25 +16,25 @@ public class Domain {
 		this.topography = topography;
 	}
 
-	public Domain(@Nullable final AMesh floorFieldMesh, @NotNull final Topography topography) {
+	public Domain(@Nullable final ATriangleMeshWithDataStorage floorFieldMesh, @NotNull final Topography topography) {
 		this.floorFieldMesh = floorFieldMesh;
-		this.backgroundMesh = null;
+        this.backgroundMesh = null;
 		this.topography = topography;
 	}
 
-	public Domain(@Nullable final AMesh floorFieldMesh, @Nullable final AMesh backgroundMesh, @NotNull final Topography topography) {
+	public Domain(@Nullable final ATriangleMeshWithDataStorage floorFieldMesh, @Nullable final ATriangleMeshWithDataStorage backgroundMesh, @NotNull final Topography topography) {
 		this.floorFieldMesh = floorFieldMesh;
 		this.backgroundMesh = backgroundMesh;
 		this.topography = topography;
 	}
 
 	@Nullable
-	public AMesh getFloorFieldMesh() {
+	public ATriangleMeshWithDataStorage getFloorFieldMesh() {
 		return floorFieldMesh;
 	}
 
 	@Nullable
-	public AMesh getBackgroundMesh() {
+	public ATriangleMeshWithDataStorage getBackgroundMesh() {
 		return backgroundMesh;
 	}
 
@@ -43,6 +43,6 @@ public class Domain {
 	}
 
 	public Domain clone() {
-		return new Domain(floorFieldMesh == null ? null : floorFieldMesh.clone(), backgroundMesh == null ? null : backgroundMesh.clone(), topography.clone());
+		return new Domain(floorFieldMesh == null ? null : (ATriangleMeshWithDataStorage) floorFieldMesh.clone(), backgroundMesh == null ? null : (ATriangleMeshWithDataStorage) backgroundMesh.clone(), topography.clone());
 	}
 }

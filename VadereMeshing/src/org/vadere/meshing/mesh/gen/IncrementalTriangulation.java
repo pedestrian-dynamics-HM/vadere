@@ -2,16 +2,24 @@ package org.vadere.meshing.mesh.gen;
 
 import org.apache.commons.lang3.tuple.Triple;
 import org.jetbrains.annotations.NotNull;
-import org.vadere.meshing.mesh.inter.IFace;
-import org.vadere.meshing.mesh.inter.IHalfEdge;
-import org.vadere.meshing.mesh.inter.IMesh;
-import org.vadere.meshing.mesh.inter.IMeshSupplier;
-import org.vadere.meshing.mesh.inter.IPointConstructor;
-import org.vadere.meshing.mesh.inter.IPointLocator;
-import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
-import org.vadere.meshing.mesh.inter.ITriEventListener;
-import org.vadere.meshing.mesh.inter.IVertex;
-import org.vadere.meshing.mesh.iterators.EdgeIterator;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AFace;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AHalfEdge;
+import org.vadere.meshing.mesh.gen.mesh.arrayBased.elements.AVertex;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PFace;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PHalfEdge;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PMesh;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PVertex;
+import org.vadere.meshing.mesh.gen.pointLocator.*;
+import org.vadere.meshing.mesh.inter.*;
+import org.vadere.meshing.mesh.inter.mesh.*;
+import org.vadere.meshing.mesh.inter.mesh.builder.ITriangleMeshBuilder;
+import org.vadere.meshing.mesh.inter.mesh.data.IMeshDataStorage;
+import org.vadere.meshing.mesh.inter.mesh.triangle.ITriangleMesh;
+import org.vadere.meshing.mesh.inter.mesh.triangle.ITriangleMeshEdges;
+import org.vadere.meshing.mesh.inter.mesh.triangle.ITriangleMeshFaces;
+import org.vadere.meshing.mesh.inter.mesh.triangle.ITriangleMeshVertices;
+import org.vadere.meshing.mesh.inter.meshConnectivity.IReadOnlyTriConnectivity;
+import org.vadere.meshing.mesh.inter.meshConnectivity.ITriConnectivity;
 import org.vadere.meshing.mesh.iterators.FaceIterator;
 import org.vadere.meshing.mesh.triangulation.BowyerWatsonSlow;
 import org.vadere.meshing.mesh.triangulation.triangulator.gen.GenConstrainedDelaunayTriangulator;
@@ -48,7 +56,7 @@ import javax.swing.*;
 
 /**
  * This class implements the Bowyer-Watson algorithm efficiently by using the mesh data structure {@link IMesh} and
- * sophisticated point locators {@link IPointLocator} where {@link JumpAndWalk} is the default. The incremental nature
+ * sophisticated point locators {@link ITriangleMeshPointLocator} where {@link JumpAndWalkPointLocator} is the default. The incremental nature
  * of the implementation allows to insertVertex points after the triangulation is finished, i.e. after the virtual points and
  * their neighbouring faces are removed. However, points have to lie inside some interior face of the current triangulation.
  * Furthermore, this implementation allows for other criteria {@link Predicate} for flipping edges {@link E} than the
@@ -64,119 +72,208 @@ import javax.swing.*;
  * @see <a href="https://en.wikipedia.org/wiki/Delaunay_triangulation">Delaunay triangulation</a>
  * @see <a href="https://en.wikipedia.org/wiki/Bowyer%E2%80%93Watson_algorithm">Bowyer-Watson algorithm</a>
  */
-public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F extends IFace> implements IIncrementalTriangulation<V, E, F> {
+public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F extends IFace> implements IIncrementalTriangulation<V, E, F>, ITriEventListener<V, E, F> {
 
 	protected Collection<IPoint> points;
 	private VRectangle bound;
 	private boolean finalized = false;
-	private IMesh<V, E, F> mesh;
-	private IPointLocator<V, E, F> pointLocator;
+	private ITriangleMeshBuilder<V, E, F> meshBuilder;
+
+	private ITriangleMesh<V, E, F> mesh;
+	private ITriangleMeshVertices<V,E,F> vertices;
+	private ITriangleMeshEdges<V,E,F> edges;
+	private ITriangleMeshFaces<V,E,F> faces;
+
+	private ITriangleMeshPointLocator<V, E, F> pointLocator;
 	private boolean initialized;
 	private List<V> virtualVertices;
 	private boolean useMeshForBound;
-	private IPointLocator.Type type;
-	private final List<ITriEventListener<V, E, F>> triEventListeners;
+	private ITriangleMeshPointLocator.Type type;
 
-
-	private static double BUFFER_PERCENTAGE = GeometryUtils.DOUBLE_EPS;
-
-	// TODO this epsilon it hard coded!!! => replace it with a user choice
-	private double epsilon = 0.0001;
-	private double edgeCoincidenceTolerance = GeometryUtils.DOUBLE_EPS;
+	private final double edgeCoincidenceTolerance = GeometryUtils.DOUBLE_EPS;
 
 	private Predicate<E> illegalPredicate;
 	private static Logger log = Logger.getLogger(IncrementalTriangulation.class);
+	private ITriConnectivity<V, E, F> changeConnectivity;
+	private IReadOnlyTriConnectivity<V, E, F> readConnectivity;
 
 	/*static {
 		ITriConnectivity.log.setDebug();
 	}*/
 
+	public ITriangleMesh<V, E, F> getMesh() {
+		return mesh;
+	}
+
 	/**
 	 * Construct a triangulation using an empty mesh.
 	 *
-	 * @param mesh              the empty mesh
+	 * @param meshBuilderFactory the empty mesh
 	 * @param type              the type of the point location algorithm
 	 * @param points            points to be inserted, which also specify the bounding box
 	 * @param illegalPredicate  a predicate which tests if an edge is illegal, i.e. an edge is illegal if it does not
 	 *                          fulfill the delaunay criteria and the illegalPredicate
 	 */
-	public IncrementalTriangulation(
-			@NotNull final IMesh<V, E, F> mesh,
-			@NotNull final IPointLocator.Type type,
+	protected IncrementalTriangulation(
+			@NotNull final Supplier<ITriangleMeshBuilder<V, E, F>> meshBuilderFactory,
+			@NotNull final ITriangleMeshPointLocator.Type type,
 			@NotNull final Collection<IPoint> points,
 			@NotNull final Predicate<E> illegalPredicate) {
 
-		assert mesh.getNumberOfVertices() == 0;
 		this.type = type;
 		this.useMeshForBound = false;
-		this.mesh = mesh;
+		this.meshBuilder = meshBuilderFactory.get();
+		this.meshBuilder.changeConnectivity().setIsIllegalPredicate(
+				evPair -> isIllegal(evPair.getLeft(), evPair.getRight()),
+				evDoubleTriple -> isIllegal(evDoubleTriple.getLeft(), evDoubleTriple.getMiddle(), evDoubleTriple.getRight()));
+		this.changeConnectivity = meshBuilder.changeConnectivity();
+		this.mesh = this.meshBuilder.getMesh();
+		this.readConnectivity = this.mesh.readConnectivity();
+		this.mesh.addTriEventListener(this);
+		this.vertices = mesh.vertices();
+		this.edges = mesh.edges();
+		this.faces = mesh.faces();
+		assert this.vertices.getAll().size() == 0;
+
 		this.points = points;
 		this.illegalPredicate = illegalPredicate;
 		this.bound = GeometryUtils.boundRelative(points);
 		this.finalized = false;
 		this.initialized = false;
-		this.mesh = mesh;
-		this.triEventListeners = new ArrayList<>();
 		this.setPointLocator(type);
 	}
 
 	/**
 	 * Construct a triangulation using an empty mesh.
 	 *
-	 * @param mesh              the empty mesh
+	 * @param meshBuilderFactory              the empty mesh
 	 * @param type              the type of the point location algorithm
 	 * @param bound             the bound of the triangulation, i.e. there will be no points outside the bound to be inserted into the triangulation
 	 * @param illegalPredicate  a predicate which tests if an edge is illegal, i.e. an edge is illegal if it does not
 	 *                          fulfill the delaunay criteria and the illegalPredicate
 	 */
-	public IncrementalTriangulation(
-			@NotNull final IMesh<V, E, F> mesh,
-			@NotNull final IPointLocator.Type type,
+	protected IncrementalTriangulation(
+			@NotNull final Supplier<ITriangleMeshBuilder<V, E, F> > meshBuilderFactory,
+			@NotNull final ITriangleMeshPointLocator.Type type,
 			@NotNull final VRectangle bound,
 			@NotNull final Predicate<E> illegalPredicate) {
 
-		assert mesh.getNumberOfVertices() == 0;
 		this.type = type;
 		this.useMeshForBound = false;
-		this.mesh = mesh;
+		this.meshBuilder = meshBuilderFactory.get();
+		this.meshBuilder.changeConnectivity().setIsIllegalPredicate(
+				evPair -> isIllegal(evPair.getLeft(), evPair.getRight()),
+				evDoubleTriple -> isIllegal(evDoubleTriple.getLeft(), evDoubleTriple.getMiddle(), evDoubleTriple.getRight()));
+		this.changeConnectivity = meshBuilder.changeConnectivity();
+		this.mesh = this.meshBuilder.getMesh();
+		this.mesh.addTriEventListener(this);
+		this.readConnectivity = this.mesh.readConnectivity();
+		this.vertices = mesh.vertices();
+		this.edges = mesh.edges();
+		this.faces = mesh.faces();
+		assert this.vertices.getAll().size() == 0;
+
 		this.points = new HashSet<>();
 		this.illegalPredicate = illegalPredicate;
 		this.bound = bound;
 		this.finalized = false;
 		this.initialized = false;
-		this.triEventListeners = new ArrayList<>();
 		this.setPointLocator(type);
 	}
 
 	/**
 	 * Construct a triangulation using an empty mesh.
 	 *
-	 * @param mesh              the empty mesh
+	 * @param meshBuilderFactory factory for a new mesh builder
 	 * @param type              the type of the point location algorithm
-	 * @param bound             the bound of the triangulation, i.e. there will be no points outside the bound to be inserted into the triangulation
+	 * @param points            points to be inserted, which also specify the bounding box
+	 * @param illegalPredicate  a predicate which tests if an edge is illegal, i.e. an edge is illegal if it does not
+	 *                          fulfill the delaunay criteria and the illegalPredicate
 	 */
-	public IncrementalTriangulation(@NotNull final IMesh<V, E, F> mesh,
-	                                @NotNull final IPointLocator.Type type,
-	                                @NotNull final VRectangle bound) {
-		this(mesh, type, bound, halfEdge -> true);
+	public static <Vert extends IVertex, Edge extends IHalfEdge, Face extends IFace> IncrementalTriangulation<Vert, Edge, Face>  fromBuilderFactory(
+			@NotNull final Supplier<ITriangleMeshBuilder<Vert, Edge, Face>> meshBuilderFactory,
+			@NotNull final ITriangleMeshPointLocator.Type type,
+			@NotNull final Collection<IPoint> points,
+			@NotNull final Predicate<Edge> illegalPredicate) {
+		return new IncrementalTriangulation<>(meshBuilderFactory, type, points, illegalPredicate);
 	}
 
 	/**
-	 * Construct a triangulation using an empty mesh and {@link JumpAndWalk} as point location algorithm.
+	 * Construct a triangulation using an empty mesh.
 	 *
-	 * @param mesh  the empty mesh
+	 * @param meshBuilderFactory factory for a new mesh builder
+	 * @param type              the type of the point location algorithm
+	 * @param points            points to be inserted, which also specify the bounding box
+	 */
+	public static <Vert extends IVertex, Edge extends IHalfEdge, Face extends IFace> IncrementalTriangulation<Vert, Edge, Face>  fromBuilderFactory(
+			@NotNull final Supplier<ITriangleMeshBuilder<Vert, Edge, Face>> meshBuilderFactory,
+			@NotNull final ITriangleMeshPointLocator.Type type,
+			@NotNull final Collection<IPoint> points) {
+		return new IncrementalTriangulation<>(meshBuilderFactory, type, points, edge -> true);
+	}
+
+	/**
+	 * Construct a triangulation using an empty mesh.
+	 *
+	 * @param meshBuilderFactory factory for a new mesh builder
+	 * @param type              the type of the point location algorithm
+	 * @param bound the bound of the triangulation, i.e. there will be no points outside the
+	 * 	 *              bound to be inserted into the triangulation
+	 * @param illegalPredicate  a predicate which tests if an edge is illegal, i.e. an edge is illegal if it does not
+	 *                          fulfill the delaunay criteria and the illegalPredicate
+	 */
+	public static <Vert extends IVertex, Edge extends IHalfEdge, Face extends IFace> IncrementalTriangulation<Vert, Edge, Face>  fromBuilderFactory(
+			@NotNull final Supplier<ITriangleMeshBuilder<Vert, Edge, Face>> meshBuilderFactory,
+			@NotNull final ITriangleMeshPointLocator.Type type,
+			@NotNull final VRectangle bound,
+			@NotNull final Predicate<Edge> illegalPredicate
+	){
+		return new IncrementalTriangulation<>(meshBuilderFactory, type, bound, illegalPredicate);
+	}
+
+	/**
+	 * Construct a triangulation using an empty mesh.
+	 *
+	 * @param meshBuilderFactory factory for a new mesh builder
+	 * @param type              the type of the point location algorithm
+	 * @param bound the bound of the triangulation, i.e. there will be no points outside the
+	 * 	 *              bound to be inserted into the triangulation
+	 */
+	public static <Vert extends IVertex, Edge extends IHalfEdge, Face extends IFace> IncrementalTriangulation<Vert, Edge, Face>  fromBuilderFactory(
+			@NotNull final Supplier<ITriangleMeshBuilder<Vert, Edge, Face>> meshBuilderFactory,
+			@NotNull final ITriangleMeshPointLocator.Type type,
+			@NotNull final VRectangle bound
+	){
+		return fromBuilderFactory(meshBuilderFactory, type, bound, halfEdge -> true);
+	}
+
+	/**
+	 * Construct a triangulation using an empty mesh and {@link JumpAndWalkPointLocator} as point location algorithm.
+	 *
+	 * @param meshBuilderFactory factory for a new mesh builder
 	 * @param bound the bound of the triangulation, i.e. there will be no points outside the
 	 *              bound to be inserted into the triangulation
 	 */
-	public IncrementalTriangulation(@NotNull final IMesh<V, E, F> mesh,
-	                                @NotNull final VRectangle bound) {
-		this(mesh, IPointLocator.Type.JUMP_AND_WALK, bound, halfEdge -> true);
+	public static <Vert extends IVertex, Edge extends IHalfEdge, Face extends IFace> IncrementalTriangulation<Vert, Edge, Face>  fromBuilderFactory(
+			@NotNull final Supplier<ITriangleMeshBuilder<Vert, Edge, Face>> meshBuilderFactory,
+			@NotNull final VRectangle bound
+	){
+		return fromBuilderFactory(meshBuilderFactory, ITriangleMeshPointLocator.Type.JUMP_AND_WALK, bound, halfEdge -> true);
 	}
 
-	public IncrementalTriangulation(@NotNull final IMesh<V, E, F> mesh,
-	                                @NotNull final VRectangle bound,
-	                                @NotNull final Predicate<E> illegalCondition) {
-		this(mesh, IPointLocator.Type.JUMP_AND_WALK, bound, illegalCondition);
+	/**
+	 * Construct a triangulation using an empty mesh and {@link JumpAndWalkPointLocator} as point location algorithm.
+	 *
+	 * @param meshBuilderFactory factory for a new mesh builder
+	 * @param bound the bound of the triangulation, i.e. there will be no points outside the
+	 *              bound to be inserted into the triangulation
+	 */
+	public static <Vert extends IVertex, Edge extends IHalfEdge, Face extends IFace> IncrementalTriangulation<Vert, Edge, Face>  fromBuilderFactory(
+			@NotNull final Supplier<ITriangleMeshBuilder<Vert, Edge, Face>> meshBuilderFactory,
+			@NotNull final VRectangle bound,
+			@NotNull final Predicate<Edge> illegalCondition
+	){
+		return fromBuilderFactory(meshBuilderFactory, ITriangleMeshPointLocator.Type.JUMP_AND_WALK, bound, illegalCondition);
 	}
 
 	/**
@@ -184,244 +281,281 @@ public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F 
 	 * Therefore the bound has to specify some polygon and there will be no points inserted outside
 	 * the bound i.e. outside the mesh.
 	 *
-	 * @param mesh              the non-empty mesh which will be used and which specifies the bound
+	 * @param meshBuilder the non-empty mesh which will be used and which specifies the bound
 	 * @param type              the type of the used point location algorithm
 	 * @param illegalPredicate  a predicate which tests if an edge is illegal, i.e. an edge is illegal if it does not
 	 *                          fulfill the delaunay criteria and the illegalPredicate
 	 */
-	public IncrementalTriangulation(
-			@NotNull final IMesh<V, E, F> mesh,
-			@NotNull final IPointLocator.Type type,
+	private IncrementalTriangulation(
+			@NotNull final ITriangleMeshBuilder<V, E, F>  meshBuilder,
+			@NotNull final ITriangleMeshPointLocator.Type type,
 			@NotNull final Predicate<E> illegalPredicate) {
 
-		assert mesh.getNumberOfVertices() >= 3;
 		this.type = type;
 		this.useMeshForBound = true;
-		this.mesh = mesh;
+
+		this.meshBuilder = meshBuilder;
+		this.meshBuilder.changeConnectivity().setIsIllegalPredicate(
+				evPair -> isIllegal(evPair.getLeft(), evPair.getRight()),
+				evDoubleTriple -> isIllegal(evDoubleTriple.getLeft(), evDoubleTriple.getMiddle(), evDoubleTriple.getRight()));
+		this.changeConnectivity = meshBuilder.changeConnectivity();
+		this.mesh = meshBuilder.getMesh();
+		this.mesh.addTriEventListener(this);
+		this.readConnectivity = this.mesh.readConnectivity();
+		this.vertices = mesh.vertices();
+		this.edges = mesh.edges();
+		this.faces = mesh.faces();
+
+		assert vertices.count() >= 3;
+
 		this.points = new HashSet<>();
 		this.illegalPredicate = illegalPredicate;
-		this.bound = GeometryUtils.boundRelative(mesh.getPoints(mesh.getBorder()));
+		this.bound = GeometryUtils.boundRelative(meshBuilder.getMesh().faces().getPoints(meshBuilder.getMesh().faces().getOuterBorder()));
 		this.initialized = false;
 		this.finalized = false;
 		this.virtualVertices = new ArrayList<>();
-		this.virtualVertices.addAll(mesh.getVertices());
-		this.triEventListeners = new ArrayList<>();
+		this.virtualVertices.addAll(meshBuilder.getMesh().vertices().getAll());
 		this.setPointLocator(type);
 	}
 
 	/**
-	 * Construct a triangulation using non-empty mesh and {@link JumpAndWalk} as point location algorithm.
-	 * The border of the mesh specifies the bound. Therefore the bound has to specify some polygon and
-	 * there will be no points inserted outside the bound i.e. outside the mesh.
+	 * Copy constructor
+	 */
+	private IncrementalTriangulation(IncrementalTriangulation<V, E, F> toCopy){
+		this.type = toCopy.type;
+		this.useMeshForBound = toCopy.useMeshForBound;
+
+		this.meshBuilder = toCopy.meshBuilder.copy();
+		this.changeConnectivity = meshBuilder.changeConnectivity();
+		this.mesh = meshBuilder.getMesh();
+		this.mesh.addTriEventListener(this);
+		this.readConnectivity = this.mesh.readConnectivity();
+
+		this.vertices = mesh.vertices();
+		this.edges = mesh.edges();
+		this.faces = mesh.faces();
+		this.meshBuilder.changeConnectivity().setIsIllegalPredicate(
+				evPair -> isIllegal(evPair.getLeft(), evPair.getRight()),
+				evDoubleTriple -> isIllegal(evDoubleTriple.getLeft(), evDoubleTriple.getMiddle(), evDoubleTriple.getRight()));
+		this.illegalPredicate = toCopy.illegalPredicate;
+		this.bound = toCopy.bound;
+		this.finalized = toCopy.finalized;
+		this.initialized = toCopy.initialized;
+		this.points = new HashSet<>(toCopy.points);
+
+		List<V> cVirtualVertices = new ArrayList<>();
+		for(V v : toCopy.virtualVertices) {
+			for(V cV : vertices.getAll()) {
+				if(v.getPoint().equals(cV.getPoint())) {
+					cVirtualVertices.add(cV);
+					break;
+				}
+			}
+		}
+		assert cVirtualVertices.size() == toCopy.virtualVertices.size();
+		this.virtualVertices = cVirtualVertices;
+
+		/**
+		 * The point locator is not cloned but reconstructed. Cloning the Delaunay-Hierarchy or the Delaunay-Tree seems impossible with
+		 * respect to the performance. However, the reconstruction is also expensive O(n * log(n)) where n is the number of vertices.
+		 */
+		setPointLocator(toCopy.pointLocator.getType());
+	}
+
+	/**
+	 * Construct a triangulation using non-empty mesh. The border of the mesh specifies the bound.
+	 * Therefore the bound has to specify some polygon and there will be no points inserted outside
+	 * the bound i.e. outside the mesh.
 	 *
-	 * @param mesh              the non-empty mesh which will be used and which specifies the bound
+	 * @param meshWithDataStorage the non-empty mesh which will be used and which specifies the bound
+	 * @param type              the type of the used point location algorithm
 	 * @param illegalPredicate  a predicate which tests if an edge is illegal, i.e. an edge is illegal if it does not
 	 *                          fulfill the delaunay criteria and the illegalPredicate
 	 */
-	public IncrementalTriangulation(
-			@NotNull final IMesh<V, E, F> mesh,
-			@NotNull final Predicate<E> illegalPredicate) {
-		this(mesh, IPointLocator.Type.JUMP_AND_WALK, illegalPredicate);
+	public static <Vert extends IVertex, Edge extends IHalfEdge, Face extends IFace> IncrementalTriangulation<Vert, Edge, Face>  fromMeshBuilder(
+			@NotNull final ITriangleMeshBuilder<Vert, Edge, Face> meshWithDataStorage,
+			@NotNull final ITriangleMeshPointLocator.Type type,
+			@NotNull final Predicate<Edge> illegalPredicate
+	){
+		return new IncrementalTriangulation<>(meshWithDataStorage, type, illegalPredicate);
 	}
 
 	/**
-	 * Construct a triangulation using non-empty mesh. The border of the mesh specifies the bound.
-	 * Therefore the bound has to specify some polygon and there will be no points inserted outside
-	 * the bound i.e. outside the mesh.
-	 *
-	 * @param mesh      the non-empty mesh which will be used and which specifies the bound
-	 * @param type      the type of the used point location algorithm
-	 * @param points    points to be inserted, which also specify the bounding box
-	 */
-	public IncrementalTriangulation(
-			@NotNull final IMesh<V, E, F> mesh,
-			@NotNull final IPointLocator.Type type,
-			@NotNull final Collection<IPoint> points) {
-		this(mesh, type, points, halfEdge -> true);
-	}
-
-	/**
-	 * Construct a triangulation using non-empty mesh. The border of the mesh specifies the bound.
-	 * Therefore the bound has to specify some polygon and there will be no points inserted outside
-	 * the bound i.e. outside the mesh.
-	 *
-	 * @param mesh      the non-empty mesh which will be used and which specifies the bound
-	 * @param type      the type of the used point location algorithm
-	 */
-	public IncrementalTriangulation(
-			@NotNull final IMesh<V, E, F> mesh,
-			@NotNull final IPointLocator.Type type) {
-		this(mesh, type, halfEdge -> true);
-	}
-
-	/**
-	 * Construct a triangulation using non-empty mesh and {@link JumpAndWalk} as point location algorithm.
+	 * Construct a triangulation using non-empty mesh and {@link JumpAndWalkPointLocator} as point location algorithm.
 	 * The border of the mesh specifies the bound. Therefore the bound has to specify some polygon and
 	 * there will be no points inserted outside the bound i.e. outside the mesh.
 	 *
-	 * @param mesh      the non-empty mesh which will be used and which specifies the bound
+	 * @param meshBuilder              the non-empty mesh which will be used and which specifies the bound
+	 * @param illegalPredicate  a predicate which tests if an edge is illegal, i.e. an edge is illegal if it does not
+	 *                          fulfill the delaunay criteria and the illegalPredicate
 	 */
-	public IncrementalTriangulation(@NotNull final IMesh<V, E, F> mesh) {
-		this(mesh, IPointLocator.Type.JUMP_AND_WALK, halfEdge -> true);
+	public static <Vert extends IVertex, Edge extends IHalfEdge, Face extends IFace> IncrementalTriangulation<Vert, Edge, Face>  fromMeshBuilder(
+			@NotNull final ITriangleMeshBuilder<Vert, Edge, Face> meshBuilder,
+			@NotNull final Predicate<Edge> illegalPredicate
+	){
+		return IncrementalTriangulation.fromMeshBuilder(meshBuilder, ITriangleMeshPointLocator.Type.JUMP_AND_WALK, illegalPredicate);
 	}
+
+	/**
+	 * Construct a triangulation using non-empty mesh. The border of the mesh specifies the bound.
+	 * Therefore the bound has to specify some polygon and there will be no points inserted outside
+	 * the bound i.e. outside the mesh.
+	 *
+	 * @param meshBuilder      the non-empty mesh which will be used and which specifies the bound
+	 * @param type      the type of the used point location algorithm
+	 */
+	public static <Vert extends IVertex, Edge extends IHalfEdge, Face extends IFace> IncrementalTriangulation<Vert, Edge, Face>  fromMeshBuilder(
+			@NotNull final ITriangleMeshBuilder<Vert, Edge, Face> meshBuilder,
+			@NotNull final ITriangleMeshPointLocator.Type type
+	){
+		return IncrementalTriangulation.fromMeshBuilder(meshBuilder, type, halfEdge -> true);
+	}
+
+	/**
+	 * Construct a triangulation using non-empty mesh and {@link JumpAndWalkPointLocator} as point location algorithm.
+	 * The border of the mesh specifies the bound. Therefore the bound has to specify some polygon and
+	 * there will be no points inserted outside the bound i.e. outside the mesh.
+	 *
+	 * @param meshBuilder the non-empty mesh and its datastorage which will be used and which specifies the bound
+	 */
+	public static <Vert extends IVertex, Edge extends IHalfEdge, Face extends IFace> IncrementalTriangulation<Vert, Edge, Face>  fromMeshBuilder(
+			@NotNull final ITriangleMeshBuilder<Vert, Edge, Face> meshBuilder
+	){
+		return IncrementalTriangulation.fromMeshBuilder(meshBuilder, ITriangleMeshPointLocator.Type.JUMP_AND_WALK, halfEdge -> true);
+	}
+
+	// end constructors
 
 	@Override
 	public void setCanIllegalPredicate(@NotNull final Predicate<E> illegalPredicate) {
 		this.illegalPredicate = illegalPredicate;
 	}
 
-	// end constructors
-
 	@Override
-	public void setPointLocator(@NotNull final IPointLocator.Type type) {
-
-		/**
-		 * This method is somehow recursive. The Delaunay-Hierarchy is a hierarchy of triangulations using the base point
-		 * location algorithm. Therefore if the type is equal to the Delaunay-Hierarchy a supplier is required which
-		 * construct triangulations based on this triangulation i.e. with the same "starting" mesh or bound!
-		 */
+	public void setPointLocator(@NotNull final ITriangleMeshPointLocator.Type type) {
 		switch (type) {
-			case DELAUNAY_TREE:
-				if(!points.isEmpty()) {
-					throw new IllegalArgumentException(IPointLocator.Type.DELAUNAY_TREE + " is only supported for empty triangulations.");
-				}
-				pointLocator = new DelaunayTree<>(this);
-				break;
-			case DELAUNAY_HIERARCHY:
-				Supplier<IIncrementalTriangulation<V, E, F>> supplier;
-				if(useMeshForBound) {
-					supplier = () -> new IncrementalTriangulation<>(mesh.clone(), IPointLocator.Type.BASE, illegalPredicate);
-				}
-				else {
-					supplier = () -> new IncrementalTriangulation<>(mesh.construct(), IPointLocator.Type.BASE, bound, illegalPredicate);
-				}
-				pointLocator = new DelaunayHierarchy<>(this, supplier);
-				break;
+			default:
 			case JUMP_AND_WALK:
-				pointLocator = new JumpAndWalk<>(this);
+				pointLocator = new JumpAndWalkPointLocator<>(this.mesh);
 				break;
-			default: pointLocator = new BasePointLocator<>(this);
 		}
 	}
 
-	public void fillHoles(@NotNull final IMeshSupplier<V, E, F> meshSupplier) {
-		for(F hole : getMesh().getHoles()) {
-			List<IPoint> points = getMesh().getPoints(hole);
-			IncrementalTriangulation<V, E, F> incrementalTriangulation = new IncrementalTriangulation<>(
-					meshSupplier.get(),
-					IPointLocator.Type.JUMP_AND_WALK,
-					GeometryUtils.boundRelative(points),
-					e -> true);
+	public void fillHoles(@NotNull final Supplier<ITriangleMeshBuilder<V, E, F>> meshBuilderFactory) {
+		for(F hole : faces.getHoles()) {
+			List<IPoint> points = faces.getPoints(hole);
 
-			List<VLine> constrians = getMesh().streamEdges(hole).map(e -> getMesh().toLine(e)).collect(Collectors.toList());
+			IncrementalTriangulation<V, E, F> incrementalTriangulation
+					= IncrementalTriangulation.fromBuilderFactory(meshBuilderFactory, GeometryUtils.boundRelative(points));
+
+			List<VLine> constrians = edges.streamEdgesOf(hole).map(e -> edges.toLine(e)).collect(Collectors.toList());
 
 			// generate a contrained delaunay triangulation
 			GenConstrainedDelaunayTriangulator<V, E, F> cdt = new GenConstrainedDelaunayTriangulator<>(incrementalTriangulation, constrians, false, false);
 			cdt.generate(true);
 
 			// remove all faces outside the hole
-			VPolygon polygon = getMesh().toPolygon(hole);
-			Predicate<F> removePredicate = face -> !polygon.contains(getMesh().toMidpoint(face));
-			cdt.getTriangulation().shrinkBorder(removePredicate, true);
+			VPolygon polygon = faces.toPolygon(hole);
+			Predicate<F> removePredicate = face -> !polygon.contains(faces.toTriangleMidpoint(face));
+			cdt.getMeshBuilder().changeConnectivity().shrinkBorder(removePredicate, true);
 
-			IMesh<V, E, F> holeMesh = incrementalTriangulation.getMesh();
+			IMesh<V, E, F> holeMesh = incrementalTriangulation.mesh;
 			Map<V, V> vertexToVertex = new HashMap<>();
 			Map<F, F> faceToFace = new HashMap<>();
 			Map<E, E> edgeToEdge = new HashMap<>();
 
-			E edge = getMesh().getEdge(hole);
-			VPoint p2 = getMesh().toPoint(getMesh().getTwinVertex(edge));
-			VPoint p1 = getMesh().toPoint(getMesh().getVertex(edge));
-			E otherEdge = getMesh().getEdge(holeMesh.getBorder(), p1, p2).get();
+			E edge = edges.getAnyOf(hole);
+			VPoint p2 = vertices.toPoint(vertices.getTwin(edge));
+			VPoint p1 = vertices.toPoint(vertices.getEndOf(edge));
+			E otherEdge = edges.getOf(holeMesh.faces().getOuterBorder(), p1, p2).get();
 
 
-			List<E> edges = getMesh().getEdges(edge).stream().map(e -> getMesh().getTwin(e)).collect(Collectors.toList());
-			List<E> otherEdges = holeMesh.getEdges(otherEdge);
+			List<E> e = edges.getAllOf(edge).stream().map(es -> edges.getTwin(es)).collect(Collectors.toList());
+			List<E> otherEdges = holeMesh.edges().getAllOf(otherEdge);
 			otherEdges.add(otherEdges.remove(0));
 			Collections.reverse(otherEdges);
-			assert edges.size() == otherEdges.size();
+			assert e.size() == otherEdges.size();
 
 			// copy elements
-			for(int i = 0; i < edges.size(); i++) {
-				E e = edges.get(i);
-				E o = otherEdges.get(i);
-				vertexToVertex.put(holeMesh.getVertex(o), getMesh().getVertex(e));
+			for(int i = 0; i < e.size(); i++) {
+				E edgeToCopy = e.get(i);
+				E otherEdgeToCopy = otherEdges.get(i);
+				vertexToVertex.put(holeMesh.vertices().getEndOf(otherEdgeToCopy), vertices.getEndOf(edgeToCopy));
 			}
 
-			for(V v : holeMesh.getVertices()) {
-				if(!getMesh().isAtBoundary(v)) {
+			for(V v : holeMesh.vertices().getAll()) {
+				if(!vertices.isAtBoundary(v)) {
 					// maybe clone the vertex?
-					vertexToVertex.put(v, getMesh().insertVertex(holeMesh.getX(v), holeMesh.getY(v)));
+					vertexToVertex.put(v, meshBuilder.vertices().createAndInsert(holeMesh.vertices().getX(v), holeMesh.vertices().getY(v)));
 				}
 			}
 
-			for(E e : holeMesh.getEdges()) {
-				V v = holeMesh.getVertex(e);
-				edgeToEdge.put(e, getMesh().createEdge(vertexToVertex.get(v)));
+			for(E es : holeMesh.edges().getAll()) {
+				V v = holeMesh.vertices().getEndOf(es);
+				edgeToEdge.put(es, meshBuilder.edges().createAndInsert(vertexToVertex.get(v)));
 			}
 
-			for(F face : holeMesh.getFaces()) {
-				faceToFace.put(face, getMesh().createFace());
+			for(F face : holeMesh.faces().getAll()) {
+				faceToFace.put(face, meshBuilder.faces().createAndInsert());
 			}
-			//faceToFace.put(holeMesh.getBorder(), )
 
 			// copy connectivity
-			for(E o : holeMesh.getEdges()) {
-				E e = edgeToEdge.get(o);
-				getMesh().setTwin(e, edgeToEdge.get(holeMesh.getTwin(o)));
-				getMesh().setNext(e, edgeToEdge.get(holeMesh.getNext(o)));
-				getMesh().setPrev(e, edgeToEdge.get(holeMesh.getPrev(o)));
-				getMesh().setVertex(e, vertexToVertex.get(holeMesh.getVertex(o)));
+			for(E holeEdge : holeMesh.edges().getAll()) {
+				E connectedEdge = edgeToEdge.get(holeEdge);
+				meshBuilder.edges().setTwin(connectedEdge, edgeToEdge.get(holeMesh.edges().getTwin(holeEdge)));
+				meshBuilder.edges().setNext(connectedEdge, edgeToEdge.get(holeMesh.edges().getNext(holeEdge)));
+				meshBuilder.edges().setPrev(connectedEdge, edgeToEdge.get(holeMesh.edges().getPrev(holeEdge)));
+				meshBuilder.edges().setVertex(connectedEdge, vertexToVertex.get(holeMesh.vertices().getEndOf(holeEdge)));
 
-				if(!holeMesh.isBoundary(holeMesh.getFace(o))) {
-					getMesh().setFace(e, faceToFace.get(holeMesh.getFace(o)));
+				if(!holeMesh.faces().isBoundary(holeMesh.faces().getOf(holeEdge))) {
+					meshBuilder.edges().setFace(connectedEdge, faceToFace.get(holeMesh.faces().getOf(holeEdge)));
 				}
 			}
 
-			for(F o : holeMesh.getFaces()) {
-				F e = faceToFace.get(o);
-				getMesh().setEdge(e, edgeToEdge.get(holeMesh.getEdge(o)));
+			for(F holeFace : holeMesh.faces().getAll()) {
+				F connectedFace = faceToFace.get(holeFace);
+				meshBuilder.faces().setEdge(connectedFace, edgeToEdge.get(holeMesh.edges().getAnyOf(holeFace)));
 			}
 
-			for(V o : holeMesh.getVertices()) {
-				V e = vertexToVertex.get(o);
-				getMesh().setEdge(e, edgeToEdge.get(holeMesh.getEdge(o)));
+			for(V holeVertex : holeMesh.vertices().getAll()) {
+				V connectedVertex = vertexToVertex.get(holeVertex);
+				meshBuilder.vertices().setEdge(connectedVertex, edgeToEdge.get(holeMesh.edges().getOf(holeVertex)));
 			}
 
 			// merge internal
-			for(int i = 0; i < edges.size(); i++) {
-				E e = edges.get(i);
+			for(int i = 0; i < e.size(); i++) {
+				E currentEdge = e.get(i);
 				E o = edgeToEdge.get(otherEdges.get(i));
 
-				E twin = getMesh().getTwin(e);
-				V tv = getMesh().getVertex(twin);
-				E ve = getMesh().getEdge(tv);
-				E oTwin = holeMesh.getTwin(o);
+				E twin = edges.getTwin(currentEdge);
+				V twinVertex = vertices.getEndOf(twin);
+				E twinVertexEdge = edges.getOf(twinVertex);
+				E oTwin = holeMesh.edges().getTwin(o);
 
-				if(ve.equals(twin)) {
-					getMesh().setEdge(tv, oTwin);
+				if(twinVertexEdge.equals(twin)) {
+					meshBuilder.vertices().setEdge(twinVertex, oTwin);
 				}
 
-				getMesh().setTwin(e, oTwin);
-				getMesh().destroyEdge(twin);
-				getMesh().destroyEdge(o);
+				meshBuilder.edges().setTwin(currentEdge, oTwin);
+				meshBuilder.edges().destroy(twin);
+				meshBuilder.edges().destroy(o);
 			}
 
 			// destroy the hole-mesh
-			holeMesh.clear();
-			getMesh().destroyFace(hole);
+			incrementalTriangulation.getMeshBuilder().clear();
+			meshBuilder.faces().destroy(hole);
 		}
 	}
 
 	@Override
-	public void enableCache() {
+	public void enablePointLocatorCache() {
 		if(!pointLocator.isCached()) {
-			pointLocator = new CachedPointLocator<>(pointLocator, this);
+			pointLocator = new CachedPointLocator<>(pointLocator, getMesh());
 		}
 	}
 
 	@Override
-	public void disableCache() {
+	public void disablePointLocatorCache() {
 		if(pointLocator.isCached()) {
 			pointLocator = pointLocator.getUncachedLocator();
 		}
@@ -431,10 +565,9 @@ public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F 
 	public void init() {
 		if(!initialized) {
 
-			if(mesh.getNumberOfVertices() == 0) {
+			if(vertices.count() == 0) {
 				double max = Math.max(bound.getWidth(), bound.getHeight());
 				double min = Math.min(bound.getWidth(), bound.getHeight());
-
 
 				double xMin = bound.getMinX();
 				double yMin = bound.getMinY();
@@ -442,24 +575,24 @@ public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F 
 				double xMax = bound.getMinX() + 2*max;
 				double yMax = bound.getMinY() + 2*max;
 
-				V p0 = mesh.insertVertex(xMin, yMin);
-				V p1 = mesh.insertVertex(xMax, yMin);
-				V p2 = mesh.insertVertex(xMin, yMax);
+				V p0 = meshBuilder.vertices().createAndInsert(xMin, yMin);
+				V p1 = meshBuilder.vertices().createAndInsert(xMax, yMin);
+				V p2 = meshBuilder.vertices().createAndInsert(xMin, yMax);
 
 				// construct super triangle
-				F superTriangle = mesh.createFace(p0, p1, p2);
-				F borderFace = mesh.getTwinFace(mesh.getEdge(superTriangle));
+				F superTriangle = meshBuilder.faces().createFromVertexesInTheMesh(p0, p1, p2);
+				F borderFace = faces.getTwin(edges.getAnyOf(superTriangle));
 				// end divide the square into 2 triangles
 
 				this.virtualVertices = Arrays.asList(p0, p1, p2);
 				this.initialized = true;
 			}
 			else {
-				assert mesh.getNumberOfVertices() >= 3;
-				F borderFace = mesh.getBorder();
+				assert vertices.count() >= 3;
+				F borderFace = faces.getOuterBorder();
 				// end divide the square into 2 triangles
 
-				this.virtualVertices = mesh.streamVertices(borderFace).collect(Collectors.toList());
+				this.virtualVertices = vertices.streamVerticesOf(borderFace).collect(Collectors.toList());
 				this.initialized = true;
 			}
 		}
@@ -479,7 +612,7 @@ public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F 
 
 	@Override
 	public List<V> getVertices() {
-		return getMesh().streamVertices().filter(v -> !virtualVertices.contains(v)).collect(Collectors.toList());
+		return vertices.stream().filter(v -> !virtualVertices.contains(v)).collect(Collectors.toList());
 	}
 
 	@Override
@@ -500,16 +633,16 @@ public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F 
 	    virtualVertices = new ArrayList<>();
         initialized = false;
         finalized = false;
-        points = mesh.getPoints();
+        points = vertices.toPoints();
 	    bound = GeometryUtils.boundRelative(points);
-        mesh.clear();
+        meshBuilder.clear();
 	    setPointLocator(type);
         compute();
     }
 
     @Override
 	public E insert(@NotNull final IPoint point, @NotNull F face) {
-		return insertVertex(getMesh().createVertex(point), face);
+		return insertVertex(meshBuilder.vertices().create(point), face);
 	}
 
 	public E insertVertex(@NotNull final V vertex, @NotNull final F face) {
@@ -523,9 +656,9 @@ public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F 
 			init();
 		}
 
-		E edge = mesh.closestEdge(face, vertex.getX(), vertex.getY());
-		IPoint p1 = mesh.getPoint(mesh.getPrev(edge));
-		IPoint p2 = mesh.getPoint(edge);
+		E edge = getMesh().edges().closestOfFaceTo(face, vertex.getX(), vertex.getY());
+		IPoint p1 = getMesh().edges().getMutableEndPoint(getMesh().edges().getPrev(edge));
+		IPoint p2 = getMesh().edges().getMutableEndPoint(edge);
 
 		/*
 		 * 3 Cases:
@@ -533,25 +666,19 @@ public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F 
 		 *      2) point lies on an edge of a face => split the edge
 		 *      3) point lies in the interior of the face => split the face (this should be the main case)
 		 */
-		if(isClose(vertex.getX(), vertex.getY(), face, edgeCoincidenceTolerance)) {
-			//log.info("ignore insertion point, since the point " + vertex + " already exists or it is too close to another point!");
-			return getCloseEdge(face, vertex.getX(), vertex.getY(), edgeCoincidenceTolerance).get();
+		if(readConnectivity.isClose(vertex.getX(), vertex.getY(), face, edgeCoincidenceTolerance)) {
+			return readConnectivity.getCloseEdge(face, vertex.getX(), vertex.getY(), edgeCoincidenceTolerance).get();
 		}
 		if(GeometryUtils.isOnEdge(p1, p2, vertex, edgeCoincidenceTolerance)) {
-			//log.info("splitEdge()");
-			E newEdge = getAnyEdge(splitEdge(vertex, edge, legalize));
-			insertEvent(newEdge);
+			E newEdge = readConnectivity.getAnyEdge(changeConnectivity.splitEdge(vertex, edge, legalize));
+			mesh.insertEvent(newEdge);
 			return newEdge;
 		}
 		else {
-			//log.info("splitTriangle()");
-			/*if(!contains(vertex.getX(), vertex.getY(), face)) {
-				System.out.println("wtf" + contains(vertex.getX(), vertex.getY(), face));
-			}*/
-			assert contains(vertex.getX(), vertex.getY(), face) : face + " does not contain " + vertex;
+			assert readConnectivity.faceContains(vertex.getX(), vertex.getY(), face) : face + " does not contain " + vertex;
 
-			E newEdge = splitTriangle(face, vertex,  legalize);
-			insertEvent(newEdge);
+			E newEdge = changeConnectivity.splitTriangle(face, vertex,  legalize);
+			mesh.insertEvent(newEdge);
 			return newEdge;
 		}
 	}
@@ -629,7 +756,7 @@ public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F 
 		}
 	}
 
-	protected IPointLocator<V, E, F> getPointLocator() {
+	public ITriangleMeshPointLocator<V, E, F> getPointLocator() {
 	    return pointLocator;
     }
 
@@ -639,7 +766,7 @@ public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F 
 			return false;
 		}
 		else {
-			return getMesh().streamVertices(face).anyMatch(v -> virtualVertices.contains(v));
+			return getMesh().vertices().streamVerticesOf(face).anyMatch(v -> virtualVertices.contains(v));
 		}
 
 	}
@@ -650,183 +777,73 @@ public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F 
 			return false;
 		}
 		else {
-			return virtualVertices.contains(getMesh().getVertex(edge))
-					|| virtualVertices.contains(getMesh().getVertex(getMesh().getPrev(edge)));
+			return virtualVertices.contains(getMesh().vertices().getEndOf(edge))
+					|| virtualVertices.contains(getMesh().vertices().getEndOf(getMesh().edges().getPrev(edge)));
 		}
 	}
-
-	/**
-	 * Removes the super triangle from the mesh data structure.
-	 */
-	/*public void finish() {
-		if(!finalized) {
-			// we have to use other halfedges than he1 and he2 since they might be deleted
-			// if we deleteBoundaryFace he0!
-			List<F> faces1 = IteratorUtils.toList(new AdjacentFaceIterator(mesh, he0));
-			List<F> faces2 = IteratorUtils.toList(new AdjacentFaceIterator(mesh, he1));
-			List<F> faces3 = IteratorUtils.toList(new AdjacentFaceIterator(mesh, he2));
-
-			faces1.removeIf(f -> mesh.isBoundary(f));
-			faces1.forEach(f -> deleteBoundaryFace(f));
-
-			faces2.removeIf(f -> mesh.isDestroyed(f) || mesh.isBoundary(f));
-			faces2.forEach(f -> deleteBoundaryFace(f));
-
-			faces3.removeIf(f -> mesh.isDestroyed(f) || mesh.isBoundary(f));
-			faces3.forEach(f -> deleteBoundaryFace(f));
-
-			finalized = true;
-		}
-	}*/
-
 
 	private boolean isVirtualVertex(@NotNull final V v) {
 		return virtualVertices.contains(v);
 	}
 
-
 	@Override
 	public void finish() {
-		if(!finalized) {
-			// remove the super triangle properly!
-			if(!useMeshForBound) {
-				// flip all edges
-				List<E> toLegalize = new ArrayList<>();
-				for(V virtualPoint : virtualVertices) {
+        if (finalized) {
+            return;
+        }
+        // remove the super triangle properly!
+        if(!useMeshForBound) {
+            var edges = getMesh().edges();
+            var vertices = getMesh().vertices();
+            var faces = getMesh().faces();
+            // flip all edges
+            List<E> toLegalize = new ArrayList<>();
+            for(V virtualPoint : virtualVertices) {
 
-					for(E edge : getMesh().getEdges(virtualPoint)) {
-						V vertex = getMesh().getVertex(getMesh().getNext(edge));
-						if(isLeftOf(vertex.getX(), vertex.getY(), getMesh().getNext(getMesh().getTwin(edge)))) {
-							flip(edge);
-							toLegalize.add(edge);
-						}
-					}
-				}
+                for(E edge : edges.getAllOf(virtualPoint)) {
+                    V vertex = vertices.getEndOf(edges.getNext(edge));
+                    if(readConnectivity.isLeftOf(vertex.getX(), vertex.getY(), edges.getNext(edges.getTwin(edge)))) {
+						changeConnectivity.flip(edge);
+                        toLegalize.add(edge);
+                    }
+                }
+            }
 
-				for(V virtualPoint : virtualVertices) {
-					if(!mesh.isDestroyed(virtualPoint)) {
-						List<F> faces1 = mesh.getFaces(virtualPoint);
-						faces1.removeIf(f -> mesh.isBoundary(f));
-						faces1.forEach(f -> removeFaceAtBorder(f, true));
-					}
-				}
+            for(V virtualPoint : virtualVertices) {
+                if(!vertices.isDestroyed(virtualPoint)) {
+                    List<F> faces1 = faces.getAdjacentOf(virtualPoint);
+                    faces1.removeIf(f -> faces.isBoundary(f));
+                    faces1.forEach(f -> changeConnectivity.removeFaceAtBorder(f, true));
+                }
+            }
 
-				for(E edge : toLegalize) {
-					if(!getMesh().isDestroyed(edge)) {
-						legalize(edge);
-					}
-				}
-			}
+            for(E edge : toLegalize) {
+                if(!edges.isDestroyed(edge)) {
+					changeConnectivity.legalize(edge);
+                }
+            }
+        }
 
-			//assert getMesh().streamEdges().noneMatch(e -> isIllegal(e));
-
-			/*if(!mesh.isDestroyed(p1)) {
-				List<F> faces2 = mesh.getFaces(p1);
-				faces2.removeIf(f -> mesh.isDestroyed(f) || mesh.isBoundary(f));
-				faces2.forEach(f -> removeFaceAtBoundary(f, true));
-			}
-
-			if(!mesh.isDestroyed(p2)) {
-				List<F> faces3 = mesh.getFaces(p2);
-				faces3.removeIf(f -> mesh.isDestroyed(f) || mesh.isBoundary(f));
-				faces3.forEach(f -> removeFaceAtBoundary(f, true));
-			}*/
-
-			finalized = true;
-		}
-	}
-
-	@Override
-	public void addTriEventListener(@NotNull ITriEventListener<V, E, F> triEventListener) {
-		triEventListeners.add(triEventListener);
-	}
-
-	@Override
-	public void removeTriEventListener(@NotNull ITriEventListener<V, E, F> triEventListener) {
-		triEventListeners.remove(triEventListener);
-	}
+		this.mesh.removeTriEventListener(this);
+        finalized = true;
+    }
 
 	public boolean isDeletionOk(final F face) {
-		if(mesh.isDestroyed(face)) {
+		if(getMesh().faces().isDestroyed(face)) {
 			return false;
 		}
 
-		for(E halfEdge : mesh.getEdgeIt(face)) {
-			if(mesh.isBoundary(mesh.getTwin(halfEdge))) {
+		for(E halfEdge : getMesh().edges().iterableFor(face)) {
+			if(getMesh().edges().isBoundary(getMesh().edges().getTwin(halfEdge))) {
 				return true;
 			}
 		}
 		return false;
 	}
 
-	/**
-	 * Deletes a face assuming that the face triangleContains at least one boundary edge, otherwise the
-	 * deletion will not result in an feasibly triangulation.
-	 *
-	 * @param face the face that will be deleted, which as to be adjacent to the boundary.
-	 */
-	public void deleteBoundaryFace(final F face) {
-		//assert isDeletionOk(face);
-
-		// 3 cases: 1. triangle consist of 1, 2 or 3 boundary edges
-		List<E> boundaryEdges = new ArrayList<>(3);
-		List<E> nonBoundaryEdges = new ArrayList<>(3);
-
-		for(E halfEdge : mesh.getEdgeIt(face)) {
-			if(mesh.isBoundary(mesh.getTwin(halfEdge))) {
-				boundaryEdges.add(halfEdge);
-			}
-			else {
-				nonBoundaryEdges.add(halfEdge);
-			}
-		}
-
-		if(boundaryEdges.size() == 3) {
-			// release memory
-			mesh.getEdges(face).forEach(halfEdge -> mesh.destroyEdge(halfEdge));
-		}
-		else if(boundaryEdges.size() == 2) {
-			E toB = mesh.isBoundary(mesh.getTwin(mesh.getNext(boundaryEdges.get(0)))) ? boundaryEdges.get(0) : boundaryEdges.get(1);
-			E toF = mesh.isBoundary(mesh.getTwin(mesh.getNext(boundaryEdges.get(0)))) ? boundaryEdges.get(1) : boundaryEdges.get(0);
-			E nB = nonBoundaryEdges.get(0);
-			mesh.setFace(nB, mesh.getTwinFace(toF));
-			mesh.setNext(nB, mesh.getNext(mesh.getTwin(toB)));
-			mesh.setPrev(nB, mesh.getPrev(mesh.getTwin(toF)));
-			mesh.setEdge(mesh.getFace(mesh.getTwin(toF)), nB);
-
-			//this.face = mesh.getTwinFace(toF);
-
-			// release memory
-			mesh.destroyEdge(toF);
-			mesh.destroyEdge(toB);
-
-		}
-		else {
-			E boundaryHe = boundaryEdges.get(0);
-			E prec = mesh.getPrev(mesh.getTwin(boundaryHe));
-			E succ = mesh.getNext(mesh.getTwin(boundaryHe));
-
-			E next = mesh.getNext(boundaryHe);
-			E prev = mesh.getPrev(boundaryHe);
-			mesh.setPrev(next, prec);
-			mesh.setFace(next, mesh.getTwinFace(boundaryHe));
-
-			mesh.setNext(prev, succ);
-			mesh.setFace(prev, mesh.getTwinFace(boundaryHe));
-
-			mesh.setEdge(mesh.getFace(prec), prec);
-
-			//this.face = mesh.getFace(prec);
-			// release memory
-			mesh.destroyEdge(boundaryHe);
-		}
-
-		mesh.destroyFace(face);
-	}
-
 	@Override
-	public IMesh<V, E, F> getMesh() {
-		return mesh;
+	public ITriangleMeshBuilder<V, E, F>  getMeshBuilder() {
+		return meshBuilder;
 	}
 
 	@Override
@@ -861,17 +878,17 @@ public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F 
 
 	@Override
 	public Stream<VTriangle> streamTriangles() {
-		return stream().map(f -> getMesh().toTriangle(f));
+		return stream().map(f -> faces.toTriangle(f));
 	}
 
 	@Override
 	public Stream<Triple<IPoint, IPoint, IPoint>> streamTriples() {
-		return mesh.streamFaces().map(f -> faceToTriple(f));
+		return faces.stream().map(f -> faceToTriple(f));
 	}
 
 	@Override
 	public Stream<IPoint> streamPoints() {
-		return mesh.streamPoints();
+		return vertices.streamPoints();
 	}
 
 	@Override
@@ -879,9 +896,9 @@ public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F 
 		Optional<F> optFace = locateFace(point);
 		if(optFace.isPresent()) {
 			F face = optFace.get();
-			for(V vertex : getMesh().getVertexIt(face)) {
-				if(getMesh().getPoint(vertex).equals(point)) {
-					remove(vertex);
+			for(V vertex : mesh.vertices().iterableFor(face)) {
+				if(vertices.toMutablePoint(vertex).equals(point)) {
+					changeConnectivity.remove(vertex);
 					break;
 				}
 			}
@@ -893,7 +910,7 @@ public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F 
 	}
 
 	private Triple<IPoint, IPoint, IPoint> faceToTriple(final F face) {
-		List<IPoint> points = mesh.getPoints(face);
+		List<IPoint> points = faces.getPoints(face);
 		assert points.size() == 3;
 		IPoint p1 = points.get(0);
 		IPoint p2 = points.get(1);
@@ -902,7 +919,7 @@ public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F 
 	}
 
 	private VTriangle faceToTriangle(final F face) {
-		List<V> points = mesh.getEdges(face).stream().map(edge -> mesh.getVertex(edge)).collect(Collectors.toList());
+		List<V> points = edges.streamEdgesOf(face).map(edge -> vertices.getEndOf(edge)).collect(Collectors.toList());
 		V p1 = points.get(0);
 		V p2 = points.get(1);
 		V p3 = points.get(2);
@@ -919,21 +936,19 @@ public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F 
 	 * @param p     point(next(edge))
 	 * @return true if the edge with respect to p is illegal, otherwise false
 	 */
-	@Override
 	public boolean isIllegal(@NotNull final E edge, @NotNull final V p) {
-		// TODO: duplicated code
-		if(/*!isVirtualVertex(p) && */!mesh.isAtBoundary(edge) && illegalPredicate.test(edge)) {
-			V v1 = getMesh().getVertex(edge);
-			V v2 = getMesh().getTwinVertex(edge);
+		if(/*!isVirtualVertex(p) && */!edges.isAtBoundary(edge) && illegalPredicate.test(edge)) {
+			/*V v1 = vertices.getEndOf(edge);
+			V v2 = vertices.getTwinVertex(edge);
 
-			/*if(isVirtualVertex(v1)) {
+			if(isVirtualVertex(v1)) {
 				E e = getMesh().getNext(getMesh().getTwin(edge));
 				return !isVirtualEdge(e) && isLeftOf(p.getX(), p.getY(), e);
 			} else if(isVirtualVertex(v2)) {
 				E e = getMesh().getPrev(getMesh().getTwin(edge));
 				return !isVirtualEdge(e) && isLeftOf(p.getX(), p.getY(), e);
 			} else {*/
-				return isDelaunayIllegal(edge, p);
+				return getMeshBuilder().changeConnectivity().isDelaunayIllegal(edge, p);
 			//}
 		}
 
@@ -941,165 +956,8 @@ public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F 
 		//return isIllegal(edge, p, mesh);
 	}
 
-	@Override
 	public boolean isIllegal(@NotNull final E edge, @NotNull final V p, final double eps) {
-		if(/*!isVirtualVertex(p) && */!mesh.isAtBoundary(edge) && illegalPredicate.test(edge)) {
-			// special case for infinity vertices for which the arc of their circumcircle becomes a line!
-			//V v1 = getMesh().getVertex(edge);
-			//V v2 = getMesh().getTwinVertex(edge);
-
-			/*if(isVirtualVertex(v1)) {
-				return isLeftOf(p.getX(), p.getY(), getMesh().getNext(getMesh().getTwin(edge)));
-			} else if(isVirtualVertex(v2)) {
-				return isLeftOf(p.getX(), p.getY(), getMesh().getPrev(getMesh().getTwin(edge)));
-			} else {
-			*/
-				return isDelaunayIllegal(edge, p, eps);
-			//}
-		}
-
-		return false;
-		//return isIllegal(edge, p, mesh);
-	}
-
-	/*public static <P extends IPoint, V extends  IVertex<P>, E extends IHalfEdge<P>, F extends IFace<P>> boolean isIllegal(E edge, V p, IMesh<P, V, E, F> mesh) {
-		if(!mesh.isBoundary(mesh.getTwinFace(edge))) {
-			//V p = mesh.getVertex(mesh.getNext(edge));
-			E t0 = mesh.getTwin(edge);
-			E t1 = mesh.getNext(t0);
-			E t2 = mesh.getNext(t1);
-
-			V x = mesh.getVertex(t0);
-			V y = mesh.getVertex(t1);
-			V z = mesh.getVertex(t2);
-
-			//return Utils.angle3D(x, y, z) + Utils.angle3D(x, p, z) > Math.PI;
-
-			//return Utils.isInCircumscribedCycle(x, y, z, p);
-			if (Utils.ccw(x,y,z) > 0
-					t.dest().rightOf(e) && v.isInCircle(e.orig(), t.dest(), e.dest())) {
-			log.info(Utils.ccw(x,y,z) > 0);
-			return Utils.isInsideCircle(x, y, z, p);
-		}
-		return false;
-	}*/
-
-	/*public static <P extends IPoint, CE, CF, V extends  IVertex, E extends IHalfEdge, F extends IFace> boolean isIllegal(E edge, V p, IMesh<V, E, F> mesh) {
-		if(!mesh.isBoundary(mesh.getTwinFace(edge))) {
-			//assert mesh.getVertex(mesh.getNext(edge)).equals(p);
-			//V p = mesh.getVertex(mesh.getNext(edge));
-			E t0 = mesh.getTwin(edge);
-			E t1 = mesh.getNext(t0);
-			E t2 = mesh.getNext(t1);
-
-			V x = mesh.getVertex(t0);
-			V y = mesh.getVertex(t1);
-			V z = mesh.getVertex(t2);
-
-			//return Utils.angle3D(x, y, z) + Utils.angle3D(x, p, z) > Math.PI;
-
-			//return Utils.isInCircumscribedCycle(x, y, z, p);
-			//if(Utils.ccw(z,x,y) > 0) {
-				return GeometryUtils.isInsideCircle(z, x, y, p);
-			//}
-			//else {
-			//	return Utils.isInsideCircle(x, z, y, p);
-			//}
-		}
-		return false;
-	}*/
-
-	/*public static <P extends IPoint> boolean isIllegalEdge(final E edge){
-		P p = edge.getNext().getEnd();
-
-		if(!edge.isAtBoundary() && !edge.getTwin().isAtBoundary()) {
-			P x = edge.getTwin().getEnd();
-			P y = edge.getTwin().getNext().getEnd();
-			P z = edge.getTwin().getNext().getNext().getEnd();
-			VTriangle triangle = new VTriangle(new VPoint(x.getX(), x.getY()), new VPoint(y.getX(), y.getY()), new VPoint(z.getX(), z.getY()));
-			return triangle.isInCircumscribedCycle(p);
-		}
-		return false;
-	}*/
-
-	@Override
-	public void legalizeNonRecursive(@NotNull final E edge, final V p) {
-		int flips = 0;
-		int its = 0;
-		//if(isIllegal(edge, p)) {
-
-			// this should be the same afterwards
-			//E halfEdge = getMesh().getNext(edge);
-
-			IMesh<V, E, F> mesh = getMesh();
-			E startEdge = mesh.getPrev(edge);
-			E endEdge = mesh.getTwin(getMesh().getPrev(startEdge));
-			E currentEdge = mesh.getPrev(edge);
-
-			// flipp
-			//c.prev.twin
-
-			while(currentEdge != endEdge) {
-				while (isIllegal(mesh.getNext(currentEdge), p)) {
-					flip(mesh.getNext(currentEdge));
-					flips++;
-					its++;
-				}
-				its++;
-
-				currentEdge = mesh.getTwin(mesh.getPrev(currentEdge));
-			}
-
-			//log.info("#flips = " + flips);
-			//log.info("#its = " + its);
-		//}
-	}
-
-	/*@Override
-	/*@Override
-	public void legalizeNonRecursive(@NotNull final E edge, final V p) {
-		boolean found = false;
-		do {
-			found = false;
-			for(E e : getMesh().getEdges()) {
-				if(isIllegal(e)) {
-					flip(e);
-					found = true;
-				}
-			}
-		} while (found);
-	}*/
-
-	@Override
-	public void flipEdgeEvent(final F f1, final F f2) {
-		pointLocator.postFlipEdgeEvent(f1, f2);
-		for(ITriEventListener<V, E, F> triEventListener : triEventListeners) {
-			triEventListener.postFlipEdgeEvent(f1, f2);
-		}
-	}
-
-	@Override
-	public void splitTriangleEvent(final F original, final F f1, F f2, F f3, V v) {
-		pointLocator.postSplitTriangleEvent(original, f1, f2, f3,v );
-		for(ITriEventListener<V, E, F> triEventListener : triEventListeners) {
-			triEventListener.postSplitTriangleEvent(original, f1, f2, f3, v);
-		}
-	}
-
-	@Override
-	public void splitEdgeEvent(E originalEdge, F original, F f1, F f2, V v) {
-		pointLocator.postSplitHalfEdgeEvent(originalEdge, original, f1, f2,v );
-		for(ITriEventListener<V, E, F> triEventListener : triEventListeners) {
-			triEventListener.postSplitHalfEdgeEvent(originalEdge, original, f1, f2, v);
-		}
-	}
-
-	@Override
-	public void insertEvent(@NotNull final E halfEdge) {
-		pointLocator.postInsertEvent(getMesh().getVertex(halfEdge));
-		for(ITriEventListener<V, E, F> triEventListener : triEventListeners) {
-			triEventListener.postInsertEvent(getMesh().getVertex(halfEdge));
-		}
+		return isIllegal(edge, p);
 	}
 
 	@Override
@@ -1111,37 +969,36 @@ public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F 
 		return StreamSupport.stream(this.spliterator(), false);
 	}
 
-	@Override
-	public IncrementalTriangulation<V, E, F> clone() {
-		try {
-			IncrementalTriangulation<V, E, F> clone = (IncrementalTriangulation<V, E, F>)super.clone();
-			clone.mesh = mesh.clone();
-
-			List<V> cVirtualVertices = new ArrayList<>();
-			for(V v : virtualVertices) {
-				for(V cV : clone.mesh.getVertices()) {
-					if(v.getPoint().equals(cV.getPoint())) {
-						cVirtualVertices.add(cV);
-						break;
-					}
-				}
-			}
-
-			assert cVirtualVertices.size() == virtualVertices.size();
-			clone.virtualVertices = cVirtualVertices;
-
-			/**
-			 * The point locator is not cloned but reconstructed. Cloning the Delaunay-Hierarchy or the Delaunay-Tree seems impossible with
-			 * respect to the performance. However, the reconstruction is also expensive O(n * log(n)) where n is the number of vertices.
-			 */
-			clone.setPointLocator(pointLocator.getType());
-
-			return clone;
-
-		} catch (CloneNotSupportedException e) {
-			throw new InternalError(e.getMessage());
-		}
+	public IncrementalTriangulation<V, E, F> copy() {
+		return new IncrementalTriangulation<>(this);
 	}
+
+	@Override
+	public void postSplitTriangleEvent(F original, F f1, F f2, F f3, V v) {
+		pointLocator.postSplitTriangleEvent(original, f1, f2, f3,v );
+	}
+
+	@Override
+	public void postSplitHalfEdgeEvent(E originalEdge, F original, F f1, F f2, V v) {
+		pointLocator.postSplitHalfEdgeEvent(originalEdge, original, f1, f2,v );
+	}
+
+	@Override
+	public void postFlipEdgeEvent(F f1, F f2) {
+		pointLocator.postFlipEdgeEvent(f1, f2);
+	}
+
+	@Override
+	public void postInsertEvent(V vertex) {
+		pointLocator.postInsertEvent(vertex);
+	}
+
+	@Override
+	public IMeshDataStorage<V, E, F> getMeshDataStorage() {
+		return meshBuilder.getDataStorage();
+	}
+
+
 
 	// TODO: the following code can be deleted, this is only for visual checks
 	public static void main(String[] args) {
@@ -1167,7 +1024,7 @@ public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F 
 
 		PMesh mesh = new PMesh();
 		IIncrementalTriangulation<PVertex, PHalfEdge, PFace> bw = IIncrementalTriangulation.createPTriangulation(
-				IPointLocator.Type.DELAUNAY_HIERARCHY,
+				ITriangleMeshPointLocator.Type.JUMP_AND_WALK,
 				points
 		);
 		bw.finish();
@@ -1183,7 +1040,7 @@ public class IncrementalTriangulation<V extends IVertex, E extends IHalfEdge, F 
 
         ms = System.currentTimeMillis();
         IIncrementalTriangulation<AVertex, AHalfEdge, AFace> bw2 = IIncrementalTriangulation.createATriangulation(
-                IPointLocator.Type.DELAUNAY_HIERARCHY,
+                ITriangleMeshPointLocator.Type.JUMP_AND_WALK,
                 points
         );
         bw2.finish();

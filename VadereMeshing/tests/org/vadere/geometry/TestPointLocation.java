@@ -1,21 +1,14 @@
 package org.vadere.geometry;
 
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.vadere.meshing.mesh.gen.PFace;
-import org.vadere.meshing.mesh.gen.PHalfEdge;
-import org.vadere.meshing.mesh.gen.PMesh;
-import org.vadere.meshing.mesh.gen.PVertex;
-import org.vadere.meshing.mesh.inter.IFace;
-import org.vadere.meshing.mesh.inter.IHalfEdge;
-import org.vadere.meshing.mesh.inter.IMesh;
-import org.vadere.meshing.mesh.inter.ITriConnectivity;
-import org.vadere.meshing.mesh.inter.IVertex;
-import org.vadere.util.geometry.shapes.IPoint;
-import org.vadere.util.geometry.shapes.VPoint;
-
-import java.util.Iterator;
+import org.vadere.meshing.mesh.gen.mesh.ReadOnlyTriangleConnectivity;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PFace;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PHalfEdge;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PVertex;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.triangles.PTriangleMeshBuilder;
+import org.vadere.meshing.mesh.inter.mesh.builder.ITriangleMeshBuilder;
+import org.vadere.meshing.mesh.inter.meshConnectivity.IReadOnlyTriConnectivity;
 
 import static  org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -30,8 +23,8 @@ public class TestPointLocation {
 	private static PFace face2;
 	private static PFace border;
 	private static double EPSILON = 1.0e-6;
-	private IMesh<PVertex, PHalfEdge, PFace> mesh;
-	private ITriConnectivity<PVertex, PHalfEdge, PFace> triConnectivity;
+	private ITriangleMeshBuilder<PVertex, PHalfEdge, PFace> meshBuilder;
+	private IReadOnlyTriConnectivity<PVertex, PHalfEdge, PFace> triConnectivity;
 
 	/**
 	 * Sets up a mesh consisting of 2 triangles and 1 border face.
@@ -40,90 +33,60 @@ public class TestPointLocation {
 	 */
 	@BeforeEach
 	public void setUp() throws Exception {
-		mesh = new PMesh();
-		face1 = mesh.createFace();
-		face2 = mesh.createFace();
-		border = mesh.getBorder();
+		meshBuilder = new PTriangleMeshBuilder();
+		face1 = meshBuilder.faces().createAndInsert();
+		face2 = meshBuilder.faces().createAndInsert();
+		border = meshBuilder.getMesh().faces().getOuterBorder();
 
-		PVertex x = mesh.insertVertex(0, 0);
-		PVertex y = mesh.insertVertex(1.5,3.0);
-		PVertex z = mesh.insertVertex(3.0,0);
-		PVertex w = mesh.insertVertex(4.5,3.0);
+		PVertex x = meshBuilder.vertices().createAndInsert(0, 0);
+		PVertex y = meshBuilder.vertices().createAndInsert(1.5,3.0);
+		PVertex z = meshBuilder.vertices().createAndInsert(3.0,0);
+		PVertex w = meshBuilder.vertices().createAndInsert(4.5,3.0);
 
-		PHalfEdge xy = mesh.createEdge(y, border);
-		mesh.setEdge(y, xy);
-		PHalfEdge yx = mesh.createEdge(x, face1);
-		mesh.setEdge(x, yx);
-		mesh.setTwin(xy, yx);
+		PHalfEdge xy = meshBuilder.edges().createAndInsert(y, border);
+		meshBuilder.vertices().setEdge(y, xy);
+		PHalfEdge yx = meshBuilder.edges().createAndInsert(x, face1);
+		meshBuilder.vertices().setEdge(x, yx);
+		meshBuilder.edges().setTwin(xy, yx);
 
-		PHalfEdge yz = mesh.createEdge(z, face2);
-		mesh.setEdge(z, yz);
+		PHalfEdge yz = meshBuilder.edges().createAndInsert(z, face2);
+		meshBuilder.vertices().setEdge(z, yz);
 
-		PHalfEdge zx = mesh.createEdge(x, border);
-		PHalfEdge xz = mesh.createEdge(z, face1);
-		mesh.setTwin(zx, xz);
+		PHalfEdge zx = meshBuilder.edges().createAndInsert(x, border);
+		PHalfEdge xz = meshBuilder.edges().createAndInsert(z, face1);
+		meshBuilder.edges().setTwin(zx, xz);
 
-		PHalfEdge zy = mesh.createEdge(y, face1);
-		mesh.setTwin(yz, zy);
-		PHalfEdge yw = mesh.createEdge(w, border);
-		mesh.setEdge(w, yw);
-		PHalfEdge wy = mesh.createEdge(y, face2);
-		mesh.setTwin(yw, wy);
+		PHalfEdge zy = meshBuilder.edges().createAndInsert(y, face1);
+		meshBuilder.edges().setTwin(yz, zy);
+		PHalfEdge yw = meshBuilder.edges().createAndInsert(w, border);
+		meshBuilder.vertices().setEdge(w, yw);
+		PHalfEdge wy = meshBuilder.edges().createAndInsert(y, face2);
+		meshBuilder.edges().setTwin(yw, wy);
 
-		PHalfEdge wz = mesh.createEdge(z, border);
-		PHalfEdge zw = mesh.createEdge(w, face2);
-		mesh.setTwin(wz, zw);
+		PHalfEdge wz = meshBuilder.edges().createAndInsert(z, border);
+		PHalfEdge zw = meshBuilder.edges().createAndInsert(w, face2);
+		meshBuilder.edges().setTwin(wz, zw);
 
-		mesh.setNext(zy, yx);
-		mesh.setNext(yx, xz);
-		mesh.setNext(xz, zy);
+		meshBuilder.edges().setNext(zy, yx);
+		meshBuilder.edges().setNext(yx, xz);
+		meshBuilder.edges().setNext(xz, zy);
 
-		mesh.setEdge(face1, zy);
+		meshBuilder.faces().setEdge(face1, zy);
 
-		mesh.setNext(yz, zw);
-		mesh.setNext(zw, wy);
-		mesh.setNext(wy, yz);
+		meshBuilder.edges().setNext(yz, zw);
+		meshBuilder.edges().setNext(zw, wy);
+		meshBuilder.edges().setNext(wy, yz);
 
-		mesh.setEdge(face2, yz);
+		meshBuilder.faces().setEdge(face2, yz);
 
-		mesh.setNext(zx, xy);
-		mesh.setNext(xy, yw);
-		mesh.setNext(yw, wz);
-		mesh.setNext(wz, zx);
+		meshBuilder.edges().setNext(zx, xy);
+		meshBuilder.edges().setNext(xy, yw);
+		meshBuilder.edges().setNext(yw, wz);
+		meshBuilder.edges().setNext(wz, zx);
 
-		mesh.setEdge(border, zx);
+		meshBuilder.faces().setEdge(border, zx);
 
-		triConnectivity = new ITriConnectivity() {
-			@Override
-			public boolean isIllegal(IHalfEdge edge, IVertex p) {
-				return true;
-			}
-
-			@Override
-			public boolean isIllegal(@NotNull IHalfEdge edge, @NotNull IVertex p, double eps) {
-				return false;
-			}
-
-			@Override
-			public IHalfEdge insert(@NotNull IPoint point, @NotNull IFace face) {
-				return null;
-			}
-
-			@Override
-			public void legalizeNonRecursive(@NotNull IHalfEdge edge, IVertex p) {
-
-			}
-
-			@Override
-			public IMesh<PVertex, PHalfEdge, PFace> getMesh() {
-				return mesh;
-			}
-
-			@Override
-			public Iterator<VPoint> iterator() {
-				return null;
-			}
-		};
+		triConnectivity = new ReadOnlyTriangleConnectivity<>(meshBuilder.getMesh());
 	}
 
 	@Test

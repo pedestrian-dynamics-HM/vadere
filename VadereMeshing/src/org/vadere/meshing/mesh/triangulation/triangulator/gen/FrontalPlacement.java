@@ -1,10 +1,10 @@
 package org.vadere.meshing.mesh.triangulation.triangulator.gen;
 
 import org.jetbrains.annotations.NotNull;
-import org.vadere.meshing.mesh.inter.IFace;
-import org.vadere.meshing.mesh.inter.IHalfEdge;
-import org.vadere.meshing.mesh.inter.IMesh;
-import org.vadere.meshing.mesh.inter.IVertex;
+import org.vadere.meshing.mesh.inter.mesh.IFace;
+import org.vadere.meshing.mesh.inter.mesh.IHalfEdge;
+import org.vadere.meshing.mesh.inter.mesh.IMesh;
+import org.vadere.meshing.mesh.inter.mesh.IVertex;
 import org.vadere.meshing.mesh.triangulation.triangulator.inter.IPlacementStrategy;
 import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VLine;
@@ -35,7 +35,7 @@ public class FrontalPlacement<P extends IPoint, CE, CF, V extends IVertex, E ext
 
 	@Override
 	public VPoint computePlacement(@NotNull final E edge, final VTriangle triangle) {
-		VLine line = getMesh().toLine(edge);
+		VLine line = getMesh().edges().toLine(edge);
 		VPoint midpoint = line.midPoint();
 		VPoint x1 = delaunayPlacement.computePlacement(edge, triangle);
 		VPoint x2 = voronoiSegPlacement.computePlacement(edge, triangle);

@@ -4,8 +4,9 @@ import org.apache.commons.math3.util.Pair;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.vadere.meshing.WeilerAtherton;
-import org.vadere.meshing.mesh.gen.PFace;
-import org.vadere.meshing.mesh.gen.PMesh;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PFace;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.elements.PMesh;
+import org.vadere.meshing.mesh.gen.mesh.pointerBased.triangles.PTriangleMeshBuilder;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.VPoint;
 import org.vadere.util.geometry.shapes.VPolygon;
@@ -111,8 +112,8 @@ public class TestWeilerAtherton {
 
 		WeilerAtherton weilerAtherton = new WeilerAtherton(originalList);
 		Pair<PFace, PFace> pair = weilerAtherton.constructIntersectionFaces(
-				poly1, new PMesh(),
-				poly2, new PMesh()
+				poly1, new PTriangleMeshBuilder(),
+				poly2, new PTriangleMeshBuilder()
 		);
 
 		PFace face1 = pair.getFirst();
@@ -127,8 +128,8 @@ public class TestWeilerAtherton {
 		expectedPoints1.addAll(poly1.getPath());
 		expectedPoints2.addAll(poly2.getPath());
 
-		assertEquals(expectedPoints1, mesh.streamPoints(face1).map(p -> new VPoint(p)).collect(Collectors.toSet()));
-		assertEquals(expectedPoints2, mesh.streamPoints(face2).map(p -> new VPoint(p)).collect(Collectors.toSet()));
+		assertEquals(expectedPoints1, mesh.vertices().streamPoints(face1).map(p -> new VPoint(p)).collect(Collectors.toSet()));
+		assertEquals(expectedPoints2, mesh.vertices().streamPoints(face2).map(p -> new VPoint(p)).collect(Collectors.toSet()));
 
 	}
 
@@ -143,8 +144,8 @@ public class TestWeilerAtherton {
 
 		WeilerAtherton weilerAtherton = new WeilerAtherton(originalList);
 		Pair<PFace, PFace> pair = weilerAtherton.constructIntersectionFaces(
-				poly1, new PMesh(),
-				poly2, new PMesh()
+				poly1, new PTriangleMeshBuilder(),
+				poly2, new PTriangleMeshBuilder()
 		);
 
 		PFace face1 = pair.getFirst();
@@ -153,8 +154,8 @@ public class TestWeilerAtherton {
 		// we need a mesh to iterate
 		PMesh mesh = new PMesh();
 
-		assertEquals(5, mesh.streamPoints(face1).map(p -> new VPoint(p)).collect(Collectors.toSet()).size());
-		assertEquals(5, mesh.streamPoints(face2).map(p -> new VPoint(p)).collect(Collectors.toSet()).size());
+		assertEquals(5, mesh.vertices().streamPoints(face1).map(p -> new VPoint(p)).collect(Collectors.toSet()).size());
+		assertEquals(5, mesh.vertices().streamPoints(face2).map(p -> new VPoint(p)).collect(Collectors.toSet()).size());
 	}
 
 

@@ -1,7 +1,7 @@
 package org.vadere.simulator.models.potential.solver.timecost;
 
 import org.jetbrains.annotations.NotNull;
-import org.vadere.meshing.mesh.inter.IVertex;
+import org.vadere.meshing.mesh.inter.mesh.IVertex;
 import org.vadere.util.geometry.shapes.IPoint;
 
 /**

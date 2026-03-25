@@ -2,14 +2,11 @@ package org.vadere.meshing.mesh.triangulation.improver;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.meshing.mesh.IllegalMeshException;
-import org.vadere.meshing.mesh.inter.IFace;
-import org.vadere.meshing.mesh.inter.IHalfEdge;
-import org.vadere.meshing.mesh.inter.IMesh;
+import org.vadere.meshing.mesh.inter.mesh.*;
 import org.vadere.meshing.mesh.inter.IIncrementalTriangulation;
-import org.vadere.meshing.mesh.inter.IVertex;
+import org.vadere.meshing.mesh.inter.mesh.data.IMeshDataStorage;
 import org.vadere.meshing.mesh.triangulation.improver.distmesh.Parameters;
 import org.vadere.meshing.mesh.triangulation.improver.eikmesh.gen.IEikMeshImprover;
-import org.vadere.util.geometry.shapes.IPoint;
 import org.vadere.util.geometry.shapes.VTriangle;
 import org.vadere.util.math.IDistanceFunction;
 
@@ -33,11 +30,12 @@ public interface IMeshImprover<V extends IVertex, E extends IHalfEdge, F extends
 	 * @return the mesh the improver is working on.
 	 */
 	default IMesh<V,E,F> getMesh() {
-		return getTriangulation().getMesh();
+		return getTriangulation().getMeshBuilder().getMesh();
 	}
+	default IMeshDataStorage<V,E,F> getMeshDataStorage() { return getTriangulation().getMeshDataStorage(); }
 
 	default Predicate<F> outsidePredicate(@NotNull final IDistanceFunction distanceFunc) {
-		return f -> distanceFunc.apply(getMesh().toTriangle(f).midPoint()) > 0;
+		return f -> distanceFunc.apply(getMesh().faces().toTriangle(f).midPoint()) > 0;
 	}
 
 	default Predicate<F> lowQualityPredicate() {
@@ -59,11 +57,11 @@ public interface IMeshImprover<V extends IVertex, E extends IHalfEdge, F extends
 	 *                              therefore the mesh becomes illegal
 	 */
 	default void removeFacesInsideHoles(@NotNull final IDistanceFunction distanceFunc) throws IllegalMeshException {
-		Predicate<F> isBoundary = f -> getMesh().isBoundary(f);
+		Predicate<F> isBoundary = f -> getMesh().faces().isBoundary(f);
 		Predicate<F> isOutside = outsidePredicate(distanceFunc);
 
-		for(F face : getMesh().getHoles()) {
-			getTriangulation().mergeFaces(face, isOutside, isBoundary, true);
+		for(F face : getMesh().faces().getHoles()) {
+			getTriangulation().getMeshBuilder().changeConnectivity().mergeFaces(face, isOutside, isBoundary, true);
 		}
 	}
 
@@ -75,7 +73,7 @@ public interface IMeshImprover<V extends IVertex, E extends IHalfEdge, F extends
 	 * @param distanceFunc the distance function which defines inside and outside
 	 */
 	default void removeFacesOutsideBBox(@NotNull final IDistanceFunction distanceFunc) {
-		getTriangulation().shrinkBorder(outsidePredicate(distanceFunc), true);
+		getTriangulation().getMeshBuilder().changeConnectivity().shrinkBorder(outsidePredicate(distanceFunc), true);
 	}
 
 	/**
@@ -106,9 +104,11 @@ public interface IMeshImprover<V extends IVertex, E extends IHalfEdge, F extends
 	 * @param distanceFunc the distance function which defines inside and outside
 	 */
 	default void removeAllFacesOutside(@NotNull final IDistanceFunction distanceFunc) {
-		for(F face : getMesh().getFaces()) {
-			if(!getTriangulation().getMesh().isDestroyed(face) && !getTriangulation().getMesh().isHole(face)) {
-				getTriangulation().createHole(face, outsidePredicate(distanceFunc), true);
+		var meshBuilder = getTriangulation().getMeshBuilder();
+
+		for(F face : getMesh().faces().getAll()) {
+			if(!meshBuilder.getMesh().faces().isDestroyed(face) && !meshBuilder.getMesh().faces().isHole(face)) {
+				meshBuilder.changeConnectivity().createHole(face, outsidePredicate(distanceFunc), true);
 			}
 		}
 	}
@@ -120,18 +120,18 @@ public interface IMeshImprover<V extends IVertex, E extends IHalfEdge, F extends
 	 *                              therefore the mesh becomes illegal
 	 */
 	default void removeLowQualityFacesAtHoles() throws IllegalMeshException {
-		Predicate<F> isBoundary = f -> getMesh().isBoundary(f);
+		Predicate<F> isBoundary = f -> getMesh().faces().isBoundary(f);
 		Predicate<F> isOfLowQuality = lowQualityPredicate();
 
-		for(F face : getMesh().getHoles()) {
-			getTriangulation().mergeFaces(face, isOfLowQuality, isBoundary, true, 1);
+		for(F face : getMesh().faces().getHoles()) {
+			getTriangulation().getMeshBuilder().changeConnectivity().mergeFaces(face, isOfLowQuality, isBoundary, true, 1);
 		}
 	}
 
 	default void removeLowQualityFacesAtBorder() throws IllegalMeshException {
-		Predicate<F> isBoundary = f -> getMesh().isBoundary(f);
+		Predicate<F> isBoundary = f -> getMesh().faces().isBoundary(f);
 		Predicate<F> isOfLowQuality = lowQualityPredicate();
-		getTriangulation().mergeFaces(getMesh().getBorder(), isOfLowQuality, isBoundary, true, 1);
+		getTriangulation().getMeshBuilder().changeConnectivity().mergeFaces(getMesh().faces().getOuterBorder(), isOfLowQuality, isBoundary, true, 1);
 	}
 
     /**
@@ -160,7 +160,7 @@ public interface IMeshImprover<V extends IVertex, E extends IHalfEdge, F extends
 	 * @return the overall quality of the triangulation.
 	 */
 	default double getQuality() {
-		Collection<F> faces = getMesh().getFaces();
+		Collection<F> faces = getMesh().faces().getAll();
 		return faces.stream().map(face -> faceToQuality(face)).reduce((d1, d2) -> d1 + d2).get() / faces.size();
 	}
 
@@ -171,7 +171,7 @@ public interface IMeshImprover<V extends IVertex, E extends IHalfEdge, F extends
 	 * @return the quality of the triangle with the lowest quality
 	 */
 	default double getMinQuality() {
-		Collection<F> faces = getMesh().getFaces();
+		Collection<F> faces = getMesh().faces().getAll();
 		return faces.stream().map(face -> faceToQuality(face)).reduce((d1, d2) -> Math.min(d1, d2)).get();
 	}
 
@@ -182,7 +182,7 @@ public interface IMeshImprover<V extends IVertex, E extends IHalfEdge, F extends
 	 * @return the quality of a face / triangle
 	 */
 	default double faceToQuality(final F face) {
-		return getTriangulation().faceToQuality(face);
+		return getTriangulation().getMeshBuilder().getMesh().readConnectivity().faceToQuality(face);
 	}
 
 	default double faceToQuality(final F face, Function<F, Double> qualityMeasure) {
@@ -190,10 +190,10 @@ public interface IMeshImprover<V extends IVertex, E extends IHalfEdge, F extends
 	}
 
 	default double faceToQuality(final E edge) {
-		if(getMesh().isBoundary(edge)) {
-			return faceToQuality(getMesh().getTwinFace(edge));
+		if(getMesh().edges().isBoundary(edge)) {
+			return faceToQuality(getMesh().faces().getTwin(edge));
 		} else {
-			return faceToQuality(getMesh().getFace(edge));
+			return faceToQuality(getMesh().faces().getOf(edge));
 		}
 	}
 

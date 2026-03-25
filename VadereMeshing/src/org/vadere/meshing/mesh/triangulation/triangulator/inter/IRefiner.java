@@ -1,8 +1,8 @@
 package org.vadere.meshing.mesh.triangulation.triangulator.inter;
 
-import org.vadere.meshing.mesh.inter.IFace;
-import org.vadere.meshing.mesh.inter.IHalfEdge;
-import org.vadere.meshing.mesh.inter.IVertex;
+import org.vadere.meshing.mesh.inter.mesh.IFace;
+import org.vadere.meshing.mesh.inter.mesh.IHalfEdge;
+import org.vadere.meshing.mesh.inter.mesh.IVertex;
 import org.vadere.util.geometry.shapes.VLine;
 
 import java.util.Collection;

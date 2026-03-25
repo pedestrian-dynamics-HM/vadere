@@ -2,10 +2,10 @@ package org.vadere.meshing.mesh.triangulation.triangulator.gen;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.vadere.meshing.mesh.inter.IFace;
-import org.vadere.meshing.mesh.inter.IHalfEdge;
-import org.vadere.meshing.mesh.inter.IMesh;
-import org.vadere.meshing.mesh.inter.IVertex;
+import org.vadere.meshing.mesh.inter.mesh.IFace;
+import org.vadere.meshing.mesh.inter.mesh.IHalfEdge;
+import org.vadere.meshing.mesh.inter.mesh.IMesh;
+import org.vadere.meshing.mesh.inter.mesh.IVertex;
 import org.vadere.meshing.mesh.triangulation.triangulator.inter.IPlacementStrategy;
 import org.vadere.util.geometry.GeometryUtils;
 import org.vadere.util.geometry.shapes.IPoint;
@@ -46,9 +46,9 @@ public class VoronoiSegPlacement<V extends IVertex, E extends IHalfEdge, F exten
 
 	@Override
 	public VPoint computePlacement(@NotNull final E edge, @Nullable final VTriangle triangle) {
-		F face = getMesh().getFace(edge);
+		F face = getMesh().faces().getOf(edge);
 		E shortestEdge = edge;
-		VLine line = getMesh().toLine(edge);
+		VLine line = getMesh().edges().toLine(edge);
 
 		VPoint midpoint = line.midPoint();
 		VPoint c = triangle.getCircumcenter();
@@ -101,8 +101,8 @@ public class VoronoiSegPlacement<V extends IVertex, E extends IHalfEdge, F exten
 		VPoint e;
 		VPoint x;
 		VPoint cc;
-		if(!getMesh().isAtBoundary(edge)) {
-			cc = getMesh().toTriangle(getMesh().getTwinFace(edge)).getCircumcenter();
+		if(!getMesh().edges().isAtBoundary(edge)) {
+			cc = getMesh().faces().toTriangle(getMesh().faces().getTwin(edge)).getCircumcenter();
 		} else {
 			double incircleRadius = Math.sqrt(3) / 6.0 * line.length();
 			VPoint dir = line.asVPoint().rotate(Math.PI * 0.5).setMagnitude(incircleRadius);

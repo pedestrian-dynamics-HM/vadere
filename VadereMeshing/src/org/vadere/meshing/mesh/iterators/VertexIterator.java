@@ -1,10 +1,9 @@
 package org.vadere.meshing.mesh.iterators;
 
-import org.vadere.meshing.mesh.inter.IFace;
-import org.vadere.meshing.mesh.inter.IHalfEdge;
-import org.vadere.meshing.mesh.inter.IMesh;
-import org.vadere.meshing.mesh.inter.IVertex;
-import org.vadere.util.geometry.shapes.IPoint;
+import org.vadere.meshing.mesh.inter.mesh.IFace;
+import org.vadere.meshing.mesh.inter.mesh.IHalfEdge;
+import org.vadere.meshing.mesh.inter.mesh.IMesh;
+import org.vadere.meshing.mesh.inter.mesh.IVertex;
 
 import java.util.Iterator;
 
@@ -33,6 +32,6 @@ public class VertexIterator<V extends IVertex, E extends IHalfEdge, F extends IF
 
 	@Override
 	public V next() {
-		return mesh.getVertex(edgeIterator.next());
+		return mesh.vertices().getEndOf(edgeIterator.next());
 	}
 }
