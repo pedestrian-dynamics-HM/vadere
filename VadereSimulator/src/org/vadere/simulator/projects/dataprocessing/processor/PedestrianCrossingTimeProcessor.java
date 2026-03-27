@@ -31,7 +31,8 @@ public class PedestrianCrossingTimeProcessor extends DataProcessor<PedestrianIdK
 		public VPoint exitingPoint;
 
 		// Used to track multiple crossings of the measurement area.
-		// If a pedestrian enters the measurement area, then exits and then enters again, we want to track both crossings and use the longer one for the final output.
+		// If a pedestrian enters the measurement area, then exits and then enters again, we want to track both crossings
+		// and use the one with the longer crossing distance for the final output.
 		@Nullable
 		public Double enterAgainTime;
 		@Nullable
@@ -47,7 +48,9 @@ public class PedestrianCrossingTimeProcessor extends DataProcessor<PedestrianIdK
 		}
 
 		public PedestrianCrossingTimeProcessorCrossInformation setEnterAgain(double enteringTime, VPoint enteringPoint) {
-			assert exitingTime != null && exitingPoint != null;
+			if(exitingTime == null || exitingPoint == null){
+				throw new RuntimeException("setEnterAgain even though setEnd was not called before.");
+			}
 
 			this.enterAgainTime = enteringTime;
 			this.enteringAgainPoint = enteringPoint;
@@ -87,7 +90,7 @@ public class PedestrianCrossingTimeProcessor extends DataProcessor<PedestrianIdK
 		}
 
 		@Nullable
-		public Vector2D GetExitDirection(){
+		public Vector2D getExitDirection(){
 			if(exitingPoint == null) {
 				return null;
 			}
@@ -154,7 +157,10 @@ public class PedestrianCrossingTimeProcessor extends DataProcessor<PedestrianIdK
 
 	private void setExit(@NotNull final PedestrianIdKey key, double time, VPoint exitingPoint) {
 		PedestrianCrossingTimeProcessorCrossInformation current = getValue(key);
-		assert current != null;
+		if(current == null){
+			throw new RuntimeException("Setting exit was called without setting the enter information first");
+		}
+
 		putValue(key, current.setEnd(time, exitingPoint));
 	}
 
@@ -185,13 +191,13 @@ public class PedestrianCrossingTimeProcessor extends DataProcessor<PedestrianIdK
 	}
 
 	@Override
-	public String[] toStrings(@NotNull final  PedestrianIdKey key) {
+	public String[] toStrings(@NotNull final PedestrianIdKey key) {
 		PedestrianCrossingTimeProcessorCrossInformation times = getValue(key);
 		if(times == null) {
 			return new String[]{"-", "-", "-"};
 		}
 
-		Vector2D exitDirection = times.GetExitDirection();
+		Vector2D exitDirection = times.getExitDirection();
 		return new String[]{
 				Double.toString(times.enteringTime),
 				times.exitingTime == null ? "" : Double.toString(times.exitingTime),
