@@ -97,7 +97,7 @@ class RestaurantModelTest {
         buildSetUp(true, true, true);
         List<SeatGroup> seatGroups = restaurantModel.getSeatGroups();
         assertEquals(1, seatGroups.size());
-        assertEquals(2, seatGroups.get(0).getFreeSeats().size());
+        assertEquals(2, seatGroups.get(0).getFreeSeatsTargetIds().size());
     }
 
     @Test
@@ -107,12 +107,12 @@ class RestaurantModelTest {
         Pedestrian ped = addPedestrian(0, new VPoint(0, 0), -1);
 
         SeatGroup seatGroup = restaurantModel.getSeatGroups().get(0);
-        assertEquals(2, seatGroup.getFreeSeats().size());
+        assertEquals(2, seatGroup.getFreeSeatsTargetIds().size());
 
         movePedestrianToTable(ped);
         restaurantModel.update(simStartTime);
 
-        assertEquals(1, seatGroup.getFreeSeats().size());
+        assertEquals(1, seatGroup.getFreeSeatsTargetIds().size());
 
         movePedestrianToSeat(ped);
 
@@ -120,7 +120,7 @@ class RestaurantModelTest {
 
         restaurantModel.update(simStartTime + STAY_TIME);
 
-        assertEquals(2, seatGroup.getFreeSeats().size());
+        assertEquals(2, seatGroup.getFreeSeatsTargetIds().size());
         assertFalse(ped.isSitting());
         assertEquals(LEAF_ID, ped.getNextTargetId());
     }
@@ -133,12 +133,12 @@ class RestaurantModelTest {
         Pedestrian ped2 = addPedestrian(1, new VPoint(0, 0), 0);
 
         SeatGroup seatGroup = restaurantModel.getSeatGroups().get(0);
-        assertEquals(2, seatGroup.getFreeSeats().size());
+        assertEquals(2, seatGroup.getFreeSeatsTargetIds().size());
 
         movePedestrianToTable(ped1);
         restaurantModel.update(simStartTime);
 
-        assertEquals(0, seatGroup.getFreeSeats().size());
+        assertEquals(0, seatGroup.getFreeSeatsTargetIds().size());
 
         movePedestrianToSeat(ped1);
         movePedestrianToSeat(ped2);
@@ -148,7 +148,7 @@ class RestaurantModelTest {
 
         restaurantModel.update(simStartTime + STAY_TIME);
 
-        assertEquals(2, seatGroup.getFreeSeats().size());
+        assertEquals(2, seatGroup.getFreeSeatsTargetIds().size());
         assertFalse(ped1.isSitting());
         assertFalse(ped2.isSitting());
         assertEquals(LEAF_ID, ped1.getNextTargetId());
@@ -168,7 +168,7 @@ class RestaurantModelTest {
         movePedestrianToSeat(ped2);
 
         SeatGroup seatGroup = restaurantModel.getSeatGroups().get(0);
-        assertEquals(0, seatGroup.getFreeSeats().size());
+        assertEquals(0, seatGroup.getFreeSeatsTargetIds().size());
 
         Pedestrian ped3 = addPedestrian(2, new VPoint(0, 0), -1);
 
@@ -179,7 +179,7 @@ class RestaurantModelTest {
 
         assertEquals(LEAF_ID, ped1.getNextTargetId());
         assertEquals(LEAF_ID, ped2.getNextTargetId());
-        assertEquals(1, seatGroup.getFreeSeats().size());
+        assertEquals(1, seatGroup.getFreeSeatsTargetIds().size());
         assertNotEquals(TABLE_ID, ped3.getNextTargetId());
         assertNotEquals(LEAF_ID, ped3.getNextTargetId());
     }
@@ -196,7 +196,7 @@ class RestaurantModelTest {
         restaurantModel.update(simStartTime);
 
         SeatGroup seatGroup = restaurantModel.getSeatGroups().get(0);
-        assertEquals(2, seatGroup.getFreeSeats().size());
+        assertEquals(2, seatGroup.getFreeSeatsTargetIds().size());
         assertEquals(LEAF_ID, ped1.getNextTargetId());
         assertEquals(LEAF_ID, ped2.getNextTargetId());
         assertEquals(LEAF_ID, ped3.getNextTargetId());

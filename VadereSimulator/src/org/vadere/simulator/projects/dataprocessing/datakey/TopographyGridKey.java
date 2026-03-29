@@ -29,13 +29,14 @@ public class TopographyGridKey implements DataKey<TopographyGridKey> {
 
     @Override
     public int compareTo(@NotNull TopographyGridKey other) {
-        int ret;
-        if ((ret = Integer.compare(xId, other.xId))==0){
-            if ((ret = Double.compare(yId, other.yId)) == 0){
-                return 0;
-            }
-            return ret;
+        int xComparison = Integer.compare(xId, other.xId);
+        if (xComparison != 0) {
+            return xComparison;
         }
-        return ret;
+        int yComparison = Double.compare(yId, other.yId);
+        if (yComparison != 0) {
+            return yComparison;
+        }
+        return 0;
     }
 }

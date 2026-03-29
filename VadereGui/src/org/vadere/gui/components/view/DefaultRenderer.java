@@ -34,6 +34,7 @@ import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -299,82 +300,52 @@ public abstract class DefaultRenderer {
 
 	protected void renderAirflow(final Topography topography, final AirFlow airFlow, final Graphics2D g, final java.util.List<Attributes> modelAttributes, String airFlowScale){
 
-		if (airFlow != null){
-
-			double topoXmin = topography.getBounds().getX() + topography.getBoundingBoxWidth();
-			double topoYmin = topography.getBounds().getY() + topography.getBoundingBoxWidth();
-			double topoXmax = topography.getBounds().getX() + topography.getBounds().getWidth() - topography.getBoundingBoxWidth();
-			double topoYmax = topography.getBounds().getY() + topography.getBounds().getHeight() - topography.getBoundingBoxWidth();
-
-			AttributesAirFlowModel attributesAirFlowModel = Model.findAttributes(modelAttributes, AttributesAirFlowModel.class);
-			double airflowXmin = attributesAirFlowModel.getBounds().getXmin();
-			double airflowYmin = attributesAirFlowModel.getBounds().getYmin();
-			double airflowXmax = attributesAirFlowModel.getBounds().getXmax();
-			double airflowYmax = attributesAirFlowModel.getBounds().getYmax();
-
-			double xMin = Math.max(topoXmin, airflowXmin);
-			double yMin = Math.max(topoYmin, airflowYmin);
-			double xMax = Math.min(topoXmax, airflowXmax);
-			double yMax = Math.min(topoYmax, airflowYmax);
-
-			double inletOutletDepth = 0.1;
-
-			g.setColor(new Color(100, 190, 100)); // green
-
-			for (AttributesInOutLet inlet : attributesAirFlowModel.getInlets()) {
-				switch (inlet.getSide()) {
-					case "south":
-						g.fill(new VRectangle.Double(inlet.getStart(), yMin, inlet.getWidth(), inletOutletDepth));
-						break;
-					case "north":
-						g.fill(new VRectangle.Double(inlet.getStart(), yMax - inletOutletDepth, inlet.getWidth(), inletOutletDepth));
-						break;
-					case "west":
-						g.fill(new VRectangle.Double(xMin, inlet.getStart(), inletOutletDepth, inlet.getWidth()));
-						break;
-					case "east":
-						g.fill(new VRectangle.Double(xMax - inletOutletDepth, inlet.getStart(), inletOutletDepth, inlet.getWidth()));
-						break;
-				}
-
-			}
-
-			g.setColor(new Color(220, 30, 30)); // red
-
-			for (AttributesInOutLet outlet : attributesAirFlowModel.getOutlets()) {
-				switch (outlet.getSide()) {
-					case "south":
-						g.fill(new VRectangle.Double(outlet.getStart(), yMin, outlet.getWidth(), inletOutletDepth));
-						break;
-					case "north":
-						g.fill(new VRectangle.Double(outlet.getStart(), yMax - inletOutletDepth, outlet.getWidth(), inletOutletDepth));
-						break;
-					case "west":
-						g.fill(new VRectangle.Double(xMin, outlet.getStart(), inletOutletDepth, outlet.getWidth()));
-						break;
-					case "east":
-						g.fill(new VRectangle.Double(xMax - inletOutletDepth, outlet.getStart(), inletOutletDepth, outlet.getWidth()));
-						break;
-				}
-
-			}
+		if (airFlow != null) {
+			return;
 		}
+
+		Rectangle2D.Double contentRect = topography.getContentRect();
+		double topoXmin = contentRect.getMinX();
+		double topoYmin = contentRect.getMinY();
+		double topoXmax = contentRect.getMaxX();
+		double topoYmax = contentRect.getMaxY();
+
+		AttributesAirFlowModel attributesAirFlowModel = Model.findAttributes(modelAttributes, AttributesAirFlowModel.class);
+		double airflowXmin = attributesAirFlowModel.getBounds().getXmin();
+		double airflowYmin = attributesAirFlowModel.getBounds().getYmin();
+		double airflowXmax = attributesAirFlowModel.getBounds().getXmax();
+		double airflowYmax = attributesAirFlowModel.getBounds().getYmax();
+
+		double xMin = Math.max(topoXmin, airflowXmin);
+		double yMin = Math.max(topoYmin, airflowYmin);
+		double xMax = Math.min(topoXmax, airflowXmax);
+		double yMax = Math.min(topoYmax, airflowYmax);
+
+		double inletOutletDepth = 0.1;
+
+		drawAirflowPorts(g, attributesAirFlowModel.getInlets(), new Color(100, 190, 100), xMin, xMax, yMin, yMax, inletOutletDepth);
+		drawAirflowPorts(g, attributesAirFlowModel.getOutlets(), new Color(220, 30, 30), xMin, xMax, yMin, yMax, inletOutletDepth);
 	}
 
-	protected void drawLineArrow(Graphics2D g2d, double x1, double y1, double angle, double length) {
-		// pull peek length towards 0.1
-		double peek = 0.1 + (length - 0.1) * 0.25;
+	private void drawAirflowPorts(Graphics2D g, ArrayList<AttributesInOutLet> ports, Color color, double xMin, double xMax, double yMin, double yMax, double inletOutletDepth) {
+		g.setColor(color);
 
-		double x2 = x1 + Math.cos(angle) * length;
-		double y2 = y1 + Math.sin(angle) * length;
-
-		g2d.draw(new Line2D.Double(x1, y1, x2, y2));
-
-		double phi1 = angle + Math.PI - Math.PI / 8;
-		g2d.draw(new Line2D.Double(x2, y2, x2 + Math.cos(phi1) * peek, y2 + Math.sin(phi1) * peek));
-
-		double phi2 = angle + Math.PI + Math.PI / 8;
-		g2d.draw(new Line2D.Double(x2, y2, x2 + Math.cos(phi2) * peek, y2 + Math.sin(phi2) * peek));
+		for (AttributesInOutLet port : ports) {
+			switch (port.getSide()) {
+				case "south":
+					g.fill(new VRectangle.Double(port.getStart(), yMin, port.getWidth(), inletOutletDepth));
+					break;
+				case "north":
+					g.fill(new VRectangle.Double(port.getStart(), yMax - inletOutletDepth, port.getWidth(), inletOutletDepth));
+					break;
+				case "west":
+					g.fill(new VRectangle.Double(xMin, port.getStart(), inletOutletDepth, port.getWidth()));
+					break;
+				case "east":
+					g.fill(new VRectangle.Double(xMax - inletOutletDepth, port.getStart(), inletOutletDepth, port.getWidth()));
+					break;
+			}
+		}
 	}
 
 	protected void renderAllDroplets(final Iterable<? extends ScenarioElement> elements, final Graphics2D g,

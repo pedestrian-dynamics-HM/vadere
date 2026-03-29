@@ -31,12 +31,6 @@ public class RestaurantModel implements Model {
 
     private static Logger logger = Logger.getLogger(RestaurantModel.class);
 
-    private Random random;
-
-    private Domain domain;
-
-    private AttributesAgent attributesAgent;
-
     private Topography topography;
 
     private AttributesRestaurantModel attrRestaurantModel;
@@ -56,9 +50,6 @@ public class RestaurantModel implements Model {
      */
     @Override
     public void initialize(List<Attributes> attributesList, Domain domain, AttributesAgent attributesPedestrian, Random random) {
-        this.domain = domain;
-        this.random = random;
-        this.attributesAgent = attributesPedestrian;
         this.attrRestaurantModel = Model.findAttributes(attributesList, AttributesRestaurantModel.class);
         this.topography = domain.getTopography();
         this.seatGroupMap = new HashMap<>();
@@ -129,7 +120,7 @@ public class RestaurantModel implements Model {
     @Override
     public void update(double simTimeInSec) {
         for (SeatGroup seatGroup : seatGroupMap.values()) {
-            Collection<List<Pedestrian>> leavingGroups = seatGroup.leaveSeats(simTimeInSec);
+            Collection<List<Pedestrian>> leavingGroups = seatGroup.leaveSeatsForExpiredGroups(simTimeInSec);
             // leaving pedestrians have to stand up
             leavingGroups.forEach(group -> group.forEach(pedestrian -> {
                 pedestrian.setSitting(false);
@@ -149,13 +140,14 @@ public class RestaurantModel implements Model {
                 .filter(p -> this.attrRestaurantModel.getTableTargetIds().contains(p.getNextTargetId()))
                 .collect(Collectors.toSet());
 
-        // arriving groups
-        Map<LinkedList<Integer>, List<Pedestrian>> groups = arrivingPedestrians.stream().filter(ped-> !ped.getGroupIds().isEmpty()).collect(Collectors.groupingBy(Pedestrian::getGroupIds));
-        // arriving single pedestrians
-        List<Pedestrian> singles = arrivingPedestrians.stream().filter(ped-> ped.getGroupIds().isEmpty()).toList();
+        Map<LinkedList<Integer>, List<Pedestrian>> arrivingGroups = arrivingPedestrians.stream()
+                .filter(ped-> !ped.getGroupIds().isEmpty())
+                .collect(Collectors.groupingBy(Pedestrian::getGroupIds));
+        List<Pedestrian> arrivingSinglePedestrians = arrivingPedestrians.stream()
+                .filter(ped-> ped.getGroupIds().isEmpty()).toList();
 
         // try to occupy seats for a whole group
-        for (Map.Entry<LinkedList<Integer>, List<Pedestrian>> groupEntry : groups.entrySet()) {
+        for (Map.Entry<LinkedList<Integer>, List<Pedestrian>> groupEntry : arrivingGroups.entrySet()) {
             List<Pedestrian> pedestrians = groupEntry.getValue();
             int tableId = pedestrians.get(0).getNextTargetId();
             SeatGroup seatGroup = seatGroupMap.get(tableId);
@@ -166,18 +158,18 @@ public class RestaurantModel implements Model {
                     pedestrian.setTargets(targets);
                 }
             } else if (pedestrians.stream().anyMatch(ped -> seatGroup.getTable().getShape().distance(ped.getPosition()) < TABLE_REACH_DISTANCE)) {
-                if (seatGroup.requestFreeSeats(pedestrians, simTime)) {
+                if (seatGroup.tryAssignPedestriansToFreeSeats(pedestrians, simTime)) {
                     pedestrians.forEach(ped -> pedestrianSeatGroupMap.put(ped, tableId));
                 }
             }
         }
 
         // try to occupy seats for a single pedestrian
-        for (Pedestrian pedestrian : singles) {
+        for (Pedestrian pedestrian : arrivingSinglePedestrians) {
             int tableId = pedestrian.getNextTargetId();
             SeatGroup seatGroup = seatGroupMap.get(tableId);
             if (seatGroup.getTable().getShape().distance(pedestrian.getPosition()) < TABLE_REACH_DISTANCE) {
-                if (seatGroup.requestFreeSeats(List.of(pedestrian), simTime)) {
+                if (seatGroup.tryAssignPedestriansToFreeSeats(List.of(pedestrian), simTime)) {
                     pedestrianSeatGroupMap.put(pedestrian, tableId);
                 }
             }
@@ -196,16 +188,22 @@ public class RestaurantModel implements Model {
         @Override
         public void reachedTarget(Target target, Agent agent) {
             Pedestrian pedestrian = topography.getPedestrianDynamicElements().getElement(agent.getId());
-            if (!pedestrian.isSitting()) {
-                Target table = seatGroupMap.get(pedestrianSeatGroupMap.get(pedestrian)).getTable();
-                if (table != null) {
-                    pedestrian.setSitting(true);
-                    double sittingDirectionX = table.getShape().getCentroid().getX() - pedestrian.getPosition().getX();
-                    double sittingDirectionY = table.getShape().getCentroid().getY() - pedestrian.getPosition().getY();
-                    Vector2D sittingDirection = new Vector2D(sittingDirectionX, sittingDirectionY);
-                    pedestrian.setSittingDirection(sittingDirection);
-                }
+            if (pedestrian == null || pedestrian.isSitting()) {
+                return;
             }
+            if (!pedestrianSeatGroupMap.containsKey(pedestrian)) {
+                return;
+            }
+            Target table = seatGroupMap.get(pedestrianSeatGroupMap.get(pedestrian)).getTable();
+            if (table == null) {
+                return;
+            }
+            pedestrian.setSitting(true);
+            double sittingDirectionX = table.getShape().getCentroid().getX() - pedestrian.getPosition().getX();
+            double sittingDirectionY = table.getShape().getCentroid().getY() - pedestrian.getPosition().getY();
+
+            Vector2D sittingDirection = new Vector2D(sittingDirectionX, sittingDirectionY);
+            pedestrian.setSittingDirection(sittingDirection);
         }
     };
 

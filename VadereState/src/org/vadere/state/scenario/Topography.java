@@ -839,4 +839,13 @@ public class Topography implements DynamicElementMover{
 	public void setAirFlow(AirFlow airFlow) {
 		this.airFlow = airFlow;	
 	}
+
+	public java.awt.geom.Rectangle2D.Double getContentRect() {
+		double x = getBounds().getX() + getBoundingBoxWidth();
+		double y = getBounds().getY() + getBoundingBoxWidth();
+		double width = getBounds().getWidth() - (2 * getBoundingBoxWidth());
+		double height = getBounds().getHeight() - (2 * getBoundingBoxWidth());
+
+		return new java.awt.geom.Rectangle2D.Double(x, y, width, height);
+	}
 }

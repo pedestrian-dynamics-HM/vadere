@@ -29,35 +29,32 @@ public class AirFlowProcessor extends DataProcessor<TopographyGridKey, String> {
     @Override
     public void postLoop(SimulationState state) {
 
-
         double[][] xVelocity = airFlow.getXVelocities();
         double[][] yVelocity = airFlow.getYVelocities();
+
+        if (xVelocity == null || yVelocity == null) {
+            return;
+        }
         double rectangularGridCellSize = airFlow.getRectangularGridCellSize();
+        for (int row = 0; row < xVelocity.length; row++) {
+            for (int column = 0; column < yVelocity[0].length; column++) {
+                double xStart = column * rectangularGridCellSize + airFlow.getXmin();
+                double xEnd = (column + 1) * rectangularGridCellSize + airFlow.getXmin();
+                double yStart = row * rectangularGridCellSize + airFlow.getYmin();
+                double yEnd = (row + 1) * rectangularGridCellSize + airFlow.getYmin();
 
-        if (xVelocity != null && yVelocity != null) {
-            double[][] x_velocity = airFlow.getXVelocities();
-            double[][] y_velocity = airFlow.getYVelocities();
-            //state.getTopography().getBounds().width = x_velocity.length;
+                double xCenter = (xStart + xEnd) / 2.0;
+                double yCenter = (yStart + yEnd) / 2.0;
 
-            int xSteps = (int) Math.ceil(state.getTopography().getBounds().width / rectangularGridCellSize);
-            int ySteps = (int) Math.ceil(state.getTopography().getBounds().height / rectangularGridCellSize);
+                double xVal = xVelocity[row][column];
+                double yVal = yVelocity[row][column];
 
-            for (int i = 0; i < x_velocity.length; i++) {
-                for (int j = 0; j < y_velocity[0].length; j++) {
-                    double xStart = j * rectangularGridCellSize + airFlow.getXmin();
-                    double xEnd = (j + 1) * rectangularGridCellSize + airFlow.getXmin();
-                    double yStart = i * rectangularGridCellSize + airFlow.getYmin();
-                    double yEnd = (i + 1) * rectangularGridCellSize + airFlow.getYmin();
-                    double xCenter = (xStart + xEnd) / 2.0;
-                    double yCenter = (yStart + yEnd) / 2.0;
-                    double xVal = xVelocity[i][j];
-                    double yVal = yVelocity[i][j];
-                    if (xCenter < airFlow.getXmin() || xCenter > airFlow.getXmax() || yCenter < airFlow.getYmin() || yCenter > airFlow.getYmax()) {
-                        xVal = 0.0;
-                        yVal = 0.0;
-                    }
-                    putValue(new TopographyGridKey(j, i), String.format("%.2f %.2f %.2f %.2f %.5f %.5f", xStart, xEnd, yStart, yEnd, xVal, yVal));
+                if (xCenter < airFlow.getXmin() || xCenter > airFlow.getXmax() || yCenter < airFlow.getYmin() || yCenter > airFlow.getYmax()) {
+                    xVal = 0.0;
+                    yVal = 0.0;
                 }
+
+                putValue(new TopographyGridKey(column, row), String.format("%.2f %.2f %.2f %.2f %.5f %.5f", xStart, xEnd, yStart, yEnd, xVal, yVal));
             }
         }
     }

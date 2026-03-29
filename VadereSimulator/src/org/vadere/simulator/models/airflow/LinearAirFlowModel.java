@@ -6,12 +6,12 @@ import org.vadere.simulator.context.VadereContext;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.projects.Domain;
 import org.vadere.state.attributes.Attributes;
-import org.vadere.state.attributes.models.airflow.AttributesAirFlowModel;
 import org.vadere.state.attributes.models.airflow.AttributesLinearAirFlowModel;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.AirFlow;
 import org.vadere.util.logging.Logger;
 
+import java.awt.geom.Rectangle2D;
 import java.util.List;
 import java.util.Random;
 
@@ -26,10 +26,11 @@ public class LinearAirFlowModel extends AbstractAirFlowModel {
     public void initialize(List<Attributes> attributesList, Domain domain, AttributesAgent attributesPedestrian, Random random) {
         String scenarioPath = VadereContext.getCtx(domain.getTopography()).getString("scenarioPath");
         this.attributesLinearAirFlowModel = Model.findAttributes(attributesList, AttributesLinearAirFlowModel.class);
-        double xmin = domain.getTopography().getBounds().x + domain.getTopography().getBoundingBoxWidth();
-        double ymin = domain.getTopography().getBounds().y + domain.getTopography().getBoundingBoxWidth();
-        double xmax = domain.getTopography().getBounds().x + domain.getTopography().getBounds().width;
-        double ymax = domain.getTopography().getBounds().y + domain.getTopography().getBounds().height;
+        Rectangle2D.Double contentRect = domain.getTopography().getContentRect();
+        double xmin = contentRect.getMinX();
+        double ymin = contentRect.getMinY();
+        double xmax = contentRect.getMaxX();
+        double ymax = contentRect.getMaxY();
         this.airFlow = new AirFlow(scenarioPath, "", xmin, ymin, xmax, ymax);
         domain.getTopography().setAirFlow(airFlow);
 
@@ -40,8 +41,8 @@ public class LinearAirFlowModel extends AbstractAirFlowModel {
 
     @Override
     public void setupAirFlow() {
-        double xVelocity = Math.cos(attributesLinearAirFlowModel.getWindDirection()) * attributesLinearAirFlowModel.getWindSpeed();
-        double yVelocity = Math.sin(attributesLinearAirFlowModel.getWindDirection()) * attributesLinearAirFlowModel.getWindSpeed();
+        double xVelocity = Math.cos(attributesLinearAirFlowModel.getAirflowDirection()) * attributesLinearAirFlowModel.getAirflowSpeed();
+        double yVelocity = Math.sin(attributesLinearAirFlowModel.getAirflowDirection()) * attributesLinearAirFlowModel.getAirflowSpeed();
  
         // Set velocity only in the center cell (1,1) because borders are not used anyway in getFlowDirection (requires 3x3 arrays)
         double[][] xVelocities = new double[3][3]; 

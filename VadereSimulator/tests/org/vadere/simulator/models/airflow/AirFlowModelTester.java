@@ -34,8 +34,6 @@ public class AirFlowModelTester extends AirFlowModel {
             4.180337738451944674e-03 3.333853042031265090e-03 -4.026288308112135894e-03 -1.106773514173986506e-02 -1.717588413264192759e-02
             """;
 
-    Random rand = new Random();
-
     @Override
     public void initialize(List<Attributes> attributesList, Domain domain, AttributesAgent attributesPedestrian, Random random) {
         super.initialize(attributesList, domain, attributesPedestrian, random);
@@ -46,6 +44,9 @@ public class AirFlowModelTester extends AirFlowModel {
 
     @Override
     protected void calculateAirFlow(String hash) {
+        // This overrides the parent's actual calculation method.
+        // Instead of running heavy Python scripts during testing,
+        // we "calculate" by just writing hardcoded test strings to the cache.
         // Write files to the same location that setupAirFlow() will look for them.
         // setupAirFlow() constructs: cacheDir / scenarioName + "_" + hash + ending
         File scenarioFile = new File(airFlow.getScenarioPath());
@@ -69,7 +70,9 @@ public class AirFlowModelTester extends AirFlowModel {
         }
     }
 
-    protected void calculateWrongAirFlow() {
+    protected void mockMalformedAirFlowFile() {
+        // Simulates a corrupted or malformed airflow file.
+        // This writes only the header with no actual velocity matrix data.
         File scenarioFile = new File(airFlow.getScenarioPath());
         File cacheDir = new File(scenarioFile.getParent(), "cache");
         cacheDir.mkdirs();
@@ -89,12 +92,5 @@ public class AirFlowModelTester extends AirFlowModel {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public void testAirflowBounds() {
-        double[] inside = airFlow.getFlowDirection(0, 1, 1);
-        double[] outside = airFlow.getFlowDirection(0, 3, 3);
-        assert inside[0] != 0 || inside[1] != 0 : "Airflow inside bounds should not be zero";
-        assert outside[0] == 0 && outside[1] == 0 : "Airflow outside bounds should be zero";
     }
 }

@@ -13,9 +13,7 @@ import org.vadere.state.attributes.models.airflow.AttributesInOutLet;
 import org.vadere.state.scenario.Topography;
 
 import java.io.File;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -100,29 +98,37 @@ class AirFlowModelTest {
     @Test
     public void testSetupAirFlowWithExistingEmptyFile() {
         initializeModel(true, false);
-        airFlowModel.calculateWrongAirFlow();
+        airFlowModel.mockMalformedAirFlowFile();
+
         assertNull(airFlowModel.airFlow.getXVelocities(), "X velocities should be null before preLoop");
         assertNull(airFlowModel.airFlow.getYVelocities(), "Y velocities should be null before preLoop");
-        assertThrows(NullPointerException.class, () -> airFlowModel.preLoop(0));
+        airFlowModel.preLoop(0);
+        // Assert that the code safely fell back to keeping the velocities null
+        assertNull(airFlowModel.airFlow.getXVelocities(), "X velocities should remain null after failing to read empty file");
+        assertNull(airFlowModel.airFlow.getYVelocities(), "Y velocities should remain null after failing to read empty file");
     }
 
     @Test
     public void testPeriodicAirflow() {
         initializeModel(true, true);
         airFlowModel.preLoop(0);
-        assertNotNull(airFlowModel.airFlow.getFlowDirection(0, 0, 0));
-        double[] airFlow = airFlowModel.airFlow.getFlowDirection(0, 0, 0);
-        assertFalse(Math.pow(airFlow[0], 2) + Math.pow(airFlow[1], 2) > 0);
-        airFlow = airFlowModel.airFlow.getFlowDirection(0.5, 0, 0);
-        assertFalse(Math.pow(airFlow[0], 2) + Math.pow(airFlow[1], 2) > 0);
-        airFlow = airFlowModel.airFlow.getFlowDirection(1, 0, 0);
-        assertTrue(Math.pow(airFlow[0], 2) + Math.pow(airFlow[1], 2) > 0);
-        airFlow = airFlowModel.airFlow.getFlowDirection(1.5, 0, 0);
-        assertTrue(Math.pow(airFlow[0], 2) + Math.pow(airFlow[1], 2) > 0);
-        airFlow = airFlowModel.airFlow.getFlowDirection(2, 0, 0);
-        assertFalse(Math.pow(airFlow[0], 2) + Math.pow(airFlow[1], 2) > 0);
-        airFlow = airFlowModel.airFlow.getFlowDirection(2.5, 0, 0);
-        assertFalse(Math.pow(airFlow[0], 2) + Math.pow(airFlow[1], 2) > 0);
+        // The simulation is configured with 1 second OFF, then 1 second ON.
+
+        // t = 0.0 to 0.5: OFF Phase (No wind expected)
+        assertFalse(hasAirflow(airFlowModel.airFlow.getFlowDirection(0, 0, 0)));
+        assertFalse(hasAirflow(airFlowModel.airFlow.getFlowDirection(0.5, 0, 0)));
+
+        // t = 1.0 to 1.5: ON Phase (Wind expected)
+        assertTrue(hasAirflow(airFlowModel.airFlow.getFlowDirection(1, 0, 0)));
+        assertTrue(hasAirflow(airFlowModel.airFlow.getFlowDirection(1.5, 0, 0)));
+
+        // t = 2.0 to 2.5: OFF Phase (No wind expected)
+        assertFalse(hasAirflow(airFlowModel.airFlow.getFlowDirection(2, 0, 0)));
+        assertFalse(hasAirflow(airFlowModel.airFlow.getFlowDirection(2.5, 0, 0)));
+    }
+
+    private boolean hasAirflow(double[] flowDirection) {
+        return Math.pow(flowDirection[0], 2) + Math.pow(flowDirection[1], 2) > 0;
     }
 
     @Test
@@ -214,14 +220,5 @@ class AirFlowModelTest {
         attributesList.clear();
         attributesList.add(attributesAirFlowModel);
         airFlowModel.initialize(attributesList, new Domain(topography), null, rdm);
-    }
-
-    private void deleteFile(String fileName) {
-        try {
-            Path path = Paths.get(fileName);
-            Files.deleteIfExists(path);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 }

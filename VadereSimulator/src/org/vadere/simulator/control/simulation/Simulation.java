@@ -249,7 +249,7 @@ public class Simulation implements ControllerProvider{
 
 		if (attributesSimulation.isWriteSimulationData()) {
 			processorManager.writeOutput();
-            Runnable callback = (Runnable) VadereContext.getCtx(topography).get(DatabasedStepsModel.outputWrittenCallback);
+            Runnable callback = (Runnable) VadereContext.getCtx(topography).get(DatabasedStepsModel.trajectoryFileCopiedCallback);
             if (callback != null) {
                 callback.run();
             }

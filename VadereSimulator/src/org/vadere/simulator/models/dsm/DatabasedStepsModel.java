@@ -54,11 +54,12 @@ public class DatabasedStepsModel implements MainModel {
     private MainModel fallbackMainModel;
     public static String outputPath = "outputPath";
     public static String scenarioPath;
-    public static String outputWrittenCallback = "outputWrittenCallback";
+    public static String trajectoryFileCopiedCallback = "trajectoryFileCopiedCallback";
     public static String simulationSeedName = "simulationSeed";
     protected long simulationSeed;
     private String locomotionHash = "";
     private String contextId;
+
 
 
     @Override
@@ -79,11 +80,10 @@ public class DatabasedStepsModel implements MainModel {
             subModelBuilder.addBuildedSubModelsToList(models);
             models.add(this);
             this.trajectoryBuffer = new TrajectoryBuffer(attributesDSM.getTrajectoryFileOrFolder(), attributesDSM.getBufferedLines());
-
-            VadereContext.getCtx(domain.getTopography()).put(outputWrittenCallback, (Runnable) this::deleteTrajectoryFile);
         } else {
             initializeFallbackMainModel(attributesList);
         }
+        schedulePostProcessingCallback();
     }
 
     protected boolean checkIfCanExtractStepsFromFile() {
@@ -122,7 +122,6 @@ public class DatabasedStepsModel implements MainModel {
     }
 
     private void initializeFallbackMainModel(List<Attributes> attributesList) {
-        // attributesListWithoutDSM = attributesDSM.getAttributesFallbackModel() + (attributesList - attributesDSM)
         List<Attributes> attributesListWithoutDSM = attributesList.stream()
                 .filter(attr -> !(attr instanceof AttributesDSM))
                 .collect(Collectors.toList());
@@ -146,9 +145,6 @@ public class DatabasedStepsModel implements MainModel {
         if (!attributesDSM.getSubmodels().isEmpty()) {
             logger.warn("The submodels list in AttributesDSM is not empty but will be ignored. Only the submodels list of the FallbackMainModel is relevant.");
         }
-
-        // Register callback in VadereContext to be called after output is written
-        VadereContext.getCtx(domain.getTopography()).put(outputWrittenCallback, (Runnable) this::copyTrajectoryFile);
     }
 
 
@@ -263,6 +259,44 @@ public class DatabasedStepsModel implements MainModel {
         }
     }
 
+    protected void setLocomotionHash(String locomotionHash) {
+        this.locomotionHash = locomotionHash;
+    }
+
+    protected void setAttributesDSM(AttributesDSM attributesDSM) {
+        this.attributesDSM = attributesDSM;
+    }
+
+    protected boolean canExtractStepsFromFile() {
+        return this.canExtractStepsFromFile;
+    }
+
+    protected String getContextId() {
+        if (contextId != null) {
+            return contextId;
+        }
+        return domain.getTopography().getContextId();
+    }
+
+    protected void setContextId(String contextId) {
+        this.contextId = contextId;
+    }
+
+    private void schedulePostProcessingCallback() {
+        /* * Registers a callback in the context to be executed by the Simulation loop
+         * after all output has been written. We use the context map here to keep
+         * the core simulation class decoupled from this specific model's file IO logic.
+         */
+        Runnable postSimulationLogic = () -> {
+            if (this.canExtractStepsFromFile) {
+                deleteTrajectoryFile();
+            } else {
+                copyTrajectoryFile();
+            }
+        };
+        VadereContext.getCtx(domain.getTopography()).put(trajectoryFileCopiedCallback, postSimulationLogic);
+    }
+
     private void copyTrajectoryFile() {
         try {
             Path sourcePath = Paths.get(outputPath, "postvis.traj");
@@ -288,6 +322,10 @@ public class DatabasedStepsModel implements MainModel {
     }
 
     private void deleteTrajectoryFile() {
+        // When running in read-only mode, the simulator still generates a default
+        // postvis.traj file. We delete it here to save disk space since we already
+        // have the cached version we are reading from. This is particularly important
+        // for UQ analyses.
         if (!attributesDSM.isDeletePostvisFile()) {
             return;
         }
@@ -300,28 +338,5 @@ public class DatabasedStepsModel implements MainModel {
         } catch (IOException e) {
             logger.warn("Failed to delete source trajectory file: " + e.getMessage());
         }
-    }
-
-    protected void setLocomotionHash(String locomotionHash) {
-        this.locomotionHash = locomotionHash;
-    }
-
-    protected void setAttributesDSM(AttributesDSM attributesDSM) {
-        this.attributesDSM = attributesDSM;
-    }
-
-    protected boolean canExtractStepsFromFile() {
-        return this.canExtractStepsFromFile;
-    }
-
-    protected String getContextId() {
-        if (contextId != null) {
-            return contextId;
-        }
-        return domain.getTopography().getContextId();
-    }
-
-    protected void setContextId(String contextId) {
-        this.contextId = contextId;
     }
 }

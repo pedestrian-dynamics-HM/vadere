@@ -1,7 +1,5 @@
 package org.vadere.state.scenario;
 
-import org.vadere.state.attributes.models.airflow.AttributesInOutLet;
-
 import java.util.ArrayList;
 import java.util.List;
 

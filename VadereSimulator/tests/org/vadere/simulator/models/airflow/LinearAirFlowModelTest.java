@@ -62,8 +62,8 @@ public class LinearAirFlowModelTest {
         initializeModel();
         airFlowModel.preLoop(0);
         double[] result = airFlowModel.airFlow.getFlowDirection(0, 1, 1);
-        assertEquals(Math.atan2(result[1], result[0]), airFlowModel.attributesLinearAirFlowModel.getWindDirection());
-        assertEquals(Math.sqrt(Math.pow(result[0], 2) + Math.pow(result[1], 2)), airFlowModel.attributesLinearAirFlowModel.getWindSpeed());
+        assertEquals(Math.atan2(result[1], result[0]), airFlowModel.attributesLinearAirFlowModel.getAirflowDirection());
+        assertEquals(Math.sqrt(Math.pow(result[0], 2) + Math.pow(result[1], 2)), airFlowModel.attributesLinearAirFlowModel.getAirflowSpeed());
     }
 
     private void initializeModel() {

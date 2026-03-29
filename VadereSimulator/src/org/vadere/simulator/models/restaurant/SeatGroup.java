@@ -4,7 +4,6 @@ import java.util.stream.Collectors;
 
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.scenario.Target;
-import org.vadere.state.scenario.Source;
 
 public class SeatGroup {
 
@@ -66,21 +65,22 @@ public class SeatGroup {
      * @param simTime current simulation time
      * @return true, if enough seats are available, else false
      */
-    public boolean requestFreeSeats(List<Pedestrian> pedestrians, double simTime) {
-        List<Integer> freeSeats = getFreeSeats();
-        if (freeSeats.size() >= pedestrians.size()) {
-            for (int i = 0; i < pedestrians.size(); i++) {
-                int seat = freeSeats.get(i);
-                Pedestrian pedestrian = pedestrians.get(i);
-                seats.put(seat, false);
-                LinkedList<Integer> targetIds = pedestrian.getTargets();
-                targetIds.set(pedestrian.getNextTargetListIndex(), seat);
-                Pedestrian.setGroupTarget(List.of(pedestrian), targetIds);
-            }
-            arrivalTimes.put(pedestrians, simTime);
-            return true;
+    public boolean tryAssignPedestriansToFreeSeats(List<Pedestrian> pedestrians, double simTime) {
+        List<Integer> freeSeats = getFreeSeatsTargetIds();
+        if (freeSeats.size() < pedestrians.size()) {
+            return false;
         }
-        return false;
+        for (int i = 0; i < pedestrians.size(); i++) {
+            int seat = freeSeats.get(i);
+            Pedestrian pedestrian = pedestrians.get(i);
+            seats.put(seat, false);
+
+            LinkedList<Integer> targetIds = pedestrian.getTargets();
+            targetIds.set(pedestrian.getNextTargetListIndex(), seat);
+            Pedestrian.setGroupTarget(List.of(pedestrian), targetIds);
+        }
+        arrivalTimes.put(pedestrians, simTime);
+        return true;
     }
 
     /**
@@ -88,7 +88,7 @@ public class SeatGroup {
      * @param simTime current simulation time
      * @return list of groups of pedestrians that left the table
      */
-    public Collection<List<Pedestrian>> leaveSeats(double simTime) {
+    public Collection<List<Pedestrian>> leaveSeatsForExpiredGroups(double simTime) {
         Collection<List<Pedestrian>> groups = new HashSet<>();
         for (Map.Entry<List<Pedestrian>, Double> entry : arrivalTimes.entrySet()) {
             if (entry.getValue() + tableTime <= simTime) {
@@ -107,8 +107,11 @@ public class SeatGroup {
      * Get all seats belonging to this seating group, that are not occupied by pedestrians
      * @return list of free seats
      */
-    public List<Integer> getFreeSeats() {
-        return seats.entrySet().stream().filter(Map.Entry::getValue).map(Map.Entry::getKey).collect(Collectors.toList());
+    public List<Integer> getFreeSeatsTargetIds() {
+        return seats.entrySet().stream()
+                .filter(Map.Entry::getValue)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
     }
 
     /**

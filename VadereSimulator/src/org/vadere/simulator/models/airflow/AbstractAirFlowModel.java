@@ -9,6 +9,7 @@ import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.scenario.AirFlow;
 import org.vadere.simulator.context.VadereContext;
 
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -23,10 +24,11 @@ public abstract class AbstractAirFlowModel implements Model {
         String scenarioPath = VadereContext.getCtx(domain.getTopography()).getString("scenarioPath");
 
         AttributesAirFlowModel attributesAirFlowModel = Model.findAttributes(attributesList, AttributesAirFlowModel.class);
-        double xmin = domain.getTopography().getBounds().x + domain.getTopography().getBoundingBoxWidth();
-        double ymin = domain.getTopography().getBounds().y + domain.getTopography().getBoundingBoxWidth();
-        double xmax = domain.getTopography().getBounds().x + domain.getTopography().getBounds().width - domain.getTopography().getBoundingBoxWidth();
-        double ymax = domain.getTopography().getBounds().y + domain.getTopography().getBounds().height - domain.getTopography().getBoundingBoxWidth();
+        Rectangle2D.Double contentRect = domain.getTopography().getContentRect();
+        double xmin = contentRect.getMinX();
+        double ymin = contentRect.getMinY();
+        double xmax = contentRect.getMaxX();
+        double ymax = contentRect.getMaxY();
         if (attributesAirFlowModel != null) {
             xmin = Math.max(xmin, attributesAirFlowModel.getBounds().getXmin());
             ymin = Math.max(ymin, attributesAirFlowModel.getBounds().getYmin());

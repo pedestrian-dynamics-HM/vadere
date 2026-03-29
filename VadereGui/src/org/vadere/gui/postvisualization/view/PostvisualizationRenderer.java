@@ -3,6 +3,7 @@ package org.vadere.gui.postvisualization.view;
 import org.vadere.gui.components.model.SimulationModel;
 import org.vadere.gui.components.view.DefaultRenderer;
 import org.vadere.gui.components.view.SimulationRenderer;
+import org.vadere.gui.postvisualization.model.AirFlowData;
 import org.vadere.gui.postvisualization.model.PostvisualizationModel;
 import org.vadere.gui.postvisualization.model.TableTrajectoryFootStep;
 import org.vadere.gui.renderer.agent.AgentRender;
@@ -286,7 +287,8 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 
 	private void renderAirflow(final Graphics2D g) {
 		if (model.config.isShowAirflow()) {
-			model.getTableAirflow().initAirflow();
+			AirFlowData airflowData = model.getTableAirflow();
+			airflowData.initAirflow();
 			AirFlow airFlow = model.getTableAirflow().getAirflow();
 			renderAirflow(model.getTopography(), airFlow, g, model.getModelAttributes(), model.config.getAirflowScale());
 		}

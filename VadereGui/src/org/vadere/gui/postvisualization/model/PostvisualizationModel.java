@@ -111,11 +111,14 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 				case ContactData.TABLE_NAME:
 					this.config.setContactsRecorded(true);
 					this.contactData = new ContactData(entry.getValue());
+					break;
 				case TableAerosolCloudData.TABLE_NAME:
 					this.config.setAerosolCloudsRecorded(true);
 					this.tableAerosolCloudData = new TableAerosolCloudData(entry.getValue());
+					break;
 				case AirFlowData.TABLE_NAME:
 					this.airFlowData = new AirFlowData(entry.getValue());
+					break;
 			}
 		}
 		this.visTime = 0;

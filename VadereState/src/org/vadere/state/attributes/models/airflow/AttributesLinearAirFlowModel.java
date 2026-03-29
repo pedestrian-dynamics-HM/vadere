@@ -7,31 +7,31 @@ import org.vadere.state.attributes.Attributes;
 public class AttributesLinearAirFlowModel extends Attributes {
 
     /**
-     * Describes the speed of the wind shifting the AerosolClouds
+     * Describes the speed of the airflow shifting the AerosolClouds
      * Unit: m/s
      */
-    private double windSpeed;
+    private double airflowSpeed;
 
     /**
-     * Describes the direction of the wind
+     * Describes the direction of the airflow
      * Unit: point of the compass
      */
-    private WindDirection windDirection;
+    private AirflowDirection airflowDirection;
 
     public AttributesLinearAirFlowModel() {
-        windSpeed = 0.1;
-        windDirection = WindDirection.N;
+        airflowSpeed = 0.1;
+        airflowDirection = AirflowDirection.N;
     }
 
-    public double getWindSpeed() {
-        return windSpeed;
+    public double getAirflowSpeed() {
+        return airflowSpeed;
     }
 
-    public double getWindDirection()  {
-        return windDirection.angle;
+    public double getAirflowDirection()  {
+        return airflowDirection.angle;
     }
 
-    public enum WindDirection {
+    public enum AirflowDirection {
         N(Math.PI * 1/2),
         NO(Math.PI * 1/4),
         O(0),
@@ -43,7 +43,7 @@ public class AttributesLinearAirFlowModel extends Attributes {
 
         final double angle;
 
-        WindDirection(double angle) {
+        AirflowDirection(double angle) {
             this.angle = angle;
         }
     }

@@ -43,45 +43,46 @@ public class AirFlowModel extends AbstractAirFlowModel {
         File cacheDir = new File(scenarioPath.getParent(), "cache");
         String scenarioName = scenarioPath.getName().replaceFirst("\\.scenario$", "");
 
-        File f_x_velocity = new File(cacheDir, scenarioName + "_" + hash + X_VELOCITY_FILE_ENDING);
-        File f_y_velocity = new File(cacheDir, scenarioName + "_" + hash + Y_VELOCITY_FILE_ENDING);
+        File xVelocityFile = new File(cacheDir, scenarioName + "_" + hash + X_VELOCITY_FILE_ENDING);
+        File yVelocityFile = new File(cacheDir, scenarioName + "_" + hash + Y_VELOCITY_FILE_ENDING);
 
         // To make sure suq controller doesn't compute airflow multiple times for same scenario: 
         // If files don't exist with exact name, try finding files with alternative pattern but same hash
-        if(!(f_x_velocity.exists() && !f_x_velocity.isDirectory()) && !(f_y_velocity.exists() && !f_y_velocity.isDirectory())) {
+        if(!(xVelocityFile.exists() && !xVelocityFile.isDirectory()) && !(yVelocityFile.exists() && !yVelocityFile.isDirectory())) {
             File[] alternativeFiles = findAlternativeVelocityFiles(hash, cacheDir);
             if (alternativeFiles != null) {
-                f_x_velocity = alternativeFiles[0];
-                f_y_velocity = alternativeFiles[1];
+                xVelocityFile = alternativeFiles[0];
+                yVelocityFile = alternativeFiles[1];
             } else {
                 calculateAirFlow(hash);
             }
         }
 
         try {
-            airFlow.setX_velocity(readArrayFromFile(f_x_velocity.getAbsolutePath()));
-            airFlow.setY_velocity(readArrayFromFile(f_y_velocity.getAbsolutePath()));
-            airFlow.setRectangularGridCellSize(attributesAirFlowModel.getRectangularGridCellSize());
-            airFlow.setPeriod(attributesAirFlowModel.getOnPeriod(), attributesAirFlowModel.getOffPeriod());
-            airFlow.setBlockingObstaclesIDs(attributesAirFlowModel.getBlockingObstacles());
-
+            setupVelocityFromFile(xVelocityFile, yVelocityFile);
         } catch (IllegalArgumentException e) {
             calculateAirFlow(hash);
-
             try {
-                airFlow.setX_velocity(readArrayFromFile(f_x_velocity.getAbsolutePath()));
-                airFlow.setY_velocity(readArrayFromFile(f_y_velocity.getAbsolutePath()));
-                airFlow.setRectangularGridCellSize(attributesAirFlowModel.getRectangularGridCellSize());
-                airFlow.setPeriod(attributesAirFlowModel.getOnPeriod(), attributesAirFlowModel.getOffPeriod());
-                airFlow.setBlockingObstaclesIDs(attributesAirFlowModel.getBlockingObstacles());
+                setupVelocityFromFile(xVelocityFile, yVelocityFile);
 
             } catch (IOException ex) {
-                logger.error("Error reading airflow matrices: {}", e.getMessage());
+                logger.error("Error reading airflow matrices: {}", ex.getMessage());
             }
         } catch (IOException e) {
             logger.error("Error reading airflow matrices: {}", e.getMessage());
         }
     }
+
+
+    private void setupVelocityFromFile(File xVelocityFile, File yVelocityFile) throws IOException, IllegalArgumentException {
+        airFlow.setX_velocity(readArrayFromFile(xVelocityFile.getAbsolutePath()));
+        airFlow.setY_velocity(readArrayFromFile(yVelocityFile.getAbsolutePath()));
+        airFlow.setRectangularGridCellSize(attributesAirFlowModel.getRectangularGridCellSize());
+        airFlow.setPeriod(attributesAirFlowModel.getOnPeriod(), attributesAirFlowModel.getOffPeriod());
+        airFlow.setBlockingObstaclesIDs(attributesAirFlowModel.getBlockingObstacles());
+    }
+
+
 
 
     private File[] findAlternativeVelocityFiles(String hash, File cacheDir) {
@@ -133,9 +134,13 @@ public class AirFlowModel extends AbstractAirFlowModel {
                 env.put("PATH", condaBinDir + File.pathSeparator + env.getOrDefault("PATH", ""));
             }
             Process process = processBuilder.start();
-
-            System.out.println(attributesAirFlowModel.getCondaPath() + " run -n " + attributesAirFlowModel.getCondaEnv() + " " +
-                    "python " + attributesAirFlowModel.getPythonPath() + " " + airFlow.getScenarioPath() + " " + hash);
+            logger.info("Executing command: {} run -n {} python {} {} {}",
+                    attributesAirFlowModel.getCondaPath(),
+                    attributesAirFlowModel.getCondaEnv(),
+                    attributesAirFlowModel.getPythonPath(),
+                    airFlow.getScenarioPath(),
+                    hash
+            );
 
             int exitCode = process.waitFor();
             logger.info("Finished python script with exitCode: {}", exitCode);
@@ -150,22 +155,32 @@ public class AirFlowModel extends AbstractAirFlowModel {
     private double[][] readArrayFromFile(String filename) throws IOException {
         try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
             String header = reader.readLine();
+            if (header == null) {
+                throw new IOException("Velocity file is empty: " + filename);
+            }
             String[] split = header.substring(2).split("_");
             int x_dim = Integer.parseInt(split[0]);
             int y_dim = Integer.parseInt(split[1]);
 
             double[][] result = new double[x_dim][y_dim];
 
-            for (int i = 0; i < x_dim; i++) {
+            for (int row = 0; row < x_dim; row++) {
                 String line = reader.readLine();
+                if (line == null) {
+                    throw new IOException("Unexpected end of file at row " + row + " in: " + filename);
+                }
                 String[] lineSplit = line.split(" ");
-                for (int j = 0; j < y_dim; j++) {
+                for (int column = 0; column < y_dim; column++) {
                     try {
-                        result[i][j] = Double.parseDouble(lineSplit[j]);
-                    } catch (NumberFormatException ignored) {}
+                        result[row][column] = Double.parseDouble(lineSplit[column]);
+                    } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
+                        throw new IOException("Corrupted data at row " + row + ", column " + column + " in: " + filename, e);
+                    }
                 }
             }
             return result;
+        } catch (IndexOutOfBoundsException | NumberFormatException e) {
+            throw new IOException("Malformed file format in: " + filename, e);
         }
     }
 }

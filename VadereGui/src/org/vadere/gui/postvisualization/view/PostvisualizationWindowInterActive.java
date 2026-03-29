@@ -348,10 +348,13 @@ public class PostvisualizationWindowInterActive extends PostvisualizationWindow 
                 switch (entry.getKey()) {
                     case ContactData.TABLE_NAME:
                         additionalTables.put(entry.getKey(), IOOutput.readContactData(entry.getValue().toPath()));
+                        break;
                     case TableAerosolCloudData.TABLE_NAME:
                         additionalTables.put(entry.getKey(), IOOutput.readAerosolCloudData(entry.getValue().toPath()));
+                        break;
                     case AirFlowData.TABLE_NAME:
                         additionalTables.put(entry.getKey(), IOOutput.readAirflowData(entry.getValue().toPath()));
+                        break;
                 }
             }
             model.init(IOOutput.readTrajectories(trajectoryFile.toPath()), additionalTables, scenario, trajectoryFile.getParent());

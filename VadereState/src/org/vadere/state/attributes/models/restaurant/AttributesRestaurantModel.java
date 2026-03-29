@@ -6,12 +6,10 @@ import org.vadere.state.attributes.Attributes;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.Map;
 
 @ModelAttributeClass
 public class AttributesRestaurantModel extends Attributes{
     private ArrayList<AttributesSeatGroup> attrsSeatGroup;
-    //private Map<Integer, AttributesSeatGroup> tableTargetMap;
 
     public static final int INVALID_ID = -1;
 
