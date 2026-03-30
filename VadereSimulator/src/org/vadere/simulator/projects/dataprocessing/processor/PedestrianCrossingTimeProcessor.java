@@ -23,6 +23,10 @@ import java.util.Optional;
 @DataProcessorClass()
 public class PedestrianCrossingTimeProcessor extends DataProcessor<PedestrianIdKey, PedestrianCrossingTimeProcessor.PedestrianCrossingTimeProcessorCrossInformation> implements UsesMeasurementArea {
 
+	public static final String crossStartTime = "crossStartTime";
+	public static final String crossEndTime = "crossEndTime";
+	public static final String crossDirection = "crossDirection";
+
 	public static class PedestrianCrossingTimeProcessorCrossInformation{
 		public double enteringTime;
 		@Nullable
@@ -106,7 +110,7 @@ public class PedestrianCrossingTimeProcessor extends DataProcessor<PedestrianIdK
 	private static Logger logger = Logger.getLogger(PedestrianCrossingTimeProcessor.class);
 
 	public PedestrianCrossingTimeProcessor() {
-		super("crossStartTime", "crossEndTime", "crossDirection");
+		super(crossStartTime, crossEndTime, crossDirection);
 		setAttributes(new AttributesCrossingTimeProcessor());
 	}
 
@@ -178,7 +182,12 @@ public class PedestrianCrossingTimeProcessor extends DataProcessor<PedestrianIdK
 	public void init(final ProcessorManager manager) {
 		super.init(manager);
 		AttributesCrossingTimeProcessor att = (AttributesCrossingTimeProcessor) this.getAttributes();
-		this.measurementArea  = manager.getMeasurementArea(att.getMeasurementAreaId(), true);
+		MeasurementArea measurementArea = manager.getMeasurementArea(att.getMeasurementAreaId(), true);
+		init(measurementArea);
+	}
+
+	public void init(MeasurementArea measurementArea) {
+		this.measurementArea = measurementArea;
 		measurementAreaVRec = measurementArea.asVRectangle();
 	}
 
