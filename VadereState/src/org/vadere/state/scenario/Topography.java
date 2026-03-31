@@ -122,6 +122,8 @@ public class Topography implements DynamicElementMover{
 	/** set dynamicElementIds to values bigger than the biggest initial element to ensure unique ids.**/
 	private AtomicInteger dynamicElementIdCounter;
 
+	private AirFlow airFlow;
+
 	public Topography(
 			AttributesTopography attributes,
 			AttributesAgent attributesPedestrian) {
@@ -829,4 +831,21 @@ public class Topography implements DynamicElementMover{
 
 		return null;
     }
+
+	public AirFlow getAirFlow() {
+		return airFlow;
+	}
+
+	public void setAirFlow(AirFlow airFlow) {
+		this.airFlow = airFlow;	
+	}
+
+	public java.awt.geom.Rectangle2D.Double getContentRect() {
+		double x = getBounds().getX() + getBoundingBoxWidth();
+		double y = getBounds().getY() + getBoundingBoxWidth();
+		double width = getBounds().getWidth() - (2 * getBoundingBoxWidth());
+		double height = getBounds().getHeight() - (2 * getBoundingBoxWidth());
+
+		return new java.awt.geom.Rectangle2D.Double(x, y, width, height);
+	}
 }

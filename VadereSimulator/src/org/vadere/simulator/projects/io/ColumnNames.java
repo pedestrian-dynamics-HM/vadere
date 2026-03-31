@@ -35,6 +35,15 @@ public final class ColumnNames {
 	private Set<String> aerosolCloudCenterYKeys;
 	private Set<String> timeStepKeys; //ToDo replace timeStepKeys by start/endTimeKeys?
 
+	private Set<String> airflowIdX;
+	private Set<String> airflowIdY;
+	private Set<String> airflowXPosStart;
+	private Set<String> airflowXPosEnd;
+	private Set<String> airflowYPosStart;
+	private Set<String> airflowYPosEnd;
+	private Set<String> airflowXVelocity;
+	private Set<String> airflowYVelocity;
+
 	private List<Set<String>> keys;
 
 	public static final int NOT_SET_COLUMN_INDEX_IDENTIFIER = -1;
@@ -74,6 +83,15 @@ public final class ColumnNames {
 		startTimeKeys = new HashSet<>();
 		endTimeKeys = new HashSet<>();
 		durationKeys = new HashSet<>();
+
+		airflowIdX = new HashSet<>();
+		airflowIdY = new HashSet<>();
+		airflowXPosStart = new HashSet<>();
+		airflowXPosEnd = new HashSet<>();
+		airflowYPosStart = new HashSet<>();
+		airflowYPosEnd = new HashSet<>();
+		airflowXVelocity = new HashSet<>();
+		airflowYVelocity = new HashSet<>();
 
 		//should be set via Processor.getHeader
 		pedestrianIdKeys.add("id");
@@ -118,6 +136,15 @@ public final class ColumnNames {
 
 		timeStepKeys.add("timeStep");
 
+		airflowIdX.add("idx_x");
+		airflowIdY.add("idx_y");
+		airflowXPosStart.add("xPosStart");
+		airflowXPosEnd.add("xPosEnd");
+		airflowYPosStart.add("yPosStart");
+		airflowYPosEnd.add("yPosEnd");
+		airflowXVelocity.add("xVelocity");
+		airflowYVelocity.add("yVelocity");
+
 		keys.add(pedestrianIdKeys);
 		keys.add(secondPedestrianIdKeys);
 		keys.add(startX);
@@ -142,6 +169,15 @@ public final class ColumnNames {
 		keys.add(startTimeKeys);
 		keys.add(endTimeKeys);
 		keys.add(durationKeys);
+
+		keys.add(airflowIdX);
+		keys.add(airflowIdY);
+		keys.add(airflowXPosStart);
+		keys.add(airflowXPosEnd);
+		keys.add(airflowYPosStart);
+		keys.add(airflowYPosEnd);
+		keys.add(airflowXVelocity);
+		keys.add(airflowYVelocity);
 	}
 
 	public int getMostImportantStimulusCol(@NotNull final Table dataFrame) {
@@ -235,6 +271,38 @@ public final class ColumnNames {
 
 	public int getGroupSizeCol(@NotNull final Table dataFrame) {
 		return getColId(dataFrame, groupSizeKeys);
+	}
+
+	public int getAirflowIdXCol(@NotNull final Table dataFrame) {
+		return getColId(dataFrame, airflowIdX);
+	}
+
+	public int getAirflowIdYCol(@NotNull final Table dataFrame) {
+		return getColId(dataFrame, airflowIdY);
+	}
+
+	public int getAirflowXPosStartCol(@NotNull final Table dataFrame) {
+		return getColId(dataFrame, airflowXPosStart);
+	}
+
+	public int getAirflowXPosEndCol(@NotNull final Table dataFrame) {
+		return getColId(dataFrame, airflowXPosEnd);
+	}
+
+	public int getAirflowYPosStartCol(@NotNull final Table dataFrame) {
+		return getColId(dataFrame, airflowYPosStart);
+	}
+
+	public int getAirflowYPosEndCol(@NotNull final Table dataFrame) {
+		return getColId(dataFrame, airflowYPosEnd);
+	}
+
+	public int getAirflowXVelocityCol(@NotNull final Table dataFrame) {
+		return getColId(dataFrame, airflowXVelocity);
+	}
+
+	public int getAirflowYVelocityCol(@NotNull final Table dataFrame) {
+		return getColId(dataFrame, airflowYVelocity);
 	}
 
 	private int getColId(@NotNull final Table dataFrame, @NotNull final Set<String> possibleHeaderNames) {

@@ -3,10 +3,12 @@ package org.vadere.gui.postvisualization.view;
 import org.vadere.gui.components.model.SimulationModel;
 import org.vadere.gui.components.view.DefaultRenderer;
 import org.vadere.gui.components.view.SimulationRenderer;
+import org.vadere.gui.postvisualization.model.AirFlowData;
 import org.vadere.gui.postvisualization.model.PostvisualizationModel;
 import org.vadere.gui.postvisualization.model.TableTrajectoryFootStep;
 import org.vadere.gui.renderer.agent.AgentRender;
 import org.vadere.state.scenario.AerosolCloud;
+import org.vadere.state.scenario.AirFlow;
 import org.vadere.state.scenario.Pedestrian;
 import org.vadere.state.simulation.FootStep;
 import org.vadere.util.debugDraw.DebugDraw;
@@ -50,6 +52,7 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 		if (!model.isEmpty()) {
 			Color savedColor = g.getColor();
 
+			renderAirflow(g);
 			renderAerosolCloudData(g);
 
 			Table slice = (model.config.isShowAllTrajectories()) ? model.getAppearedPedestrians() : model.getAlivePedestrians() ;
@@ -280,5 +283,15 @@ public class PostvisualizationRenderer extends SimulationRenderer {
 				targetGraphics2D,
 				getGridLineWidth());
 		debugRenderTarget.updateTime(0);
+	}
+
+	private void renderAirflow(final Graphics2D g) {
+		if (model.config.isShowAirflow()) {
+			AirFlowData airflowData = model.getTableAirflow();
+			airflowData.initAirflow();
+			AirFlow airFlow = model.getTableAirflow().getAirflow();
+			renderAirflow(model.getTopography(), airFlow, g, model.getModelAttributes(), model.config.getAirflowScale());
+		}
+
 	}
 }

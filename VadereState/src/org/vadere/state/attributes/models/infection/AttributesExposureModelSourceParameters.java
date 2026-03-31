@@ -2,6 +2,9 @@ package org.vadere.state.attributes.models.infection;
 
 import org.vadere.state.attributes.Attributes;
 
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * Attributes required by an exposure model to define which source (defined by {@link #sourceId}) spawns
  * {@link #infectious} agents.
@@ -18,15 +21,20 @@ public class AttributesExposureModelSourceParameters extends Attributes {
      */
     private boolean infectious;
 
+    /**
+     * Describes the spawnIds of the Agents spawned by this source, who are infectious.
+     */
+    private List<Integer> infectiousSpawnIds = new LinkedList<>();
 
 
-    public AttributesExposureModelSourceParameters(int sourceId, boolean infectious) {
+    public AttributesExposureModelSourceParameters(int sourceId, boolean infectious, List<Integer> infectiousSpawnIds) {
         this.sourceId = sourceId;
         this.infectious = infectious;
+        this.infectiousSpawnIds = infectiousSpawnIds;
     }
 
     public AttributesExposureModelSourceParameters() {
-        this(Attributes.ID_NOT_SET, false);
+        this(Attributes.ID_NOT_SET, false, List.of(0));
     }
 
     public boolean isInfectious() {
@@ -35,5 +43,9 @@ public class AttributesExposureModelSourceParameters extends Attributes {
 
     public int getSourceId() {
         return sourceId;
+    }
+
+    public List<Integer> getInfectiousSpawnIds() {
+        return infectiousSpawnIds;
     }
 }

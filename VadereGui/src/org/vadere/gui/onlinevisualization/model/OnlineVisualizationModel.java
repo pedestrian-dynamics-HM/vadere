@@ -6,7 +6,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.function.Function;
+import java.util.jar.Attributes;
 import java.util.stream.Collectors;
 
 import org.jetbrains.annotations.NotNull;
@@ -104,6 +106,11 @@ public class OnlineVisualizationModel extends SimulationModel<DefaultSimulationC
 			return null;
 		}
 		return domain.getTopography();
+	}
+
+	@Override
+	public List<Attributes> getModelAttributes() {
+		return List.of();
 	}
 
 	@Override

@@ -1,9 +1,14 @@
 package org.vadere.gui.components.view;
+import org.vadere.gui.components.utils.Localization;
 
 import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.components.model.IDefaultModel;
 import org.vadere.meshing.mesh.gen.MeshRenderer;
 import org.vadere.meshing.mesh.inter.mesh.IMesh;
+import org.vadere.simulator.models.Model;
+import org.vadere.state.attributes.Attributes;
+import org.vadere.state.attributes.models.airflow.AttributesAirFlowModel;
+import org.vadere.state.attributes.models.airflow.AttributesInOutLet;
 import org.vadere.state.scenario.*;
 import org.vadere.util.config.VadereConfig;
 import org.vadere.util.geometry.shapes.VShape;
@@ -29,6 +34,7 @@ import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -290,6 +296,56 @@ public abstract class DefaultRenderer {
 		fill(element.getShape(), graphics);
 
 		graphics.setColor(tmpColor);
+	}
+
+	protected void renderAirflow(final Topography topography, final AirFlow airFlow, final Graphics2D g, final java.util.List<Attributes> modelAttributes, String airFlowScale){
+
+		if (airFlow != null) {
+			return;
+		}
+
+		Rectangle2D.Double contentRect = topography.getContentRect();
+		double topoXmin = contentRect.getMinX();
+		double topoYmin = contentRect.getMinY();
+		double topoXmax = contentRect.getMaxX();
+		double topoYmax = contentRect.getMaxY();
+
+		AttributesAirFlowModel attributesAirFlowModel = Model.findAttributes(modelAttributes, AttributesAirFlowModel.class);
+		double airflowXmin = attributesAirFlowModel.getBounds().getXmin();
+		double airflowYmin = attributesAirFlowModel.getBounds().getYmin();
+		double airflowXmax = attributesAirFlowModel.getBounds().getXmax();
+		double airflowYmax = attributesAirFlowModel.getBounds().getYmax();
+
+		double xMin = Math.max(topoXmin, airflowXmin);
+		double yMin = Math.max(topoYmin, airflowYmin);
+		double xMax = Math.min(topoXmax, airflowXmax);
+		double yMax = Math.min(topoYmax, airflowYmax);
+
+		double inletOutletDepth = 0.1;
+
+		drawAirflowPorts(g, attributesAirFlowModel.getInlets(), new Color(100, 190, 100), xMin, xMax, yMin, yMax, inletOutletDepth);
+		drawAirflowPorts(g, attributesAirFlowModel.getOutlets(), new Color(220, 30, 30), xMin, xMax, yMin, yMax, inletOutletDepth);
+	}
+
+	private void drawAirflowPorts(Graphics2D g, ArrayList<AttributesInOutLet> ports, Color color, double xMin, double xMax, double yMin, double yMax, double inletOutletDepth) {
+		g.setColor(color);
+
+		for (AttributesInOutLet port : ports) {
+			switch (port.getSide()) {
+				case "south":
+					g.fill(new VRectangle.Double(port.getStart(), yMin, port.getWidth(), inletOutletDepth));
+					break;
+				case "north":
+					g.fill(new VRectangle.Double(port.getStart(), yMax - inletOutletDepth, port.getWidth(), inletOutletDepth));
+					break;
+				case "west":
+					g.fill(new VRectangle.Double(xMin, port.getStart(), inletOutletDepth, port.getWidth()));
+					break;
+				case "east":
+					g.fill(new VRectangle.Double(xMax - inletOutletDepth, port.getStart(), inletOutletDepth, port.getWidth()));
+					break;
+			}
+		}
 	}
 
 	protected void renderAllDroplets(final Iterable<? extends ScenarioElement> elements, final Graphics2D g,

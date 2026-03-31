@@ -1,0 +1,5 @@
+numpy==2.2.1
+matplotlib==3.10.0
+scipy==1.15.1
+gmsh==4.15.0
+sfepy==2025.3

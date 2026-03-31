@@ -26,7 +26,7 @@ public class AirTransmissionModelHealthStatus extends ExposureModelHealthStatus 
     /*
      * reset value for simulation periods during which pedestrian inhales
      */
-    private final static VPoint RESET_EXHALATION_POSITION = null;
+    final static VPoint RESET_EXHALATION_POSITION = null;
 
     // Constructors
     public AirTransmissionModelHealthStatus() {
@@ -46,7 +46,6 @@ public class AirTransmissionModelHealthStatus extends ExposureModelHealthStatus 
         this.respiratoryTimeOffset = other.getRespiratoryTimeOffset();
         this.exhalationStartPosition = other.getExhalationStartPosition();
     }
-
 
     // Getter
     @Override
@@ -106,7 +105,8 @@ public class AirTransmissionModelHealthStatus extends ExposureModelHealthStatus 
         if (!(obj instanceof AirTransmissionModelHealthStatus)) return false;
         if (!super.equals(obj)) return false;
         AirTransmissionModelHealthStatus other = (AirTransmissionModelHealthStatus) obj;
-        return breathingIn == other.breathingIn && Double.compare(other.respiratoryTimeOffset, respiratoryTimeOffset) == 0 && Objects.equals(exhalationStartPosition, other.exhalationStartPosition);
+        return breathingIn == (other.breathingIn && Double.compare(other.respiratoryTimeOffset, respiratoryTimeOffset) == 0
+                && Objects.equals(exhalationStartPosition, other.exhalationStartPosition));
     }
 
     @Override

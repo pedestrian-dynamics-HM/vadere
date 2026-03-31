@@ -6,6 +6,7 @@ import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.exceptions.AttributesMultiplyDefinedException;
 import org.vadere.state.attributes.exceptions.AttributesNotFoundException;
 import org.vadere.state.attributes.scenario.AttributesAgent;
+import org.vadere.state.scenario.Topography;
 import org.vadere.util.data.FindByClass;
 
 import java.util.List;
@@ -49,8 +50,5 @@ public interface Model {
 			throw new AttributesMultiplyDefinedException(type);
 		}
 	}
-
-
-
 
 }

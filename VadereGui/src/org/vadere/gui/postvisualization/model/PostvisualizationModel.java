@@ -5,6 +5,7 @@ import org.vadere.gui.components.model.AgentColoring;
 import org.vadere.gui.components.model.SimulationModel;
 import org.vadere.gui.postvisualization.utils.PotentialFieldContainer;
 import org.vadere.simulator.projects.Scenario;
+import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.AttributesSimulation;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.health.BasicExposureModelHealthStatus;
@@ -54,6 +55,8 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 
 	private TableAerosolCloudData tableAerosolCloudData;
 
+	private AirFlowData airFlowData;
+
 	private PredicateColoringModel predicateColoringModel;
 
 	private TableTrajectoryFootStep trajectories;
@@ -74,6 +77,7 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 		this.topographyId = 0;
 		this.potentialContainer = null;
 		this.tableAerosolCloudData = new TableAerosolCloudData(Table.create());
+		this.airFlowData = new AirFlowData(Table.create());
 		this.simTimeStepLength = new AttributesSimulation().getSimTimeStepLength();
 		this.timeResolution = this.simTimeStepLength;
 		this.visTime = 0;
@@ -107,9 +111,14 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 				case ContactData.TABLE_NAME:
 					this.config.setContactsRecorded(true);
 					this.contactData = new ContactData(entry.getValue());
+					break;
 				case TableAerosolCloudData.TABLE_NAME:
 					this.config.setAerosolCloudsRecorded(true);
 					this.tableAerosolCloudData = new TableAerosolCloudData(entry.getValue());
+					break;
+				case AirFlowData.TABLE_NAME:
+					this.airFlowData = new AirFlowData(entry.getValue());
+					break;
 			}
 		}
 		this.visTime = 0;
@@ -220,6 +229,10 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 		return tableAerosolCloudData;
 	}
 
+	public synchronized AirFlowData getTableAirflow() {
+		return airFlowData;
+	}
+
 	public synchronized DoubleColumn getDeathTime() {
 		return trajectories.getDeathTime();
 	}
@@ -233,6 +246,7 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 		contactData = new ContactData(Table.create());
 		config.setAerosolCloudsRecorded(false);
 		tableAerosolCloudData = new TableAerosolCloudData(Table.create());
+		airFlowData = new AirFlowData(Table.create());
 	}
 
 	private Pedestrian toAgent(final Row row) {
@@ -313,6 +327,10 @@ public class PostvisualizationModel extends SimulationModel<PostvisualizationCon
 	@Override
 	public synchronized Topography getTopography() {
 		return scenario.getTopography();
+	}
+
+	public List<Attributes> getModelAttributes() {
+		return scenario.getModelAttributes();
 	}
 
 	@Override

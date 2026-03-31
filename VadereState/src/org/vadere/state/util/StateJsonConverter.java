@@ -16,6 +16,7 @@ import org.vadere.state.attributes.*;
 import org.vadere.state.attributes.models.AttributesFloorField;
 import org.vadere.state.attributes.models.AttributesPotentialCompactSoftshell;
 import org.vadere.state.attributes.AttributesSimulation;
+import org.vadere.state.attributes.models.airflow.AttributesAirFlowModel;
 import org.vadere.state.attributes.scenario.*;
 import org.vadere.state.attributes.spawner.AttributesSpawner;
 import org.vadere.state.psychology.perception.json.StimulusInfo;
@@ -571,4 +572,27 @@ public abstract class StateJsonConverter {
             return DigestUtils.sha1Hex("error");
         }
     }
+
+	public static String getAirFlowHash(final Topography topography, final AttributesAirFlowModel attr)  {
+		try {
+			// Include only obstacles and bounds from topography for airflow hash
+			String obstaclesStr = mapper
+									.writerWithDefaultPrettyPrinter()
+									.writeValueAsString(topography.getObstacles());
+			String boundsStr = mapper
+									.writerWithDefaultPrettyPrinter()
+									.writeValueAsString(topography.getBounds());
+			String attrString = mapper
+									.writerWithDefaultPrettyPrinter()
+									.writeValueAsString(attr);
+			String hashIt = attrString + "\n" + obstaclesStr + "\n" + boundsStr;
+			String hash = DigestUtils.sha1Hex(hashIt.getBytes());
+			logger.debugf("created AirFlow Hash: %s", hash);
+			logger.tracef("used String for AirFlow hash: \n%s", hashIt);
+			return hash;
+		} catch (JsonProcessingException e) {
+			logger.error("cannot create hash of topography and airflow attributes for cache access.");
+		}
+		return DigestUtils.sha1Hex("error");
+	}
 }

@@ -8,6 +8,8 @@ import org.vadere.state.attributes.Attributes;
 import org.vadere.state.attributes.distributions.AttributesBinomialDistribution;
 import org.vadere.state.attributes.distributions.AttributesDistribution;
 import org.vadere.state.attributes.models.AttributesFloorField;
+import org.vadere.state.attributes.models.airflow.AttributesAirFlowModel;
+import org.vadere.state.attributes.models.airflow.AttributesBounds;
 import org.vadere.state.attributes.scenario.AttributesAgent;
 import org.vadere.state.attributes.scenario.AttributesObstacle;
 import org.vadere.state.attributes.scenario.AttributesSource;
@@ -19,6 +21,7 @@ import org.vadere.state.psychology.perception.json.StimulusInfoStore;
 import org.vadere.state.psychology.perception.types.Stimulus;
 import org.vadere.state.psychology.perception.types.Timeframe;
 import org.vadere.state.psychology.perception.types.WaitInArea;
+import org.vadere.state.scenario.*;
 import org.vadere.state.scenario.*;
 import org.vadere.state.types.ScenarioElementType;
 import org.vadere.util.geometry.shapes.VRectangle;
@@ -218,6 +221,57 @@ public class StateJsonConverterTest {
         attrSource.setSpawnerAttributes(attrSpawn);
         String hash7 = StateJsonConverter.getLocomotionHash(topography, simulationSeed, differentFallbackModel);
         assertNotEquals(hash1, hash7, "Hashes must differ - spawner attributes affect locomotion");
+    }
+
+
+    @Test
+    public void getAirFlowHashTest() {
+        // Setup initial topography
+        Topography topography = new Topography();
+        AttributesObstacle attrObs1 = new AttributesObstacle(1, new VRectangle(1, 1, 3, 3));
+        Obstacle obstacle1 = new Obstacle(attrObs1);
+        topography.addObstacle(obstacle1);
+
+        // Setup initial AirFlow model
+        AttributesAirFlowModel attrAirFlow = new AttributesAirFlowModel();
+        String hash1 = StateJsonConverter.getAirFlowHash(topography, attrAirFlow);
+
+        // Changes that should NOT change the AirFlow hash
+
+        // Test 1: Adding a Target
+        AttributesTarget attrTarget = new AttributesTarget(1, new VRectangle(8, 8, 1, 1));
+        Target t = new Target(attrTarget);
+        topography.addTarget(t);
+
+        String hash2 = StateJsonConverter.getAirFlowHash(topography, attrAirFlow);
+        assertEquals(hash1, hash2, "Hashes must be equal - Targets should not affect airflow hash");
+
+        // Test 2: Adding a Source
+        AttributesSource attrSource = new AttributesSource(1, new VRectangle(5, 5, 2, 2));
+        Source source = new Source(attrSource);
+        topography.addSource(source);
+
+        String hash3 = StateJsonConverter.getAirFlowHash(topography, attrAirFlow);
+        assertEquals(hash1, hash3, "Hashes must be equal - Sources should not affect airflow hash");
+
+        // Test 3: Adding an AerosolCloud
+        topography.addAerosolCloud(new AerosolCloud());
+
+        String hash4 = StateJsonConverter.getAirFlowHash(topography, attrAirFlow);
+        assertEquals(hash1, hash4, "Hashes must be equal - AerosolClouds should not affect airflow hash");
+
+        // Changes that SHOULD change the AirFlow hash
+
+        // Test 4: Changing AirFlow model attributes
+        AttributesAirFlowModel differentAttrAirFlow = new AttributesAirFlowModel();
+        differentAttrAirFlow.setBounds(new AttributesBounds(1, 9, 1, 9));
+        String hash5 = StateJsonConverter.getAirFlowHash(topography, differentAttrAirFlow);
+        assertNotEquals(hash1, hash5, "Hashes must differ - AirFlow model attributes affect the hash");
+
+        // Test 5: Changing topography structure (adding an obstacle)
+        topography.addObstacle(new Obstacle(new AttributesObstacle(2, new VRectangle(20, 20, 5, 5))));
+        String hash6 = StateJsonConverter.getAirFlowHash(topography, attrAirFlow);
+        assertNotEquals(hash1, hash6, "Hashes must differ - adding an obstacle affects topography structure");
     }
 
     @Test

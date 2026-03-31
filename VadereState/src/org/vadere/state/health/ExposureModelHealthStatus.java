@@ -15,7 +15,9 @@ import java.util.Objects;
 public abstract class ExposureModelHealthStatus {
 
     boolean infectious;
+
     double degreeOfExposure;
+
 
     ExposureModelHealthStatus() {
         this(false, 0);

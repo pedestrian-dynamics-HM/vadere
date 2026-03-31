@@ -15,6 +15,8 @@ import org.vadere.util.voronoi.VoronoiDiagram;
 
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
+import java.util.List;
+import java.util.jar.Attributes;
 
 public interface IDefaultModel<T extends DefaultConfig> extends Iterable<ScenarioElement> {
 
@@ -122,6 +124,8 @@ public interface IDefaultModel<T extends DefaultConfig> extends Iterable<Scenari
 	 * @return the topography
 	 */
 	Topography getTopography();
+
+	List<Attributes> getModelAttributes();
 
 	/**
 	 * Return the current mouse position.

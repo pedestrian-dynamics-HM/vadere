@@ -71,6 +71,9 @@ public class IOUtils {
 
 	public static List<String> getFileNameList(final File directory, final String fileExtension) {
 		File[] files = getFileList(directory, fileExtension);
+        if (files == null) {
+            return new ArrayList<>();
+        }
 		List<String> stringList = Arrays.stream(files).map(File::getName).collect(Collectors.toList());
 
 		return stringList;

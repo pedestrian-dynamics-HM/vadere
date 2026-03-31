@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import org.vadere.gui.components.utils.Localization;
 import org.vadere.gui.components.utils.Resources;
 import org.vadere.gui.postvisualization.control.Player;
+import org.vadere.gui.postvisualization.model.AirFlowData;
 import org.vadere.gui.postvisualization.model.ContactData;
 import org.vadere.gui.postvisualization.model.TableAerosolCloudData;
 import org.vadere.gui.projectview.control.*;
@@ -646,7 +647,7 @@ public class ProjectView extends JFrame implements ProjectFinishedListener, Sing
 						.getFirstFile(bundle.getDirectory(), IOUtils.TRAJECTORY_FILE_EXTENSION);
 				
 				File[] txtFiles = IOUtils.getFileList(bundle.getDirectory(), ".txt");
-				List<String> tableNames = new ArrayList<>(Arrays.asList(ContactData.TABLE_NAME, TableAerosolCloudData.TABLE_NAME));
+				List<String> tableNames = new ArrayList<>(Arrays.asList(ContactData.TABLE_NAME, TableAerosolCloudData.TABLE_NAME, AirFlowData.TABLE_NAME));
 				HashMap<String, File> optionalPostVisFiles = new HashMap<>();
 				for (String name : tableNames) {
 					for (File f : txtFiles) {

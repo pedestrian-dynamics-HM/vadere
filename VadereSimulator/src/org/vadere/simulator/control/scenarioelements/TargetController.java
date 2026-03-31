@@ -50,8 +50,8 @@ public class TargetController extends ScenarioElementController {
 
 		for (DynamicElement element : getNearbyPedestrians()) {
 			final Agent agent = castCheckAgent(element);
-			final int agentID = agent.getId();
 			if (agent == null) continue;
+			final int agentID = agent.getId();
 
 			final boolean agentHasReachedThisTarget =
 					isNextTargetForAgent(agent)

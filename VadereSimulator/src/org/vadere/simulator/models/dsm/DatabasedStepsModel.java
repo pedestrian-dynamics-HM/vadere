@@ -53,10 +53,12 @@ public class DatabasedStepsModel implements MainModel {
     private boolean canExtractStepsFromFile;
     private MainModel fallbackMainModel;
     public static String outputPath = "outputPath";
-    public static String outputWrittenCallback = "outputWrittenCallback";
+    public static String scenarioPath;
     public static String simulationSeedName = "simulationSeed";
     protected long simulationSeed;
     private String locomotionHash = "";
+    private String contextId;
+
 
 
     @Override
@@ -65,6 +67,7 @@ public class DatabasedStepsModel implements MainModel {
         this.random = random;
         this.attributesPedestrian = attributesPedestrian;
         this.outputPath = VadereContext.getCtx(domain.getTopography()).getString(outputPath);
+        this.scenarioPath = VadereContext.getCtx(domain.getTopography()).getString("scenarioPath");
         this.simulationSeed = VadereContext.getCtx(domain.getTopography()).getLong(simulationSeedName);
         attributesDSM = Model.findAttributes(attributesList, AttributesDSM.class);
         this.locomotionHash = getLocomotionHash(this.domain.getTopography(), this.simulationSeed, this.attributesDSM.getAttributesFallbackModel());
@@ -75,7 +78,6 @@ public class DatabasedStepsModel implements MainModel {
             subModelBuilder.buildSubModels(attributesDSM.getSubmodels());
             subModelBuilder.addBuildedSubModelsToList(models);
             models.add(this);
-
             this.trajectoryBuffer = new TrajectoryBuffer(attributesDSM.getTrajectoryFileOrFolder(), attributesDSM.getBufferedLines());
         } else {
             initializeFallbackMainModel(attributesList);
@@ -84,8 +86,7 @@ public class DatabasedStepsModel implements MainModel {
 
     protected boolean checkIfCanExtractStepsFromFile() {
         if (attributesDSM.getTrajectoryFileOrFolder() == null) {
-            logger.error("Variable trajectoryFileOrFolder must be a .traj file or directory");
-            throw new IllegalArgumentException("Invalid argument for trajectoryFile");
+            setDefaultTrajectoryPath();
         }
         if (attributesDSM.getTrajectoryFileOrFolder().endsWith(".traj")) {
             return true;
@@ -95,7 +96,7 @@ public class DatabasedStepsModel implements MainModel {
             logger.error("Variable trajectoryFileOrFolder must be a .traj file or directory");
             throw new IllegalArgumentException("Invalid argument for trajectoryFile");
         }
-        String trajFileName = "postvis_" + locomotionHash + ".traj";
+        String trajFileName = getContextId() + "_" + locomotionHash + ".traj";
         File trajFile = new File(dir, trajFileName);
         if (trajFile.exists()) {
             attributesDSM.setTrajectoryFileOrFolder(trajFile.getAbsolutePath());
@@ -105,8 +106,20 @@ public class DatabasedStepsModel implements MainModel {
         }
     }
 
+    private void setDefaultTrajectoryPath() {
+        logger.info("Variable trajectoryFileOrFolder is null. Using default cache folder.");
+        File scenarioFile = new File(this.scenarioPath);
+        File cacheDir = new File(scenarioFile.getParent(), "cache");
+        if (!cacheDir.exists()) {
+            boolean success = cacheDir.mkdirs();
+            if (!success) {
+                logger.warn("Could not create default cache directory: " + cacheDir.getAbsolutePath());
+            }
+        }
+        attributesDSM.setTrajectoryFileOrFolder(cacheDir.getAbsolutePath());
+    }
+
     private void initializeFallbackMainModel(List<Attributes> attributesList) {
-        // attributesListWithoutDSM = attributesDSM.getAttributesFallbackModel() + (attributesList - attributesDSM)
         List<Attributes> attributesListWithoutDSM = attributesList.stream()
                 .filter(attr -> !(attr instanceof AttributesDSM))
                 .collect(Collectors.toList());
@@ -130,9 +143,6 @@ public class DatabasedStepsModel implements MainModel {
         if (!attributesDSM.getSubmodels().isEmpty()) {
             logger.warn("The submodels list in AttributesDSM is not empty but will be ignored. Only the submodels list of the FallbackMainModel is relevant.");
         }
-
-        // Register callback in VadereContext to be called after output is written
-        VadereContext.getCtx(domain.getTopography()).put(outputWrittenCallback, (Runnable) this::copyTrajectoryFile);
     }
 
 
@@ -163,6 +173,7 @@ public class DatabasedStepsModel implements MainModel {
             LinkedList<Integer> nextTarget = new LinkedList<>();
             nextTarget.add(nextStep.getTargetId());
             pedestrian.setTargets(nextTarget);
+            pedestrian.setNextTargetListIndex(0);
 
             FootStep currentFootstep = new FootStep(startPosition, endPosition, nextStep.getStartTime(), nextStep.getEndTime());
             pedestrian.getTrajectoryOfSimulationStep().add(currentFootstep);
@@ -246,6 +257,38 @@ public class DatabasedStepsModel implements MainModel {
         }
     }
 
+    protected void setLocomotionHash(String locomotionHash) {
+        this.locomotionHash = locomotionHash;
+    }
+
+    protected void setAttributesDSM(AttributesDSM attributesDSM) {
+        this.attributesDSM = attributesDSM;
+    }
+
+    protected boolean canExtractStepsFromFile() {
+        return this.canExtractStepsFromFile;
+    }
+
+    protected String getContextId() {
+        if (contextId != null) {
+            return contextId;
+        }
+        return domain.getTopography().getContextId();
+    }
+
+    protected void setContextId(String contextId) {
+        this.contextId = contextId;
+    }
+
+    @Override
+    public void postProcessorUpdate() {
+        if (this.canExtractStepsFromFile) {
+            deleteTrajectoryFile();
+        } else {
+            copyTrajectoryFile();
+        }
+    }
+
     private void copyTrajectoryFile() {
         try {
             Path sourcePath = Paths.get(outputPath, "postvis.traj");
@@ -254,7 +297,7 @@ public class DatabasedStepsModel implements MainModel {
                 return;
             }
 
-            String targetFileName = "postvis_" + locomotionHash + ".traj";
+            String targetFileName = getContextId() + "_" + locomotionHash + ".traj";
             File targetDir = new File(attributesDSM.getTrajectoryFileOrFolder());
             if (!targetDir.exists()) {
                 targetDir.mkdirs();
@@ -270,15 +313,22 @@ public class DatabasedStepsModel implements MainModel {
         }
     }
 
-    protected void setLocomotionHash(String locomotionHash) {
-        this.locomotionHash = locomotionHash;
-    }
-
-    protected void setAttributesDSM(AttributesDSM attributesDSM) {
-        this.attributesDSM = attributesDSM;
-    }
-
-    protected boolean canExtractStepsFromFile() {
-        return this.canExtractStepsFromFile;
+    private void deleteTrajectoryFile() {
+        // When running in read-only mode, the simulator still generates a default
+        // postvis.traj file. We delete it here to save disk space since we already
+        // have the cached version we are reading from. This is particularly important
+        // for UQ analyses.
+        if (!attributesDSM.isDeletePostvisFile()) {
+            return;
+        }
+        try {
+            Path sourcePath = Paths.get(outputPath, "postvis.traj");
+            if (Files.exists(sourcePath)) {
+                Files.delete(sourcePath);
+                logger.info("Deleted source trajectory file: " + sourcePath);
+            }
+        } catch (IOException e) {
+            logger.warn("Failed to delete source trajectory file: " + e.getMessage());
+        }
     }
 }

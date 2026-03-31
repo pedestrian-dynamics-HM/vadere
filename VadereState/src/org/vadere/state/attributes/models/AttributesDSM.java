@@ -21,13 +21,19 @@ public class AttributesDSM extends Attributes {
      * or a folder, in which either a .traj file with the corresponding hash is stored or if not,
      * will be created using the fallbackMainModel and stored in the folder
      */
-    private String trajectoryFileOrFolder = "./temp/postvis.traj";
+    private String trajectoryFileOrFolder = null;
     private int bufferedLines = 1000;
+    /**
+     * Option to delete the postvis.traj file from the scenario output folder. This is useful
+     * for parameter studies, since the postvis.traj file take up a lot of space.
+     */
+    private boolean deletePostvisFile = true;
     /**
      * This list should only be used if fallbackMainModel is null.
      * Otherwise, the submodels list of fallbackMainModel will be used.
      */
     private List<String> submodels = new LinkedList<>();
+
     /**
      * the main model if the trajectory file is not found
      */
@@ -43,6 +49,8 @@ public class AttributesDSM extends Attributes {
     public String getTrajectoryFileOrFolder() {
         return trajectoryFileOrFolder;
     }
+
+    public boolean isDeletePostvisFile() { return deletePostvisFile; }
 
     public List<String> getSubmodels() {
         return new ArrayList<>(submodels);

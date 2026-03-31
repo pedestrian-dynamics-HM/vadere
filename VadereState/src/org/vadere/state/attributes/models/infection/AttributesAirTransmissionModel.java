@@ -58,7 +58,7 @@ public class AttributesAirTransmissionModel extends AttributesExposureModel {
 		return aerosolCloudsActive;
 	}
 
-	public double getAerosolCloudInitialPathogenLoad() {
+	public int getAerosolCloudInitialPathogenLoad() {
 		return aerosolCloudParameters.getInitialPathogenLoad();
 	}
 

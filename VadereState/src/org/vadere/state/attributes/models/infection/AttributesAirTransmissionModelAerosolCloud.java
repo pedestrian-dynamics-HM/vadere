@@ -30,7 +30,7 @@ public class AttributesAirTransmissionModelAerosolCloud extends Attributes {
      * is mitigated, e.g. by masks.
      * Unit: particles / exhalation
      */
-    private double initialPathogenLoad;
+    private int initialPathogenLoad;
 
     /**
      * Describes constant dispersion (over time), i.e. the spatial spread over time due to local air movement.
@@ -55,16 +55,19 @@ public class AttributesAirTransmissionModelAerosolCloud extends Attributes {
      */
     private double absorptionRate;
 
+
     public AttributesAirTransmissionModelAerosolCloud() {
-        this.halfLife = 600;
-        this.initialRadius = 1.5;
-        this.initialPathogenLoad = 10000;
-        this.airDispersionFactor = 0;
-        this.pedestrianDispersionWeight = 0.0125;
+        this.halfLife = 5300;
+        this.initialRadius = 1.0;
+        this.initialPathogenLoad = 1000;
+        this.airDispersionFactor = 0.003;
+        this.pedestrianDispersionWeight = 0.0;
         this.absorptionRate = 0.0005;
     }
 
-    public AttributesAirTransmissionModelAerosolCloud(double aerosolCloudHalfLife, double aerosolCloudInitialRadius, double initialPathogenLoad, double airDispersionFactor, double pedestrianDispersionWeight, double absorptionRate) {
+    public AttributesAirTransmissionModelAerosolCloud(double aerosolCloudHalfLife, double aerosolCloudInitialRadius,
+                                                      int initialPathogenLoad, double airDispersionFactor,
+                                                      double pedestrianDispersionWeight, double absorptionRate) {
         this.halfLife = aerosolCloudHalfLife;
         this.initialRadius = aerosolCloudInitialRadius;
         this.initialPathogenLoad = initialPathogenLoad;
@@ -83,9 +86,10 @@ public class AttributesAirTransmissionModelAerosolCloud extends Attributes {
         return initialRadius;
     }
 
-    public double getInitialPathogenLoad() {
+    public int getInitialPathogenLoad() {
         return initialPathogenLoad;
     }
+
 
     public double getAirDispersionFactor() {
         return airDispersionFactor;

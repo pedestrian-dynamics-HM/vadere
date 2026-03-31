@@ -25,6 +25,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Observer;
 import java.util.function.Predicate;
+import java.util.jar.Attributes;
 
 
 /**
@@ -110,6 +111,10 @@ public class TopographyCreatorModel extends DefaultModel implements IDrawPanelMo
 		return topographyBuilder.build();
 	}
 
+	@Override
+	public List<Attributes> getModelAttributes() {
+		return List.of();
+	}
 
 
 	@Override

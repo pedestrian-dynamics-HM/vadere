@@ -168,6 +168,15 @@ public class AerosolCloud extends ParticleDispersion {
         }
     }
 
+    public void shiftShape(double x, double y) {
+        VPoint newCenter = new VPoint(
+                getCenter().getX() + x,
+                getCenter().getY() + y
+        );
+        VCircle newShape = createAerosolCloudShape(newCenter, attributes.getRadius());
+        attributes.setShape(newShape);
+    }
+
     /*
      * The 2D representation of the spherical aerosol clouds is a circle (cross-sectional area of the cloud at the
      * agents' heads)
