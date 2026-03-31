@@ -159,8 +159,14 @@ public class AirFlowModel extends AbstractAirFlowModel {
                 throw new IOException("Velocity file is empty: " + filename);
             }
             String[] split = header.substring(2).split("_");
-            int x_dim = Integer.parseInt(split[0]);
-            int y_dim = Integer.parseInt(split[1]);
+            int x_dim;
+            int y_dim;
+            try {
+                x_dim = Integer.parseInt(split[0]);
+                y_dim = Integer.parseInt(split[1]);
+            } catch (NumberFormatException e) {
+                throw new IOException("Header dimensions must be valid integers in file: " + filename, e);
+            }
 
             double[][] result = new double[x_dim][y_dim];
 

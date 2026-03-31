@@ -34,4 +34,7 @@ public interface MainModel extends Model, DynamicElementFactory {
 	default int getNewDynamicElementId(final Topography topography) {
 		return registerDynamicElementId(topography, AttributesAgent.ID_NOT_SET);
 	}
+
+	default void postProcessorUpdate() {
+	}
 }

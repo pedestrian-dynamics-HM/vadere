@@ -54,7 +54,6 @@ public class DatabasedStepsModel implements MainModel {
     private MainModel fallbackMainModel;
     public static String outputPath = "outputPath";
     public static String scenarioPath;
-    public static String trajectoryFileCopiedCallback = "trajectoryFileCopiedCallback";
     public static String simulationSeedName = "simulationSeed";
     protected long simulationSeed;
     private String locomotionHash = "";
@@ -83,7 +82,6 @@ public class DatabasedStepsModel implements MainModel {
         } else {
             initializeFallbackMainModel(attributesList);
         }
-        schedulePostProcessingCallback();
     }
 
     protected boolean checkIfCanExtractStepsFromFile() {
@@ -282,19 +280,13 @@ public class DatabasedStepsModel implements MainModel {
         this.contextId = contextId;
     }
 
-    private void schedulePostProcessingCallback() {
-        /* * Registers a callback in the context to be executed by the Simulation loop
-         * after all output has been written. We use the context map here to keep
-         * the core simulation class decoupled from this specific model's file IO logic.
-         */
-        Runnable postSimulationLogic = () -> {
-            if (this.canExtractStepsFromFile) {
-                deleteTrajectoryFile();
-            } else {
-                copyTrajectoryFile();
-            }
-        };
-        VadereContext.getCtx(domain.getTopography()).put(trajectoryFileCopiedCallback, postSimulationLogic);
+    @Override
+    public void postProcessorUpdate() {
+        if (this.canExtractStepsFromFile) {
+            deleteTrajectoryFile();
+        } else {
+            copyTrajectoryFile();
+        }
     }
 
     private void copyTrajectoryFile() {
