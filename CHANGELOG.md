@@ -7,6 +7,7 @@
 - Added new `DatabasedStepsModel` as implementation of `MainModel`. This model allows to reconstruct the movement behaviour of agents from a trajectory file.
 - Add `crossDirection` to `PedestrianCrossingTimeProcessor` and `PedestrianLineCrossProcessor`
 - Rework Line with Rectangle clipping logic used in cutting trajectories at measurement areas.
+- Added new `AirflowModel` that shifts aerosol clouds in the `AirTransmissionModel` according to a pre-computed airflow field. The airflow field is computed in a python conda environment. 
 
 ### Removed
 - Removed unused Eikonal Solvers `HIGH_ACCURACY_FAST_MARCHING_DYNAMIC`, `HIGH_ACCURACY_FAST_MARCHING_DENSITY`, `INFORMED_FAST_ITERATIVE_METHOD`, `FAST_SWEEPING_METHOD`, `FAST_ITERATIVE_METHOD_TRI_LOCK_FREE`, `FAST_ITERATIVE_METHOD_TRI`, `INFORMED_FAST_ITERATIVE_METHOD_TRI`, and `INFORMED_FAST_ITERATIVE_METHOD_TRI_LOCK_FREE`
