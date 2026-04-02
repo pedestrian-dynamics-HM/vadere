@@ -1,0 +1,183 @@
+{
+    "@context": "https://w3id.org/codemeta/3.1",
+    "type": "SoftwareSourceCode",
+    "applicationCategory": "Pedestrian Dynamics",
+    "author": [
+        {
+            "id": "https://orcid.org/0000-0002-3369-6206",
+            "type": "Person",
+            "affiliation": {
+                "type": "Organization",
+                "name": "Munich University of Applied Sciences"
+            },
+            "email": "vadere@lists.lrz.de",
+            "familyName": "Köster",
+            "givenName": "Gerta"
+        }
+    ],
+    "codeRepository": "https://github.com/pedestrian-dynamics-HM/vadere",
+    "contributor": [
+        {
+            "id": "_:contributor_1",
+            "type": "Person",
+            "familyName": "Albrecht",
+            "givenName": "Florian"
+        },
+        {
+            "id": "_:contributor_2",
+            "type": "Person",
+            "familyName": "Degenhart",
+            "givenName": "Benjamin"
+        },
+        {
+            "id": "https://orcid.org/0000-0002-2906-1769",
+            "type": "Person",
+            "familyName": "Dietrich",
+            "givenName": "Felix"
+        },
+        {
+            "id": "https://orcid.org/0000-0002-1572-842X",
+            "type": "Person",
+            "familyName": "Gödel",
+            "givenName": "Marion"
+        },
+        {
+            "id": "https://orcid.org/0009-0005-2122-8877",
+            "type": "Person",
+            "familyName": "Kern",
+            "givenName": "Sabrina"
+        },
+        {
+            "id": "https://orcid.org/0000-0003-2344-8265",
+            "type": "Person",
+            "familyName": "Kleinmeier",
+            "givenName": "Benedikt"
+        },
+        {
+            "id": "_:contributor_7",
+            "type": "Person",
+            "familyName": "Laubinger",
+            "givenName": "Matthias"
+        },
+        {
+            "id": "https://orcid.org/0000-0002-4012-5014",
+            "type": "Person",
+            "familyName": "Lehmberg",
+            "givenName": "Daniel"
+        },
+        {
+            "id": "https://orcid.org/0000-0003-1686-3460",
+            "type": "Person",
+            "familyName": "Mayr",
+            "givenName": "Christina"
+        },
+        {
+            "id": "https://orcid.org/0000-0002-0842-2406",
+            "type": "Person",
+            "familyName": "Rahn",
+            "givenName": "Simon"
+        },
+        {
+            "id": "_:contributor_11",
+            "type": "Person",
+            "familyName": "Schöttl",
+            "givenName": "Jakob"
+        },
+        {
+            "id": "https://orcid.org/0000-0002-2471-0520",
+            "type": "Person",
+            "familyName": "Schuhbäck",
+            "givenName": "Stefan"
+        },
+        {
+            "id": "_:contributor_13",
+            "type": "Person",
+            "familyName": "Seitz",
+            "givenName": "Michael"
+        },
+        {
+            "id": "_:contributor_14",
+            "type": "Person",
+            "familyName": "Stemmer",
+            "givenName": "Swen"
+        },
+        {
+            "id": "https://orcid.org/0000-0001-5118-6317",
+            "type": "Person",
+            "familyName": "von Sivers",
+            "givenName": "Isabella"
+        },
+        {
+            "id": "https://orcid.org/0000-0002-1924-8730",
+            "type": "Person",
+            "familyName": "Parente",
+            "givenName": "Mario Teixeira"
+        },
+        {
+            "id": "https://orcid.org/0009-0001-7129-8153",
+            "type": "Person",
+            "familyName": "Wagner",
+            "givenName": "Sophia Johanna"
+        },
+        {
+            "id": "https://orcid.org/0000-0002-0764-2669",
+            "type": "Person",
+            "familyName": "Zönnchen",
+            "givenName": "Benedikt"
+        },
+        {
+            "id": "https://orcid.org/0009-0009-7293-1553",
+            "type": "Person",
+            "familyName": "Hess",
+            "givenName": "Hayato"
+        },
+        {
+            "id": "https://orcid.org/0009-0003-1321-2571",
+            "type": "Person",
+            "familyName": "Reetz",
+            "givenName": "Luise"
+        }
+    ],
+    "dateCreated": "2016-08-05",
+    "dateModified": "2023-10-04",
+    "datePublished": "2019-09-03",
+    "description": "Vadere is an open-source framework for the simulation of microscopic pedestrian and crowd dynamics.",
+    "downloadUrl": "https://www.vadere.org/download/",
+    "funder": {
+        "type": "Organization",
+        "name": "Gerta Köster's research group at the Munich University of Applied Sciences"
+    },
+    "identifier": "https://www.vadere.org/",
+    "keywords": [
+        "framework",
+        "microscopic",
+        "open source",
+        "pedestrian",
+        "software",
+        "vadere"
+    ],
+    "license": "https://spdx.org/licenses/LGPL-3.0-only",
+    "name": "Vadere",
+    "operatingSystem": [
+        "Linux",
+        "Windows"
+    ],
+    "programmingLanguage": [
+        "Java 17.0.11 or above",
+        "OpenCL"
+    ],
+    "relatedLink": [
+        "https://www.vadere.org/",
+        "https://github.com/pedestrian-dynamics-HM/vadere",
+        "https://gitlab.lrz.de/vadere/vadere"
+    ],
+    "softwareRequirements": [
+        "https://jdk.java.net/java-se-ri/17-MR1",
+        "https://git-scm.com/",
+        "https://maven.apache.org/docs/3.9.11/release-notes.html"
+    ],
+    "version": "3.0",
+    "developmentStatus": "active",
+    "issueTracker": "https://gitlab.lrz.de/vadere/vadere/-/issues",
+    "referencePublication": "https://doi.org/10.17815/CD.2019.21"
+}
