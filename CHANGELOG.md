@@ -2,11 +2,17 @@
 
 **Note:** Before writing into this file, read the guidelines in [Writing Changelog Entries.md](Documentation/contributing/Writing Changelog Entries.md).
 
-## In Progress:
+## v4.0 (2026-04-07)
+This release introduces a new **Airflow Model** in Vadere, enabling aerosol clouds to be shifted based on a precomputed airflow field.
+
+Additionally, pedestrian crossing detection for both lines and areas has been improved.
+We also refactored the triangulation mesh logic to enhance readability, improve maintainability, and better prepare the codebase for future extensions.
+
+Breaking change: Removed unused Eikonal solvers and PointLocators.
+
 ### Added
 - Added new `DatabasedStepsModel` as implementation of `MainModel`. This model allows to reconstruct the movement behaviour of agents from a trajectory file.
 - Add `crossDirection` to `PedestrianCrossingTimeProcessor` and `PedestrianLineCrossProcessor`
-- Rework Line with Rectangle clipping logic used in cutting trajectories at measurement areas.
 - Added new `AirflowModel` that shifts aerosol clouds in the `AirTransmissionModel` according to a pre-computed airflow field. The airflow field is computed in a python conda environment. 
 
 ### Removed
@@ -20,14 +26,7 @@
 - Introduce TriangleMesh to clearly distinguish cases where a regular mesh is insufficient
 
 ### Fixed
-
-### Performance
-
-### Security
-
-### Deprecated
-
-### Other
+- Fix line with rectangle clipping edge cases used in cutting trajectories at measurement areas.
 
 ## v3.1 (2024-08-06)
 Release 3.1 provides a new GUI feature that allows users to overlay images over agents' torso.
