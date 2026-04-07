@@ -1,8 +1,8 @@
 {
   "name" : "hamner-2020-life_template",
-  "description" : "Superspreading event during a choir rehearsal following hamner-2020-life;\n\nL. Hamner, P. Dubbel, I. Capron, A. Ross, A. Jordan,\nJ. Lee, J. Lynn, A. Ball, S. Narwal, S. Russell, et al.\nHigh SARS-CoV-2 attack rate following exposure at a\nchoir practice — skagit county, washington, march 2020.\nMMWR. Morbidity and Mortality Weekly Report, 69\n(19):606–610, 2020. doi:10.15585/mmwr.mm6919e6.",
-  "release" : "3.0",
-  "commithash" : "a200b4ddd066a581da3fd86d600a9c689f60a145",
+  "description" : "Superspreading event during a choir rehearsal following hamner-2020-life;\n\nL. Hamner, P. Dubbel, I. Capron, A. Ross, A. Jordan,\nJ. Lee, J. Lynn, A. Ball, S. Narwal, S. Russell, et al.\nHigh SARS-CoV-2 attack rate following exposure at a\nchoir practice ï¿½ skagit county, washington, march 2020.\nMMWR. Morbidity and Mortality Weekly Report, 69\n(19):606ï¿½610, 2020. doi:10.15585/mmwr.mm6919e6.",
+  "release" : "4.0",
+  "commithash" : "53705feac8e871edd054f23b7544852b3ed7968e",
   "processWriters" : {
     "files" : [ ],
     "processors" : [ ],
@@ -67,10 +67,12 @@
       "org.vadere.state.attributes.models.infection.AttributesAirTransmissionModel" : {
         "exposureModelSourceParameters" : [ {
           "sourceId" : -1,
-          "infectious" : false
+          "infectious" : false,
+          "infectiousSpawnIds" : [ 0 ]
         }, {
           "sourceId" : 1,
-          "infectious" : true
+          "infectious" : true,
+          "infectiousSpawnIds" : [ 0 ]
         } ],
         "infectiousPedestrianIdsNoSource" : [ ],
         "pedestrianRespiratoryCyclePeriod" : 4.0,
@@ -78,7 +80,7 @@
         "aerosolCloudParameters" : {
           "halfLife" : 600.0,
           "initialRadius" : 1.5,
-          "initialPathogenLoad" : 10000.0,
+          "initialPathogenLoad" : 10000,
           "airDispersionFactor" : 0.0,
           "pedestrianDispersionWeight" : 0.0125,
           "absorptionRate" : 5.0E-4

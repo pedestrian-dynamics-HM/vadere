@@ -1,8 +1,8 @@
 {
   "name" : "DenseCrowd",
   "description" : "",
-  "release" : "3.0",
-  "commithash" : "a200b4ddd066a581da3fd86d600a9c689f60a145",
+  "release" : "4.0",
+  "commithash" : "53705feac8e871edd054f23b7544852b3ed7968e",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -509,10 +509,12 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
+        "isSitting" : false,
+        "sittingDirection" : null,
         "groupIds" : [ 2 ],
         "groupSizes" : [ ],
         "agentsInGroup" : [ ],
-        "trajectory" : {
+        "trajectoryOfSimulationStep" : {
           "footSteps" : [ ]
         },
         "modelPedestrianMap" : null,
@@ -574,10 +576,12 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
+        "isSitting" : false,
+        "sittingDirection" : null,
         "groupIds" : [ 2 ],
         "groupSizes" : [ ],
         "agentsInGroup" : [ ],
-        "trajectory" : {
+        "trajectoryOfSimulationStep" : {
           "footSteps" : [ ]
         },
         "modelPedestrianMap" : null,
@@ -639,10 +643,12 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
+        "isSitting" : false,
+        "sittingDirection" : null,
         "groupIds" : [ 2 ],
         "groupSizes" : [ ],
         "agentsInGroup" : [ ],
-        "trajectory" : {
+        "trajectoryOfSimulationStep" : {
           "footSteps" : [ ]
         },
         "modelPedestrianMap" : null,
@@ -704,10 +710,12 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
+        "isSitting" : false,
+        "sittingDirection" : null,
         "groupIds" : [ 2 ],
         "groupSizes" : [ ],
         "agentsInGroup" : [ ],
-        "trajectory" : {
+        "trajectoryOfSimulationStep" : {
           "footSteps" : [ ]
         },
         "modelPedestrianMap" : null,
@@ -769,10 +777,12 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
+        "isSitting" : false,
+        "sittingDirection" : null,
         "groupIds" : [ 2 ],
         "groupSizes" : [ ],
         "agentsInGroup" : [ ],
-        "trajectory" : {
+        "trajectoryOfSimulationStep" : {
           "footSteps" : [ ]
         },
         "modelPedestrianMap" : null,
@@ -834,10 +844,12 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
+        "isSitting" : false,
+        "sittingDirection" : null,
         "groupIds" : [ 2 ],
         "groupSizes" : [ ],
         "agentsInGroup" : [ ],
-        "trajectory" : {
+        "trajectoryOfSimulationStep" : {
           "footSteps" : [ ]
         },
         "modelPedestrianMap" : null,
@@ -899,10 +911,12 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
+        "isSitting" : false,
+        "sittingDirection" : null,
         "groupIds" : [ 2 ],
         "groupSizes" : [ ],
         "agentsInGroup" : [ ],
-        "trajectory" : {
+        "trajectoryOfSimulationStep" : {
           "footSteps" : [ ]
         },
         "modelPedestrianMap" : null,
@@ -964,10 +978,12 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
+        "isSitting" : false,
+        "sittingDirection" : null,
         "groupIds" : [ 2 ],
         "groupSizes" : [ ],
         "agentsInGroup" : [ ],
-        "trajectory" : {
+        "trajectoryOfSimulationStep" : {
           "footSteps" : [ ]
         },
         "modelPedestrianMap" : null,
@@ -1029,10 +1045,12 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
+        "isSitting" : false,
+        "sittingDirection" : null,
         "groupIds" : [ 2 ],
         "groupSizes" : [ ],
         "agentsInGroup" : [ ],
-        "trajectory" : {
+        "trajectoryOfSimulationStep" : {
           "footSteps" : [ ]
         },
         "modelPedestrianMap" : null,
@@ -1094,10 +1112,12 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
+        "isSitting" : false,
+        "sittingDirection" : null,
         "groupIds" : [ 2 ],
         "groupSizes" : [ ],
         "agentsInGroup" : [ ],
-        "trajectory" : {
+        "trajectoryOfSimulationStep" : {
           "footSteps" : [ ]
         },
         "modelPedestrianMap" : null,
@@ -1159,10 +1179,12 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
+        "isSitting" : false,
+        "sittingDirection" : null,
         "groupIds" : [ 2 ],
         "groupSizes" : [ ],
         "agentsInGroup" : [ ],
-        "trajectory" : {
+        "trajectoryOfSimulationStep" : {
           "footSteps" : [ ]
         },
         "modelPedestrianMap" : null,
@@ -1224,10 +1246,12 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
+        "isSitting" : false,
+        "sittingDirection" : null,
         "groupIds" : [ 2 ],
         "groupSizes" : [ ],
         "agentsInGroup" : [ ],
-        "trajectory" : {
+        "trajectoryOfSimulationStep" : {
           "footSteps" : [ ]
         },
         "modelPedestrianMap" : null,
@@ -1289,10 +1313,12 @@
         },
         "healthStatus" : null,
         "infectionStatus" : null,
+        "isSitting" : false,
+        "sittingDirection" : null,
         "groupIds" : [ 2 ],
         "groupSizes" : [ ],
         "agentsInGroup" : [ ],
-        "trajectory" : {
+        "trajectoryOfSimulationStep" : {
           "footSteps" : [ ]
         },
         "modelPedestrianMap" : null,

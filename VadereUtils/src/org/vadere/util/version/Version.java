@@ -55,7 +55,8 @@ public enum Version {
 	V2_4(2,4),
 	V2_5(2,5),
     V2_6(2,6),
-	V3_0(3, 0);
+	V3_0(3, 0),
+	V4_0(4, 0);
 
 
 	private static final Logger logger = Logger.getLogger(Version.class);

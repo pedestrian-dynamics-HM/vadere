@@ -1,8 +1,8 @@
 {
   "name" : "lu-2020-life",
-  "description" : "Superspreading event in a restaurant following lu-2021-life;\n\nJ. Lu, J. Gu, K. Li, C. Xu, W. Su, Z. Lai, D. Zhou,\nC. Yu, B. Xu, and Z. Yang. COVID-19 outbreak associated\nwith air conditioning in restaurant, guangzhou,\nchina, 2020. Emerging Infectious Diseases, 26(7):1628–\n1631, 2020. doi:10.3201/eid2607.200764.",
-  "release" : "3.0",
-  "commithash" : "a200b4ddd066a581da3fd86d600a9c689f60a145",
+  "description" : "Superspreading event in a restaurant following lu-2021-life;\n\nJ. Lu, J. Gu, K. Li, C. Xu, W. Su, Z. Lai, D. Zhou,\nC. Yu, B. Xu, and Z. Yang. COVID-19 outbreak associated\nwith air conditioning in restaurant, guangzhou,\nchina, 2020. Emerging Infectious Diseases, 26(7):1628ï¿½\n1631, 2020. doi:10.3201/eid2607.200764.",
+  "release" : "4.0",
+  "commithash" : "53705feac8e871edd054f23b7544852b3ed7968e",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
@@ -98,10 +98,12 @@
       "org.vadere.state.attributes.models.infection.AttributesAirTransmissionModel" : {
         "exposureModelSourceParameters" : [ {
           "sourceId" : -1,
-          "infectious" : false
+          "infectious" : false,
+          "infectiousSpawnIds" : [ 0 ]
         }, {
           "sourceId" : 11,
-          "infectious" : true
+          "infectious" : true,
+          "infectiousSpawnIds" : [ 0 ]
         } ],
         "infectiousPedestrianIdsNoSource" : [ ],
         "pedestrianRespiratoryCyclePeriod" : 4.0,
@@ -109,7 +111,7 @@
         "aerosolCloudParameters" : {
           "halfLife" : 600.0,
           "initialRadius" : 1.5,
-          "initialPathogenLoad" : 10000.0,
+          "initialPathogenLoad" : 10000,
           "airDispersionFactor" : 0.0,
           "pedestrianDispersionWeight" : 0.0125,
           "absorptionRate" : 5.0E-4

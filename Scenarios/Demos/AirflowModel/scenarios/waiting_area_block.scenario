@@ -1,7 +1,8 @@
 {
   "name" : "waiting_area_block",
   "description" : "This scenario corresponds to the queue_long_uq_03.scenario and single_run_queue_long.scenario. It represents an alternative way of how to serve a given number of agents, each one with the same service time.\nThe horizontal distance between the waiting positions (seats) corresponds to the average distance in the queue scenarios if no distancing measure is applied.",
-  "release" : "3.0",
+  "release" : "4.0",
+  "commithash" : "53705feac8e871edd054f23b7544852b3ed7968e",
   "processWriters" : {
     "files" : [ {
       "type" : "org.vadere.simulator.projects.dataprocessing.outputfile.EventtimePedestrianIdOutputFile",
