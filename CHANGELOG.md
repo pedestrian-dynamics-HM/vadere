@@ -2,6 +2,23 @@
 
 **Note:** Before writing into this file, read the guidelines in [Writing Changelog Entries.md](Documentation/contributing/Writing Changelog Entries.md).
 
+## In Progress:
+### Added
+
+### Removed
+
+### Changed
+
+### Fixed
+
+### Performance
+
+### Security
+
+### Deprecated
+
+### Other
+
 ## v4.0 (2026-04-07)
 This release introduces a new **Airflow Model** in Vadere, enabling aerosol clouds to be shifted based on a precomputed airflow field.
 
